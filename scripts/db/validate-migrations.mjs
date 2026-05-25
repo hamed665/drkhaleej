@@ -8,7 +8,8 @@ const required = [
   '0004_geo.sql',
   '0005_taxonomy.sql',
   '0006_centers.sql',
-  '0007_center_locations.sql'
+  '0007_center_locations.sql',
+  '0008_center_services.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -17,27 +18,27 @@ const requiredEnumChecks = [
   {
     file: '0002_enums.sql',
     regex: /create\s+type\s+center_type\s+as\s+enum/i,
-    message: 'Phase 2.4B requires create type center_type as enum in 0002_enums.sql.'
+    message: 'Phase 2.4C requires create type center_type as enum in 0002_enums.sql.'
   }
 ];
 
 const forbiddenPatterns = [
-  { regex: /\bpostgis\b/i, message: 'postgis is deferred and forbidden in Phase 2.4B.' },
-  { regex: /\bgeometry\b/i, message: 'geometry is forbidden in Phase 2.4B.' },
-  { regex: /\bgeography\b/i, message: 'geography is forbidden in Phase 2.4B.' },
-  { regex: /\bcreate\s+policy\b/i, message: 'CREATE POLICY is forbidden in Phase 2.4B.' },
-  { regex: /\benable\s+row\s+level\s+security\b/i, message: 'ENABLE ROW LEVEL SECURITY is forbidden in Phase 2.4B.' },
-  { regex: /\binsert\s+into\b/i, message: 'INSERT INTO is forbidden in Phase 2.4B.' },
-  { regex: /\bdrop\b/i, message: 'DROP statements are forbidden in Phase 2.4B.' }
+  { regex: /\bpostgis\b/i, message: 'postgis is deferred and forbidden in Phase 2.4C.' },
+  { regex: /\bgeometry\b/i, message: 'geometry is forbidden in Phase 2.4C.' },
+  { regex: /\bgeography\b/i, message: 'geography is forbidden in Phase 2.4C.' },
+  { regex: /\bcreate\s+policy\b/i, message: 'CREATE POLICY is forbidden in Phase 2.4C.' },
+  { regex: /\benable\s+row\s+level\s+security\b/i, message: 'ENABLE ROW LEVEL SECURITY is forbidden in Phase 2.4C.' },
+  { regex: /\binsert\s+into\b/i, message: 'INSERT INTO is forbidden in Phase 2.4C.' },
+  { regex: /\bdrop\b/i, message: 'DROP statements are forbidden in Phase 2.4C.' }
 ];
 
 const forbiddenTables = [
-  'center_services',
   'center_owners',
   'provider_locations',
   'center_location_mappings',
   'providers',
   'doctors',
+  'doctor_services',
   'doctor_practice_locations',
   'appointments',
   'appointment_slots',
@@ -64,7 +65,7 @@ try {
 const files = readdirSync(dir).filter((name) => name.endsWith('.sql')).sort();
 
 if (files.join('|') !== required.join('|')) {
-  console.error('ERROR: Phase 2.4B requires exactly these migration files:');
+  console.error('ERROR: Phase 2.4C requires exactly these migration files:');
   required.forEach((name) => console.error(`- ${name}`));
 
   const missing = required.filter((name) => !files.includes(name));
@@ -95,6 +96,16 @@ let foundLongitudeNumeric = false;
 let foundLatitudeRangeCheck = false;
 let foundLongitudeRangeCheck = false;
 
+let foundCenterServicesTable = false;
+let foundCenterServicesCenterRef = false;
+let foundCenterServicesLocationRef = false;
+let foundCenterServicesTaxonomyRef = false;
+let foundCenterServicesServiceCategoryRef = false;
+let foundCenterServicesServiceRef = false;
+let foundCenterServicesSpecialtyRef = false;
+let foundCenterServicesScopeCheck = false;
+let foundCenterServicesUpdatedAtTrigger = false;
+
 const createdGeoTables = new Set();
 const createdTaxonomyTables = new Set();
 
@@ -103,7 +114,7 @@ for (const file of files) {
 
   for (const rule of forbiddenPatterns) {
     if (rule.regex.test(content)) {
-      console.error(`ERROR: ${file} violates Phase 2.4B rule: ${rule.message}`);
+      console.error(`ERROR: ${file} violates Phase 2.4C rule: ${rule.message}`);
       process.exit(1);
     }
   }
@@ -119,7 +130,7 @@ for (const file of files) {
     const tableRegex = new RegExp(`\\b${table}\\b`, 'i');
 
     if (tableRegex.test(content)) {
-      console.error(`ERROR: ${file} references forbidden table for Phase 2.4B: ${table}`);
+      console.error(`ERROR: ${file} references forbidden table for Phase 2.4C: ${table}`);
       process.exit(1);
     }
   }
@@ -163,10 +174,20 @@ for (const file of files) {
     foundLongitudeRangeCheck = true;
   }
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_locations\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterLocationsUpdatedAtTrigger = true;
+
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.center_services\b/i.test(content)) foundCenterServicesTable = true;
+  if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesCenterRef = true;
+  if (/\bcenter_location_id\s+uuid\s+null\s+references\s+public\.center_locations\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesLocationRef = true;
+  if (/\btaxonomy_group_id\s+uuid\s+null\s+references\s+public\.taxonomy_groups\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesTaxonomyRef = true;
+  if (/\bservice_category_id\s+uuid\s+null\s+references\s+public\.service_categories\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesServiceCategoryRef = true;
+  if (/\bservice_id\s+uuid\s+null\s+references\s+public\.services\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesServiceRef = true;
+  if (/\bspecialty_id\s+uuid\s+null\s+references\s+public\.specialties\s*\(\s*id\s*\)/i.test(content)) foundCenterServicesSpecialtyRef = true;
+  if (/\bconstraint\s+center_services_service_scope_check\s+check\s*\([\s\S]*service_id\s+is\s+not\s+null[\s\S]*specialty_id\s+is\s+not\s+null[\s\S]*service_category_id\s+is\s+not\s+null[\s\S]*\)/i.test(content)) foundCenterServicesScopeCheck = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_services\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterServicesUpdatedAtTrigger = true;
 }
 
 if (!foundProfilesTable) {
-  console.error('ERROR: Phase 2.4B requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.');
+  console.error('ERROR: Phase 2.4C requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.');
   process.exit(1);
 }
 
@@ -176,53 +197,73 @@ if (foundSetUpdatedAtFunction && !foundProfilesUpdatedAtTrigger) {
 }
 
 if (!foundCentersTable) {
-  console.error('ERROR: Phase 2.4B requires CREATE TABLE public.centers from 0006_centers.sql.');
+  console.error('ERROR: Phase 2.4C requires CREATE TABLE public.centers from 0006_centers.sql.');
   process.exit(1);
 }
 
 if (!foundCentersUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4B requires a BEFORE UPDATE trigger on public.centers using public.set_updated_at().');
+  console.error('ERROR: Phase 2.4C requires a BEFORE UPDATE trigger on public.centers using public.set_updated_at().');
   process.exit(1);
 }
 
 if (centersCenterTypeUsesProviderStatus) {
-  console.error('ERROR: Phase 2.4B forbids `center_type provider_status`; center_type must use the canonical center_type enum from 0002_enums.sql.');
+  console.error('ERROR: Phase 2.4C forbids `center_type provider_status`; center_type must use the canonical center_type enum from 0002_enums.sql.');
   process.exit(1);
 }
 
 if (!foundCenterLocationsTable) {
-  console.error('ERROR: Phase 2.4B requires CREATE TABLE public.center_locations in 0007_center_locations.sql.');
+  console.error('ERROR: Phase 2.4C requires CREATE TABLE public.center_locations in 0007_center_locations.sql.');
   process.exit(1);
 }
 
 if (!foundCenterReference || !foundCountryReference || !foundRegionReference || !foundCityReference || !foundAreaReference) {
-  console.error('ERROR: Phase 2.4B requires center_locations references to centers, geo_countries, geo_regions, geo_cities, and geo_areas.');
+  console.error('ERROR: Phase 2.4C requires center_locations references to centers, geo_countries, geo_regions, geo_cities, and geo_areas.');
   process.exit(1);
 }
 
 if (!foundLatitudeNumeric || !foundLongitudeNumeric || !foundLatitudeRangeCheck || !foundLongitudeRangeCheck) {
-  console.error('ERROR: Phase 2.4B requires latitude/longitude numeric(9,6) with safe range checks.');
+  console.error('ERROR: Phase 2.4C requires latitude/longitude numeric(9,6) with safe range checks.');
   process.exit(1);
 }
 
 if (!foundCenterLocationsUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4B requires a BEFORE UPDATE trigger on public.center_locations using public.set_updated_at().');
+  console.error('ERROR: Phase 2.4C requires a BEFORE UPDATE trigger on public.center_locations using public.set_updated_at().');
+  process.exit(1);
+}
+
+if (!foundCenterServicesTable) {
+  console.error('ERROR: Phase 2.4C requires CREATE TABLE public.center_services in 0008_center_services.sql.');
+  process.exit(1);
+}
+
+if (!foundCenterServicesCenterRef || !foundCenterServicesLocationRef || !foundCenterServicesTaxonomyRef || !foundCenterServicesServiceCategoryRef || !foundCenterServicesServiceRef || !foundCenterServicesSpecialtyRef) {
+  console.error('ERROR: Phase 2.4C requires center_services references to centers, center_locations, taxonomy_groups, service_categories, services, and specialties.');
+  process.exit(1);
+}
+
+if (!foundCenterServicesScopeCheck) {
+  console.error('ERROR: Phase 2.4C requires center_services check constraint requiring at least one of service_id, specialty_id, or service_category_id.');
+  process.exit(1);
+}
+
+if (!foundCenterServicesUpdatedAtTrigger) {
+  console.error('ERROR: Phase 2.4C requires a BEFORE UPDATE trigger on public.center_services using public.set_updated_at().');
   process.exit(1);
 }
 
 for (const table of allowedGeoTables) {
   if (!createdGeoTables.has(table)) {
-    console.error(`ERROR: Phase 2.4B requires CREATE TABLE public.${table}.`);
+    console.error(`ERROR: Phase 2.4C requires CREATE TABLE public.${table}.`);
     process.exit(1);
   }
 }
 
 for (const table of allowedTaxonomyTables) {
   if (!createdTaxonomyTables.has(table)) {
-    console.error(`ERROR: Phase 2.4B requires CREATE TABLE public.${table}.`);
+    console.error(`ERROR: Phase 2.4C requires CREATE TABLE public.${table}.`);
     process.exit(1);
   }
 }
 
-console.log('Phase 2.4B migration validation passed.');
+console.log('Phase 2.4C migration validation passed.');
 console.log(`Validated files: ${required.join(', ')}`);
