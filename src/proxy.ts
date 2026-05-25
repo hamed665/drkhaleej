@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const localeCountryPattern = /^\/(en|ar)\/(.+?)(?:\/)?$/;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
 
