@@ -1,31 +1,32 @@
-# Phase 2.2B — Supabase Geo Hierarchy Foundation
+# Phase 2.3 — Supabase Taxonomy/Services Foundation
 
-This file defines the approved Phase 2.2B migration scope.
+This file defines the approved Phase 2.3 migration scope.
 
-## Approved files for Phase 2.2B
+## Approved files for Phase 2.3
 - `supabase/migrations/0001_extensions.sql`
 - `supabase/migrations/0002_enums.sql`
 - `supabase/migrations/0003_profiles_auth.sql`
 - `supabase/migrations/0004_geo.sql`
+- `supabase/migrations/0005_taxonomy.sql`
 
 No other SQL migration files are allowed in this phase.
 
-## Allowed in Phase 2.2B
-- Geo hierarchy foundation only.
-- Canonical geo hierarchy tables only:
-  - `public.geo_countries`
-  - `public.geo_regions`
-  - `public.geo_cities`
-  - `public.geo_areas`
-- Essential geo hierarchy foreign keys and indexes only.
-- Idempotent `updated_at` triggers for geo tables using existing `public.set_updated_at()`.
+## Allowed in Phase 2.3
+- Taxonomy/services foundation only.
+- Canonical taxonomy tables only:
+  - `public.taxonomy_groups`
+  - `public.service_categories`
+  - `public.services`
+  - `public.specialties`
+- Essential foreign keys and indexes only.
+- Idempotent `updated_at` triggers for taxonomy tables using existing `public.set_updated_at()`.
 
-## Explicitly not allowed in Phase 2.2B
+## Explicitly not allowed in Phase 2.3
 - No seed rows yet.
 - No PostGIS yet.
 - No geometry/geography columns.
-- No provider/center/doctor tables yet.
-- No services/taxonomy tables.
+- No center/provider/doctor tables yet.
+- No appointment tables.
 - No legal/consent tables.
 - No behavior events tables.
 - No sponsored slots tables.
@@ -35,11 +36,13 @@ No other SQL migration files are allowed in this phase.
 - No `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`.
 - No `INSERT` statements.
 - No `DROP` statements.
+- No search ranking/indexing yet.
+- No frontend/backend app features yet.
 
 ## Strict exclusions
 - no center/provider tables
 - no doctor tables
-- no services/taxonomy tables
+- no appointment tables
 - no legal/consent tables
 - no behavior events tables
 - no sponsored slots tables
@@ -67,4 +70,4 @@ No other SQL migration files are allowed in this phase.
 - `pnpm test:db:rls`
 - `pnpm test:db:seed`
 
-Phase 2.2B does not require Supabase login, linking to a remote project, or a live Supabase instance.
+Phase 2.3 does not require Supabase login, linking to a remote project, or a live Supabase instance.
