@@ -1,6 +1,6 @@
 create table if not exists public.profiles (
   id uuid primary key default gen_random_uuid(),
-  auth_user_id uuid unique null,
+  auth_user_id uuid null,
   email text null,
   phone text null,
   full_name text null,
@@ -46,7 +46,16 @@ begin
 end;
 $$;
 
-create trigger set_profiles_updated_at
-before update on public.profiles
-for each row
-execute function public.set_updated_at();
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_trigger
+    where tgname = 'set_profiles_updated_at'
+  ) then
+    create trigger set_profiles_updated_at
+    before update on public.profiles
+    for each row
+    execute function public.set_updated_at();
+  end if;
+end $$;
