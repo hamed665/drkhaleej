@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
+const PHASE = '2.5A';
+
 const required = [
   '0001_extensions.sql',
   '0002_enums.sql',
@@ -10,37 +12,28 @@ const required = [
   '0006_centers.sql',
   '0007_center_locations.sql',
   '0008_center_services.sql',
-  '0009_center_ownership_claims.sql'
+  '0009_center_ownership_claims.sql',
+  '0010_doctors.sql'
 ];
 
 const dir = 'supabase/migrations';
 
 const requiredEnumChecks = [
-  {
-    file: '0002_enums.sql',
-    regex: /create\s+type\s+center_type\s+as\s+enum/i,
-    message: 'Phase 2.4D requires create type center_type as enum in 0002_enums.sql.'
-  },
-  {
-    file: '0009_center_ownership_claims.sql',
-    regex: /create\s+type\s+center_member_role\s+as\s+enum/i,
-    message: 'Phase 2.4D requires create type center_member_role as enum in 0009_center_ownership_claims.sql.'
-  },
-  {
-    file: '0009_center_ownership_claims.sql',
-    regex: /create\s+type\s+center_membership_status\s+as\s+enum/i,
-    message: 'Phase 2.4D requires create type center_membership_status as enum in 0009_center_ownership_claims.sql.'
-  }
+  { file: '0002_enums.sql', regex: /create\s+type\s+center_type\s+as\s+enum/i, message: `Phase ${PHASE} requires create type center_type as enum in 0002_enums.sql.` },
+  { file: '0009_center_ownership_claims.sql', regex: /create\s+type\s+center_member_role\s+as\s+enum/i, message: `Phase ${PHASE} requires create type center_member_role as enum in 0009_center_ownership_claims.sql.` },
+  { file: '0009_center_ownership_claims.sql', regex: /create\s+type\s+center_membership_status\s+as\s+enum/i, message: `Phase ${PHASE} requires create type center_membership_status as enum in 0009_center_ownership_claims.sql.` },
+  { file: '0010_doctors.sql', regex: /create\s+type\s+doctor_title\s+as\s+enum/i, message: `Phase ${PHASE} requires create type doctor_title as enum in 0010_doctors.sql.` },
+  { file: '0010_doctors.sql', regex: /create\s+type\s+doctor_gender\s+as\s+enum/i, message: `Phase ${PHASE} requires create type doctor_gender as enum in 0010_doctors.sql.` }
 ];
 
 const forbiddenPatterns = [
-  { regex: /\bpostgis\b/i, message: 'postgis is deferred and forbidden in Phase 2.4D.' },
-  { regex: /\bgeometry\b/i, message: 'geometry is forbidden in Phase 2.4D.' },
-  { regex: /\bgeography\b/i, message: 'geography is forbidden in Phase 2.4D.' },
-  { regex: /\bcreate\s+policy\b/i, message: 'CREATE POLICY is forbidden in Phase 2.4D.' },
-  { regex: /\benable\s+row\s+level\s+security\b/i, message: 'ENABLE ROW LEVEL SECURITY is forbidden in Phase 2.4D.' },
-  { regex: /\binsert\s+into\b/i, message: 'INSERT INTO is forbidden in Phase 2.4D.' },
-  { regex: /\bdrop\b/i, message: 'DROP statements are forbidden in Phase 2.4D.' }
+  { regex: /\bpostgis\b/i, message: `postgis is deferred and forbidden in Phase ${PHASE}.` },
+  { regex: /\bgeometry\b/i, message: `geometry is forbidden in Phase ${PHASE}.` },
+  { regex: /\bgeography\b/i, message: `geography is forbidden in Phase ${PHASE}.` },
+  { regex: /\bcreate\s+policy\b/i, message: `CREATE POLICY is forbidden in Phase ${PHASE}.` },
+  { regex: /\benable\s+row\s+level\s+security\b/i, message: `ENABLE ROW LEVEL SECURITY is forbidden in Phase ${PHASE}.` },
+  { regex: /\binsert\s+into\b/i, message: `INSERT INTO is forbidden in Phase ${PHASE}.` },
+  { regex: /\bdrop\b/i, message: `DROP statements are forbidden in Phase ${PHASE}.` }
 ];
 
 const forbiddenTables = [
@@ -48,13 +41,17 @@ const forbiddenTables = [
   'provider_locations',
   'center_location_mappings',
   'providers',
-  'doctors',
   'doctor_services',
   'doctor_practice_locations',
+  'doctor_centers',
+  'doctor_memberships',
+  'doctor_schedules',
   'appointments',
   'appointment_slots',
   'insurance',
   'pricing',
+  'reviews',
+  'ratings',
   'legal_documents',
   'consent_logs',
   'behavior_events',
@@ -65,6 +62,18 @@ const forbiddenTables = [
 const allowedGeoTables = ['geo_countries', 'geo_regions', 'geo_cities', 'geo_areas'];
 const allowedTaxonomyTables = ['taxonomy_groups', 'service_categories', 'services', 'specialties'];
 const allowedOwnershipTables = ['center_claims', 'center_memberships'];
+const allowedDoctorTables = ['doctors'];
+
+let foundDoctorsTable = false;
+let foundDoctorTitleUsage = false;
+let foundDoctorGenderUsage = false;
+let foundDoctorSpecialtiesReference = false;
+let foundDoctorVerificationStatusUsage = false;
+let foundDoctorProviderStatusUsage = false;
+let foundDoctorAppLocaleUsage = false;
+let foundDoctorCountryCodeUsage = false;
+let foundDoctorYearsExperienceCheck = false;
+let foundDoctorsUpdatedAtTrigger = false;
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -77,7 +86,7 @@ try {
 const files = readdirSync(dir).filter((name) => name.endsWith('.sql')).sort();
 
 if (files.join('|') !== required.join('|')) {
-  console.error('ERROR: Phase 2.4D requires exactly these migration files:');
+  console.error(`ERROR: Phase ${PHASE} requires exactly these migration files:`);
   required.forEach((name) => console.error(`- ${name}`));
 
   const missing = required.filter((name) => !files.includes(name));
@@ -107,7 +116,6 @@ let foundLatitudeNumeric = false;
 let foundLongitudeNumeric = false;
 let foundLatitudeRangeCheck = false;
 let foundLongitudeRangeCheck = false;
-
 let foundCenterServicesTable = false;
 let foundCenterServicesCenterRef = false;
 let foundCenterServicesLocationRef = false;
@@ -117,7 +125,6 @@ let foundCenterServicesServiceRef = false;
 let foundCenterServicesSpecialtyRef = false;
 let foundCenterServicesScopeCheck = false;
 let foundCenterServicesUpdatedAtTrigger = false;
-
 let foundCenterClaimsTable = false;
 let foundCenterMembershipsTable = false;
 let foundCenterClaimsCenterRef = false;
@@ -134,13 +141,14 @@ let foundCenterMembershipsUpdatedAtTrigger = false;
 const createdGeoTables = new Set();
 const createdTaxonomyTables = new Set();
 const createdOwnershipTables = new Set();
+const createdDoctorTables = new Set();
 
 for (const file of files) {
   const content = readFileSync(`${dir}/${file}`, 'utf8');
 
   for (const rule of forbiddenPatterns) {
     if (rule.regex.test(content)) {
-      console.error(`ERROR: ${file} violates Phase 2.4D rule: ${rule.message}`);
+      console.error(`ERROR: ${file} violates Phase ${PHASE} rule: ${rule.message}`);
       process.exit(1);
     }
   }
@@ -153,33 +161,20 @@ for (const file of files) {
   }
 
   for (const table of forbiddenTables) {
-    const tableRegex = new RegExp(`\\b${table}\\b`, 'i');
-
-    if (tableRegex.test(content)) {
-      console.error(`ERROR: ${file} references forbidden table for Phase 2.4D: ${table}`);
+    if (new RegExp(`\\b${table}\\b`, 'i').test(content)) {
+      console.error(`ERROR: ${file} references forbidden table for Phase ${PHASE}: ${table}`);
       process.exit(1);
     }
   }
 
-  for (const table of allowedGeoTables) {
-    const createRegex = new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i');
-    if (createRegex.test(content)) createdGeoTables.add(table);
-  }
-
-  for (const table of allowedTaxonomyTables) {
-    const createRegex = new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i');
-    if (createRegex.test(content)) createdTaxonomyTables.add(table);
-  }
-
-  for (const table of allowedOwnershipTables) {
-    const createRegex = new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i');
-    if (createRegex.test(content)) createdOwnershipTables.add(table);
-  }
+  for (const table of allowedGeoTables) if (new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i').test(content)) createdGeoTables.add(table);
+  for (const table of allowedTaxonomyTables) if (new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i').test(content)) createdTaxonomyTables.add(table);
+  for (const table of allowedOwnershipTables) if (new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i').test(content)) createdOwnershipTables.add(table);
+  for (const table of allowedDoctorTables) if (new RegExp(`\\bcreate\\s+table\\s+(if\\s+not\\s+exists\\s+)?public\\.${table}\\b`, 'i').test(content)) createdDoctorTables.add(table);
 
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.profiles\b/i.test(content)) foundProfilesTable = true;
   if (/\bcreate\s+or\s+replace\s+function\s+public\.set_updated_at\s*\(\s*\)\b/i.test(content)) foundSetUpdatedAtFunction = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.profiles\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundProfilesUpdatedAtTrigger = true;
-
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.centers\b/i.test(content)) foundCentersTable = true;
   if (/\bcenter_type\s+provider_status\b/i.test(content)) centersCenterTypeUsesProviderStatus = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.centers\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCentersUpdatedAtTrigger = true;
@@ -192,18 +187,8 @@ for (const file of files) {
   if (/\barea_id\s+uuid\s+null\s+references\s+public\.geo_areas\s*\(\s*id\s*\)/i.test(content)) foundAreaReference = true;
   if (/\blatitude\s+numeric\s*\(\s*9\s*,\s*6\s*\)/i.test(content)) foundLatitudeNumeric = true;
   if (/\blongitude\s+numeric\s*\(\s*9\s*,\s*6\s*\)/i.test(content)) foundLongitudeNumeric = true;
-  if (
-    /latitude\s+is\s+null\s+or\s*\(\s*latitude\s*>=\s*-90\s+and\s+latitude\s*<=\s*90\s*\)/i.test(content) ||
-    /\bconstraint\s+center_locations_latitude_range_check\b/i.test(content)
-  ) {
-    foundLatitudeRangeCheck = true;
-  }
-  if (
-    /longitude\s+is\s+null\s+or\s*\(\s*longitude\s*>=\s*-180\s+and\s+longitude\s*<=\s*180\s*\)/i.test(content) ||
-    /\bconstraint\s+center_locations_longitude_range_check\b/i.test(content)
-  ) {
-    foundLongitudeRangeCheck = true;
-  }
+  if (/latitude\s+is\s+null\s+or\s*\(\s*latitude\s*>=\s*-90\s+and\s+latitude\s*<=\s*90\s*\)/i.test(content) || /\bconstraint\s+center_locations_latitude_range_check\b/i.test(content)) foundLatitudeRangeCheck = true;
+  if (/longitude\s+is\s+null\s+or\s*\(\s*longitude\s*>=\s*-180\s+and\s+longitude\s*<=\s*180\s*\)/i.test(content) || /\bconstraint\s+center_locations_longitude_range_check\b/i.test(content)) foundLongitudeRangeCheck = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_locations\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterLocationsUpdatedAtTrigger = true;
 
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.center_services\b/i.test(content)) foundCenterServicesTable = true;
@@ -218,131 +203,50 @@ for (const file of files) {
 
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.center_claims\b/i.test(content)) foundCenterClaimsTable = true;
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.center_memberships\b/i.test(content)) foundCenterMembershipsTable = true;
-
-  if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundCenterClaimsCenterRef = true;
   if (/\bclaimant_profile_id\s+uuid\s+not\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundCenterClaimsClaimantProfileRef = true;
   if (/\breviewed_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundCenterClaimsReviewedByProfileRef = true;
   if (/\bclaim_status\s+claim_status\s+not\s+null\s+default\s+'started'/i.test(content)) foundCenterClaimsClaimStatusEnum = true;
-
   if (/\bprofile_id\s+uuid\s+not\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundCenterMembershipsProfileRef = true;
   if (/\brole\s+center_member_role\s+not\s+null\s+default\s+'staff'/i.test(content)) foundCenterMembershipsRoleEnum = true;
   if (/\bstatus\s+center_membership_status\s+not\s+null\s+default\s+'pending'/i.test(content)) foundCenterMembershipsStatusEnum = true;
-  if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundCenterMembershipsCenterRef = true;
-
+  if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) { foundCenterClaimsCenterRef = true; foundCenterMembershipsCenterRef = true; }
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_claims\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterClaimsUpdatedAtTrigger = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_memberships\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterMembershipsUpdatedAtTrigger = true;
+
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.doctors\b/i.test(content)) foundDoctorsTable = true;
+  if (/\btitle\s+doctor_title\s+not\s+null\s+default\s+'dr'/i.test(content)) foundDoctorTitleUsage = true;
+  if (/\bgender\s+doctor_gender\s+not\s+null\s+default\s+'unspecified'/i.test(content)) foundDoctorGenderUsage = true;
+  if (/\bprimary_specialty_id\s+uuid\s+null\s+references\s+public\.specialties\s*\(\s*id\s*\)/i.test(content)) foundDoctorSpecialtiesReference = true;
+  if (/\bverification_status\s+verification_status\s+not\s+null\s+default\s+'unverified'/i.test(content)) foundDoctorVerificationStatusUsage = true;
+  if (/\bstatus\s+provider_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundDoctorProviderStatusUsage = true;
+  if (/\bdefault_locale\s+app_locale\s+not\s+null\s+default\s+'en'/i.test(content)) foundDoctorAppLocaleUsage = true;
+  if (/\bdefault_country\s+country_code\s+not\s+null\s+default\s+'om'/i.test(content)) foundDoctorCountryCodeUsage = true;
+  if (/\byears_experience\s+is\s+null\s+or\s*\(\s*years_experience\s*>=\s*0\s+and\s+years_experience\s*<=\s*80\s*\)/i.test(content) || /\bconstraint\s+doctors_years_experience_check\b/i.test(content)) foundDoctorYearsExperienceCheck = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.doctors\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundDoctorsUpdatedAtTrigger = true;
 }
 
-if (!foundProfilesTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.');
-  process.exit(1);
-}
+for (const table of allowedGeoTables) if (!createdGeoTables.has(table)) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.${table}.`); process.exit(1); }
+for (const table of allowedTaxonomyTables) if (!createdTaxonomyTables.has(table)) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.${table}.`); process.exit(1); }
+for (const table of allowedOwnershipTables) if (!createdOwnershipTables.has(table)) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.${table}.`); process.exit(1); }
+for (const table of allowedDoctorTables) if (!createdDoctorTables.has(table)) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.${table}.`); process.exit(1); }
 
-if (foundSetUpdatedAtFunction && !foundProfilesUpdatedAtTrigger) {
-  console.error('ERROR: public.set_updated_at() is only allowed when used by a trigger on public.profiles.updated_at.');
-  process.exit(1);
-}
+if (!foundProfilesTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.`); process.exit(1); }
+if (foundSetUpdatedAtFunction && !foundProfilesUpdatedAtTrigger) { console.error('ERROR: public.set_updated_at() is only allowed when used by a trigger on public.profiles.updated_at.'); process.exit(1); }
+if (!foundCentersTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.centers from 0006_centers.sql.`); process.exit(1); }
+if (!foundCentersUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires a BEFORE UPDATE trigger on public.centers using public.set_updated_at().`); process.exit(1); }
+if (centersCenterTypeUsesProviderStatus) { console.error('ERROR: center_type must use center_type enum; found invalid provider_status usage.'); process.exit(1); }
+if (!foundCenterLocationsTable || !foundCenterReference || !foundCountryReference || !foundRegionReference || !foundCityReference || !foundAreaReference) { console.error(`ERROR: Phase ${PHASE} requires valid center_locations + geo references.`); process.exit(1); }
+if (!foundLatitudeNumeric || !foundLongitudeNumeric || !foundLatitudeRangeCheck || !foundLongitudeRangeCheck) { console.error(`ERROR: Phase ${PHASE} requires latitude/longitude numeric(9,6) with safe range checks.`); process.exit(1); }
+if (!foundCenterLocationsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires center_locations BEFORE UPDATE trigger with public.set_updated_at().`); process.exit(1); }
+if (!foundCenterServicesTable || !foundCenterServicesCenterRef || !foundCenterServicesLocationRef || !foundCenterServicesTaxonomyRef || !foundCenterServicesServiceCategoryRef || !foundCenterServicesServiceRef || !foundCenterServicesSpecialtyRef || !foundCenterServicesScopeCheck || !foundCenterServicesUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete center_services schema and trigger.`); process.exit(1); }
+if (!foundCenterClaimsTable || !foundCenterMembershipsTable || !foundCenterClaimsCenterRef || !foundCenterClaimsClaimantProfileRef || !foundCenterClaimsReviewedByProfileRef || !foundCenterClaimsClaimStatusEnum || !foundCenterMembershipsCenterRef || !foundCenterMembershipsProfileRef || !foundCenterMembershipsRoleEnum || !foundCenterMembershipsStatusEnum || !foundCenterClaimsUpdatedAtTrigger || !foundCenterMembershipsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete center claims/memberships schema and triggers.`); process.exit(1); }
 
-if (!foundCentersTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.centers from 0006_centers.sql.');
-  process.exit(1);
-}
+if (!foundDoctorsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.doctors in 0010_doctors.sql.`); process.exit(1); }
+if (!foundDoctorTitleUsage || !foundDoctorGenderUsage) { console.error(`ERROR: Phase ${PHASE} requires doctors.title doctor_title and doctors.gender doctor_gender usage.`); process.exit(1); }
+if (!foundDoctorSpecialtiesReference) { console.error(`ERROR: Phase ${PHASE} requires doctors.primary_specialty_id references public.specialties(id).`); process.exit(1); }
+if (!foundDoctorVerificationStatusUsage || !foundDoctorProviderStatusUsage || !foundDoctorAppLocaleUsage || !foundDoctorCountryCodeUsage) { console.error(`ERROR: Phase ${PHASE} requires doctors enum usage for verification_status, provider_status, app_locale, and country_code.`); process.exit(1); }
+if (!foundDoctorYearsExperienceCheck) { console.error(`ERROR: Phase ${PHASE} requires doctors years_experience safe check (0..80 or null).`); process.exit(1); }
+if (!foundDoctorsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires doctors BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
 
-if (!foundCentersUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4D requires a BEFORE UPDATE trigger on public.centers using public.set_updated_at().');
-  process.exit(1);
-}
-
-if (centersCenterTypeUsesProviderStatus) {
-  console.error('ERROR: Phase 2.4D forbids `center_type provider_status`; center_type must use the canonical center_type enum from 0002_enums.sql.');
-  process.exit(1);
-}
-
-if (!foundCenterLocationsTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.center_locations in 0007_center_locations.sql.');
-  process.exit(1);
-}
-
-if (!foundCenterReference || !foundCountryReference || !foundRegionReference || !foundCityReference || !foundAreaReference) {
-  console.error('ERROR: Phase 2.4D requires center_locations references to centers, geo_countries, geo_regions, geo_cities, and geo_areas.');
-  process.exit(1);
-}
-
-if (!foundLatitudeNumeric || !foundLongitudeNumeric || !foundLatitudeRangeCheck || !foundLongitudeRangeCheck) {
-  console.error('ERROR: Phase 2.4D requires latitude/longitude numeric(9,6) with safe range checks.');
-  process.exit(1);
-}
-
-if (!foundCenterLocationsUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4D requires a BEFORE UPDATE trigger on public.center_locations using public.set_updated_at().');
-  process.exit(1);
-}
-
-if (!foundCenterServicesTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.center_services in 0008_center_services.sql.');
-  process.exit(1);
-}
-
-if (!foundCenterServicesCenterRef || !foundCenterServicesLocationRef || !foundCenterServicesTaxonomyRef || !foundCenterServicesServiceCategoryRef || !foundCenterServicesServiceRef || !foundCenterServicesSpecialtyRef) {
-  console.error('ERROR: Phase 2.4D requires center_services references to centers, center_locations, taxonomy_groups, service_categories, services, and specialties.');
-  process.exit(1);
-}
-
-if (!foundCenterServicesScopeCheck) {
-  console.error('ERROR: Phase 2.4D requires center_services check constraint requiring at least one of service_id, specialty_id, or service_category_id.');
-  process.exit(1);
-}
-
-if (!foundCenterServicesUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4D requires a BEFORE UPDATE trigger on public.center_services using public.set_updated_at().');
-  process.exit(1);
-}
-
-for (const table of allowedGeoTables) {
-  if (!createdGeoTables.has(table)) {
-    console.error(`ERROR: Phase 2.4D requires CREATE TABLE public.${table}.`);
-    process.exit(1);
-  }
-}
-
-for (const table of allowedTaxonomyTables) {
-  if (!createdTaxonomyTables.has(table)) {
-    console.error(`ERROR: Phase 2.4D requires CREATE TABLE public.${table}.`);
-    process.exit(1);
-  }
-}
-
-for (const table of allowedOwnershipTables) {
-  if (!createdOwnershipTables.has(table)) {
-    console.error(`ERROR: Phase 2.4D requires CREATE TABLE public.${table}.`);
-    process.exit(1);
-  }
-}
-
-if (!foundCenterClaimsTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.center_claims in 0009_center_ownership_claims.sql.');
-  process.exit(1);
-}
-
-if (!foundCenterMembershipsTable) {
-  console.error('ERROR: Phase 2.4D requires CREATE TABLE public.center_memberships in 0009_center_ownership_claims.sql.');
-  process.exit(1);
-}
-
-if (!foundCenterClaimsCenterRef || !foundCenterClaimsClaimantProfileRef || !foundCenterClaimsReviewedByProfileRef || !foundCenterClaimsClaimStatusEnum) {
-  console.error('ERROR: Phase 2.4D requires center_claims references to public.centers(id), claimant/reviewed profiles, and claim_status enum usage.');
-  process.exit(1);
-}
-
-if (!foundCenterMembershipsCenterRef || !foundCenterMembershipsProfileRef || !foundCenterMembershipsRoleEnum || !foundCenterMembershipsStatusEnum) {
-  console.error('ERROR: Phase 2.4D requires center_memberships references to public.centers/profiles and usage of center_member_role + center_membership_status enums.');
-  process.exit(1);
-}
-
-if (!foundCenterClaimsUpdatedAtTrigger || !foundCenterMembershipsUpdatedAtTrigger) {
-  console.error('ERROR: Phase 2.4D requires BEFORE UPDATE triggers on public.center_claims and public.center_memberships using public.set_updated_at().');
-  process.exit(1);
-}
-
-console.log('Phase 2.4D migration validation passed.');
+console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
