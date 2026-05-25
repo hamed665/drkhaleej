@@ -69,6 +69,8 @@ let foundSetUpdatedAtFunction = false;
 let foundProfilesUpdatedAtTrigger = false;
 let foundCentersTable = false;
 let foundCentersUpdatedAtTrigger = false;
+
+let centersCenterTypeUsesProviderStatus = false;
 const createdGeoTables = new Set();
 const createdTaxonomyTables = new Set();
 
@@ -112,6 +114,9 @@ for (const file of files) {
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.centers\b/i.test(content)) {
     foundCentersTable = true;
   }
+  if (/\bcenter_type\s+provider_status\b/i.test(content)) {
+    centersCenterTypeUsesProviderStatus = true;
+  }
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.centers\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) {
     foundCentersUpdatedAtTrigger = true;
   }
@@ -131,6 +136,11 @@ if (!foundCentersTable) {
 }
 if (!foundCentersUpdatedAtTrigger) {
   console.error('ERROR: Phase 2.4A requires a BEFORE UPDATE trigger on public.centers using public.set_updated_at().');
+  process.exit(1);
+}
+
+if (centersCenterTypeUsesProviderStatus) {
+  console.error('ERROR: Phase 2.4A forbids `center_type provider_status`; center_type must use the canonical center/facility enum from 0002_enums.sql.');
   process.exit(1);
 }
 
