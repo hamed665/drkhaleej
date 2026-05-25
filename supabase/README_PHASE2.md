@@ -1,69 +1,59 @@
-# Phase 2.0 — Supabase Database Foundation Protocol (Scaffold Only)
+# Phase 2.1 — Supabase Database Foundation (Extensions + Core Enums Only)
 
-This file defines the approved Phase 2.0 scaffolding rules.
+This file defines the approved Phase 2.1 migration scope.
 
-## Scope
-- Create Supabase folder structure only.
-- Add protocol validation scripts only.
-- Add npm script wiring only.
+## Approved files for Phase 2.1
+- `supabase/migrations/0001_extensions.sql`
+- `supabase/migrations/0002_enums.sql`
 
-Not allowed in Phase 2.0:
-- real SQL migrations
-- enums
-- table creation
-- RLS policies
-- seed data rows
+No other SQL migration files are allowed in this phase.
 
-## Required folders
-- `supabase/migrations/`
-- `supabase/seed/`
-- `supabase/tests/rls/`
-- `supabase/tests/seed/`
-- `supabase/types/`
+## Allowed in Phase 2.1
+- Required PostgreSQL extensions only:
+  - `pgcrypto`
+  - `pg_trgm`
+  - `unaccent`
+- Core foundational enum types only:
+  - `app_locale`
+  - `country_code`
+  - `verification_status`
+  - `provider_status`
+  - `claim_status`
+  - `plan_interval`
+  - `consent_type`
+  - `notification_channel`
+  - `sponsored_slot_type`
+  - `audit_actor_type`
+  - `audit_action_type`
 
-## Migration naming convention (for upcoming Phase 2.1+)
-1. `0001_extensions.sql`
-2. `0002_enums.sql`
-3. `0003_profiles_auth.sql`
-4. `0004_geo.sql`
-5. `0005_taxonomy.sql`
-6. `0006_centers.sql`
-7. `0007_doctors.sql`
-8. `0008_doctor_practice_locations.sql`
-9. `0009_services_media.sql`
-10. `0010_claims_ownership.sql`
-11. `0011_plans_settings_flags.sql`
-12. `0012_legal_consent.sql`
-13. `0013_behavior_events.sql`
-14. `0014_sponsored_slots.sql`
-15. `0015_audit_admin_ops.sql`
-16. `0016_indexes_constraints.sql`
-17. `0017_rls.sql`
+## Explicitly not allowed in Phase 2.1
+- No tables yet
+- No seed rows yet
+- No RLS yet
+- No PostGIS yet
+- No `CREATE POLICY`
+- No `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+- No `INSERT` statements
+- No `DROP` statements
 
-## Canonical naming rules
-- Use `geo_areas` as canonical geo area table. Do not use legacy writable `areas`.
-- Use `doctor_practice_locations` as canonical doctor-location table. Do not use `doctor_centers` as writable canonical.
-- Use `platform_settings` as canonical settings table. Do not use generic `settings` as canonical.
-- Use `provider_plans` as canonical provider plan table. Do not use generic `plans` as canonical.
-
-## Extension decision (for first real migration)
-Required:
-- `pgcrypto`
-- `pg_trgm`
-- `unaccent`
-
-Deferred unless explicitly needed:
-- `postgis`
+## Strict exclusions
+- no geo tables
+- no center/provider tables
+- no doctor tables
+- no legal/consent tables
+- no behavior events tables
+- no sponsored slots tables
+- no audit log tables
+- no indexes beyond extension setup
+- no frontend/backend app features
+- no admin UI, provider dashboard, payments, appointment engine, or AI chat
+- no Persian/Hindi routes
+- no country expansion beyond Oman
 
 ## Commands
-- `pnpm db:check-cli`
 - `pnpm db:validate:migrations`
 - `pnpm db:validate:seeds`
-- `pnpm db:types`
-- `pnpm db:reset`
 - `pnpm test:db:rls`
 - `pnpm test:db:seed`
 
-## Supabase CLI behavior
-- `db:check-cli` must fail with a clear actionable message if Supabase CLI is unavailable.
-- Phase 2.0 does not require Supabase login, a running Supabase instance, or a linked remote project.
+Phase 2.1 does not require Supabase login, linking to a remote project, or a live Supabase instance.
