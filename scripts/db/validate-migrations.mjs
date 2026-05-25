@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
 
 const expected = [
   '0001_extensions.sql',
