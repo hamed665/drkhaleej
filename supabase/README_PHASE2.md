@@ -1,8 +1,8 @@
-# Phase 2.4B — Supabase Center Locations / Geo Mapping Foundation
+# Phase 2.4C — Supabase Center Services Mapping Foundation
 
-This file defines the approved Phase 2.4B migration scope.
+This file defines the approved Phase 2.4C migration scope.
 
-## Approved files for Phase 2.4B
+## Approved files for Phase 2.4C
 
 - `supabase/migrations/0001_extensions.sql`
 - `supabase/migrations/0002_enums.sql`
@@ -11,17 +11,18 @@ This file defines the approved Phase 2.4B migration scope.
 - `supabase/migrations/0005_taxonomy.sql`
 - `supabase/migrations/0006_centers.sql`
 - `supabase/migrations/0007_center_locations.sql`
+- `supabase/migrations/0008_center_services.sql`
 
 No other SQL migration files are allowed in this phase.
 
-## Phase 2.4B approved scope
+## Phase 2.4C approved scope
 
-- `0007_center_locations.sql` is approved.
-- Center locations / geo mapping foundation only.
+- `0008_center_services.sql` is approved.
+- Center services mapping foundation only.
 - Canonical new table in this phase:
-  - `public.center_locations`
+  - `public.center_services`
 
-## Already approved before Phase 2.4B
+## Already approved before Phase 2.4C
 
 - Phase 2.1: core extensions and enums
 - Phase 2.2A: profiles/auth foundation
@@ -29,23 +30,24 @@ No other SQL migration files are allowed in this phase.
 - Phase 2.3: taxonomy/services foundation
 - Phase 2.3B: `center_type` enum patch only
 - Phase 2.4A: centers core foundation
+- Phase 2.4B: center locations / geo mapping foundation
 
-## Explicitly not allowed in Phase 2.4B
+## Explicitly not allowed in Phase 2.4C
 
 - No seed rows yet.
 - No seed SQL files in `supabase/seed`.
-- No center services mapping yet.
 - No provider ownership yet.
 - No doctor tables yet.
+- No appointment tables yet.
+- No pricing/payment tables yet.
+- No insurance tables yet.
 - No RLS yet.
 - No PostGIS yet.
-- No geometry/geography columns.
 - No search ranking/indexing yet.
 - No frontend/backend app features yet.
 
 ## Strict exclusions
 
-- no service mapping tables
 - no provider ownership tables
 - no provider tables
 - no doctor tables
@@ -78,4 +80,4 @@ No other SQL migration files are allowed in this phase.
 - `pnpm test:db:rls`
 - `pnpm test:db:seed`
 
-Phase 2.4B does not require Supabase login, linking to a remote project, or a live Supabase instance.
+Phase 2.4C does not require Supabase login, linking to a remote project, or a live Supabase instance.
