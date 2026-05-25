@@ -10,14 +10,18 @@ const required = [
 ];
 const dir = 'supabase/migrations';
 
+const requiredEnumChecks = [
+  { file: '0002_enums.sql', regex: /create\s+type\s+center_type\s+as\s+enum/i, message: 'Phase 2.3B requires create type center_type as enum in 0002_enums.sql.' }
+];
+
 const forbiddenPatterns = [
-  { regex: /\bpostgis\b/i, message: 'postgis is deferred and forbidden in Phase 2.3.' },
-  { regex: /\bgeometry\b/i, message: 'geometry is forbidden in Phase 2.3.' },
-  { regex: /\bgeography\b/i, message: 'geography is forbidden in Phase 2.3.' },
-  { regex: /\bcreate\s+policy\b/i, message: 'CREATE POLICY is forbidden in Phase 2.3.' },
-  { regex: /\benable\s+row\s+level\s+security\b/i, message: 'ENABLE ROW LEVEL SECURITY is forbidden in Phase 2.3.' },
-  { regex: /\binsert\s+into\b/i, message: 'INSERT INTO is forbidden in Phase 2.3.' },
-  { regex: /\bdrop\b/i, message: 'DROP statements are forbidden in Phase 2.3.' }
+  { regex: /\bpostgis\b/i, message: 'postgis is deferred and forbidden in Phase 2.3B.' },
+  { regex: /\bgeometry\b/i, message: 'geometry is forbidden in Phase 2.3B.' },
+  { regex: /\bgeography\b/i, message: 'geography is forbidden in Phase 2.3B.' },
+  { regex: /\bcreate\s+policy\b/i, message: 'CREATE POLICY is forbidden in Phase 2.3B.' },
+  { regex: /\benable\s+row\s+level\s+security\b/i, message: 'ENABLE ROW LEVEL SECURITY is forbidden in Phase 2.3B.' },
+  { regex: /\binsert\s+into\b/i, message: 'INSERT INTO is forbidden in Phase 2.3B.' },
+  { regex: /\bdrop\b/i, message: 'DROP statements are forbidden in Phase 2.3B.' }
 ];
 
 const forbiddenTables = [
@@ -51,7 +55,7 @@ try {
 
 const files = readdirSync(dir).filter((name) => name.endsWith('.sql')).sort();
 if (files.join('|') !== required.join('|')) {
-  console.error('ERROR: Phase 2.3 requires exactly these migration files:');
+  console.error('ERROR: Phase 2.3B requires exactly these migration files:');
   required.forEach((name) => console.error(`- ${name}`));
   const missing = required.filter((name) => !files.includes(name));
   const unexpected = files.filter((name) => !required.includes(name));
@@ -77,10 +81,19 @@ for (const file of files) {
     }
   }
 
+
+
+  for (const check of requiredEnumChecks) {
+    if (file === check.file && !check.regex.test(content)) {
+      console.error(`ERROR: ${check.message}`);
+      process.exit(1);
+    }
+  }
+
   for (const table of forbiddenTables) {
     const tableRegex = new RegExp(`\\b${table}\\b`, 'i');
     if (tableRegex.test(content)) {
-      console.error(`ERROR: ${file} references forbidden table for Phase 2.3: ${table}`);
+      console.error(`ERROR: ${file} references forbidden table for Phase 2.3B: ${table}`);
       process.exit(1);
     }
   }
@@ -107,7 +120,7 @@ for (const file of files) {
 }
 
 if (!foundProfilesTable) {
-  console.error('ERROR: Phase 2.3 requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.');
+  console.error('ERROR: Phase 2.3B requires CREATE TABLE public.profiles from 0003_profiles_auth.sql.');
   process.exit(1);
 }
 if (foundSetUpdatedAtFunction && !foundProfilesUpdatedAtTrigger) {
@@ -117,17 +130,17 @@ if (foundSetUpdatedAtFunction && !foundProfilesUpdatedAtTrigger) {
 
 for (const table of allowedGeoTables) {
   if (!createdGeoTables.has(table)) {
-    console.error(`ERROR: Phase 2.3 requires CREATE TABLE public.${table}.`);
+    console.error(`ERROR: Phase 2.3B requires CREATE TABLE public.${table}.`);
     process.exit(1);
   }
 }
 
 for (const table of allowedTaxonomyTables) {
   if (!createdTaxonomyTables.has(table)) {
-    console.error(`ERROR: Phase 2.3 requires CREATE TABLE public.${table}.`);
+    console.error(`ERROR: Phase 2.3B requires CREATE TABLE public.${table}.`);
     process.exit(1);
   }
 }
 
-console.log('Phase 2.3 migration validation passed.');
+console.log('Phase 2.3B migration validation passed.');
 console.log(`Validated files: ${required.join(', ')}`);

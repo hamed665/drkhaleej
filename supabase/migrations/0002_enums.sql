@@ -63,3 +63,21 @@ do $$ begin
 exception
   when duplicate_object then null;
 end $$;
+
+do $$ begin
+  create type center_type as enum (
+    'clinic',
+    'hospital',
+    'dental_clinic',
+    'beauty_clinic',
+    'laboratory',
+    'imaging_center',
+    'pharmacy',
+    'wellness_center',
+    'physiotherapy_center',
+    'other'
+  );
+exception
+  when duplicate_object then null;
+end $$;
+
