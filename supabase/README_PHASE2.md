@@ -167,3 +167,41 @@ Strict exclusions:
 - no Persian/Hindi routes
 - no country expansion beyond Oman
 - no unrelated refactor
+
+## Phase 2.5C — Doctor Services Mapping Foundation
+
+Approved in this phase:
+- `supabase/migrations/0012_doctor_services.sql`
+- Doctor services mapping foundation only (`public.doctor_services`)
+
+Explicitly not included yet:
+- no seed rows yet
+- no doctor schedules yet
+- no appointment tables yet
+- no pricing/payment tables yet
+- no insurance tables yet
+- no reviews/ratings yet
+- no RLS yet
+- no frontend/backend app features yet
+
+Strict exclusions:
+- no doctor schedule tables
+- no appointment tables
+- no pricing/payment tables
+- no insurance tables
+- no reviews/ratings tables
+- no legal/consent tables
+- no behavior events tables
+- no sponsored slots tables
+- no audit log tables
+- no RLS policies
+- no seed rows
+- no frontend pages
+- no admin UI
+- no provider dashboard
+- no payment code
+- no appointment engine
+- no AI chat
+- no Persian/Hindi routes
+- no country expansion beyond Oman
+- no unrelated refactor
