@@ -8,7 +8,12 @@ export function proxy(request: NextRequest) {
 
   const match = pathname.match(localeCountryPattern);
   if (match) {
-    const [, locale, country] = match;
+    const locale = match[1];
+    const country = match[2];
+
+    if (!locale || !country) {
+      return NextResponse.rewrite(new URL('/404', request.url));
+    }
 
     const isAllowedCountry = country === 'om';
     if (!isAllowedCountry) {
