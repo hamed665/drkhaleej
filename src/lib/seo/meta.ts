@@ -1,4 +1,3 @@
-export const defaultMetadata = {
-  title: 'DrMuscat',
-  description: 'Healthcare directory foundation'
-};
+export { defaultMetadata } from './metadata';
+export { buildLocalizedMetadata } from './metadata';
+export { siteConfig } from './site';

@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
-import { ReactNode } from 'react';
 import { headers } from 'next/headers';
+import type { ReactNode } from 'react';
+import { AppShell } from '@/components/layout/app-shell';
 import { isSupportedLocale, localeDirection } from '@/lib/i18n/config';
+import { defaultMetadata } from '@/lib/seo/meta';
 import '@/styles/globals.css';
 
-export const metadata: Metadata = {
-  title: 'DrMuscat',
-  description: 'DrMuscat foundation'
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const localeHeader = (await headers()).get('x-drmuscat-locale');
@@ -15,7 +14,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang={locale} dir={localeDirection(locale)}>
-      <body>{children}</body>
+      <body>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

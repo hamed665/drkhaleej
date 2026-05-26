@@ -1,9 +1,14 @@
-import { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
-type ContainerProps = {
+type ContainerProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
 };
 
-export function Container({ children }: ContainerProps) {
-  return <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>{children}</div>;
+export function Container({ children, className, ...props }: ContainerProps) {
+  const classes = ['ui-container', className].filter(Boolean).join(' ');
+  return (
+    <div className={classes} {...props}>
+      {children}
+    </div>
+  );
 }
