@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.1B';
+const PHASE = '3.2A';
 
 const required = [
   '0001_extensions.sql',
@@ -38,7 +38,8 @@ const required = [
   '0032_rls_public_catalog_read_policies.sql',
   '0033_profiles_rls.sql',
   '0034_center_access_helpers.sql',
-  '0035_center_claims_memberships_rls.sql'
+  '0035_center_claims_memberships_rls.sql',
+  '0036_patient_contacts_profile_link.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -126,6 +127,8 @@ const profilesRlsPolicyFile = '0033_profiles_rls.sql';
 const centerAccessHelpersFile = '0034_center_access_helpers.sql';
 const centerClaimsMembershipsRlsFile = '0035_center_claims_memberships_rls.sql';
 const helperFunctionFile = '0031_rls_auth_helpers.sql';
+
+const patientContactsProfileLinkFile = '0036_patient_contacts_profile_link.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1031,6 +1034,27 @@ requireCondition(!/\bfor\s+insert\b/i.test(centerClaimsMembershipsRlsContent), '
 requireCondition(!/\bfor\s+update\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include FOR UPDATE policies.');
 requireCondition(!/\bfor\s+delete\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include FOR DELETE policies.');
 requireCondition(!/\bdrop\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include DROP statements.');
+
+
+
+const patientContactsProfileLinkContent = readFileSync(`${dir}/${patientContactsProfileLinkFile}`, 'utf8');
+
+const requiredPatientContactsProfileLinkPatterns = [
+  /alter\s+table\s+public\.patient_contacts\s+add\s+column\s+if\s+not\s+exists\s+profile_id\s+uuid\s+null/i,
+  /do\s*\$\$[\s\S]*pg_constraint[\s\S]*patient_contacts_profile_id_fkey[\s\S]*end\s*\$\$/i,
+  /add\s+constraint\s+patient_contacts_profile_id_fkey[\s\S]*foreign\s+key\s*\(\s*profile_id\s*\)[\s\S]*references\s+public\.profiles\s*\(\s*id\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+patient_contacts_profile_id_idx\s+on\s+public\.patient_contacts\s*\(\s*profile_id\s*\)\s*where\s+profile_id\s+is\s+not\s+null/i
+];
+for (const pattern of requiredPatientContactsProfileLinkPatterns) {
+  requireCondition(pattern.test(patientContactsProfileLinkContent), `0036_patient_contacts_profile_link.sql missing required pattern: ${pattern}`);
+}
+
+requireCondition(!/\bprofile_id\s+uuid\s+not\s+null\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must keep profile_id nullable.');
+requireCondition(!/\bcreate\s+policy\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include ENABLE ROW LEVEL SECURITY.');
+requireCondition(!/\binsert\s+into\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include DROP statements.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);

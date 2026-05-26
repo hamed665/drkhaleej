@@ -533,3 +533,20 @@ Phase 3.1B scope:
 - no frontend/backend app features
 - no seed rows
 - no private appointment/patient RLS yet
+
+
+## Phase 3.2A — Patient Identity Link Foundation
+
+Approved in this phase:
+- `supabase/migrations/0036_patient_contacts_profile_link.sql`
+- patient identity linkage foundation only
+- `public.patient_contacts.profile_id` nullable foreign key to `public.profiles(id)`
+
+Explicitly not included yet:
+- no backfill
+- no auto-linking by phone/email
+- no patient RLS yet
+- no appointment RLS yet
+- no frontend/backend app features
+- no profile creation flow
+- no seed rows
