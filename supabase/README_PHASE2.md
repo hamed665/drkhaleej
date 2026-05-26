@@ -631,3 +631,21 @@ Scope in this phase:
 - no audit triggers or audit writing functions
 - no frontend/backend app features
 - no seed rows
+
+## Phase 3.6A — Static DB Test Harness Hardening
+
+Approved in this phase:
+- `scripts/db/test-rls-static.mjs`
+- `scripts/db/test-seed-static.mjs`
+- `package.json` script updates for `test:db:rls` and `test:db:seed`
+
+Phase 3.6A scope:
+- static DB test harness hardening only
+- no migrations
+- no schema changes
+- no seed rows
+- no frontend/backend app features
+- `test:db:rls` is no longer a Phase 2 placeholder
+- `test:db:seed` is no longer a Phase 2 placeholder
+- static tests do not replace future live Supabase RLS integration tests
+- live DB RLS tests should be added later in a dedicated phase

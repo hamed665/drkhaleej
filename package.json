@@ -15,8 +15,8 @@
     "db:validate:seeds": "node scripts/db/validate-seeds.mjs",
     "db:types": "pnpm db:check-cli && supabase gen types typescript --local > supabase/types/database.types.ts",
     "db:reset": "pnpm db:check-cli && supabase db reset",
-    "test:db:rls": "pnpm db:validate:migrations && node -e \"console.log('RLS test placeholder: no policies allowed in Phase 2.0')\"",
-    "test:db:seed": "pnpm db:validate:seeds && node -e \"console.log('Seed test placeholder: no seed rows allowed in Phase 2.0')\""
+    "test:db:rls": "pnpm db:validate:migrations && node scripts/db/test-rls-static.mjs",
+    "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs"
   },
   "dependencies": {
     "next": "16.0.2",
