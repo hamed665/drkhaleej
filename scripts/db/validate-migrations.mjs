@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.9A';
+const PHASE = '2.9B';
 
 const required = [
   '0001_extensions.sql',
@@ -37,6 +37,15 @@ const required = [
 ];
 
 const dir = 'supabase/migrations';
+
+function fail(message) {
+  console.error(`ERROR: Phase ${PHASE}: ${message}`);
+  process.exit(1);
+}
+
+function requireCondition(condition, message) {
+  if (!condition) fail(message);
+}
 
 const requiredEnumChecks = [
   { file: '0002_enums.sql', regex: /create\s+type\s+center_type\s+as\s+enum/i, message: `Phase ${PHASE} requires create type center_type as enum in 0002_enums.sql.` },
@@ -366,9 +375,7 @@ let foundAuditLogsCreatedAt = false;
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
 } catch (error) {
-  console.error(`ERROR: Missing required directory: ${dir}`);
-  console.error(`Details: ${error.message}`);
-  process.exit(1);
+  fail(`Missing required directory: ${dir}. Details: ${error.message}`);
 }
 
 const files = readdirSync(dir).filter((name) => name.endsWith('.sql')).sort();
@@ -436,15 +443,13 @@ for (const file of files) {
 
   for (const rule of forbiddenPatterns) {
     if (rule.regex.test(content)) {
-      console.error(`ERROR: ${file} violates Phase ${PHASE} rule: ${rule.message}`);
-      process.exit(1);
+      fail(`${file} violates rule: ${rule.message}`);
     }
   }
 
   for (const check of requiredEnumChecks) {
     if (file === check.file && !check.regex.test(content)) {
-      console.error(`ERROR: ${check.message}`);
-      process.exit(1);
+      fail(check.message.replace(`Phase ${PHASE} `, ''));
     }
   }
 
@@ -879,13 +884,13 @@ if (!foundLegalDocumentsTable || !foundLegalDocumentsConsentTypeUsage || !foundL
 if (!foundConsentLogsTable || !foundConsentLogsConsentTypeUsage || !foundConsentLogsLegalDocumentRef || !foundConsentLogsProfilesRef || !foundConsentLogsPatientContactsRef || !foundConsentLogsLocaleUsage || !foundConsentLogsCountryCodeUsage || !foundConsentLogsConsentedAt || !foundConsentLogsIdentityCheck) { console.error(`ERROR: Phase ${PHASE} requires complete consent_logs table/references/enum usage/consented_at/identity check foundation.`); process.exit(1); }
 if (!foundAuditLogsTable || !foundAuditLogsActorTypeUsage || !foundAuditLogsActionTypeUsage || !foundAuditLogsProfilesRef || !foundAuditLogsEntityTypeNotNull || !foundAuditLogsCreatedAt) { console.error(`ERROR: Phase ${PHASE} requires complete audit_logs table/references/enum usage/entity_type/created_at foundation.`); process.exit(1); }
 
-console.log(`Phase ${PHASE} migration validation passed.`);
-console.log(`Validated files: ${required.join(', ')}`);
-
 if (!foundCenterTypeGym || !foundCenterTypeFitnessCenter || !foundCenterTypeSpa || !foundCenterTypeHealthyRestaurant || !foundCenterTypeNutritionCenter || !foundCenterTypeJuiceBar || !foundCenterTypeMealPlanProvider || !foundCenterTypeHomeHealthcare || !foundCenterTypeOpticalStore || !foundCenterTypeMedicalEquipmentStore) { console.error(`ERROR: Phase ${PHASE} requires 0022_center_type_expansion.sql ALTER TYPE center_type ADD VALUE IF NOT EXISTS for all required values.`); process.exit(1); }
 if (!foundMediaAssetStatusEnum || !foundMediaAssetSourceEnum || !foundMediaAssetsTable || !foundMediaAssetsProfileRef || !foundMediaAssetsStatusUsage || !foundMediaAssetsSourceUsage || !foundMediaAssetsStorageBucket || !foundMediaAssetsStoragePath || !foundMediaAssetsPublicUrl || !foundMediaAssetsExternalUrl || !foundMediaAssetsMetadata || !foundMediaAssetsLocationCheck || !foundMediaAssetsSizeDimensionChecks || !foundMediaAssetsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete media_assets enum/table/constraint/trigger foundation.`); process.exit(1); }
 if (!foundMediaEntityTypeEnum || !foundMediaUsageKindEnum || !foundEntityMediaTable || !foundEntityMediaMediaAssetRef || !foundEntityMediaEntityTypeUsage || !foundEntityMediaUsageKindUsage || !foundEntityMediaEntityId || !foundEntityMediaAltText || !foundEntityMediaCaption || !foundEntityMediaIsPrimary || !foundEntityMediaSortOrder || !foundEntityMediaMetadata || !foundEntityMediaUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete entity_media enum/table/trigger foundation.`); process.exit(1); }
 
 if (!foundSubscriptionPlanStatusEnum || !foundSubscriptionPlansTable || !foundSubscriptionPlansStatusUsage || !foundSubscriptionPlansIntervalUsage || !foundSubscriptionPlansSlugUnique || !foundSubscriptionPlansPriceCheck || !foundSubscriptionPlansCurrencyDefault || !foundSubscriptionPlansUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete subscription_plans enum/table/constraints/trigger foundation.`); process.exit(1); }
 if (!foundCenterSubscriptionStatusEnum || !foundCenterSubscriptionsTable || !foundCenterSubscriptionsCenterRef || !foundCenterSubscriptionsPlanRef || !foundCenterSubscriptionsProfileRef || !foundCenterSubscriptionsStatusUsage || !foundCenterSubscriptionsIntervalUsage || !foundCenterSubscriptionsDateChecks || !foundCenterSubscriptionsPartialUnique || !foundCenterSubscriptionsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete center_subscriptions enum/table/references/constraints/partial-unique/trigger foundation.`); process.exit(1); }
-if (!foundSponsoredCampaignStatusEnum || !foundSponsoredCampaignsTable || !foundSponsoredPlacementsTable || !foundSponsoredCampaignsCenterRef || !foundSponsoredCampaignsProfileRef || !foundSponsoredCampaignsStatusUsage || !foundSponsoredPlacementsCampaignRef || !foundSponsoredPlacementsCenterRef || !foundSponsoredPlacementsDoctorRef || !foundSponsoredPlacementsCenterServiceRef || !foundSponsoredPlacementsDoctorServiceRef || !foundSponsoredPlacementsSlotTypeUsage || !foundSponsoredPlacementsCountryUsage || !foundSponsoredPlacementsLocaleUsage || !foundSponsoredPlacementsTargetCheck || !foundSponsoredCampaignsUpdatedAtTrigger || !foundSponsoredPlacementsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete sponsored_campaigns/sponsored_placements enum/table/references/constraints/trigger foundation.`); process.exit(1); }
+requireCondition(foundSponsoredCampaignStatusEnum && foundSponsoredCampaignsTable && foundSponsoredPlacementsTable && foundSponsoredCampaignsCenterRef && foundSponsoredCampaignsProfileRef && foundSponsoredCampaignsStatusUsage && foundSponsoredPlacementsCampaignRef && foundSponsoredPlacementsCenterRef && foundSponsoredPlacementsDoctorRef && foundSponsoredPlacementsCenterServiceRef && foundSponsoredPlacementsDoctorServiceRef && foundSponsoredPlacementsSlotTypeUsage && foundSponsoredPlacementsCountryUsage && foundSponsoredPlacementsLocaleUsage && foundSponsoredPlacementsTargetCheck && foundSponsoredCampaignsUpdatedAtTrigger && foundSponsoredPlacementsUpdatedAtTrigger, 'requires complete sponsored_campaigns/sponsored_placements enum/table/references/constraints/trigger foundation.');
+
+console.log(`Phase ${PHASE} migration validation passed.`);
+console.log(`Validated files: ${required.join(', ')}`);

@@ -457,3 +457,20 @@ Explicitly not included yet:
 - no insurance tables yet
 - no medical records/diagnoses/prescriptions/lab results yet
 - no behavior events yet
+
+## Phase 2.9B — Migration Validator Hardening Only
+
+Approved in this phase:
+- `scripts/db/validate-migrations.mjs` hardening/refactor only
+- migration validator structure hardening only
+- no schema changes
+- no new migrations
+
+Explicitly not included in this phase:
+- no seed rows
+- no RLS yet
+- no frontend/backend app features
+- no payment/invoice/checkout
+- no notifications/reminders
+- no medical records
+- no behavior events
