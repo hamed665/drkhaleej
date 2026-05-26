@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.2A';
+const PHASE = '3.2B';
 
 const required = [
   '0001_extensions.sql',
@@ -39,7 +39,9 @@ const required = [
   '0033_profiles_rls.sql',
   '0034_center_access_helpers.sql',
   '0035_center_claims_memberships_rls.sql',
-  '0036_patient_contacts_profile_link.sql'
+  '0036_patient_contacts_profile_link.sql',
+  '0037_patient_appointment_access_helpers.sql',
+  '0038_patient_contacts_appointments_rls.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -120,7 +122,8 @@ const allowedDoctorTables = ['doctors', 'doctor_services', 'doctor_schedules', '
 const rlsPolicyFiles = new Set([
   '0032_rls_public_catalog_read_policies.sql',
   '0033_profiles_rls.sql',
-  '0035_center_claims_memberships_rls.sql'
+  '0035_center_claims_memberships_rls.sql',
+  '0038_patient_contacts_appointments_rls.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -129,6 +132,8 @@ const centerClaimsMembershipsRlsFile = '0035_center_claims_memberships_rls.sql';
 const helperFunctionFile = '0031_rls_auth_helpers.sql';
 
 const patientContactsProfileLinkFile = '0036_patient_contacts_profile_link.sql';
+const patientAppointmentAccessHelpersFile = '0037_patient_appointment_access_helpers.sql';
+const patientContactsAppointmentsRlsFile = '0038_patient_contacts_appointments_rls.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1038,6 +1043,8 @@ requireCondition(!/\bdrop\b/i.test(centerClaimsMembershipsRlsContent), '0035_cen
 
 
 const patientContactsProfileLinkContent = readFileSync(`${dir}/${patientContactsProfileLinkFile}`, 'utf8');
+const patientAppointmentAccessHelpersContent = readFileSync(`${dir}/${patientAppointmentAccessHelpersFile}`, 'utf8');
+const patientContactsAppointmentsRlsContent = readFileSync(`${dir}/${patientContactsAppointmentsRlsFile}`, 'utf8');
 
 const requiredPatientContactsProfileLinkPatterns = [
   /alter\s+table\s+public\.patient_contacts\s+add\s+column\s+if\s+not\s+exists\s+profile_id\s+uuid\s+null/i,
@@ -1055,6 +1062,53 @@ requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(patientContactsPro
 requireCondition(!/\binsert\s+into\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include INSERT INTO.');
 requireCondition(!/\bupdate\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include UPDATE.');
 requireCondition(!/\bdrop\b/i.test(patientContactsProfileLinkContent), '0036_patient_contacts_profile_link.sql must not include DROP statements.');
+
+const requiredPatientAppointmentAccessHelperPatterns = [
+  /create\s+or\s+replace\s+function\s+public\.can_view_patient_contact\s*\(/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_appointment\s*\(/i,
+  /public\.current_profile_id\s*\(\s*\)/i,
+  /public\.is_platform_admin\s*\(\s*\)/i,
+  /public\.can_view_center_private_data/i,
+  /public\.patient_contacts/i,
+  /public\.appointments/i,
+  /profile_id\s*=\s*public\.current_profile_id\s*\(\s*\)/i,
+  /deleted_at\s+is\s+null/i
+];
+for (const pattern of requiredPatientAppointmentAccessHelperPatterns) {
+  requireCondition(pattern.test(patientAppointmentAccessHelpersContent), `0037_patient_appointment_access_helpers.sql missing required pattern: ${pattern}`);
+}
+requireCondition(!/\bcreate\s+policy\b/i.test(patientAppointmentAccessHelpersContent), '0037_patient_appointment_access_helpers.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(patientAppointmentAccessHelpersContent), '0037_patient_appointment_access_helpers.sql must not include ENABLE ROW LEVEL SECURITY.');
+requireCondition(!/\binsert\s+into\b/i.test(patientAppointmentAccessHelpersContent), '0037_patient_appointment_access_helpers.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(patientAppointmentAccessHelpersContent), '0037_patient_appointment_access_helpers.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(patientAppointmentAccessHelpersContent), '0037_patient_appointment_access_helpers.sql must not include DROP statements.');
+
+const requiredPatientContactsAppointmentsRlsPatterns = [
+  /alter\s+table\s+public\.patient_contacts\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.appointments\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.appointment_status_history\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.appointment_cancellations\s+enable\s+row\s+level\s+security/i,
+  /create\s+policy\s+patient_contacts_select_allowed/i,
+  /create\s+policy\s+appointments_select_allowed/i,
+  /create\s+policy\s+appointment_status_history_select_allowed/i,
+  /create\s+policy\s+appointment_cancellations_select_allowed/i,
+  /public\.can_view_patient_contact\s*\(\s*id\s*\)/i,
+  /public\.can_view_appointment\s*\(\s*id\s*\)/i,
+  /public\.can_view_appointment\s*\(\s*appointment_id\s*\)/i
+];
+for (const pattern of requiredPatientContactsAppointmentsRlsPatterns) {
+  requireCondition(pattern.test(patientContactsAppointmentsRlsContent), `0038_patient_contacts_appointments_rls.sql missing required pattern: ${pattern}`);
+}
+requireCondition((patientContactsAppointmentsRlsContent.match(/\bfor\s+select\b/gi) || []).length >= 4, '0038_patient_contacts_appointments_rls.sql must define all policies as FOR SELECT.');
+requireCondition((patientContactsAppointmentsRlsContent.match(/\bto\s+authenticated\b/gi) || []).length >= 4, '0038_patient_contacts_appointments_rls.sql must define all policies as TO authenticated.');
+requireCondition((patientContactsAppointmentsRlsContent.match(/deleted_at\s+is\s+null/gi) || []).length >= 4, '0038_patient_contacts_appointments_rls.sql must require deleted_at IS NULL in all policies.');
+requireCondition(!/\bto\s+anon\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include TO anon.');
+requireCondition(!/\bfor\s+insert\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include FOR INSERT policies.');
+requireCondition(!/\bfor\s+update\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include FOR UPDATE policies.');
+requireCondition(!/\bfor\s+delete\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include FOR DELETE policies.');
+requireCondition(!/\binsert\s+into\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include DROP statements.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);

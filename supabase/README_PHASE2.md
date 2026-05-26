@@ -550,3 +550,21 @@ Explicitly not included yet:
 - no frontend/backend app features
 - no profile creation flow
 - no seed rows
+
+## Phase 3.2B — Patient/Appointments Private Read RLS (SELECT-only)
+
+Approved in this phase:
+- `supabase/migrations/0037_patient_appointment_access_helpers.sql`
+- `supabase/migrations/0038_patient_contacts_appointments_rls.sql`
+
+Phase scope:
+- patient/appointment private SELECT RLS only
+- authenticated patients can SELECT their own linked `patient_contacts` and `appointments`
+- platform admins can SELECT all non-deleted `patient_contacts` and `appointments`
+- center members with private-data access can SELECT appointments and linked contacts for their centers
+- `appointment_status_history` and `appointment_cancellations` are SELECT-only through `public.can_view_appointment(...)`
+- no anon access
+- no INSERT/UPDATE/DELETE policies yet
+- no appointment creation/cancellation/confirmation/reschedule flow
+- no frontend/backend app features
+- no seed rows
