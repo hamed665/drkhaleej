@@ -7,7 +7,8 @@ const requiredFiles = [
   'src/app/robots.ts',
   'src/app/sitemap.ts',
   'src/lib/seo/site.ts',
-  'src/lib/seo/metadata.ts'
+  'src/lib/seo/metadata.ts',
+  'public/llms.txt'
 ];
 
 const forbiddenRouteTokens = ['doctor', 'center', 'service', 'pharmacy', 'lab'];
@@ -41,6 +42,7 @@ const robotsSource = await readText('src/app/robots.ts');
 const sitemapSource = await readText('src/app/sitemap.ts');
 const metadataSource = await readText('src/lib/seo/metadata.ts');
 const seoCheckSource = await readText('scripts/seo-check.mjs');
+const llmsSource = await readText('public/llms.txt');
 
 assertMatch(siteSource, /supportedLocales\s*=\s*\[['"]en['"]\s*,\s*['"]ar['"]\]/, 'supportedLocales must include en and ar in src/lib/seo/site.ts');
 assertMatch(siteSource, /supportedCountries\s*=\s*\[['"]om['"]\]/, 'supportedCountries must include om in src/lib/seo/site.ts');
@@ -84,4 +86,52 @@ if (!metadataSource.includes('siteConfig.baseUrl')) {
   throw new Error('src/lib/seo/metadata.ts must continue using siteConfig.baseUrl.');
 }
 
-console.log('seo:check passed (robots, sitemap, locales/countries, and static SEO constraints verified).');
+assertMatch(llmsSource, /drmuscat/i, 'public/llms.txt must mention DrMuscat.');
+assertMatch(llmsSource, /\/en\/om/, 'public/llms.txt must mention /en/om.');
+assertMatch(llmsSource, /\/ar\/om/, 'public/llms.txt must mention /ar/om.');
+assertMatch(llmsSource, /\/robots\.txt/i, 'public/llms.txt must mention /robots.txt.');
+assertMatch(llmsSource, /\/sitemap\.xml/i, 'public/llms.txt must mention /sitemap.xml.');
+
+if (!/(not yet public|are not yet public|not public in this phase)/i.test(llmsSource)) {
+  throw new Error('public/llms.txt must clearly state future doctor/center/service/pharmacy/laboratory/programmatic pages are not yet public in this phase.');
+}
+
+const forbiddenMohPositiveClaimPatterns = [
+  /\bmoh[-\s]*verified\b/i,
+  /\bverified\s+by\s+moh\b/i,
+  /\bmoh[-\s]*approved\b/i,
+  /\bmoh\s+approved\b/i,
+  /\bmoh\s+certified\b/i,
+  /\bcertified\s+by\s+moh\b/i,
+  /\bmoh\s+verification\s+badge\b/i,
+  /\bofficial\s+moh\s+verification\b/i,
+  /\bmoh\s+checked\b/i,
+  /\bchecked\s+by\s+moh\b/i
+];
+
+if (forbiddenMohPositiveClaimPatterns.some((pattern) => pattern.test(llmsSource))) {
+  throw new Error('public/llms.txt must not claim MOH verification or approval.');
+}
+
+const forbiddenAiSymptomPositiveClaimPatterns = [
+  /\bai\s*diagnosis\s+is\s+available\b/i,
+  /\bai\s*diagnosis\s+available\b/i,
+  /\boffers\s+ai\s*diagnosis\b/i,
+  /\bprovides\s+ai\s*diagnosis\b/i,
+  /\bai\s*diagnostic\s+tool\b/i,
+  /\bai[-\s]*powered\s+diagnosis\b/i,
+  /\bsymptom\s*checker\s+is\s+available\b/i,
+  /\bsymptom\s*checker\s+available\b/i,
+  /\buse\s+our\s+symptom\s*checker\b/i,
+  /\btry\s+our\s+symptom\s*checker\b/i,
+  /\bai\s*symptom\s*checker\b/i,
+  /\bdiagnose\s+your\s+symptoms\b/i,
+  /\bget\s+a\s+diagnosis\b/i,
+  /\bmedical\s+diagnosis\s+by\s+ai\b/i
+];
+
+if (forbiddenAiSymptomPositiveClaimPatterns.some((pattern) => pattern.test(llmsSource))) {
+  throw new Error('public/llms.txt must not claim AI diagnosis or symptom checker availability.');
+}
+
+console.log('seo:check passed (robots, sitemap, locales/countries, llms, and static SEO constraints verified).');

@@ -54,3 +54,6 @@ jobs:
 
       - name: Static seed tests
         run: pnpm test:db:seed
+
+      - name: SEO check
+        run: pnpm seo:check

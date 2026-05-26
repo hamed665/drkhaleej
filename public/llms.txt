@@ -1,0 +1,16 @@
+# DrMuscat
+
+DrMuscat is an SEO-first healthcare discovery and provider visibility platform for Oman.
+
+Current public routes in this phase:
+- /en/om
+- /ar/om
+
+Crawler-facing files:
+- /robots.txt
+- /sitemap.xml
+
+In Phase 4.0C, doctor, center, service, pharmacy, laboratory, and programmatic SEO pages are not yet public.
+
+DrMuscat does not claim MOH verification in this phase.
+DrMuscat does not offer AI diagnosis or a symptom checker in this phase.
