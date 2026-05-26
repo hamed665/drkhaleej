@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.1A';
+const PHASE = '3.1B';
 
 const required = [
   '0001_extensions.sql',
@@ -36,7 +36,9 @@ const required = [
   '0030_audit_logs.sql',
   '0031_rls_auth_helpers.sql',
   '0032_rls_public_catalog_read_policies.sql',
-  '0033_profiles_rls.sql'
+  '0033_profiles_rls.sql',
+  '0034_center_access_helpers.sql',
+  '0035_center_claims_memberships_rls.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -76,6 +78,7 @@ const forbiddenTables = [
   'bookings',
   'patients',
   'payments',
+  'appointment_payments',
   'payment_transactions',
   'invoices',
   'invoice_items',
@@ -101,6 +104,11 @@ const forbiddenTables = [
   'storage_buckets',
   'upload_jobs',
   'image_processing_jobs'
+  ,
+  'appointment_reminders',
+  'provider_wallets',
+  'payouts',
+  'webhook_events'
 ];
 
 const allowedGeoTables = ['geo_countries', 'geo_regions', 'geo_cities', 'geo_areas'];
@@ -110,10 +118,13 @@ const allowedDoctorTables = ['doctors', 'doctor_services', 'doctor_schedules', '
 
 const rlsPolicyFiles = new Set([
   '0032_rls_public_catalog_read_policies.sql',
-  '0033_profiles_rls.sql'
+  '0033_profiles_rls.sql',
+  '0035_center_claims_memberships_rls.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
+const centerAccessHelpersFile = '0034_center_access_helpers.sql';
+const centerClaimsMembershipsRlsFile = '0035_center_claims_memberships_rls.sql';
 const helperFunctionFile = '0031_rls_auth_helpers.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
@@ -955,6 +966,8 @@ for (const pattern of requiredRlsPatterns) {
 
 
 const profilesRlsContent = readFileSync(`${dir}/${profilesRlsPolicyFile}`, 'utf8');
+const centerAccessHelpersContent = readFileSync(`${dir}/${centerAccessHelpersFile}`, 'utf8');
+const centerClaimsMembershipsRlsContent = readFileSync(`${dir}/${centerClaimsMembershipsRlsFile}`, 'utf8');
 
 const requiredProfilesRlsPatterns = [
   /alter\s+table\s+public\.profiles\s+enable\s+row\s+level\s+security/i,
@@ -974,6 +987,50 @@ requireCondition(!/\bto\s+anon\b/i.test(profilesRlsContent), '0033_profiles_rls.
 requireCondition(!/\bfor\s+insert\b/i.test(profilesRlsContent), '0033_profiles_rls.sql must not include FOR INSERT policies.');
 requireCondition(!/\bfor\s+update\b/i.test(profilesRlsContent), '0033_profiles_rls.sql must not include FOR UPDATE policies.');
 requireCondition(!/\bfor\s+delete\b/i.test(profilesRlsContent), '0033_profiles_rls.sql must not include FOR DELETE policies.');
+
+const requiredCenterAccessHelperPatterns = [
+  /create\s+or\s+replace\s+function\s+public\.is_active_center_member\s*\(/i,
+  /create\s+or\s+replace\s+function\s+public\.can_manage_center\s*\(/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_center_private_data\s*\(/i,
+  /public\.current_profile_id\s*\(\s*\)/i,
+  /public\.is_platform_admin\s*\(\s*\)/i,
+  /public\.center_memberships/i,
+  /status\s*=\s*'active'/i,
+  /deleted_at\s+is\s+null/i,
+  /can_manage_center[\s\S]*role\s+in\s*\(\s*'owner'\s*,\s*'admin'\s*,\s*'manager'\s*\)/i,
+  /can_view_center_private_data[\s\S]*role\s+in\s*\(\s*'owner'\s*,\s*'admin'\s*,\s*'manager'\s*,\s*'staff'\s*,\s*'billing'\s*,\s*'sales'\s*,\s*'editor'\s*\)/i
+];
+for (const pattern of requiredCenterAccessHelperPatterns) {
+  requireCondition(pattern.test(centerAccessHelpersContent), `0034_center_access_helpers.sql missing required pattern: ${pattern}`);
+}
+requireCondition(!/\bcreate\s+policy\b/i.test(centerAccessHelpersContent), '0034_center_access_helpers.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(centerAccessHelpersContent), '0034_center_access_helpers.sql must not include ENABLE ROW LEVEL SECURITY.');
+
+const requiredCenterClaimsMembershipsRlsPatterns = [
+  /alter\s+table\s+public\.center_memberships\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.center_claims\s+enable\s+row\s+level\s+security/i,
+  /create\s+policy\s+center_memberships_select_own/i,
+  /create\s+policy\s+center_memberships_select_platform_admin/i,
+  /create\s+policy\s+center_memberships_select_center_managers/i,
+  /create\s+policy\s+center_claims_select_own/i,
+  /create\s+policy\s+center_claims_select_platform_admin/i,
+  /create\s+policy\s+center_claims_select_center_managers/i,
+  /profile_id\s*=\s*public\.current_profile_id\s*\(\s*\)/i,
+  /claimant_profile_id\s*=\s*public\.current_profile_id\s*\(\s*\)/i,
+  /public\.is_platform_admin\s*\(\s*\)\s*=\s*true/i,
+  /public\.can_manage_center\s*\(\s*center_id\s*\)\s*=\s*true/i
+];
+for (const pattern of requiredCenterClaimsMembershipsRlsPatterns) {
+  requireCondition(pattern.test(centerClaimsMembershipsRlsContent), `0035_center_claims_memberships_rls.sql missing required pattern: ${pattern}`);
+}
+requireCondition((centerClaimsMembershipsRlsContent.match(/\bfor\s+select\b/gi) || []).length >= 6, '0035_center_claims_memberships_rls.sql must define all policies as FOR SELECT.');
+requireCondition((centerClaimsMembershipsRlsContent.match(/\bto\s+authenticated\b/gi) || []).length >= 6, '0035_center_claims_memberships_rls.sql must define all policies as TO authenticated.');
+requireCondition((centerClaimsMembershipsRlsContent.match(/deleted_at\s+is\s+null/gi) || []).length >= 6, '0035_center_claims_memberships_rls.sql must require deleted_at IS NULL in all policies.');
+requireCondition(!/\bto\s+anon\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include TO anon.');
+requireCondition(!/\bfor\s+insert\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include FOR INSERT policies.');
+requireCondition(!/\bfor\s+update\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include FOR UPDATE policies.');
+requireCondition(!/\bfor\s+delete\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include FOR DELETE policies.');
+requireCondition(!/\bdrop\b/i.test(centerClaimsMembershipsRlsContent), '0035_center_claims_memberships_rls.sql must not include DROP statements.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
