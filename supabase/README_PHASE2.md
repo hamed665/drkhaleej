@@ -436,3 +436,24 @@ Explicitly not included yet:
 - no audit log tables yet
 - no RLS yet
 - no frontend/backend app features yet
+
+## Phase 2.9A — Legal / Consent / Audit Foundation
+
+Approved in this phase:
+- `supabase/migrations/0028_legal_documents.sql`
+- `supabase/migrations/0029_consent_logs.sql`
+- `supabase/migrations/0030_audit_logs.sql`
+- legal, consent, and audit foundation only
+
+Explicitly not included yet:
+- no seed rows yet
+- no legal editor UI yet
+- no cookie banner UI yet
+- no automatic audit triggers yet
+- no RLS yet
+- no frontend/backend app features yet
+- no payments/invoices/checkout yet
+- no notifications/reminders yet
+- no insurance tables yet
+- no medical records/diagnoses/prescriptions/lab results yet
+- no behavior events yet

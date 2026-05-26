@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.8A';
+const PHASE = '2.9A';
 
 const required = [
   '0001_extensions.sql',
@@ -30,7 +30,10 @@ const required = [
   '0024_entity_media.sql',
   '0025_subscription_plans.sql',
   '0026_center_subscriptions.sql',
-  '0027_sponsored_campaigns.sql'
+  '0027_sponsored_campaigns.sql',
+  '0028_legal_documents.sql',
+  '0029_consent_logs.sql',
+  '0030_audit_logs.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -80,11 +83,8 @@ const forbiddenTables = [
   'medical_records',
   'reminders',
   'notifications',
-  'legal_documents',
-  'consent_logs',
   'behavior_events',
   'sponsored_slots',
-  'audit_logs',
   'review_aggregates',
   'review_summaries',
   'ai_moderation',
@@ -333,6 +333,35 @@ let foundSponsoredPlacementsLocaleUsage = false;
 let foundSponsoredPlacementsTargetCheck = false;
 let foundSponsoredCampaignsUpdatedAtTrigger = false;
 let foundSponsoredPlacementsUpdatedAtTrigger = false;
+
+let foundLegalDocumentStatusEnum = false;
+let foundLegalDocumentsTable = false;
+let foundLegalDocumentsConsentTypeUsage = false;
+let foundLegalDocumentsStatusUsage = false;
+let foundLegalDocumentsProfilesRef = false;
+let foundLegalDocumentsVersionNotNull = false;
+let foundLegalDocumentsTitleEnNotNull = false;
+let foundLegalDocumentsBodyEnNotNull = false;
+let foundLegalDocumentsPartialUnique = false;
+let foundLegalDocumentsUpdatedAtTrigger = false;
+
+let foundConsentLogsTable = false;
+let foundConsentLogsConsentTypeUsage = false;
+let foundConsentLogsLegalDocumentRef = false;
+let foundConsentLogsProfilesRef = false;
+let foundConsentLogsPatientContactsRef = false;
+let foundConsentLogsLocaleUsage = false;
+let foundConsentLogsCountryCodeUsage = false;
+let foundConsentLogsConsentedAt = false;
+let foundConsentLogsIdentityCheck = false;
+
+let foundAuditLogsTable = false;
+let foundAuditLogsActorTypeUsage = false;
+let foundAuditLogsActionTypeUsage = false;
+let foundAuditLogsProfilesRef = false;
+let foundAuditLogsEntityTypeNotNull = false;
+let foundAuditLogsCreatedAt = false;
+
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -709,6 +738,34 @@ for (const file of files) {
   if (/target_center_id\s+is\s+not\s+null[\s\S]*target_doctor_id\s+is\s+not\s+null[\s\S]*target_center_service_id\s+is\s+not\s+null[\s\S]*target_doctor_service_id\s+is\s+not\s+null/i.test(content)) foundSponsoredPlacementsTargetCheck = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.sponsored_campaigns\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundSponsoredCampaignsUpdatedAtTrigger = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.sponsored_placements\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundSponsoredPlacementsUpdatedAtTrigger = true;
+  if (/create\s+type\s+legal_document_status\s+as\s+enum/i.test(content)) foundLegalDocumentStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.legal_documents\b/i.test(content)) foundLegalDocumentsTable = true;
+  if (/document_type\s+consent_type\s+not\s+null/i.test(content)) foundLegalDocumentsConsentTypeUsage = true;
+  if (/status\s+legal_document_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundLegalDocumentsStatusUsage = true;
+  if (/created_by_profile_id\s+uuid\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content) || /created_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundLegalDocumentsProfilesRef = true;
+  if (/version\s+text\s+not\s+null/i.test(content)) foundLegalDocumentsVersionNotNull = true;
+  if (/title_en\s+text\s+not\s+null/i.test(content)) foundLegalDocumentsTitleEnNotNull = true;
+  if (/body_en\s+text\s+not\s+null/i.test(content)) foundLegalDocumentsBodyEnNotNull = true;
+  if (/create\s+unique\s+index[\s\S]*on\s+public\.legal_documents\s*\(\s*document_type\s*,\s*version\s*\)[\s\S]*where\s+deleted_at\s+is\s+null/i.test(content)) foundLegalDocumentsPartialUnique = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.legal_documents\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundLegalDocumentsUpdatedAtTrigger = true;
+
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.consent_logs\b/i.test(content)) foundConsentLogsTable = true;
+  if (/consent_type\s+consent_type\s+not\s+null/i.test(content)) foundConsentLogsConsentTypeUsage = true;
+  if (/legal_document_id\s+uuid\s+references\s+public\.legal_documents\s*\(\s*id\s*\)/i.test(content) || /legal_document_id\s+uuid\s+null\s+references\s+public\.legal_documents\s*\(\s*id\s*\)/i.test(content)) foundConsentLogsLegalDocumentRef = true;
+  if (/profile_id\s+uuid\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content) || /profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundConsentLogsProfilesRef = true;
+  if (/patient_contact_id\s+uuid\s+references\s+public\.patient_contacts\s*\(\s*id\s*\)/i.test(content) || /patient_contact_id\s+uuid\s+null\s+references\s+public\.patient_contacts\s*\(\s*id\s*\)/i.test(content)) foundConsentLogsPatientContactsRef = true;
+  if (/locale\s+app_locale\s+not\s+null\s+default\s+'en'/i.test(content)) foundConsentLogsLocaleUsage = true;
+  if (/country_code\s+country_code\s+not\s+null\s+default\s+'om'/i.test(content)) foundConsentLogsCountryCodeUsage = true;
+  if (/consented_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i.test(content)) foundConsentLogsConsentedAt = true;
+  if (/profile_id\s+is\s+not\s+null[\s\S]*patient_contact_id\s+is\s+not\s+null[\s\S]*anonymous_id/i.test(content)) foundConsentLogsIdentityCheck = true;
+
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.audit_logs\b/i.test(content)) foundAuditLogsTable = true;
+  if (/actor_type\s+audit_actor_type\s+not\s+null\s+default\s+'system'/i.test(content)) foundAuditLogsActorTypeUsage = true;
+  if (/action_type\s+audit_action_type\s+not\s+null/i.test(content)) foundAuditLogsActionTypeUsage = true;
+  if (/actor_profile_id\s+uuid\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content) || /actor_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundAuditLogsProfilesRef = true;
+  if (/entity_type\s+text\s+not\s+null/i.test(content)) foundAuditLogsEntityTypeNotNull = true;
+  if (/created_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i.test(content)) foundAuditLogsCreatedAt = true;
+
 }
 
 
@@ -815,6 +872,12 @@ if (!foundReviewReportsTable) { console.error(`ERROR: Phase ${PHASE} requires CR
 if (!foundReviewReportsReviewRef || !foundReviewReportsProfileRef || !foundReviewReportsPatientContactRef) { console.error(`ERROR: Phase ${PHASE} requires review_reports references to reviews, profiles, and patient_contacts.`); process.exit(1); }
 if (!foundReviewReportsReasonUsage || !foundReviewReportsStatusUsage) { console.error(`ERROR: Phase ${PHASE} requires review_reports enum usage for review_report_reason and review_report_status.`); process.exit(1); }
 if (!foundReviewReportsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires review_reports BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
+
+if (!foundLegalDocumentStatusEnum) { console.error(`ERROR: Phase ${PHASE} requires create type legal_document_status as enum in 0028_legal_documents.sql.`); process.exit(1); }
+if (!foundLegalDocumentsTable || !foundLegalDocumentsConsentTypeUsage || !foundLegalDocumentsStatusUsage || !foundLegalDocumentsProfilesRef || !foundLegalDocumentsVersionNotNull || !foundLegalDocumentsTitleEnNotNull || !foundLegalDocumentsBodyEnNotNull || !foundLegalDocumentsPartialUnique || !foundLegalDocumentsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete legal_documents enum/table/references/constraints/partial-unique/trigger foundation.`); process.exit(1); }
+if (!foundConsentLogsTable || !foundConsentLogsConsentTypeUsage || !foundConsentLogsLegalDocumentRef || !foundConsentLogsProfilesRef || !foundConsentLogsPatientContactsRef || !foundConsentLogsLocaleUsage || !foundConsentLogsCountryCodeUsage || !foundConsentLogsConsentedAt || !foundConsentLogsIdentityCheck) { console.error(`ERROR: Phase ${PHASE} requires complete consent_logs table/references/enum usage/consented_at/identity check foundation.`); process.exit(1); }
+if (!foundAuditLogsTable || !foundAuditLogsActorTypeUsage || !foundAuditLogsActionTypeUsage || !foundAuditLogsProfilesRef || !foundAuditLogsEntityTypeNotNull || !foundAuditLogsCreatedAt) { console.error(`ERROR: Phase ${PHASE} requires complete audit_logs table/references/enum usage/entity_type/created_at foundation.`); process.exit(1); }
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
