@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.6A';
+const PHASE = '2.6B';
 
 const required = [
   '0001_extensions.sql',
@@ -18,7 +18,9 @@ const required = [
   '0012_doctor_services.sql',
   '0013_doctor_schedules.sql',
   '0014_doctor_schedule_exceptions.sql',
-  '0015_appointment_slots.sql'
+  '0015_appointment_slots.sql',
+  '0016_patient_contacts.sql',
+  '0017_appointments.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -48,14 +50,19 @@ const forbiddenTables = [
   'providers',
   'doctor_centers',
   'doctor_memberships',
-  'appointments',
-    'bookings',
+  'bookings',
   'patients',
   'payments',
   'insurance',
   'pricing',
   'reviews',
   'ratings',
+  'lab_results',
+  'prescriptions',
+  'diagnoses',
+  'medical_records',
+  'reminders',
+  'notifications',
   'legal_documents',
   'consent_logs',
   'behavior_events',
@@ -151,6 +158,36 @@ let foundAppointmentSlotsStatusUsage = false;
 let foundAppointmentSlotsTimezoneDefault = false;
 let foundAppointmentSlotsUpdatedAtTrigger = false;
 
+
+let foundPatientContactGenderEnum = false;
+let foundPatientContactsTable = false;
+let foundPatientContactsGenderUsage = false;
+let foundPatientContactsLocaleUsage = false;
+let foundPatientContactsCountryUsage = false;
+let foundPatientContactsFullNameNotNull = false;
+let foundPatientContactsPhoneNotNull = false;
+let foundPatientContactsEmail = false;
+let foundPatientContactsEmailCheck = false;
+let foundPatientContactsBirthYearCheck = false;
+let foundPatientContactsUpdatedAtTrigger = false;
+
+let foundAppointmentStatusEnum = false;
+let foundAppointmentsTable = false;
+let foundAppointmentsSlotRef = false;
+let foundAppointmentsPatientContactRef = false;
+let foundAppointmentsDoctorRef = false;
+let foundAppointmentsPracticeLocationRef = false;
+let foundAppointmentsCenterRef = false;
+let foundAppointmentsCenterLocationRef = false;
+let foundAppointmentsDoctorServiceRef = false;
+let foundAppointmentsCenterServiceRef = false;
+let foundAppointmentsSlotDateNotNull = false;
+let foundAppointmentsStartTime = false;
+let foundAppointmentsEndTime = false;
+let foundAppointmentsTimeWindowCheck = false;
+let foundAppointmentsStatusUsage = false;
+let foundAppointmentsTimezoneDefault = false;
+let foundAppointmentsUpdatedAtTrigger = false;
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -365,6 +402,36 @@ for (const file of files) {
   if (/\btimezone\s+text\s+not\s+null\s+default\s+'Asia\/Muscat'/i.test(content)) foundAppointmentSlotsTimezoneDefault = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.appointment_slots\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundAppointmentSlotsUpdatedAtTrigger = true;
 
+  if (file === '0016_patient_contacts.sql' && /create\s+type\s+patient_contact_gender\s+as\s+enum/i.test(content)) foundPatientContactGenderEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.patient_contacts\b/i.test(content)) foundPatientContactsTable = true;
+  if (/\bgender\s+patient_contact_gender\s+not\s+null\s+default\s+'unspecified'/i.test(content)) foundPatientContactsGenderUsage = true;
+  if (/\bpreferred_locale\s+app_locale\s+not\s+null\s+default\s+'en'/i.test(content)) foundPatientContactsLocaleUsage = true;
+  if (/\bcountry_code\s+country_code\s+not\s+null\s+default\s+'om'/i.test(content)) foundPatientContactsCountryUsage = true;
+  if (/\bfull_name\s+text\s+not\s+null\b/i.test(content)) foundPatientContactsFullNameNotNull = true;
+  if (/\bphone\s+text\s+not\s+null\b/i.test(content)) foundPatientContactsPhoneNotNull = true;
+  if (/\bemail\s+text\s+null\b/i.test(content)) foundPatientContactsEmail = true;
+  if (/email\s+is\s+null\s+or\s+email\s+~\*/i.test(content)) foundPatientContactsEmailCheck = true;
+  if (/birth_year\s+is\s+null\s+or\s*\(\s*birth_year\s+between\s+1900\s+and\s+2100\s*\)/i.test(content)) foundPatientContactsBirthYearCheck = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.patient_contacts\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundPatientContactsUpdatedAtTrigger = true;
+
+  if (file === '0017_appointments.sql' && /create\s+type\s+appointment_status\s+as\s+enum/i.test(content)) foundAppointmentStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.appointments\b/i.test(content)) foundAppointmentsTable = true;
+  if (/\bappointment_slot_id\s+uuid\s+null\s+references\s+public\.appointment_slots\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsSlotRef = true;
+  if (/\bpatient_contact_id\s+uuid\s+not\s+null\s+references\s+public\.patient_contacts\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsPatientContactRef = true;
+  if (/\bdoctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsDoctorRef = true;
+  if (/\bdoctor_practice_location_id\s+uuid\s+null\s+references\s+public\.doctor_practice_locations\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsPracticeLocationRef = true;
+  if (/\bcenter_id\s+uuid\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsCenterRef = true;
+  if (/\bcenter_location_id\s+uuid\s+null\s+references\s+public\.center_locations\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsCenterLocationRef = true;
+  if (/\bdoctor_service_id\s+uuid\s+null\s+references\s+public\.doctor_services\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsDoctorServiceRef = true;
+  if (/\bcenter_service_id\s+uuid\s+null\s+references\s+public\.center_services\s*\(\s*id\s*\)/i.test(content)) foundAppointmentsCenterServiceRef = true;
+  if (/\bslot_date\s+date\s+not\s+null\b/i.test(content)) foundAppointmentsSlotDateNotNull = true;
+  if (/\bstart_time\s+time\s+not\s+null\b/i.test(content)) foundAppointmentsStartTime = true;
+  if (/\bend_time\s+time\s+not\s+null\b/i.test(content)) foundAppointmentsEndTime = true;
+  if (/\bconstraint\s+appointments_time_window_check\b/i.test(content) || /end_time\s*>\s*start_time/i.test(content)) foundAppointmentsTimeWindowCheck = true;
+  if (/\bstatus\s+appointment_status\s+not\s+null\s+default\s+'requested'/i.test(content)) foundAppointmentsStatusUsage = true;
+  if (/\btimezone\s+text\s+not\s+null\s+default\s+'Asia\/Muscat'/i.test(content)) foundAppointmentsTimezoneDefault = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.appointments\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundAppointmentsUpdatedAtTrigger = true;
+
 
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.doctor_practice_locations\b/i.test(content)) foundDoctorPracticeLocationsTable = true;
   if (/\bdoctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsDoctorRef = true;
@@ -439,6 +506,19 @@ if (!foundAppointmentSlotsCapacityCheck || !foundAppointmentSlotsBookedCountChec
 if (!foundAppointmentSlotsStatusUsage) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots status to use appointment_slot_status enum with default 'draft'.`); process.exit(1); }
 if (!foundAppointmentSlotsTimezoneDefault) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots timezone default 'Asia/Muscat'.`); process.exit(1); }
 if (!foundAppointmentSlotsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
+if (!foundPatientContactGenderEnum) { console.error(`ERROR: Phase ${PHASE} requires create type patient_contact_gender as enum in 0016_patient_contacts.sql.`); process.exit(1); }
+if (!foundPatientContactsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.patient_contacts in 0016_patient_contacts.sql.`); process.exit(1); }
+if (!foundPatientContactsGenderUsage || !foundPatientContactsLocaleUsage || !foundPatientContactsCountryUsage) { console.error(`ERROR: Phase ${PHASE} requires patient_contacts enum usage for patient_contact_gender, app_locale, and country_code.`); process.exit(1); }
+if (!foundPatientContactsFullNameNotNull || !foundPatientContactsPhoneNotNull || !foundPatientContactsEmail || !foundPatientContactsEmailCheck || !foundPatientContactsBirthYearCheck) { console.error(`ERROR: Phase ${PHASE} requires patient_contacts full_name/phone/email/birth_year constraints.`); process.exit(1); }
+if (!foundPatientContactsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires patient_contacts BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+if (!foundAppointmentStatusEnum) { console.error(`ERROR: Phase ${PHASE} requires create type appointment_status as enum in 0017_appointments.sql.`); process.exit(1); }
+if (!foundAppointmentsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.appointments in 0017_appointments.sql.`); process.exit(1); }
+if (!foundAppointmentsSlotRef || !foundAppointmentsPatientContactRef || !foundAppointmentsDoctorRef || !foundAppointmentsPracticeLocationRef || !foundAppointmentsCenterRef || !foundAppointmentsCenterLocationRef || !foundAppointmentsDoctorServiceRef || !foundAppointmentsCenterServiceRef) { console.error(`ERROR: Phase ${PHASE} requires appointments references to appointment_slots, patient_contacts, doctors, doctor_practice_locations, centers, center_locations, doctor_services, and center_services.`); process.exit(1); }
+if (!foundAppointmentsSlotDateNotNull || !foundAppointmentsStartTime || !foundAppointmentsEndTime || !foundAppointmentsTimeWindowCheck) { console.error(`ERROR: Phase ${PHASE} requires appointments slot_date/start_time/end_time with safe end_time > start_time check.`); process.exit(1); }
+if (!foundAppointmentsStatusUsage || !foundAppointmentsTimezoneDefault) { console.error(`ERROR: Phase ${PHASE} requires appointments appointment_status enum default and timezone default 'Asia/Muscat'.`); process.exit(1); }
+if (!foundAppointmentsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires appointments BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
 
 
 console.log(`Phase ${PHASE} migration validation passed.`);

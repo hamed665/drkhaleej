@@ -329,3 +329,21 @@ Strict exclusions:
 - no Persian/Hindi routes
 - no country expansion beyond Oman
 - no unrelated refactor
+
+## Phase 2.6B — Appointment Booking Core Foundation
+
+Approved in this phase:
+- `supabase/migrations/0016_patient_contacts.sql`
+- `supabase/migrations/0017_appointments.sql`
+- Appointment booking core foundation only.
+- Lightweight patient contact foundation only.
+
+Explicitly not included yet:
+- no seed rows yet
+- no payments/pricing yet
+- no insurance tables yet
+- no reviews/ratings yet
+- no notifications/reminders yet
+- no medical records/diagnoses/prescriptions/lab results yet
+- no RLS yet
+- no frontend/backend app features yet
