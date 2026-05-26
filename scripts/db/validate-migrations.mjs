@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.7B';
+const PHASE = '2.8A';
 
 const required = [
   '0001_extensions.sql',
@@ -27,7 +27,10 @@ const required = [
   '0021_review_reports.sql',
   '0022_center_type_expansion.sql',
   '0023_media_assets.sql',
-  '0024_entity_media.sql'
+  '0024_entity_media.sql',
+  '0025_subscription_plans.sql',
+  '0026_center_subscriptions.sql',
+  '0027_sponsored_campaigns.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -60,6 +63,14 @@ const forbiddenTables = [
   'bookings',
   'patients',
   'payments',
+  'payment_transactions',
+  'invoices',
+  'invoice_items',
+  'refunds',
+  'checkout_sessions',
+  'payment_gateway_customers',
+  'taxes',
+  'coupons',
   'insurance',
   'pricing',
   'ratings',
@@ -284,6 +295,44 @@ let foundEntityMediaIsPrimary = false;
 let foundEntityMediaSortOrder = false;
 let foundEntityMediaMetadata = false;
 let foundEntityMediaUpdatedAtTrigger = false;
+
+let foundSubscriptionPlanStatusEnum = false;
+let foundSubscriptionPlansTable = false;
+let foundSubscriptionPlansStatusUsage = false;
+let foundSubscriptionPlansIntervalUsage = false;
+let foundSubscriptionPlansSlugUnique = false;
+let foundSubscriptionPlansPriceCheck = false;
+let foundSubscriptionPlansCurrencyDefault = false;
+let foundSubscriptionPlansUpdatedAtTrigger = false;
+
+let foundCenterSubscriptionStatusEnum = false;
+let foundCenterSubscriptionsTable = false;
+let foundCenterSubscriptionsCenterRef = false;
+let foundCenterSubscriptionsPlanRef = false;
+let foundCenterSubscriptionsProfileRef = false;
+let foundCenterSubscriptionsStatusUsage = false;
+let foundCenterSubscriptionsIntervalUsage = false;
+let foundCenterSubscriptionsDateChecks = false;
+let foundCenterSubscriptionsPartialUnique = false;
+let foundCenterSubscriptionsUpdatedAtTrigger = false;
+
+let foundSponsoredCampaignStatusEnum = false;
+let foundSponsoredCampaignsTable = false;
+let foundSponsoredPlacementsTable = false;
+let foundSponsoredCampaignsCenterRef = false;
+let foundSponsoredCampaignsProfileRef = false;
+let foundSponsoredCampaignsStatusUsage = false;
+let foundSponsoredPlacementsCampaignRef = false;
+let foundSponsoredPlacementsCenterRef = false;
+let foundSponsoredPlacementsDoctorRef = false;
+let foundSponsoredPlacementsCenterServiceRef = false;
+let foundSponsoredPlacementsDoctorServiceRef = false;
+let foundSponsoredPlacementsSlotTypeUsage = false;
+let foundSponsoredPlacementsCountryUsage = false;
+let foundSponsoredPlacementsLocaleUsage = false;
+let foundSponsoredPlacementsTargetCheck = false;
+let foundSponsoredCampaignsUpdatedAtTrigger = false;
+let foundSponsoredPlacementsUpdatedAtTrigger = false;
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -621,6 +670,45 @@ for (const file of files) {
   if (/\bsort_order\s+integer\s+not\s+null\s+default\s+0\b/i.test(content)) foundEntityMediaSortOrder = true;
   if (/\bmetadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i.test(content)) foundEntityMediaMetadata = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.entity_media\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundEntityMediaUpdatedAtTrigger = true;
+
+
+  if (/create\s+type\s+subscription_plan_status\s+as\s+enum/i.test(content)) foundSubscriptionPlanStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.subscription_plans\b/i.test(content)) foundSubscriptionPlansTable = true;
+  if (/\bstatus\s+subscription_plan_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundSubscriptionPlansStatusUsage = true;
+  if (/\binterval\s+plan_interval\s+not\s+null\s+default\s+'monthly'/i.test(content)) foundSubscriptionPlansIntervalUsage = true;
+  if (/\bslug\s+text\s+not\s+null\s+unique\b/i.test(content)) foundSubscriptionPlansSlugUnique = true;
+  if (/price_amount[^\n]*check[^\n]*>=\s*0/i.test(content)) foundSubscriptionPlansPriceCheck = true;
+  if (/\bcurrency_code\s+text\s+not\s+null\s+default\s+'OMR'/i.test(content)) foundSubscriptionPlansCurrencyDefault = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.subscription_plans\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundSubscriptionPlansUpdatedAtTrigger = true;
+
+  if (/create\s+type\s+center_subscription_status\s+as\s+enum/i.test(content)) foundCenterSubscriptionStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.center_subscriptions\b/i.test(content)) foundCenterSubscriptionsTable = true;
+  if (/center_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundCenterSubscriptionsCenterRef = true;
+  if (/subscription_plan_id\s+uuid\s+not\s+null\s+references\s+public\.subscription_plans\s*\(\s*id\s*\)/i.test(content)) foundCenterSubscriptionsPlanRef = true;
+  if (/sales_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundCenterSubscriptionsProfileRef = true;
+  if (/\bstatus\s+center_subscription_status\s+not\s+null\s+default\s+'pending'/i.test(content)) foundCenterSubscriptionsStatusUsage = true;
+  if (/\bbilling_interval\s+plan_interval\s+not\s+null\s+default\s+'monthly'/i.test(content)) foundCenterSubscriptionsIntervalUsage = true;
+  if (/ends_at[^\n]*>=\s*starts_at/i.test(content) && /trial_ends_at[^\n]*>=\s*starts_at/i.test(content)) foundCenterSubscriptionsDateChecks = true;
+  if (/create\s+unique\s+index\s+if\s+not\s+exists\s+uq_center_subscriptions_one_active_like_per_center/i.test(content) && /status\s+in\s*\(\s*'pending'\s*,\s*'active'\s*,\s*'paused'\s*\)/i.test(content) && /deleted_at\s+is\s+null/i.test(content)) foundCenterSubscriptionsPartialUnique = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.center_subscriptions\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundCenterSubscriptionsUpdatedAtTrigger = true;
+
+  if (/create\s+type\s+sponsored_campaign_status\s+as\s+enum/i.test(content)) foundSponsoredCampaignStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.sponsored_campaigns\b/i.test(content)) foundSponsoredCampaignsTable = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.sponsored_placements\b/i.test(content)) foundSponsoredPlacementsTable = true;
+  if (/center_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundSponsoredCampaignsCenterRef = true;
+  if (/created_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundSponsoredCampaignsProfileRef = true;
+  if (/\bstatus\s+sponsored_campaign_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundSponsoredCampaignsStatusUsage = true;
+  if (/campaign_id\s+uuid\s+not\s+null\s+references\s+public\.sponsored_campaigns\s*\(\s*id\s*\)/i.test(content)) foundSponsoredPlacementsCampaignRef = true;
+  if (/target_center_id\s+uuid\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundSponsoredPlacementsCenterRef = true;
+  if (/target_doctor_id\s+uuid\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundSponsoredPlacementsDoctorRef = true;
+  if (/target_center_service_id\s+uuid\s+null\s+references\s+public\.center_services\s*\(\s*id\s*\)/i.test(content)) foundSponsoredPlacementsCenterServiceRef = true;
+  if (/target_doctor_service_id\s+uuid\s+null\s+references\s+public\.doctor_services\s*\(\s*id\s*\)/i.test(content)) foundSponsoredPlacementsDoctorServiceRef = true;
+  if (/slot_type\s+sponsored_slot_type\s+not\s+null\s+default\s+'sponsored_result'/i.test(content)) foundSponsoredPlacementsSlotTypeUsage = true;
+  if (/country_code\s+country_code\s+not\s+null\s+default\s+'om'/i.test(content)) foundSponsoredPlacementsCountryUsage = true;
+  if (/locale\s+app_locale\s+null/i.test(content)) foundSponsoredPlacementsLocaleUsage = true;
+  if (/target_center_id\s+is\s+not\s+null[\s\S]*target_doctor_id\s+is\s+not\s+null[\s\S]*target_center_service_id\s+is\s+not\s+null[\s\S]*target_doctor_service_id\s+is\s+not\s+null/i.test(content)) foundSponsoredPlacementsTargetCheck = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.sponsored_campaigns\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundSponsoredCampaignsUpdatedAtTrigger = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.sponsored_placements\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundSponsoredPlacementsUpdatedAtTrigger = true;
 }
 
 
@@ -734,3 +822,7 @@ console.log(`Validated files: ${required.join(', ')}`);
 if (!foundCenterTypeGym || !foundCenterTypeFitnessCenter || !foundCenterTypeSpa || !foundCenterTypeHealthyRestaurant || !foundCenterTypeNutritionCenter || !foundCenterTypeJuiceBar || !foundCenterTypeMealPlanProvider || !foundCenterTypeHomeHealthcare || !foundCenterTypeOpticalStore || !foundCenterTypeMedicalEquipmentStore) { console.error(`ERROR: Phase ${PHASE} requires 0022_center_type_expansion.sql ALTER TYPE center_type ADD VALUE IF NOT EXISTS for all required values.`); process.exit(1); }
 if (!foundMediaAssetStatusEnum || !foundMediaAssetSourceEnum || !foundMediaAssetsTable || !foundMediaAssetsProfileRef || !foundMediaAssetsStatusUsage || !foundMediaAssetsSourceUsage || !foundMediaAssetsStorageBucket || !foundMediaAssetsStoragePath || !foundMediaAssetsPublicUrl || !foundMediaAssetsExternalUrl || !foundMediaAssetsMetadata || !foundMediaAssetsLocationCheck || !foundMediaAssetsSizeDimensionChecks || !foundMediaAssetsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete media_assets enum/table/constraint/trigger foundation.`); process.exit(1); }
 if (!foundMediaEntityTypeEnum || !foundMediaUsageKindEnum || !foundEntityMediaTable || !foundEntityMediaMediaAssetRef || !foundEntityMediaEntityTypeUsage || !foundEntityMediaUsageKindUsage || !foundEntityMediaEntityId || !foundEntityMediaAltText || !foundEntityMediaCaption || !foundEntityMediaIsPrimary || !foundEntityMediaSortOrder || !foundEntityMediaMetadata || !foundEntityMediaUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete entity_media enum/table/trigger foundation.`); process.exit(1); }
+
+if (!foundSubscriptionPlanStatusEnum || !foundSubscriptionPlansTable || !foundSubscriptionPlansStatusUsage || !foundSubscriptionPlansIntervalUsage || !foundSubscriptionPlansSlugUnique || !foundSubscriptionPlansPriceCheck || !foundSubscriptionPlansCurrencyDefault || !foundSubscriptionPlansUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete subscription_plans enum/table/constraints/trigger foundation.`); process.exit(1); }
+if (!foundCenterSubscriptionStatusEnum || !foundCenterSubscriptionsTable || !foundCenterSubscriptionsCenterRef || !foundCenterSubscriptionsPlanRef || !foundCenterSubscriptionsProfileRef || !foundCenterSubscriptionsStatusUsage || !foundCenterSubscriptionsIntervalUsage || !foundCenterSubscriptionsDateChecks || !foundCenterSubscriptionsPartialUnique || !foundCenterSubscriptionsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete center_subscriptions enum/table/references/constraints/partial-unique/trigger foundation.`); process.exit(1); }
+if (!foundSponsoredCampaignStatusEnum || !foundSponsoredCampaignsTable || !foundSponsoredPlacementsTable || !foundSponsoredCampaignsCenterRef || !foundSponsoredCampaignsProfileRef || !foundSponsoredCampaignsStatusUsage || !foundSponsoredPlacementsCampaignRef || !foundSponsoredPlacementsCenterRef || !foundSponsoredPlacementsDoctorRef || !foundSponsoredPlacementsCenterServiceRef || !foundSponsoredPlacementsDoctorServiceRef || !foundSponsoredPlacementsSlotTypeUsage || !foundSponsoredPlacementsCountryUsage || !foundSponsoredPlacementsLocaleUsage || !foundSponsoredPlacementsTargetCheck || !foundSponsoredCampaignsUpdatedAtTrigger || !foundSponsoredPlacementsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete sponsored_campaigns/sponsored_placements enum/table/references/constraints/trigger foundation.`); process.exit(1); }

@@ -412,3 +412,27 @@ Explicitly not included yet:
 - no audit log tables yet
 - no RLS yet
 - no frontend/backend app features yet
+
+
+## Phase 2.8A — Monetization Foundation (Schema Only)
+
+Approved in this phase:
+- `supabase/migrations/0025_subscription_plans.sql`
+- `supabase/migrations/0026_center_subscriptions.sql`
+- `supabase/migrations/0027_sponsored_campaigns.sql`
+- Monetization foundation only (subscription and sponsored campaign schema only).
+
+Explicitly not included yet:
+- no seed rows yet
+- no payments yet
+- no invoices yet
+- no checkout/payment gateway yet
+- no impression/click tracking yet
+- no behavior events yet
+- no notifications/reminders yet
+- no insurance tables yet
+- no medical records/diagnoses/prescriptions/lab results yet
+- no legal/consent tables yet
+- no audit log tables yet
+- no RLS yet
+- no frontend/backend app features yet
