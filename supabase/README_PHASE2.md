@@ -286,3 +286,46 @@ Strict exclusions:
 - no Persian/Hindi routes
 - no country expansion beyond Oman
 - no unrelated refactor
+
+## Phase 2.6A — Appointment Slots Foundation
+
+Approved in this phase:
+- `supabase/migrations/0015_appointment_slots.sql`
+- Appointment slots foundation only (`public.appointment_slots` + `appointment_slot_status` enum)
+
+Explicitly not included yet:
+- no seed rows yet
+- no appointments table yet
+- no bookings yet
+- no patients yet
+- no payments/pricing yet
+- no insurance tables yet
+- no reviews/ratings yet
+- no notifications/reminders yet
+- no RLS yet
+- no frontend/backend app features yet
+
+Strict exclusions:
+- no appointment booking tables
+- no booking tables
+- no patient tables
+- no payment tables
+- no pricing tables
+- no insurance tables
+- no reviews/ratings tables
+- no notifications/reminders tables
+- no legal/consent tables
+- no behavior events tables
+- no sponsored slots tables
+- no audit log tables
+- no RLS policies
+- no seed rows
+- no frontend pages
+- no admin UI
+- no provider dashboard
+- no payment code
+- no appointment engine
+- no AI chat
+- no Persian/Hindi routes
+- no country expansion beyond Oman
+- no unrelated refactor

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.5E';
+const PHASE = '2.6A';
 
 const required = [
   '0001_extensions.sql',
@@ -17,7 +17,8 @@ const required = [
   '0011_doctor_practice_locations.sql',
   '0012_doctor_services.sql',
   '0013_doctor_schedules.sql',
-  '0014_doctor_schedule_exceptions.sql'
+  '0014_doctor_schedule_exceptions.sql',
+  '0015_appointment_slots.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -48,9 +49,9 @@ const forbiddenTables = [
   'doctor_centers',
   'doctor_memberships',
   'appointments',
-  'appointment_slots',
-  'bookings',
+    'bookings',
   'patients',
+  'payments',
   'insurance',
   'pricing',
   'reviews',
@@ -65,7 +66,7 @@ const forbiddenTables = [
 const allowedGeoTables = ['geo_countries', 'geo_regions', 'geo_cities', 'geo_areas'];
 const allowedTaxonomyTables = ['taxonomy_groups', 'service_categories', 'services', 'specialties'];
 const allowedOwnershipTables = ['center_claims', 'center_memberships'];
-const allowedDoctorTables = ['doctors', 'doctor_services', 'doctor_schedules', 'doctor_schedule_exceptions'];
+const allowedDoctorTables = ['doctors', 'doctor_services', 'doctor_schedules', 'doctor_schedule_exceptions', 'appointment_slots'];
 
 let foundDoctorsTable = false;
 let foundDoctorTitleUsage = false;
@@ -128,6 +129,28 @@ let foundDoctorScheduleExceptionsEndTime = false;
 let foundDoctorScheduleExceptionsTimePairCheck = false;
 let foundDoctorScheduleExceptionsTimeWindowCheck = false;
 let foundDoctorScheduleExceptionsUpdatedAtTrigger = false;
+
+
+let foundAppointmentSlotStatusEnum = false;
+let foundAppointmentSlotsTable = false;
+let foundAppointmentSlotsDoctorRef = false;
+let foundAppointmentSlotsPracticeLocationRef = false;
+let foundAppointmentSlotsScheduleRef = false;
+let foundAppointmentSlotsScheduleExceptionRef = false;
+let foundAppointmentSlotsCenterRef = false;
+let foundAppointmentSlotsCenterLocationRef = false;
+let foundAppointmentSlotsDoctorServiceRef = false;
+let foundAppointmentSlotsCenterServiceRef = false;
+let foundAppointmentSlotsSlotDateNotNull = false;
+let foundAppointmentSlotsStartTime = false;
+let foundAppointmentSlotsEndTime = false;
+let foundAppointmentSlotsTimeWindowCheck = false;
+let foundAppointmentSlotsCapacityCheck = false;
+let foundAppointmentSlotsBookedCountChecks = false;
+let foundAppointmentSlotsStatusUsage = false;
+let foundAppointmentSlotsTimezoneDefault = false;
+let foundAppointmentSlotsUpdatedAtTrigger = false;
+
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -322,6 +345,27 @@ for (const file of files) {
   if (/\bconstraint\s+doctor_schedule_exceptions_time_window_check\b/i.test(content) || /end_time\s*>\s*start_time/i.test(content)) foundDoctorScheduleExceptionsTimeWindowCheck = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.doctor_schedule_exceptions\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundDoctorScheduleExceptionsUpdatedAtTrigger = true;
 
+  if (file === '0015_appointment_slots.sql' && /create\s+type\s+appointment_slot_status\s+as\s+enum/i.test(content)) foundAppointmentSlotStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.appointment_slots\b/i.test(content)) foundAppointmentSlotsTable = true;
+  if (/\bdoctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsDoctorRef = true;
+  if (/\bdoctor_practice_location_id\s+uuid\s+null\s+references\s+public\.doctor_practice_locations\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsPracticeLocationRef = true;
+  if (/\bdoctor_schedule_id\s+uuid\s+null\s+references\s+public\.doctor_schedules\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsScheduleRef = true;
+  if (/\bdoctor_schedule_exception_id\s+uuid\s+null\s+references\s+public\.doctor_schedule_exceptions\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsScheduleExceptionRef = true;
+  if (/\bcenter_id\s+uuid\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsCenterRef = true;
+  if (/\bcenter_location_id\s+uuid\s+null\s+references\s+public\.center_locations\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsCenterLocationRef = true;
+  if (/\bdoctor_service_id\s+uuid\s+null\s+references\s+public\.doctor_services\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsDoctorServiceRef = true;
+  if (/\bcenter_service_id\s+uuid\s+null\s+references\s+public\.center_services\s*\(\s*id\s*\)/i.test(content)) foundAppointmentSlotsCenterServiceRef = true;
+  if (/\bslot_date\s+date\s+not\s+null\b/i.test(content)) foundAppointmentSlotsSlotDateNotNull = true;
+  if (/\bstart_time\s+time\s+not\s+null\b/i.test(content)) foundAppointmentSlotsStartTime = true;
+  if (/\bend_time\s+time\s+not\s+null\b/i.test(content)) foundAppointmentSlotsEndTime = true;
+  if (/\bconstraint\s+appointment_slots_time_window_check\b/i.test(content) || /end_time\s*>\s*start_time/i.test(content)) foundAppointmentSlotsTimeWindowCheck = true;
+  if (/\bconstraint\s+appointment_slots_capacity_check\b/i.test(content) || /capacity\s*>=\s*1/i.test(content)) foundAppointmentSlotsCapacityCheck = true;
+  if ((/booked_count\s*>=\s*0/i.test(content) || /appointment_slots_booked_count_nonnegative_check/i.test(content)) && (/booked_count\s*<=\s*capacity/i.test(content) || /appointment_slots_booked_count_capacity_check/i.test(content))) foundAppointmentSlotsBookedCountChecks = true;
+  if (/\bstatus\s+appointment_slot_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundAppointmentSlotsStatusUsage = true;
+  if (/\btimezone\s+text\s+not\s+null\s+default\s+'Asia\/Muscat'/i.test(content)) foundAppointmentSlotsTimezoneDefault = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.appointment_slots\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundAppointmentSlotsUpdatedAtTrigger = true;
+
+
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.doctor_practice_locations\b/i.test(content)) foundDoctorPracticeLocationsTable = true;
   if (/\bdoctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsDoctorRef = true;
   if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsCenterRef = true;
@@ -383,6 +427,19 @@ if (!foundDoctorScheduleExceptionsDateNotNull) { console.error(`ERROR: Phase ${P
 if (!foundDoctorScheduleExceptionsStartTime || !foundDoctorScheduleExceptionsEndTime) { console.error(`ERROR: Phase ${PHASE} requires doctor_schedule_exceptions start_time and end_time time columns.`); process.exit(1); }
 if (!foundDoctorScheduleExceptionsTimePairCheck || !foundDoctorScheduleExceptionsTimeWindowCheck) { console.error(`ERROR: Phase ${PHASE} requires doctor_schedule_exceptions safe start_time/end_time pairing and ordering checks.`); process.exit(1); }
 if (!foundDoctorScheduleExceptionsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires doctor_schedule_exceptions BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
+
+if (!foundAppointmentSlotStatusEnum) { console.error(`ERROR: Phase ${PHASE} requires create type appointment_slot_status as enum in 0015_appointment_slots.sql.`); process.exit(1); }
+if (!foundAppointmentSlotsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.appointment_slots in 0015_appointment_slots.sql.`); process.exit(1); }
+if (!foundAppointmentSlotsDoctorRef || !foundAppointmentSlotsPracticeLocationRef || !foundAppointmentSlotsScheduleRef || !foundAppointmentSlotsScheduleExceptionRef || !foundAppointmentSlotsCenterRef || !foundAppointmentSlotsCenterLocationRef || !foundAppointmentSlotsDoctorServiceRef || !foundAppointmentSlotsCenterServiceRef) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots references to doctors, doctor_practice_locations, doctor_schedules, doctor_schedule_exceptions, centers, center_locations, doctor_services, and center_services.`); process.exit(1); }
+if (!foundAppointmentSlotsSlotDateNotNull) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots slot_date date not null.`); process.exit(1); }
+if (!foundAppointmentSlotsStartTime || !foundAppointmentSlotsEndTime) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots start_time and end_time time columns.`); process.exit(1); }
+if (!foundAppointmentSlotsTimeWindowCheck) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots safe check end_time > start_time.`); process.exit(1); }
+if (!foundAppointmentSlotsCapacityCheck || !foundAppointmentSlotsBookedCountChecks) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots safe checks for capacity and booked_count.`); process.exit(1); }
+if (!foundAppointmentSlotsStatusUsage) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots status to use appointment_slot_status enum with default 'draft'.`); process.exit(1); }
+if (!foundAppointmentSlotsTimezoneDefault) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots timezone default 'Asia/Muscat'.`); process.exit(1); }
+if (!foundAppointmentSlotsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires appointment_slots BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
