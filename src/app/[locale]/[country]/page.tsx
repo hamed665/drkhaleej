@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { HomeCategoryPreview } from '@/components/home/home-category-preview';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeTrustStrip } from '@/components/home/home-trust-strip';
-import { Container } from '@/components/ui/container';
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -171,17 +170,15 @@ export default async function LocaleCountryHome({ params }: { params: Promise<Pa
   const copy = homeCopyByLocale[safeLocale];
 
   return (
-    <Container>
-      <div className="home-foundation" dir={dir} data-country={safeCountry}>
-        <HomeHero copy={copy.hero} dir={dir} />
-        <HomeTrustStrip items={copy.trust} dir={dir} />
-        <HomeCategoryPreview
-          title={copy.categories.title}
-          subtitle={copy.categories.subtitle}
-          categories={copy.categories.items}
-          dir={dir}
-        />
-      </div>
-    </Container>
+    <div className="home-foundation" dir={dir} data-country={safeCountry} data-locale={safeLocale}>
+      <HomeHero copy={copy.hero} dir={dir} />
+      <HomeTrustStrip items={copy.trust} dir={dir} />
+      <HomeCategoryPreview
+        title={copy.categories.title}
+        subtitle={copy.categories.subtitle}
+        categories={copy.categories.items}
+        dir={dir}
+      />
+    </div>
   );
 }

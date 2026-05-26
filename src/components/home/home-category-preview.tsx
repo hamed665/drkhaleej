@@ -19,7 +19,7 @@ export function HomeCategoryPreview({ title, subtitle, categories, dir }: HomeCa
       </div>
       <div className="home-categories__grid">
         {categories.map((category) => (
-          <article key={category.key} className={`home-categories__card ui-card premium-card-surface ${category.accentClass}`}>
+          <article key={category.key} className={`home-categories__card glass-strong card-shimmer ${category.accentClass}`}>
             <h3>{category.label}</h3>
             <p>{category.description}</p>
           </article>
