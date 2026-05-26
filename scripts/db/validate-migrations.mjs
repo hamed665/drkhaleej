@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.2B';
+const PHASE = '3.3A';
 
 const required = [
   '0001_extensions.sql',
@@ -41,7 +41,9 @@ const required = [
   '0035_center_claims_memberships_rls.sql',
   '0036_patient_contacts_profile_link.sql',
   '0037_patient_appointment_access_helpers.sql',
-  '0038_patient_contacts_appointments_rls.sql'
+  '0038_patient_contacts_appointments_rls.sql',
+  '0039_review_media_access_helpers.sql',
+  '0040_reviews_reports_media_private_rls.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -123,7 +125,8 @@ const rlsPolicyFiles = new Set([
   '0032_rls_public_catalog_read_policies.sql',
   '0033_profiles_rls.sql',
   '0035_center_claims_memberships_rls.sql',
-  '0038_patient_contacts_appointments_rls.sql'
+  '0038_patient_contacts_appointments_rls.sql',
+  '0040_reviews_reports_media_private_rls.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -134,6 +137,8 @@ const helperFunctionFile = '0031_rls_auth_helpers.sql';
 const patientContactsProfileLinkFile = '0036_patient_contacts_profile_link.sql';
 const patientAppointmentAccessHelpersFile = '0037_patient_appointment_access_helpers.sql';
 const patientContactsAppointmentsRlsFile = '0038_patient_contacts_appointments_rls.sql';
+const reviewMediaAccessHelpersFile = '0039_review_media_access_helpers.sql';
+const reviewsReportsMediaPrivateRlsFile = '0040_reviews_reports_media_private_rls.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1045,6 +1050,8 @@ requireCondition(!/\bdrop\b/i.test(centerClaimsMembershipsRlsContent), '0035_cen
 const patientContactsProfileLinkContent = readFileSync(`${dir}/${patientContactsProfileLinkFile}`, 'utf8');
 const patientAppointmentAccessHelpersContent = readFileSync(`${dir}/${patientAppointmentAccessHelpersFile}`, 'utf8');
 const patientContactsAppointmentsRlsContent = readFileSync(`${dir}/${patientContactsAppointmentsRlsFile}`, 'utf8');
+const reviewMediaAccessHelpersContent = readFileSync(`${dir}/${reviewMediaAccessHelpersFile}`, 'utf8');
+const reviewsReportsMediaPrivateRlsContent = readFileSync(`${dir}/${reviewsReportsMediaPrivateRlsFile}`, 'utf8');
 
 const requiredPatientContactsProfileLinkPatterns = [
   /alter\s+table\s+public\.patient_contacts\s+add\s+column\s+if\s+not\s+exists\s+profile_id\s+uuid\s+null/i,
@@ -1109,6 +1116,51 @@ requireCondition(!/\bfor\s+delete\b/i.test(patientContactsAppointmentsRlsContent
 requireCondition(!/\binsert\s+into\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include INSERT INTO.');
 requireCondition(!/\bupdate\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include UPDATE.');
 requireCondition(!/\bdrop\b/i.test(patientContactsAppointmentsRlsContent), '0038_patient_contacts_appointments_rls.sql must not include DROP statements.');
+
+
+
+const requiredReviewMediaAccessHelperPatterns = [
+  /create\s+or\s+replace\s+function\s+public\.can_view_review_private/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_review_report/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_media_asset_private/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_entity_media_private/i,
+  /public\.current_profile_id\s*\(/i,
+  /public\.is_platform_admin\s*\(/i,
+  /public\.can_view_patient_contact\s*\(/i,
+  /public\.can_view_appointment\s*\(/i,
+  /public\.can_view_center_private_data\s*\(/i,
+  /public\.reviews/i,
+  /public\.review_reports/i,
+  /public\.media_assets/i,
+  /public\.entity_media/i,
+  /deleted_at\s+is\s+null/i
+];
+for (const pattern of requiredReviewMediaAccessHelperPatterns) {
+  requireCondition(pattern.test(reviewMediaAccessHelpersContent), `0039_review_media_access_helpers.sql missing required pattern: ${pattern}`);
+}
+requireCondition(!/\bcreate\s+policy\b/i.test(reviewMediaAccessHelpersContent), '0039_review_media_access_helpers.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(reviewMediaAccessHelpersContent), '0039_review_media_access_helpers.sql must not include ENABLE ROW LEVEL SECURITY.');
+requireCondition(!/\binsert\s+into\b/i.test(reviewMediaAccessHelpersContent), '0039_review_media_access_helpers.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(reviewMediaAccessHelpersContent), '0039_review_media_access_helpers.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(reviewMediaAccessHelpersContent), '0039_review_media_access_helpers.sql must not include DROP statements.');
+
+const requiredReviewsPolicyBlockPatterns = [
+  /create\s+policy\s+reviews_select_private_allowed[\s\S]*on\s+public\.reviews[\s\S]*for\s+select[\s\S]*to\s+authenticated[\s\S]*using\s*\([\s\S]*public\.can_view_review_private\s*\(\s*id\s*\)[\s\S]*deleted_at\s+is\s+null[\s\S]*\)/i,
+  /create\s+policy\s+review_reports_select_allowed[\s\S]*on\s+public\.review_reports[\s\S]*for\s+select[\s\S]*to\s+authenticated[\s\S]*using\s*\([\s\S]*public\.can_view_review_report\s*\(\s*id\s*\)[\s\S]*deleted_at\s+is\s+null[\s\S]*\)/i,
+  /create\s+policy\s+media_assets_select_private_allowed[\s\S]*on\s+public\.media_assets[\s\S]*for\s+select[\s\S]*to\s+authenticated[\s\S]*using\s*\([\s\S]*public\.can_view_media_asset_private\s*\(\s*id\s*\)[\s\S]*deleted_at\s+is\s+null[\s\S]*\)/i,
+  /create\s+policy\s+entity_media_select_private_allowed[\s\S]*on\s+public\.entity_media[\s\S]*for\s+select[\s\S]*to\s+authenticated[\s\S]*using\s*\([\s\S]*public\.can_view_entity_media_private\s*\(\s*id\s*\)[\s\S]*deleted_at\s+is\s+null[\s\S]*\)/i
+];
+for (const pattern of requiredReviewsPolicyBlockPatterns) {
+  requireCondition(pattern.test(reviewsReportsMediaPrivateRlsContent), `0040_reviews_reports_media_private_rls.sql missing required policy block pattern: ${pattern}`);
+}
+requireCondition(/alter\s+table\s+public\.review_reports\s+enable\s+row\s+level\s+security/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must enable RLS on public.review_reports.');
+requireCondition(!/\bto\s+anon\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include TO anon.');
+requireCondition(!/\bfor\s+insert\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include FOR INSERT policies.');
+requireCondition(!/\bfor\s+update\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include FOR UPDATE policies.');
+requireCondition(!/\bfor\s+delete\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include FOR DELETE policies.');
+requireCondition(!/\binsert\s+into\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include DROP statements.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);

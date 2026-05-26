@@ -568,3 +568,22 @@ Phase scope:
 - no appointment creation/cancellation/confirmation/reschedule flow
 - no frontend/backend app features
 - no seed rows
+
+## Phase 3.3A — Reviews / Reports / Media Private Read RLS
+
+Approved in this phase:
+- `supabase/migrations/0039_review_media_access_helpers.sql`
+- `supabase/migrations/0040_reviews_reports_media_private_rls.sql`
+
+Scope in this phase:
+- reviews/reports/media private SELECT RLS only
+- authenticated users can SELECT own/non-public reviews only through appointment/contact ownership or center private access
+- platform admins can SELECT all non-deleted review/report/media rows
+- center members with private-data access can SELECT related review/media/report context
+- public approved reviews/media remain governed by existing public policies
+- no anon access in new private policies
+- no INSERT/UPDATE/DELETE policies yet
+- no review submission/moderation flow
+- no media upload/storage/image processing flow
+- no frontend/backend app features
+- no seed rows
