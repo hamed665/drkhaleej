@@ -75,3 +75,16 @@ For every phase:
 - Do not create thin/empty SEO pages.
 - Do not fake structured data.
 - Do not add schema.org markup unless the content supports it.
+
+## Phase 3.0C TypeScript Safety Baseline
+
+Phase 3.0C establishes a strict TypeScript-first baseline for upcoming private RLS/auth/backend/API/dashboard phases.
+
+- Future app/auth/API/security/backend code must be TypeScript-first.
+- Do not introduce new `.js` app/backend/security files without explicit approval.
+- `.mjs` scripts/config files may remain `.mjs` when intentionally script-only.
+- Agents must not weaken `tsconfig`, lint, build, route, env, migration, seed, or RLS checks to make work pass.
+- Do not perform mass JS-to-TS conversion or file renaming without an approved dedicated phase.
+- Preserve `PHASED_BUILD_ONLY` execution and file-plan-before-editing workflow.
+- Preserve STOP-on-blocker/no-guessing behavior, and never fake passing tests.
+- Preserve existing RLS/private-data/seed restrictions unless a specific approved phase expands scope.

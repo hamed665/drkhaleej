@@ -121,3 +121,16 @@ Build mode:
 ## Agent workflow reminder
 
 Agents must read `AGENTS.md` before doing any work.
+
+## Phase 3.0C — TypeScript Safety Baseline
+
+Phase 3.0C establishes a TypeScript safety baseline before private RLS, auth, backend, API, and dashboard phases continue.
+
+- Repository inspection in this phase found no `.js` / `.jsx` app code in the current Next.js app surface.
+- Existing `.mjs` files are intentionally script/config oriented and may remain `.mjs` when script-only.
+- Future app/auth/API/security/backend code must be TypeScript-first.
+- Future React components must be implemented as `.tsx`.
+- Future server utilities, API handlers, and server actions must be implemented as `.ts`.
+- No broad JS-to-TS conversion is allowed without a dedicated approved phase.
+- Private RLS/auth/backend work must continue with type-safety discipline; do not bypass typecheck/lint/build to force progress.
+- Existing UI/UX and SEO guardrails remain mandatory for all future public work.
