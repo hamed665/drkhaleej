@@ -388,3 +388,27 @@ Explicitly not included yet:
 - no audit log tables yet
 - no RLS yet
 - no frontend/backend app features yet
+
+## Phase 2.7B — Center Type Expansion + Media Assets Foundation
+
+Approved in this phase:
+- `supabase/migrations/0022_center_type_expansion.sql` approved
+- `supabase/migrations/0023_media_assets.sql` approved
+- `supabase/migrations/0024_entity_media.sql` approved
+- center type expansion and media assets foundation only
+
+Explicitly not included yet:
+- no seed rows yet
+- no upload API yet
+- no Supabase Storage bucket creation yet
+- no image processing jobs yet
+- no moderation dashboard yet
+- no AI moderation yet
+- no payments/pricing yet
+- no insurance tables yet
+- no notifications/reminders yet
+- no medical records/diagnoses/prescriptions/lab results yet
+- no legal/consent tables yet
+- no audit log tables yet
+- no RLS yet
+- no frontend/backend app features yet

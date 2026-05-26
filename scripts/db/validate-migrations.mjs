@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.7A';
+const PHASE = '2.7B';
 
 const required = [
   '0001_extensions.sql',
@@ -24,7 +24,10 @@ const required = [
   '0018_appointment_status_history.sql',
   '0019_appointment_cancellations.sql',
   '0020_reviews.sql',
-  '0021_review_reports.sql'
+  '0021_review_reports.sql',
+  '0022_center_type_expansion.sql',
+  '0023_media_assets.sql',
+  '0024_entity_media.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -73,7 +76,10 @@ const forbiddenTables = [
   'audit_logs',
   'review_aggregates',
   'review_summaries',
-  'ai_moderation'
+  'ai_moderation',
+  'storage_buckets',
+  'upload_jobs',
+  'image_processing_jobs'
 ];
 
 const allowedGeoTables = ['geo_countries', 'geo_regions', 'geo_cities', 'geo_areas'];
@@ -237,6 +243,47 @@ let foundReviewReportsPatientContactRef = false;
 let foundReviewReportsReasonUsage = false;
 let foundReviewReportsStatusUsage = false;
 let foundReviewReportsUpdatedAtTrigger = false;
+
+
+let foundCenterTypeGym = false;
+let foundCenterTypeFitnessCenter = false;
+let foundCenterTypeSpa = false;
+let foundCenterTypeHealthyRestaurant = false;
+let foundCenterTypeNutritionCenter = false;
+let foundCenterTypeJuiceBar = false;
+let foundCenterTypeMealPlanProvider = false;
+let foundCenterTypeHomeHealthcare = false;
+let foundCenterTypeOpticalStore = false;
+let foundCenterTypeMedicalEquipmentStore = false;
+
+let foundMediaAssetStatusEnum = false;
+let foundMediaAssetSourceEnum = false;
+let foundMediaAssetsTable = false;
+let foundMediaAssetsProfileRef = false;
+let foundMediaAssetsStatusUsage = false;
+let foundMediaAssetsSourceUsage = false;
+let foundMediaAssetsStorageBucket = false;
+let foundMediaAssetsStoragePath = false;
+let foundMediaAssetsPublicUrl = false;
+let foundMediaAssetsExternalUrl = false;
+let foundMediaAssetsMetadata = false;
+let foundMediaAssetsLocationCheck = false;
+let foundMediaAssetsSizeDimensionChecks = false;
+let foundMediaAssetsUpdatedAtTrigger = false;
+
+let foundMediaEntityTypeEnum = false;
+let foundMediaUsageKindEnum = false;
+let foundEntityMediaTable = false;
+let foundEntityMediaMediaAssetRef = false;
+let foundEntityMediaEntityTypeUsage = false;
+let foundEntityMediaUsageKindUsage = false;
+let foundEntityMediaEntityId = false;
+let foundEntityMediaAltText = false;
+let foundEntityMediaCaption = false;
+let foundEntityMediaIsPrimary = false;
+let foundEntityMediaSortOrder = false;
+let foundEntityMediaMetadata = false;
+let foundEntityMediaUpdatedAtTrigger = false;
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -532,6 +579,48 @@ for (const file of files) {
   if (/\bcenter_location_id\s+uuid\s+null\s+references\s+public\.center_locations\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsCenterLocationRef = true;
   if (/\bprimary_specialty_id\s+uuid\s+null\s+references\s+public\.specialties\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsSpecialtyRef = true;
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.doctor_practice_locations\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundDoctorPracticeLocationsUpdatedAtTrigger = true;
+
+  if (file === '0022_center_type_expansion.sql') {
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'gym'/i.test(content)) foundCenterTypeGym = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'fitness_center'/i.test(content)) foundCenterTypeFitnessCenter = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'spa'/i.test(content)) foundCenterTypeSpa = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'healthy_restaurant'/i.test(content)) foundCenterTypeHealthyRestaurant = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'nutrition_center'/i.test(content)) foundCenterTypeNutritionCenter = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'juice_bar'/i.test(content)) foundCenterTypeJuiceBar = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'meal_plan_provider'/i.test(content)) foundCenterTypeMealPlanProvider = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'home_healthcare'/i.test(content)) foundCenterTypeHomeHealthcare = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'optical_store'/i.test(content)) foundCenterTypeOpticalStore = true;
+    if (/alter\s+type\s+center_type\s+add\s+value\s+if\s+not\s+exists\s+'medical_equipment_store'/i.test(content)) foundCenterTypeMedicalEquipmentStore = true;
+  }
+
+  if (file === '0023_media_assets.sql' && /create\s+type\s+media_asset_status\s+as\s+enum/i.test(content)) foundMediaAssetStatusEnum = true;
+  if (file === '0023_media_assets.sql' && /create\s+type\s+media_asset_source\s+as\s+enum/i.test(content)) foundMediaAssetSourceEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.media_assets\b/i.test(content)) foundMediaAssetsTable = true;
+  if (/\bcreated_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundMediaAssetsProfileRef = true;
+  if (/\bstatus\s+media_asset_status\s+not\s+null\s+default\s+'draft'/i.test(content)) foundMediaAssetsStatusUsage = true;
+  if (/\bsource\s+media_asset_source\s+not\s+null\s+default\s+'uploaded'/i.test(content)) foundMediaAssetsSourceUsage = true;
+  if (/\bstorage_bucket\s+text\s+null\b/i.test(content)) foundMediaAssetsStorageBucket = true;
+  if (/\bstorage_path\s+text\s+null\b/i.test(content)) foundMediaAssetsStoragePath = true;
+  if (/\bpublic_url\s+text\s+null\b/i.test(content)) foundMediaAssetsPublicUrl = true;
+  if (/\bexternal_url\s+text\s+null\b/i.test(content)) foundMediaAssetsExternalUrl = true;
+  if (/\bmetadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i.test(content)) foundMediaAssetsMetadata = true;
+  if (/storage_path\s+is\s+not\s+null\s+or\s+public_url\s+is\s+not\s+null\s+or\s+external_url\s+is\s+not\s+null/i.test(content)) foundMediaAssetsLocationCheck = true;
+  if ((/file_size_bytes\s+is\s+null\s+or\s+file_size_bytes\s*>=\s*0/i.test(content)) && (/width\s+is\s+null\s+or\s+width\s*>\s*0/i.test(content)) && (/height\s+is\s+null\s+or\s+height\s*>\s*0/i.test(content))) foundMediaAssetsSizeDimensionChecks = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.media_assets\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundMediaAssetsUpdatedAtTrigger = true;
+
+  if (file === '0024_entity_media.sql' && /create\s+type\s+media_entity_type\s+as\s+enum/i.test(content)) foundMediaEntityTypeEnum = true;
+  if (file === '0024_entity_media.sql' && /create\s+type\s+media_usage_kind\s+as\s+enum/i.test(content)) foundMediaUsageKindEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.entity_media\b/i.test(content)) foundEntityMediaTable = true;
+  if (/\bmedia_asset_id\s+uuid\s+not\s+null\s+references\s+public\.media_assets\s*\(\s*id\s*\)/i.test(content)) foundEntityMediaMediaAssetRef = true;
+  if (/\bentity_type\s+media_entity_type\s+not\s+null\b/i.test(content)) foundEntityMediaEntityTypeUsage = true;
+  if (/\busage_kind\s+media_usage_kind\s+not\s+null\s+default\s+'gallery'/i.test(content)) foundEntityMediaUsageKindUsage = true;
+  if (/\bentity_id\s+uuid\s+not\s+null\b/i.test(content)) foundEntityMediaEntityId = true;
+  if (/\balt_text_en\s+text\s+null\b/i.test(content) && /\balt_text_ar\s+text\s+null\b/i.test(content)) foundEntityMediaAltText = true;
+  if (/\bcaption_en\s+text\s+null\b/i.test(content) && /\bcaption_ar\s+text\s+null\b/i.test(content)) foundEntityMediaCaption = true;
+  if (/\bis_primary\s+boolean\s+not\s+null\s+default\s+false\b/i.test(content)) foundEntityMediaIsPrimary = true;
+  if (/\bsort_order\s+integer\s+not\s+null\s+default\s+0\b/i.test(content)) foundEntityMediaSortOrder = true;
+  if (/\bmetadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i.test(content)) foundEntityMediaMetadata = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.entity_media\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundEntityMediaUpdatedAtTrigger = true;
 }
 
 
@@ -641,3 +730,7 @@ if (!foundReviewReportsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} 
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
+
+if (!foundCenterTypeGym || !foundCenterTypeFitnessCenter || !foundCenterTypeSpa || !foundCenterTypeHealthyRestaurant || !foundCenterTypeNutritionCenter || !foundCenterTypeJuiceBar || !foundCenterTypeMealPlanProvider || !foundCenterTypeHomeHealthcare || !foundCenterTypeOpticalStore || !foundCenterTypeMedicalEquipmentStore) { console.error(`ERROR: Phase ${PHASE} requires 0022_center_type_expansion.sql ALTER TYPE center_type ADD VALUE IF NOT EXISTS for all required values.`); process.exit(1); }
+if (!foundMediaAssetStatusEnum || !foundMediaAssetSourceEnum || !foundMediaAssetsTable || !foundMediaAssetsProfileRef || !foundMediaAssetsStatusUsage || !foundMediaAssetsSourceUsage || !foundMediaAssetsStorageBucket || !foundMediaAssetsStoragePath || !foundMediaAssetsPublicUrl || !foundMediaAssetsExternalUrl || !foundMediaAssetsMetadata || !foundMediaAssetsLocationCheck || !foundMediaAssetsSizeDimensionChecks || !foundMediaAssetsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete media_assets enum/table/constraint/trigger foundation.`); process.exit(1); }
+if (!foundMediaEntityTypeEnum || !foundMediaUsageKindEnum || !foundEntityMediaTable || !foundEntityMediaMediaAssetRef || !foundEntityMediaEntityTypeUsage || !foundEntityMediaUsageKindUsage || !foundEntityMediaEntityId || !foundEntityMediaAltText || !foundEntityMediaCaption || !foundEntityMediaIsPrimary || !foundEntityMediaSortOrder || !foundEntityMediaMetadata || !foundEntityMediaUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires complete entity_media enum/table/trigger foundation.`); process.exit(1); }
