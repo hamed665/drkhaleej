@@ -587,3 +587,28 @@ Scope in this phase:
 - no media upload/storage/image processing flow
 - no frontend/backend app features
 - no seed rows
+
+## Phase 3.4A — Monetization/Sponsored Private Read + Public Active Placement RLS (SELECT-only)
+
+Approved in this phase:
+- `supabase/migrations/0041_monetization_access_helpers.sql`
+- `supabase/migrations/0042_monetization_sponsored_rls.sql`
+
+Phase 3.4A approved scope:
+- Monetization/sponsored access helpers for private read visibility only.
+- SELECT-only RLS policies for:
+  - `public.subscription_plans`
+  - `public.center_subscriptions`
+  - `public.sponsored_campaigns`
+  - `public.sponsored_placements`
+- Active `subscription_plans` can be public-read (`anon`, `authenticated`) when non-deleted.
+- `center_subscriptions` are private to platform admins and center managers.
+- `sponsored_campaigns` are private to platform admins, creators, and center managers.
+- Active `sponsored_placements` can be public-read only when both placement and linked campaign are active and non-deleted within time windows.
+
+Explicitly not included yet:
+- no INSERT/UPDATE/DELETE policies yet
+- no payments/invoices/checkout/transactions
+- no behavior events or ad click/impression tracking
+- no frontend/backend app features
+- no seed rows

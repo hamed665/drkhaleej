@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.3A';
+const PHASE = '3.4A';
 
 const required = [
   '0001_extensions.sql',
@@ -43,7 +43,9 @@ const required = [
   '0037_patient_appointment_access_helpers.sql',
   '0038_patient_contacts_appointments_rls.sql',
   '0039_review_media_access_helpers.sql',
-  '0040_reviews_reports_media_private_rls.sql'
+  '0040_reviews_reports_media_private_rls.sql',
+  '0041_monetization_access_helpers.sql',
+  '0042_monetization_sponsored_rls.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -126,7 +128,8 @@ const rlsPolicyFiles = new Set([
   '0033_profiles_rls.sql',
   '0035_center_claims_memberships_rls.sql',
   '0038_patient_contacts_appointments_rls.sql',
-  '0040_reviews_reports_media_private_rls.sql'
+  '0040_reviews_reports_media_private_rls.sql',
+  '0042_monetization_sponsored_rls.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -139,6 +142,8 @@ const patientAppointmentAccessHelpersFile = '0037_patient_appointment_access_hel
 const patientContactsAppointmentsRlsFile = '0038_patient_contacts_appointments_rls.sql';
 const reviewMediaAccessHelpersFile = '0039_review_media_access_helpers.sql';
 const reviewsReportsMediaPrivateRlsFile = '0040_reviews_reports_media_private_rls.sql';
+const monetizationAccessHelpersFile = '0041_monetization_access_helpers.sql';
+const monetizationSponsoredRlsFile = '0042_monetization_sponsored_rls.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1052,6 +1057,8 @@ const patientAppointmentAccessHelpersContent = readFileSync(`${dir}/${patientApp
 const patientContactsAppointmentsRlsContent = readFileSync(`${dir}/${patientContactsAppointmentsRlsFile}`, 'utf8');
 const reviewMediaAccessHelpersContent = readFileSync(`${dir}/${reviewMediaAccessHelpersFile}`, 'utf8');
 const reviewsReportsMediaPrivateRlsContent = readFileSync(`${dir}/${reviewsReportsMediaPrivateRlsFile}`, 'utf8');
+const monetizationAccessHelpersContent = readFileSync(`${dir}/${monetizationAccessHelpersFile}`, 'utf8');
+const monetizationSponsoredRlsContent = readFileSync(`${dir}/${monetizationSponsoredRlsFile}`, 'utf8');
 
 const requiredPatientContactsProfileLinkPatterns = [
   /alter\s+table\s+public\.patient_contacts\s+add\s+column\s+if\s+not\s+exists\s+profile_id\s+uuid\s+null/i,
@@ -1161,6 +1168,57 @@ requireCondition(!/\bfor\s+delete\b/i.test(reviewsReportsMediaPrivateRlsContent)
 requireCondition(!/\binsert\s+into\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include INSERT INTO.');
 requireCondition(!/\bupdate\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include UPDATE.');
 requireCondition(!/\bdrop\b/i.test(reviewsReportsMediaPrivateRlsContent), '0040_reviews_reports_media_private_rls.sql must not include DROP statements.');
+
+const requiredMonetizationAccessHelperPatterns = [
+  /create\s+or\s+replace\s+function\s+public\.can_view_center_subscription\s*\(/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_sponsored_campaign\s*\(/i,
+  /create\s+or\s+replace\s+function\s+public\.can_view_sponsored_placement_private\s*\(/i,
+  /public\.current_profile_id\s*\(\s*\)/i,
+  /public\.is_platform_admin\s*\(\s*\)/i,
+  /public\.can_manage_center\s*\(/i,
+  /public\.can_view_center_private_data\s*\(/i,
+  /public\.center_subscriptions/i,
+  /public\.sponsored_campaigns/i,
+  /public\.sponsored_placements/i,
+  /deleted_at\s+is\s+null/i
+];
+for (const pattern of requiredMonetizationAccessHelperPatterns) {
+  requireCondition(pattern.test(monetizationAccessHelpersContent), `0041_monetization_access_helpers.sql missing required pattern: ${pattern}`);
+}
+requireCondition(!/\bcreate\s+policy\b/i.test(monetizationAccessHelpersContent), '0041_monetization_access_helpers.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(monetizationAccessHelpersContent), '0041_monetization_access_helpers.sql must not include ENABLE ROW LEVEL SECURITY.');
+requireCondition(!/\binsert\s+into\b/i.test(monetizationAccessHelpersContent), '0041_monetization_access_helpers.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(monetizationAccessHelpersContent), '0041_monetization_access_helpers.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(monetizationAccessHelpersContent), '0041_monetization_access_helpers.sql must not include DROP statements.');
+
+const requiredMonetizationSponsoredRlsPatterns = [
+  /alter\s+table\s+public\.subscription_plans\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.center_subscriptions\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.sponsored_campaigns\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.sponsored_placements\s+enable\s+row\s+level\s+security/i,
+  /create\s+policy\s+subscription_plans_select_public_active/i,
+  /create\s+policy\s+subscription_plans_select_platform_admin/i,
+  /create\s+policy\s+center_subscriptions_select_allowed/i,
+  /create\s+policy\s+sponsored_campaigns_select_allowed/i,
+  /create\s+policy\s+sponsored_placements_select_private_allowed/i,
+  /create\s+policy\s+sponsored_placements_select_public_active/i,
+  /status\s*=\s*'active'[\s\S]*deleted_at\s+is\s+null/i,
+  /public\.is_platform_admin\s*\(\s*\)\s*=\s*true[\s\S]*deleted_at\s+is\s+null/i,
+  /public\.can_view_center_subscription\s*\(\s*id\s*\)\s*=\s*true[\s\S]*deleted_at\s+is\s+null/i,
+  /public\.can_view_sponsored_campaign\s*\(\s*id\s*\)\s*=\s*true[\s\S]*deleted_at\s+is\s+null/i,
+  /public\.can_view_sponsored_placement_private\s*\(\s*id\s*\)\s*=\s*true[\s\S]*deleted_at\s+is\s+null/i,
+  /is_active\s*=\s*true[\s\S]*deleted_at\s+is\s+null[\s\S]*status\s*=\s*'active'[\s\S]*deleted_at\s+is\s+null/i
+];
+for (const pattern of requiredMonetizationSponsoredRlsPatterns) {
+  requireCondition(pattern.test(monetizationSponsoredRlsContent), `0042_monetization_sponsored_rls.sql missing required pattern: ${pattern}`);
+}
+requireCondition((monetizationSponsoredRlsContent.match(/\bfor\s+select\b/gi) || []).length >= 6, '0042_monetization_sponsored_rls.sql must define all policies as FOR SELECT.');
+requireCondition(!/\bfor\s+insert\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include FOR INSERT policies.');
+requireCondition(!/\bfor\s+update\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include FOR UPDATE policies.');
+requireCondition(!/\bfor\s+delete\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include FOR DELETE policies.');
+requireCondition(!/\binsert\s+into\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include DROP statements.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
