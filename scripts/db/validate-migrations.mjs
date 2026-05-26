@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.4A';
+const PHASE = '3.5A';
 
 const required = [
   '0001_extensions.sql',
@@ -45,7 +45,9 @@ const required = [
   '0039_review_media_access_helpers.sql',
   '0040_reviews_reports_media_private_rls.sql',
   '0041_monetization_access_helpers.sql',
-  '0042_monetization_sponsored_rls.sql'
+  '0042_monetization_sponsored_rls.sql',
+  '0043_legal_consent_audit_access_helpers.sql',
+  '0044_legal_consent_audit_rls.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -129,7 +131,8 @@ const rlsPolicyFiles = new Set([
   '0035_center_claims_memberships_rls.sql',
   '0038_patient_contacts_appointments_rls.sql',
   '0040_reviews_reports_media_private_rls.sql',
-  '0042_monetization_sponsored_rls.sql'
+  '0042_monetization_sponsored_rls.sql',
+  '0044_legal_consent_audit_rls.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -144,6 +147,8 @@ const reviewMediaAccessHelpersFile = '0039_review_media_access_helpers.sql';
 const reviewsReportsMediaPrivateRlsFile = '0040_reviews_reports_media_private_rls.sql';
 const monetizationAccessHelpersFile = '0041_monetization_access_helpers.sql';
 const monetizationSponsoredRlsFile = '0042_monetization_sponsored_rls.sql';
+const legalConsentAuditAccessHelpersFile = '0043_legal_consent_audit_access_helpers.sql';
+const legalConsentAuditRlsFile = '0044_legal_consent_audit_rls.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1219,6 +1224,55 @@ requireCondition(!/\bfor\s+delete\b/i.test(monetizationSponsoredRlsContent), '00
 requireCondition(!/\binsert\s+into\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include INSERT INTO.');
 requireCondition(!/\bupdate\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include UPDATE.');
 requireCondition(!/\bdrop\b/i.test(monetizationSponsoredRlsContent), '0042_monetization_sponsored_rls.sql must not include DROP statements.');
+
+
+
+const legalConsentAuditAccessHelpersContent = readFileSync(`${dir}/${legalConsentAuditAccessHelpersFile}`, 'utf8');
+requireCondition(/create\s+or\s+replace\s+function\s+public\.can_view_consent_log/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must define public.can_view_consent_log(uuid).');
+requireCondition(/create\s+or\s+replace\s+function\s+public\.can_view_audit_log/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must define public.can_view_audit_log(uuid).');
+requireCondition(/public\.current_profile_id\s*\(/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must use public.current_profile_id().');
+requireCondition(/public\.is_platform_admin\s*\(/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must use public.is_platform_admin().');
+requireCondition(/public\.can_view_patient_contact\s*\(/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must use public.can_view_patient_contact().');
+requireCondition(/public\.consent_logs/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must reference public.consent_logs.');
+requireCondition(/public\.audit_logs/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must reference public.audit_logs.');
+requireCondition(/deleted_at\s+is\s+null/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must enforce deleted_at IS NULL checks.');
+requireCondition(!/\bcreate\s+policy\b/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must not include CREATE POLICY.');
+requireCondition(!/\benable\s+row\s+level\s+security\b/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must not include ENABLE ROW LEVEL SECURITY.');
+requireCondition(!/\binsert\s+into\b/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(legalConsentAuditAccessHelpersContent), '0043_legal_consent_audit_access_helpers.sql must not include DROP statements.');
+
+const legalConsentAuditRlsContent = readFileSync(`${dir}/${legalConsentAuditRlsFile}`, 'utf8');
+for (const pattern of [
+  /alter\s+table\s+public\.legal_documents\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.consent_logs\s+enable\s+row\s+level\s+security/i,
+  /alter\s+table\s+public\.audit_logs\s+enable\s+row\s+level\s+security/i,
+  /create\s+policy\s+legal_documents_select_public_active/i,
+  /create\s+policy\s+legal_documents_select_platform_admin/i,
+  /create\s+policy\s+consent_logs_select_allowed/i,
+  /create\s+policy\s+audit_logs_select_platform_admin/i
+]) {
+  requireCondition(pattern.test(legalConsentAuditRlsContent), `0044_legal_consent_audit_rls.sql missing required pattern: ${pattern}`);
+}
+requireCondition((legalConsentAuditRlsContent.match(/\bfor\s+select\b/gi) || []).length >= 4, '0044_legal_consent_audit_rls.sql must define all policies as FOR SELECT.');
+requireCondition(!/\bfor\s+insert\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include FOR INSERT policies.');
+requireCondition(!/\bfor\s+update\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include FOR UPDATE policies.');
+requireCondition(!/\bfor\s+delete\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include FOR DELETE policies.');
+requireCondition(!/\binsert\s+into\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include INSERT INTO.');
+requireCondition(!/\bupdate\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include UPDATE.');
+requireCondition(!/\bdrop\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not include DROP statements.');
+requireCondition(/create\s+policy\s+legal_documents_select_public_active[\s\S]*?status\s*=\s*'active'/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents public policy must require status = \'active\'.');
+requireCondition(/create\s+policy\s+legal_documents_select_public_active[\s\S]*?deleted_at\s+is\s+null/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents public policy must require deleted_at IS NULL.');
+requireCondition(/create\s+policy\s+legal_documents_select_public_active[\s\S]*?published_at\s+is\s+null\s+or\s+published_at\s*<=\s*now\s*\(\s*\)/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents public policy must guard published_at <= now().');
+requireCondition(/create\s+policy\s+legal_documents_select_public_active[\s\S]*?effective_at\s+is\s+null\s+or\s+effective_at\s*<=\s*now\s*\(\s*\)/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents public policy must guard effective_at <= now().');
+requireCondition(/create\s+policy\s+legal_documents_select_platform_admin[\s\S]*?public\.is_platform_admin\s*\(\s*\)\s*=\s*true/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents admin policy must use public.is_platform_admin() = true.');
+requireCondition(/create\s+policy\s+legal_documents_select_platform_admin[\s\S]*?deleted_at\s+is\s+null/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql legal_documents admin policy must require deleted_at IS NULL.');
+requireCondition(/create\s+policy\s+consent_logs_select_allowed[\s\S]*?public\.can_view_consent_log\s*\(\s*id\s*\)\s*=\s*true/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql consent_logs policy must use public.can_view_consent_log(id) = true.');
+requireCondition(/create\s+policy\s+consent_logs_select_allowed[\s\S]*?deleted_at\s+is\s+null/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql consent_logs policy must require deleted_at IS NULL.');
+requireCondition(/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?public\.can_view_audit_log\s*\(\s*id\s*\)\s*=\s*true/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql audit_logs policy must use public.can_view_audit_log(id) = true.');
+requireCondition(/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?deleted_at\s+is\s+null/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql audit_logs policy must require deleted_at IS NULL.');
+requireCondition(!/create\s+policy\s+consent_logs_select_allowed[\s\S]*?\bto\s+anon\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not grant consent_logs SELECT policy to anon.');
+requireCondition(!/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?\bto\s+anon\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not grant audit_logs SELECT policy to anon.');
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);

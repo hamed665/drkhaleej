@@ -612,3 +612,22 @@ Explicitly not included yet:
 - no behavior events or ad click/impression tracking
 - no frontend/backend app features
 - no seed rows
+
+## Phase 3.5A — Legal/Consent/Audit Read Access + SELECT RLS
+
+Approved in this phase:
+- `supabase/migrations/0043_legal_consent_audit_access_helpers.sql`
+- `supabase/migrations/0044_legal_consent_audit_rls.sql`
+
+Scope in this phase:
+- legal/consent/audit SELECT RLS only
+- active legal documents can be public-read when non-deleted and time-valid
+- consent logs are private to platform admins and linked profile/patient contact owners
+- audit logs direct table read is platform-admin-only
+- no anonymous_id direct consent lookup yet
+- no INSERT/UPDATE/DELETE policies yet
+- no legal publishing flow
+- no consent capture flow
+- no audit triggers or audit writing functions
+- no frontend/backend app features
+- no seed rows
