@@ -16,7 +16,8 @@
     "db:types": "pnpm db:check-cli && supabase gen types typescript --local > supabase/types/database.types.ts",
     "db:reset": "pnpm db:check-cli && supabase db reset",
     "test:db:rls": "pnpm db:validate:migrations && node scripts/db/test-rls-static.mjs",
-    "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs"
+    "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs",
+    "seo:check": "node scripts/seo-check.mjs"
   },
   "dependencies": {
     "next": "16.0.2",
