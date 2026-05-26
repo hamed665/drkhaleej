@@ -512,3 +512,24 @@ Explicitly not included yet:
 - no frontend/backend app features
 - no seed rows
 - no private appointment/patient/provider/admin RLS beyond profiles yet
+
+## Phase 3.1B — Center Access Helpers + Center Membership/Claims SELECT-Only RLS
+
+Approved in this phase:
+- `supabase/migrations/0034_center_access_helpers.sql`
+- `supabase/migrations/0035_center_claims_memberships_rls.sql`
+
+Phase 3.1B scope:
+- center access helper functions only
+- `public.center_memberships` and `public.center_claims` SELECT-only RLS
+- authenticated users can SELECT own memberships/claims
+- platform admins can SELECT all non-deleted memberships/claims
+- active center managers can SELECT memberships/claims for their centers
+- no anon access
+- no INSERT/UPDATE/DELETE policies yet
+- no claim submission flow
+- no membership invitation flow
+- no admin approval workflow
+- no frontend/backend app features
+- no seed rows
+- no private appointment/patient RLS yet
