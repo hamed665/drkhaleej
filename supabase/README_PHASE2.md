@@ -367,3 +367,24 @@ Explicitly not included yet:
 - no audit log tables yet
 - no RLS yet
 - no frontend/backend app features yet
+
+## Phase 2.7A — Reviews and Trust Foundation
+
+Approved in this phase:
+- `supabase/migrations/0020_reviews.sql`
+- `supabase/migrations/0021_review_reports.sql`
+- reviews and trust foundation only
+
+Explicitly not included yet:
+- no seed rows yet
+- no moderation dashboard yet
+- no AI moderation yet
+- no public aggregate ratings yet
+- no payments/pricing yet
+- no insurance tables yet
+- no notifications/reminders yet
+- no medical records/diagnoses/prescriptions/lab results yet
+- no legal/consent tables yet
+- no audit log tables yet
+- no RLS yet
+- no frontend/backend app features yet

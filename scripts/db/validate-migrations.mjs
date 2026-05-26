@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '2.6C';
+const PHASE = '2.7A';
 
 const required = [
   '0001_extensions.sql',
@@ -22,7 +22,9 @@ const required = [
   '0016_patient_contacts.sql',
   '0017_appointments.sql',
   '0018_appointment_status_history.sql',
-  '0019_appointment_cancellations.sql'
+  '0019_appointment_cancellations.sql',
+  '0020_reviews.sql',
+  '0021_review_reports.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -57,7 +59,6 @@ const forbiddenTables = [
   'payments',
   'insurance',
   'pricing',
-  'reviews',
   'ratings',
   'lab_results',
   'prescriptions',
@@ -69,7 +70,10 @@ const forbiddenTables = [
   'consent_logs',
   'behavior_events',
   'sponsored_slots',
-  'audit_logs'
+  'audit_logs',
+  'review_aggregates',
+  'review_summaries',
+  'ai_moderation'
 ];
 
 const allowedGeoTables = ['geo_countries', 'geo_regions', 'geo_cities', 'geo_areas'];
@@ -206,6 +210,33 @@ let foundAppointmentCancellationsActorUsage = false;
 let foundAppointmentCancellationsReasonUsage = false;
 let foundAppointmentCancellationsCancelledAt = false;
 let foundAppointmentCancellationsUpdatedAtTrigger = false;
+
+
+let foundReviewTargetTypeEnum = false;
+let foundReviewStatusEnum = false;
+let foundReviewsTable = false;
+let foundReviewsCenterRef = false;
+let foundReviewsDoctorRef = false;
+let foundReviewsCenterServiceRef = false;
+let foundReviewsDoctorServiceRef = false;
+let foundReviewsAppointmentRef = false;
+let foundReviewsPatientContactRef = false;
+let foundReviewsTargetTypeUsage = false;
+let foundReviewsStatusUsage = false;
+let foundReviewsLocaleUsage = false;
+let foundReviewsRatingCheck = false;
+let foundReviewsTargetPresenceCheck = false;
+let foundReviewsUpdatedAtTrigger = false;
+
+let foundReviewReportReasonEnum = false;
+let foundReviewReportStatusEnum = false;
+let foundReviewReportsTable = false;
+let foundReviewReportsReviewRef = false;
+let foundReviewReportsProfileRef = false;
+let foundReviewReportsPatientContactRef = false;
+let foundReviewReportsReasonUsage = false;
+let foundReviewReportsStatusUsage = false;
+let foundReviewReportsUpdatedAtTrigger = false;
 
 try {
   if (!statSync(dir).isDirectory()) throw new Error(`${dir} is not a directory`);
@@ -467,6 +498,34 @@ for (const file of files) {
   if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.appointment_cancellations\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundAppointmentCancellationsUpdatedAtTrigger = true;
 
 
+
+
+  if (file === '0020_reviews.sql' && /create\s+type\s+review_target_type\s+as\s+enum/i.test(content)) foundReviewTargetTypeEnum = true;
+  if (file === '0020_reviews.sql' && /create\s+type\s+review_status\s+as\s+enum/i.test(content)) foundReviewStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.reviews\b/i.test(content)) foundReviewsTable = true;
+  if (/\bcenter_id\s+uuid\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundReviewsCenterRef = true;
+  if (/\bdoctor_id\s+uuid\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundReviewsDoctorRef = true;
+  if (/\bcenter_service_id\s+uuid\s+null\s+references\s+public\.center_services\s*\(\s*id\s*\)/i.test(content)) foundReviewsCenterServiceRef = true;
+  if (/\bdoctor_service_id\s+uuid\s+null\s+references\s+public\.doctor_services\s*\(\s*id\s*\)/i.test(content)) foundReviewsDoctorServiceRef = true;
+  if (/\bappointment_id\s+uuid\s+null\s+references\s+public\.appointments\s*\(\s*id\s*\)/i.test(content)) foundReviewsAppointmentRef = true;
+  if (/\bpatient_contact_id\s+uuid\s+null\s+references\s+public\.patient_contacts\s*\(\s*id\s*\)/i.test(content)) foundReviewsPatientContactRef = true;
+  if (/\btarget_type\s+review_target_type\s+not\s+null\b/i.test(content)) foundReviewsTargetTypeUsage = true;
+  if (/\bstatus\s+review_status\s+not\s+null\s+default\s+'pending'/i.test(content)) foundReviewsStatusUsage = true;
+  if (/\bsource_locale\s+app_locale\s+not\s+null\s+default\s+'en'/i.test(content)) foundReviewsLocaleUsage = true;
+  if (/\bconstraint\s+reviews_rating_check\s+check\s*\(\s*rating\s*>?=\s*1\s+and\s+rating\s*<=\s*5\s*\)/i.test(content) || /rating\s+between\s+1\s+and\s+5/i.test(content)) foundReviewsRatingCheck = true;
+  if (/\bconstraint\s+reviews_target_presence_check\s+check\s*\([\s\S]*center_id\s+is\s+not\s+null[\s\S]*doctor_id\s+is\s+not\s+null[\s\S]*center_service_id\s+is\s+not\s+null[\s\S]*doctor_service_id\s+is\s+not\s+null[\s\S]*\)/i.test(content)) foundReviewsTargetPresenceCheck = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.reviews\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundReviewsUpdatedAtTrigger = true;
+
+  if (file === '0021_review_reports.sql' && /create\s+type\s+review_report_reason\s+as\s+enum/i.test(content)) foundReviewReportReasonEnum = true;
+  if (file === '0021_review_reports.sql' && /create\s+type\s+review_report_status\s+as\s+enum/i.test(content)) foundReviewReportStatusEnum = true;
+  if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.review_reports\b/i.test(content)) foundReviewReportsTable = true;
+  if (/\breview_id\s+uuid\s+not\s+null\s+references\s+public\.reviews\s*\(\s*id\s*\)/i.test(content)) foundReviewReportsReviewRef = true;
+  if (/\breported_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content) && /\breviewed_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i.test(content)) foundReviewReportsProfileRef = true;
+  if (/\breported_by_patient_contact_id\s+uuid\s+null\s+references\s+public\.patient_contacts\s*\(\s*id\s*\)/i.test(content)) foundReviewReportsPatientContactRef = true;
+  if (/\breason\s+review_report_reason\s+not\s+null\s+default\s+'other'/i.test(content)) foundReviewReportsReasonUsage = true;
+  if (/\bstatus\s+review_report_status\s+not\s+null\s+default\s+'open'/i.test(content)) foundReviewReportsStatusUsage = true;
+  if (/\bcreate\s+trigger\b[\s\S]*\bbefore\s+update\s+on\s+public\.review_reports\b[\s\S]*\bexecute\s+function\s+public\.set_updated_at\s*\(\s*\)/i.test(content)) foundReviewReportsUpdatedAtTrigger = true;
+
   if (/\bcreate\s+table\s+(if\s+not\s+exists\s+)?public\.doctor_practice_locations\b/i.test(content)) foundDoctorPracticeLocationsTable = true;
   if (/\bdoctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsDoctorRef = true;
   if (/\bcenter_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i.test(content)) foundDoctorPracticeLocationsCenterRef = true;
@@ -564,6 +623,21 @@ if (!foundAppointmentCancellationsCancelledAt) { console.error(`ERROR: Phase ${P
 if (!foundAppointmentCancellationsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires appointment_cancellations BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
 
 
+
+
+if (!foundReviewTargetTypeEnum || !foundReviewStatusEnum) { console.error(`ERROR: Phase ${PHASE} requires create type review_target_type and review_status as enum in 0020_reviews.sql.`); process.exit(1); }
+if (!foundReviewsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.reviews in 0020_reviews.sql.`); process.exit(1); }
+if (!foundReviewsCenterRef || !foundReviewsDoctorRef || !foundReviewsCenterServiceRef || !foundReviewsDoctorServiceRef || !foundReviewsAppointmentRef || !foundReviewsPatientContactRef) { console.error(`ERROR: Phase ${PHASE} requires reviews references to centers, doctors, center_services, doctor_services, appointments, and patient_contacts.`); process.exit(1); }
+if (!foundReviewsTargetTypeUsage || !foundReviewsStatusUsage || !foundReviewsLocaleUsage) { console.error(`ERROR: Phase ${PHASE} requires reviews enum usage for review_target_type, review_status, and app_locale.`); process.exit(1); }
+if (!foundReviewsRatingCheck) { console.error(`ERROR: Phase ${PHASE} requires reviews rating safe check between 1 and 5.`); process.exit(1); }
+if (!foundReviewsTargetPresenceCheck) { console.error(`ERROR: Phase ${PHASE} requires reviews target presence check for center_id/doctor_id/center_service_id/doctor_service_id.`); process.exit(1); }
+if (!foundReviewsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires reviews BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
+
+if (!foundReviewReportReasonEnum || !foundReviewReportStatusEnum) { console.error(`ERROR: Phase ${PHASE} requires create type review_report_reason and review_report_status as enum in 0021_review_reports.sql.`); process.exit(1); }
+if (!foundReviewReportsTable) { console.error(`ERROR: Phase ${PHASE} requires CREATE TABLE public.review_reports in 0021_review_reports.sql.`); process.exit(1); }
+if (!foundReviewReportsReviewRef || !foundReviewReportsProfileRef || !foundReviewReportsPatientContactRef) { console.error(`ERROR: Phase ${PHASE} requires review_reports references to reviews, profiles, and patient_contacts.`); process.exit(1); }
+if (!foundReviewReportsReasonUsage || !foundReviewReportsStatusUsage) { console.error(`ERROR: Phase ${PHASE} requires review_reports enum usage for review_report_reason and review_report_status.`); process.exit(1); }
+if (!foundReviewReportsUpdatedAtTrigger) { console.error(`ERROR: Phase ${PHASE} requires review_reports BEFORE UPDATE trigger using public.set_updated_at().`); process.exit(1); }
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
