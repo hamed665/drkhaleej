@@ -8,6 +8,7 @@ type HomeHeroCopy = {
   findCare: string;
   forClinics: string;
   note: string;
+  chips: readonly string[];
 };
 
 type HomeHeroProps = {
@@ -17,10 +18,10 @@ type HomeHeroProps = {
 
 export function HomeHero({ copy, dir }: HomeHeroProps) {
   return (
-    <section className="home-hero hero-aura gradient-mesh-soft" dir={dir} aria-labelledby="home-hero-title">
+    <section className="home-hero hero-aura" dir={dir} aria-labelledby="home-hero-title">
       <div className="home-hero__content glass-soft">
         <Badge variant="trust">{copy.announcement}</Badge>
-        <h1 id="home-hero-title" className="home-hero__title neon-glow">
+        <h1 id="home-hero-title" className="home-hero__title">
           {copy.title}
         </h1>
         <p className="home-hero__subtitle">{copy.subtitle}</p>
@@ -35,17 +36,37 @@ export function HomeHero({ copy, dir }: HomeHeroProps) {
         <p className="home-hero__note">{copy.note}</p>
       </div>
 
-      <div className="home-hero__visual glass-strong card-shimmer" aria-hidden="true">
+      <div className="home-hero__visual glass-strong" aria-hidden="true">
         <div className="home-hero__layers">
-          <span className="pulse-ring" />
-          <span className="orbit-node orbit-node--one" />
-          <span className="orbit-node orbit-node--two" />
-          <span className="scan-sweep" />
-          <span className="beam-glow" />
+          <span className="hero-orb__aura" />
+          <span className="hero-orb__halo hero-orb__halo--one" />
+          <span className="hero-orb__halo hero-orb__halo--two" />
+          <span className="hero-orb__halo hero-orb__halo--three" />
+          <span className="hero-orb__core" />
+
+          <span className="hero-particle hero-particle--one" />
+          <span className="hero-particle hero-particle--two" />
+          <span className="hero-particle hero-particle--three" />
+          <span className="hero-particle hero-particle--four" />
+          <span className="hero-particle hero-particle--five" />
+
+          <svg className="hero-network" viewBox="0 0 420 280" role="presentation" focusable="false">
+            <path d="M62 160 C110 110, 165 102, 206 145" />
+            <path d="M206 145 C252 180, 308 178, 352 134" />
+            <path d="M102 220 C154 205, 242 210, 316 236" />
+            <circle cx="62" cy="160" r="4" />
+            <circle cx="206" cy="145" r="5" />
+            <circle cx="352" cy="134" r="4" />
+            <circle cx="102" cy="220" r="3.5" />
+            <circle cx="316" cy="236" r="3.5" />
+          </svg>
+
+          {copy.chips.map((chip, index) => (
+            <span key={chip} className={`hero-chip hero-chip--${index + 1}`}>
+              {chip}
+            </span>
+          ))}
         </div>
-        <svg className="home-hero__ecg ecg-line-animated" viewBox="0 0 420 120" role="presentation" focusable="false">
-          <path d="M0 64 H72 L95 64 L110 34 L128 92 L150 22 L174 97 L196 64 H240 L260 64 L272 44 L286 82 L308 36 L326 86 L348 64 H420" fill="none" pathLength="100" />
-        </svg>
       </div>
     </section>
   );

@@ -37,7 +37,7 @@ export async function SiteFooter() {
   const dir = localeDirection(safeLocale);
 
   return (
-    <footer className="site-footer" role="contentinfo" dir={dir}>
+    <footer className="site-footer site-footer--premium" role="contentinfo" dir={dir}>
       <Container className="site-footer__inner">
         <div className="site-footer__brand">
           <strong>DrMuscat</strong>

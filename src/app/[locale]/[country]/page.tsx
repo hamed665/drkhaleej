@@ -23,6 +23,7 @@ type HomeCopy = {
     findCare: string;
     forClinics: string;
     note: string;
+    chips: readonly string[];
   };
   trust: readonly string[];
   categories: {
@@ -49,7 +50,8 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         'DrMuscat is building a bilingual healthcare discovery experience for patients and providers across Oman.',
       findCare: 'Find care',
       forClinics: 'For clinics',
-      note: 'Richer provider profiles and discovery tools are rolling out in upcoming phases.'
+      note: 'Richer provider profiles and discovery tools are rolling out in upcoming phases.',
+      chips: ['Doctors', 'Clinics', 'Pharmacies', 'Labs']
     },
     trust: [
       'Bilingual experience designed for English and Arabic users',
@@ -98,7 +100,8 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       subtitle: 'يبني DrMuscat تجربة ثنائية اللغة لاكتشاف مقدمي الرعاية الصحية للمرضى والجهات الطبية في عُمان.',
       findCare: 'ابحث عن رعاية',
       forClinics: 'للعيادات',
-      note: 'سيتم إطلاق ملفات مقدمي الرعاية وميزات اكتشاف أكثر تفصيلاً في المراحل القادمة.'
+      note: 'سيتم إطلاق ملفات مقدمي الرعاية وميزات اكتشاف أكثر تفصيلاً في المراحل القادمة.',
+      chips: ['الأطباء', 'العيادات', 'الصيدليات', 'المختبرات']
     },
     trust: [
       'تجربة ثنائية اللغة مصممة للمستخدمين بالعربية والإنجليزية',

@@ -27,7 +27,7 @@ export async function SiteHeader() {
   const dir = localeDirection(safeLocale);
 
   return (
-    <header className="site-header" role="banner" dir={dir}>
+    <header className="site-header site-header--premium" role="banner" dir={dir}>
       <Container className="site-header__inner">
         <div className="site-header__brand">
           <Logo />
