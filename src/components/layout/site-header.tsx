@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { Logo } from '@/components/brand/logo';
 import { Container } from '@/components/ui/container';
+import { SiteHeaderClient } from '@/components/layout/site-header-client';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
 
 const navCopy: Record<
@@ -33,26 +34,28 @@ export async function SiteHeader() {
 
   return (
     <header className="site-header site-header--premium" role="banner" dir={dir}>
-      <Container className="site-header__outer">
-        <div className="site-header__capsule">
-          <div className="site-header__brand">
-            <Logo />
+      <SiteHeaderClient>
+        <Container className="site-header__outer">
+          <div className="site-header__capsule">
+            <div className="site-header__brand">
+              <Logo />
+            </div>
+            <nav aria-label="Primary" className="site-header__nav">
+              <ul>
+                <li><span>{copy.doctors}</span></li>
+                <li><span>{copy.clinics}</span></li>
+                <li><span>{copy.pharmacies}</span></li>
+                <li><span>{copy.labs}</span></li>
+              </ul>
+            </nav>
+            <div className="site-header__locale" aria-label={copy.switchLabel}>
+              <Link href={switchHref} className="site-header__locale-switch">
+                <span>{copy.switchLabel}</span>
+              </Link>
+            </div>
           </div>
-          <nav aria-label="Primary" className="site-header__nav">
-            <ul>
-              <li><span>{copy.doctors}</span></li>
-              <li><span>{copy.clinics}</span></li>
-              <li><span>{copy.pharmacies}</span></li>
-              <li><span>{copy.labs}</span></li>
-            </ul>
-          </nav>
-          <div className="site-header__locale" aria-label={copy.switchLabel}>
-            <Link href={switchHref} className="site-header__locale-switch">
-              <span>{copy.switchLabel}</span>
-            </Link>
-          </div>
-        </div>
-      </Container>
+        </Container>
+      </SiteHeaderClient>
     </header>
   );
 }

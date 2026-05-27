@@ -16,14 +16,14 @@ export function HomeSearchCommand({ copy, dir }: HomeSearchCommandProps) {
     <section className="home-search-command" dir={dir} aria-label="Homepage search">
       <div className="home-search-command__shell">
         <div className="home-search-command__row" role="group" aria-label="Search fields">
-          <div className="home-search-command__field home-search-command__field--main" aria-hidden="true">
+          <div className="home-search-command__field home-search-command__field--main" role="textbox" aria-readonly="true">
             <span className="home-search-command__icon">⌕</span>
             <span>{copy.primaryPlaceholder}</span>
           </div>
-          <div className="home-search-command__field" aria-hidden="true">
+          <div className="home-search-command__field" role="textbox" aria-readonly="true">
             <span>{copy.servicePlaceholder}</span>
           </div>
-          <div className="home-search-command__field" aria-hidden="true">
+          <div className="home-search-command__field" role="textbox" aria-readonly="true">
             <span>{copy.locationPlaceholder}</span>
           </div>
           <button type="button" className="home-search-command__cta">
