@@ -20,10 +20,16 @@ type HomeCopy = {
     announcement: string;
     title: string;
     subtitle: string;
-    findCare: string;
-    forClinics: string;
     note: string;
-    chips: readonly string[];
+    search: {
+      primaryPlaceholder: string;
+      servicePlaceholder: string;
+      locationPlaceholder: string;
+      ctaLabel: string;
+      categories: readonly string[];
+    };
+    popularSearchLabel: string;
+    popularSearches: readonly string[];
   };
   trust: readonly string[];
   categories: {
@@ -40,101 +46,113 @@ type HomeCopy = {
 
 const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
   en: {
-    metadataTitle: 'DrMuscat Oman | Healthcare Discovery Foundation',
+    metadataTitle: 'DrMuscat Oman | Search-First Healthcare Discovery',
     metadataDescription:
-      'Find trusted healthcare in Oman, faster. DrMuscat is building a bilingual healthcare discovery foundation for patients and providers across Oman.',
+      'Find healthcare in Oman without guessing. Search doctors, clinics, pharmacies, and labs in one bilingual healthcare discovery experience.',
     hero: {
-      announcement: 'Oman-first bilingual healthcare discovery',
-      title: 'Find trusted healthcare in Oman, faster.',
+      announcement: 'Pastel premium healthcare discovery for Oman',
+      title: 'Find healthcare in Oman without guessing.',
       subtitle:
-        'DrMuscat is building a bilingual healthcare discovery experience for patients and providers across Oman.',
-      findCare: 'Find care',
-      forClinics: 'For clinics',
-      note: 'Richer provider profiles and discovery tools are rolling out in upcoming phases.',
-      chips: ['Doctors', 'Clinics', 'Pharmacies', 'Labs']
+        'Search doctors, clinics, pharmacies, and labs in one bilingual healthcare discovery experience.',
+      note: 'This phase introduces a safer search-first experience shell while verified data workflows are prepared.',
+      search: {
+        primaryPlaceholder: 'Search doctors, clinics, pharmacies, labs...',
+        servicePlaceholder: 'Dentist, dermatologist, lab test...',
+        locationPlaceholder: 'Muscat, Al Khuwair, Qurum...',
+        ctaLabel: 'Search',
+        categories: ['Dental care', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy']
+      },
+      popularSearchLabel: 'Popular searches',
+      popularSearches: ['Dental care', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy']
     },
     trust: [
-      'Bilingual experience designed for English and Arabic users',
-      'Oman-first healthcare discovery with GCC-ready foundations',
-      'Built for future verified provider data workflows',
-      'SEO-ready visibility architecture for healthcare providers'
+      'Search-first healthcare discovery',
+      'Bilingual Arabic and English experience',
+      'Built for provider visibility',
+      'Prepared for verified data workflows'
     ],
     categories: {
-      title: 'Future care categories in progress',
-      subtitle: 'Structured to expand safely as provider data and coverage phases are approved.',
+      title: 'Explore healthcare categories',
+      subtitle: 'Doctors, clinics, pharmacies, and labs in a clean bilingual discovery structure.',
       items: [
         {
           key: 'doctors',
           label: 'Doctors',
-          description: 'Specialty-first discovery framework prepared for future profile enrichment.',
+          description: 'Structured for specialty-led healthcare discovery across Oman.',
           accentClass: 'home-categories__card--doctors'
         },
         {
           key: 'clinics',
           label: 'Clinics',
-          description: 'Location-ready clinic visibility foundation aligned with Oman-first navigation.',
+          description: 'Prepared for local clinic visibility with Arabic-first and English support.',
           accentClass: 'home-categories__card--clinics'
         },
         {
           key: 'pharmacies',
           label: 'Pharmacies',
-          description: 'Prepared for future pharmacy discovery and structured local availability signals.',
+          description: 'Ready for pharmacy discovery pathways in future verified data phases.',
           accentClass: 'home-categories__card--pharmacies'
         },
         {
           key: 'laboratories',
-          label: 'Laboratories',
-          description: 'Built to support upcoming diagnostic and laboratory provider surfaces.',
+          label: 'Labs',
+          description: 'Prepared for diagnostic and lab search experiences as approved phases expand.',
           accentClass: 'home-categories__card--laboratories'
         }
       ]
     }
   },
   ar: {
-    metadataTitle: 'د.مسقط عُمان | أساس اكتشاف الرعاية الصحية',
+    metadataTitle: 'د.مسقط عُمان | تجربة بحث أولاً للرعاية الصحية',
     metadataDescription:
-      'اكتشف الرعاية الصحية في عُمان بسهولة أكبر. يعمل DrMuscat على بناء تجربة ثنائية اللغة لاكتشاف مقدمي الرعاية الصحية للمرضى والجهات الطبية في عُمان.',
+      'اعثر على الرعاية الصحية في عُمان بوضوح. ابحث عن الأطباء والعيادات والصيدليات والمختبرات من تجربة واحدة ثنائية اللغة.',
     hero: {
-      announcement: 'منصة عُمانية لاكتشاف الرعاية الصحية بثنائية اللغة',
-      title: 'اكتشف الرعاية الصحية في عُمان بسهولة أكبر.',
-      subtitle: 'يبني DrMuscat تجربة ثنائية اللغة لاكتشاف مقدمي الرعاية الصحية للمرضى والجهات الطبية في عُمان.',
-      findCare: 'ابحث عن رعاية',
-      forClinics: 'للعيادات',
-      note: 'سيتم إطلاق ملفات مقدمي الرعاية وميزات اكتشاف أكثر تفصيلاً في المراحل القادمة.',
-      chips: ['الأطباء', 'العيادات', 'الصيدليات', 'المختبرات']
+      announcement: 'تجربة بحث طبية راقية لعُمان',
+      title: 'اعثر على الرعاية الصحية في عُمان بوضوح.',
+      subtitle: 'ابحث عن الأطباء والعيادات والصيدليات والمختبرات من تجربة واحدة ثنائية اللغة.',
+      note: 'تقدم هذه المرحلة واجهة بحث أولاً بشكل آمن تمهيداً لمسارات بيانات موثوقة في المراحل القادمة.',
+      search: {
+        primaryPlaceholder: 'ابحث عن طبيب، عيادة، صيدلية أو مختبر...',
+        servicePlaceholder: 'طبيب أسنان، جلدية، تحليل دم...',
+        locationPlaceholder: 'مسقط، الخوير، القرم...',
+        ctaLabel: 'ابحث',
+        categories: ['طب الأسنان', 'الجلدية', 'طب الأطفال', 'التحاليل', 'الصيدليات']
+      },
+      popularSearchLabel: 'عمليات بحث شائعة',
+      popularSearches: ['طب الأسنان', 'الجلدية', 'طب الأطفال', 'التحاليل', 'الصيدليات']
     },
     trust: [
-      'تجربة ثنائية اللغة مصممة للمستخدمين بالعربية والإنجليزية',
-      'اكتشاف رعاية صحية يركز على عُمان مع جاهزية للتوسع الخليجي',
-      'مبنية لدعم تدفقات بيانات مقدمي الخدمة الموثقة مستقبلاً',
-      'أساس ظهور رقمي متوافق مع متطلبات SEO لمقدمي الرعاية الصحية'
+      'تجربة بحث طبية واضحة',
+      'تجربة ثنائية اللغة بالعربية والإنجليزية',
+      'مهيأ لظهور مقدمي الرعاية الصحية',
+      'جاهز لمسارات البيانات الموثوقة'
     ],
     categories: {
-      title: 'فئات رعاية مستقبلية قيد التطوير',
-      subtitle: 'تم إعداد الهيكل للتوسع الآمن مع اعتماد مراحل البيانات والتغطية القادمة.',
+      title: 'استكشف فئات الرعاية الصحية',
+      subtitle: 'الأطباء والعيادات والصيدليات والمختبرات ضمن هيكل بحث ثنائي اللغة واضح.',
       items: [
         {
           key: 'doctors',
           label: 'الأطباء',
-          description: 'هيكل اكتشاف قائم على التخصصات ومهيأ لتوسيع الملفات التعريفية لاحقاً.',
+          description: 'مهيأ لاكتشاف الرعاية الصحية حسب التخصصات داخل عُمان.',
           accentClass: 'home-categories__card--doctors'
         },
         {
           key: 'clinics',
           label: 'العيادات',
-          description: 'أساس ظهور للعيادات مهيأ للمواقع ومتوافق مع التنقل المحلي داخل عُمان.',
+          description: 'مجهز لمسارات ظهور العيادات محلياً بدعم عربي وإنجليزي.',
           accentClass: 'home-categories__card--clinics'
         },
         {
           key: 'pharmacies',
           label: 'الصيدليات',
-          description: 'مهيأ لدعم اكتشاف الصيدليات وإشارات التوفر المحلي المنظمة مستقبلاً.',
+          description: 'أساس جاهز لمسارات اكتشاف الصيدليات في مراحل البيانات الموثوقة.',
           accentClass: 'home-categories__card--pharmacies'
         },
         {
           key: 'laboratories',
           label: 'المختبرات',
-          description: 'أساس جاهز لدعم واجهات مقدمي خدمات التشخيص والمختبرات في المراحل القادمة.',
+          description: 'مهيأ لتجارب بحث التحاليل والمختبرات عند توسع المراحل المعتمدة.',
           accentClass: 'home-categories__card--laboratories'
         }
       ]

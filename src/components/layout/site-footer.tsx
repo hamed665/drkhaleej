@@ -3,27 +3,24 @@ import { headers } from 'next/headers';
 import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
 
-const footerCopy: Record<SupportedLocale, {
-  tagline: string;
-  doctors: string;
-  centers: string;
-  services: string;
-  utility: string;
-  switchLabel: string;
-}> = {
+const footerCopy: Record<
+  SupportedLocale,
+  {
+    tagline: string;
+    labels: string;
+    utility: string;
+    switchLabel: string;
+  }
+> = {
   en: {
-    tagline: 'Trusted healthcare discovery foundation for Oman.',
-    doctors: 'Doctors',
-    centers: 'Centers',
-    services: 'Services',
+    tagline: 'Search-first healthcare discovery experience for Oman.',
+    labels: 'Doctors · Clinics · Pharmacies · Labs',
     utility: 'Privacy · Terms · Contact',
     switchLabel: 'English / العربية'
   },
   ar: {
-    tagline: 'أساس موثوق لاكتشاف الرعاية الصحية في عُمان.',
-    doctors: 'الأطباء',
-    centers: 'المراكز',
-    services: 'الخدمات',
+    tagline: 'تجربة بحث أولاً لاكتشاف الرعاية الصحية في عُمان.',
+    labels: 'الأطباء · العيادات · الصيدليات · المختبرات',
     utility: 'الخصوصية · الشروط · التواصل',
     switchLabel: 'English / العربية'
   }
@@ -44,7 +41,7 @@ export async function SiteFooter() {
           <p>{copy.tagline}</p>
         </div>
         <div className="site-footer__links" aria-label="Footer placeholders">
-          <p>{copy.doctors} · {copy.centers} · {copy.services}</p>
+          <p>{copy.labels}</p>
           <p>{copy.utility}</p>
           <Link href={switchHref} className="site-footer__locale-switch" aria-label={copy.switchLabel}>
             {copy.switchLabel}
