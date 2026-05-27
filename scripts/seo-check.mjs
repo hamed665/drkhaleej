@@ -11,7 +11,7 @@ const requiredFiles = [
   'public/llms.txt'
 ];
 
-const forbiddenRouteTokens = ['doctor', 'center', 'service', 'pharmacy', 'lab'];
+const approvedDiscoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/labs', '/services', '/search'];
 
 async function ensureFileExists(relativePath) {
   const absolutePath = path.join(root, relativePath);
@@ -36,7 +36,6 @@ function assertMatch(source, regex, message) {
 for (const file of requiredFiles) {
   await ensureFileExists(file);
 }
-
 
 const jsonLdPath = 'src/lib/seo/jsonld.ts';
 await ensureFileExists(jsonLdPath);
@@ -82,7 +81,6 @@ if (
   throw new Error('src/lib/seo/jsonld.ts must not import Supabase or React.');
 }
 
-
 const siteSource = await readText('src/lib/seo/site.ts');
 const robotsSource = await readText('src/app/robots.ts');
 const sitemapSource = await readText('src/app/sitemap.ts');
@@ -97,10 +95,14 @@ if (!sitemapSource.includes("localizedRootPath('en')") || !sitemapSource.include
   throw new Error('src/app/sitemap.ts must include /en/om and /ar/om via localizedRootPath helper usage.');
 }
 
-for (const token of forbiddenRouteTokens) {
-  if (new RegExp(`['"\\"]/[^'"\\n]*${token}`, 'i').test(sitemapSource)) {
-    throw new Error(`src/app/sitemap.ts must not include programmatic ${token} routes in Phase 4.0B.`);
+for (const route of approvedDiscoveryRoutes) {
+  if (!sitemapSource.includes(route)) {
+    throw new Error(`src/app/sitemap.ts must include approved public skeleton route: ${route}.`);
   }
+}
+
+if (/\/(doctor|center|service|pharmacy|lab)s?\/\[/.test(sitemapSource)) {
+  throw new Error('src/app/sitemap.ts must not include dynamic provider route patterns in this phase.');
 }
 
 if (!/sitemap\s*:/.test(robotsSource)) {

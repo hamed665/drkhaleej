@@ -9,6 +9,17 @@ const checks = [
     pass: existsSync(resolve(projectRoot, 'src/app/[locale]/[country]/page.tsx'))
   },
   {
+    name: 'approved discovery skeleton routes exist',
+    pass: [
+      'doctors',
+      'centers',
+      'pharmacies',
+      'labs',
+      'services',
+      'search'
+    ].every((slug) => existsSync(resolve(projectRoot, `src/app/[locale]/[country]/${slug}/page.tsx`)))
+  },
+  {
     name: 'src/app/[locale]/centers route does not exist',
     pass: !existsSync(resolve(projectRoot, 'src/app/[locale]/centers'))
   },
