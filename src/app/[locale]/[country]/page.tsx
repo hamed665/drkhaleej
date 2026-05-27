@@ -30,7 +30,6 @@ type HomeCopy = {
     };
     popularSearchLabel: string;
     popularSearches: readonly string[];
-    visualTags: readonly string[];
   };
   trust: readonly string[];
   categories: {
@@ -64,8 +63,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         categories: ['Dental care', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy']
       },
       popularSearchLabel: 'Popular searches',
-      popularSearches: ['Dental care', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy'],
-      visualTags: ['Arabic + English', 'Oman-first', 'Doctors · Clinics · Labs']
+      popularSearches: ['Dental care', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy']
     },
     trust: [
       'Search-first healthcare discovery',
@@ -121,8 +119,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         categories: ['طب الأسنان', 'الجلدية', 'طب الأطفال', 'التحاليل', 'الصيدليات']
       },
       popularSearchLabel: 'عمليات بحث شائعة',
-      popularSearches: ['طب الأسنان', 'الجلدية', 'طب الأطفال', 'التحاليل', 'الصيدليات'],
-      visualTags: ['العربية + الإنجليزية', 'عُمان أولاً', 'أطباء · عيادات · مختبرات']
+      popularSearches: ['طب الأسنان', 'الجلدية', 'طب الأطفال', 'التحاليل', 'الصيدليات']
     },
     trust: [
       'تجربة بحث طبية واضحة',

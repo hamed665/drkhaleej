@@ -16,7 +16,6 @@ type HomeHeroCopy = {
   };
   popularSearchLabel: string;
   popularSearches: readonly string[];
-  visualTags: readonly string[];
 };
 
 type HomeHeroProps = {
@@ -39,30 +38,6 @@ export function HomeHero({ copy, dir }: HomeHeroProps) {
 
         <p className="home-hero__note">{copy.note}</p>
       </div>
-
-      <aside className="home-hero__visual glass-soft" aria-hidden="true">
-        <div className="hero-arch">
-          <div className="hero-arch__inner">
-            <div className="hero-arch__panel hero-arch__panel--top" />
-            <div className="hero-arch__panel hero-arch__panel--left" />
-            <div className="hero-arch__panel hero-arch__panel--right" />
-          </div>
-        </div>
-
-        <div className="hero-visual-card hero-visual-card--primary">
-          <span className="hero-visual-card__title">Healthcare discovery</span>
-          <div className="hero-visual-card__line" />
-          <div className="hero-visual-card__line hero-visual-card__line--soft" />
-        </div>
-
-        <div className="hero-visual-tags">
-          {copy.visualTags.map((tag) => (
-            <span key={tag} className="hero-visual-tag">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </aside>
     </section>
   );
 }
