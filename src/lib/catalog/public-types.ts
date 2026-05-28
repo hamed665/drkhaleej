@@ -109,19 +109,26 @@ export type PublicDoctorDetailServiceSummary = {
   requiresMedicalDisclaimer: boolean;
 };
 
-export type PublicCenterDetailLocationSummary = {
+export type PublicProviderLocationSummary = {
   id: string;
+  locationNameEn: string | null;
+  locationNameAr: string | null;
   areaNameEn: string | null;
   areaNameAr: string | null;
   cityNameEn: string | null;
   cityNameAr: string | null;
   countryNameEn: string | null;
   countryNameAr: string | null;
+  isPrimary: boolean;
+  sortOrder: number;
 };
+
+export type PublicCenterDetailLocationSummary = PublicProviderLocationSummary;
 
 export type PublicCenterDetail = PublicCenterSummary & {
   verificationStatus: VerificationStatus;
-  location: PublicCenterDetailLocationSummary | null;
+  location: PublicProviderLocationSummary | null;
+  locations: PublicProviderLocationSummary[];
   services: PublicCenterDetailServiceSummary[];
   doctors: PublicCenterDetailDoctorSummary[];
 };
@@ -132,7 +139,7 @@ export type PublicDoctorPracticeLocationSummary = {
     verificationStatus: VerificationStatus;
   };
   primarySpecialty: PublicDoctorDetailSpecialtySummary | null;
-  location: PublicCenterDetailLocationSummary | null;
+  location: PublicProviderLocationSummary | null;
 };
 
 export type PublicDoctorDetail = PublicDoctorSummary & {

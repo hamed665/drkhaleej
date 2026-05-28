@@ -7,7 +7,6 @@ import type {
   PublicCatalogSearchResult,
   PublicCenterDetail,
   PublicCenterDetailDoctorSummary,
-  PublicCenterDetailLocationSummary,
   PublicCenterDetailOptions,
   PublicCenterDetailServiceSummary,
   PublicCenterListOptions,
@@ -22,6 +21,7 @@ import type {
   PublicDoctorSummary,
   PublicGeoAreaListOptions,
   PublicGeoAreaSummary,
+  PublicProviderLocationSummary,
   PublicSearchOptions,
   PublicServiceListOptions,
   PublicServiceSummary
@@ -108,14 +108,15 @@ type PublicCenterDetailRow = PublicCenterBaseRow & Pick<CenterRow, 'verification
 
 function mapCenterDetailRow(
   row: PublicCenterDetailRow,
-  location: PublicCenterDetailLocationSummary | null,
+  locations: PublicProviderLocationSummary[],
   services: PublicCenterDetailServiceSummary[],
   doctors: PublicCenterDetailDoctorSummary[]
 ): PublicCenterDetail {
   return {
     ...mapCenterRow(row),
     verificationStatus: row.verification_status,
-    location,
+    location: locations[0] ?? null,
+    locations,
     services,
     doctors
   };
@@ -141,20 +142,24 @@ function mapCenterServiceRow(
   };
 }
 
-function mapCenterLocationSummary(
-  location: Pick<CenterLocationRow, 'id'>,
+function mapPublicProviderLocationSummary(
+  location: PublicCenterLocationLookupRow,
   area: Pick<GeoAreaRow, 'name_en' | 'name_ar'> | null,
   city: Pick<GeoCityRow, 'name_en' | 'name_ar'> | null,
   country: Pick<GeoCountryRow, 'name_en' | 'name_ar'> | null
-): PublicCenterDetailLocationSummary {
+): PublicProviderLocationSummary {
   return {
     id: location.id,
+    locationNameEn: location.name_en,
+    locationNameAr: location.name_ar,
     areaNameEn: area?.name_en ?? null,
     areaNameAr: area?.name_ar ?? null,
     cityNameEn: city?.name_en ?? null,
     cityNameAr: city?.name_ar ?? null,
     countryNameEn: country?.name_en ?? null,
-    countryNameAr: country?.name_ar ?? null
+    countryNameAr: country?.name_ar ?? null,
+    isPrimary: location.is_primary,
+    sortOrder: location.sort_order
   };
 }
 
@@ -213,7 +218,10 @@ type PublicDoctorPracticeLocationRow = Pick<
 
 type PublicPracticeCenterRow = PublicCenterBaseRow & Pick<CenterRow, 'verification_status'>;
 
-type PublicCenterLocationLookupRow = Pick<CenterLocationRow, 'id' | 'center_id' | 'area_id' | 'city_id' | 'country_id'>;
+type PublicCenterLocationLookupRow = Pick<
+  CenterLocationRow,
+  'id' | 'center_id' | 'name_en' | 'name_ar' | 'area_id' | 'city_id' | 'country_id' | 'is_primary' | 'sort_order'
+>;
 
 function mapSpecialtyRow(row: PublicSpecialtyRow): PublicDoctorDetailSpecialtySummary {
   return {
@@ -333,8 +341,8 @@ async function listPublicDoctorServices(
 
 async function getPublicLocationSummariesByLocation(
   locations: PublicCenterLocationLookupRow[]
-): Promise<{ locationsById: Map<string, PublicCenterDetailLocationSummary>; error: boolean }> {
-  const locationsById = new Map<string, PublicCenterDetailLocationSummary>();
+): Promise<{ locationsById: Map<string, PublicProviderLocationSummary>; error: boolean }> {
+  const locationsById = new Map<string, PublicProviderLocationSummary>();
   if (locations.length === 0) return { locationsById, error: false };
 
   const supabase = createSupabaseServerClient();
@@ -363,7 +371,7 @@ async function getPublicLocationSummariesByLocation(
   for (const location of locations) {
     locationsById.set(
       location.id,
-      mapCenterLocationSummary(
+      mapPublicProviderLocationSummary(
         location,
         location.area_id ? areasById.get(location.area_id) ?? null : null,
         citiesById.get(location.city_id) ?? null,
@@ -412,7 +420,7 @@ async function listPublicDoctorPracticeLocations(
 
   const { data: centerLocations, error: centerLocationsError } = await supabase
     .from('center_locations')
-    .select('id,center_id,area_id,city_id,country_id')
+    .select('id,center_id,name_en,name_ar,area_id,city_id,country_id,is_primary,sort_order')
     .in('center_id', centerIds)
     .order('is_primary', { ascending: false })
     .order('sort_order', { ascending: true });
@@ -520,37 +528,28 @@ export async function listPublicCenters(options: PublicCenterListOptions = {}): 
 }
 
 
-async function getPublicCenterLocation(
-  centerId: string
-): Promise<{ location: PublicCenterDetailLocationSummary | null; error: boolean }> {
+async function getPublicCenterLocations(
+  centerId: string,
+  limit = 6
+): Promise<{ locations: PublicProviderLocationSummary[]; error: boolean }> {
   const supabase = createSupabaseServerClient();
 
-  const { data: location, error: locationError } = await supabase
+  const { data, error } = await supabase
     .from('center_locations')
-    .select('id,area_id,city_id,country_id')
+    .select('id,center_id,name_en,name_ar,area_id,city_id,country_id,is_primary,sort_order')
     .eq('center_id', centerId)
     .order('is_primary', { ascending: false })
     .order('sort_order', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .limit(limit);
 
-  if (locationError) return { location: null, error: true };
-  if (!location) return { location: null, error: false };
+  if (error) return { locations: [], error: true };
 
-  const [areaResult, cityResult, countryResult] = await Promise.all([
-    location.area_id
-      ? supabase.from('geo_areas').select('name_en,name_ar').eq('id', location.area_id).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-    supabase.from('geo_cities').select('name_en,name_ar').eq('id', location.city_id).maybeSingle(),
-    supabase.from('geo_countries').select('name_en,name_ar').eq('id', location.country_id).maybeSingle()
-  ]);
-
-  if (areaResult.error || cityResult.error || countryResult.error) {
-    return { location: null, error: true };
-  }
+  const locationRows = data ?? [];
+  const locationResult = await getPublicLocationSummariesByLocation(locationRows);
+  if (locationResult.error) return { locations: [], error: true };
 
   return {
-    location: mapCenterLocationSummary(location, areaResult.data, cityResult.data, countryResult.data),
+    locations: locationRows.flatMap((location) => locationResult.locationsById.get(location.id) ?? []),
     error: false
   };
 }
@@ -628,6 +627,7 @@ export async function getPublicCenterBySlug(
   const supabase = createSupabaseServerClient();
   const servicesLimit = clampLimit(options.servicesLimit ?? 6);
   const doctorsLimit = clampLimit(options.doctorsLimit ?? 6);
+  const locationsLimit = clampLimit(6);
 
   let query = supabase
     .from('centers')
@@ -643,18 +643,18 @@ export async function getPublicCenterBySlug(
   if (error) return createErrorResult(null);
   if (!center) return createSuccessResult(null, 'no_rows');
 
-  const [locationResult, servicesResult, doctorsResult] = await Promise.all([
-    getPublicCenterLocation(center.id),
+  const [locationsResult, servicesResult, doctorsResult] = await Promise.all([
+    getPublicCenterLocations(center.id, locationsLimit),
     listPublicCenterServices(center.id, servicesLimit),
     listPublicCenterDoctors(center.id, doctorsLimit)
   ]);
 
-  if (locationResult.error || servicesResult.error || doctorsResult.error) {
+  if (locationsResult.error || servicesResult.error || doctorsResult.error) {
     return createErrorResult(null);
   }
 
   return createSuccessResult(
-    mapCenterDetailRow(center, locationResult.location, servicesResult.services, doctorsResult.doctors)
+    mapCenterDetailRow(center, locationsResult.locations, servicesResult.services, doctorsResult.doctors)
   );
 }
 

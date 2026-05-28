@@ -1,3 +1,4 @@
+import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import type { PublicCatalogLocale, PublicDoctorDetail } from '@/lib/catalog/public-types';
 import { publicCenterDetailRoute } from '@/lib/routes/public';
 
@@ -40,7 +41,7 @@ const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
     servicesTitle: 'Services and specialties preview',
     servicesDescription: 'A limited read-only preview of public services and specialty information connected to this doctor.',
     practiceLocationsTitle: 'Practice locations preview',
-    practiceLocationsDescription: 'Only connected center names and general area, city, and country information are shown in this phase.',
+    practiceLocationsDescription: 'Only connected center names, public branch labels, and general area, city, and country information are shown in this phase.',
     trustTitle: 'Profile verification',
     trustVerified: 'This public profile is marked as verified in DrMuscat records. This is not a license or MOH approval claim.',
     trustPlaceholder: 'License and verification details will be added after the provider verification foundation is complete.',
@@ -76,7 +77,7 @@ const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
     servicesTitle: 'لمحة عن الخدمات والتخصصات',
     servicesDescription: 'عرض محدود للقراءة فقط للخدمات ومعلومات التخصص العامة المرتبطة بهذا الطبيب.',
     practiceLocationsTitle: 'لمحة عن مواقع الممارسة',
-    practiceLocationsDescription: 'تظهر في هذه المرحلة أسماء المراكز المرتبطة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
+    practiceLocationsDescription: 'تظهر في هذه المرحلة أسماء المراكز المرتبطة وأسماء الفروع العامة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
     trustTitle: 'توثيق الملف',
     trustVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrMuscat. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
     trustPlaceholder: 'ستضاف تفاصيل الترخيص والتوثيق بعد اكتمال أساس توثيق مقدمي الخدمة.',
@@ -118,16 +119,6 @@ function formatNeutralLabel(value: string): string {
     .split('_')
     .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase())
     .join(' ');
-}
-
-function buildLocationText(locale: PublicCatalogLocale, location: PublicDoctorDetail['practiceLocations'][number]['location']): string | null {
-  if (!location) return null;
-
-  const area = preferredText(locale, location.areaNameEn, location.areaNameAr);
-  const city = preferredText(locale, location.cityNameEn, location.cityNameAr);
-  const country = preferredText(locale, location.countryNameEn, location.countryNameAr);
-
-  return [area, city, country].filter(Boolean).join(' · ') || null;
 }
 
 export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) {
@@ -210,7 +201,7 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
           <ul className="grid gap-3 sm:grid-cols-2" role="list">
             {doctor.practiceLocations.map((practiceLocation) => {
               const centerName = preferredText(locale, practiceLocation.center.nameEn, practiceLocation.center.nameAr) ?? practiceLocation.center.nameEn;
-              const locationText = buildLocationText(locale, practiceLocation.location);
+              const locationText = formatPublicLocationSummary(locale, practiceLocation.location);
               const specialtyName = practiceLocation.primarySpecialty
                 ? preferredText(locale, practiceLocation.primarySpecialty.nameEn, practiceLocation.primarySpecialty.nameAr) ?? practiceLocation.primarySpecialty.nameEn
                 : null;
