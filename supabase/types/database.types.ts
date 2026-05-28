@@ -577,6 +577,8 @@ export type Database = {
           area_id: string | null
           center_id: string
           city_id: string
+          contact_review_status: string
+          contact_reviewed_at: string | null
           country_id: string
           created_at: string
           deleted_at: string | null
@@ -594,6 +596,10 @@ export type Database = {
           name_en: string | null
           postal_code: string | null
           primary_phone: string | null
+          public_email_visible: boolean
+          public_primary_phone_visible: boolean
+          public_secondary_phone_visible: boolean
+          public_whatsapp_phone_visible: boolean
           region_id: string
           secondary_phone: string | null
           slug: string
@@ -609,6 +615,8 @@ export type Database = {
           area_id?: string | null
           center_id: string
           city_id: string
+          contact_review_status?: string
+          contact_reviewed_at?: string | null
           country_id: string
           created_at?: string
           deleted_at?: string | null
@@ -626,6 +634,10 @@ export type Database = {
           name_en?: string | null
           postal_code?: string | null
           primary_phone?: string | null
+          public_email_visible?: boolean
+          public_primary_phone_visible?: boolean
+          public_secondary_phone_visible?: boolean
+          public_whatsapp_phone_visible?: boolean
           region_id: string
           secondary_phone?: string | null
           slug: string
@@ -641,6 +653,8 @@ export type Database = {
           area_id?: string | null
           center_id?: string
           city_id?: string
+          contact_review_status?: string
+          contact_reviewed_at?: string | null
           country_id?: string
           created_at?: string
           deleted_at?: string | null
@@ -658,6 +672,10 @@ export type Database = {
           name_en?: string | null
           postal_code?: string | null
           primary_phone?: string | null
+          public_email_visible?: boolean
+          public_primary_phone_visible?: boolean
+          public_secondary_phone_visible?: boolean
+          public_whatsapp_phone_visible?: boolean
           region_id?: string
           secondary_phone?: string | null
           slug?: string
@@ -992,6 +1010,8 @@ export type Database = {
       centers: {
         Row: {
           center_type: Database["public"]["Enums"]["center_type"]
+          contact_review_status: string
+          contact_reviewed_at: string | null
           cover_image_url: string | null
           created_at: string
           default_country: Database["public"]["Enums"]["country_code"]
@@ -1010,6 +1030,10 @@ export type Database = {
           name_ar: string | null
           name_en: string
           primary_phone: string | null
+          public_email_visible: boolean
+          public_primary_phone_visible: boolean
+          public_secondary_phone_visible: boolean
+          public_whatsapp_phone_visible: boolean
           secondary_phone: string | null
           short_description_ar: string | null
           short_description_en: string | null
@@ -1023,6 +1047,8 @@ export type Database = {
         }
         Insert: {
           center_type: Database["public"]["Enums"]["center_type"]
+          contact_review_status?: string
+          contact_reviewed_at?: string | null
           cover_image_url?: string | null
           created_at?: string
           default_country?: Database["public"]["Enums"]["country_code"]
@@ -1041,6 +1067,10 @@ export type Database = {
           name_ar?: string | null
           name_en: string
           primary_phone?: string | null
+          public_email_visible?: boolean
+          public_primary_phone_visible?: boolean
+          public_secondary_phone_visible?: boolean
+          public_whatsapp_phone_visible?: boolean
           secondary_phone?: string | null
           short_description_ar?: string | null
           short_description_en?: string | null
@@ -1054,6 +1084,8 @@ export type Database = {
         }
         Update: {
           center_type?: Database["public"]["Enums"]["center_type"]
+          contact_review_status?: string
+          contact_reviewed_at?: string | null
           cover_image_url?: string | null
           created_at?: string
           default_country?: Database["public"]["Enums"]["country_code"]
@@ -1072,6 +1104,10 @@ export type Database = {
           name_ar?: string | null
           name_en?: string
           primary_phone?: string | null
+          public_email_visible?: boolean
+          public_primary_phone_visible?: boolean
+          public_secondary_phone_visible?: boolean
+          public_whatsapp_phone_visible?: boolean
           secondary_phone?: string | null
           short_description_ar?: string | null
           short_description_en?: string | null
