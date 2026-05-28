@@ -1,6 +1,8 @@
+import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import type { PublicCenterDetail, PublicCatalogLocale } from '@/lib/catalog/public-types';
 
 import { PublicCenterDetailSection } from './public-center-detail-section';
+import { PublicLocationSection } from './public-location-section';
 
 type PublicCenterDetailProps = {
   locale: PublicCatalogLocale;
@@ -36,7 +38,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     doctorsTitle: 'Doctors preview',
     doctorsDescription: 'A limited read-only preview of public doctor profiles connected to this center.',
     locationTitle: 'Location overview',
-    locationDescription: 'Only general area, city, and country information is shown in this phase.',
+    locationDescription: 'Only public branch labels and general area, city, and country information are shown in this phase.',
     verificationTitle: 'Profile verification',
     verificationVerified: 'This public profile is marked as verified in DrMuscat records. This is not a license or MOH approval claim.',
     verificationPlaceholder: 'License and verification details will be added after the provider verification foundation is complete.',
@@ -57,7 +59,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     doctorsTitle: 'لمحة عن الأطباء',
     doctorsDescription: 'عرض محدود للقراءة فقط لملفات الأطباء العامة المرتبطة بهذا المركز.',
     locationTitle: 'نظرة عامة على الموقع',
-    locationDescription: 'تظهر في هذه المرحلة معلومات عامة فقط عن المنطقة والمدينة والدولة.',
+    locationDescription: 'تظهر في هذه المرحلة أسماء الفروع العامة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
     verificationTitle: 'توثيق الملف',
     verificationVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrMuscat. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
     verificationPlaceholder: 'ستضاف تفاصيل الترخيص والتوثيق بعد اكتمال أساس توثيق مقدمي الخدمة.',
@@ -85,22 +87,12 @@ function formatNeutralLabel(value: string): string {
     .join(' ');
 }
 
-function buildLocationText(locale: PublicCatalogLocale, center: PublicCenterDetail): string | null {
-  if (!center.location) return null;
-
-  const area = preferredText(locale, center.location.areaNameEn, center.location.areaNameAr);
-  const city = preferredText(locale, center.location.cityNameEn, center.location.cityNameAr);
-  const country = preferredText(locale, center.location.countryNameEn, center.location.countryNameAr);
-
-  return [area, city, country].filter(Boolean).join(' · ') || null;
-}
-
 export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) {
   const copy = copyByLocale[locale];
   const description =
     preferredText(locale, center.shortDescriptionEn, center.shortDescriptionAr) ??
     preferredText(locale, center.descriptionEn, center.descriptionAr);
-  const locationText = buildLocationText(locale, center);
+  const locationText = formatPublicLocationSummary(locale, center.location);
 
   return (
     <div className="mt-10 space-y-5">
@@ -114,9 +106,13 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         {description ? <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{description}</p> : null}
       </PublicCenterDetailSection>
 
-      <PublicCenterDetailSection title={copy.locationTitle} description={copy.locationDescription}>
-        <p className="text-sm leading-6 text-slate-700">{locationText ?? copy.noLocation}</p>
-      </PublicCenterDetailSection>
+      <PublicLocationSection
+        locale={locale}
+        title={copy.locationTitle}
+        description={copy.locationDescription}
+        locations={center.locations}
+        emptyLabel={copy.noLocation}
+      />
 
       <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
         {center.services.length > 0 ? (
