@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { PublicComingSoonPanel } from '@/components/public/public-coming-soon-panel';
 import { PublicDiscoveryGrid } from '@/components/public/public-discovery-grid';
 import { PublicRouteHero } from '@/components/public/public-route-hero';
@@ -7,10 +8,11 @@ type PublicPageShellProps = {
   heroBadge: string;
   heroTitle: string;
   heroDescription: string;
-  panelHeading: string;
-  panelBody: string;
-  gridTitle: string;
-  gridItems: readonly string[];
+  content?: ReactNode;
+  panelHeading?: string;
+  panelBody?: string;
+  gridTitle?: string;
+  gridItems?: readonly string[];
 };
 
 export function PublicPageShell({
@@ -18,6 +20,7 @@ export function PublicPageShell({
   heroBadge,
   heroTitle,
   heroDescription,
+  content,
   panelHeading,
   panelBody,
   gridTitle,
@@ -26,8 +29,13 @@ export function PublicPageShell({
   return (
     <main className="public-page-shell" dir={dir}>
       <PublicRouteHero badge={heroBadge} title={heroTitle} description={heroDescription} dir={dir} />
-      <PublicComingSoonPanel heading={panelHeading} body={panelBody} />
-      <PublicDiscoveryGrid title={gridTitle} items={gridItems} />
+      {content ??
+        (panelHeading && panelBody && gridTitle && gridItems ? (
+          <>
+            <PublicComingSoonPanel heading={panelHeading} body={panelBody} />
+            <PublicDiscoveryGrid title={gridTitle} items={gridItems} />
+          </>
+        ) : null)}
     </main>
   );
 }
