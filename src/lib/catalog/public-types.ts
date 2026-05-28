@@ -91,6 +91,24 @@ export type PublicCenterDetailServiceSummary = {
 
 export type PublicCenterDetailDoctorSummary = PublicDoctorSummary;
 
+export type PublicDoctorDetailSpecialtySummary = {
+  id: string;
+  nameEn: string;
+  nameAr: string | null;
+  descriptionEn: string | null;
+  descriptionAr: string | null;
+};
+
+export type PublicDoctorDetailServiceSummary = {
+  id: string;
+  slug: string | null;
+  nameEn: string;
+  nameAr: string | null;
+  descriptionEn: string | null;
+  descriptionAr: string | null;
+  requiresMedicalDisclaimer: boolean;
+};
+
 export type PublicCenterDetailLocationSummary = {
   id: string;
   areaNameEn: string | null;
@@ -106,6 +124,28 @@ export type PublicCenterDetail = PublicCenterSummary & {
   location: PublicCenterDetailLocationSummary | null;
   services: PublicCenterDetailServiceSummary[];
   doctors: PublicCenterDetailDoctorSummary[];
+};
+
+export type PublicDoctorPracticeLocationSummary = {
+  id: string;
+  center: Pick<PublicCenterSummary, 'id' | 'slug' | 'nameEn' | 'nameAr' | 'centerType' | 'shortDescriptionEn' | 'shortDescriptionAr' | 'defaultCountry'> & {
+    verificationStatus: VerificationStatus;
+  };
+  primarySpecialty: PublicDoctorDetailSpecialtySummary | null;
+  location: PublicCenterDetailLocationSummary | null;
+};
+
+export type PublicDoctorDetail = PublicDoctorSummary & {
+  displayNameEn: string | null;
+  displayNameAr: string | null;
+  bioEn: string | null;
+  bioAr: string | null;
+  profileImageUrl: string | null;
+  yearsExperience: number | null;
+  verificationStatus: VerificationStatus;
+  primarySpecialty: PublicDoctorDetailSpecialtySummary | null;
+  services: PublicDoctorDetailServiceSummary[];
+  practiceLocations: PublicDoctorPracticeLocationSummary[];
 };
 
 export type PublicCatalogSearchResult = {
@@ -133,6 +173,13 @@ export type PublicCenterDetailOptions = {
 
 export type PublicDoctorListOptions = PublicListOptions & {
   country?: CountryCode;
+};
+
+export type PublicDoctorDetailOptions = {
+  slug: string;
+  country?: CountryCode;
+  servicesLimit?: number;
+  practiceLocationsLimit?: number;
 };
 
 export type PublicServiceListOptions = PublicListOptions & {

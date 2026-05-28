@@ -13,7 +13,12 @@ import type {
   PublicCenterListOptions,
   PublicCenterSummary,
   PublicDiscoveryCategory,
+  PublicDoctorDetail,
+  PublicDoctorDetailOptions,
+  PublicDoctorDetailServiceSummary,
+  PublicDoctorDetailSpecialtySummary,
   PublicDoctorListOptions,
+  PublicDoctorPracticeLocationSummary,
   PublicDoctorSummary,
   PublicGeoAreaListOptions,
   PublicGeoAreaSummary,
@@ -30,8 +35,10 @@ type CenterRow = Database['public']['Tables']['centers']['Row'];
 type CenterLocationRow = Database['public']['Tables']['center_locations']['Row'];
 type CenterServiceRow = Database['public']['Tables']['center_services']['Row'];
 type DoctorPracticeLocationRow = Database['public']['Tables']['doctor_practice_locations']['Row'];
+type DoctorServiceRow = Database['public']['Tables']['doctor_services']['Row'];
 type DoctorRow = Database['public']['Tables']['doctors']['Row'];
 type ServiceRow = Database['public']['Tables']['services']['Row'];
+type SpecialtyRow = Database['public']['Tables']['specialties']['Row'];
 type GeoAreaRow = Database['public']['Tables']['geo_areas']['Row'];
 type GeoCityRow = Database['public']['Tables']['geo_cities']['Row'];
 type GeoCountryRow = Database['public']['Tables']['geo_countries']['Row'];
@@ -161,6 +168,304 @@ function mapDoctorRow(row: Pick<DoctorRow, 'id' | 'slug' | 'full_name_en' | 'ful
     titleAr: row.title,
     gender: row.gender,
     defaultCountry: row.default_country
+  };
+}
+
+
+type PublicDoctorDetailRow = Pick<
+  DoctorRow,
+  | 'id'
+  | 'slug'
+  | 'full_name_en'
+  | 'full_name_ar'
+  | 'display_name_en'
+  | 'display_name_ar'
+  | 'title'
+  | 'gender'
+  | 'bio_en'
+  | 'bio_ar'
+  | 'profile_image_url'
+  | 'years_experience'
+  | 'primary_specialty_id'
+  | 'default_country'
+  | 'verification_status'
+>;
+
+type PublicSpecialtyRow = Pick<SpecialtyRow, 'id' | 'name_en' | 'name_ar' | 'description_en' | 'description_ar'>;
+
+type PublicDoctorServiceRow = Pick<
+  DoctorServiceRow,
+  | 'id'
+  | 'slug'
+  | 'display_name_en'
+  | 'display_name_ar'
+  | 'description_en'
+  | 'description_ar'
+  | 'requires_medical_disclaimer'
+  | 'service_id'
+  | 'specialty_id'
+>;
+
+type PublicDoctorPracticeLocationRow = Pick<
+  DoctorPracticeLocationRow,
+  'id' | 'center_id' | 'center_location_id' | 'primary_specialty_id'
+>;
+
+type PublicPracticeCenterRow = PublicCenterBaseRow & Pick<CenterRow, 'verification_status'>;
+
+type PublicCenterLocationLookupRow = Pick<CenterLocationRow, 'id' | 'center_id' | 'area_id' | 'city_id' | 'country_id'>;
+
+function mapSpecialtyRow(row: PublicSpecialtyRow): PublicDoctorDetailSpecialtySummary {
+  return {
+    id: row.id,
+    nameEn: row.name_en,
+    nameAr: row.name_ar,
+    descriptionEn: row.description_en,
+    descriptionAr: row.description_ar
+  };
+}
+
+function mapDoctorServiceRow(
+  row: PublicDoctorServiceRow,
+  service: Pick<ServiceRow, 'name_en' | 'name_ar' | 'description_en' | 'description_ar'> | null,
+  specialty: PublicDoctorDetailSpecialtySummary | null
+): PublicDoctorDetailServiceSummary {
+  return {
+    id: row.id,
+    slug: row.slug,
+    nameEn: row.display_name_en ?? service?.name_en ?? specialty?.nameEn ?? 'Healthcare service',
+    nameAr: row.display_name_ar ?? service?.name_ar ?? specialty?.nameAr ?? null,
+    descriptionEn: row.description_en ?? service?.description_en ?? specialty?.descriptionEn ?? null,
+    descriptionAr: row.description_ar ?? service?.description_ar ?? specialty?.descriptionAr ?? null,
+    requiresMedicalDisclaimer: row.requires_medical_disclaimer
+  };
+}
+
+function mapDoctorDetailRow(
+  row: PublicDoctorDetailRow,
+  primarySpecialty: PublicDoctorDetailSpecialtySummary | null,
+  services: PublicDoctorDetailServiceSummary[],
+  practiceLocations: PublicDoctorPracticeLocationSummary[]
+): PublicDoctorDetail {
+  return {
+    ...mapDoctorRow(row),
+    displayNameEn: row.display_name_en,
+    displayNameAr: row.display_name_ar,
+    bioEn: row.bio_en,
+    bioAr: row.bio_ar,
+    profileImageUrl: row.profile_image_url,
+    yearsExperience: row.years_experience,
+    verificationStatus: row.verification_status,
+    primarySpecialty,
+    services,
+    practiceLocations
+  };
+}
+
+async function getPublicSpecialtiesByIds(
+  specialtyIds: string[]
+): Promise<{ specialtiesById: Map<string, PublicDoctorDetailSpecialtySummary>; error: boolean }> {
+  const specialtiesById = new Map<string, PublicDoctorDetailSpecialtySummary>();
+  const uniqueIds = Array.from(new Set(specialtyIds.filter(Boolean)));
+  if (uniqueIds.length === 0) return { specialtiesById, error: false };
+
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('specialties')
+    .select('id,name_en,name_ar,description_en,description_ar')
+    .in('id', uniqueIds);
+
+  if (error) return { specialtiesById, error: true };
+
+  for (const specialty of data ?? []) {
+    specialtiesById.set(specialty.id, mapSpecialtyRow(specialty));
+  }
+
+  return { specialtiesById, error: false };
+}
+
+async function listPublicDoctorServices(
+  doctorId: string,
+  limit: number
+): Promise<{ services: PublicDoctorDetailServiceSummary[]; error: boolean }> {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('doctor_services')
+    .select('id,slug,display_name_en,display_name_ar,description_en,description_ar,requires_medical_disclaimer,service_id,specialty_id')
+    .eq('doctor_id', doctorId)
+    .order('sort_order', { ascending: true })
+    .limit(limit);
+
+  if (error) return { services: [], error: true };
+
+  const rows = data ?? [];
+  const serviceIds = Array.from(new Set(rows.map((row) => row.service_id).filter((id): id is string => Boolean(id))));
+  const specialtyIds = Array.from(new Set(rows.map((row) => row.specialty_id).filter((id): id is string => Boolean(id))));
+  const servicesById = new Map<string, Pick<ServiceRow, 'name_en' | 'name_ar' | 'description_en' | 'description_ar'>>();
+
+  if (serviceIds.length > 0) {
+    const { data: serviceRows, error: serviceRowsError } = await supabase
+      .from('services')
+      .select('id,name_en,name_ar,description_en,description_ar')
+      .in('id', serviceIds);
+
+    if (serviceRowsError) return { services: [], error: true };
+
+    for (const service of serviceRows ?? []) {
+      servicesById.set(service.id, service);
+    }
+  }
+
+  const specialtiesResult = await getPublicSpecialtiesByIds(specialtyIds);
+  if (specialtiesResult.error) return { services: [], error: true };
+
+  return {
+    services: rows.map((row) =>
+      mapDoctorServiceRow(
+        row,
+        row.service_id ? servicesById.get(row.service_id) ?? null : null,
+        row.specialty_id ? specialtiesResult.specialtiesById.get(row.specialty_id) ?? null : null
+      )
+    ),
+    error: false
+  };
+}
+
+async function getPublicLocationSummariesByLocation(
+  locations: PublicCenterLocationLookupRow[]
+): Promise<{ locationsById: Map<string, PublicCenterDetailLocationSummary>; error: boolean }> {
+  const locationsById = new Map<string, PublicCenterDetailLocationSummary>();
+  if (locations.length === 0) return { locationsById, error: false };
+
+  const supabase = createSupabaseServerClient();
+  const areaIds = Array.from(new Set(locations.map((location) => location.area_id).filter((id): id is string => Boolean(id))));
+  const cityIds = Array.from(new Set(locations.map((location) => location.city_id)));
+  const countryIds = Array.from(new Set(locations.map((location) => location.country_id)));
+
+  const areasById = new Map<string, Pick<GeoAreaRow, 'name_en' | 'name_ar'>>();
+  const citiesById = new Map<string, Pick<GeoCityRow, 'name_en' | 'name_ar'>>();
+  const countriesById = new Map<string, Pick<GeoCountryRow, 'name_en' | 'name_ar'>>();
+
+  if (areaIds.length > 0) {
+    const { data, error } = await supabase.from('geo_areas').select('id,name_en,name_ar').in('id', areaIds);
+    if (error) return { locationsById, error: true };
+    for (const area of data ?? []) areasById.set(area.id, area);
+  }
+
+  const { data: cities, error: citiesError } = await supabase.from('geo_cities').select('id,name_en,name_ar').in('id', cityIds);
+  if (citiesError) return { locationsById, error: true };
+  for (const city of cities ?? []) citiesById.set(city.id, city);
+
+  const { data: countries, error: countriesError } = await supabase.from('geo_countries').select('id,name_en,name_ar').in('id', countryIds);
+  if (countriesError) return { locationsById, error: true };
+  for (const country of countries ?? []) countriesById.set(country.id, country);
+
+  for (const location of locations) {
+    locationsById.set(
+      location.id,
+      mapCenterLocationSummary(
+        location,
+        location.area_id ? areasById.get(location.area_id) ?? null : null,
+        citiesById.get(location.city_id) ?? null,
+        countriesById.get(location.country_id) ?? null
+      )
+    );
+  }
+
+  return { locationsById, error: false };
+}
+
+async function listPublicDoctorPracticeLocations(
+  doctorId: string,
+  limit: number
+): Promise<{ practiceLocations: PublicDoctorPracticeLocationSummary[]; error: boolean }> {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('doctor_practice_locations')
+    .select(
+      'id,center_id,center_location_id,primary_specialty_id'
+    )
+    .eq('doctor_id', doctorId)
+    .order('is_primary', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .limit(limit);
+
+  if (error) return { practiceLocations: [], error: true };
+
+  const rows = data ?? [];
+  if (rows.length === 0) return { practiceLocations: [], error: false };
+
+  const centerIds = Array.from(new Set(rows.map((row) => row.center_id)));
+  const specialtyIds = Array.from(new Set(rows.map((row) => row.primary_specialty_id).filter((id): id is string => Boolean(id))));
+
+  const { data: centers, error: centersError } = await supabase
+    .from('centers')
+    .select(
+      'id,slug,name_en,name_ar,center_type,description_en,description_ar,short_description_en,short_description_ar,default_country,verification_status'
+    )
+    .in('id', centerIds);
+
+  if (centersError) return { practiceLocations: [], error: true };
+
+  const centersById = new Map<string, PublicPracticeCenterRow>();
+  for (const center of centers ?? []) centersById.set(center.id, center);
+
+  const { data: centerLocations, error: centerLocationsError } = await supabase
+    .from('center_locations')
+    .select('id,center_id,area_id,city_id,country_id')
+    .in('center_id', centerIds)
+    .order('is_primary', { ascending: false })
+    .order('sort_order', { ascending: true });
+
+  if (centerLocationsError) return { practiceLocations: [], error: true };
+
+  const locationRows = centerLocations ?? [];
+  const explicitLocationsById = new Map(locationRows.map((location) => [location.id, location]));
+  const firstLocationsByCenterId = new Map<string, PublicCenterLocationLookupRow>();
+
+  for (const location of locationRows) {
+    if (!firstLocationsByCenterId.has(location.center_id)) firstLocationsByCenterId.set(location.center_id, location);
+  }
+
+  const selectedLocations = rows
+    .map((row) => (row.center_location_id ? explicitLocationsById.get(row.center_location_id) ?? null : firstLocationsByCenterId.get(row.center_id) ?? null))
+    .filter((location): location is PublicCenterLocationLookupRow => Boolean(location));
+
+  const locationResult = await getPublicLocationSummariesByLocation(selectedLocations);
+  if (locationResult.error) return { practiceLocations: [], error: true };
+
+  const specialtiesResult = await getPublicSpecialtiesByIds(specialtyIds);
+  if (specialtiesResult.error) return { practiceLocations: [], error: true };
+
+  return {
+    practiceLocations: rows.flatMap((row) => {
+      const center = centersById.get(row.center_id);
+      if (!center) return [];
+
+      const selectedLocation = row.center_location_id
+        ? explicitLocationsById.get(row.center_location_id) ?? null
+        : firstLocationsByCenterId.get(row.center_id) ?? null;
+
+      return [
+        {
+          id: row.id,
+          center: {
+            id: center.id,
+            slug: center.slug,
+            nameEn: center.name_en,
+            nameAr: center.name_ar,
+            centerType: center.center_type,
+            shortDescriptionEn: center.short_description_en,
+            shortDescriptionAr: center.short_description_ar,
+            defaultCountry: center.default_country,
+            verificationStatus: center.verification_status
+          },
+          primarySpecialty: row.primary_specialty_id ? specialtiesResult.specialtiesById.get(row.primary_specialty_id) ?? null : null,
+          location: selectedLocation ? locationResult.locationsById.get(selectedLocation.id) ?? null : null
+        }
+      ];
+    }),
+    error: false
   };
 }
 
@@ -371,6 +676,48 @@ export async function listPublicDoctors(options: PublicDoctorListOptions = {}): 
   if (!data || data.length === 0) return createSuccessResult([], 'no_rows');
 
   return createSuccessResult(data.map(mapDoctorRow));
+}
+
+
+export async function getPublicDoctorBySlug(
+  options: PublicDoctorDetailOptions
+): Promise<PublicCatalogQueryResult<PublicDoctorDetail | null>> {
+  const supabase = createSupabaseServerClient();
+  const servicesLimit = clampLimit(options.servicesLimit ?? 6);
+  const practiceLocationsLimit = clampLimit(options.practiceLocationsLimit ?? 6);
+
+  let query = supabase
+    .from('doctors')
+    .select(
+      'id,slug,full_name_en,full_name_ar,display_name_en,display_name_ar,title,gender,bio_en,bio_ar,profile_image_url,years_experience,primary_specialty_id,default_country,verification_status'
+    )
+    .eq('slug', options.slug)
+    .limit(1);
+
+  if (options.country) query = query.eq('default_country', options.country);
+
+  const { data: doctor, error } = await query.maybeSingle();
+  if (error) return createErrorResult(null);
+  if (!doctor) return createSuccessResult(null, 'no_rows');
+
+  const [primarySpecialtyResult, servicesResult, practiceLocationsResult] = await Promise.all([
+    getPublicSpecialtiesByIds(doctor.primary_specialty_id ? [doctor.primary_specialty_id] : []),
+    listPublicDoctorServices(doctor.id, servicesLimit),
+    listPublicDoctorPracticeLocations(doctor.id, practiceLocationsLimit)
+  ]);
+
+  if (primarySpecialtyResult.error || servicesResult.error || practiceLocationsResult.error) {
+    return createErrorResult(null);
+  }
+
+  return createSuccessResult(
+    mapDoctorDetailRow(
+      doctor,
+      doctor.primary_specialty_id ? primarySpecialtyResult.specialtiesById.get(doctor.primary_specialty_id) ?? null : null,
+      servicesResult.services,
+      practiceLocationsResult.practiceLocations
+    )
+  );
 }
 
 export async function listPublicServices(options: PublicServiceListOptions = {}): Promise<PublicCatalogQueryResult<PublicServiceSummary[]>> {
