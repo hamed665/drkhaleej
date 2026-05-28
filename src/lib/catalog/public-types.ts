@@ -34,6 +34,7 @@ export type CenterType = Database['public']['Enums']['center_type'];
 export type CountryCode = Database['public']['Enums']['country_code'];
 export type DoctorGender = Database['public']['Enums']['doctor_gender'];
 export type DoctorTitle = Database['public']['Enums']['doctor_title'];
+export type VerificationStatus = Database['public']['Enums']['verification_status'];
 
 export type PublicCenterSummary = {
   id: string;
@@ -78,6 +79,35 @@ export type PublicGeoAreaSummary = {
   countryId: string;
 };
 
+export type PublicCenterDetailServiceSummary = {
+  id: string;
+  slug: string | null;
+  nameEn: string;
+  nameAr: string | null;
+  descriptionEn: string | null;
+  descriptionAr: string | null;
+  requiresMedicalDisclaimer: boolean;
+};
+
+export type PublicCenterDetailDoctorSummary = PublicDoctorSummary;
+
+export type PublicCenterDetailLocationSummary = {
+  id: string;
+  areaNameEn: string | null;
+  areaNameAr: string | null;
+  cityNameEn: string | null;
+  cityNameAr: string | null;
+  countryNameEn: string | null;
+  countryNameAr: string | null;
+};
+
+export type PublicCenterDetail = PublicCenterSummary & {
+  verificationStatus: VerificationStatus;
+  location: PublicCenterDetailLocationSummary | null;
+  services: PublicCenterDetailServiceSummary[];
+  doctors: PublicCenterDetailDoctorSummary[];
+};
+
 export type PublicCatalogSearchResult = {
   centers: PublicCenterSummary[];
   doctors: PublicDoctorSummary[];
@@ -92,6 +122,13 @@ export type PublicListOptions = {
 export type PublicCenterListOptions = PublicListOptions & {
   country?: CountryCode;
   centerType?: CenterType;
+};
+
+export type PublicCenterDetailOptions = {
+  slug: string;
+  country?: CountryCode;
+  servicesLimit?: number;
+  doctorsLimit?: number;
 };
 
 export type PublicDoctorListOptions = PublicListOptions & {
