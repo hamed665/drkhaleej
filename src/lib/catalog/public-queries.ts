@@ -34,8 +34,12 @@ function clampLimit(limit: number | undefined): number {
 
 
 function normalizeSearchQuery(input: string): string {
-  const trimmed = input.trim().slice(0, MAX_SEARCH_QUERY_LENGTH);
-  return trimmed.replace(/[%_,()]/g, ' ').replace(/\s+/g, ' ').trim();
+  return input
+    .normalize('NFKC')
+    .replace(/[^\p{L}\p{N}\s_-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_SEARCH_QUERY_LENGTH);
 }
 
 function createSuccessResult<T>(data: T, emptyReason: PublicCatalogQueryResult<T>['emptyReason'] = null): PublicCatalogQueryResult<T> {
