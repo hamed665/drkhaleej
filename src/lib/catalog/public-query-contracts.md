@@ -17,6 +17,8 @@ Implemented files:
 - Query execution uses `createSupabaseServerClient()` (anon key path).
 - Conservative column selection (summary-only, non-sensitive fields).
 - Safe query limits with default `20` and max `50`.
+- Search input normalization/sanitization is applied before search execution.
+- Search query length is capped to a safe maximum before SQL filter construction.
 - Typed result wrappers with explicit `ok / data / emptyReason / error` behavior.
 - Generic public error responses (no raw Supabase errors exposed).
 
@@ -49,7 +51,9 @@ RLS remains the enforcement layer for public SELECT eligibility.
   - live SELECT from `public.geo_areas` with optional safe filters (`country_id`, `city_id`).
 - `searchPublicCatalog(query, options?)`
   - grouped SELECT searches across centers/doctors/services/areas.
-  - returns `search_query_too_short` when query length is `< 2`.
+  - query is normalized/sanitized before applying `ilike` filters.
+  - query length is capped before `ilike` filter construction.
+  - returns `search_query_too_short` when normalized query length is `< 2`.
 
 ## Explicit exclusions retained
 

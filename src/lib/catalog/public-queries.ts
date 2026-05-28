@@ -19,6 +19,7 @@ import type {
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
+const MAX_SEARCH_QUERY_LENGTH = 64;
 
 type CenterRow = Database['public']['Tables']['centers']['Row'];
 type DoctorRow = Database['public']['Tables']['doctors']['Row'];
@@ -29,6 +30,12 @@ function clampLimit(limit: number | undefined): number {
   if (typeof limit !== 'number' || Number.isNaN(limit)) return DEFAULT_LIMIT;
   if (limit < 1) return 1;
   return Math.min(limit, MAX_LIMIT);
+}
+
+
+function normalizeSearchQuery(input: string): string {
+  const trimmed = input.trim().slice(0, MAX_SEARCH_QUERY_LENGTH);
+  return trimmed.replace(/[%_,()]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function createSuccessResult<T>(data: T, emptyReason: PublicCatalogQueryResult<T>['emptyReason'] = null): PublicCatalogQueryResult<T> {
@@ -202,7 +209,7 @@ export async function searchPublicCatalog(
   query: string,
   options: PublicSearchOptions = {}
 ): Promise<PublicCatalogQueryResult<PublicCatalogSearchResult>> {
-  const normalizedQuery = query.trim();
+  const normalizedQuery = normalizeSearchQuery(query);
   const emptySearch: PublicCatalogSearchResult = { centers: [], doctors: [], services: [], areas: [] };
 
   if (normalizedQuery.length < 2) {
