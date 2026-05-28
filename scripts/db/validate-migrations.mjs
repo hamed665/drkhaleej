@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '3.5A';
+const PHASE = '4.6C-1';
 
 const required = [
   '0001_extensions.sql',
@@ -47,7 +47,8 @@ const required = [
   '0041_monetization_access_helpers.sql',
   '0042_monetization_sponsored_rls.sql',
   '0043_legal_consent_audit_access_helpers.sql',
-  '0044_legal_consent_audit_rls.sql'
+  '0044_legal_consent_audit_rls.sql',
+  '0045_contact_visibility_foundation.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -149,6 +150,8 @@ const monetizationAccessHelpersFile = '0041_monetization_access_helpers.sql';
 const monetizationSponsoredRlsFile = '0042_monetization_sponsored_rls.sql';
 const legalConsentAuditAccessHelpersFile = '0043_legal_consent_audit_access_helpers.sql';
 const legalConsentAuditRlsFile = '0044_legal_consent_audit_rls.sql';
+
+const contactVisibilityFoundationFile = '0045_contact_visibility_foundation.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1273,6 +1276,50 @@ requireCondition(/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?publ
 requireCondition(/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?deleted_at\s+is\s+null/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql audit_logs policy must require deleted_at IS NULL.');
 requireCondition(!/create\s+policy\s+consent_logs_select_allowed[\s\S]*?\bto\s+anon\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not grant consent_logs SELECT policy to anon.');
 requireCondition(!/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?\bto\s+anon\b/i.test(legalConsentAuditRlsContent), '0044_legal_consent_audit_rls.sql must not grant audit_logs SELECT policy to anon.');
+
+
+const contactVisibilityFoundationContent = readFileSync(`${dir}/${contactVisibilityFoundationFile}`, 'utf8');
+
+for (const pattern of [
+  /alter\s+table\s+public\.centers/i,
+  /alter\s+table\s+public\.center_locations/i,
+  /alter\s+table\s+public\.centers[\s\S]*?public_primary_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.centers[\s\S]*?public_secondary_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.centers[\s\S]*?public_whatsapp_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.centers[\s\S]*?public_email_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.centers[\s\S]*?contact_review_status\s+text\s+not\s+null\s+default\s+'not_reviewed'/i,
+  /alter\s+table\s+public\.centers[\s\S]*?contact_reviewed_at\s+timestamptz\s+null/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?public_primary_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?public_secondary_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?public_whatsapp_phone_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?public_email_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?contact_review_status\s+text\s+not\s+null\s+default\s+'not_reviewed'/i,
+  /alter\s+table\s+public\.center_locations[\s\S]*?contact_reviewed_at\s+timestamptz\s+null/i,
+  /centers_contact_review_status_check/i,
+  /center_locations_contact_review_status_check/i,
+  /contact_review_status\s+in\s*\(\s*'not_reviewed'\s*,\s*'pending'\s*,\s*'approved'\s*,\s*'rejected'\s*\)/i
+]) {
+  requireCondition(pattern.test(contactVisibilityFoundationContent), `0045_contact_visibility_foundation.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\benable\s+row\s+level\s+security\b/i,
+  /\binsert\s+into\b/i,
+  /\bdrop\b/i,
+  /\bcontact_reviewed_by\b/i,
+  /src\/app/i,
+  /src\/components/i,
+  /public[-_ ]?ui/i,
+  /\bpage\.tsx\b/i,
+  /\bcomponent\b/i,
+  /\broute\b/i,
+  /whatsapp\s+link/i,
+  /tel:/i,
+  /mailto:/i
+]) {
+  requireCondition(!forbidden.test(contactVisibilityFoundationContent), `0045_contact_visibility_foundation.sql contains forbidden pattern: ${forbidden}`);
+}
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);
