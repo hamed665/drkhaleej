@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
+import { publicDiscoveryRoute } from '@/lib/routes/public';
 
 const footerCopy: Record<SupportedLocale, {
   tagline: string;
@@ -12,7 +13,7 @@ const footerCopy: Record<SupportedLocale, {
   switchLabel: string;
 }> = {
   en: {
-    tagline: 'Trusted healthcare discovery foundation for Oman.',
+    tagline: 'Healthcare discovery foundation for Oman.',
     doctors: 'Doctors',
     centers: 'Centers',
     services: 'Services',
@@ -20,7 +21,7 @@ const footerCopy: Record<SupportedLocale, {
     switchLabel: 'English / العربية'
   },
   ar: {
-    tagline: 'أساس موثوق لاكتشاف الرعاية الصحية في عُمان.',
+    tagline: 'أساس لاكتشاف الرعاية الصحية في عُمان.',
     doctors: 'الأطباء',
     centers: 'المراكز',
     services: 'الخدمات',
@@ -34,6 +35,9 @@ export async function SiteFooter() {
   const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
   const copy = footerCopy[safeLocale];
   const switchHref = safeLocale === 'en' ? '/ar/om' : '/en/om';
+  const doctorsHref = publicDiscoveryRoute(safeLocale, 'om', 'doctors');
+  const centersHref = publicDiscoveryRoute(safeLocale, 'om', 'centers');
+  const servicesHref = publicDiscoveryRoute(safeLocale, 'om', 'services');
   const dir = localeDirection(safeLocale);
 
   return (
@@ -44,7 +48,10 @@ export async function SiteFooter() {
           <p>{copy.tagline}</p>
         </div>
         <div className="site-footer__links" aria-label="Footer placeholders">
-          <p>{copy.doctors} · {copy.centers} · {copy.services}</p>
+          <p>
+            <Link href={doctorsHref}>{copy.doctors}</Link> · <Link href={centersHref}>{copy.centers}</Link> ·{' '}
+            <Link href={servicesHref}>{copy.services}</Link>
+          </p>
           <p>{copy.utility}</p>
           <Link href={switchHref} className="site-footer__locale-switch" aria-label={copy.switchLabel}>
             {copy.switchLabel}

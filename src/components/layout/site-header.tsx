@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { Logo } from '@/components/brand/logo';
 import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
+import { publicDiscoveryRoute } from '@/lib/routes/public';
 
 const navCopy: Record<SupportedLocale, { doctors: string; centers: string; services: string; switchLabel: string }> = {
   en: {
@@ -24,6 +25,9 @@ export async function SiteHeader() {
   const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
   const copy = navCopy[safeLocale];
   const switchHref = safeLocale === 'en' ? '/ar/om' : '/en/om';
+  const doctorsHref = publicDiscoveryRoute(safeLocale, 'om', 'doctors');
+  const centersHref = publicDiscoveryRoute(safeLocale, 'om', 'centers');
+  const servicesHref = publicDiscoveryRoute(safeLocale, 'om', 'services');
   const dir = localeDirection(safeLocale);
 
   return (
@@ -34,9 +38,9 @@ export async function SiteHeader() {
         </div>
         <nav aria-label="Primary" className="site-header__nav">
           <ul>
-            <li><span>{copy.doctors}</span></li>
-            <li><span>{copy.centers}</span></li>
-            <li><span>{copy.services}</span></li>
+            <li><Link href={doctorsHref}>{copy.doctors}</Link></li>
+            <li><Link href={centersHref}>{copy.centers}</Link></li>
+            <li><Link href={servicesHref}>{copy.services}</Link></li>
           </ul>
         </nav>
         <div className="site-header__locale" aria-label={copy.switchLabel}>
