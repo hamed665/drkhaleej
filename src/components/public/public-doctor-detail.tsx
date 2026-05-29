@@ -2,6 +2,7 @@ import { formatPublicLocationSummary, getPublicDirectionsUrl } from '@/lib/catal
 import type { PublicCatalogLocale, PublicDoctorDetail } from '@/lib/catalog/public-types';
 import { publicCenterDetailRoute } from '@/lib/routes/public';
 
+import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
 import { PublicContactActions } from './public-contact-actions';
 
@@ -213,25 +214,38 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
                     <p>{locationText ?? copy.noLocation}</p>
                     {specialtyName ? <p>{specialtyName}</p> : null}
                   </div>
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <PublicContactActions actions={practiceLocation.contactActions} locale={locale} />
-                    {directionsUrl ? (
+                  <div className="mt-4 space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <PublicContactActions actions={practiceLocation.contactActions} locale={locale} />
+                      {directionsUrl ? (
+                        <a
+                          href={directionsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={copy.practiceDirectionsAriaLabel}
+                          className="inline-flex w-fit rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        >
+                          {copy.directionsLabel}
+                        </a>
+                      ) : null}
                       <a
-                        href={directionsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={copy.practiceDirectionsAriaLabel}
-                        className="inline-flex w-fit rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        href={publicCenterDetailRoute(locale, doctor.defaultCountry, practiceLocation.center.slug)}
+                        className="inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline"
                       >
-                        {copy.directionsLabel}
+                        {copy.centerProfileLabel}
                       </a>
+                    </div>
+                    {practiceLocation.contactActions.length > 0 ? (
+                      <PublicCallbackRequestForm
+                        locale={locale}
+                        countryCode={doctor.defaultCountry}
+                        centerId={practiceLocation.center.id}
+                        centerLocationId={practiceLocation.location?.id ?? null}
+                        doctorId={doctor.id}
+                        doctorPracticeLocationId={practiceLocation.id}
+                        variant="practice"
+                      />
                     ) : null}
-                    <a
-                      href={publicCenterDetailRoute(locale, doctor.defaultCountry, practiceLocation.center.slug)}
-                      className="inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline"
-                    >
-                      {copy.centerProfileLabel}
-                    </a>
                   </div>
                 </li>
               );

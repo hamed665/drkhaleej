@@ -1,6 +1,7 @@
 import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import type { PublicCenterDetail, PublicCatalogLocale } from '@/lib/catalog/public-types';
 
+import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
 import { PublicContactActions } from './public-contact-actions';
 import { PublicLocationSection } from './public-location-section';
@@ -118,7 +119,18 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
 
       {center.contactActions.length > 0 ? (
         <PublicCenterDetailSection title={copy.contactTitle}>
-          <PublicContactActions actions={center.contactActions} locale={locale} />
+          <div className="space-y-4">
+            <PublicContactActions actions={center.contactActions} locale={locale} />
+            <PublicCallbackRequestForm
+              locale={locale}
+              countryCode={center.defaultCountry}
+              centerId={center.id}
+              centerLocationId={null}
+              doctorId={null}
+              doctorPracticeLocationId={null}
+              variant="center"
+            />
+          </div>
         </PublicCenterDetailSection>
       ) : null}
 
