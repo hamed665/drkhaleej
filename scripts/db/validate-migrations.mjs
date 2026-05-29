@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '4.6C-1';
+const PHASE = '4.6D-1';
 
 const required = [
   '0001_extensions.sql',
@@ -48,7 +48,8 @@ const required = [
   '0042_monetization_sponsored_rls.sql',
   '0043_legal_consent_audit_access_helpers.sql',
   '0044_legal_consent_audit_rls.sql',
-  '0045_contact_visibility_foundation.sql'
+  '0045_contact_visibility_foundation.sql',
+  '0046_callback_request_foundation.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -133,7 +134,8 @@ const rlsPolicyFiles = new Set([
   '0038_patient_contacts_appointments_rls.sql',
   '0040_reviews_reports_media_private_rls.sql',
   '0042_monetization_sponsored_rls.sql',
-  '0044_legal_consent_audit_rls.sql'
+  '0044_legal_consent_audit_rls.sql',
+  '0046_callback_request_foundation.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -152,6 +154,7 @@ const legalConsentAuditAccessHelpersFile = '0043_legal_consent_audit_access_help
 const legalConsentAuditRlsFile = '0044_legal_consent_audit_rls.sql';
 
 const contactVisibilityFoundationFile = '0045_contact_visibility_foundation.sql';
+const callbackRequestFoundationFile = '0046_callback_request_foundation.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1279,6 +1282,7 @@ requireCondition(!/create\s+policy\s+audit_logs_select_platform_admin[\s\S]*?\bt
 
 
 const contactVisibilityFoundationContent = readFileSync(`${dir}/${contactVisibilityFoundationFile}`, 'utf8');
+const callbackRequestFoundationContent = readFileSync(`${dir}/${callbackRequestFoundationFile}`, 'utf8');
 
 for (const pattern of [
   /alter\s+table\s+public\.centers/i,
@@ -1319,6 +1323,88 @@ for (const forbidden of [
   /mailto:/i
 ]) {
   requireCondition(!forbidden.test(contactVisibilityFoundationContent), `0045_contact_visibility_foundation.sql contains forbidden pattern: ${forbidden}`);
+}
+
+
+for (const pattern of [
+  /create\s+table\s+if\s+not\s+exists\s+public\.callback_requests/i,
+  /alter\s+table\s+public\.callback_requests\s+enable\s+row\s+level\s+security/i,
+  /id\s+uuid\s+primary\s+key\s+default\s+gen_random_uuid\s*\(\s*\)/i,
+  /country_code\s+public\.country_code\s+not\s+null\s+default\s+'om'/i,
+  /locale\s+public\.app_locale\s+not\s+null\s+default\s+'en'/i,
+  /center_id\s+uuid\s+not\s+null\s+references\s+public\.centers\s*\(\s*id\s*\)/i,
+  /center_location_id\s+uuid\s+null\s+references\s+public\.center_locations\s*\(\s*id\s*\)/i,
+  /doctor_id\s+uuid\s+null\s+references\s+public\.doctors\s*\(\s*id\s*\)/i,
+  /doctor_practice_location_id\s+uuid\s+null\s+references\s+public\.doctor_practice_locations\s*\(\s*id\s*\)/i,
+  /profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i,
+  /requester_name\s+text\s+not\s+null/i,
+  /requester_phone\s+text\s+not\s+null/i,
+  /preferred_language\s+text\s+null/i,
+  /message\s+text\s+null/i,
+  /consent_to_contact\s+boolean\s+not\s+null\s+default\s+false/i,
+  /request_source\s+text\s+not\s+null\s+default\s+'public_profile'/i,
+  /status\s+text\s+not\s+null\s+default\s+'new'/i,
+  /priority\s+text\s+not\s+null\s+default\s+'normal'/i,
+  /handled_at\s+timestamptz\s+null/i,
+  /metadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i,
+  /created_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i,
+  /updated_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i,
+  /deleted_at\s+timestamptz\s+null/i,
+  /callback_requests_requester_name_not_empty_check[\s\S]*?check\s*\(\s*btrim\s*\(\s*requester_name\s*\)\s*<>\s*''\s*\)/i,
+  /callback_requests_requester_name_length_check[\s\S]*?check\s*\(\s*char_length\s*\(\s*btrim\s*\(\s*requester_name\s*\)\s*\)\s+between\s+2\s+and\s+120\s*\)/i,
+  /callback_requests_requester_phone_not_empty_check[\s\S]*?check\s*\(\s*btrim\s*\(\s*requester_phone\s*\)\s*<>\s*''\s*\)/i,
+  /callback_requests_requester_phone_length_check[\s\S]*?check\s*\(\s*char_length\s*\(\s*btrim\s*\(\s*requester_phone\s*\)\s*\)\s+between\s+6\s+and\s+32\s*\)/i,
+  /callback_requests_preferred_language_length_check[\s\S]*?check\s*\(\s*preferred_language\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*preferred_language\s*\)\s*\)\s+between\s+2\s+and\s+40\s*\)/i,
+  /callback_requests_message_length_check[\s\S]*?check\s*\(\s*message\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*message\s*\)\s*\)\s*<=\s*500\s*\)/i,
+  /callback_requests_consent_to_contact_check[\s\S]*?check\s*\(\s*consent_to_contact\s*=\s*true\s*\)/i,
+  /callback_requests_request_source_check[\s\S]*?check\s*\(\s*request_source\s+in\s*\(\s*'public_profile'\s*\)\s*\)/i,
+  /callback_requests_status_check[\s\S]*?check\s*\(\s*status\s+in\s*\(\s*'new'\s*,\s*'viewed'\s*,\s*'contacted'\s*,\s*'unreachable'\s*,\s*'closed'\s*,\s*'spam'\s*,\s*'rejected'\s*\)\s*\)/i,
+  /callback_requests_priority_check[\s\S]*?check\s*\(\s*priority\s+in\s*\(\s*'normal'\s*,\s*'high'\s*\)\s*\)/i,
+  /callback_requests_message_plain_text_check[\s\S]*?check\s*\(\s*message\s+is\s+null\s+or\s+message\s+!~\*\s*'<\[\^>\]\+>'\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_center_id_idx\s+on\s+public\.callback_requests\s*\(\s*center_id\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_center_location_id_idx\s+on\s+public\.callback_requests\s*\(\s*center_location_id\s*\)[\s\S]*?where\s+center_location_id\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_doctor_id_idx\s+on\s+public\.callback_requests\s*\(\s*doctor_id\s*\)[\s\S]*?where\s+doctor_id\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_doctor_practice_location_id_idx\s+on\s+public\.callback_requests\s*\(\s*doctor_practice_location_id\s*\)[\s\S]*?where\s+doctor_practice_location_id\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_profile_id_idx\s+on\s+public\.callback_requests\s*\(\s*profile_id\s*\)[\s\S]*?where\s+profile_id\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_status_idx\s+on\s+public\.callback_requests\s*\(\s*status\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_priority_idx\s+on\s+public\.callback_requests\s*\(\s*priority\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_created_at_idx\s+on\s+public\.callback_requests\s*\(\s*created_at\s+desc\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_country_code_idx\s+on\s+public\.callback_requests\s*\(\s*country_code\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_open_queue_idx\s+on\s+public\.callback_requests\s*\(\s*status\s*,\s*created_at\s+desc\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null\s+and\s+status\s+in\s*\(\s*'new'\s*,\s*'viewed'\s*,\s*'unreachable'\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+callback_requests_deleted_at_idx\s+on\s+public\.callback_requests\s*\(\s*deleted_at\s*\)[\s\S]*?where\s+deleted_at\s+is\s+not\s+null/i,
+]) {
+  requireCondition(pattern.test(callbackRequestFoundationContent), `0046_callback_request_foundation.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\binsert\s+into\b/i,
+  /request\s+a\s+callback/i,
+  /callback\s+form/i,
+  /src\/app/i,
+  /src\/components/i,
+  /\bpage\.tsx\b/i,
+  /\bcomponent\b/i,
+  /\broute\b/i,
+  /\bserver\s+action\b/i,
+  /\bapi\b/i,
+  /\bassigned_to\b/i,
+  /\bhandled_by\b/i,
+  /\bip_hash\b/i,
+  /\buser_agent_hash\b/i,
+  /\braw\s+ip\b/i,
+  /\braw_ip\b/i,
+  /\bnotification/i,
+  /\bbooking\b/i,
+  /\bpayment\b/i,
+  /\bai\b/i,
+  /\breviews?\b/i,
+  /\bratings?\b/i,
+  /\bemergency\b/i,
+  /online\s+consultation/i,
+  /direct\s+doctor\s+chat/i,
+]) {
+  requireCondition(!forbidden.test(callbackRequestFoundationContent), `0046_callback_request_foundation.sql contains forbidden pattern: ${forbidden}`);
 }
 
 console.log(`Phase ${PHASE} migration validation passed.`);

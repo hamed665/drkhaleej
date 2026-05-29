@@ -23,6 +23,7 @@ const REQUIRED_FILES = [
   '0042_monetization_sponsored_rls.sql',
   '0043_legal_consent_audit_access_helpers.sql',
   '0044_legal_consent_audit_rls.sql',
+  '0046_callback_request_foundation.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([
@@ -33,6 +34,7 @@ const APPROVED_POLICY_FILES = new Set([
   '0040_reviews_reports_media_private_rls.sql',
   '0042_monetization_sponsored_rls.sql',
   '0044_legal_consent_audit_rls.sql',
+  '0046_callback_request_foundation.sql',
 ]);
 
 const HELPER_FILES = new Set([
@@ -85,6 +87,7 @@ const SENSITIVE_TABLES_NO_ANON = new Set([
   'center_subscriptions',
   'consent_logs',
   'audit_logs',
+  'callback_requests',
 ]);
 
 const ALLOWED_ANON_POLICIES = new Set([
@@ -176,5 +179,36 @@ for (const p of policyStatements) {
     );
   }
 }
+
+
+const callbackRequestFoundationContent = contentsByFile.get('0046_callback_request_foundation.sql') ?? '';
+assert(
+  /alter\s+table\s+public\.callback_requests\s+enable\s+row\s+level\s+security/i.test(callbackRequestFoundationContent),
+  'callback_requests must have RLS enabled in 0046_callback_request_foundation.sql',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?to\s+anon[\s\S]*?for\s+select/i.test(callbackRequestFoundationContent)
+    && !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?for\s+select[\s\S]*?to\s+anon/i.test(callbackRequestFoundationContent),
+  'callback_requests must not grant anon SELECT',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?to\s+anon[\s\S]*?for\s+insert/i.test(callbackRequestFoundationContent)
+    && !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?for\s+insert[\s\S]*?to\s+anon/i.test(callbackRequestFoundationContent),
+  'callback_requests must not grant anon INSERT',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?to\s+anon[\s\S]*?for\s+update/i.test(callbackRequestFoundationContent)
+    && !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?for\s+update[\s\S]*?to\s+anon/i.test(callbackRequestFoundationContent),
+  'callback_requests must not grant anon UPDATE',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?to\s+anon[\s\S]*?for\s+delete/i.test(callbackRequestFoundationContent)
+    && !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?for\s+delete[\s\S]*?to\s+anon/i.test(callbackRequestFoundationContent),
+  'callback_requests must not grant anon DELETE',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.callback_requests[\s\S]*?for\s+select/i.test(callbackRequestFoundationContent),
+  'callback_requests must not have any public SELECT policy in this phase',
+);
 
 console.log('✅ RLS static harness checks passed for required Phase 3 policy/helper migration rules.');

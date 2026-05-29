@@ -483,6 +483,114 @@ export type Database = {
           },
         ]
       }
+      callback_requests: {
+        Row: {
+          center_id: string
+          center_location_id: string | null
+          consent_to_contact: boolean
+          country_code: Database["public"]["Enums"]["country_code"]
+          created_at: string
+          deleted_at: string | null
+          doctor_id: string | null
+          doctor_practice_location_id: string | null
+          handled_at: string | null
+          id: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          message: string | null
+          metadata: Json
+          preferred_language: string | null
+          priority: string
+          profile_id: string | null
+          request_source: string
+          requester_name: string
+          requester_phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          center_id: string
+          center_location_id?: string | null
+          consent_to_contact?: boolean
+          country_code?: Database["public"]["Enums"]["country_code"]
+          created_at?: string
+          deleted_at?: string | null
+          doctor_id?: string | null
+          doctor_practice_location_id?: string | null
+          handled_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          message?: string | null
+          metadata?: Json
+          preferred_language?: string | null
+          priority?: string
+          profile_id?: string | null
+          request_source?: string
+          requester_name: string
+          requester_phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          center_id?: string
+          center_location_id?: string | null
+          consent_to_contact?: boolean
+          country_code?: Database["public"]["Enums"]["country_code"]
+          created_at?: string
+          deleted_at?: string | null
+          doctor_id?: string | null
+          doctor_practice_location_id?: string | null
+          handled_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          message?: string | null
+          metadata?: Json
+          preferred_language?: string | null
+          priority?: string
+          profile_id?: string | null
+          request_source?: string
+          requester_name?: string
+          requester_phone?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "callback_requests_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "callback_requests_center_location_id_fkey"
+            columns: ["center_location_id"]
+            isOneToOne: false
+            referencedRelation: "center_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "callback_requests_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "callback_requests_doctor_practice_location_id_fkey"
+            columns: ["doctor_practice_location_id"]
+            isOneToOne: false
+            referencedRelation: "doctor_practice_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "callback_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       center_claims: {
         Row: {
           approved_at: string | null
