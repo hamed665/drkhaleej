@@ -25,6 +25,7 @@ const REQUIRED_FILES = [
   '0044_legal_consent_audit_rls.sql',
   '0046_callback_request_foundation.sql',
   '0047_provider_license_verification_foundation.sql',
+  '0048_media_public_visibility_hardening.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '4.6E-1';
+const PHASE = '4.6F-1';
 
 const required = [
   '0001_extensions.sql',
@@ -50,7 +50,8 @@ const required = [
   '0044_legal_consent_audit_rls.sql',
   '0045_contact_visibility_foundation.sql',
   '0046_callback_request_foundation.sql',
-  '0047_provider_license_verification_foundation.sql'
+  '0047_provider_license_verification_foundation.sql',
+  '0048_media_public_visibility_hardening.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -158,6 +159,7 @@ const legalConsentAuditRlsFile = '0044_legal_consent_audit_rls.sql';
 const contactVisibilityFoundationFile = '0045_contact_visibility_foundation.sql';
 const callbackRequestFoundationFile = '0046_callback_request_foundation.sql';
 const providerLicenseVerificationFoundationFile = '0047_provider_license_verification_foundation.sql';
+const mediaPublicVisibilityHardeningFile = '0048_media_public_visibility_hardening.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1493,6 +1495,54 @@ for (const forbidden of [
   /for\s+delete/i,
 ]) {
   requireCondition(!forbidden.test(providerLicenseVerificationFoundationContent), `0047_provider_license_verification_foundation.sql contains forbidden pattern: ${forbidden}`);
+}
+
+
+const mediaPublicVisibilityHardeningContent = readFileSync(`${dir}/${mediaPublicVisibilityHardeningFile}`, 'utf8');
+
+for (const pattern of [
+  /alter\s+table\s+public\.entity_media/i,
+  /public_media_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  /media_review_status\s+text\s+not\s+null\s+default\s+'not_reviewed'/i,
+  /media_reviewed_at\s+timestamptz\s+null/i,
+  /entity_media_media_review_status_check[\s\S]*?media_review_status\s+in\s*\(\s*'not_reviewed'\s*,\s*'pending'\s*,\s*'approved'\s*,\s*'rejected'\s*\)/i,
+  /entity_media_public_visible_requires_approved_review_check[\s\S]*?public_media_visible\s*=\s*false[\s\S]*?media_review_status\s*=\s*'approved'/i,
+  /entity_media_reviewed_at_status_check[\s\S]*?media_reviewed_at\s+is\s+null\s+or\s+media_review_status\s+in\s*\(\s*'approved'\s*,\s*'rejected'\s*\)/i,
+  /entity_media_alt_text_en_length_check[\s\S]*?alt_text_en\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*alt_text_en\s*\)\s*\)\s*<=\s*180/i,
+  /entity_media_alt_text_ar_length_check[\s\S]*?alt_text_ar\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*alt_text_ar\s*\)\s*\)\s*<=\s*180/i,
+  /entity_media_caption_en_length_check[\s\S]*?caption_en\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*caption_en\s*\)\s*\)\s*<=\s*300/i,
+  /entity_media_caption_ar_length_check[\s\S]*?caption_ar\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*caption_ar\s*\)\s*\)\s*<=\s*300/i,
+  /entity_media_alt_text_en_plain_text_check[\s\S]*?alt_text_en\s+is\s+null\s+or\s+alt_text_en\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /entity_media_alt_text_ar_plain_text_check[\s\S]*?alt_text_ar\s+is\s+null\s+or\s+alt_text_ar\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /entity_media_caption_en_plain_text_check[\s\S]*?caption_en\s+is\s+null\s+or\s+caption_en\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /entity_media_caption_ar_plain_text_check[\s\S]*?caption_ar\s+is\s+null\s+or\s+caption_ar\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /create\s+index\s+if\s+not\s+exists\s+entity_media_public_entity_visible_idx\s+on\s+public\.entity_media\s*\(\s*entity_type\s*,\s*entity_id\s*,\s*usage_kind\s*,\s*sort_order\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null\s+and\s+public_media_visible\s*=\s*true/i,
+  /create\s+index\s+if\s+not\s+exists\s+entity_media_public_primary_idx\s+on\s+public\.entity_media\s*\(\s*entity_type\s*,\s*entity_id\s*,\s*usage_kind\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null\s+and\s+public_media_visible\s*=\s*true\s+and\s+is_primary\s*=\s*true/i,
+  /create\s+index\s+if\s+not\s+exists\s+entity_media_media_review_status_idx\s+on\s+public\.entity_media\s*\(\s*media_review_status\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+]) {
+  requireCondition(pattern.test(mediaPublicVisibilityHardeningContent), `0048_media_public_visibility_hardening.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /create\s+table\s+(if\s+not\s+exists\s+)?public\.provider_media_assets/i,
+  /create\s+table\s+(if\s+not\s+exists\s+)?public\.provider_media\b/i,
+  /\bcreate\s+policy\b/i,
+  /\balter\s+policy\b/i,
+  /\bdrop\b/i,
+  /\binsert\s+into\b/i,
+  /storage\s+bucket/i,
+  /create\s+bucket/i,
+  /\bupload\b/i,
+  /signed\s+upload/i,
+  /public\s+ui/i,
+  /dashboard/i,
+  /booking/i,
+  /payment/i,
+  /\bai\b/i,
+  /video/i,
+  /seed\s+rows?/i,
+]) {
+  requireCondition(!forbidden.test(mediaPublicVisibilityHardeningContent), `0048_media_public_visibility_hardening.sql contains forbidden pattern: ${forbidden}`);
 }
 
 console.log(`Phase ${PHASE} migration validation passed.`);

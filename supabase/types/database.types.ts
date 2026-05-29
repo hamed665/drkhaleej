@@ -1851,7 +1851,10 @@ export type Database = {
           is_featured: boolean
           is_primary: boolean
           media_asset_id: string
+          media_review_status: string
+          media_reviewed_at: string | null
           metadata: Json
+          public_media_visible: boolean
           sort_order: number
           updated_at: string
           usage_kind: Database["public"]["Enums"]["media_usage_kind"]
@@ -1869,7 +1872,10 @@ export type Database = {
           is_featured?: boolean
           is_primary?: boolean
           media_asset_id: string
+          media_review_status?: string
+          media_reviewed_at?: string | null
           metadata?: Json
+          public_media_visible?: boolean
           sort_order?: number
           updated_at?: string
           usage_kind?: Database["public"]["Enums"]["media_usage_kind"]
@@ -1887,7 +1893,10 @@ export type Database = {
           is_featured?: boolean
           is_primary?: boolean
           media_asset_id?: string
+          media_review_status?: string
+          media_reviewed_at?: string | null
           metadata?: Json
+          public_media_visible?: boolean
           sort_order?: number
           updated_at?: string
           usage_kind?: Database["public"]["Enums"]["media_usage_kind"]
