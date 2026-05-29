@@ -130,17 +130,23 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
     ? preferredText(locale, doctor.primarySpecialty.nameEn, doctor.primarySpecialty.nameAr) ?? doctor.primarySpecialty.nameEn
     : null;
   const gender = doctor.gender !== 'unspecified' ? formatNeutralLabel(doctor.gender) : null;
+  const profileImage = doctor.profileImage;
 
   return (
     <div className="mt-10 space-y-5">
       <PublicCenterDetailSection title={copy.aboutTitle}>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          {doctor.profileImageUrl ? (
-            <img
-              src={doctor.profileImageUrl}
-              alt={displayName}
-              className="h-24 w-24 rounded-2xl border border-slate-200 object-cover shadow-sm"
-            />
+          {profileImage ? (
+            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
+              <img
+                src={profileImage.url}
+                alt={profileImage.altText}
+                width={profileImage.width ?? undefined}
+                height={profileImage.height ?? undefined}
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+            </div>
           ) : null}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
