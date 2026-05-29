@@ -12,6 +12,7 @@ const requiredFiles = [
 ];
 
 const approvedDiscoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/labs', '/services', '/search'];
+const approvedProviderRoutes = ['/for-providers'];
 
 async function ensureFileExists(relativePath) {
   const absolutePath = path.join(root, relativePath);
@@ -98,6 +99,12 @@ if (!sitemapSource.includes("localizedRootPath('en')") || !sitemapSource.include
 for (const route of approvedDiscoveryRoutes) {
   if (!sitemapSource.includes(route)) {
     throw new Error(`src/app/sitemap.ts must include approved public skeleton route: ${route}.`);
+  }
+}
+
+for (const route of approvedProviderRoutes) {
+  if (!sitemapSource.includes(route)) {
+    throw new Error(`src/app/sitemap.ts must include approved provider route: ${route}.`);
   }
 }
 

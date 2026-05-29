@@ -11,6 +11,9 @@ export const publicDiscoveryRoute = (
   slug: PublicDiscoverySlug
 ) => `/${locale}/${country}/${slug}`;
 
+export const publicProviderRoute = (locale: SupportedLocale, country: SupportedCountry) =>
+  `/${locale}/${country}/for-providers`;
+
 export const publicCenterDetailRoute = (
   locale: SupportedLocale,
   country: SupportedCountry,
@@ -26,4 +29,5 @@ export const publicDoctorDetailRoute = (
 export const localeCountryRoutePattern = /^\/(en|ar)\/(om)(?:\/)?$/;
 export const localeCountryDiscoveryRoutePattern =
   /^\/(en|ar)\/(om)\/(doctors|centers|pharmacies|labs|services|search)(?:\/)?$/;
+export const publicProviderRoutePattern = /^\/(en|ar)\/(om)\/for-providers(?:\/)?$/;
 export const publicDoctorDetailRoutePattern = /^\/(en|ar)\/(om)\/doctor\/([^/]+)(?:\/)?$/;

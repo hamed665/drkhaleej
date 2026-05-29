@@ -24,6 +24,10 @@ const checks = [
     pass: existsSync(resolve(projectRoot, 'src/app/[locale]/[country]/doctor/[doctorSlug]/page.tsx'))
   },
   {
+    name: 'approved provider route exists',
+    pass: existsSync(resolve(projectRoot, 'src/app/[locale]/[country]/for-providers/page.tsx'))
+  },
+  {
     name: 'plural doctor detail entity route does not exist',
     pass: !existsSync(resolve(projectRoot, 'src/app/[locale]/[country]/doctors/[doctorSlug]/page.tsx'))
   },
