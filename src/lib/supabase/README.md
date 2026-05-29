@@ -1,28 +1,31 @@
-# Supabase Client Foundation (Phase 4.3A)
+# Supabase Client Foundation
 
-This directory contains the **Phase 4.3A** typed Supabase client foundation only.
+This directory contains the typed Supabase client foundation for DrMuscat.
 
-## Scope in this phase
+## Public anon client
 
-- Uses `@supabase/supabase-js` with TypeScript.
-- Uses **anon key only** (`NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-- Uses `NEXT_PUBLIC_SUPABASE_URL` with runtime validation.
-- Provides minimal client factories for future usage.
+- Public catalog reads should continue to use the anon-key client by default.
+- The anon client uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Public read access must remain enforced by Supabase RLS policies.
 
-## Explicit exclusions in this phase
+## Server-only service-role client
 
-- No service role key usage.
+- `service-role.ts` provides a server-only service-role client for trusted backend write paths.
+- The service-role client uses `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+- `SUPABASE_SERVICE_ROLE_KEY` must never use a `NEXT_PUBLIC_` prefix.
+- The service-role key must never be exposed to browsers or logged.
+- The service-role client must never be imported into client components.
+- The service-role client bypasses RLS, so callers must enforce authorization, public visibility, and context validation manually before reading or writing data.
+
+## Callback request note
+
+A controlled callback insert route is planned for a later phase. That route must validate request input and public catalog context before using the service-role client to insert callback requests.
+
+## Explicit exclusions in this foundation
+
+- No callback request route.
+- No callback request insert helper.
+- No public callback UI.
 - No authenticated session helpers.
 - No cookie-based auth handling.
-- No data query helpers.
-- No live data fetching.
-- No page integration.
-
-## Types status
-
-- Generated DB types are deferred to a dedicated `db:types` phase.
-- Current `Database` type is a placeholder to keep client generics typed safely.
-
-## RLS note
-
-Public read access must remain enforced by Supabase RLS policies as future read queries are introduced.
+- No queries or writes inside the service-role client factory.
