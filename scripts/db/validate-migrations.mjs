@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '4.6F-2';
+const PHASE = '5.2A-2A';
 
 const required = [
   '0001_extensions.sql',
@@ -52,7 +52,8 @@ const required = [
   '0046_callback_request_foundation.sql',
   '0047_provider_license_verification_foundation.sql',
   '0048_media_public_visibility_hardening.sql',
-  '0049_media_public_rls_hardening.sql'
+  '0049_media_public_rls_hardening.sql',
+  '0050_provider_onboarding_leads.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -140,7 +141,8 @@ const rlsPolicyFiles = new Set([
   '0044_legal_consent_audit_rls.sql',
   '0046_callback_request_foundation.sql',
   '0047_provider_license_verification_foundation.sql',
-  '0049_media_public_rls_hardening.sql'
+  '0049_media_public_rls_hardening.sql',
+  '0050_provider_onboarding_leads.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -163,6 +165,7 @@ const callbackRequestFoundationFile = '0046_callback_request_foundation.sql';
 const providerLicenseVerificationFoundationFile = '0047_provider_license_verification_foundation.sql';
 const mediaPublicVisibilityHardeningFile = '0048_media_public_visibility_hardening.sql';
 const mediaPublicRlsHardeningFile = '0049_media_public_rls_hardening.sql';
+const providerOnboardingLeadsFile = '0050_provider_onboarding_leads.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1598,6 +1601,93 @@ for (const forbidden of [
   /for\s+delete/i,
 ]) {
   requireCondition(!forbidden.test(mediaPublicRlsHardeningContent), `0049_media_public_rls_hardening.sql contains forbidden pattern: ${forbidden}`);
+}
+
+
+const providerOnboardingLeadsContent = readFileSync(`${dir}/${providerOnboardingLeadsFile}`, 'utf8');
+
+for (const pattern of [
+  /create\s+table\s+if\s+not\s+exists\s+public\.provider_onboarding_leads/i,
+  /id\s+uuid\s+primary\s+key\s+default\s+gen_random_uuid\s*\(\s*\)/i,
+  /country_code\s+public\.country_code\s+not\s+null\s+default\s+'om'/i,
+  /locale\s+public\.app_locale\s+not\s+null\s+default\s+'en'/i,
+  /center_name\s+text\s+not\s+null/i,
+  /contact_name\s+text\s+not\s+null/i,
+  /phone\s+text\s+not\s+null/i,
+  /email\s+text\s+null/i,
+  /whatsapp\s+text\s+null/i,
+  /provider_type\s+text\s+not\s+null\s+default\s+'other'/i,
+  /area_text\s+text\s+null/i,
+  /city_text\s+text\s+null/i,
+  /preferred_language\s+text\s+null/i,
+  /message\s+text\s+null/i,
+  /consent_to_contact\s+boolean\s+not\s+null\s+default\s+false/i,
+  /request_source\s+text\s+not\s+null\s+default\s+'for_providers_page'/i,
+  /status\s+text\s+not\s+null\s+default\s+'new'/i,
+  /priority\s+text\s+not\s+null\s+default\s+'normal'/i,
+  /metadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i,
+  /created_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i,
+  /updated_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i,
+  /handled_at\s+timestamptz\s+null/i,
+  /deleted_at\s+timestamptz\s+null/i,
+  /provider_onboarding_leads_country_code_check[\s\S]*?country_code\s*=\s*'om'/i,
+  /provider_onboarding_leads_provider_type_check[\s\S]*?provider_type\s+in\s*\(\s*'clinic'\s*,\s*'medical_center'\s*,\s*'dental_clinic'\s*,\s*'pharmacy'\s*,\s*'lab'\s*,\s*'wellness'\s*,\s*'other'\s*\)/i,
+  /provider_onboarding_leads_status_check[\s\S]*?status\s+in\s*\(\s*'new'\s*,\s*'reviewing'\s*,\s*'contacted'\s*,\s*'qualified'\s*,\s*'rejected'\s*,\s*'converted'\s*,\s*'closed'\s*\)/i,
+  /provider_onboarding_leads_priority_check[\s\S]*?priority\s+in\s*\(\s*'low'\s*,\s*'normal'\s*,\s*'high'\s*\)/i,
+  /provider_onboarding_leads_center_name_length_check[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*center_name\s*\)\s*\)\s+between\s+2\s+and\s+160/i,
+  /provider_onboarding_leads_center_name_plain_text_check[\s\S]*?center_name\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_contact_name_length_check[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*contact_name\s*\)\s*\)\s+between\s+2\s+and\s+120/i,
+  /provider_onboarding_leads_contact_name_plain_text_check[\s\S]*?contact_name\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_phone_length_check[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*phone\s*\)\s*\)\s+between\s+6\s+and\s+32/i,
+  /provider_onboarding_leads_email_length_check[\s\S]*?email\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*email\s*\)\s*\)\s+between\s+5\s+and\s+254/i,
+  /provider_onboarding_leads_email_basic_format_check[\s\S]*?email\s+is\s+null\s+or\s+btrim\s*\(\s*email\s*\)\s+~\*\s*'\^\[\^@\\s\]\+@\[\^@\\s\]\+\\\.\[\^@\\s\]\+\$'/i,
+  /provider_onboarding_leads_whatsapp_length_check[\s\S]*?whatsapp\s+is\s+null\s+or\s+char_length\s*\(\s*btrim\s*\(\s*whatsapp\s*\)\s*\)\s+between\s+6\s+and\s+32/i,
+  /provider_onboarding_leads_area_text_check[\s\S]*?area_text\s+is\s+null[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*area_text\s*\)\s*\)\s+between\s+2\s+and\s+120[\s\S]*?area_text\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_city_text_check[\s\S]*?city_text\s+is\s+null[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*city_text\s*\)\s*\)\s+between\s+2\s+and\s+120[\s\S]*?city_text\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_preferred_language_check[\s\S]*?preferred_language\s+is\s+null[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*preferred_language\s*\)\s*\)\s+between\s+2\s+and\s+40[\s\S]*?preferred_language\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_message_check[\s\S]*?message\s+is\s+null[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*message\s*\)\s*\)\s*<=\s*1000[\s\S]*?message\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_leads_consent_required_check[\s\S]*?consent_to_contact\s*=\s*true/i,
+  /provider_onboarding_leads_request_source_check[\s\S]*?request_source\s+in\s*\(\s*'for_providers_page'\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_country_code_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*country_code\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_status_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*status\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_priority_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*priority\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_created_at_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*created_at\s+desc\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_open_queue_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*status\s*,\s*created_at\s+desc\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null\s+and\s+status\s+in\s*\(\s*'new'\s*,\s*'reviewing'\s*,\s*'contacted'\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_deleted_at_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*deleted_at\s*\)[\s\S]*?where\s+deleted_at\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_phone_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*phone\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_leads_center_name_idx\s+on\s+public\.provider_onboarding_leads\s*\(\s*center_name\s*\)[\s\S]*?where\s+deleted_at\s+is\s+null/i,
+  /create\s+trigger\s+trg_provider_onboarding_leads_set_updated_at[\s\S]*?before\s+update\s+on\s+public\.provider_onboarding_leads[\s\S]*?execute\s+function\s+public\.set_updated_at\s*\(\s*\)/i,
+  /alter\s+table\s+public\.provider_onboarding_leads\s+enable\s+row\s+level\s+security/i,
+]) {
+  requireCondition(pattern.test(providerOnboardingLeadsContent), `0050_provider_onboarding_leads.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\binsert\s+into\b/i,
+  /seed\s+(data|rows?)/i,
+  /\braw\s+ip\b/i,
+  /\braw_ip\b/i,
+  /\braw\s+user\s+agent\b/i,
+  /\braw_user_agent\b/i,
+  /\buser_agent\b/i,
+  /\bip_hash\b/i,
+  /\buser_agent_hash\b/i,
+  /\bassigned_to\b/i,
+  /\bhandled_by\b/i,
+  /license\s+document/i,
+  /document\s+url/i,
+  /\bfile\s+upload/i,
+  /\bfile_url\b/i,
+  /\bupload_url\b/i,
+  /\bpayment_?[a-z_]*\b/i,
+  /\bsubscription_?[a-z_]*\b/i,
+  /\bentitlement_?[a-z_]*\b/i,
+  /\bcenter_id\b/i,
+  /\bprofile_id\b/i,
+  /\bprovider_account\b/i,
+]) {
+  requireCondition(!forbidden.test(providerOnboardingLeadsContent), `0050_provider_onboarding_leads.sql contains forbidden pattern: ${forbidden}`);
 }
 
 console.log(`Phase ${PHASE} migration validation passed.`);

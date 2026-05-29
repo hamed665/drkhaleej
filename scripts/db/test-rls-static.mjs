@@ -27,6 +27,7 @@ const REQUIRED_FILES = [
   '0047_provider_license_verification_foundation.sql',
   '0048_media_public_visibility_hardening.sql',
   '0049_media_public_rls_hardening.sql',
+  '0050_provider_onboarding_leads.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([
@@ -40,6 +41,7 @@ const APPROVED_POLICY_FILES = new Set([
   '0046_callback_request_foundation.sql',
   '0047_provider_license_verification_foundation.sql',
   '0049_media_public_rls_hardening.sql',
+  '0050_provider_onboarding_leads.sql',
 ]);
 
 const HELPER_FILES = new Set([
@@ -93,6 +95,7 @@ const SENSITIVE_TABLES_NO_ANON = new Set([
   'consent_logs',
   'audit_logs',
   'callback_requests',
+  'provider_onboarding_leads',
 ]);
 
 const ALLOWED_ANON_POLICIES = new Set([
@@ -186,6 +189,32 @@ for (const p of policyStatements) {
   }
 }
 
+
+
+const providerOnboardingLeadsContent = contentsByFile.get('0050_provider_onboarding_leads.sql') ?? '';
+assert(
+  /alter\s+table\s+public\.provider_onboarding_leads\s+enable\s+row\s+level\s+security/i.test(providerOnboardingLeadsContent),
+  '0050 must enable RLS on public.provider_onboarding_leads',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.provider_onboarding_leads/i.test(providerOnboardingLeadsContent),
+  '0050 must not create policies on public.provider_onboarding_leads',
+);
+assert(
+  !/to\s+anon[\s\S]*?on\s+public\.provider_onboarding_leads/i.test(providerOnboardingLeadsContent)
+    && !/on\s+public\.provider_onboarding_leads[\s\S]*?to\s+anon/i.test(providerOnboardingLeadsContent),
+  'provider_onboarding_leads must not grant anon access',
+);
+assert(
+  !/to\s+authenticated[\s\S]*?on\s+public\.provider_onboarding_leads/i.test(providerOnboardingLeadsContent)
+    && !/on\s+public\.provider_onboarding_leads[\s\S]*?to\s+authenticated/i.test(providerOnboardingLeadsContent),
+  'provider_onboarding_leads must not grant authenticated broad access',
+);
+assert(
+  !/on\s+public\.provider_onboarding_leads[\s\S]*?for\s+(insert|update|delete)/i.test(providerOnboardingLeadsContent)
+    && !/for\s+(insert|update|delete)[\s\S]*?on\s+public\.provider_onboarding_leads/i.test(providerOnboardingLeadsContent),
+  'provider_onboarding_leads must not define public write policies',
+);
 
 
 const mediaPublicRlsHardeningContent = contentsByFile.get('0049_media_public_rls_hardening.sql') ?? '';
