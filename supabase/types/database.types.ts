@@ -1851,7 +1851,10 @@ export type Database = {
           is_featured: boolean
           is_primary: boolean
           media_asset_id: string
+          media_review_status: string
+          media_reviewed_at: string | null
           metadata: Json
+          public_media_visible: boolean
           sort_order: number
           updated_at: string
           usage_kind: Database["public"]["Enums"]["media_usage_kind"]
@@ -1869,7 +1872,10 @@ export type Database = {
           is_featured?: boolean
           is_primary?: boolean
           media_asset_id: string
+          media_review_status?: string
+          media_reviewed_at?: string | null
           metadata?: Json
+          public_media_visible?: boolean
           sort_order?: number
           updated_at?: string
           usage_kind?: Database["public"]["Enums"]["media_usage_kind"]
@@ -1887,7 +1893,10 @@ export type Database = {
           is_featured?: boolean
           is_primary?: boolean
           media_asset_id?: string
+          media_review_status?: string
+          media_reviewed_at?: string | null
           metadata?: Json
+          public_media_visible?: boolean
           sort_order?: number
           updated_at?: string
           usage_kind?: Database["public"]["Enums"]["media_usage_kind"]
@@ -2459,6 +2468,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      provider_onboarding_leads: {
+        Row: {
+          area_text: string | null
+          center_name: string
+          city_text: string | null
+          consent_to_contact: boolean
+          contact_name: string
+          country_code: Database["public"]["Enums"]["country_code"]
+          created_at: string
+          deleted_at: string | null
+          email: string | null
+          handled_at: string | null
+          id: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          message: string | null
+          metadata: Json
+          phone: string
+          preferred_language: string | null
+          priority: string
+          provider_type: string
+          request_source: string
+          status: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          area_text?: string | null
+          center_name: string
+          city_text?: string | null
+          consent_to_contact?: boolean
+          contact_name: string
+          country_code?: Database["public"]["Enums"]["country_code"]
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          handled_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          message?: string | null
+          metadata?: Json
+          phone: string
+          preferred_language?: string | null
+          priority?: string
+          provider_type?: string
+          request_source?: string
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          area_text?: string | null
+          center_name?: string
+          city_text?: string | null
+          consent_to_contact?: boolean
+          contact_name?: string
+          country_code?: Database["public"]["Enums"]["country_code"]
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          handled_at?: string | null
+          id?: string
+          locale?: Database["public"]["Enums"]["app_locale"]
+          message?: string | null
+          metadata?: Json
+          phone?: string
+          preferred_language?: string | null
+          priority?: string
+          provider_type?: string
+          request_source?: string
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
       }
       review_reports: {
         Row: {
