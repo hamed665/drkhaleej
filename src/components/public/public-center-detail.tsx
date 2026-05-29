@@ -111,14 +111,45 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
 
   return (
     <div className="mt-10 space-y-5">
-      <PublicCenterDetailSection title={copy.aboutTitle}>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="inline-flex w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
-            {formatNeutralLabel(center.centerType)}
-          </p>
-          {locationText ? <p className="text-sm leading-6 text-slate-600">{locationText}</p> : null}
+      {center.coverImage ? (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+          <div className="aspect-[16/7] w-full overflow-hidden bg-slate-100">
+            <img
+              src={center.coverImage.url}
+              alt={center.coverImage.altText}
+              width={center.coverImage.width ?? undefined}
+              height={center.coverImage.height ?? undefined}
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
+          </div>
         </div>
-        {description ? <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{description}</p> : null}
+      ) : null}
+
+      <PublicCenterDetailSection title={copy.aboutTitle}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {center.logoImage ? (
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:h-20 sm:w-20">
+              <img
+                src={center.logoImage.url}
+                alt={center.logoImage.altText}
+                width={center.logoImage.width ?? undefined}
+                height={center.logoImage.height ?? undefined}
+                decoding="async"
+                className="h-full w-full object-contain"
+              />
+            </div>
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="inline-flex w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+                {formatNeutralLabel(center.centerType)}
+              </p>
+              {locationText ? <p className="text-sm leading-6 text-slate-600">{locationText}</p> : null}
+            </div>
+            {description ? <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{description}</p> : null}
+          </div>
+        </div>
       </PublicCenterDetailSection>
 
       {center.contactActions.length > 0 ? (
