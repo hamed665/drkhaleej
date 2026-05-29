@@ -23,6 +23,7 @@ import type {
   PublicDoctorSummary,
   PublicGeoAreaListOptions,
   PublicGeoAreaSummary,
+  PublicLicenseInfo,
   PublicProviderLocationSummary,
   PublicSearchOptions,
   PublicServiceListOptions,
@@ -32,6 +33,8 @@ import type {
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const MAX_SEARCH_QUERY_LENGTH = 64;
+const HTML_LIKE_TAG_PATTERN = /<[^>]+>/;
+const SAFE_LICENSE_NUMBER_PATTERN = /^[A-Za-z0-9 .\-/]+$/;
 
 type CenterRow = Database['public']['Tables']['centers']['Row'];
 type CenterLocationRow = Database['public']['Tables']['center_locations']['Row'];
@@ -39,11 +42,29 @@ type CenterServiceRow = Database['public']['Tables']['center_services']['Row'];
 type DoctorPracticeLocationRow = Database['public']['Tables']['doctor_practice_locations']['Row'];
 type DoctorServiceRow = Database['public']['Tables']['doctor_services']['Row'];
 type DoctorRow = Database['public']['Tables']['doctors']['Row'];
+type ProviderLicenseRecordRow = Database['public']['Tables']['provider_license_records']['Row'];
 type ServiceRow = Database['public']['Tables']['services']['Row'];
 type SpecialtyRow = Database['public']['Tables']['specialties']['Row'];
 type GeoAreaRow = Database['public']['Tables']['geo_areas']['Row'];
 type GeoCityRow = Database['public']['Tables']['geo_cities']['Row'];
 type GeoCountryRow = Database['public']['Tables']['geo_countries']['Row'];
+
+type PublicLicenseRecordLookupRow = Pick<
+  ProviderLicenseRecordRow,
+  | 'entity_type'
+  | 'center_id'
+  | 'doctor_id'
+  | 'license_number'
+  | 'license_authority'
+  | 'license_country'
+  | 'license_review_status'
+  | 'public_license_visible'
+  | 'deleted_at'
+>;
+
+type PublicLicenseEntityLookup =
+  | { entityType: 'center'; entityId: string }
+  | { entityType: 'doctor'; entityId: string };
 
 function clampLimit(limit: number | undefined): number {
   if (typeof limit !== 'number' || Number.isNaN(limit)) return DEFAULT_LIMIT;
@@ -76,6 +97,72 @@ function createErrorResult<T>(fallbackData: T): PublicCatalogQueryResult<T> {
     data: fallbackData,
     emptyReason: 'query_error',
     error
+  };
+}
+
+function mapPublicLicenseInfo(
+  row: PublicLicenseRecordLookupRow,
+  entity: PublicLicenseEntityLookup
+): PublicLicenseInfo | null {
+  if (entity.entityType === 'center') {
+    if (row.entity_type !== 'center' || row.center_id !== entity.entityId || row.doctor_id !== null) return null;
+  } else if (row.entity_type !== 'doctor' || row.doctor_id !== entity.entityId || row.center_id !== null) {
+    return null;
+  }
+
+  if (row.deleted_at !== null) return null;
+  if (row.public_license_visible !== true) return null;
+  if (row.license_review_status !== 'approved') return null;
+  if (typeof row.license_number !== 'string') return null;
+
+  const licenseNumber = row.license_number.trim();
+  if (licenseNumber.length < 3 || licenseNumber.length > 80) return null;
+  if (HTML_LIKE_TAG_PATTERN.test(licenseNumber)) return null;
+  if (!SAFE_LICENSE_NUMBER_PATTERN.test(licenseNumber)) return null;
+
+  let licenseAuthority: string | null = null;
+  if (typeof row.license_authority === 'string') {
+    const trimmedAuthority = row.license_authority.trim();
+
+    if (
+      trimmedAuthority.length >= 2 &&
+      trimmedAuthority.length <= 120 &&
+      !HTML_LIKE_TAG_PATTERN.test(trimmedAuthority)
+    ) {
+      licenseAuthority = trimmedAuthority;
+    }
+  }
+
+  return {
+    licenseNumber,
+    licenseAuthority,
+    licenseCountry: row.license_country
+  };
+}
+
+async function getPublicLicenseInfoForEntity(
+  entity: PublicLicenseEntityLookup
+): Promise<{ licenseInfo: PublicLicenseInfo | null; error: boolean }> {
+  const supabase = createSupabaseServerClient();
+  const query = supabase
+    .from('provider_license_records')
+    .select(
+      'entity_type,center_id,doctor_id,license_number,license_authority,license_country,license_review_status,public_license_visible,deleted_at'
+    )
+    .eq('entity_type', entity.entityType)
+    .is('deleted_at', null)
+    .limit(1);
+
+  const { data, error } = entity.entityType === 'center'
+    ? await query.eq('center_id', entity.entityId).maybeSingle()
+    : await query.eq('doctor_id', entity.entityId).maybeSingle();
+
+  if (error) return { licenseInfo: null, error: true };
+  if (!data) return { licenseInfo: null, error: false };
+
+  return {
+    licenseInfo: mapPublicLicenseInfo(data, entity),
+    error: false
   };
 }
 
@@ -121,6 +208,7 @@ type PublicCenterDetailRow = PublicCenterBaseRow & Pick<CenterRow, 'verification
 
 function mapCenterDetailRow(
   row: PublicCenterDetailRow,
+  licenseInfo: PublicLicenseInfo | null,
   locations: PublicProviderLocationSummary[],
   services: PublicCenterDetailServiceSummary[],
   doctors: PublicCenterDetailDoctorSummary[]
@@ -128,6 +216,7 @@ function mapCenterDetailRow(
   return {
     ...mapCenterRow(row),
     verificationStatus: row.verification_status,
+    licenseInfo,
     location: locations[0] ?? null,
     locations,
     services,
@@ -302,12 +391,14 @@ function mapDoctorServiceRow(
 function mapDoctorDetailRow(
   row: PublicDoctorDetailRow,
   primarySpecialty: PublicDoctorDetailSpecialtySummary | null,
+  licenseInfo: PublicLicenseInfo | null,
   services: PublicDoctorDetailServiceSummary[],
   practiceLocations: PublicDoctorPracticeLocationSummary[]
 ): PublicDoctorDetail {
   return {
     ...mapDoctorRow(row),
     displayNameEn: row.display_name_en,
+    licenseInfo,
     displayNameAr: row.display_name_ar,
     bioEn: row.bio_en,
     bioAr: row.bio_ar,
@@ -708,18 +799,19 @@ export async function getPublicCenterBySlug(
   if (error) return createErrorResult(null);
   if (!center) return createSuccessResult(null, 'no_rows');
 
-  const [locationsResult, servicesResult, doctorsResult] = await Promise.all([
+  const [locationsResult, servicesResult, doctorsResult, licenseResult] = await Promise.all([
     getPublicCenterLocations(center.id, locationsLimit),
     listPublicCenterServices(center.id, servicesLimit),
-    listPublicCenterDoctors(center.id, doctorsLimit)
+    listPublicCenterDoctors(center.id, doctorsLimit),
+    getPublicLicenseInfoForEntity({ entityType: 'center', entityId: center.id })
   ]);
 
-  if (locationsResult.error || servicesResult.error || doctorsResult.error) {
+  if (locationsResult.error || servicesResult.error || doctorsResult.error || licenseResult.error) {
     return createErrorResult(null);
   }
 
   return createSuccessResult(
-    mapCenterDetailRow(center, locationsResult.locations, servicesResult.services, doctorsResult.doctors)
+    mapCenterDetailRow(center, licenseResult.licenseInfo, locationsResult.locations, servicesResult.services, doctorsResult.doctors)
   );
 }
 
@@ -765,13 +857,14 @@ export async function getPublicDoctorBySlug(
   if (error) return createErrorResult(null);
   if (!doctor) return createSuccessResult(null, 'no_rows');
 
-  const [primarySpecialtyResult, servicesResult, practiceLocationsResult] = await Promise.all([
+  const [primarySpecialtyResult, servicesResult, practiceLocationsResult, licenseResult] = await Promise.all([
     getPublicSpecialtiesByIds(doctor.primary_specialty_id ? [doctor.primary_specialty_id] : []),
     listPublicDoctorServices(doctor.id, servicesLimit),
-    listPublicDoctorPracticeLocations(doctor.id, practiceLocationsLimit)
+    listPublicDoctorPracticeLocations(doctor.id, practiceLocationsLimit),
+    getPublicLicenseInfoForEntity({ entityType: 'doctor', entityId: doctor.id })
   ]);
 
-  if (primarySpecialtyResult.error || servicesResult.error || practiceLocationsResult.error) {
+  if (primarySpecialtyResult.error || servicesResult.error || practiceLocationsResult.error || licenseResult.error) {
     return createErrorResult(null);
   }
 
@@ -779,6 +872,7 @@ export async function getPublicDoctorBySlug(
     mapDoctorDetailRow(
       doctor,
       doctor.primary_specialty_id ? primarySpecialtyResult.specialtiesById.get(doctor.primary_specialty_id) ?? null : null,
+      licenseResult.licenseInfo,
       servicesResult.services,
       practiceLocationsResult.practiceLocations
     )

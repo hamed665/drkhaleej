@@ -37,6 +37,12 @@ export type DoctorGender = Database['public']['Enums']['doctor_gender'];
 export type DoctorTitle = Database['public']['Enums']['doctor_title'];
 export type VerificationStatus = Database['public']['Enums']['verification_status'];
 
+export type PublicLicenseInfo = {
+  licenseNumber: string;
+  licenseAuthority: string | null;
+  licenseCountry: CountryCode;
+};
+
 export type PublicCenterSummary = {
   id: string;
   slug: string;
@@ -130,6 +136,7 @@ export type PublicCenterDetailLocationSummary = PublicProviderLocationSummary;
 
 export type PublicCenterDetail = PublicCenterSummary & {
   verificationStatus: VerificationStatus;
+  licenseInfo: PublicLicenseInfo | null;
   location: PublicProviderLocationSummary | null;
   locations: PublicProviderLocationSummary[];
   services: PublicCenterDetailServiceSummary[];
@@ -149,6 +156,7 @@ export type PublicDoctorPracticeLocationSummary = {
 
 export type PublicDoctorDetail = PublicDoctorSummary & {
   displayNameEn: string | null;
+  licenseInfo: PublicLicenseInfo | null;
   displayNameAr: string | null;
   bioEn: string | null;
   bioAr: string | null;
