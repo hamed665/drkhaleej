@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type ProviderLeadStatus =
   | "new"
   | "reviewing"
@@ -315,12 +317,12 @@ export function ProviderOnboardingLeadsList({
             >
               Apply filters
             </button>
-            <a
+            <Link
               href="/admin/provider-onboarding-leads"
               className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-200 hover:text-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
             >
               Reset
-            </a>
+            </Link>
           </div>
         </div>
       </form>
@@ -417,24 +419,24 @@ export function ProviderOnboardingLeadsList({
         </p>
         <div className="flex gap-2">
           {hasPreviousPage ? (
-            <a
+            <Link
               href={buildPageHref(filters, currentPage - 1)}
               className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-200 hover:text-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
             >
               Previous
-            </a>
+            </Link>
           ) : (
             <span className="cursor-not-allowed rounded-2xl border border-slate-100 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-400">
               Previous
             </span>
           )}
           {hasNextPage ? (
-            <a
+            <Link
               href={buildPageHref(filters, currentPage + 1)}
               className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-200 hover:text-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
             >
               Next
-            </a>
+            </Link>
           ) : (
             <span className="cursor-not-allowed rounded-2xl border border-slate-100 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-400">
               Next

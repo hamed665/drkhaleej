@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function AdminPage() {
   return (
     <div className="space-y-6">
@@ -28,12 +30,12 @@ export default function AdminPage() {
           Status actions, contact actions, assignment, conversion, and audit
           writes come later in separately approved phases.
         </p>
-        <a
+        <Link
           href="/admin/provider-onboarding-leads"
           className="mt-4 inline-flex rounded-2xl bg-cyan-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
         >
           Open read-only lead list
-        </a>
+        </Link>
       </section>
     </div>
   );
