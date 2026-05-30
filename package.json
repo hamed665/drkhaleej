@@ -20,6 +20,7 @@
     "seo:check": "node scripts/seo-check.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "2.50.2",
     "next": "16.0.2",
     "react": "19.2.0",
