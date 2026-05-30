@@ -179,8 +179,8 @@ const checks = [
     pass: !existsSync(resolve(projectRoot, "src/app/[locale]/areas")),
   },
   {
-    name: "approved service route scaffold does not exist yet",
-    pass: !existsSync(
+    name: "approved SEO-D2C1 service route scaffold exists",
+    pass: existsSync(
       resolve(
         projectRoot,
         "src/app/[locale]/[country]/services/[serviceSlug]/page.tsx",
@@ -331,6 +331,9 @@ const seoD2aSpecialtyAreaPageSource = readSourceIfExists(
 const seoD2bAreaPageSource = readSourceIfExists(
   "src/app/[locale]/[country]/areas/[areaSlug]/page.tsx",
 );
+const seoD2c1ServicePageSource = readSourceIfExists(
+  "src/app/[locale]/[country]/services/[serviceSlug]/page.tsx",
+);
 const adminProviderOnboardingLeadsSource = readSourceIfExists(
   "src/server/admin/provider-onboarding-leads.ts",
 );
@@ -404,6 +407,37 @@ checks.push({
   pass:
     typeof seoD2bAreaPageSource === "string" &&
     !sourceImportsForbiddenLandingPageData(seoD2bAreaPageSource),
+});
+
+
+checks.push({
+  name: "SEO-D2C1 service scaffold route is not included in sitemap",
+  pass:
+    typeof sitemapSource === "string" &&
+    !/services\/\$\{|services\/\[serviceSlug\]|services.*serviceSlug/.test(
+      sitemapSource,
+    ),
+});
+
+checks.push({
+  name: "SEO-D2C1 service scaffold file does not emit schema output",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    !sourceIncludesSchemaOutput(seoD2c1ServicePageSource),
+});
+
+checks.push({
+  name: "SEO-D2C1 service scaffold file does not import keyword seed data",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    !sourceImportsKeywordSeedData(seoD2c1ServicePageSource),
+});
+
+checks.push({
+  name: "SEO-D2C1 service scaffold file does not import private admin/provider or service-role data",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    !sourceImportsForbiddenLandingPageData(seoD2c1ServicePageSource),
 });
 
 checks.push({
