@@ -12,14 +12,15 @@ Build mode:
 
 ## Current project phase status
 
-- Current completed phase: **Phase 3.0A**
-- Database foundation status: **completed through Phase 3.0A**
-- Completed migration set: **`0001` through `0032`** (expected to exist)
+- Current repo state: **after the admin provider onboarding lead detail baseline**
+- Database/migration status: **validates through `0050_provider_onboarding_leads.sql`**
+- Completed migration set: **`0001` through `0050`** (expected to exist)
+- Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
-## Completed database foundation scope (through Phase 3.0A)
+## Completed database and platform foundation scope
 
 - core extensions/enums
-- profiles/auth base
+- profiles/auth base and approved profile RLS baseline
 - geo hierarchy
 - taxonomy/services
 - centers/locations/services/claims
@@ -27,20 +28,60 @@ Build mode:
 - appointment slots/core/operations
 - reviews/reports
 - media assets/entity media
-- monetization foundation without payments
+- monetization foundation without payment gateways
 - legal/consent/audit foundation
-- RLS auth helpers
+- RLS auth helpers and approved access-helper foundations
 - public catalog read RLS policies
+- center access helpers and center claims/memberships RLS foundation
+- patient contact profile link and patient appointment access-helper/RLS foundations
+- reviews/reports/media private RLS foundation
+- monetization sponsored RLS foundation
+- legal/consent/audit RLS foundation
+- contact visibility foundation
+- callback request foundation
+- provider license verification foundation
+- media public visibility/RLS hardening
+- provider onboarding lead database/RLS foundation through `0050_provider_onboarding_leads.sql`
+
+## Current implemented app surface
+
+The repository now includes approved public and admin baselines. These are not permission to expand product scope without a dedicated phase approval.
+
+- public localized app routes under `/:locale/:country`
+- supported public locales: `en` and `ar`
+- supported public country: `om`
+- public catalog/discovery surfaces for doctors, centers, pharmacies, labs, services, and search
+- public center detail pages
+- public doctor detail pages
+- public provider plans/onboarding page at `/:locale/:country/for-providers`
+- contact/callback, media, and license display foundations
+- public callback request API
+- public provider onboarding lead capture API
+- protected root-level `/admin` baseline
+- read-only admin provider onboarding lead list/detail baseline
+
+## Route and locale contract
+
+- Public localized routes are Oman-first and currently limited to `en`/`ar` plus `om`.
+- Admin routes are root-level `/admin` routes, not localized routes.
+- Admin routes must remain excluded from the sitemap and public SEO surfaces.
+- Persian and Hindi public SEO routes are not implemented and remain forbidden unless explicitly approved.
+- Deprecated route patterns such as `/en/dentist/al-khuwair` remain forbidden.
+- Duplicate route patterns that compete with canonical URLs remain forbidden.
+- The singular doctor detail route is the approved doctor detail route pattern.
 
 ## Explicitly excluded / not implemented yet
 
-- no frontend/backend app features yet
-- no seed rows yet
-- no payments/invoices/checkout yet
-- no notifications/reminders yet
-- no insurance yet
+- no payment gateways, invoices, checkout, or billing integrations yet
+- no AI chat yet
+- no real seed rows yet unless a seed phase is explicitly approved
+- no Persian/Hindi public SEO routes
+- no provider dashboard mutation workflows yet
+- no admin provider onboarding lead mutation/status/update actions yet
+- no admin lead assignment, conversion, contact-action, or audit-write workflows yet
+- no broad sales, referral, billing, analytics, SEO AI, provider dashboard, or business expansion features unless explicitly approved
 - no medical records/diagnoses/prescriptions/lab results yet
-- no private appointment/patient/provider/admin RLS yet
+- private-data access remains phase-gated and must not be expanded without explicit approval
 
 ## Future frontend/UI/UX requirements (guardrails)
 
@@ -111,12 +152,23 @@ Build mode:
 - SEO pages must not create Persian/Hindi public routes unless explicitly approved.
 - Oman-first URL and content strategy remains the default.
 
+## Validation commands
+
+Run the relevant validation gate after each approved phase. For this documentation alignment, the full current validation set is:
+
+- `pnpm env:check`
+- `pnpm db:validate:migrations`
+- `pnpm test:db:rls`
+- `pnpm routes:check`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm lint`
+
+`pnpm lint` may report warnings only, but must not report errors. Do not fake passing tests or weaken validation commands to force progress.
+
 ## Next recommended phases
 
-- Phase 3.0C TypeScript Safety Baseline
-- Phase 3.1A Profiles RLS
-- Provider membership/access foundation before provider write policies
-- Patient contact profile link before patient appointment RLS
+Future implementation must remain explicitly phase-approved and narrowly scoped. Do not implement sales, referral, billing, analytics, SEO AI, provider dashboard, payment, admin mutation, seed, or other business expansion features unless a future phase specifically approves that scope.
 
 ## Agent workflow reminder
 
@@ -124,13 +176,12 @@ Agents must read `AGENTS.md` before doing any work.
 
 ## Phase 3.0C — TypeScript Safety Baseline
 
-Phase 3.0C establishes a TypeScript safety baseline before private RLS, auth, backend, API, and dashboard phases continue.
+Phase 3.0C established a TypeScript safety baseline before private RLS, auth, backend, API, and dashboard phases continued.
 
-- Repository inspection in this phase found no `.js` / `.jsx` app code in the current Next.js app surface.
-- Existing `.mjs` files are intentionally script/config oriented and may remain `.mjs` when script-only.
 - Future app/auth/API/security/backend code must be TypeScript-first.
 - Future React components must be implemented as `.tsx`.
 - Future server utilities, API handlers, and server actions must be implemented as `.ts`.
+- Existing `.mjs` files are intentionally script/config oriented and may remain `.mjs` when script-only.
 - No broad JS-to-TS conversion is allowed without a dedicated approved phase.
 - Private RLS/auth/backend work must continue with type-safety discipline; do not bypass typecheck/lint/build to force progress.
 - Existing UI/UX and SEO guardrails remain mandatory for all future public work.

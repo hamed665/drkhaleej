@@ -12,9 +12,9 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current completed phase: **Phase 3.0A**.
+Current repo state: **after the admin provider onboarding lead detail baseline**.
 
-Completed migrations: **`0001` through `0032`**.
+Completed migrations: **`0001` through `0050`**. Migration validation is expected through `0050_provider_onboarding_leads.sql`.
 
 Do not implement business features yet.
 Do not implement payment gateways.
@@ -26,8 +26,9 @@ Do not create deprecated routes such as /en/dentist/al-khuwair.
 Do not fake passing tests.
 Do not disable TypeScript, lint, RLS, or validation to make the build pass.
 
-Private data RLS is not complete yet.
-Frontend/backend features are still out of scope until explicitly approved.
+Private data RLS remains phase-gated and must not be expanded without explicit approval.
+Approved public and admin baselines now exist: localized public catalog/detail surfaces, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, and read-only admin provider onboarding lead list/detail.
+New frontend/backend/business features remain out of scope until explicitly approved.
 No seed rows are allowed yet unless a seed phase is explicitly approved.
 
 Future phases must not modify existing SQL migrations unless explicitly approved.
