@@ -149,6 +149,15 @@ const checks = [
     ),
   },
   {
+    name: "approved SEO-D2B area route scaffold exists",
+    pass: existsSync(
+      resolve(
+        projectRoot,
+        "src/app/[locale]/[country]/areas/[areaSlug]/page.tsx",
+      ),
+    ),
+  },
+  {
     name: "plural doctor detail entity route does not exist",
     pass: !existsSync(
       resolve(
@@ -168,6 +177,24 @@ const checks = [
   {
     name: "src/app/[locale]/areas route does not exist",
     pass: !existsSync(resolve(projectRoot, "src/app/[locale]/areas")),
+  },
+  {
+    name: "approved service route scaffold does not exist yet",
+    pass: !existsSync(
+      resolve(
+        projectRoot,
+        "src/app/[locale]/[country]/services/[serviceSlug]/page.tsx",
+      ),
+    ),
+  },
+  {
+    name: "approved service-area route scaffold does not exist yet",
+    pass: !existsSync(
+      resolve(
+        projectRoot,
+        "src/app/[locale]/[country]/services/[serviceSlug]/[areaSlug]/page.tsx",
+      ),
+    ),
   },
   {
     name: "article routes do not exist",
@@ -301,6 +328,9 @@ const seoD2aSpecialtyPageSource = readSourceIfExists(
 const seoD2aSpecialtyAreaPageSource = readSourceIfExists(
   "src/app/[locale]/[country]/centers/[specialtySlug]/[areaSlug]/page.tsx",
 );
+const seoD2bAreaPageSource = readSourceIfExists(
+  "src/app/[locale]/[country]/areas/[areaSlug]/page.tsx",
+);
 const adminProviderOnboardingLeadsSource = readSourceIfExists(
   "src/server/admin/provider-onboarding-leads.ts",
 );
@@ -346,6 +376,34 @@ checks.push({
       seoD2aSpecialtyPageSource,
       seoD2aSpecialtyAreaPageSource,
     ].some(sourceImportsForbiddenLandingPageData),
+});
+
+checks.push({
+  name: "SEO-D2B area scaffold route is not included in sitemap",
+  pass:
+    typeof sitemapSource === "string" &&
+    !/areas\/\$\{|areas\/\[areaSlug\]|areas.*areaSlug/.test(sitemapSource),
+});
+
+checks.push({
+  name: "SEO-D2B area scaffold file does not emit schema output",
+  pass:
+    typeof seoD2bAreaPageSource === "string" &&
+    !sourceIncludesSchemaOutput(seoD2bAreaPageSource),
+});
+
+checks.push({
+  name: "SEO-D2B area scaffold file does not import keyword seed data",
+  pass:
+    typeof seoD2bAreaPageSource === "string" &&
+    !sourceImportsKeywordSeedData(seoD2bAreaPageSource),
+});
+
+checks.push({
+  name: "SEO-D2B area scaffold file does not import private admin/provider or service-role data",
+  pass:
+    typeof seoD2bAreaPageSource === "string" &&
+    !sourceImportsForbiddenLandingPageData(seoD2bAreaPageSource),
 });
 
 checks.push({
