@@ -139,6 +139,37 @@ const checks = [
       !existsSync(resolve(projectRoot, "src/app/en/om/admin")) &&
       !existsSync(resolve(projectRoot, "src/app/ar/om/admin")),
   },
+  {
+    name: "admin provider onboarding lead list route exists",
+    pass: existsSync(
+      resolve(projectRoot, "src/app/admin/provider-onboarding-leads/page.tsx"),
+    ),
+  },
+  {
+    name: "localized provider onboarding lead admin routes do not exist",
+    pass:
+      !existsSync(
+        resolve(projectRoot, "src/app/[locale]/admin/provider-onboarding-leads"),
+      ) &&
+      !existsSync(
+        resolve(
+          projectRoot,
+          "src/app/[locale]/[country]/admin/provider-onboarding-leads",
+        ),
+      ) &&
+      !existsSync(
+        resolve(projectRoot, "src/app/en/admin/provider-onboarding-leads"),
+      ) &&
+      !existsSync(
+        resolve(projectRoot, "src/app/ar/admin/provider-onboarding-leads"),
+      ) &&
+      !existsSync(
+        resolve(projectRoot, "src/app/en/om/admin/provider-onboarding-leads"),
+      ) &&
+      !existsSync(
+        resolve(projectRoot, "src/app/ar/om/admin/provider-onboarding-leads"),
+      ),
+  },
 ];
 
 const i18nConfigPath = resolve(projectRoot, "src/lib/i18n/config.ts");
@@ -174,6 +205,12 @@ const adminLayoutSource = readSourceIfExists("src/app/admin/layout.tsx");
 const adminPageSource = readSourceIfExists("src/app/admin/page.tsx");
 const adminShellSource = readSourceIfExists(
   "src/components/admin/admin-shell.tsx",
+);
+const adminProviderOnboardingLeadsPageSource = readSourceIfExists(
+  "src/app/admin/provider-onboarding-leads/page.tsx",
+);
+const adminProviderOnboardingLeadsListSource = readSourceIfExists(
+  "src/components/admin/provider-onboarding-leads-list.tsx",
 );
 const sitemapSource = readSourceIfExists("src/app/sitemap.ts");
 const adminProviderOnboardingLeadsSource = readSourceIfExists(
@@ -217,6 +254,74 @@ checks.push({
     !/^["']use client["'];?/m.test(adminShellSource),
 });
 
+
+checks.push({
+  name: "admin provider onboarding lead list page imports list helper",
+  pass:
+    typeof adminProviderOnboardingLeadsPageSource === "string" &&
+    /listAdminProviderOnboardingLeads/.test(
+      adminProviderOnboardingLeadsPageSource,
+    ) &&
+    sourceImportsAdminProviderOnboardingLeads(
+      adminProviderOnboardingLeadsPageSource,
+    ),
+});
+
+checks.push({
+  name: "admin provider onboarding lead UI files do not import service-role client",
+  pass:
+    typeof adminProviderOnboardingLeadsPageSource === "string" &&
+    typeof adminProviderOnboardingLeadsListSource === "string" &&
+    ![
+      adminProviderOnboardingLeadsPageSource,
+      adminProviderOnboardingLeadsListSource,
+    ].some(sourceIncludesForbiddenServiceRoleImport),
+});
+
+checks.push({
+  name: "admin provider onboarding lead list component remains server-only presentation",
+  pass:
+    typeof adminProviderOnboardingLeadsListSource === "string" &&
+    !sourceIsClientComponent(adminProviderOnboardingLeadsListSource) &&
+    !sourceImportsAdminProviderOnboardingLeads(
+      adminProviderOnboardingLeadsListSource,
+    ),
+});
+
+checks.push({
+  name: "admin provider onboarding lead route is not included in sitemap",
+  pass:
+    typeof sitemapSource === "string" &&
+    !/admin\/provider-onboarding-leads/.test(sitemapSource),
+});
+
+checks.push({
+  name: "provider onboarding lead admin mutation routes and actions do not exist",
+  pass:
+    !existsSync(
+      resolve(projectRoot, "src/app/admin/provider-onboarding-leads/actions.ts"),
+    ) &&
+    !existsSync(
+      resolve(projectRoot, "src/app/admin/provider-onboarding-leads/action.ts"),
+    ) &&
+    !existsSync(
+      resolve(projectRoot, "src/app/admin/provider-onboarding-leads/[id]"),
+    ) &&
+    !existsSync(
+      resolve(projectRoot, "src/app/api/admin/provider-onboarding-leads"),
+    ) &&
+    !existsSync(
+      resolve(projectRoot, "src/app/api/provider-onboarding-leads/status"),
+    ) &&
+    !existsSync(
+      resolve(projectRoot, "src/app/api/provider-onboarding-leads/[id]"),
+    ) &&
+    typeof adminProviderOnboardingLeadsPageSource === "string" &&
+    typeof adminProviderOnboardingLeadsListSource === "string" &&
+    !/["']use server["']/.test(adminProviderOnboardingLeadsPageSource) &&
+    !/["']use server["']/.test(adminProviderOnboardingLeadsListSource),
+});
+
 checks.push({
   name: "admin auth and guard do not import service-role client",
   pass:
@@ -250,14 +355,15 @@ checks.push({
 });
 
 checks.push({
-  name: "admin provider onboarding lead read helper is the server-admin service-role importer",
+  name: "admin provider onboarding lead read helper imports stay server-only or approved admin page",
   pass: sourceFiles.every((absolutePath) => {
     const relativePath = relative(projectRoot, absolutePath);
     const source = readFileSync(absolutePath, "utf8");
 
     return (
       !sourceImportsAdminProviderOnboardingLeads(source) ||
-      relativePath.startsWith("src/server/admin/")
+      relativePath.startsWith("src/server/admin/") ||
+      relativePath === "src/app/admin/provider-onboarding-leads/page.tsx"
     );
   }),
 });
