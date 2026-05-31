@@ -17,7 +17,9 @@
     "db:reset": "pnpm db:check-cli && supabase db reset",
     "test:db:rls": "pnpm db:validate:migrations && node scripts/db/test-rls-static.mjs",
     "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs",
-    "seo:check": "node scripts/seo-check.mjs"
+    "seo:check": "node scripts/seo-check.mjs",
+    "test": "pnpm test:unit",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
@@ -36,7 +38,8 @@
     "eslint-config-next": "16.0.2",
     "supabase": "^2.101.0",
     "tailwindcss": "4.1.8",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.1.7"
   },
   "packageManager": "pnpm@10.22.0"
 }
