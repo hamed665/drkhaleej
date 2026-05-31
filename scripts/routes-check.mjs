@@ -128,6 +128,112 @@ const sourceIncludesForbiddenLandingPageGateHelperToken = (source) =>
   helperForbiddenLandingPageGateTokens.some((token) => source.includes(token)) ||
   /\bcanonical\b/.test(source);
 
+const publicLandingPageQuerySkeletonPath =
+  "src/lib/catalog/public-landing-page-queries.ts";
+
+const publicLandingPageQueryHelperNames = [
+  "getSpecialtyLandingGateData",
+  "getSpecialtyAreaLandingGateData",
+  "getAreaLandingGateData",
+  "getServiceLandingGateData",
+  "getServiceAreaLandingGateData",
+];
+
+const requiredPublicLandingPageQuerySkeletonTokens = [
+  "ok: false",
+  "helperAvailable: false",
+  "entityExists: false",
+  "providerCount: 0",
+  "centerCount: 0",
+  "exactCombinationCount: 0",
+  "hasUniqueVisibleIntro: false",
+  "hasLocalRelevance: false",
+  "medicalReviewStatus: 'missing'",
+  "canonicalIsUnique: false",
+  "sourceTables: []",
+];
+
+const forbiddenPublicLandingPageQuerySkeletonTokens = [
+  "Supabase",
+  "supabase",
+  "@supabase",
+  "createSupabaseServerClient",
+  "createSupabaseServiceRoleClient",
+  "service-role",
+  "serviceRole",
+  "from(",
+  ".from(",
+  "select(",
+  ".select(",
+  "insert(",
+  ".insert(",
+  "update(",
+  ".update(",
+  "delete(",
+  ".delete(",
+  "upsert(",
+  ".upsert(",
+  "rpc(",
+  ".rpc(",
+  "storage",
+  "channel",
+  "auth",
+  "public-queries",
+  "public-types",
+  "landing-page-indexability",
+  "decideLandingPageGate",
+  "data/seo",
+  "drmuscat-keyword-seed.json",
+  "fs",
+  "node:fs",
+  "path",
+  "node:path",
+  "next/navigation",
+  "notFound",
+  "src/app",
+  "route.ts",
+  "sitemap",
+  "robots",
+  "llms.txt",
+  "generateMetadata",
+  "generateStaticParams",
+  "schema.org",
+  "application/ld+json",
+  "jsonLd",
+  "structuredData",
+  "StructuredData",
+  "openGraph",
+  "metadata",
+  "canonicalUrl",
+  "hreflang",
+  "alternates",
+  "ranking",
+  "rank",
+  "boost",
+  "sponsored",
+  "payment",
+  "referral",
+  "commission",
+  "entitlement",
+  "invoice",
+  "provider-dashboard",
+  "admin",
+  "crm",
+  "billing",
+  "audit_logs",
+  "license",
+  "claim evidence",
+];
+
+const sourceIncludesForbiddenPublicLandingPageQuerySkeletonToken = (
+  source,
+  token,
+) => {
+  if (token === "canonical") return /\bcanonical\b/.test(source);
+
+  return source.includes(token);
+};
+
 const sourceIsClientComponent = (source) =>
   /^\s*["']use client["'];?/m.test(source);
 
@@ -394,6 +500,9 @@ const llmsTextSource = readSourceIfExists("public/llms.txt");
 const landingPageIndexabilitySource = readSourceIfExists(
   "src/lib/seo/landing-page-indexability.ts",
 );
+const publicLandingPageQuerySkeletonSource = readSourceIfExists(
+  publicLandingPageQuerySkeletonPath,
+);
 const seoD2aSpecialtyPageSource = readSourceIfExists(
   "src/app/[locale]/[country]/centers/[specialtySlug]/page.tsx",
 );
@@ -459,6 +568,66 @@ checks.push({
 });
 
 checks.push({
+  name: `${publicLandingPageQuerySkeletonPath} exists for SEO-D3D2B fail-closed skeleton`,
+  pass: typeof publicLandingPageQuerySkeletonSource === "string",
+});
+
+for (const helperName of publicLandingPageQueryHelperNames) {
+  checks.push({
+    name: `${publicLandingPageQuerySkeletonPath} exports ${helperName}`,
+    pass:
+      typeof publicLandingPageQuerySkeletonSource === "string" &&
+      new RegExp(`export\\s+function\\s+${helperName}\\s*\\(`).test(
+        publicLandingPageQuerySkeletonSource,
+      ),
+  });
+}
+
+for (const requiredToken of requiredPublicLandingPageQuerySkeletonTokens) {
+  checks.push({
+    name: `${publicLandingPageQuerySkeletonPath} fail-closed guardrail requires ${requiredToken}`,
+    pass:
+      typeof publicLandingPageQuerySkeletonSource === "string" &&
+      publicLandingPageQuerySkeletonSource.includes(requiredToken),
+  });
+}
+
+checks.push({
+  name: `${publicLandingPageQuerySkeletonPath} has zero import statements`,
+  pass:
+    typeof publicLandingPageQuerySkeletonSource === "string" &&
+    !sourceContainsImportStatement(publicLandingPageQuerySkeletonSource),
+});
+
+for (const forbiddenToken of [
+  ...forbiddenPublicLandingPageQuerySkeletonTokens,
+  "canonical",
+]) {
+  checks.push({
+    name: `${publicLandingPageQuerySkeletonPath} forbidden skeleton token is absent: ${forbiddenToken}`,
+    pass:
+      typeof publicLandingPageQuerySkeletonSource === "string" &&
+      !sourceIncludesForbiddenPublicLandingPageQuerySkeletonToken(
+        publicLandingPageQuerySkeletonSource,
+        forbiddenToken,
+      ),
+  });
+}
+
+for (const integrationToken of [
+  "public-landing-page-queries",
+  ...publicLandingPageQueryHelperNames,
+]) {
+  checks.push({
+    name: `src/app route files do not reference public landing query skeleton token: ${integrationToken}`,
+    pass: collectSourceFiles("src/app").every((absolutePath) => {
+      const source = readFileSync(absolutePath, "utf8");
+      return !source.includes(integrationToken);
+    }),
+  });
+}
+
+checks.push({
   name: "src/app route files do not import or reference the landing page gate helper",
   pass: collectSourceFiles("src/app").every((absolutePath) => {
     const source = readFileSync(absolutePath, "utf8");
@@ -486,6 +655,24 @@ checks.push({
     typeof llmsTextSource === "string" &&
     !sourceIncludesLandingPageGateIntegration(llmsTextSource),
 });
+
+for (const [crawlerPath, crawlerSource] of [
+  ["src/app/sitemap.ts", sitemapSource],
+  ["src/app/robots.ts", robotsSource],
+  ["public/llms.txt", llmsTextSource],
+]) {
+  for (const integrationToken of [
+    "public-landing-page-queries",
+    ...publicLandingPageQueryHelperNames,
+  ]) {
+    checks.push({
+      name: `${crawlerPath} does not reference public landing query skeleton token: ${integrationToken}`,
+      pass:
+        typeof crawlerSource === "string" &&
+        !crawlerSource.includes(integrationToken),
+    });
+  }
+}
 
 checks.push({
   name: "SEO-D2A scaffold routes are not included in sitemap",
