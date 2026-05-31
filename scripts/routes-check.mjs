@@ -61,6 +61,73 @@ const sourceIncludesSchemaOutput = (source) =>
     source,
   );
 
+const sourceContainsImportStatement = (source) =>
+  /(^|\n)\s*import\s+(?:[^('"\n][\s\S]*?\s+from\s+)?["'][^"']+["']/.test(
+    source,
+  ) || /(^|\n)\s*import\s*\(/.test(source);
+
+const sourceIncludesLandingPageGateIntegration = (source) =>
+  /landing-page-indexability|decideLandingPageGate/.test(source);
+
+const helperForbiddenLandingPageGateTokens = [
+  "Supabase",
+  "supabase",
+  "@supabase",
+  "createSupabaseServerClient",
+  "createSupabaseServiceRoleClient",
+  "service-role",
+  "serviceRole",
+  "public-queries",
+  "listPublic",
+  "getPublic",
+  "searchPublicCatalog",
+  "@/lib/catalog",
+  "drmuscat-keyword-seed.json",
+  "data/seo",
+  "node:fs",
+  "fs",
+  "node:path",
+  "path",
+  "next/navigation",
+  "notFound",
+  "src/app",
+  "route.ts",
+  "sitemap",
+  "robots",
+  "llms.txt",
+  "generateMetadata",
+  "generateStaticParams",
+  "schema.org",
+  "application/ld+json",
+  "jsonLd",
+  "structuredData",
+  "StructuredData",
+  "openGraph",
+  "metadata",
+  "canonicalUrl",
+  "hreflang",
+  "alternates",
+  "ranking",
+  "rank",
+  "boost",
+  "sponsored",
+  "payment",
+  "referral",
+  "commission",
+  "entitlement",
+  "invoice",
+  "provider-dashboard",
+  "billing",
+  "crm",
+  "claim evidence",
+  "license evidence",
+  "admin notes",
+];
+
+const sourceIncludesForbiddenLandingPageGateHelperToken = (source) =>
+  helperForbiddenLandingPageGateTokens.some((token) => source.includes(token)) ||
+  /\bcanonical\b/.test(source);
+
 const sourceIsClientComponent = (source) =>
   /^\s*["']use client["'];?/m.test(source);
 
@@ -322,6 +389,11 @@ const adminProviderOnboardingLeadDetailSource = readSourceIfExists(
   "src/components/admin/provider-onboarding-lead-detail.tsx",
 );
 const sitemapSource = readSourceIfExists("src/app/sitemap.ts");
+const robotsSource = readSourceIfExists("src/app/robots.ts");
+const llmsTextSource = readSourceIfExists("public/llms.txt");
+const landingPageIndexabilitySource = readSourceIfExists(
+  "src/lib/seo/landing-page-indexability.ts",
+);
 const seoD2aSpecialtyPageSource = readSourceIfExists(
   "src/app/[locale]/[country]/centers/[specialtySlug]/page.tsx",
 );
@@ -341,6 +413,79 @@ const adminProviderOnboardingLeadsSource = readSourceIfExists(
   "src/server/admin/provider-onboarding-leads.ts",
 );
 const sourceFiles = collectSourceFiles("src");
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper exists",
+  pass: typeof landingPageIndexabilitySource === "string",
+});
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper exports decideLandingPageGate",
+  pass:
+    typeof landingPageIndexabilitySource === "string" &&
+    /export\s+function\s+decideLandingPageGate\s*\(/.test(
+      landingPageIndexabilitySource,
+    ),
+});
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper keeps visible noindex disabled",
+  pass:
+    typeof landingPageIndexabilitySource === "string" &&
+    /safeForVisibleNoindex\s*:\s*false/.test(landingPageIndexabilitySource),
+});
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper keeps indexing disabled",
+  pass:
+    typeof landingPageIndexabilitySource === "string" &&
+    /safeForIndexing\s*:\s*false/.test(landingPageIndexabilitySource),
+});
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper has zero import statements",
+  pass:
+    typeof landingPageIndexabilitySource === "string" &&
+    !sourceContainsImportStatement(landingPageIndexabilitySource),
+});
+
+checks.push({
+  name: "SEO-D3C2A landing page gate helper contains no forbidden runtime, route, crawler, schema, metadata, or monetization references",
+  pass:
+    typeof landingPageIndexabilitySource === "string" &&
+    !sourceIncludesForbiddenLandingPageGateHelperToken(
+      landingPageIndexabilitySource,
+    ),
+});
+
+checks.push({
+  name: "src/app route files do not import or reference the landing page gate helper",
+  pass: collectSourceFiles("src/app").every((absolutePath) => {
+    const source = readFileSync(absolutePath, "utf8");
+    return !sourceIncludesLandingPageGateIntegration(source);
+  }),
+});
+
+checks.push({
+  name: "sitemap does not import or reference the landing page gate helper",
+  pass:
+    typeof sitemapSource === "string" &&
+    !sourceIncludesLandingPageGateIntegration(sitemapSource),
+});
+
+checks.push({
+  name: "robots does not import or reference the landing page gate helper",
+  pass:
+    typeof robotsSource === "string" &&
+    !sourceIncludesLandingPageGateIntegration(robotsSource),
+});
+
+checks.push({
+  name: "llms.txt does not mention the landing page gate helper",
+  pass:
+    typeof llmsTextSource === "string" &&
+    !sourceIncludesLandingPageGateIntegration(llmsTextSource),
+});
 
 checks.push({
   name: "SEO-D2A scaffold routes are not included in sitemap",
