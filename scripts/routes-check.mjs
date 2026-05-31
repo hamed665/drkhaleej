@@ -139,6 +139,71 @@ const publicLandingPageQueryHelperNames = [
   "getServiceAreaLandingGateData",
 ];
 
+const selectedServiceLandingRoutePath =
+  "src/app/[locale]/[country]/services/[serviceSlug]/page.tsx";
+
+const selectedServiceLandingAllowedIntegrationTokens = new Set([
+  "public-landing-page-queries",
+  "getServiceLandingGateData",
+]);
+
+const selectedServiceLandingForbiddenHelperNames = [
+  "getSpecialtyLandingGateData",
+  "getSpecialtyAreaLandingGateData",
+  "getAreaLandingGateData",
+  "getServiceAreaLandingGateData",
+];
+
+const selectedServiceLandingForbiddenTokens = [
+  "Supabase",
+  "supabase",
+  "@supabase",
+  "createSupabaseServerClient",
+  "createSupabaseServiceRoleClient",
+  "public-queries",
+  "public-types",
+  "data/seo",
+  "drmuscat-keyword-seed.json",
+  "generateMetadata",
+  "generateStaticParams",
+  "metadata",
+  "schema.org",
+  "application/ld+json",
+  "jsonLd",
+  "structuredData",
+  "openGraph",
+  "canonical",
+  "hreflang",
+  "alternates",
+  "sitemap",
+  "robots",
+  "llms.txt",
+  "provider-dashboard",
+  "admin",
+  "crm",
+  "billing",
+  "payment",
+  "sponsored",
+  "ranking",
+  "referral",
+  "commission",
+];
+
+const selectedServiceLandingForbiddenContentPatterns = [
+  /return\s*\(/,
+  /return\s*</,
+  /<main\b/,
+  /<section\b/,
+  /<article\b/,
+  /PublicPageShell/,
+  /<\s*Landing\b/,
+  /(^|[^A-Za-z])Landing(?:Page|Content|Shell|View|Section|Hero)/,
+  /children/,
+];
+
+const isSelectedServiceLandingRouteFile = (absolutePath) =>
+  relative(projectRoot, absolutePath) === selectedServiceLandingRoutePath;
+
 const requiredPublicLandingPageQuerySkeletonTokens = [
   "ok: false",
   "helperAvailable: false",
@@ -619,20 +684,69 @@ for (const integrationToken of [
   ...publicLandingPageQueryHelperNames,
 ]) {
   checks.push({
-    name: `src/app route files do not reference public landing query skeleton token: ${integrationToken}`,
+    name: `src/app route files do not reference public landing query skeleton token outside selected service route: ${integrationToken}`,
     pass: collectSourceFiles("src/app").every((absolutePath) => {
       const source = readFileSync(absolutePath, "utf8");
+      if (
+        isSelectedServiceLandingRouteFile(absolutePath) &&
+        selectedServiceLandingAllowedIntegrationTokens.has(integrationToken)
+      ) {
+        return true;
+      }
+
       return !source.includes(integrationToken);
     }),
   });
 }
 
 checks.push({
-  name: "src/app route files do not import or reference the landing page gate helper",
+  name: "src/app route files do not import or reference the landing page gate helper outside selected service route",
   pass: collectSourceFiles("src/app").every((absolutePath) => {
     const source = readFileSync(absolutePath, "utf8");
+    if (isSelectedServiceLandingRouteFile(absolutePath)) {
+      return true;
+    }
+
     return !sourceIncludesLandingPageGateIntegration(source);
   }),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route uses only approved fail-closed landing gate integration",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    /getServiceLandingGateData/.test(seoD2c1ServicePageSource) &&
+    /decideLandingPageGate/.test(seoD2c1ServicePageSource) &&
+    /notFound\s*\(\s*\)/.test(seoD2c1ServicePageSource) &&
+    /landing-page-indexability/.test(seoD2c1ServicePageSource) &&
+    /public-landing-page-queries/.test(seoD2c1ServicePageSource),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route does not reference non-selected landing gate helpers",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenHelperNames.every(
+      (helperName) => !seoD2c1ServicePageSource.includes(helperName),
+    ),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route has no forbidden runtime, SEO, crawler, private, monetization, or content tokens",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenTokens.every(
+      (token) => !seoD2c1ServicePageSource.includes(token),
+    ),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route has no obvious JSX or public landing content rendering",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenContentPatterns.every(
+      (pattern) => !pattern.test(seoD2c1ServicePageSource),
+    ),
 });
 
 checks.push({
