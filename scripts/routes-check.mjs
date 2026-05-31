@@ -201,6 +201,32 @@ const selectedServiceLandingForbiddenContentPatterns = [
   /children/,
 ];
 
+const selectedServiceLandingForbiddenReturnPatterns = [
+  /return\s+null\b/,
+  /return\s+undefined\b/,
+  /return\s+gate\b/,
+  /return\s+landingGateData\b/,
+  /return\s+serviceSlug\b/,
+];
+
+const selectedServiceLandingForbiddenRuntimePatterns = [
+  /<>\s*/,
+  /from\s+["']react["']/,
+  /import\s+\*\s+as\s+React\s+from\s+["']react["']/,
+  /\bfetch\s*\(/,
+  /\bredirect\s*\(/,
+  /\bcookies\s*\(/,
+  /\bheaders\s*\(/,
+  /\bunstable_noStore\s*\(/,
+];
+
+const selectedServiceLandingForbiddenRouteConfigPatterns = [
+  /export\s+const\s+revalidate\b/,
+  /export\s+const\s+dynamic\s*=/,
+  /\bunstable_cache\s*\(/,
+  /\bcache\s*\(/,
+];
+
 const isSelectedServiceLandingRouteFile = (absolutePath) =>
   relative(projectRoot, absolutePath) === selectedServiceLandingRoutePath;
 
@@ -741,10 +767,44 @@ checks.push({
 });
 
 checks.push({
+  name: "selected SEO-D3E2 service route ends with final unconditional notFound call",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    /notFound\s*\(\s*\)\s*;\s*}\s*$/.test(seoD2c1ServicePageSource),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route has no forbidden return escape hatches",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenReturnPatterns.every(
+      (pattern) => !pattern.test(seoD2c1ServicePageSource),
+    ),
+});
+
+checks.push({
   name: "selected SEO-D3E2 service route has no obvious JSX or public landing content rendering",
   pass:
     typeof seoD2c1ServicePageSource === "string" &&
     selectedServiceLandingForbiddenContentPatterns.every(
+      (pattern) => !pattern.test(seoD2c1ServicePageSource),
+    ),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route has no React rendering or runtime expansion patterns",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenRuntimePatterns.every(
+      (pattern) => !pattern.test(seoD2c1ServicePageSource),
+    ),
+});
+
+checks.push({
+  name: "selected SEO-D3E2 service route has no route config or cache expansion patterns",
+  pass:
+    typeof seoD2c1ServicePageSource === "string" &&
+    selectedServiceLandingForbiddenRouteConfigPatterns.every(
       (pattern) => !pattern.test(seoD2c1ServicePageSource),
     ),
 });
