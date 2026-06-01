@@ -20,7 +20,8 @@
     "seo:check": "node scripts/seo-check.mjs",
     "test": "pnpm test:unit",
     "test:unit": "vitest run",
-    "test:landing:public-gate": "node scripts/db/test-landing-public-gate-static.mjs"
+    "test:landing:public-gate": "node scripts/db/test-landing-public-gate-static.mjs",
+    "test:landing:runtime:scaffold": "node scripts/db/test-landing-runtime-scaffold.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
