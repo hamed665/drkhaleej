@@ -28,6 +28,7 @@ const REQUIRED_FILES = [
   '0048_media_public_visibility_hardening.sql',
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
+  '0051_landing_page_contents.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([
@@ -42,6 +43,7 @@ const APPROVED_POLICY_FILES = new Set([
   '0047_provider_license_verification_foundation.sql',
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
+  '0051_landing_page_contents.sql',
 ]);
 
 const HELPER_FILES = new Set([
@@ -96,6 +98,7 @@ const SENSITIVE_TABLES_NO_ANON = new Set([
   'audit_logs',
   'callback_requests',
   'provider_onboarding_leads',
+  'landing_page_contents',
 ]);
 
 const ALLOWED_ANON_POLICIES = new Set([
@@ -214,6 +217,36 @@ assert(
   !/on\s+public\.provider_onboarding_leads[\s\S]*?for\s+(insert|update|delete)/i.test(providerOnboardingLeadsContent)
     && !/for\s+(insert|update|delete)[\s\S]*?on\s+public\.provider_onboarding_leads/i.test(providerOnboardingLeadsContent),
   'provider_onboarding_leads must not define public write policies',
+);
+
+
+const landingPageContentsContent = contentsByFile.get('0051_landing_page_contents.sql') ?? '';
+assert(
+  /alter\s+table\s+public\.landing_page_contents\s+enable\s+row\s+level\s+security/i.test(landingPageContentsContent),
+  '0051 must enable RLS on public.landing_page_contents',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.landing_page_contents/i.test(landingPageContentsContent),
+  '0051 must not create policies on public.landing_page_contents',
+);
+assert(
+  !/to\s+anon[\s\S]*?on\s+public\.landing_page_contents/i.test(landingPageContentsContent)
+    && !/on\s+public\.landing_page_contents[\s\S]*?to\s+anon/i.test(landingPageContentsContent),
+  'landing_page_contents must not grant anon access',
+);
+assert(
+  !/to\s+authenticated[\s\S]*?on\s+public\.landing_page_contents/i.test(landingPageContentsContent)
+    && !/on\s+public\.landing_page_contents[\s\S]*?to\s+authenticated/i.test(landingPageContentsContent),
+  'landing_page_contents must not grant authenticated broad access',
+);
+assert(
+  !/on\s+public\.landing_page_contents[\s\S]*?for\s+(select|insert|update|delete)/i.test(landingPageContentsContent)
+    && !/for\s+(select|insert|update|delete)[\s\S]*?on\s+public\.landing_page_contents/i.test(landingPageContentsContent),
+  'landing_page_contents must not define public SELECT or mutation policies',
+);
+assert(
+  !/\binsert\s+into\b/i.test(landingPageContentsContent),
+  '0051 must not seed landing_page_contents rows',
 );
 
 
