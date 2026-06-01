@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 
-const PHASE = '5.2A-2A';
+const PHASE = 'SEO-D3H4-C-IMPL-A';
 
 const required = [
   '0001_extensions.sql',
@@ -53,7 +53,8 @@ const required = [
   '0047_provider_license_verification_foundation.sql',
   '0048_media_public_visibility_hardening.sql',
   '0049_media_public_rls_hardening.sql',
-  '0050_provider_onboarding_leads.sql'
+  '0050_provider_onboarding_leads.sql',
+  '0051_landing_page_contents.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -142,7 +143,8 @@ const rlsPolicyFiles = new Set([
   '0046_callback_request_foundation.sql',
   '0047_provider_license_verification_foundation.sql',
   '0049_media_public_rls_hardening.sql',
-  '0050_provider_onboarding_leads.sql'
+  '0050_provider_onboarding_leads.sql',
+  '0051_landing_page_contents.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -166,6 +168,7 @@ const providerLicenseVerificationFoundationFile = '0047_provider_license_verific
 const mediaPublicVisibilityHardeningFile = '0048_media_public_visibility_hardening.sql';
 const mediaPublicRlsHardeningFile = '0049_media_public_rls_hardening.sql';
 const providerOnboardingLeadsFile = '0050_provider_onboarding_leads.sql';
+const landingPageContentsFile = '0051_landing_page_contents.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1688,6 +1691,65 @@ for (const forbidden of [
   /\bprovider_account\b/i,
 ]) {
   requireCondition(!forbidden.test(providerOnboardingLeadsContent), `0050_provider_onboarding_leads.sql contains forbidden pattern: ${forbidden}`);
+}
+
+
+const landingPageContentsContent = readFileSync(`${dir}/${landingPageContentsFile}`, 'utf8');
+
+for (const pattern of [
+  /create\s+type\s+public\.landing_page_family\s+as\s+enum\s*\([\s\S]*?'specialty'[\s\S]*?'specialty_area'[\s\S]*?'area'[\s\S]*?'service'[\s\S]*?'service_area'[\s\S]*?\)/i,
+  /create\s+type\s+public\.landing_content_status\s+as\s+enum\s*\([\s\S]*?'draft'[\s\S]*?'in_review'[\s\S]*?'approved'[\s\S]*?'published'[\s\S]*?'archived'[\s\S]*?'rejected'[\s\S]*?\)/i,
+  /create\s+type\s+public\.landing_editorial_review_status\s+as\s+enum\s*\([\s\S]*?'missing'[\s\S]*?'pending'[\s\S]*?'approved'[\s\S]*?'rejected'[\s\S]*?\)/i,
+  /create\s+type\s+public\.landing_medical_review_status\s+as\s+enum\s*\([\s\S]*?'missing'[\s\S]*?'not_required'[\s\S]*?'required'[\s\S]*?'pending'[\s\S]*?'approved'[\s\S]*?'rejected'[\s\S]*?\)/i,
+  /create\s+table\s+if\s+not\s+exists\s+public\.landing_page_contents/i,
+  /locale\s+public\.app_locale\s+not\s+null/i,
+  /country_code\s+public\.country_code\s+not\s+null\s+default\s+'om'/i,
+  /family\s+public\.landing_page_family\s+not\s+null/i,
+  /service_id\s+uuid\s+null\s+references\s+public\.services\s*\(\s*id\s*\)/i,
+  /specialty_id\s+uuid\s+null\s+references\s+public\.specialties\s*\(\s*id\s*\)/i,
+  /area_id\s+uuid\s+null\s+references\s+public\.geo_areas\s*\(\s*id\s*\)/i,
+  /city_id\s+uuid\s+null\s+references\s+public\.geo_cities\s*\(\s*id\s*\)/i,
+  /canonical_landing_key\s+text\s+not\s+null/i,
+  /title\s+text\s+null/i,
+  /intro\s+text\s+null/i,
+  /sections\s+jsonb\s+null/i,
+  /faq\s+jsonb\s+null/i,
+  /status\s+public\.landing_content_status\s+not\s+null\s+default\s+'draft'/i,
+  /editorial_review_status\s+public\.landing_editorial_review_status\s+not\s+null\s+default\s+'missing'/i,
+  /medical_review_status\s+public\.landing_medical_review_status\s+not\s+null\s+default\s+'missing'/i,
+  /created_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i,
+  /published_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i,
+  /landing_page_contents_family_scope_check[\s\S]*?family\s*=\s*'service'[\s\S]*?service_id\s+is\s+not\s+null[\s\S]*?family\s*=\s*'service_area'[\s\S]*?area_id\s+is\s+not\s+null[\s\S]*?city_id\s+is\s+not\s+null[\s\S]*?family\s*=\s*'specialty'[\s\S]*?specialty_id\s+is\s+not\s+null[\s\S]*?family\s*=\s*'specialty_area'[\s\S]*?area_id\s+is\s+not\s+null[\s\S]*?city_id\s+is\s+not\s+null[\s\S]*?family\s*=\s*'area'[\s\S]*?area_id\s+is\s+not\s+null[\s\S]*?city_id\s+is\s+not\s+null/i,
+  /landing_page_contents_published_status_check[\s\S]*?status\s*<>\s*'published'[\s\S]*?editorial_review_status\s*=\s*'approved'[\s\S]*?medical_review_status\s+in\s*\(\s*'approved'\s*,\s*'not_required'\s*\)[\s\S]*?published_at\s+is\s+not\s+null[\s\S]*?published_by_profile_id\s+is\s+not\s+null[\s\S]*?deleted_at\s+is\s+null/i,
+  /create\s+unique\s+index\s+if\s+not\s+exists\s+landing_page_contents_one_live_published_key_idx\s+on\s+public\.landing_page_contents\s*\(\s*locale\s*,\s*country_code\s*,\s*family\s*,\s*canonical_landing_key\s*\)[\s\S]*?where\s+status\s*=\s*'published'\s+and\s+deleted_at\s+is\s+null/i,
+  /create\s+trigger\s+trg_landing_page_contents_set_updated_at[\s\S]*?before\s+update\s+on\s+public\.landing_page_contents[\s\S]*?execute\s+function\s+public\.set_updated_at\s*\(\s*\)/i,
+  /alter\s+table\s+public\.landing_page_contents\s+enable\s+row\s+level\s+security/i,
+]) {
+  requireCondition(pattern.test(landingPageContentsContent), `0051_landing_page_contents.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\binsert\s+into\b/i,
+  /seed\s+(data|rows?)/i,
+  /service[_-]?role/i,
+  /\bto\s+anon\b/i,
+  /\bto\s+authenticated\b/i,
+  /for\s+select/i,
+  /for\s+insert/i,
+  /for\s+update/i,
+  /for\s+delete/i,
+  /public\s+select/i,
+  /route/i,
+  /sitemap/i,
+  /robots/i,
+  /llms\.txt/i,
+  /schema\.org/i,
+  /metadata/i,
+  /public\s+ui/i,
+  /provider\/?center-scoped\s+roles/i,
+]) {
+  requireCondition(!forbidden.test(landingPageContentsContent), `0051_landing_page_contents.sql contains forbidden pattern: ${forbidden}`);
 }
 
 console.log(`Phase ${PHASE} migration validation passed.`);
