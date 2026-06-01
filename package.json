@@ -19,7 +19,8 @@
     "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "test": "pnpm test:unit",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "test:landing:public-gate": "node scripts/db/test-landing-public-gate-static.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
