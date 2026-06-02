@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-OM" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>List your center — DrMuscat</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- ========== ICON SPRITE ========== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M4 20l1.4-4A8 8 0 1 1 9 18.6L4 20Z"/><path d="M9 9.5c.4 2 2.5 4.1 4.5 4.5.7.1 1.3-.2 1.6-.8l.2-.5-1.8-1-.7.7c-.8-.4-1.6-1.2-2-2l.7-.7-1-1.8-.5.2c-.6.3-.9.9-.7 1.7Z"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.4 2.5 14.6 0 17M12 3.5c-2.5 2.4-2.5 14.6 0 17"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 16a6 6 0 0 0 6-6"/><circle cx="18" cy="8" r="2"/><path d="M10 16v1a4 4 0 0 0 8 0v-1"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M3 21h18M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/></symbol>
+  <symbol id="i-tooth" viewBox="0 0 24 24"><path d="M12 4c-2-1.5-5-1.2-6 1-1 2.2-.3 5 .5 8 .6 2.3 1 5 2.5 5s1.3-3 3-3 1.5 3 3 3 1.9-2.7 2.5-5c.8-3 1.5-5.8.5-8-1-2.2-4-2.5-6-1Z"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M18 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-4.5 8a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.5 7 5-16L17 12h4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 7-14 16-14 0 9-5 16-14 16-1 0-2-.7-2-2Z"/><path d="M9 15c2-3 5-5 8-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9C1.5 7.5 3.5 4.5 7 4.5c2 0 3.3 1.2 5 3 1.7-1.8 3-3 5-3 3.5 0 5.5 3 4 6.5-2 4.6-9 9-9 9Z"/></symbol>
+  <symbol id="i-ambulance" viewBox="0 0 24 24"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M7 9v3M5.5 10.5h3"/></symbol>
+</svg>
+
+
+<!-- HEADER -->
+<header class="site-header scrolled" id="siteHeader">
+  <div class="wrap hdr-inner">
+    <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+    <nav class="nav">
+      <a href="DrMuscat.html#categories" data-en="Find care" data-ar="اكتشف الرعاية">Find care</a>
+      <a href="DrMuscat.html#providers" data-en="Providers" data-ar="المزوّدون">Providers</a>
+      <a href="DrMuscat.html#areas" data-en="Areas" data-ar="المناطق">Areas</a>
+      <a href="DrMuscat.html#wellness" data-en="Wellness" data-ar="العافية">Wellness</a>
+      <a href="DrMuscat.html#trust" data-en="Why trust us" data-ar="لماذا نحن">Why trust us</a>
+    </nav>
+    <div class="hdr-cta">
+      <button class="lang" aria-label="Switch language"><svg class="ic"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+      <a class="btn sm" href="list-your-center.html" data-en="List your center" data-ar="سجّل مركزك">List your center</a>
+      <button class="iconbtn hamb" data-menu-open aria-label="Open menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="m-menu" id="mMenu" aria-hidden="true">
+  <div class="m-top">
+    <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+    <button class="iconbtn" data-menu-close aria-label="Close menu"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <nav>
+    <a href="DrMuscat.html#categories" data-en="Find care" data-ar="اكتشف الرعاية">Find care</a>
+      <a href="DrMuscat.html#providers" data-en="Providers" data-ar="المزوّدون">Providers</a>
+      <a href="DrMuscat.html#areas" data-en="Areas" data-ar="المناطق">Areas</a>
+      <a href="DrMuscat.html#wellness" data-en="Wellness" data-ar="العافية">Wellness</a>
+      <a href="DrMuscat.html#trust" data-en="Why trust us" data-ar="لماذا نحن">Why trust us</a>
+  </nav>
+  <div class="m-foot">
+    <button class="lang" style="width:fit-content" aria-label="Switch language"><svg class="ic"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+    <a class="btn block" href="list-your-center.html" data-en="List your center" data-ar="سجّل مركزك">List your center</a>
+  </div>
+</div>
+<main class="page-top">
+  <section class="sec" style="padding-top:24px">
+    <div class="wrap form-wrap">
+      <div class="crumbs reveal"><a href="DrMuscat.html" data-en="Home" data-ar="الرئيسية">Home</a><svg class="ic flip"><use href="#i-chev-r"/></svg><span data-en="List your center" data-ar="سجّل مركزك">List your center</span></div>
+      <div class="center reveal" style="margin-top:20px;margin-bottom:30px">
+        <span class="eyebrow" style="justify-content:center" data-en="For providers" data-ar="لمزوّدي الخدمة">For providers</span>
+        <h1 class="h2" style="margin-top:12px" data-en="List or claim your center" data-ar="سجّل أو وثّق مركزك">List or claim your center</h1>
+        <p class="lead" style="margin:14px auto 0" data-en="Tell us about your center and the DrMuscat team will help you get verified and visible across Muscat." data-ar="أخبرنا عن مركزك وسيساعدك فريق DrMuscat في توثيقه وإبرازه في مسقط.">Tell us about your center and the DrMuscat team will help you get verified and visible across Muscat.</p>
+      </div>
+      <div class="form-card reveal" id="formCard">
+        <div class="field-row">
+          <label data-en="Center name" data-ar="اسم المركز">Center name</label>
+          <input class="inp" type="text" data-en-ph="e.g. Muscat Skin Clinic" data-ar-ph="مثال: عيادة مسقط للجلدية" placeholder="e.g. Muscat Skin Clinic">
+        </div>
+        <div class="form-2">
+          <div class="field-row"><label data-en="Contact person" data-ar="الشخص المسؤول">Contact person</label><input class="inp" type="text" data-en-ph="Full name" data-ar-ph="الاسم الكامل" placeholder="Full name"></div>
+          <div class="field-row"><label data-en="WhatsApp number" data-ar="رقم واتساب">WhatsApp number</label><input class="inp" type="tel" dir="ltr" placeholder="+968 ----- ----"></div>
+        </div>
+        <div class="form-2">
+          <div class="field-row"><label data-en="Category" data-ar="التصنيف">Category</label>
+            <select class="sel"><option data-en="Doctor / Clinic" data-ar="طبيب / عيادة">Doctor / Clinic</option><option data-en="Dental" data-ar="أسنان">Dental</option><option data-en="Dermatology" data-ar="جلدية">Dermatology</option><option data-en="Pharmacy" data-ar="صيدلية">Pharmacy</option><option data-en="Lab" data-ar="مختبر">Lab</option><option data-en="Physiotherapy" data-ar="علاج طبيعي">Physiotherapy</option><option data-en="Beauty & Laser" data-ar="تجميل وليزر">Beauty & Laser</option><option data-en="Wellness / Gym" data-ar="عافية / صالة">Wellness / Gym</option></select></div>
+          <div class="field-row"><label data-en="Area" data-ar="المنطقة">Area</label>
+            <select class="sel"><option data-en="Al Khuwair" data-ar="الخوير">Al Khuwair</option><option data-en="Qurum" data-ar="القرم">Qurum</option><option data-en="Azaiba" data-ar="العذيبة">Azaiba</option><option data-en="Seeb" data-ar="السيب">Seeb</option><option data-en="Bausher" data-ar="بوشر">Bausher</option><option data-en="Ghubra" data-ar="الغبرة">Ghubra</option><option data-en="Muttrah" data-ar="مطرح">Muttrah</option><option data-en="Ruwi" data-ar="روي">Ruwi</option><option data-en="Al Hail" data-ar="الحيل">Al Hail</option></select></div>
+        </div>
+        <div class="field-row">
+          <label data-en="Message" data-ar="رسالة">Message</label>
+          <textarea class="txt" data-en-ph="Tell us a little about your center and services…" data-ar-ph="أخبرنا قليلاً عن مركزك وخدماتك…" placeholder="Tell us a little about your center and services…"></textarea>
+        </div>
+        <button class="btn lg block" id="submitBtn"><span data-en="Submit request" data-ar="إرسال الطلب">Submit request</span></button>
+        <p class="micro" style="text-align:center;margin-top:14px;text-transform:none;letter-spacing:0" data-en="No account needed. The DrMuscat team reviews each request manually." data-ar="لا حاجة لحساب. يراجع فريق DrMuscat كل طلب يدوياً.">No account needed. The DrMuscat team reviews each request manually.</p>
+      </div>
+      <div class="form-card success reveal" id="successCard">
+        <div class="si"><svg class="ic"><use href="#i-check"/></svg></div>
+        <h2 class="h2" data-en="Thank you" data-ar="شكراً لك">Thank you</h2>
+        <p class="lead" style="margin:14px auto 0" data-en="Thanks. Your request has been received. The DrMuscat team will contact you soon." data-ar="شكراً لك. تم استلام طلبك، وسيتواصل معك فريق DrMuscat قريباً.">Thanks. Your request has been received. The DrMuscat team will contact you soon.</p>
+        <a class="btn-2 btn" style="margin-top:24px" href="DrMuscat.html" data-en="Back to home" data-ar="العودة للرئيسية">Back to home</a>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- ========== FOOTER ========== -->
+<footer class="foot">
+  <div class="wrap sec" style="padding-bottom:48px">
+    <div class="grid" style="grid-template-columns:1.7fr 1fr 1fr 1fr;gap:40px">
+      <div class="stack sm">
+        <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+        <p class="sub" style="color:#aebcb6;max-width:36ch" data-en="A premium healthcare & wellness discovery platform for Muscat and Oman." data-ar="منصّة مميّزة لاكتشاف الرعاية الصحية والعافية في مسقط وعُمان.">A premium healthcare &amp; wellness discovery platform for Muscat and Oman.</p>
+        <button class="lang" style="width:fit-content;background:rgba(255,249,240,.08);border-color:#33433d;color:var(--ivory)" aria-label="Switch language"><svg class="ic" style="stroke:var(--ivory)"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+      </div>
+      <div><p class="h4" data-en="Discover" data-ar="اكتشف">Discover</p><a href="#" data-en="Doctors" data-ar="أطباء">Doctors</a><a href="#" data-en="Clinics" data-ar="عيادات">Clinics</a><a href="#" data-en="Dental" data-ar="أسنان">Dental</a><a href="#" data-en="Labs" data-ar="مختبرات">Labs</a><a href="#" data-en="Pharmacies" data-ar="صيدليات">Pharmacies</a></div>
+      <div><p class="h4" data-en="Areas" data-ar="المناطق">Areas</p><a href="#" data-en="Al Khuwair" data-ar="الخوير">Al Khuwair</a><a href="#" data-en="Qurum" data-ar="القرم">Qurum</a><a href="#" data-en="Seeb" data-ar="السيب">Seeb</a><a href="#" data-en="All Muscat" data-ar="كل مسقط">All Muscat</a></div>
+      <div><p class="h4" data-en="DrMuscat" data-ar="دكتور مسقط">DrMuscat</p><a href="#" data-en="How we verify" data-ar="كيف نتحقق">How we verify</a><a href="#" data-en="For providers" data-ar="لمزوّدي الخدمة">For providers</a><a href="#" data-en="About" data-ar="من نحن">About</a><a href="#" data-en="Medical disclaimer" data-ar="إخلاء طبي">Medical disclaimer</a></div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="app.js"></script>
+</body>
+</html>

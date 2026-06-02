@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrMuscat — Homepage Wireframes</title>
+<link rel="stylesheet" href="wireframes/wire.css">
+<style>
+  html,body{height:100%}
+  body{margin:0;display:flex;flex-direction:column;background:#141310;overflow:hidden}
+  .shellbar{
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+    padding:14px 24px;background:#141310;color:#efeae0;
+    border-bottom:1px solid #2a2822;position:sticky;top:0;z-index:10;
+  }
+  .shellbar .brand{display:flex;align-items:center;gap:11px;font-family:'Spectral',serif;
+    font-size:21px;font-weight:500}
+  .shellbar .brand .mark{width:28px;height:28px;border-radius:8px;background:#1f5c43;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Manrope';
+    font-weight:700;font-size:13px}
+  .shellbar .kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:#7a756a}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-inline-start:auto}
+  .tab{
+    font-family:'Manrope',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;
+    background:transparent;color:#b8b2a6;border:1px solid #34322b;border-radius:9px;
+    padding:8px 15px;display:flex;align-items:center;gap:9px;transition:.15s}
+  .tab:hover{color:#efeae0;border-color:#4a463d}
+  .tab .dot{width:8px;height:8px;border-radius:50%}
+  .tab[data-k="concierge"] .dot{background:#a8843e}
+  .tab[data-k="discovery"] .dot{background:#3f7d77}
+  .tab[data-k="wellness"] .dot{background:#b5663a}
+  .tab[data-k="rtl"] .dot{background:#cfc9bb}
+  .tab.on{background:#efeae0;color:#1b1a16;border-color:#efeae0}
+  .toggle{display:flex;align-items:center;gap:9px;font-family:'IBM Plex Mono',monospace;
+    font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#b8b2a6;cursor:pointer;
+    border:1px solid #34322b;border-radius:9px;padding:8px 13px;user-select:none}
+  .toggle .sw{width:30px;height:16px;border-radius:999px;background:#34322b;position:relative;transition:.15s}
+  .toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;
+    border-radius:50%;background:#7a756a;transition:.15s}
+  .toggle.on{color:#efeae0}
+  .toggle.on .sw{background:#1f5c43}
+  .toggle.on .sw::after{left:16px;background:#fff}
+  .stage{flex:1;min-height:0;background:#0e0d0b;padding:18px;display:flex}
+  .frame-wrap{flex:1;border:1px solid #2a2822;border-radius:14px;overflow:hidden;
+    background:#f6f3ec;box-shadow:0 30px 60px -30px #000}
+  iframe{width:100%;height:100%;border:0;display:block}
+  @media(max-width:760px){.kick{display:none}}
+</style>
+</head>
+<body>
+  <div class="shellbar">
+    <div class="brand"><span class="mark">د</span> DrMuscat</div>
+    <span class="kick">Homepage wireframes</span>
+    <div class="tabs">
+      <button class="tab on" data-k="concierge" data-src="wireframes/concierge.html"><span class="dot"></span>01 · Premium Search Concierge</button>
+      <button class="tab" data-k="discovery" data-src="wireframes/discovery.html"><span class="dot"></span>02 · Oman Medical Discovery</button>
+      <button class="tab" data-k="wellness" data-src="wireframes/wellness.html"><span class="dot"></span>03 · Luxury Wellness + Healthcare</button>
+      <button class="tab" data-k="rtl" data-src="wireframes/rtl.html"><span class="dot"></span>Arabic RTL</button>
+    </div>
+    <div class="toggle on" id="notesToggle"><span class="sw"></span> Notes</div>
+  </div>
+  <div class="stage">
+    <div class="frame-wrap">
+      <iframe id="frame" src="wireframes/concierge.html" title="wireframe"></iframe>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var frame = document.getElementById('frame');
+  var tabs = [].slice.call(document.querySelectorAll('.tab'));
+  var notesToggle = document.getElementById('notesToggle');
+
+  try{
+    var last = localStorage.getItem('dm_tab');
+    if(last){
+      var t = tabs.find(function(x){return x.dataset.k===last;});
+      if(t){ tabs.forEach(function(x){x.classList.remove('on');}); t.classList.add('on'); frame.src = t.dataset.src; }
+    }
+  }catch(e){}
+
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('on');});
+      t.classList.add('on');
+      frame.src = t.dataset.src;
+      try{ localStorage.setItem('dm_tab', t.dataset.k); }catch(e){}
+    });
+  });
+
+  function notesOn(){ return notesToggle.classList.contains('on'); }
+  function pushNotes(){ try{ frame.contentWindow.postMessage({type:'dm_notes', show:notesOn()}, '*'); }catch(e){} }
+  try{
+    var n = localStorage.getItem('dm_notes');
+    if(n !== null) notesToggle.classList.toggle('on', n === '1');
+  }catch(e){}
+
+  notesToggle.addEventListener('click', function(){
+    notesToggle.classList.toggle('on');
+    try{ localStorage.setItem('dm_notes', notesOn() ? '1':'0'); }catch(e){}
+    pushNotes();
+  });
+
+  frame.addEventListener('load', pushNotes);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrMuscat — Arabic RTL key screen</title>
+<link rel="stylesheet" href="wire.css">
+<style>
+  :root{--accent:#1f5c43;--accent-2:#a8843e}
+  .note{direction:ltr;text-align:left}
+  .micro.ltr{direction:ltr;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- ============ INTRO (LTR for the designer) ============ -->
+<section class="intro" dir="ltr">
+  <div class="wrap sec">
+    <p class="eyebrow" style="color:var(--accent-2)">Arabic RTL — key screen</p>
+    <h1 class="display" style="max-width:20ch;margin-top:14px">Arabic is a first-class layout, not a mirror afterthought</h1>
+    <p class="lead" style="color:#cfc9bb;margin-top:16px">The same premium system, fully mirrored for Arabic. Direction flips; type scale, spacing and hierarchy stay identical. Below: the Direction&nbsp;1 home in Arabic RTL, plus the rules that govern every screen.</p>
+    <div class="keyrow">
+      <div class="key"><p class="micro">Header</p><p>Logo moves to the right; nav reads right→left; language toggle pairs ع · EN.</p></div>
+      <div class="key"><p class="micro">Search</p><p>Fields right-aligned, dividers mirror, the Search button sits at the row's left end.</p></div>
+      <div class="key"><p class="micro">Cards &amp; chips</p><p>Grids &amp; chips fill right→left; badges sit on the start (right) edge; chevrons reverse.</p></div>
+      <div class="key"><p class="micro">Numerals</p><p>Latin names, counts &amp; codes stay LTR inside RTL text; icons mirror, symbols don't.</p></div>
+    </div>
+  </div>
+</section>
+
+<p class="devlabel" style="margin:28px 0 -8px" dir="ltr">Desktop · العربية</p>
+
+<!-- ============ DESKTOP RTL ============ -->
+<div class="wrap">
+  <header class="nav">
+    <div class="logo"><span class="mark">د</span> دكتور مسقط</div>
+    <nav class="navlinks"><a href="#">اكتشف الرعاية</a><a href="#">التصنيفات</a><a href="#">المناطق</a><a href="#">العافية</a><a href="#">لمزوّدي الخدمة</a></nav>
+    <div class="nav-cta"><span class="lang">ع · EN</span><a class="btn sm ghost" href="#">أضِف مركزك</a></div>
+  </header>
+</div>
+<hr class="divide">
+
+<!-- HERO RTL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="grid hero-split" style="grid-template-columns:1.04fr 1fr;gap:56px;align-items:center">
+      <div class="stack">
+        <span class="eyebrow">رعاية صحية موثوقة · مسقط، عُمان</span>
+        <h2 class="display">اعثر على رعاية صحية موثوقة في مسقط.</h2>
+        <p class="lead">ابحث عن الأطباء والعيادات والصيدليات والمختبرات ومراكز الأسنان والليزر والعلاج الطبيعي ومزوّدي العافية — موثوقون ومحليّون.</p>
+        <div class="row wrap" style="gap:10px">
+          <span class="badge"><span class="tick">✓</span> مزوّدون موثوقون</span>
+          <span class="badge"><span class="tick">✓</span> إشارات ترخيص وزارة الصحة</span>
+        </div>
+        <p class="note">Editorial promise now sits on the RIGHT. Text aligns right; reading order is RTL.</p>
+      </div>
+
+      <div class="stack">
+        <div class="searchmod">
+          <div class="field"><span class="lbl">ماذا تبحث عنه؟</span><span class="val">طبيب أسنان، جلدية، مختبر…</span></div>
+          <div class="field"><span class="lbl">أين؟</span><span class="val">الخوير، القرم، السيب…</span></div>
+          <a class="btn" href="#">بحث</a>
+        </div>
+        <div class="chips">
+          <span class="chip on">طبيب أسنان</span><span class="chip">جلدية</span><span class="chip">صيدلية</span><span class="chip">مختبر</span><span class="chip">عيادة ليزر</span><span class="chip">علاج طبيعي</span><span class="chip">أسنان</span><span class="chip">العافية</span>
+        </div>
+        <div class="card flush" style="margin-top:6px">
+          <div class="row" style="padding:16px 18px;gap:14px">
+            <div class="ph circle plain" style="width:52px;height:52px;flex:none">شعار</div>
+            <div style="flex:1">
+              <div class="row" style="gap:8px"><span class="h4">[ اسم المزوّد ]</span><span class="badge"><span class="tick">✓</span></span></div>
+              <span class="micro ltr">Dermatology · Qurum</span>
+            </div>
+            <a class="act" href="#"><span class="gl"></span> عرض</a>
+          </div>
+        </div>
+        <p class="note">Search dividers &amp; button mirror — "بحث" lands at the row's left (end of an RTL line). Latin category codes stay LTR.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divide">
+
+<!-- CATEGORY RTL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">استكشف</span><h3 class="h2" style="margin-top:8px">تصفّح حسب التصنيف</h3></div><a class="micro" href="#">← كل التصنيفات</a></div>
+    <div class="grid g6" style="margin-top:28px">
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">أطباء</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">عيادات</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">أسنان</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">جلدية</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">صيدليات</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">مختبرات</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">علاج طبيعي</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">تجميل وليزر</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">العافية</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">صالات رياضية</span></div>
+      <div class="tile"><span class="ic">أيقونة</span><span class="nm">طعام صحي</span></div>
+      <div class="tile" style="border-style:dashed;justify-content:center;align-items:center"><span class="ct">عرض الكل ←</span></div>
+    </div>
+    <p class="note">Tiles fill right→left; icons sit on the start (right) edge; the "view all" arrow flips to ←.</p>
+  </div>
+</section>
+
+<!-- FEATURED RTL -->
+<section class="sec band">
+  <div class="wrap sec tight">
+    <div class="between"><div><span class="eyebrow">مختارة</span><h3 class="h2" style="margin-top:8px">مزوّدون موثوقون ومميّزون</h3></div><div class="row" style="gap:8px"><a class="act" href="#">›</a><a class="act" href="#">‹</a></div></div>
+    <div class="grid g3" style="margin-top:28px">
+      <article class="prov"><div class="ph cover">صورة العيادة</div><div class="body"><div class="head"><div><span class="h3">[ اسم العيادة ]</span><br><span class="micro ltr">Dermatology · Qurum</span></div><span class="badge"><span class="tick">✓</span> موثوق</span></div><div class="tags"><span class="tag">جلدية</span><span class="tag">ليزر</span><span class="tag">تجميل</span></div><div class="actions"><a class="act" href="#">اتصال</a><a class="act" href="#">واتساب</a><a class="act" href="#">الاتجاهات</a><a class="act" href="#">عرض</a></div></div></article>
+      <article class="prov"><div class="ph cover">صورة العيادة</div><div class="body"><div class="head"><div><span class="h3">[ مركز أسنان ]</span><br><span class="micro ltr">Dental · Al Khuwair</span></div><span class="badge"><span class="tick">✓</span> موثوق</span></div><div class="tags"><span class="tag">تقويم</span><span class="tag">زراعة</span><span class="tag">تبييض</span></div><div class="actions"><a class="act" href="#">اتصال</a><a class="act" href="#">واتساب</a><a class="act" href="#">الاتجاهات</a><a class="act" href="#">عرض</a></div></div></article>
+      <article class="prov"><div class="ph cover">صورة العيادة</div><div class="body"><div class="head"><div><span class="h3">[ مختبر تشخيصي ]</span><br><span class="micro ltr">Lab · Azaiba</span></div><span class="badge"><span class="tick">✓</span> مُطالَب به</span></div><div class="tags"><span class="tag">تحاليل</span><span class="tag">أشعة</span><span class="tag">زيارة منزلية</span></div><div class="actions"><a class="act" href="#">اتصال</a><a class="act" href="#">واتساب</a><a class="act" href="#">الاتجاهات</a><a class="act" href="#">عرض</a></div></div></article>
+    </div>
+    <p class="note" style="margin-top:20px">Verified badge sits on the start (right) of the title row; card-carousel chevrons reverse direction.</p>
+  </div>
+</section>
+
+<!-- AREA RTL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">محليًا</span><h3 class="h2" style="margin-top:8px">تصفّح حسب منطقة مسقط</h3></div><span class="micro mute">الأعداد تظهر فقط عند توفّر البيانات</span></div>
+    <div class="grid g4" style="margin-top:28px">
+      <div class="area"><span class="nm">الخوير</span><span class="ct ltr">42</span></div>
+      <div class="area"><span class="nm">القرم</span><span class="ct ltr">28</span></div>
+      <div class="area"><span class="nm">العذيبة</span><span class="ct ltr">19</span></div>
+      <div class="area"><span class="nm">السيب</span><span class="ct ltr">23</span></div>
+      <div class="area"><span class="nm">بوشر</span><span class="ct ltr">14</span></div>
+      <div class="area"><span class="nm">الغبرة</span><span class="ct ltr">16</span></div>
+      <div class="area"><span class="nm">مطرح</span><span class="ct ltr">11</span></div>
+      <div class="area"><span class="nm">روي</span><span class="ct ltr">17</span></div>
+      <div class="area"><span class="nm">الحيل</span><span class="ct ltr">9</span></div>
+      <div class="area" style="border-style:dashed"><span class="nm">كل مسقط</span><span class="ct">←</span></div>
+    </div>
+    <p class="note">Arabic label on the start (right), count on the end (left); numerals stay LTR inside the RTL row.</p>
+  </div>
+</section>
+
+<!-- CTA RTL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="band ink" style="border-radius:18px;padding:52px 48px;display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap">
+      <div class="stack sm" style="max-width:48ch">
+        <span class="eyebrow" style="color:var(--accent-2)">لمزوّدي الخدمة</span>
+        <h3 class="display" style="font-size:clamp(28px,3vw,40px)">عزّز حضورك الصحي في عُمان.</h3>
+        <p class="sub" style="color:#cfc9bb">طالِب بملفك، اعرض خدماتك، استقبل استفسارات المرضى، وابنِ حضورًا موثوقًا في مسقط.</p>
+      </div>
+      <div class="row wrap" style="gap:12px"><a class="btn on-dark" href="#">طالِب بملفك</a><a class="btn ghost" href="#" style="color:#efeae0;border-color:#4a463d">أضِف مركزك</a></div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap sec">
+    <div class="grid" style="grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px">
+      <div class="stack sm">
+        <div class="logo" style="color:#efeae0"><span class="mark">د</span> دكتور مسقط</div>
+        <p class="sub" style="color:#9a948a;max-width:36ch">منصّة مميّزة لاكتشاف الرعاية الصحية والعافية في مسقط وعُمان.</p>
+        <span class="lang" style="color:#b8b2a6;border-color:#3a382f;width:fit-content">ع · EN</span>
+      </div>
+      <div><p class="h4">اكتشف</p><a href="#">أطباء</a><a href="#">عيادات</a><a href="#">أسنان</a><a href="#">مختبرات</a></div>
+      <div><p class="h4">المناطق</p><a href="#">الخوير</a><a href="#">القرم</a><a href="#">السيب</a><a href="#">كل مسقط</a></div>
+      <div><p class="h4">دكتور مسقط</p><a href="#">كيف نتحقق</a><a href="#">لمزوّدي الخدمة</a><a href="#">من نحن</a><a href="#">إخلاء طبي</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MOBILE RTL ============ -->
+<hr class="divide">
+<p class="devlabel" style="margin-top:40px" dir="ltr">Mobile · العربية</p>
+<section class="sec tight">
+  <div class="devices">
+    <div>
+      <div class="device">
+        <div class="screen">
+          <div class="statusbar" dir="ltr"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="mp" style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;padding-bottom:14px">
+            <div class="logo" style="font-size:18px"><span class="mark" style="width:26px;height:26px;font-size:12px">د</span> دكتور مسقط</div>
+            <div class="ph plain" style="width:34px;height:34px;border-radius:8px">≡</div>
+          </div>
+          <div class="mp stack">
+            <h2 class="display" style="font-size:28px">اعثر على رعاية موثوقة في مسقط.</h2>
+            <div class="searchmod" style="flex-direction:column;padding:8px">
+              <div class="field" style="width:100%"><span class="lbl">ماذا</span><span class="val">طبيب أسنان، مختبر، صيدلية…</span></div>
+              <div class="field" style="width:100%"><span class="lbl">أين</span><span class="val">منطقة في مسقط</span></div>
+              <a class="btn block" href="#" style="margin:4px 0 0">بحث</a>
+            </div>
+            <div class="chips"><span class="chip on">طبيب أسنان</span><span class="chip">صيدلية</span><span class="chip">مختبر</span><span class="chip">ليزر</span></div>
+          </div>
+          <div class="mp" style="margin-top:24px">
+            <span class="eyebrow">تصفّح حسب التصنيف</span>
+            <div class="grid g2" style="margin-top:14px">
+              <div class="tile" style="padding:16px"><span class="ic">أيقونة</span><span class="nm">أطباء</span></div>
+              <div class="tile" style="padding:16px"><span class="ic">أيقونة</span><span class="nm">أسنان</span></div>
+              <div class="tile" style="padding:16px"><span class="ic">أيقونة</span><span class="nm">صيدليات</span></div>
+              <div class="tile" style="padding:16px"><span class="ic">أيقونة</span><span class="nm">مختبرات</span></div>
+            </div>
+          </div>
+          <div class="mp" style="margin-top:24px">
+            <span class="eyebrow">مختارة</span>
+            <article class="prov" style="margin-top:14px">
+              <div class="ph cover">صورة العيادة</div>
+              <div class="body"><div class="head"><div><span class="h3">[ اسم العيادة ]</span><br><span class="micro ltr">Dermatology · Qurum</span></div><span class="badge"><span class="tick">✓</span></span></div><div class="actions"><a class="act" href="#">اتصال</a><a class="act" href="#">واتساب</a><a class="act" href="#">الاتجاهات</a></div></div>
+            </article>
+          </div>
+          <div class="mp" style="margin:24px 0 30px">
+            <div class="band ink" style="border-radius:14px;padding:22px">
+              <span class="eyebrow" style="color:var(--accent-2)">لمزوّدي الخدمة</span>
+              <div class="h3" style="color:#fff;margin:8px 0 14px">عزّز حضورك في عُمان.</div>
+              <a class="btn on-dark block" href="#">طالِب بملفك</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="devlabel" dir="ltr">Home · RTL mobile</p>
+    </div>
+  </div>
+</section>
+
+<div style="height:30px"></div>
+<script src="wire.js"></script>
+</body>
+</html>

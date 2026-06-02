@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en-OM" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muscat Skin Clinic — DrMuscat</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- ========== ICON SPRITE ========== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M4 20l1.4-4A8 8 0 1 1 9 18.6L4 20Z"/><path d="M9 9.5c.4 2 2.5 4.1 4.5 4.5.7.1 1.3-.2 1.6-.8l.2-.5-1.8-1-.7.7c-.8-.4-1.6-1.2-2-2l.7-.7-1-1.8-.5.2c-.6.3-.9.9-.7 1.7Z"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.4 2.5 14.6 0 17M12 3.5c-2.5 2.4-2.5 14.6 0 17"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 16a6 6 0 0 0 6-6"/><circle cx="18" cy="8" r="2"/><path d="M10 16v1a4 4 0 0 0 8 0v-1"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M3 21h18M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/></symbol>
+  <symbol id="i-tooth" viewBox="0 0 24 24"><path d="M12 4c-2-1.5-5-1.2-6 1-1 2.2-.3 5 .5 8 .6 2.3 1 5 2.5 5s1.3-3 3-3 1.5 3 3 3 1.9-2.7 2.5-5c.8-3 1.5-5.8.5-8-1-2.2-4-2.5-6-1Z"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M18 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-4.5 8a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.5 7 5-16L17 12h4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 7-14 16-14 0 9-5 16-14 16-1 0-2-.7-2-2Z"/><path d="M9 15c2-3 5-5 8-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9C1.5 7.5 3.5 4.5 7 4.5c2 0 3.3 1.2 5 3 1.7-1.8 3-3 5-3 3.5 0 5.5 3 4 6.5-2 4.6-9 9-9 9Z"/></symbol>
+  <symbol id="i-ambulance" viewBox="0 0 24 24"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M7 9v3M5.5 10.5h3"/></symbol>
+</svg>
+
+
+<!-- HEADER -->
+<header class="site-header scrolled" id="siteHeader">
+  <div class="wrap hdr-inner">
+    <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+    <nav class="nav">
+      <a href="DrMuscat.html#categories" data-en="Find care" data-ar="اكتشف الرعاية">Find care</a>
+      <a href="DrMuscat.html#providers" data-en="Providers" data-ar="المزوّدون">Providers</a>
+      <a href="DrMuscat.html#areas" data-en="Areas" data-ar="المناطق">Areas</a>
+      <a href="DrMuscat.html#wellness" data-en="Wellness" data-ar="العافية">Wellness</a>
+      <a href="DrMuscat.html#trust" data-en="Why trust us" data-ar="لماذا نحن">Why trust us</a>
+    </nav>
+    <div class="hdr-cta">
+      <button class="lang" aria-label="Switch language"><svg class="ic"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+      <a class="btn sm" href="list-your-center.html" data-en="List your center" data-ar="سجّل مركزك">List your center</a>
+      <button class="iconbtn hamb" data-menu-open aria-label="Open menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="m-menu" id="mMenu" aria-hidden="true">
+  <div class="m-top">
+    <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+    <button class="iconbtn" data-menu-close aria-label="Close menu"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <nav>
+    <a href="DrMuscat.html#categories" data-en="Find care" data-ar="اكتشف الرعاية">Find care</a>
+      <a href="DrMuscat.html#providers" data-en="Providers" data-ar="المزوّدون">Providers</a>
+      <a href="DrMuscat.html#areas" data-en="Areas" data-ar="المناطق">Areas</a>
+      <a href="DrMuscat.html#wellness" data-en="Wellness" data-ar="العافية">Wellness</a>
+      <a href="DrMuscat.html#trust" data-en="Why trust us" data-ar="لماذا نحن">Why trust us</a>
+  </nav>
+  <div class="m-foot">
+    <button class="lang" style="width:fit-content" aria-label="Switch language"><svg class="ic"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+    <a class="btn block" href="list-your-center.html" data-en="List your center" data-ar="سجّل مركزك">List your center</a>
+  </div>
+</div>
+<main class="page-top">
+  <section class="sec" style="padding-top:24px">
+    <div class="wrap">
+      <div class="crumbs reveal"><a href="DrMuscat.html" data-en="Home" data-ar="الرئيسية">Home</a><svg class="ic flip"><use href="#i-chev-r"/></svg><a href="providers.html" data-en="Providers" data-ar="المزوّدون">Providers</a><svg class="ic flip"><use href="#i-chev-r"/></svg><span data-en="Muscat Skin Clinic" data-ar="عيادة مسقط للجلدية">Muscat Skin Clinic</span></div>
+      <div class="profile-hero reveal" style="margin-top:20px">
+        <div>
+          <div class="media profile-cover provider"><div class="imgfill"></div><span class="wm"><svg class="ic"><use href="#i-sparkle"/></svg></span></div>
+          <div class="profile-id">
+            <span class="pid-logo">M</span>
+            <div style="padding-top:48px">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><h1 class="h2" data-en="Muscat Skin Clinic" data-ar="عيادة مسقط للجلدية">Muscat Skin Clinic</h1><span class="badge"><svg class="ic sm"><use href="#i-shield"/></svg> <span data-en="Verified" data-ar="موثوق">Verified</span></span></div>
+              <div class="meta" style="margin-top:8px;color:var(--ink-2)"><svg class="ic"><use href="#i-pin"/></svg> <span data-en="Dermatology · Qurum, Muscat" data-ar="جلدية · القرم، مسقط">Dermatology · Qurum, Muscat</span></div>
+            </div>
+          </div>
+          <p class="lead" style="margin-top:24px" data-en="A premium dermatology and laser clinic in Qurum offering skin, cosmetic and laser treatments. Profile information is provided by the center and reviewed for clarity." data-ar="عيادة جلدية وليزر مميّزة في القرم تقدّم علاجات البشرة والتجميل والليزر. معلومات الملف مقدّمة من المركز وتُراجع للتوضيح.">A premium dermatology and laser clinic in Qurum offering skin, cosmetic and laser treatments. Profile information is provided by the center and reviewed for clarity.</p>
+          <div style="margin-top:30px"><h3 class="h3" data-en="Services" data-ar="الخدمات">Services</h3>
+            <div class="svc-list" style="margin-top:14px">
+              <span class="svc" data-en="Skin consultation" data-ar="استشارة جلدية">Skin consultation</span><span class="svc" data-en="Laser treatment" data-ar="علاج بالليزر">Laser treatment</span><span class="svc" data-en="Cosmetic dermatology" data-ar="جلدية تجميلية">Cosmetic dermatology</span><span class="svc" data-en="Acne care" data-ar="علاج حب الشباب">Acne care</span><span class="svc" data-en="Pigmentation" data-ar="التصبّغات">Pigmentation</span>
+            </div>
+          </div>
+          <div style="margin-top:30px"><h3 class="h3" data-en="Photos" data-ar="الصور">Photos</h3>
+            <div class="gallery" style="margin-top:14px">
+              <div class="media provider"><div class="imgfill"></div></div>
+              <div class="media wellness"><div class="imgfill"></div></div>
+              <div class="media beauty"><div class="imgfill"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:30px"><h3 class="h3" data-en="Similar providers" data-ar="مزوّدون مشابهون">Similar providers</h3>
+            <div class="results-grid stagger" style="margin-top:14px">
+              <article class="provider">
+  <div class="media pv-media provider"><div class="imgfill"></div><span class="wm"><svg class="ic"><use href="#i-tooth"/></svg></span><span class="badge"><svg class="ic sm"><use href="#i-shield"/></svg> <span data-en="Verified" data-ar="موثوق">Verified</span></span><span class="pv-logo">A</span></div>
+  <div class="pv-body with-logo">
+    <h3 class="h3">Al Khuwair Dental Center</h3>
+    <div class="meta"><svg class="ic"><use href="#i-pin"/></svg><span data-en="Dental · Al Khuwair" data-ar="أسنان · الخوير">Dental · Al Khuwair</span></div>
+    <div class="trust-line"><svg class="ic"><use href="#i-tag"/></svg> <span data-en="Patient offer available" data-ar="عرض للمرضى متاح">Patient offer available</span></div>
+    <div class="tags"><span class="tag" data-en="Ortho" data-ar="تقويم">Ortho</span><span class="tag" data-en="Implants" data-ar="زراعة">Implants</span><span class="tag" data-en="Whitening" data-ar="تبييض">Whitening</span></div>
+    <div class="pv-actions">
+      <a class="pv-cta" href="provider.html"><svg class="ic"><use href="#i-eye"/></svg><span data-en="View profile" data-ar="عرض الملف">View profile</span></a>
+      <button class="pv-util" aria-label="WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></button>
+      <button class="pv-util" aria-label="Call"><svg class="ic"><use href="#i-phone"/></svg></button>
+      <button class="pv-util" aria-label="Directions"><svg class="ic"><use href="#i-pin"/></svg></button>
+    </div>
+  </div>
+</article>
+<article class="provider">
+  <div class="media pv-media provider"><div class="imgfill"></div><span class="wm"><svg class="ic"><use href="#i-stetho"/></svg></span><span class="badge"><svg class="ic sm"><use href="#i-shield"/></svg> <span data-en="Verified" data-ar="موثوق">Verified</span></span><span class="pv-logo">Q</span></div>
+  <div class="pv-body with-logo">
+    <h3 class="h3">Qurum Family Clinic</h3>
+    <div class="meta"><svg class="ic"><use href="#i-pin"/></svg><span data-en="Clinic · Qurum" data-ar="عيادة · القرم">Clinic · Qurum</span></div>
+    <div class="trust-line"><svg class="ic"><use href="#i-shield"/></svg> <span data-en="Verified license info" data-ar="معلومات ترخيص موثّقة">Verified license info</span></div>
+    <div class="tags"><span class="tag" data-en="General" data-ar="عام">General</span><span class="tag" data-en="Pediatrics" data-ar="أطفال">Pediatrics</span><span class="tag" data-en="ENT" data-ar="أنف وأذن">ENT</span></div>
+    <div class="pv-actions">
+      <a class="pv-cta" href="provider.html"><svg class="ic"><use href="#i-eye"/></svg><span data-en="View profile" data-ar="عرض الملف">View profile</span></a>
+      <button class="pv-util" aria-label="WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></button>
+      <button class="pv-util" aria-label="Call"><svg class="ic"><use href="#i-phone"/></svg></button>
+      <button class="pv-util" aria-label="Directions"><svg class="ic"><use href="#i-pin"/></svg></button>
+    </div>
+  </div>
+</article>
+            </div>
+          </div>
+          <p class="sub" style="margin-top:28px;padding:16px 18px;background:var(--pearl);border-radius:14px" data-en="Information shown is for contact and discovery only and is not medical advice. Always confirm details directly with the provider." data-ar="المعلومات المعروضة للتواصل والاكتشاف فقط وليست نصيحة طبية. يُرجى دائماً تأكيد التفاصيل مباشرة مع المزوّد.">Information shown is for contact and discovery only and is not medical advice. Always confirm details directly with the provider.</p>
+        </div>
+        <div>
+          <div class="contact-card">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <a class="btn block" href="#"><svg class="ic"><use href="#i-whatsapp"/></svg> <span data-en="WhatsApp" data-ar="واتساب">WhatsApp</span></a>
+              <a class="btn-2 btn block" href="#"><svg class="ic"><use href="#i-phone"/></svg> <span data-en="Call" data-ar="اتصال">Call</span></a>
+              <a class="btn-2 btn block" href="#"><svg class="ic"><use href="#i-pin"/></svg> <span data-en="Directions" data-ar="الاتجاهات">Directions</span></a>
+            </div>
+            <div style="margin-top:20px">
+              <div class="ccrow"><svg class="ic"><use href="#i-pin"/></svg> <span data-en="Qurum, Muscat" data-ar="القرم، مسقط">Qurum, Muscat</span></div>
+              <div class="ccrow"><svg class="ic"><use href="#i-clock"/></svg> <span data-en="Open · closes 9:00 PM" data-ar="مفتوح · يغلق 9:00 مساءً">Open · closes 9:00 PM</span></div>
+              <div class="ccrow"><svg class="ic"><use href="#i-shield"/></svg> <span data-en="Licensed information on file" data-ar="معلومات الترخيص محفوظة">Licensed information on file</span></div>
+            </div>
+            <div style="margin-top:14px">
+              <p class="micro" style="margin:0 0 6px" data-en="Opening hours" data-ar="ساعات العمل">Opening hours</p>
+              <div class="hours-row"><span class="day" data-en="Sat – Thu" data-ar="السبت – الخميس">Sat – Thu</span><span class="hrs lat">9:00 – 21:00</span></div>
+              <div class="hours-row"><span class="day" data-en="Friday" data-ar="الجمعة">Friday</span><span class="hrs" data-en="Closed" data-ar="مغلق">Closed</span></div>
+            </div>
+            <span class="badge gold" style="margin-top:16px"><svg class="ic sm"><use href="#i-tag"/></svg> <span data-en="Patient offer available" data-ar="عرض للمرضى متاح">Patient offer available</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- ========== FOOTER ========== -->
+<footer class="foot">
+  <div class="wrap sec" style="padding-bottom:48px">
+    <div class="grid" style="grid-template-columns:1.7fr 1fr 1fr 1fr;gap:40px">
+      <div class="stack sm">
+        <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+        <p class="sub" style="color:#aebcb6;max-width:36ch" data-en="A premium healthcare & wellness discovery platform for Muscat and Oman." data-ar="منصّة مميّزة لاكتشاف الرعاية الصحية والعافية في مسقط وعُمان.">A premium healthcare &amp; wellness discovery platform for Muscat and Oman.</p>
+        <button class="lang" style="width:fit-content;background:rgba(255,249,240,.08);border-color:#33433d;color:var(--ivory)" aria-label="Switch language"><svg class="ic" style="stroke:var(--ivory)"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+      </div>
+      <div><p class="h4" data-en="Discover" data-ar="اكتشف">Discover</p><a href="#" data-en="Doctors" data-ar="أطباء">Doctors</a><a href="#" data-en="Clinics" data-ar="عيادات">Clinics</a><a href="#" data-en="Dental" data-ar="أسنان">Dental</a><a href="#" data-en="Labs" data-ar="مختبرات">Labs</a><a href="#" data-en="Pharmacies" data-ar="صيدليات">Pharmacies</a></div>
+      <div><p class="h4" data-en="Areas" data-ar="المناطق">Areas</p><a href="#" data-en="Al Khuwair" data-ar="الخوير">Al Khuwair</a><a href="#" data-en="Qurum" data-ar="القرم">Qurum</a><a href="#" data-en="Seeb" data-ar="السيب">Seeb</a><a href="#" data-en="All Muscat" data-ar="كل مسقط">All Muscat</a></div>
+      <div><p class="h4" data-en="DrMuscat" data-ar="دكتور مسقط">DrMuscat</p><a href="#" data-en="How we verify" data-ar="كيف نتحقق">How we verify</a><a href="#" data-en="For providers" data-ar="لمزوّدي الخدمة">For providers</a><a href="#" data-en="About" data-ar="من نحن">About</a><a href="#" data-en="Medical disclaimer" data-ar="إخلاء طبي">Medical disclaimer</a></div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="app.js"></script>
+</body>
+</html>

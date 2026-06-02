@@ -1,0 +1,241 @@
+/* ============================================================
+   DrMuscat — Premium low-fidelity wireframe system
+   Refined, structured, luxury healthcare. Neutral + emerald.
+   Serif display (Spectral) · grotesk UI (Manrope) · mono labels.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --ink:#1b1a16;
+  --ink-soft:#6c675d;
+  --ink-faint:#9a948a;
+  --paper:#f6f3ec;        /* warm ivory page */
+  --panel:#efeae0;        /* sand panel */
+  --surface:#fffdf9;      /* pearl card */
+  --line:#e6e0d4;         /* hairline */
+  --line-2:#d6cfbf;
+  --accent:#1f5c43;       /* deep Omani emerald */
+  --accent-ink:#143c2d;
+  --accent-wash:#1f5c430d;
+  --accent-2:#a8843e;     /* subtle gold (per-page override) */
+  --shadow:0 1px 2px #1b1a1608, 0 8px 24px -14px #1b1a1620;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Manrope', system-ui, sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+html[dir="rtl"] body, body[dir="rtl"]{
+  font-family:'IBM Plex Sans Arabic','Manrope',sans-serif;
+}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+.sec{padding:72px 0}
+.sec.tight{padding:48px 0}
+.divide{border:none;border-top:1px solid var(--line);margin:0}
+
+/* ---------- type ---------- */
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);font-weight:500}
+.eyebrow.mute{color:var(--ink-faint)}
+.display{font-family:'Spectral',serif;font-weight:400;line-height:1.04;
+  letter-spacing:-.01em;font-size:clamp(38px,4.6vw,62px);margin:0;color:var(--ink)}
+h1,h2,h3,h4{margin:0;font-weight:400}
+.h2{font-family:'Spectral',serif;font-weight:400;font-size:clamp(26px,2.8vw,38px);
+  line-height:1.12;letter-spacing:-.01em}
+.h3{font-family:'Spectral',serif;font-weight:500;font-size:21px;line-height:1.2}
+.h4{font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em}
+.lead{font-size:19px;line-height:1.6;color:var(--ink-soft);max-width:52ch;font-weight:400}
+.sub{color:var(--ink-soft);font-size:15px}
+.micro{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.serif{font-family:'Spectral',serif}
+
+/* ---------- surfaces ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:24px}
+.card.flush{padding:0;overflow:hidden}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+
+/* image / map placeholders — flat, clean, labelled */
+.ph{background:var(--panel);border:1px solid var(--line-2);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;padding:14px;position:relative;
+  background-image:linear-gradient(135deg,#0000 0,#0000 49.5%,var(--line) 49.5%,var(--line) 50.5%,#0000 50.5%);
+}
+.ph.plain{background-image:none}
+.ph.circle{border-radius:50%}
+.ph.dark{background:#26241f;border-color:#3a382f;color:#8b8579;
+  background-image:linear-gradient(135deg,#0000 0,#0000 49.5%,#3a382f 49.5%,#3a382f 50.5%,#0000 50.5%)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:'Manrope',sans-serif;font-weight:600;font-size:15px;cursor:pointer;
+  background:var(--accent);color:#fdfcf8;border:1px solid var(--accent);
+  border-radius:10px;padding:13px 24px;text-decoration:none;letter-spacing:.01em;
+  transition:transform .12s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.on-dark{background:#fdfcf8;color:var(--ink);border-color:#fdfcf8}
+.btn.sm{padding:9px 16px;font-size:13px;border-radius:8px}
+.btn.block{width:100%}
+
+/* small inline actions (Call / WhatsApp / Directions) */
+.act{display:inline-flex;align-items:center;gap:6px;font-family:'Manrope',sans-serif;
+  font-weight:600;font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);
+  background:var(--surface);border-radius:8px;padding:7px 11px;text-decoration:none}
+.act .gl{width:14px;height:14px;border:1.5px solid var(--ink-faint);border-radius:4px}
+
+/* ---------- chips & tags ---------- */
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-2);
+  background:var(--surface);border-radius:999px;padding:8px 16px;font-size:14px;
+  font-weight:500;color:var(--ink-soft);cursor:pointer}
+.chip.on{background:var(--accent);color:#fdfcf8;border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--line);
+  border-radius:6px;padding:4px 8px;background:var(--paper)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ---------- search module ---------- */
+.searchmod{background:var(--surface);border:1px solid var(--line-2);border-radius:16px;
+  box-shadow:0 1px 2px #1b1a1608,0 18px 50px -28px #1b1a1640;padding:10px;
+  display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.searchmod .field{flex:1;min-width:160px;display:flex;flex-direction:column;gap:3px;
+  padding:12px 18px;position:relative}
+.searchmod .field + .field::before{content:"";position:absolute;inset-inline-start:0;top:14px;
+  bottom:14px;width:1px;background:var(--line)}
+.field .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent);font-weight:500}
+.field .val{font-size:16px;color:var(--ink-faint);font-weight:500}
+.searchmod .btn{margin:4px;align-self:stretch;padding-inline:28px}
+
+/* ---------- verified / trust badges ---------- */
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:'Manrope',sans-serif;
+  font-weight:600;font-size:12px;color:var(--accent);background:var(--accent-wash);
+  border:1px solid #1f5c4333;border-radius:999px;padding:4px 11px}
+.badge .tick{width:13px;height:13px;border-radius:50%;background:var(--accent);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:8px;line-height:1}
+
+/* ---------- layout helpers ---------- */
+.grid{display:grid;gap:20px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack.sm{gap:10px}
+.row{display:flex;align-items:center;gap:14px}
+.row.wrap{flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.center{text-align:center}
+.mt0{margin-top:0}
+
+/* ---------- category tile ---------- */
+.tile{display:flex;flex-direction:column;gap:14px;align-items:flex-start;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
+.tile:hover{border-color:var(--accent)}
+.tile .ic{width:42px;height:42px;border:1px solid var(--line-2);border-radius:10px;
+  background:var(--paper);display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-faint)}
+.tile .nm{font-family:'Manrope',sans-serif;font-weight:600;font-size:15.5px}
+.tile .ct{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint)}
+
+/* ---------- provider card ---------- */
+.prov{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.prov .cover{height:124px}
+.prov .body{padding:18px;display:flex;flex-direction:column;gap:12px;flex:1}
+.prov .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.prov .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+
+/* ---------- area cards ---------- */
+.area{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--line);border-radius:11px;
+  padding:14px 16px;cursor:pointer;transition:border-color .15s}
+.area:hover{border-color:var(--accent)}
+.area .nm{font-weight:600;font-size:15px}
+.area .ct{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint)}
+
+/* ---------- bands ---------- */
+.band{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band.ink{background:#1b1a16;color:#efeae0;border-color:#1b1a16}
+.band.ink .sub,.band.ink .micro{color:#9a948a}
+.band.ink .display,.band.ink .h2{color:#fdfcf8}
+
+/* ---------- header / nav ---------- */
+.nav{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:22px 0}
+.logo{display:flex;align-items:center;gap:11px;font-family:'Spectral',serif;font-size:23px;
+  font-weight:500;letter-spacing:-.01em}
+.logo .mark{width:32px;height:32px;border-radius:9px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+  font-family:'Manrope';font-size:15px}
+.navlinks{display:flex;gap:28px;align-items:center}
+.navlinks a{color:var(--ink-soft);text-decoration:none;font-size:14.5px;font-weight:500}
+.navlinks a:hover{color:var(--ink)}
+.lang{font-family:'IBM Plex Mono',monospace;font-size:12px;border:1px solid var(--line-2);
+  border-radius:8px;padding:6px 11px;color:var(--ink-soft)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+
+/* ---------- footer ---------- */
+.foot{background:#1b1a16;color:#b8b2a6}
+.foot a{color:#b8b2a6;text-decoration:none;display:block;margin:9px 0;font-size:14px}
+.foot a:hover{color:#fdfcf8}
+.foot .h4{color:#efeae0;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;margin:0 0 6px;font-weight:500}
+.foot .mark{width:30px;height:30px}
+
+/* ---------- subtle annotation ---------- */
+.note{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.5;
+  letter-spacing:.02em;color:var(--accent);border-inline-start:2px solid var(--accent);
+  padding-inline-start:12px;margin:0;max-width:64ch}
+.note.mute{color:var(--ink-faint);border-color:var(--line-2)}
+body.hide-notes .note{display:none}
+
+/* ---------- direction intro strip ---------- */
+.intro{background:#1b1a16;color:#efeae0}
+.intro .display{color:#fdfcf8}
+.intro .keyrow{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#3a382f;
+  border:1px solid #3a382f;border-radius:12px;overflow:hidden;margin-top:28px}
+.intro .key{background:#1b1a16;padding:18px 20px}
+.intro .key .micro{color:#8b8579}
+.intro .key p{margin:6px 0 0;font-size:13.5px;color:#cfc9bb;line-height:1.45}
+
+/* ---------- device frame (mobile) ---------- */
+.devices{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.device{width:380px;flex:none;border:11px solid #1b1a16;border-radius:46px;background:#1b1a16;
+  box-shadow:0 40px 80px -30px #1b1a1666;overflow:hidden}
+.device .screen{height:760px;overflow-y:auto;background:var(--paper);border-radius:35px;
+  position:relative;scrollbar-width:none}
+.device .screen::-webkit-scrollbar{display:none}
+.device .statusbar{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 26px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink)}
+.device .statusbar .dots{display:flex;gap:4px}
+.device .statusbar .dots i{width:5px;height:5px;border-radius:50%;background:var(--ink);display:block}
+.devlabel{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:16px}
+.mp{padding:0 18px}  /* mobile gutter */
+
+/* ---------- responsive ---------- */
+@media(max-width:1000px){
+  .intro .keyrow{grid-template-columns:repeat(2,1fr)}
+  .g6{grid-template-columns:repeat(4,1fr)}
+  .g4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .wrap{padding:0 22px}
+  .sec{padding:52px 0}
+  .navlinks{display:none}
+  .g3,.g2{grid-template-columns:1fr}
+  .g6{grid-template-columns:repeat(3,1fr)}
+  .hero-split{grid-template-columns:1fr !important}
+  .intro .keyrow{grid-template-columns:1fr}
+}

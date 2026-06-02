@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-OM" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrMuscat — Design system</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .ds-top{padding:40px 0 56px;background:var(--pearl);border-bottom:1px solid var(--line)}
+  .ds-h{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+  .ds-n{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--gold);
+    border:1px solid var(--line-2);border-radius:8px;padding:4px 9px;background:var(--white)}
+  .ds-swgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .ds-sw{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--line);
+    border-radius:12px;padding:14px}
+  .ds-sw .chip-color{width:46px;height:46px;border-radius:11px;flex:none;border:1px solid rgba(0,0,0,.06)}
+  .ds-sw code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3)}
+  .ds-type{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding:16px 0;
+    border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .ds-type code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-3);text-align:end}
+  .ds-table{width:100%;border-collapse:collapse}
+  .ds-table td,.ds-table th{text-align:start;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  .ds-table th{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+  .ds-table code{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);font-weight:600}
+  @media(max-width:760px){.ds-swgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.ds-swgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- ========== ICON SPRITE ========== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M4 20l1.4-4A8 8 0 1 1 9 18.6L4 20Z"/><path d="M9 9.5c.4 2 2.5 4.1 4.5 4.5.7.1 1.3-.2 1.6-.8l.2-.5-1.8-1-.7.7c-.8-.4-1.6-1.2-2-2l.7-.7-1-1.8-.5.2c-.6.3-.9.9-.7 1.7Z"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 1.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.4 2.5 14.6 0 17M12 3.5c-2.5 2.4-2.5 14.6 0 17"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 16a6 6 0 0 0 6-6"/><circle cx="18" cy="8" r="2"/><path d="M10 16v1a4 4 0 0 0 8 0v-1"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M3 21h18M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/></symbol>
+  <symbol id="i-tooth" viewBox="0 0 24 24"><path d="M12 4c-2-1.5-5-1.2-6 1-1 2.2-.3 5 .5 8 .6 2.3 1 5 2.5 5s1.3-3 3-3 1.5 3 3 3 1.9-2.7 2.5-5c.8-3 1.5-5.8.5-8-1-2.2-4-2.5-6-1Z"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M18 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-4.5 8a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.5 7 5-16L17 12h4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 7-14 16-14 0 9-5 16-14 16-1 0-2-.7-2-2Z"/><path d="M9 15c2-3 5-5 8-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9C1.5 7.5 3.5 4.5 7 4.5c2 0 3.3 1.2 5 3 1.7-1.8 3-3 5-3 3.5 0 5.5 3 4 6.5-2 4.6-9 9-9 9Z"/></symbol>
+  <symbol id="i-ambulance" viewBox="0 0 24 24"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/><path d="M7 9v3M5.5 10.5h3"/></symbol>
+</svg>
+
+
+<main>
+  <header class="ds-top">
+    <div class="wrap">
+      <div class="row between" style="align-items:center">
+        <a class="brand" href="DrMuscat.html"><span class="mark"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg></span> DrMuscat</a>
+        <div class="row" style="gap:12px">
+          <button class="lang" aria-label="Switch language"><svg class="ic"><use href="#i-globe"/></svg> <span class="lang-target">العربية</span></button>
+          <a class="btn sm" href="DrMuscat.html" data-en="View homepage" data-ar="عرض الصفحة الرئيسية">View homepage</a>
+        </div>
+      </div>
+      <span class="eyebrow" style="margin-top:30px;display:inline-flex" data-en="Design system" data-ar="نظام التصميم">Design system</span>
+      <h1 class="display" style="margin-top:12px" data-en="DrMuscat design system" data-ar="نظام تصميم دكتور مسقط">DrMuscat design system</h1>
+      <p class="lead" style="margin-top:14px" data-en="Tokens, components, page templates and rules so future pages stay consistent. Toggle العربية to preview every component in RTL." data-ar="الرموز والمكوّنات وقوالب الصفحات والقواعد لتبقى الصفحات المستقبلية متّسقة. بدّل إلى الإنجليزية لمعاينة كل مكوّن في الاتجاهين.">Tokens, components, page templates and rules so future pages stay consistent. Toggle العربية to preview every component in RTL.</p>
+    </div>
+  </header>
+
+  <section class="sec"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">01</span><h2 class="h2" data-en="Color tokens" data-ar="رموز الألوان">Color tokens</h2></div>
+    <div class="ds-swgrid"><div class="ds-sw"><span class="chip-color" style="background:var(--green)"></span><div><div class="h4">Primary</div><code>--green</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--green-h)"></span><div><div class="h4">Primary hover</div><code>--green-h</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--green-d)"></span><div><div class="h4">Primary deep</div><code>--green-d</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--teal)"></span><div><div class="h4">Teal accent</div><code>--teal</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--pale-teal)"></span><div><div class="h4">Pale teal</div><code>--pale-teal</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--ivory)"></span><div><div class="h4">Background</div><code>--ivory</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--pearl)"></span><div><div class="h4">Surface alt</div><code>--pearl</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--sand)"></span><div><div class="h4">Sand</div><code>--sand</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--white)"></span><div><div class="h4">Surface</div><code>--white</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--gold)"></span><div><div class="h4">Gold accent</div><code>--gold</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--ink)"></span><div><div class="h4">Text primary</div><code>--ink</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--ink-2)"></span><div><div class="h4">Text secondary</div><code>--ink-2</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--ink-3)"></span><div><div class="h4">Muted text</div><code>--ink-3</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--line)"></span><div><div class="h4">Border</div><code>--line</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--line-2)"></span><div><div class="h4">Border strong</div><code>--line-2</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--success)"></span><div><div class="h4">Success / verified</div><code>--success</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--warning)"></span><div><div class="h4">Warning / offer</div><code>--warning</code></div></div><div class="ds-sw"><span class="chip-color" style="background:var(--error)"></span><div><div class="h4">Error</div><code>--error</code></div></div></div>
+  </div></section>
+
+  <section class="sec band"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">02</span><h2 class="h2" data-en="Typography" data-ar="الطباعة">Typography</h2></div>
+    <p class="sub" style="margin:-10px 0 26px;max-width:60ch" data-en="English uses Spectral (serif display) + Manrope (UI). Arabic uses Alexandria for headings (smaller, lighter) + IBM Plex Sans Arabic for body/UI. Toggle العربية to compare." data-ar="تستخدم الإنجليزية خط Spectral للعناوين وManrope للواجهة. وتستخدم العربية خط Alexandria للعناوين (أصغر وأخف) وIBM Plex Sans Arabic للنص والواجهة.">English uses Spectral (serif display) + Manrope (UI). Arabic uses Alexandria for headings (smaller, lighter) + IBM Plex Sans Arabic for body/UI.</p>
+    <div class="stack" style="gap:18px">
+      <div class="ds-type"><span class="display" data-en="Display heading" data-ar="عنوان كبير">Display heading</span><code>.display · EN Spectral 400 clamp(40–64) · AR Alexandria 500 clamp(35–53)</code></div>
+      <div class="ds-type"><span class="h2" data-en="Section heading" data-ar="عنوان قسم">Section heading</span><code>.h2 · EN Spectral · AR Alexandria 500, smaller</code></div>
+      <div class="ds-type"><span class="h3" data-en="Card heading" data-ar="عنوان بطاقة">Card heading</span><code>.h3</code></div>
+      <div class="ds-type"><span class="lead" data-en="Lead paragraph for intros and hero subtitles." data-ar="فقرة استهلالية للمقدمات والعناوين الفرعية.">Lead paragraph for intros and hero subtitles.</span><code>.lead · AR line-height 1.9</code></div>
+      <div class="ds-type"><span class="sub" data-en="Body / secondary text used across cards and descriptions." data-ar="نص أساسي / ثانوي يُستخدم في البطاقات والأوصاف.">Body / secondary text used across cards and descriptions.</span><code>.sub</code></div>
+      <div class="ds-type"><span class="eyebrow">Eyebrow label</span><code>.eyebrow · gold rule</code></div>
+      <div class="ds-type"><span class="micro" data-en="Micro label · uppercase" data-ar="تسمية صغيرة">Micro label · uppercase</span><code>.micro</code></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">03</span><h2 class="h2" data-en="Spacing · radius · shadow" data-ar="المسافات والزوايا والظلال">Spacing · radius · shadow</h2></div>
+    <div class="grid g3" style="align-items:start;gap:40px">
+      <div><h4 class="h4" style="margin-bottom:16px" data-en="Spacing scale" data-ar="مقياس المسافات">Spacing scale</h4><div class="stack" style="gap:10px"><div class="row" style="gap:14px"><code style="width:80px">--s-2</code><span style="height:18px;width:var(--s-2);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">8px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-4</code><span style="height:18px;width:var(--s-4);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">16px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-6</code><span style="height:18px;width:var(--s-6);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">24px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-8</code><span style="height:18px;width:var(--s-8);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">32px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-12</code><span style="height:18px;width:var(--s-12);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">48px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-16</code><span style="height:18px;width:var(--s-16);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">64px</span></div><div class="row" style="gap:14px"><code style="width:80px">--s-22</code><span style="height:18px;width:var(--s-22);background:var(--teal);border-radius:4px;display:block"></span><span class="sub">88px</span></div></div></div>
+      <div><h4 class="h4" style="margin-bottom:16px" data-en="Radius" data-ar="الزوايا">Radius</h4><div class="grid" style="grid-template-columns:1fr 1fr;gap:14px"><div style="text-align:center"><div style="height:74px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:8px">sm 10</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:8px">md 14</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:8px">lg 20</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:8px">xl 28</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-pill);box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:8px">pill</code></div></div></div>
+      <div><h4 class="h4" style="margin-bottom:16px" data-en="Shadow" data-ar="الظلال">Shadow</h4><div class="grid" style="grid-template-columns:1fr 1fr;gap:20px"><div style="text-align:center"><div style="height:74px;background:var(--white);border-radius:14px;box-shadow:var(--sh-1)"></div><code style="display:block;margin-top:10px">Card</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border-radius:14px;box-shadow:var(--sh-2)"></div><code style="display:block;margin-top:10px">Hover</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border-radius:14px;box-shadow:var(--sh-3)"></div><code style="display:block;margin-top:10px">Dropdown / sheet</code></div><div style="text-align:center"><div style="height:74px;background:var(--white);border-radius:14px;box-shadow:var(--glow)"></div><code style="display:block;margin-top:10px">Focus ring</code></div></div></div>
+    </div>
+  </div></section>
+
+  <section class="sec band"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">04</span><h2 class="h2" data-en="Motion tokens" data-ar="رموز الحركة">Motion tokens</h2></div>
+    <table class="ds-table"><tr><td><code>--t-btn</code></td><td><strong>170ms</strong></td><td class="sub">Button hover/press</td></tr><tr><td><code>--t-card</code></td><td><strong>280ms</strong></td><td class="sub">Card hover</td></tr><tr><td><code>--t-drop</code></td><td><strong>220ms</strong></td><td class="sub">Dropdown</td></tr><tr><td><code>--t-menu</code></td><td><strong>360ms</strong></td><td class="sub">Menu / sheet</td></tr><tr><td><code>--t-reveal</code></td><td><strong>520ms</strong></td><td class="sub">Section reveal</td></tr><tr><td><code>--e-premium</code></td><td><strong>cubic-bezier(.22,1,.36,1)</strong></td><td class="sub">Premium easing</td></tr><tr><td><code>--e-surface</code></td><td><strong>cubic-bezier(.16,1,.3,1)</strong></td><td class="sub">Large surfaces</td></tr></table>
+    <p class="sub" style="margin-top:16px" data-en="All motion respects prefers-reduced-motion: transforms are disabled and reveals show instantly." data-ar="تحترم كل الحركات إعداد تقليل الحركة: تُعطّل التحوّلات وتظهر العناصر فوراً.">All motion respects prefers-reduced-motion: transforms are disabled and reveals show instantly.</p>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">05</span><h2 class="h2" data-en="Buttons & states" data-ar="الأزرار والحالات">Buttons &amp; states</h2></div>
+    <div class="row wrap" style="gap:14px;align-items:center">
+      <button class="btn"><svg class="ic"><use href="#i-search"/></svg> <span data-en="Primary" data-ar="أساسي">Primary</span></button>
+      <button class="btn-2 btn" data-en="Secondary" data-ar="ثانوي">Secondary</button>
+      <button class="btn" disabled style="opacity:.5;cursor:default" data-en="Disabled" data-ar="معطّل">Disabled</button>
+      <button class="iconbtn" aria-label="icon"><svg class="ic"><use href="#i-whatsapp"/></svg></button>
+      <span class="badge"><svg class="ic sm"><use href="#i-shield"/></svg> <span data-en="Verified" data-ar="موثوق">Verified</span></span>
+      <span class="badge gold"><svg class="ic sm"><use href="#i-check"/></svg> <span data-en="Claimed" data-ar="موثّق">Claimed</span></span>
+    </div>
+    <div class="chips" data-chipgroup data-single style="margin-top:22px">
+      <button class="chip is-selected" data-en="Selected chip" data-ar="رقاقة مختارة">Selected chip</button>
+      <button class="chip" data-en="Default chip" data-ar="رقاقة">Default chip</button>
+      <button class="chip" data-en="Hover me" data-ar="مرّر هنا">Hover me</button>
+    </div>
+    <p class="sub" style="margin-top:14px" data-en="States defined for every control: default, hover, active, focus-visible, disabled, loading." data-ar="حالات معرّفة لكل عنصر: افتراضي، تمرير، نشط، تركيز، معطّل، تحميل.">States defined for every control: default, hover, active, focus-visible, disabled, loading.</p>
+  </div></section>
+
+  <section class="sec band"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">06</span><h2 class="h2" data-en="Cards" data-ar="البطاقات">Cards</h2></div>
+    <div class="grid g3 stagger">
+      <article class="provider">
+        <div class="media pv-media beauty"><div class="imgfill"></div><span class="wm"><svg class="ic"><use href="#i-sparkle"/></svg></span><span class="badge"><svg class="ic sm"><use href="#i-shield"/></svg> <span data-en="Verified" data-ar="موثوق">Verified</span></span><span class="pv-logo">M</span></div>
+        <div class="pv-body with-logo"><h3 class="h3">Muscat Skin Clinic</h3><div class="meta"><svg class="ic"><use href="#i-pin"/></svg><span data-en="Dermatology · Qurum" data-ar="جلدية · القرم">Dermatology · Qurum</span></div><div class="trust-line wa"><svg class="ic"><use href="#i-whatsapp"/></svg> <span data-en="Responds on WhatsApp" data-ar="يرد عبر واتساب">Responds on WhatsApp</span></div><div class="tags"><span class="tag">Skin</span><span class="tag">Laser</span></div><div class="pv-actions"><a class="pv-cta" href="provider.html"><svg class="ic"><use href="#i-eye"/></svg><span data-en="View profile" data-ar="عرض الملف">View profile</span></a><button class="pv-util" aria-label="WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></button><button class="pv-util" aria-label="Call"><svg class="ic"><use href="#i-phone"/></svg></button></div></div>
+      </article>
+      <a class="cat" href="category.html" style="align-self:start"><span class="cat-ic"><svg class="ic"><use href="#i-tooth"/></svg></span><span class="nm" data-en="Category card" data-ar="بطاقة تصنيف">Category card</span><span class="ct" data-en="Ortho · Implants" data-ar="تقويم · زراعة">Ortho · Implants</span></a>
+      <div class="stack" style="gap:14px">
+        <a class="area" href="area.html"><span class="nm"><svg class="ic"><use href="#i-pin"/></svg> <span data-en="Area card" data-ar="بطاقة منطقة">Area card</span></span><span class="ct lat">42</span></a>
+        <div class="qa"><span class="qa-ic"><svg class="ic"><use href="#i-ambulance"/></svg></span><div style="flex:1"><h4 class="h4" data-en="Emergency card" data-ar="بطاقة طوارئ">Emergency card</h4><span class="sub" data-en="Nearest ER" data-ar="أقرب طوارئ">Nearest ER</span></div><button class="btn sm" data-en="Find" data-ar="ابحث">Find</button></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">07</span><h2 class="h2" data-en="Forms & utility states" data-ar="النماذج والحالات">Forms &amp; utility states</h2></div>
+    <div class="grid g2" style="gap:34px;align-items:start">
+      <div class="stack">
+        <div class="field-row"><label data-en="Text input" data-ar="حقل نص">Text input</label><input class="inp" placeholder="Placeholder"></div>
+        <div class="field-row has-error"><label data-en="With error" data-ar="مع خطأ">With error</label><input class="inp" value="Invalid"><span class="field-error" data-en="This field is required." data-ar="هذا الحقل مطلوب.">This field is required.</span></div>
+        <div class="error-notice"><svg class="ic"><use href="#i-shield"/></svg> <span data-en="Error notice — something needs attention." data-ar="تنبيه خطأ — هناك ما يحتاج إلى انتباه.">Error notice — something needs attention.</span></div>
+      </div>
+      <div class="stack">
+        <div><h4 class="h4" style="margin-bottom:10px" data-en="Loading skeleton" data-ar="هيكل التحميل">Loading skeleton</h4>
+          <div class="card"><div class="skeleton" style="height:80px;border-radius:10px"></div><div class="skel-line skeleton w80" style="margin-top:14px"></div><div class="skel-line skeleton w40"></div></div></div>
+        <div class="empty-state" style="padding:30px"><div class="ei"><svg class="ic"><use href="#i-search"/></svg></div><h3 class="h3" data-en="No results yet" data-ar="لا توجد نتائج بعد">No results yet</h3><p class="sub" data-en="Try a different category or area." data-ar="جرّب تصنيفاً أو منطقة مختلفة.">Try a different category or area.</p></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="sec band"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">08</span><h2 class="h2" data-en="Routes & page templates" data-ar="المسارات وقوالب الصفحات">Routes &amp; page templates</h2></div>
+    <p class="sub" style="margin:-10px 0 22px;max-width:64ch" data-en="Locale-first routing: /en/… and /ar/…. In this prototype each route maps to a static file; click to open." data-ar="مسارات تبدأ باللغة: /en/… و /ar/…. في هذا النموذج يقابل كل مسار ملفاً ثابتاً؛ انقر للفتح.">Locale-first routing: /en/… and /ar/…. In this prototype each route maps to a static file; click to open.</p>
+    <table class="ds-table"><tr><th data-en="Route" data-ar="المسار">Route</th><th data-en="Template" data-ar="القالب">Template</th><th data-en="File" data-ar="الملف">File</th></tr><tr><td><code>/en · /ar</code></td><td>Homepage</td><td><a href="DrMuscat.html" style="color:var(--green);font-weight:600">DrMuscat.html</a></td></tr><tr><td><code>/en/providers</code></td><td>Provider listing</td><td><a href="providers.html" style="color:var(--green);font-weight:600">providers.html</a></td></tr><tr><td><code>/en/providers/[slug]</code></td><td>Provider profile</td><td><a href="provider.html" style="color:var(--green);font-weight:600">provider.html</a></td></tr><tr><td><code>/en/categories/[category]</code></td><td>Category landing</td><td><a href="category.html" style="color:var(--green);font-weight:600">category.html</a></td></tr><tr><td><code>/en/areas/[area]</code></td><td>Area landing</td><td><a href="area.html" style="color:var(--green);font-weight:600">area.html</a></td></tr><tr><td><code>/en/articles</code></td><td>Articles listing</td><td><a href="articles.html" style="color:var(--green);font-weight:600">articles.html</a></td></tr><tr><td><code>/en/articles/[slug]</code></td><td>Article detail</td><td><a href="article.html" style="color:var(--green);font-weight:600">article.html</a></td></tr><tr><td><code>/en/list-your-center</code></td><td>Claim / lead form</td><td><a href="list-your-center.html" style="color:var(--green);font-weight:600">list-your-center.html</a></td></tr></table>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="ds-h"><span class="ds-n">09</span><h2 class="h2" data-en="RTL & mobile rules" data-ar="قواعد RTL والجوال">RTL &amp; mobile rules</h2></div>
+    <div class="grid g2" style="gap:30px">
+      <div class="panel" style="padding:26px"><h4 class="h4" data-en="Arabic / RTL" data-ar="العربية / RTL">Arabic / RTL</h4><ul class="prose" style="margin-top:10px"><li data-en="dir=rtl flips layout, nav, cards & icons" data-ar="dir=rtl يعكس التخطيط والتنقّل والبطاقات والأيقونات">dir=rtl flips layout, nav, cards & icons</li><li data-en="Arabic headings: Alexandria, smaller & lighter than English" data-ar="عناوين عربية: Alexandria، أصغر وأخف من الإنجليزية">Arabic headings smaller & lighter</li><li data-en="Latin names & numerals stay LTR (.lat)" data-ar="الأسماء اللاتينية والأرقام تبقى LTR">Latin names & numerals stay LTR</li><li data-en="Arabic body line-height ≈ 1.9" data-ar="ارتفاع سطر النص العربي ≈ 1.9">Arabic body line-height ≈ 1.9</li></ul></div>
+      <div class="panel" style="padding:26px"><h4 class="h4" data-en="Mobile" data-ar="الجوال">Mobile</h4><ul class="prose" style="margin-top:10px"><li data-en="No horizontal scroll; search stacks full-width" data-ar="لا تمرير أفقي؛ يتراص البحث بعرض كامل">No horizontal scroll; search stacks</li><li data-en="Filters become a full-screen sheet" data-ar="تتحوّل عوامل التصفية إلى لوحة كاملة">Filters become a full-screen sheet</li><li data-en="Touch targets ≥ 44px" data-ar="أهداف اللمس ≥ 44 بكسل">Touch targets ≥ 44px</li><li data-en="Carousels swipe with snap" data-ar="تنزلق العروض الدوّارة مع محاذاة">Carousels swipe with snap</li></ul></div>
+    </div>
+  </div></section>
+</main>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

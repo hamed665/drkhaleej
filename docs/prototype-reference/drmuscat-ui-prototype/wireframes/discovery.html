@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrMuscat — Direction 2: Oman Medical Discovery</title>
+<link rel="stylesheet" href="wire.css">
+<style>:root{--accent:#1f5c43;--accent-2:#3f7d77}</style>
+</head>
+<body>
+
+<!-- ============ INTRO ============ -->
+<section class="intro">
+  <div class="wrap sec">
+    <p class="eyebrow" style="color:var(--accent-2)">Direction 02 — wireframe</p>
+    <h1 class="display" style="max-width:18ch;margin-top:14px">Oman Medical Discovery</h1>
+    <p class="lead" style="color:#cfc9bb;margin-top:16px">Discovery is the spine. Search opens the page, but the experience is built around exploring Muscat by category and area — a map-anchored, Oman-first way to understand where trusted care actually is.</p>
+    <div class="keyrow">
+      <div class="key"><p class="micro">Focus</p><p>Muscat areas + category discovery, map-inspired layout, strong local identity.</p></div>
+      <div class="key"><p class="micro">How search works</p><p>Centered search over a soft map panel, then deep category &amp; area browse below.</p></div>
+      <div class="key"><p class="micro">How trust shows</p><p>Verified badges on cards + a centered "how we verify" panel; real area counts only.</p></div>
+      <div class="key"><p class="micro">Arabic RTL</p><p>Map sits right, area list left; chips &amp; cards flow right→left, numerals stay LTR.</p></div>
+    </div>
+  </div>
+</section>
+
+<p class="devlabel" style="margin:28px 0 -8px">Desktop</p>
+
+<!-- ============ DESKTOP ============ -->
+<div class="wrap">
+  <header class="nav">
+    <div class="logo"><span class="mark">د</span> DrMuscat</div>
+    <nav class="navlinks"><a href="#">Discover</a><a href="#">Categories</a><a href="#">Map</a><a href="#">Wellness</a><a href="#">For providers</a></nav>
+    <div class="nav-cta"><span class="lang">EN · ع</span><a class="btn sm ghost" href="#">List your center</a></div>
+  </header>
+</div>
+<hr class="divide">
+
+<!-- HERO: centered search over map panel -->
+<section class="sec">
+  <div class="wrap">
+    <div class="center stack" style="align-items:center;gap:18px;max-width:760px;margin:0 auto">
+      <span class="eyebrow">Healthcare discovery · Oman</span>
+      <h2 class="display" style="max-width:16ch">Discover trusted care, anywhere in Muscat.</h2>
+      <p class="lead center" style="margin:0 auto">Search doctors, clinics, pharmacies, labs, dental &amp; laser centers, physiotherapy and wellness — by specialty, service, name or area.</p>
+    </div>
+    <div class="card flush" style="margin-top:32px;position:relative">
+      <div class="ph plain" style="height:360px;border:none;border-radius:0">soft Muscat map — coastline · area pins</div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px">
+        <div style="width:min(720px,100%)">
+          <div class="searchmod">
+            <div class="field"><span class="lbl">What</span><span class="val">Specialty, service or name…</span></div>
+            <div class="field"><span class="lbl">Where</span><span class="val">Area in Muscat</span></div>
+            <a class="btn" href="#">Search</a>
+          </div>
+          <div class="chips" style="margin-top:14px;justify-content:center">
+            <span class="chip on">Dentist</span><span class="chip">Dermatologist</span><span class="chip">Pharmacy</span><span class="chip">Lab</span><span class="chip">Laser Clinic</span><span class="chip">Physiotherapy</span><span class="chip">Wellness</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:18px">Search floats on a calm map panel — signalling "discovery" from the first screen. The backdrop is subtle, never a busy stock photo.</p>
+  </div>
+</section>
+
+<hr class="divide">
+
+<!-- CATEGORY DISCOVERY (dominant) -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">Start here</span><h3 class="h2" style="margin-top:8px">Explore by category</h3></div><a class="micro" href="#">All categories →</a></div>
+    <div class="grid g4" style="margin-top:28px">
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Doctors &amp; clinics</span><br><span class="micro">General · Specialists</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Dental centers</span><br><span class="micro">Ortho · Implants</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Labs &amp; imaging</span><br><span class="micro">Blood · Scans</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Pharmacies</span><br><span class="micro">24h · Delivery</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Dermatology &amp; laser</span><br><span class="micro">Skin · Aesthetics</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Physiotherapy</span><br><span class="micro">Rehab · Sports</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Beauty &amp; wellness</span><br><span class="micro">Spa · Recovery</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Gyms &amp; nutrition</span><br><span class="micro">Studios · Diet</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP + AREA -->
+<section class="sec band">
+  <div class="wrap sec tight">
+    <div class="grid" style="grid-template-columns:1.5fr 1fr;gap:32px;align-items:stretch">
+      <div class="card flush"><div class="ph plain" style="height:420px;border:none;border-radius:0">interactive Muscat map — pins clustered by area</div></div>
+      <div class="stack">
+        <span class="eyebrow">Browse by area</span>
+        <h3 class="h2 mt0">Find care near you in Muscat</h3>
+        <div class="grid g2" style="gap:10px">
+          <div class="area"><span class="nm">Al Khuwair</span><span class="ct">42</span></div>
+          <div class="area"><span class="nm">Qurum</span><span class="ct">28</span></div>
+          <div class="area"><span class="nm">Azaiba</span><span class="ct">19</span></div>
+          <div class="area"><span class="nm">Seeb</span><span class="ct">23</span></div>
+          <div class="area"><span class="nm">Bausher</span><span class="ct">14</span></div>
+          <div class="area"><span class="nm">Ghubra</span><span class="ct">16</span></div>
+          <div class="area"><span class="nm">Muttrah</span><span class="ct">11</span></div>
+          <div class="area"><span class="nm">Ruwi</span><span class="ct">17</span></div>
+        </div>
+        <a class="btn ghost" href="#" style="width:fit-content">Open full map</a>
+        <p class="note mute">Map motif = the Oman-first signature of this direction. Pins + an area index, real counts only.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">Curated</span><h3 class="h2" style="margin-top:8px">Verified providers</h3></div><div class="row" style="gap:8px"><a class="act" href="#">‹</a><a class="act" href="#">›</a></div></div>
+    <div class="grid g4" style="margin-top:28px">
+      <article class="prov"><div class="body" style="gap:14px"><div class="ph circle plain" style="width:56px;height:56px">logo</div><div><span class="h3">[ Provider ]</span><br><span class="micro">Clinic · Qurum</span></div><div class="tags"><span class="tag">General</span><span class="tag">Pediatrics</span></div><span class="badge"><span class="tick">✓</span> Verified</span><div class="actions"><a class="act" href="#">Call</a><a class="act" href="#">Directions</a></div></div></article>
+      <article class="prov"><div class="body" style="gap:14px"><div class="ph circle plain" style="width:56px;height:56px">logo</div><div><span class="h3">[ Provider ]</span><br><span class="micro">Dental · Seeb</span></div><div class="tags"><span class="tag">Ortho</span><span class="tag">Implants</span></div><span class="badge"><span class="tick">✓</span> Verified</span><div class="actions"><a class="act" href="#">Call</a><a class="act" href="#">Directions</a></div></div></article>
+      <article class="prov"><div class="body" style="gap:14px"><div class="ph circle plain" style="width:56px;height:56px">logo</div><div><span class="h3">[ Provider ]</span><br><span class="micro">Lab · Azaiba</span></div><div class="tags"><span class="tag">Blood</span><span class="tag">Home visit</span></div><span class="badge"><span class="tick">✓</span> Claimed</span><div class="actions"><a class="act" href="#">Call</a><a class="act" href="#">Directions</a></div></div></article>
+      <article class="prov"><div class="body" style="gap:14px"><div class="ph circle plain" style="width:56px;height:56px">logo</div><div><span class="h3">[ Provider ]</span><br><span class="micro">Pharmacy · Ruwi</span></div><div class="tags"><span class="tag">24h</span><span class="tag">Delivery</span></div><span class="badge"><span class="tick">✓</span> Verified</span><div class="actions"><a class="act" href="#">Call</a><a class="act" href="#">Directions</a></div></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST (centered) -->
+<section class="sec">
+  <div class="wrap">
+    <div class="card center stack" style="align-items:center;max-width:760px;margin:0 auto;padding:48px">
+      <span class="eyebrow">Credibility</span>
+      <h3 class="h2" style="max-width:22ch">Every provider is verified before it appears</h3>
+      <p class="lead center" style="margin:0 auto">A clear editorial explainer — licensing checks, what "verified" and "claimed" mean, and how we keep details accurate. No ratings, no reviews, no invented numbers.</p>
+      <div class="row wrap" style="gap:10px;justify-content:center"><span class="badge"><span class="tick">✓</span> MOH-licensing cues</span><span class="badge"><span class="tick">✓</span> Verified info</span><span class="badge"><span class="tick">✓</span> Human review</span></div>
+      <div class="row wrap" style="gap:14px;justify-content:center"><a class="btn ghost sm" href="#">How we verify</a><a class="micro" href="#" style="text-decoration:underline">Medical disclaimer →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- EMERGENCY -->
+<section class="sec band">
+  <div class="wrap sec tight">
+    <div class="between"><div><span class="eyebrow">Quick access</span><h3 class="h2" style="margin-top:8px">Emergency &amp; pharmacy</h3></div><span class="micro mute">Contact &amp; directions — not medical advice</span></div>
+    <div class="grid g3" style="margin-top:24px">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><span class="h4">Emergency</span><br><span class="micro">Nearest ER</span></div><a class="btn sm" href="#">Find</a></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><span class="h4">24h pharmacy</span><br><span class="micro">Open now</span></div><a class="btn sm" href="#">Find</a></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><span class="h4">Urgent lab</span><br><span class="micro">Same-day</span></div><a class="btn sm" href="#">Find</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- WELLNESS -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">Lifestyle</span><h3 class="h2" style="margin-top:8px">Wellness &amp; lifestyle</h3></div><a class="micro" href="#">Explore →</a></div>
+    <div class="grid g4" style="margin-top:28px">
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Gyms</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Healthy food</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Spa &amp; recovery</span></div></div>
+      <div class="card flush"><div class="ph cover">photo</div><div style="padding:16px"><span class="h4">Nutrition</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLES -->
+<section class="sec">
+  <div class="wrap">
+    <div class="between"><div><span class="eyebrow">Read</span><h3 class="h2" style="margin-top:8px">Health articles &amp; guides</h3></div><span class="micro mute">SEO content</span></div>
+    <div class="grid g3" style="margin-top:28px">
+      <div class="card flush"><div class="ph cover">cover</div><div style="padding:18px"><span class="micro">Guide</span><div class="h3" style="margin-top:8px">[ Article headline ]</div></div></div>
+      <div class="card flush"><div class="ph cover">cover</div><div style="padding:18px"><span class="micro">Guide</span><div class="h3" style="margin-top:8px">[ Article headline ]</div></div></div>
+      <div class="card flush"><div class="ph cover">cover</div><div style="padding:18px"><span class="micro">Guide</span><div class="h3" style="margin-top:8px">[ Article headline ]</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec">
+  <div class="wrap">
+    <div class="band ink" style="border-radius:18px;padding:52px 48px;display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap">
+      <div class="stack sm" style="max-width:46ch">
+        <span class="eyebrow" style="color:var(--accent-2)">For providers</span>
+        <h3 class="display" style="font-size:clamp(28px,3vw,40px)">Grow your healthcare presence in Oman.</h3>
+        <p class="sub" style="color:#cfc9bb">Claim your profile, showcase your services, receive patient inquiries, and build trusted visibility across Muscat.</p>
+      </div>
+      <div class="row wrap" style="gap:12px"><a class="btn on-dark" href="#">Claim your profile</a><a class="btn ghost" href="#" style="color:#efeae0;border-color:#4a463d">List your center</a></div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap sec">
+    <div class="grid" style="grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px">
+      <div class="stack sm">
+        <div class="logo" style="color:#efeae0"><span class="mark">د</span> DrMuscat</div>
+        <p class="sub" style="color:#9a948a;max-width:34ch">A premium healthcare &amp; wellness discovery platform for Muscat and Oman.</p>
+        <span class="lang" style="color:#b8b2a6;border-color:#3a382f;width:fit-content">EN · ع</span>
+      </div>
+      <div><p class="h4">Discover</p><a href="#">Categories</a><a href="#">Map</a><a href="#">Verified</a><a href="#">Wellness</a></div>
+      <div><p class="h4">Areas</p><a href="#">Al Khuwair</a><a href="#">Qurum</a><a href="#">Seeb</a><a href="#">All Muscat</a></div>
+      <div><p class="h4">DrMuscat</p><a href="#">How we verify</a><a href="#">For providers</a><a href="#">About</a><a href="#">Medical disclaimer</a></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MOBILE ============ -->
+<hr class="divide">
+<p class="devlabel" style="margin-top:40px">Mobile — discovery-first</p>
+<section class="sec tight">
+  <div class="devices">
+    <div>
+      <div class="device">
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="mp" style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;padding-bottom:14px">
+            <div class="logo" style="font-size:19px"><span class="mark" style="width:26px;height:26px;font-size:12px">د</span> DrMuscat</div>
+            <div class="ph plain" style="width:34px;height:34px;border-radius:8px">≡</div>
+          </div>
+          <div class="mp stack">
+            <h2 class="display" style="font-size:29px">Discover trusted care in Muscat.</h2>
+            <div class="searchmod" style="flex-direction:column;padding:8px">
+              <div class="field" style="width:100%"><span class="lbl">What</span><span class="val">Specialty, service, name…</span></div>
+              <div class="field" style="width:100%"><span class="lbl">Where</span><span class="val">Area in Muscat</span></div>
+              <a class="btn block" href="#" style="margin:4px 0 0">Search</a>
+            </div>
+            <div class="ph plain" style="height:150px">soft Muscat map · pins</div>
+          </div>
+          <div class="mp" style="margin-top:24px">
+            <span class="eyebrow">Explore by area</span>
+            <div class="grid g2" style="margin-top:14px;gap:10px">
+              <div class="area"><span class="nm">Al Khuwair</span><span class="ct">42</span></div>
+              <div class="area"><span class="nm">Qurum</span><span class="ct">28</span></div>
+              <div class="area"><span class="nm">Seeb</span><span class="ct">23</span></div>
+              <div class="area"><span class="nm">Azaiba</span><span class="ct">19</span></div>
+            </div>
+          </div>
+          <div class="mp" style="margin-top:24px">
+            <span class="eyebrow">By category</span>
+            <div class="grid g2" style="margin-top:14px">
+              <div class="card flush"><div class="ph cover" style="height:80px">photo</div><div style="padding:12px"><span class="h4">Clinics</span></div></div>
+              <div class="card flush"><div class="ph cover" style="height:80px">photo</div><div style="padding:12px"><span class="h4">Labs</span></div></div>
+            </div>
+          </div>
+          <div class="mp" style="margin:24px 0 30px">
+            <div class="band ink" style="border-radius:14px;padding:22px">
+              <span class="eyebrow" style="color:var(--accent-2)">For providers</span>
+              <div class="h3" style="color:#fff;margin:8px 0 14px">Grow your presence in Oman.</div>
+              <a class="btn on-dark block" href="#">List your center</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="devlabel">Home · area &amp; map discovery</p>
+    </div>
+  </div>
+</section>
+
+<div style="height:30px"></div>
+<script src="wire.js"></script>
+</body>
+</html>
