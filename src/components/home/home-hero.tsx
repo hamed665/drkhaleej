@@ -8,6 +8,8 @@ type HomeHeroCopy = {
   findCare: string;
   forClinics: string;
   note: string;
+  actionsLabel: string;
+  highlightsLabel: string;
   chips: readonly string[];
   highlights: readonly string[];
 };
@@ -30,7 +32,7 @@ export function HomeHero({ copy, dir, primaryHref, secondaryHref }: HomeHeroProp
           </h1>
           <p className="home-hero__subtitle">{copy.subtitle}</p>
         </div>
-        <div className="home-hero__actions" aria-label="Primary actions">
+        <div className="home-hero__actions" aria-label={copy.actionsLabel}>
           <Link href={primaryHref} className="ui-button ui-button--primary ui-button--lg home-hero__cta home-hero__cta--primary">
             {copy.findCare}
           </Link>
@@ -41,7 +43,7 @@ export function HomeHero({ copy, dir, primaryHref, secondaryHref }: HomeHeroProp
             {copy.forClinics}
           </Link>
         </div>
-        <ul className="home-hero__highlights" aria-label="Homepage discovery principles">
+        <ul className="home-hero__highlights" aria-label={copy.highlightsLabel}>
           {copy.highlights.map((highlight) => (
             <li key={highlight}>{highlight}</li>
           ))}
