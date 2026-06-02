@@ -229,21 +229,21 @@ Display-first does **not** mean exposing unreviewed content. It is a presentatio
 
 The UI-K roadmap should be executed as narrow, approved UI phases. Each UI phase must list files before editing and must avoid backend/database/RLS expansion unless separately approved.
 
-| Subphase | Recommended scope | Notes |
+| Subphase | Approved continuation scope | Mode |
 | --- | --- | --- |
-| UI-K-A | Public design system baseline | Tokens, typography, spacing, responsive layout rules, and professional visual direction. No business logic. |
-| UI-K-B | Header, footer, navigation polish | Localized navigation and responsive menus within approved route contract only. |
-| UI-K-C | Homepage display refresh | Use approved public/static content only; no new programmatic SEO exposure. |
-| UI-K-D | Public catalog listing card polish | Improve approved catalog presentation without changing canonical data or rankings. |
-| UI-K-E | Public doctor detail polish | Improve layout, trust cues, and CTA hierarchy without new private data. |
-| UI-K-F | Public center detail polish | Improve responsive details, services, media display, and contact hierarchy within approved data. |
-| UI-K-G | Search and filter UI polish | Display improvements only unless a search/data phase separately approves logic changes. |
-| UI-K-H | Provider onboarding interest UI polish | Improve existing provider interest/lead capture display without admin mutation workflows. |
-| UI-K-I | Contact/callback UI polish | Improve existing forms and validation presentation within approved APIs. |
-| UI-K-J | Arabic/RTL refinement | Validate layout, typography, spacing, and navigation mirroring for Arabic. |
-| UI-K-K | Accessibility and motion safety pass | Keyboard, focus, contrast, reduced motion, and responsive checks. |
-| UI-K-L | Public trust and compliance presentation | Disclaimers, verified-label clarity, and no guaranteed medical outcomes. |
-| UI-K-M | Final public visual QA and performance polish | Core Web Vitals-oriented refinement; no new features. |
+| UI-K-A | Prototype Intake & Full Platform Frontend Roadmap | PLAN ONLY |
+| UI-K-B | Frontend Prototype Intake & Full Platform Roadmap Document | DOCUMENTATION ONLY |
+| UI-K-C | Design System Token Extraction Plan | PLAN ONLY |
+| UI-K-D | Public Frontend Shell Implementation | IMPLEMENTATION |
+| UI-K-E | Homepage Display Implementation | IMPLEMENTATION |
+| UI-K-F | Provider Listing Display Implementation | IMPLEMENTATION |
+| UI-K-G | Provider Profile Display Implementation | IMPLEMENTATION |
+| UI-K-H | List Your Center Display Implementation | IMPLEMENTATION |
+| UI-K-I | Category / Specialty Display Implementation | IMPLEMENTATION |
+| UI-K-J | Area Page Display Implementation | IMPLEMENTATION |
+| UI-K-K | Article Shell Implementation | IMPLEMENTATION |
+| UI-K-L | RTL / Arabic Polish | IMPLEMENTATION |
+| UI-K-M | Responsive / Mobile Polish | IMPLEMENTATION |
 
 ---
 
@@ -542,17 +542,25 @@ The safest immediate execution order is documentation and display-first, with no
 Recommended next order:
 
 1. **DOC-K-A** — Save this master status and roadmap report. Completed by creating this document only.
-2. **UI-K-A** — Public design system baseline, if explicitly approved.
-3. **UI-K-B** — Header/footer/navigation polish, if explicitly approved.
-4. **UI-K-C** — Homepage display refresh using only approved public/static content, if explicitly approved.
-5. **UI-K-J** — Arabic/RTL refinement, if explicitly approved.
-6. **UI-K-K** — Accessibility and motion safety pass, if explicitly approved.
-7. **DATA-K-A** — Public-safe field inventory document, if explicitly approved.
-8. **DATA-K-B** — Public-safe field matrix, if explicitly approved.
-9. **SEO-K-A** — Route/canonical inventory and duplicate-pattern audit, if explicitly approved.
-10. **CMS-K-A / CMS-K-B** — Editorial and medical review requirements, if explicitly approved.
-11. **DATA-K-C / SEO-K-B** — Landing projection design and approval, if explicitly approved.
-12. **Only after approval:** implement projection/view, public helpers, metadata, sitemap, schema, and indexable landing routes in separate narrow phases.
+2. **UI-K-A** — Prototype Intake & Full Platform Frontend Roadmap — PLAN ONLY, if explicitly approved.
+3. **UI-K-B** — Frontend Prototype Intake & Full Platform Roadmap Document — DOCUMENTATION ONLY, if explicitly approved.
+4. **UI-K-C** — Design System Token Extraction Plan — PLAN ONLY, if explicitly approved.
+5. **UI-K-D** — Public Frontend Shell Implementation — IMPLEMENTATION, if explicitly approved.
+6. **UI-K-E** — Homepage Display Implementation — IMPLEMENTATION, if explicitly approved.
+7. **UI-K-F** — Provider Listing Display Implementation — IMPLEMENTATION, if explicitly approved.
+8. **UI-K-G** — Provider Profile Display Implementation — IMPLEMENTATION, if explicitly approved.
+9. **UI-K-H** — List Your Center Display Implementation — IMPLEMENTATION, if explicitly approved.
+10. **UI-K-I** — Category / Specialty Display Implementation — IMPLEMENTATION, if explicitly approved.
+11. **UI-K-J** — Area Page Display Implementation — IMPLEMENTATION, if explicitly approved.
+12. **UI-K-K** — Article Shell Implementation — IMPLEMENTATION, if explicitly approved.
+13. **UI-K-L** — RTL / Arabic Polish — IMPLEMENTATION, if explicitly approved.
+14. **UI-K-M** — Responsive / Mobile Polish — IMPLEMENTATION, if explicitly approved.
+15. **DATA-K-A** — Public-safe field inventory document, if explicitly approved after the UI continuation sequence.
+16. **DATA-K-B** — Public-safe field matrix, if explicitly approved.
+17. **SEO-K-A** — Route/canonical inventory and duplicate-pattern audit, if explicitly approved.
+18. **CMS-K-A / CMS-K-B** — Editorial and medical review requirements, if explicitly approved.
+19. **DATA-K-C / SEO-K-B** — Landing projection design and approval, if explicitly approved.
+20. **Only after approval:** implement projection/view, public helpers, metadata, sitemap, schema, and indexable landing routes in separate narrow phases.
 
 Do not skip directly to business expansion. The next safe product movement is professional public display polish and documentation-backed data/SEO planning, not payment, AI, ads, provider dashboards, or broad CMS implementation.
 
