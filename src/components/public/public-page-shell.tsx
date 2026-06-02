@@ -27,7 +27,7 @@ export function PublicPageShell({
   gridItems
 }: PublicPageShellProps) {
   return (
-    <main className="public-page-shell" dir={dir}>
+    <div className="public-page-shell" dir={dir}>
       <PublicRouteHero badge={heroBadge} title={heroTitle} description={heroDescription} dir={dir} />
       {content ??
         (panelHeading && panelBody && gridTitle && gridItems ? (
@@ -36,6 +36,6 @@ export function PublicPageShell({
             <PublicDiscoveryGrid title={gridTitle} items={gridItems} />
           </>
         ) : null)}
-    </main>
+    </div>
   );
 }

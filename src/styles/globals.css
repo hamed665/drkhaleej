@@ -65,26 +65,45 @@ body {
   background: rgba(250, 254, 255, 0.72);
   backdrop-filter: saturate(150%) blur(10px);
 }
-.site-header__inner { display: grid; grid-template-columns: auto 1fr auto; gap: 0.75rem; align-items: center; padding-block: 0.95rem; }
-.site-header__nav ul { list-style: none; display: flex; justify-content: center; gap: clamp(0.7rem, 2vw, 1.35rem); margin: 0; padding: 0; color: var(--dm-text-soft); }
-.site-header__nav span,
+.site-header__inner { display: grid; grid-template-columns: 1fr; gap: 0.85rem; align-items: center; padding-block: 0.85rem; }
+.site-header__brand {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+.site-header__nav { min-width: 0; }
+.site-header__nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.38rem;
+  margin: 0;
+  padding: 0;
+  color: var(--dm-text-soft);
+}
 .site-header__nav a {
   display: inline-flex;
-  padding: 0.35rem 0.7rem;
+  min-height: 2.35rem;
+  align-items: center;
+  padding: 0.35rem 0.68rem;
   border-radius: 999px;
   border: 1px solid transparent;
   color: inherit;
   text-decoration: none;
-  transition: all var(--dm-motion-fast) var(--dm-ease);
+  transition: color var(--dm-motion-fast) var(--dm-ease), background var(--dm-motion-fast) var(--dm-ease), border-color var(--dm-motion-fast) var(--dm-ease);
 }
-.site-header__nav span:hover,
 .site-header__nav a:hover {
   border-color: var(--dm-border);
   color: var(--dm-text);
   background: rgba(255,255,255,0.75);
 }
+.site-header__locale { justify-self: start; }
 .site-header__locale-switch {
   display: inline-flex;
+  min-height: 2.35rem;
   align-items: center;
   border: 1px solid var(--dm-border);
   border-radius: 999px;
@@ -98,13 +117,22 @@ body {
 
 .site-footer,
 .site-footer--premium { margin-top: auto; border-top: 1px solid var(--dm-border); background: rgba(255,255,255,0.78); backdrop-filter: blur(8px); }
-.site-footer__inner { display: grid; grid-template-columns: 1fr; gap: 1rem; padding-block: 2rem; }
+.site-footer__inner { display: grid; grid-template-columns: 1fr; gap: 1.25rem; padding-block: 2rem; }
 .site-footer strong { font-size: 1.1rem; }
 .site-footer p { margin: 0.35rem 0; color: var(--dm-text-soft); }
+.site-footer__links ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  margin: 0;
+  padding: 0;
+}
+.site-footer__links a,
 .site-footer__locale-switch { color: var(--dm-brand-strong); text-decoration: none; font-weight: 700; }
+.site-footer__links a:hover,
 .site-footer__locale-switch:hover { text-decoration: underline; }
-.site-footer__links a { color: var(--dm-brand-strong); text-decoration: none; }
-.site-footer__links a:hover { text-decoration: underline; }
+.site-footer__utility { display: grid; gap: 0.35rem; align-content: start; }
 
 .dm-logo { display: inline-flex; align-items: center; gap: 0.5rem; }
 .dm-logo__wordmark { font-size: 1.02rem; font-weight: 800; letter-spacing: 0.01em; color: var(--dm-text); }
@@ -211,14 +239,20 @@ body {
 @keyframes breatheAura { 0%,100% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.98); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); } }
 @keyframes floatOrb { 0%,100% { transform: translate(-50%, -50%); } 50% { transform: translate(-50%, calc(-50% - 6px)); } }
 
-@media (min-width: 768px) { .site-footer__inner { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+@media (min-width: 768px) {
+  .site-header__inner { grid-template-columns: auto 1fr auto; gap: 1rem; }
+  .site-header__nav ul { justify-content: center; }
+  .site-header__locale { justify-self: end; }
+  .site-footer__inner { grid-template-columns: 1.1fr 1.4fr 1fr; align-items: start; }
+}
 @media (min-width: 920px) {
   .home-hero { grid-template-columns: 1.13fr 0.87fr; gap: clamp(1.1rem, 3vw, 1.9rem); }
   .home-trust__list, .home-categories__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 [dir='rtl'] .site-header__nav ul { direction: rtl; }
-[dir='rtl'] .site-footer__links { text-align: right; }
+[dir='rtl'] .site-footer__links,
+[dir='rtl'] .site-footer__utility { text-align: right; }
 [dir='rtl'] .home-hero__actions { justify-content: flex-start; }
 [dir='rtl'] .home-hero__title { letter-spacing: 0; line-height: 1.25; }
 [dir='rtl'] .hero-chip { font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; }
