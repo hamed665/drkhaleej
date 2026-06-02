@@ -27,6 +27,8 @@ type HomeCopy = {
     findCare: string;
     forClinics: string;
     note: string;
+    actionsLabel: string;
+    highlightsLabel: string;
     chips: readonly string[];
     highlights: readonly string[];
   };
@@ -95,7 +97,9 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         'Explore doctors, clinics, pharmacies, labs and services in one trusted Oman-first platform built for clear public discovery.',
       findCare: 'Start exploring',
       forClinics: 'For clinics and centers',
-      note: 'Browse by specialty, service or area. DrMuscat keeps discovery clear while richer public profiles are prepared safely.',
+      note: 'Browse by specialty, service or area while richer public profiles are prepared safely.',
+      actionsLabel: 'Primary actions',
+      highlightsLabel: 'Homepage discovery principles',
       chips: ['Doctors', 'Clinics', 'Pharmacies', 'Labs'],
       highlights: ['Bilingual English and Arabic experience', 'Muscat-first discovery flow', 'Static safe public information']
     },
@@ -217,7 +221,9 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       subtitle: 'منصة مخصصة لعُمان تساعدك على تصفح الخدمات الصحية والجمالية والرفاهية بسهولة وبحضور عام أوضح.',
       findCare: 'ابدأ التصفح',
       forClinics: 'للمراكز والعيادات',
-      note: 'تصفح حسب التخصص أو الخدمة أو المنطقة. يحافظ DrMuscat على وضوح الاكتشاف العام مع تجهيز ملفات أكثر تفصيلاً بأمان.',
+      note: 'تصفح حسب التخصص أو الخدمة أو المنطقة بينما يتم تجهيز ملفات عامة أكثر تفصيلاً بأمان.',
+      actionsLabel: 'الإجراءات الرئيسية',
+      highlightsLabel: 'مبادئ اكتشاف الصفحة الرئيسية',
       chips: ['الأطباء', 'العيادات', 'الصيدليات', 'المختبرات'],
       highlights: ['تجربة عربية وإنجليزية', 'مسار اكتشاف يركز على مسقط', 'معلومات عامة آمنة وثابتة']
     },

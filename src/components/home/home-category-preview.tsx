@@ -31,7 +31,7 @@ export function HomeCategoryPreview({ eyebrow, title, subtitle, categories, dir 
               <span className="home-categories__label-row">
                 <h3>{category.label}</h3>
                 <span className="home-categories__arrow" aria-hidden="true">
-                  ↗
+                  {dir === 'rtl' ? '‹' : '›'}
                 </span>
               </span>
               <p>{category.description}</p>
@@ -47,7 +47,7 @@ export function HomeCategoryPreview({ eyebrow, title, subtitle, categories, dir 
           }
 
           return (
-            <Link key={category.key} href={category.href} className={className} aria-label={category.label}>
+            <Link key={category.key} href={category.href} className={className}>
               {content}
             </Link>
           );
