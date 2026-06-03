@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { headers } from 'next/headers';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { isSupportedLocale, type SupportedLocale } from '@/lib/i18n/config';
+import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
 type AppShellProps = {
   children: ReactNode;
+  locale?: SupportedLocale;
+  country?: SupportedCountry;
 };
 
 const skipLinkCopy: Record<SupportedLocale, string> = {
@@ -13,20 +14,21 @@ const skipLinkCopy: Record<SupportedLocale, string> = {
   ar: 'انتقل إلى المحتوى الرئيسي'
 };
 
-export async function AppShell({ children }: AppShellProps) {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
+export function AppShell({ children, locale, country }: AppShellProps) {
+  if (!locale || !country) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="app-shell">
       <a href="#main-content" className="skip-link">
-        {skipLinkCopy[safeLocale]}
+        {skipLinkCopy[locale]}
       </a>
-      <SiteHeader />
+      <SiteHeader locale={locale} country={country} />
       <main id="main-content" className="app-shell__main">
         {children}
       </main>
-      <SiteFooter />
+      <SiteFooter locale={locale} country={country} />
     </div>
   );
 }

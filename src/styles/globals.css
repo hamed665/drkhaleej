@@ -588,3 +588,307 @@ body {
   .home-hero__visual { min-height: clamp(24rem, 38vw, 34rem); }
   .home-categories__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+.home-design-lab {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1rem, 3vw, 2rem) clamp(3rem, 7vw, 5rem);
+  color: #173f38;
+}
+
+.home-design-lab *,
+.home-design-lab *::before,
+.home-design-lab *::after {
+  box-sizing: border-box;
+}
+
+.home-design-lab__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  min-height: min(620px, calc(100vh - 9rem));
+  padding: clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid rgba(16, 88, 75, 0.14);
+  border-radius: clamp(1.5rem, 4vw, 3rem);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(110, 183, 170, 0.28), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(222, 184, 107, 0.24), transparent 30%),
+    linear-gradient(135deg, #fffaf0 0%, #eef8f4 56%, #ffffff 100%);
+  box-shadow: 0 28px 70px rgba(12, 74, 62, 0.12);
+  overflow: hidden;
+}
+
+.home-design-lab__intro {
+  min-width: 0;
+}
+
+.home-design-lab__eyebrow {
+  margin: 0 0 0.9rem;
+  color: #0b7768;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-design-lab__intro h1 {
+  max-width: 11ch;
+  margin: 0;
+  color: #123c35;
+  font-size: clamp(2.2rem, 5vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.home-design-lab[data-locale='ar'] .home-design-lab__intro h1 {
+  max-width: 13ch;
+  font-size: clamp(2rem, 4.5vw, 4.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+
+.home-design-lab__subtitle {
+  max-width: 42rem;
+  margin: 1.1rem 0 0;
+  color: #49665f;
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.75;
+}
+
+.home-design-lab__search-card {
+  display: grid;
+  gap: 1rem;
+  align-self: stretch;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid rgba(16, 88, 75, 0.12);
+  border-radius: clamp(1.25rem, 3vw, 2rem);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 44px rgba(12, 74, 62, 0.13);
+  backdrop-filter: blur(14px);
+}
+
+.home-design-lab__search-fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.home-design-lab__search-field,
+.home-design-lab__location-field {
+  min-height: 4.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(16, 88, 75, 0.13);
+  border-radius: 1.1rem;
+  background: #fbf7ec;
+}
+
+.home-design-lab__search-field span,
+.home-design-lab__location-field span {
+  display: block;
+  color: #6a7b76;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.home-design-lab__search-field strong {
+  display: block;
+  margin-top: 0.28rem;
+  color: #173f38;
+  font-size: clamp(1rem, 1.7vw, 1.28rem);
+  line-height: 1.35;
+}
+
+.home-design-lab__actions,
+.home-design-lab__chips,
+.home-design-lab__areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.home-design-lab__button,
+.home-design-lab__chip,
+.home-design-lab__text-link {
+  min-height: 44px;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.home-design-lab__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.85rem 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.home-design-lab__button--primary {
+  background: #0b5a4a;
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(11, 90, 74, 0.24);
+}
+
+.home-design-lab__button--secondary {
+  border: 1px solid rgba(11, 90, 74, 0.18);
+  background: #ffffff;
+  color: #0b5a4a;
+}
+
+.home-design-lab__chips {
+  grid-column: 1 / -1;
+  align-items: stretch;
+}
+
+.home-design-lab__chip {
+  flex: 1 1 150px;
+  display: grid;
+  gap: 0.2rem;
+  min-width: min(100%, 150px);
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(16, 88, 75, 0.12);
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.76);
+  color: #173f38;
+  text-decoration: none;
+}
+
+.home-design-lab__chip span {
+  font-weight: 850;
+}
+
+.home-design-lab__chip small {
+  color: #657872;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.home-design-lab__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: clamp(1rem, 3vw, 1.5rem);
+}
+
+.home-design-lab__panel {
+  min-width: 0;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  border: 1px solid rgba(16, 88, 75, 0.12);
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 16px 44px rgba(12, 74, 62, 0.08);
+}
+
+.home-design-lab__panel h2 {
+  margin: 0;
+  color: #173f38;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.home-design-lab__panel p {
+  margin: 0.75rem 0 0;
+  color: #526d66;
+  line-height: 1.7;
+}
+
+.home-design-lab__areas {
+  margin-top: 1rem;
+}
+
+.home-design-lab__areas span,
+.home-design-lab__note {
+  border-radius: 999px;
+  background: #eef8f4;
+  color: #24564d;
+}
+
+.home-design-lab__areas span {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.home-design-lab__note {
+  padding: 0.8rem 0.95rem;
+  font-size: 0.92rem;
+}
+
+.home-design-lab__text-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1rem;
+  color: #0b5a4a;
+  font-weight: 850;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.22em;
+}
+
+.home-design-lab__button:hover,
+.home-design-lab__chip:hover,
+.home-design-lab__text-link:hover {
+  transform: translateY(-1px);
+}
+
+.home-design-lab__button:focus-visible,
+.home-design-lab__chip:focus-visible,
+.home-design-lab__text-link:focus-visible {
+  outline: 3px solid rgba(11, 90, 74, 0.28);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+  .home-design-lab__hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .home-design-lab__intro h1,
+  .home-design-lab[data-locale='ar'] .home-design-lab__intro h1 {
+    max-width: 16ch;
+  }
+
+  .home-design-lab__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .home-design-lab {
+    padding-inline: 0.75rem;
+  }
+
+  .home-design-lab__hero {
+    padding: 1rem;
+    border-radius: 1.4rem;
+  }
+
+  .home-design-lab__intro h1,
+  .home-design-lab[data-locale='ar'] .home-design-lab__intro h1 {
+    max-width: 100%;
+    font-size: clamp(2rem, 12vw, 2.85rem);
+  }
+
+  .home-design-lab__actions {
+    flex-direction: column;
+  }
+
+  .home-design-lab__button,
+  .home-design-lab__chip {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-design-lab__button,
+  .home-design-lab__chip,
+  .home-design-lab__text-link {
+    transition: none;
+  }
+
+  .home-design-lab__button:hover,
+  .home-design-lab__chip:hover,
+  .home-design-lab__text-link:hover {
+    transform: none;
+  }
+}

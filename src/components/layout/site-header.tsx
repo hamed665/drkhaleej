@@ -1,8 +1,7 @@
 import Link from 'next/link';
-import { headers } from 'next/headers';
 import { Logo } from '@/components/brand/logo';
 import { Container } from '@/components/ui/container';
-import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
+import { localeDirection, type SupportedCountry, type SupportedLocale } from '@/lib/i18n/config';
 import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
 
 const navCopy: Record<
@@ -49,22 +48,27 @@ const navCopy: Record<
   }
 };
 
-export async function SiteHeader() {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
+type SiteHeaderProps = {
+  locale: SupportedLocale;
+  country: SupportedCountry;
+};
+
+export function SiteHeader({ locale, country }: SiteHeaderProps) {
+  const safeLocale = locale;
+  const safeCountry = country;
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
-  const homeHref = homeRoute(safeLocale, 'om');
-  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
+  const homeHref = homeRoute(safeLocale, safeCountry);
+  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', safeCountry);
   const navItems = [
     { href: homeHref, label: copy.home },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'doctors'), label: copy.doctors },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'centers'), label: copy.centers },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'pharmacies'), label: copy.pharmacies },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'labs'), label: copy.labs },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'services'), label: copy.services },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search },
-    { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders }
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'doctors'), label: copy.doctors },
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'centers'), label: copy.centers },
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'pharmacies'), label: copy.pharmacies },
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'labs'), label: copy.labs },
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'services'), label: copy.services },
+    { href: publicDiscoveryRoute(safeLocale, safeCountry, 'search'), label: copy.search },
+    { href: publicProviderRoute(safeLocale, safeCountry), label: copy.forProviders }
   ] as const;
 
   return (
