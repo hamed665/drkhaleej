@@ -37,6 +37,10 @@ type HomeCopy = {
     title: string;
     description: string;
     primaryLabel: string;
+    serviceLabel: string;
+    serviceValue: string;
+    locationLabel: string;
+    locationValue: string;
     quickLinksLabel: string;
     quickLinks: readonly {
       key: DiscoveryKey;
@@ -92,27 +96,31 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       'Find healthcare options in Oman, faster. DrMuscat is building a bilingual healthcare discovery foundation for patients and providers across Oman.',
     hero: {
       announcement: 'Oman-first healthcare discovery',
-      title: 'Find healthcare, dental, beauty and wellness providers in Muscat.',
+      title: 'Find trusted healthcare across Muscat.',
       subtitle:
-        'Explore doctors, clinics, pharmacies, labs and services in one trusted Oman-first platform built for clear public discovery.',
-      findCare: 'Start exploring',
-      forClinics: 'For clinics and centers',
-      note: 'Browse by specialty, service or area while richer public profiles are prepared safely.',
+        'Browse doctors, clinics, pharmacies, labs and care services through a calm Oman-first discovery experience.',
+      findCare: 'Search care',
+      forClinics: 'For providers',
+      note: 'Use approved discovery routes while richer public profiles are prepared through safe phases.',
       actionsLabel: 'Primary actions',
       highlightsLabel: 'Homepage discovery principles',
       chips: ['Doctors', 'Clinics', 'Pharmacies', 'Labs'],
-      highlights: ['Bilingual English and Arabic experience', 'Muscat-first discovery flow', 'Static safe public information']
+      highlights: ['Bilingual English and Arabic flow', 'Muscat-first discovery', 'No invented profile metrics']
     },
     search: {
       eyebrow: 'Search entry',
-      title: 'Choose how you want to explore care in Muscat',
+      title: 'Start with a simple care search',
       description:
-        'Use the quick paths below to browse existing public discovery pages. No live provider suggestions, tracking, or private data are used here.',
-      primaryLabel: 'Open full search',
+        'A static discovery entry shaped like the prototype search rail. It links only to approved public routes and does not run autocomplete or tracking.',
+      primaryLabel: 'Open search',
+      serviceLabel: 'Care or service',
+      serviceValue: 'Doctor, clinic, pharmacy, lab or service',
+      locationLabel: 'Location',
+      locationValue: 'Muscat, Oman',
       quickLinksLabel: 'Quick discovery paths',
       quickLinks: [
         { key: 'doctors', label: 'Doctors' },
-        { key: 'centers', label: 'Clinics and centers' },
+        { key: 'centers', label: 'Centers' },
         { key: 'pharmacies', label: 'Pharmacies' },
         { key: 'labs', label: 'Labs' },
         { key: 'services', label: 'Services' },
@@ -127,14 +135,14 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       items: [
         'Bilingual platform for English and Arabic users in Oman',
         'Oman-first navigation shaped around Muscat discovery needs',
-        'Clear provider profile foundations without fake ratings or review claims',
+        'Clear provider profile foundations without invented score or testimonial claims',
         'Careful public information with no diagnosis or guaranteed medical results'
       ]
     },
     categories: {
       eyebrow: 'Care categories',
-      title: 'Browse trusted discovery paths',
-      subtitle: 'Explore approved public route families while future profile depth is prepared through safe phases.',
+      title: 'Browse by category',
+      subtitle: 'Choose an approved route family with clear labels and matching links.',
       items: [
         {
           key: 'doctors',
@@ -144,7 +152,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         },
         {
           key: 'centers',
-          label: 'Clinics and centers',
+          label: 'Centers',
           description: 'Browse center-focused discovery for clinics, medical centers and public profile foundations.',
           accentClass: 'home-categories__card--clinics'
         },
@@ -176,7 +184,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
     },
     areas: {
       eyebrow: 'Muscat discovery',
-      title: 'Explore care around familiar Muscat areas',
+      title: 'Browse by Muscat area',
       subtitle:
         'Area prompts are shown as simple browsing cues only. They do not represent provider counts, live coverage, or guaranteed availability.',
       ctaLabel: 'Browse centers',
@@ -184,9 +192,9 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
     },
     featured: {
       eyebrow: 'Prepared for future highlights',
-      title: 'Featured discovery areas are being prepared',
+      title: 'Profile highlights will stay honest',
       description:
-        'Provider highlights will appear only after the correct review, data, and visibility phases are approved. No fake listings are shown here.',
+        'Provider highlights will appear only after the correct review, data, and visibility phases are approved. No invented listings are shown here.',
       items: [
         {
           title: 'Public profile clarity',
@@ -206,7 +214,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       eyebrow: 'For clinics and centers',
       title: 'Build a clearer public presence for your healthcare center.',
       description:
-        'DrMuscat helps clinics and centers prepare a cleaner public profile path for patients browsing healthcare, dental, beauty and wellness services in Oman.',
+        'DrMuscat helps healthcare providers prepare a cleaner public profile path for patients browsing care services in Oman.',
       linkLabel: 'Learn how to list your center',
       supporting: 'No dashboard, payment, claim approval, or subscription workflow is part of this homepage section.'
     }
@@ -217,26 +225,30 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       'اكتشف الرعاية الصحية في عُمان بسهولة أكبر. يعمل DrMuscat على بناء تجربة ثنائية اللغة لاكتشاف مقدمي الرعاية الصحية للمرضى والجهات الطبية في عُمان.',
     hero: {
       announcement: 'اكتشاف الرعاية في عُمان أولاً',
-      title: 'اكتشف الأطباء والعيادات والصيدليات والمختبرات وخدمات الرعاية في مسقط.',
-      subtitle: 'منصة مخصصة لعُمان تساعدك على تصفح الخدمات الصحية والجمالية والرفاهية بسهولة وبحضور عام أوضح.',
-      findCare: 'ابدأ التصفح',
-      forClinics: 'للمراكز والعيادات',
-      note: 'تصفح حسب التخصص أو الخدمة أو المنطقة بينما يتم تجهيز ملفات عامة أكثر تفصيلاً بأمان.',
+      title: 'اعثر على رعاية صحية موثوقة في مسقط.',
+      subtitle: 'تصفح الأطباء والعيادات والصيدليات والمختبرات وخدمات الرعاية من خلال تجربة هادئة مخصصة لعُمان.',
+      findCare: 'ابحث عن رعاية',
+      forClinics: 'لمقدمي الرعاية',
+      note: 'استخدم مسارات الاكتشاف المعتمدة بينما يتم تجهيز ملفات عامة أكثر تفصيلاً ضمن مراحل آمنة.',
       actionsLabel: 'الإجراءات الرئيسية',
       highlightsLabel: 'مبادئ اكتشاف الصفحة الرئيسية',
       chips: ['الأطباء', 'العيادات', 'الصيدليات', 'المختبرات'],
-      highlights: ['تجربة عربية وإنجليزية', 'مسار اكتشاف يركز على مسقط', 'معلومات عامة آمنة وثابتة']
+      highlights: ['تجربة عربية وإنجليزية', 'اكتشاف يركز على مسقط', 'دون مؤشرات ملفات غير حقيقية']
     },
     search: {
       eyebrow: 'مدخل البحث',
-      title: 'اختر طريقة تصفح الرعاية في مسقط',
+      title: 'ابدأ ببحث رعاية بسيط',
       description:
-        'استخدم المسارات السريعة أدناه لتصفح صفحات الاكتشاف العامة الحالية. لا توجد اقتراحات مباشرة أو تتبع أو استخدام لبيانات خاصة هنا.',
-      primaryLabel: 'افتح البحث الكامل',
+        'مدخل اكتشاف ثابت مستوحى من نموذج البحث في التصميم. يربط فقط بالمسارات العامة المعتمدة دون اقتراحات تلقائية أو تتبع.',
+      primaryLabel: 'افتح البحث',
+      serviceLabel: 'الرعاية أو الخدمة',
+      serviceValue: 'طبيب أو مركز أو صيدلية أو مختبر أو خدمة',
+      locationLabel: 'الموقع',
+      locationValue: 'مسقط، عُمان',
       quickLinksLabel: 'مسارات تصفح سريعة',
       quickLinks: [
         { key: 'doctors', label: 'الأطباء' },
-        { key: 'centers', label: 'العيادات والمراكز' },
+        { key: 'centers', label: 'المراكز' },
         { key: 'pharmacies', label: 'الصيدليات' },
         { key: 'labs', label: 'المختبرات' },
         { key: 'services', label: 'الخدمات' },
@@ -251,14 +263,14 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       items: [
         'منصة ثنائية اللغة للمستخدمين بالعربية والإنجليزية في عُمان',
         'تنقل يركز على عُمان واحتياجات التصفح داخل مسقط',
-        'أساس أوضح لملفات مقدمي الخدمة دون تقييمات أو مراجعات غير موجودة',
+        'أساس أوضح لملفات مقدمي الخدمة دون درجات أو شهادات غير موجودة',
         'معلومات عامة حذرة دون تشخيص أو نتائج طبية مضمونة'
       ]
     },
     categories: {
       eyebrow: 'فئات الرعاية',
-      title: 'تصفح مسارات اكتشاف واضحة',
-      subtitle: 'استكشف عائلات المسارات العامة المعتمدة بينما يتم إعداد عمق أكبر للملفات في مراحل آمنة لاحقة.',
+      title: 'تصفح حسب الفئة',
+      subtitle: 'اختر عائلة مسار معتمدة مع تسميات وروابط متطابقة بوضوح.',
       items: [
         {
           key: 'doctors',
@@ -268,7 +280,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
         },
         {
           key: 'centers',
-          label: 'العيادات والمراكز',
+          label: 'المراكز',
           description: 'تصفح مسار المراكز للعيادات والمراكز الطبية وأساس الملفات العامة.',
           accentClass: 'home-categories__card--clinics'
         },
@@ -300,7 +312,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
     },
     areas: {
       eyebrow: 'اكتشاف مسقط',
-      title: 'تصفح الرعاية حول مناطق مألوفة في مسقط',
+      title: 'تصفح حسب منطقة في مسقط',
       subtitle:
         'تظهر المناطق كإشارات تصفح عامة فقط. لا تعبر عن أعداد مقدمي الخدمة أو تغطية مباشرة أو توفر مضمون.',
       ctaLabel: 'تصفح المراكز',
@@ -308,7 +320,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
     },
     featured: {
       eyebrow: 'قيد التجهيز للمستقبل',
-      title: 'يتم تجهيز مناطق الاكتشاف المميزة',
+      title: 'ستبقى إبرازات الملفات صادقة',
       description:
         'ستظهر أبرز الملفات فقط بعد اعتماد مراحل المراجعة والبيانات والظهور المناسبة. لا يتم عرض أي قوائم وهمية هنا.',
       items: [
@@ -330,7 +342,7 @@ const homeCopyByLocale: Record<SupportedLocale, HomeCopy> = {
       eyebrow: 'للمراكز والعيادات',
       title: 'ابنِ حضوراً عاماً أوضح لمركزك الصحي.',
       description:
-        'يساعد DrMuscat العيادات والمراكز على تجهيز مسار ملف عام أوضح للمرضى الذين يتصفحون خدمات الرعاية والصحة والجمال والرفاهية في عُمان.',
+        'يساعد DrMuscat مقدمي الرعاية الصحية على تجهيز مسار ملف عام أوضح للمرضى الذين يتصفحون خدمات الرعاية في عُمان.',
       linkLabel: 'تعرّف على طريقة إدراج مركزك',
       supporting: 'لا يتضمن هذا القسم لوحة تحكم أو دفعاً أو اعتماد مطالبات أو اشتراكات.'
     }
@@ -383,28 +395,36 @@ export default async function LocaleCountryHome({ params }: { params: Promise<Pa
     <div className="home-foundation" dir={dir} data-country={safeCountry} data-locale={safeLocale}>
       <HomeHero copy={copy.hero} dir={dir} primaryHref={searchHref} secondaryHref={providerHref} />
 
-      <section className="home-search-panel glass-soft" dir={dir} aria-labelledby="home-search-title">
+      <section className="home-search-panel" dir={dir} aria-labelledby="home-search-title">
         <div className="home-section-head home-search-panel__intro">
           <p className="home-section-eyebrow">{copy.search.eyebrow}</p>
           <h2 id="home-search-title">{copy.search.title}</h2>
           <p>{copy.search.description}</p>
         </div>
         <div className="home-search-panel__surface" aria-label={copy.search.quickLinksLabel}>
+          <div className="home-search-panel__field">
+            <span className="home-search-panel__field-label">{copy.search.serviceLabel}</span>
+            <span className="home-search-panel__field-value">{copy.search.serviceValue}</span>
+          </div>
+          <div className="home-search-panel__field">
+            <span className="home-search-panel__field-label">{copy.search.locationLabel}</span>
+            <span className="home-search-panel__field-value">{copy.search.locationValue}</span>
+          </div>
           <Link href={searchHref} className="home-search-panel__main-link">
             <span className="home-search-panel__glass-icon" aria-hidden="true" />
             <span>{copy.search.primaryLabel}</span>
           </Link>
-          <div className="home-search-panel__quick-links">
-            {copy.search.quickLinks.map((link) => (
-              <Link
-                key={link.key}
-                href={publicDiscoveryRoute(safeLocale, safeCountry, discoverySlugByKey[link.key])}
-                className="home-search-panel__quick-link"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+        </div>
+        <div className="home-search-panel__quick-links" aria-label={copy.search.quickLinksLabel}>
+          {copy.search.quickLinks.map((link) => (
+            <Link
+              key={link.key}
+              href={publicDiscoveryRoute(safeLocale, safeCountry, discoverySlugByKey[link.key])}
+              className="home-search-panel__quick-link"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -419,7 +439,7 @@ export default async function LocaleCountryHome({ params }: { params: Promise<Pa
         dir={dir}
       />
 
-      <section className="home-areas glass-soft" dir={dir} aria-labelledby="home-areas-title">
+      <section className="home-areas" dir={dir} aria-labelledby="home-areas-title">
         <div className="home-section-head">
           <p className="home-section-eyebrow">{copy.areas.eyebrow}</p>
           <h2 id="home-areas-title">{copy.areas.title}</h2>
@@ -449,7 +469,7 @@ export default async function LocaleCountryHome({ params }: { params: Promise<Pa
         </div>
         <div className="home-featured-placeholder__grid">
           {copy.featured.items.map((item) => (
-            <article key={item.title} className="home-featured-placeholder__card glass-soft">
+            <article key={item.title} className="home-featured-placeholder__card">
               <span className="home-featured-placeholder__mark" aria-hidden="true" />
               <h3>{item.title}</h3>
               <p>{item.description}</p>
@@ -458,7 +478,7 @@ export default async function LocaleCountryHome({ params }: { params: Promise<Pa
         </div>
       </section>
 
-      <section className="home-provider-cta glass-strong" dir={dir} aria-labelledby="home-provider-cta-title">
+      <section className="home-provider-cta" dir={dir} aria-labelledby="home-provider-cta-title">
         <div className="home-provider-cta__copy">
           <p className="home-section-eyebrow">{copy.providerCta.eyebrow}</p>
           <h2 id="home-provider-cta-title">{copy.providerCta.title}</h2>

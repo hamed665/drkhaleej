@@ -24,14 +24,14 @@ export function HomeCategoryPreview({ eyebrow, title, subtitle, categories, dir 
       </div>
       <div className="home-categories__grid">
         {categories.map((category) => {
-          const className = `home-categories__card glass-soft ${category.accentClass}`;
+          const className = `home-categories__card ${category.accentClass}`;
           const content = (
             <>
               <span className="home-categories__icon" aria-hidden="true" />
               <span className="home-categories__label-row">
                 <h3>{category.label}</h3>
                 <span className="home-categories__arrow" aria-hidden="true">
-                  {dir === 'rtl' ? '‹' : '›'}
+                  {dir === 'rtl' ? '←' : '→'}
                 </span>
               </span>
               <p>{category.description}</p>

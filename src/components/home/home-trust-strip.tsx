@@ -8,7 +8,12 @@ type HomeTrustStripProps = {
 
 export function HomeTrustStrip({ eyebrow, title, subtitle, items, dir }: HomeTrustStripProps) {
   return (
-    <section className="home-trust glass-soft" dir={dir} aria-labelledby="home-trust-title">
+    <section className="home-trust" dir={dir} aria-labelledby="home-trust-title">
+      <div className="home-trust__steps" aria-hidden="true">
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+      </div>
       <div className="home-section-head home-trust__head">
         <p className="home-section-eyebrow">{eyebrow}</p>
         <h2 id="home-trust-title">{title}</h2>
