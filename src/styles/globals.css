@@ -1,54 +1,170 @@
 @import "tailwindcss";
 
+/* DrMuscat 2026 UI kit foundation tokens. Keep these aliases stable for current production CSS. */
 :root {
   color-scheme: light;
-  --dm-bg: #f7fbff;
-  --dm-bg-soft: #eef8fa;
+
+  /* Brand: calm teal-green primary, with Omani gold used sparingly. */
+  --dm-teal-950: #07302c;
+  --dm-teal-900: #0a3d39;
+  --dm-teal-800: #0b4f4a;
+  --dm-teal-700: #0e6e64;
+  --dm-teal-600: #14857a;
+  --dm-teal-500: #2aa192;
+  --dm-teal-400: #5bbeb1;
+  --dm-teal-300: #8ecec2;
+  --dm-teal-200: #b9ded8;
+  --dm-teal-100: #dceeeb;
+  --dm-teal-50: #eff6f4;
+
+  --dm-gold-700: #9c7327;
+  --dm-gold-600: #b4862f;
+  --dm-gold-500: #c9a24b;
+  --dm-gold-400: #d8b871;
+  --dm-gold-300: #e6ce92;
+  --dm-gold-100: #f6efdd;
+
+  /* Neutral, surface, border, and semantic text tokens. */
+  --dm-ink-900: #0f1a1c;
+  --dm-ink-800: #1c2a2b;
+  --dm-ink-700: #2e3a3b;
+  --dm-ink-600: #45514f;
+  --dm-ink-500: #5c6b6b;
+  --dm-ink-400: #7d8a89;
+  --dm-ink-300: #9ba8a7;
+  --dm-ink-200: #c4cecc;
+  --dm-line: #e2e9e7;
+  --dm-line-soft: #edf1f0;
+  --dm-bg: #f7faf9;
+  --dm-bg-soft: #eff6f4;
+  --dm-bg-warm: #fbfbf8;
   --dm-surface: #ffffff;
-  --dm-surface-glass: rgba(255, 255, 255, 0.76);
-  --dm-text: #0b1f33;
-  --dm-text-soft: #5c7086;
-  --dm-border: rgba(14, 116, 144, 0.14);
-  --dm-brand: #00a6b8;
-  --dm-brand-strong: #008fa3;
-  --dm-brand-mint: #00c2a8;
-  --dm-brand-aqua: #4fd1ff;
-  --dm-radius-sm: 0.65rem;
-  --dm-radius-md: 0.95rem;
-  --dm-radius-lg: 1.4rem;
-  --dm-shadow-sm: 0 4px 16px rgba(21, 80, 107, 0.08);
-  --dm-shadow-md: 0 16px 36px rgba(21, 80, 107, 0.12);
-  --dm-shadow-lg: 0 32px 64px rgba(21, 80, 107, 0.15);
+  --dm-surface-glass: rgba(255, 255, 255, 0.78);
+  --dm-text: var(--dm-ink-900);
+  --dm-text-soft: var(--dm-ink-500);
+  --dm-text-muted: var(--dm-ink-400);
+  --dm-border: var(--dm-line);
+  --dm-border-soft: var(--dm-line-soft);
+
+  /* Backwards-compatible brand aliases consumed by existing components. */
+  --dm-brand: var(--dm-teal-700);
+  --dm-brand-strong: var(--dm-teal-800);
+  --dm-brand-mint: var(--dm-teal-500);
+  --dm-brand-aqua: var(--dm-teal-400);
+  --dm-accent-gold: var(--dm-gold-500);
+
+  /* Radius, spacing, and elevation foundation. */
+  --dm-radius-xs: 0.375rem;
+  --dm-radius-sm: 0.5rem;
+  --dm-radius-md: 0.75rem;
+  --dm-radius-lg: 1rem;
+  --dm-radius-xl: 1.375rem;
+  --dm-radius-2xl: 1.75rem;
+  --dm-radius-pill: 999px;
+  --dm-space-1: 0.25rem;
+  --dm-space-2: 0.5rem;
+  --dm-space-3: 0.75rem;
+  --dm-space-4: 1rem;
+  --dm-space-5: 1.25rem;
+  --dm-space-6: 1.5rem;
+  --dm-space-8: 2rem;
+  --dm-space-10: 2.5rem;
+  --dm-space-12: 3rem;
+  --dm-space-16: 4rem;
+  --dm-space-20: 5rem;
+  --dm-shadow-xs: 0 1px 2px rgba(11, 40, 38, 0.06);
+  --dm-shadow-sm: 0 2px 8px rgba(11, 40, 38, 0.06);
+  --dm-shadow-md: 0 8px 24px rgba(11, 40, 38, 0.08);
+  --dm-shadow-lg: 0 18px 48px rgba(11, 40, 38, 0.1);
+  --dm-shadow-focus-card: 0 10px 30px rgba(14, 110, 100, 0.14);
+
+  /* Typography foundation: no external font import is added in this phase. */
+  --dm-font-sans: "Readex Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --dm-font-arabic: "Readex Pro", "Noto Naskh Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  --dm-font-display: var(--dm-font-sans);
+  --dm-type-display: clamp(2.5rem, 5vw, 3.5rem);
+  --dm-type-display-line: 1.05;
+  --dm-type-h1: 2.5rem;
+  --dm-type-h1-line: 1.12;
+  --dm-type-h2: 1.875rem;
+  --dm-type-h2-line: 1.16;
+  --dm-type-h3: 1.375rem;
+  --dm-type-h3-line: 1.25;
+  --dm-type-h4: 1.125rem;
+  --dm-type-h4-line: 1.35;
+  --dm-type-body-lg: 1.125rem;
+  --dm-type-body-lg-line: 1.6;
+  --dm-type-body: 1rem;
+  --dm-type-body-line: 1.6;
+  --dm-type-small: 0.875rem;
+  --dm-type-small-line: 1.5;
+  --dm-type-caption: 0.8125rem;
+  --dm-type-caption-line: 1.45;
+  --dm-type-micro: 0.6875rem;
+  --dm-type-micro-line: 1.4;
+  --dm-weight-regular: 400;
+  --dm-weight-medium: 500;
+  --dm-weight-semibold: 600;
+  --dm-weight-bold: 700;
+  --dm-letter-tight: -0.02em;
+  --dm-letter-snug: -0.01em;
+  --dm-letter-wide: 0.06em;
+  --dm-arabic-letter-spacing: 0;
+  --dm-arabic-line-adjust: 1.72;
+
+  --dm-focus-ring: 0 0 0 3px rgba(14, 110, 100, 0.28);
   --dm-motion-fast: 180ms;
   --dm-motion-base: 320ms;
   --dm-motion-slow: 7s;
   --dm-ease: cubic-bezier(0.2, 0.65, 0.2, 1);
 
-  --dm-accent-clinic: #00c2a8;
-  --dm-accent-dental: #00a6b8;
-  --dm-accent-pharmacy: #4fd1ff;
-  --dm-accent-laboratory: #7ab8ff;
+  --dm-accent-clinic: var(--dm-teal-500);
+  --dm-accent-dental: var(--dm-teal-700);
+  --dm-accent-pharmacy: var(--dm-teal-400);
+  --dm-accent-laboratory: var(--dm-gold-500);
 }
 
+@theme inline {
+  --color-dm-bg: var(--dm-bg);
+  --color-dm-surface: var(--dm-surface);
+  --color-dm-text: var(--dm-text);
+  --color-dm-text-soft: var(--dm-text-soft);
+  --color-dm-border: var(--dm-border);
+  --color-dm-brand: var(--dm-brand);
+  --color-dm-brand-strong: var(--dm-brand-strong);
+  --color-dm-accent-gold: var(--dm-accent-gold);
+  --font-sans: var(--dm-font-sans);
+  --font-arabic: var(--dm-font-arabic);
+  --radius-dm-sm: var(--dm-radius-sm);
+  --radius-dm-md: var(--dm-radius-md);
+  --radius-dm-lg: var(--dm-radius-lg);
+  --radius-dm-xl: var(--dm-radius-xl);
+  --shadow-dm-sm: var(--dm-shadow-sm);
+  --shadow-dm-md: var(--dm-shadow-md);
+  --shadow-dm-lg: var(--dm-shadow-lg);
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
   min-height: 100vh;
   background:
-    radial-gradient(900px circle at 5% -10%, rgba(79, 209, 255, 0.24), transparent 45%),
-    radial-gradient(820px circle at 90% 4%, rgba(0, 194, 168, 0.18), transparent 42%),
-    linear-gradient(180deg, #fbfeff 0%, var(--dm-bg) 100%);
+    radial-gradient(900px circle at 5% -10%, rgba(91, 190, 177, 0.18), transparent 45%),
+    radial-gradient(820px circle at 90% 4%, rgba(201, 162, 75, 0.1), transparent 42%),
+    linear-gradient(180deg, var(--dm-bg-warm) 0%, var(--dm-bg) 100%);
   color: var(--dm-text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.6;
+  font-family: var(--dm-font-sans);
+  font-size: var(--dm-type-body);
+  line-height: var(--dm-type-body-line);
 }
 
 [dir='rtl'] body {
-  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: var(--dm-font-arabic);
+  line-height: var(--dm-arabic-line-adjust);
+  letter-spacing: var(--dm-arabic-letter-spacing);
 }
 
-::selection { background: rgba(79, 209, 255, 0.32); color: #0b1f33; }
-:focus-visible { outline: 2px solid var(--dm-brand); outline-offset: 2px; }
+::selection { background: rgba(201, 162, 75, 0.28); color: var(--dm-text); }
+:focus-visible { outline: 2px solid var(--dm-brand); outline-offset: 2px; box-shadow: var(--dm-focus-ring); }
 
 .ui-container { width: 100%; max-width: 84rem; margin-inline: auto; padding-inline: clamp(1rem, 3vw, 2rem); }
 .app-shell { display: flex; min-height: 100vh; flex-direction: column; }
