@@ -353,7 +353,7 @@ body {
   position: relative;
   isolation: isolate;
   display: grid;
-  gap: clamp(1.05rem, 2.2vw, 1.75rem);
+  gap: clamp(0.9rem, 1.9vw, 1.45rem);
   width: min(100%, 84rem);
   margin-inline: auto;
   padding: clamp(0.9rem, 2.6vw, 1.65rem);
@@ -412,7 +412,7 @@ body {
 
 .home-hero {
   display: grid;
-  gap: clamp(1rem, 2.4vw, 1.6rem);
+  gap: clamp(0.85rem, 1.8vw, 1.25rem);
   align-items: stretch;
 }
 
@@ -421,8 +421,8 @@ body {
   overflow: hidden;
   display: grid;
   align-content: center;
-  gap: clamp(1rem, 2.4vw, 1.45rem);
-  padding: clamp(1.15rem, 4.2vw, 3.35rem);
+  gap: clamp(0.85rem, 1.7vw, 1.2rem);
+  padding: clamp(1.05rem, 3.2vw, 2.45rem);
   border-radius: clamp(1.2rem, 3vw, 2rem);
 }
 
@@ -475,7 +475,7 @@ body {
   max-width: min(100%, 16.8ch);
   margin: 0;
   color: var(--home-ink);
-  font-size: clamp(2.05rem, 8vw, 4.95rem);
+  font-size: clamp(2rem, 4.8vw, 3.95rem);
   font-weight: 850;
   line-height: 1.03;
   letter-spacing: -0.045em;
@@ -562,7 +562,7 @@ body {
 
 .home-hero__visual {
   position: relative;
-  min-height: clamp(15rem, 50vw, 30rem);
+  min-height: clamp(14rem, 36vw, 25rem);
   overflow: hidden;
   border-radius: clamp(1.2rem, 3vw, 2rem);
   background:
@@ -571,11 +571,14 @@ body {
 }
 
 .home-hero__layers { position: absolute; inset: 0; }
-.hero-orb__aura { background: radial-gradient(circle, rgba(223, 242, 237, 0.95), rgba(76, 145, 135, 0.18) 42%, transparent 70%); }
-.hero-orb__core { background: linear-gradient(150deg, rgba(255, 253, 247, 0.95), rgba(223, 242, 237, 0.88)); box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.72), 0 20px 34px rgba(11, 77, 61, 0.15); }
-.hero-orb__halo { border-color: rgba(15, 122, 95, 0.22); }
-.hero-orb__halo--two { border-color: rgba(184, 137, 47, 0.22); }
-.hero-network path { stroke: rgba(15, 122, 95, 0.22); }
+.hero-orb__aura { width: 82%; background: radial-gradient(circle, rgba(223, 242, 237, 0.95), rgba(76, 145, 135, 0.2) 42%, transparent 70%); }
+.hero-orb__core { width: 38%; background: linear-gradient(150deg, rgba(255, 253, 247, 0.95), rgba(223, 242, 237, 0.88)); box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.72), 0 20px 34px rgba(11, 77, 61, 0.15); }
+.hero-orb__halo { border-color: rgba(15, 122, 95, 0.24); }
+.hero-orb__halo--one { width: 56%; }
+.hero-orb__halo--two { width: 68%; border-color: rgba(184, 137, 47, 0.24); }
+.hero-orb__halo--three { width: 78%; }
+.hero-network { opacity: 0.54; }
+.hero-network path { stroke: rgba(15, 122, 95, 0.24); }
 .hero-network circle { fill: rgba(15, 122, 95, 0.68); }
 .hero-particle { background: rgba(184, 137, 47, 0.72); box-shadow: 0 0 13px rgba(184, 137, 47, 0.28); }
 
@@ -599,8 +602,8 @@ body {
   backdrop-filter: blur(8px);
 }
 
-.hero-visual-card--primary { inset-inline-start: 10%; inset-block-start: 11%; }
-.hero-visual-card--secondary { grid-template-columns: auto 1fr; align-items: center; inset-inline-end: 9%; inset-block-end: 17%; }
+.hero-visual-card--primary { inset-inline-start: 8%; inset-block-start: 9%; }
+.hero-visual-card--secondary { grid-template-columns: auto 1fr; align-items: center; inset-inline-end: 8%; inset-block-end: 14%; }
 .hero-visual-card__line { display: block; height: 0.58rem; border-radius: 999px; background: rgba(15, 122, 95, 0.16); }
 .hero-visual-card__line--short { width: 64%; }
 .hero-visual-card__dot { width: 1rem; height: 1rem; border-radius: 999px; background: linear-gradient(135deg, var(--home-gold), var(--home-green)); }
@@ -972,9 +975,11 @@ body {
 }
 
 [dir='rtl'] .home-hero__title {
-  max-width: min(100%, 17.5ch);
+  max-width: min(100%, 19ch);
+  font-size: clamp(1.85rem, 4.2vw, 3.25rem);
+  font-weight: 780;
   letter-spacing: 0;
-  line-height: 1.18;
+  line-height: 1.16;
 }
 
 [dir='rtl'] .home-categories__card:hover .home-categories__arrow,
@@ -1004,7 +1009,7 @@ body {
   }
 
   .home-hero__visual {
-    min-height: clamp(12.5rem, 54vw, 15rem);
+    min-height: clamp(12rem, 48vw, 14rem);
   }
 
   .hero-orb__halo--three,
@@ -1062,7 +1067,7 @@ body {
 
 @media (min-width: 1080px) {
   .home-hero {
-    grid-template-columns: minmax(0, 1.06fr) minmax(24rem, 0.94fr);
+    grid-template-columns: minmax(0, 1.04fr) minmax(22rem, 0.96fr);
   }
 
   .home-categories__grid {
