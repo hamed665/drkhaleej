@@ -4,12 +4,14 @@ import { publicProviderRoute } from '@/lib/routes/public';
 import { BrowseAreas2026 } from '@/components/public-2026/sections/BrowseAreas2026';
 import { BrowseCategories2026 } from '@/components/public-2026/sections/BrowseCategories2026';
 import { FaqSection2026 } from '@/components/public-2026/sections/FaqSection2026';
+import { FeaturedCentersCarousel2026 } from '@/components/public-2026/sections/FeaturedCentersCarousel2026';
 import { FeaturedProviders2026 } from '@/components/public-2026/sections/FeaturedProviders2026';
 import { HomeArticles2026 } from '@/components/public-2026/sections/HomeArticles2026';
 import { PublicDisclaimer2026 } from '@/components/public-2026/sections/PublicDisclaimer2026';
 import { TrustAndSafety2026 } from '@/components/public-2026/sections/TrustAndSafety2026';
 import { Button2026 } from '@/components/public-2026/ui/Button2026';
 import { Container2026 } from '@/components/public-2026/ui/Container2026';
+import { FloatingActions2026 } from '@/components/public-2026/home/FloatingActions2026';
 import { HomeHeroSearch2026 } from '@/components/public-2026/home/HomeHeroSearch2026';
 import { HomeTrustBar2026 } from '@/components/public-2026/home/HomeTrustBar2026';
 import { home2026CopyByLocale } from '@/components/public-2026/home/HomeCopy2026';
@@ -20,13 +22,13 @@ export function HomePage2026({ locale, country }: HomePage2026Props) {
   const copy = home2026CopyByLocale[locale];
   const dir = localeDirection(locale);
   const providerHref = publicProviderRoute(locale, country);
-  const floatingSideClass = dir === 'rtl' ? 'left-4' : 'right-4';
 
   return (
     <main className="dm2026-home relative min-w-0 overflow-x-hidden" dir={dir} data-country={country} data-locale={locale}>
       <Container2026>
         <HomeHeroSearch2026 locale={locale} country={country} copy={copy} />
         <HomeTrustBar2026 items={copy.trustBar} />
+        <FeaturedCentersCarousel2026 locale={locale} country={country} copy={copy.carousel} actions={copy.actions} />
         <FeaturedProviders2026 locale={locale} country={country} copy={copy.featured} actions={copy.actions} />
         <BrowseCategories2026 locale={locale} country={country} copy={copy.categories} />
         <BrowseAreas2026 locale={locale} country={country} copy={copy.areas} />
@@ -48,10 +50,7 @@ export function HomePage2026({ locale, country }: HomePage2026Props) {
         </section>
         <PublicDisclaimer2026>{copy.disclaimer}</PublicDisclaimer2026>
       </Container2026>
-      <div className={`dm2026-floating fixed bottom-4 z-30 grid gap-2 ${floatingSideClass}`} aria-label={copy.floating.whatsapp}>
-        <button type="button" className="rounded-full bg-[#1FA458] px-4 py-2 text-xs font-bold text-white shadow-dm-md">{copy.floating.whatsapp}</button>
-        <button type="button" className="rounded-full border border-dm-border bg-white/95 px-4 py-2 text-xs font-bold text-dm-brand-strong shadow-dm-sm">{copy.floating.ai}</button>
-      </div>
+      <FloatingActions2026 locale={locale} copy={copy.floating} />
     </main>
   );
 }

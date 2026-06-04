@@ -132,3 +132,16 @@ No backend, API route, auth, payment, Supabase, migration, generated type, seed,
 - Category, area, and article cards were made more polished and public-safe while routing only to existing approved discovery routes.
 
 No backend, database, Supabase, RLS, sitemap, robots, llms, route-check, package, lockfile, or generated database type files were changed in FIX01.
+
+## FIX02 homepage visual and interaction cleanup
+
+`UI-K-NEW-PUBLIC-B-FIX02` patched the existing 2026 homepage implementation without rebuilding it from scratch:
+
+- Confirmed and preserved Arabic header localization with Arabic navigation labels and `دكتور مسقط` as the Arabic wordmark.
+- Strengthened the search-first hero with a larger central search card, taller query input and CTA, compact location selector, quick chips, and grouped suggestions.
+- Added a frontend-only featured centers/providers carousel below the hero search and before category grids, with sample cards, previous/next controls, dot indicators, auto-advance, hover/focus pause, and RTL/LTR-safe behavior.
+- Tightened the Country → City → Area hierarchy in the homepage location selector so Oman cities remain city-only and Muscat areas remain area-only.
+- Replaced inert floating WhatsApp/AI buttons with frontend-only interactive panels: a WhatsApp support preview panel and an AI assistant preview drawer with no backend/API calls.
+- Polished category cards, carousel cards, floating panels, and RTL typography with scoped `dm2026-*` CSS only.
+
+No database, Supabase, RLS, backend API, auth backend, payment backend, sitemap, robots, `llms.txt`, package, lockfile, or route-check files were changed in FIX02.

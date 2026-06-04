@@ -44,6 +44,23 @@ export type Home2026Copy = {
     subtitle: string;
     cards: readonly { title: string; specialty: string; description: string; slug: PublicDiscoverySlug }[];
   };
+  carousel: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    previous: string;
+    next: string;
+    pauseLabel: string;
+    sampleLabel: string;
+    providers: readonly {
+      name: string;
+      category: string;
+      location: string;
+      hours: string;
+      description: string;
+      route: PublicDiscoverySlug;
+    }[];
+  };
   categories: {
     eyebrow: string;
     title: string;
@@ -86,6 +103,15 @@ export type Home2026Copy = {
   floating: {
     whatsapp: string;
     ai: string;
+    whatsappTitle: string;
+    whatsappBody: string;
+    whatsappCta: string;
+    aiTitle: string;
+    aiBody: string;
+    aiPlaceholder: string;
+    send: string;
+    close: string;
+    disclaimer: string;
   };
 };
 
@@ -148,6 +174,25 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
         { title: 'Pharmacies, labs and services', specialty: 'Care services', description: 'Find approved discovery routes for everyday healthcare services across Oman.', slug: 'services' }
       ]
     },
+    carousel: {
+      eyebrow: 'Featured centers',
+      title: 'Trusted care across Oman',
+      subtitle: 'Sample center previews show the intended discovery layout. They do not claim ratings, reviews, availability, or paid placement.',
+      previous: 'Previous featured centers',
+      next: 'Next featured centers',
+      pauseLabel: 'Featured centers carousel',
+      sampleLabel: 'Sample preview',
+      providers: [
+        { name: 'Al Khuwair Medical Centre', category: 'Medical centre', location: 'Muscat · Al Khuwair', hours: 'Hours preview', description: 'A sample public card for general healthcare discovery and contact actions.', route: 'centers' },
+        { name: 'Madinat Qaboos Dental Clinic', category: 'Dental clinic', location: 'Muscat · Madinat Qaboos', hours: 'Hours preview', description: 'Dental service discovery preview without ratings, reviews, or clinical claims.', route: 'services' },
+        { name: 'Seeb Family Pharmacy', category: 'Pharmacy', location: 'Seeb · Al Hail', hours: 'Hours preview', description: 'Pharmacy discovery card showing safe contact and directions actions.', route: 'pharmacies' },
+        { name: 'Ruwi Diagnostic Laboratory', category: 'Laboratory', location: 'Muscat · Ruwi', hours: 'Hours preview', description: 'Lab discovery preview for future reviewed public listings.', route: 'labs' },
+        { name: 'Azaiba Pet Clinic', category: 'Pet clinic', location: 'Muscat · Azaiba', hours: 'Hours preview', description: 'Veterinary discovery preview for pet-care related services.', route: 'services' },
+        { name: 'Qurum Wellness & Beauty Clinic', category: 'Wellness and beauty', location: 'Muscat · Qurum', hours: 'Hours preview', description: 'Wellness and beauty discovery preview with honest sample labeling.', route: 'services' },
+        { name: 'Al Ghubrah Eye Centre', category: 'Eye clinic', location: 'Muscat · Al Ghubrah', hours: 'Hours preview', description: 'Eye care discovery preview without ranking or treatment claims.', route: 'centers' },
+        { name: 'Muscat Physiotherapy Clinic', category: 'Physiotherapy', location: 'Muscat · Bausher', hours: 'Hours preview', description: 'Physiotherapy service discovery preview for future approved listings.', route: 'services' }
+      ]
+    },
     categories: {
       eyebrow: 'Browse healthcare by category',
       title: 'Start with the type of care you need',
@@ -177,7 +222,7 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
       areas: ['Muscat', 'Al Khuwair', 'Qurum', 'Azaiba', 'Seeb', 'Sohar', 'Salalah', 'Nizwa']
     },
     articles: {
-      eyebrow: 'Health guides from DrMuscat',
+      eyebrow: 'Health guides and articles',
       title: 'Learn before you choose care',
       subtitle: 'Simple education and discovery guides will sit below search so care discovery remains the main action.',
       disclaimer: 'Guides are for general education only and do not replace professional medical advice.',
@@ -210,7 +255,7 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
       cta: 'For Providers',
       note: 'No payment gateway, AI chat, backend search, or provider dashboard feature is added here.'
     },
-    floating: { whatsapp: 'WhatsApp help', ai: 'AI chat preview' }
+    floating: { whatsapp: 'WhatsApp help', ai: 'AI assistant preview', whatsappTitle: 'WhatsApp support', whatsappBody: 'WhatsApp support is a frontend preview in this phase. Use this panel as a safe contact placeholder until final support details are approved.', whatsappCta: 'Open WhatsApp placeholder', aiTitle: 'DrMuscat AI assistant', aiBody: 'Ask about finding doctors, clinics, pharmacies, labs, areas, or listing your center.', aiPlaceholder: 'Type your question…', send: 'Send', close: 'Close', disclaimer: 'General discovery help only, not medical advice.' }
   },
   ar: {
     metadataTitle: 'DrMuscat عُمان | أساس اكتشاف الرعاية الصحية',
@@ -268,6 +313,25 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
         { title: 'ملفات الأطباء', specialty: 'الأطباء', description: 'تصفح اكتشاف الأطباء مع إجراءات ملف وتواصل واضحة عند مراجعة القوائم.', slug: 'doctors' },
         { title: 'العيادات والمراكز', specialty: 'المراكز', description: 'استكشف ملفات العيادات والمراكز للصحة والأسنان والتجميل والعناية.', slug: 'centers' },
         { title: 'الصيدليات والمختبرات والخدمات', specialty: 'خدمات الرعاية', description: 'اعثر على مسارات اكتشاف معتمدة لخدمات الرعاية اليومية في عُمان.', slug: 'services' }
+      ]
+    },
+    carousel: {
+      eyebrow: 'مراكز مميزة',
+      title: 'رعاية موثوقة في عُمان',
+      subtitle: 'تعرض بطاقات المراكز عينة من شكل الاكتشاف فقط، دون تقييمات أو مراجعات أو توفر حقيقي أو ادعاء ترويجي.',
+      previous: 'المراكز السابقة',
+      next: 'المراكز التالية',
+      pauseLabel: 'عارض المراكز المميزة',
+      sampleLabel: 'معاينة نموذجية',
+      providers: [
+        { name: 'مركز الخوير الطبي', category: 'مركز طبي', location: 'مسقط · الخوير', hours: 'معاينة الأوقات', description: 'بطاقة نموذجية لاكتشاف الرعاية العامة وإجراءات التواصل.', route: 'centers' },
+        { name: 'عيادة مدينة قابوس للأسنان', category: 'عيادة أسنان', location: 'مسقط · مدينة قابوس', hours: 'معاينة الأوقات', description: 'معاينة لاكتشاف خدمات الأسنان دون تقييمات أو ادعاءات سريرية.', route: 'services' },
+        { name: 'صيدلية السيب العائلية', category: 'صيدلية', location: 'السيب · الحيل', hours: 'معاينة الأوقات', description: 'بطاقة اكتشاف صيدلية مع إجراءات تواصل واتجاهات آمنة.', route: 'pharmacies' },
+        { name: 'مختبر روي التشخيصي', category: 'مختبر', location: 'مسقط · روي', hours: 'معاينة الأوقات', description: 'معاينة مختبر لقوائم عامة معتمدة مستقبلاً.', route: 'labs' },
+        { name: 'عيادة العذيبة البيطرية', category: 'عيادة بيطرية', location: 'مسقط · العذيبة', hours: 'معاينة الأوقات', description: 'معاينة لاكتشاف خدمات رعاية الحيوانات الأليفة.', route: 'services' },
+        { name: 'عيادة القرم للعناية والتجميل', category: 'العناية والتجميل', location: 'مسقط · القرم', hours: 'معاينة الأوقات', description: 'معاينة هادئة لاكتشاف خدمات العناية دون ادعاءات.', route: 'services' },
+        { name: 'مركز الغبرة للعيون', category: 'عيادة عيون', location: 'مسقط · الغبرة', hours: 'معاينة الأوقات', description: 'معاينة لاكتشاف رعاية العيون دون ترتيب أو ادعاءات علاجية.', route: 'centers' },
+        { name: 'عيادة مسقط للعلاج الطبيعي', category: 'العلاج الطبيعي', location: 'مسقط · بوشر', hours: 'معاينة الأوقات', description: 'معاينة لاكتشاف خدمات العلاج الطبيعي في قوائم مستقبلية.', route: 'services' }
       ]
     },
     categories: {
@@ -332,6 +396,6 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
       cta: 'لمقدمي الرعاية',
       note: 'لا تتم إضافة بوابة دفع أو دردشة ذكاء اصطناعي أو بحث خلفي أو لوحة مقدمي خدمة هنا.'
     },
-    floating: { whatsapp: 'مساعدة واتساب', ai: 'معاينة الذكاء' }
+    floating: { whatsapp: 'مساعدة واتساب', ai: 'معاينة المساعد الذكي', whatsappTitle: 'دعم واتساب', whatsappBody: 'دعم واتساب هو معاينة واجهة فقط في هذه المرحلة. استخدم هذه اللوحة كبديل آمن حتى اعتماد تفاصيل الدعم النهائية.', whatsappCta: 'فتح معاينة واتساب', aiTitle: 'مساعد دكتور مسقط الذكي', aiBody: 'اسأل عن العثور على أطباء أو عيادات أو صيدليات أو مختبرات أو مناطق أو إدراج مركزك.', aiPlaceholder: 'اكتب سؤالك…', send: 'إرسال', close: 'إغلاق', disclaimer: 'مساعدة عامة للاكتشاف فقط وليست نصيحة طبية.' }
   }
 };

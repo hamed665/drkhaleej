@@ -35,7 +35,7 @@ const cityOptions = {
 } as const;
 
 const areaOptionsByCityEn: Record<string, readonly string[]> = {
-  Muscat: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubrah', 'Madinat Sultan Qaboos', 'Ruwi', 'Muttrah', 'Al Hail', 'Mawaleh', 'Bausher'],
+  Muscat: ['Al Khuwair', 'Azaiba', 'Qurum', 'Al Ghubrah', 'Madinat Qaboos', 'Ruwi', 'Muttrah', 'Bausher', 'Mawaleh', 'Muscat Hills', 'Al Hail'],
   Seeb: ['Al Hail', 'Mawaleh', 'Al Khoud', 'Seeb Souq', 'Sur Al Hadid'],
   Bausher: ['Al Ghubrah', 'Bausher Heights', 'Ghala', 'Al Khuwair'],
   Muttrah: ['Muttrah Corniche', 'Ruwi', 'Wadi Kabir'],
@@ -54,7 +54,7 @@ const areaOptionsByCityEn: Record<string, readonly string[]> = {
 };
 
 const areaOptionsByCityAr: Record<string, readonly string[]> = {
-  مسقط: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'مدينة السلطان قابوس', 'روي', 'مطرح', 'الحيل', 'الموالح', 'بوشر'],
+  مسقط: ['الخوير', 'العذيبة', 'القرم', 'الغبرة', 'مدينة قابوس', 'روي', 'مطرح', 'بوشر', 'الموالح', 'مرتفعات مسقط', 'الحيل'],
   السيب: ['الحيل', 'الموالح', 'الخوض', 'سوق السيب', 'سور الحديد'],
   بوشر: ['الغبرة', 'مرتفعات بوشر', 'غلا', 'الخوير'],
   مطرح: ['كورنيش مطرح', 'روي', 'وادي الكبير'],

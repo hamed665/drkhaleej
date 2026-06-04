@@ -11,12 +11,43 @@ const toneClass: Record<CategoryTone2026, string> = {
   soft: 'from-dm-bg-soft to-white text-dm-text-soft'
 };
 
+const iconByTitle: Record<string, string> = {
+  Doctors: '☤',
+  Clinics: '✚',
+  Pharmacies: '✚',
+  Labs: '⌬',
+  Dental: '◇',
+  'Beauty clinics': '✦',
+  Wellness: '☘',
+  Physiotherapy: '◌',
+  Nutrition: '◍',
+  'Eye clinics': '◉',
+  Dermatology: '✧',
+  Pediatrics: '♡',
+  'Women’s health': '♀',
+  'Pet clinics': '♧',
+  الأطباء: '☤',
+  'العيادات والمراكز': '✚',
+  الصيدليات: '✚',
+  المختبرات: '⌬',
+  الأسنان: '◇',
+  'عيادات التجميل': '✦',
+  'العناية والصحة': '☘',
+  'العلاج الطبيعي': '◌',
+  التغذية: '◍',
+  'عيادات العيون': '◉',
+  الجلدية: '✧',
+  'طب الأطفال': '♡',
+  'صحة المرأة': '♀',
+  'العيادات البيطرية': '♧'
+};
+
 export function CategoryCard2026({ title, description, href, tone }: CategoryCard2026Props) {
   return (
     <Link href={href} className="dm2026-category-link block h-full text-inherit no-underline">
       <article className="dm2026-category-card h-full rounded-[1.45rem] border border-dm-border bg-white p-4 shadow-dm-sm transition hover:-translate-y-1 hover:shadow-dm-md">
-        <span className={`mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br ${toneClass[tone]}`} aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+        <span className={`mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br text-xl font-black ${toneClass[tone]}`} aria-hidden="true">
+          {iconByTitle[title] ?? '✚'}
         </span>
         <h3 className="text-base font-bold text-dm-text">{title}</h3>
         <p className="mt-1 text-sm leading-5 text-dm-text-soft">{description}</p>
