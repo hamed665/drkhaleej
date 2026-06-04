@@ -1,180 +1,116 @@
 import Link from 'next/link';
 
+import { drMuscatSupportWhatsAppUrl } from '@/components/public-2026/home/support-contact-2026';
 import { ModeratedComments2026 } from '@/components/public-2026/ui/ModeratedComments2026';
-
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
-import { publicArticleDetailRoute, publicArticlesRoute, publicDiscoveryRoute } from '@/lib/routes/public';
+import { homeRoute, publicArticleDetailRoute, publicArticlesRoute, publicDiscoveryRoute } from '@/lib/routes/public';
 
-type ArticlesPageProps = {
-  locale: SupportedLocale;
-  country: SupportedCountry;
-};
+type ArticlesPageProps = { locale: SupportedLocale; country: SupportedCountry };
+type ArticleDetailPageProps = ArticlesPageProps & { slug: string };
+type Article = { slug: string; category: string; title: string; excerpt: string; readTime: string; updated: string; related: string; video?: boolean };
 
-type ArticleDetailPageProps = ArticlesPageProps & {
-  slug: string;
-};
-
-const articleSamples = {
+const articles: Record<SupportedLocale, readonly Article[]> = {
   en: [
-    {
-      slug: 'health-guide',
-      category: 'Guide',
-      title: 'How to use DrMuscat to find healthcare in Oman',
-      description: 'A general discovery guide for searching doctors, clinics, pharmacies, labs, and care areas without medical advice claims.',
-      readTime: '4 min read',
-      author: 'DrMuscat editorial preview',
-    },
-    {
-      slug: 'choosing-a-clinic-area',
-      category: 'Local discovery',
-      title: 'Choosing an area before comparing clinics',
-      description: 'Use city and area filters to narrow public healthcare discovery in a calm, bilingual way.',
-      readTime: '3 min read',
-      author: 'DrMuscat editorial preview',
-    },
+    { slug: 'health-guide', category: 'Health guide', title: 'How to use DrMuscat to find healthcare in Oman', excerpt: 'A practical discovery guide for browsing doctors, clinics, pharmacies, labs, services, cities, and areas without medical ranking claims.', readTime: '4 min read', updated: 'Updated June 2026', related: 'Healthcare discovery' },
+    { slug: 'choosing-a-clinic-area', category: 'Clinic guide', title: 'Choosing an area before comparing clinics', excerpt: 'Use city and area filters to narrow healthcare discovery, then confirm location and services directly with the provider.', readTime: '3 min read', updated: 'Updated June 2026', related: 'Clinics and centers' },
+    { slug: 'dental-clinic-checklist', category: 'Dental care', title: 'What to check before visiting a dental clinic', excerpt: 'A general checklist for confirming location, services, hours, and practical details before a clinic visit.', readTime: '5 min read', updated: 'Updated June 2026', related: 'Dental clinics' },
+    { slug: 'lab-test-listings', category: 'Lab tests', title: 'Understanding common lab test listings', excerpt: 'Learn how to read laboratory discovery information and why preparation instructions must be confirmed directly.', readTime: '4 min read', updated: 'Updated June 2026', related: 'Laboratories', video: true },
+    { slug: 'pharmacy-delivery-options', category: 'Pharmacy guide', title: 'Finding pharmacies and delivery options in Oman', excerpt: 'A discovery guide for pharmacy services, opening hours, delivery notes, and medicine availability confirmation.', readTime: '4 min read', updated: 'Updated June 2026', related: 'Pharmacies' },
+    { slug: 'pet-clinic-checklist', category: 'Pet care', title: 'Pet clinic visit checklist', excerpt: 'A calm preparation checklist for discovering veterinary providers and confirming practical visit information.', readTime: '3 min read', updated: 'Updated June 2026', related: 'Pet care', video: true },
   ],
   ar: [
-    {
-      slug: 'health-guide',
-      category: 'دليل',
-      title: 'كيف تستخدم دكتور مسقط للعثور على الرعاية الصحية في عُمان',
-      description: 'دليل عام للاكتشاف يساعدك على البحث عن أطباء وعيادات وصيدليات ومختبرات ومناطق رعاية دون ادعاءات طبية.',
-      readTime: '٤ دقائق قراءة',
-      author: 'معاينة تحريرية من دكتور مسقط',
-    },
-    {
-      slug: 'choosing-a-clinic-area',
-      category: 'اكتشاف محلي',
-      title: 'اختيار المنطقة قبل مقارنة العيادات',
-      description: 'استخدم مرشحات المدينة والمنطقة لتضييق اكتشاف الرعاية الصحية العامة بطريقة هادئة وثنائية اللغة.',
-      readTime: '٣ دقائق قراءة',
-      author: 'معاينة تحريرية من دكتور مسقط',
-    },
+    { slug: 'health-guide', category: 'دليل صحي', title: 'كيف تستخدم دكتور مسقط للعثور على الرعاية الصحية في عُمان', excerpt: 'دليل عملي لاكتشاف الأطباء والعيادات والصيدليات والمختبرات والخدمات والمدن والمناطق دون ادعاءات ترتيب طبي.', readTime: '٤ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'اكتشاف الرعاية الصحية' },
+    { slug: 'choosing-a-clinic-area', category: 'دليل العيادات', title: 'اختيار المنطقة قبل مقارنة العيادات', excerpt: 'استخدم مرشحات المدينة والمنطقة لتضييق نطاق الاكتشاف، ثم أكد الموقع والخدمات مباشرة مع مقدم الرعاية.', readTime: '٣ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'العيادات والمراكز' },
+    { slug: 'dental-clinic-checklist', category: 'العناية بالأسنان', title: 'ما الذي يجب التحقق منه قبل زيارة عيادة أسنان', excerpt: 'قائمة عامة لتأكيد الموقع والخدمات والساعات والتفاصيل العملية قبل زيارة العيادة.', readTime: '٥ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'عيادات الأسنان' },
+    { slug: 'lab-test-listings', category: 'فحوصات المختبر', title: 'فهم قوائم فحوصات المختبر الشائعة', excerpt: 'تعرف على كيفية قراءة معلومات اكتشاف المختبر ولماذا يجب تأكيد تعليمات التحضير مباشرة.', readTime: '٤ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'المختبرات', video: true },
+    { slug: 'pharmacy-delivery-options', category: 'دليل الصيدليات', title: 'العثور على الصيدليات وخيارات التوصيل في عُمان', excerpt: 'دليل اكتشاف لخدمات الصيدليات وساعات العمل وملاحظات التوصيل وتأكيد توفر الدواء.', readTime: '٤ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'الصيدليات' },
+    { slug: 'pet-clinic-checklist', category: 'رعاية الحيوانات', title: 'قائمة تحضير لزيارة العيادة البيطرية', excerpt: 'قائمة هادئة لاكتشاف مقدمي الرعاية البيطرية وتأكيد معلومات الزيارة العملية.', readTime: '٣ دقائق قراءة', updated: 'تم التحديث في يونيو 2026', related: 'الرعاية البيطرية', video: true },
   ],
-} as const;
+};
 
-const articlesCopy = {
+const copy = {
   en: {
-    title: 'Health guides and articles',
-    lead: 'General DrMuscat discovery content for navigating healthcare options in Oman. Not medical advice.',
-    filters: ['All', 'Health guides', 'Dental care', 'Lab tests', 'Pet care', 'Wellness', 'Clinics guide', 'Pharmacy guide'],
-    search: 'Search articles and guides', featured: 'Featured guide', updatedLabel: 'Updated', inlineImage: 'Inline image placeholder',
-    read: 'Read guide',
-    disclaimer: 'General discovery help only. This content does not diagnose, treat, or replace professional medical advice.',
-    updated: 'Updated June 2026',
-    toc: 'On this page',
-    sections: ['Search by need', 'Choose city and area', 'Contact providers safely'],
-    faqTitle: 'FAQ',
-    faq: ['Is this medical advice?', 'Can I use this to compare areas?', 'Are comments published immediately?'],
-    relatedArticles: 'Related articles',
-    relatedProviders: 'Related providers and discovery links',
-    comments: 'Comments are moderated before public display. No reviews are published from this placeholder.',
-    video: 'Video placeholder',
-    indexFaq: [['Are articles medical advice?', 'No. Articles are general information only.'], ['Who writes the guides?', 'DrMuscat editorial previews are prepared for discovery and should be reviewed before publishing.'], ['Can providers contribute articles?', 'Future provider contributions should be reviewed before public display.'], ['Are videos supported?', 'The article layout supports a clearly labeled video placeholder.']],
-    seoTitle: 'Healthcare discovery guides for Oman',
-    seoBody: 'DrMuscat articles help users understand how to discover doctors, clinics, pharmacies, laboratories, services, cities, and areas in Oman. They do not replace advice from a qualified healthcare professional.',
+    home: 'Home', eyebrow: 'DRMUSCAT HEALTH GUIDES', title: 'Health guides and articles', subtitle: 'Practical discovery guides for finding doctors, clinics, pharmacies, labs, and healthcare services in Oman. General information only — not medical advice.', search: 'Search articles and health guides', categories: ['All', 'Health guides', 'Dental care', 'Lab tests', 'Pet care', 'Wellness', 'Clinic guide', 'Pharmacy guide'], trust: 'Reviewed for clarity before publishing. Medical claims are avoided unless reviewed.', featured: 'Featured guide', read: 'Read guide', browseDoctors: 'Browse doctors', videoGuide: 'Video guide', editorialPreview: 'DrMuscat editorial preview', categoriesTitle: 'Explore editorial categories', faqTitle: 'Articles FAQ', seoTitle: 'Healthcare discovery guides for Oman', seoParagraphs: ['DrMuscat health guides help users discover healthcare categories, providers, cities, and areas across Oman in a calm and practical way.', 'Use these guides alongside provider profiles and local filters, then verify services, hours, availability, and credentials directly with the provider.', 'Articles are general discovery information only and do not provide diagnosis, treatment, or emergency guidance.'], ctaTitle: 'Need help finding the right place?', ctaBody: 'Use DrMuscat search, browse providers, or contact DrMuscat support on WhatsApp.', searchHealthcare: 'Search healthcare', browseCenters: 'Browse centers', whatsapp: 'WhatsApp support', disclaimer: 'General discovery help only. This content does not diagnose, treat, or replace professional medical advice.', share: 'Share preview', toc: 'On this page', checklist: 'Practical discovery checklist', safety: 'Safety note', safetyBody: 'Confirm healthcare details directly with providers. This guide is not medical advice, diagnosis, treatment, or emergency guidance.', relatedProviders: 'Related provider discovery', relatedArticles: 'Related articles', articleFaq: 'Guide FAQ', media: 'Editorial guide visual', inlineMedia: 'Supporting visual', play: 'Play video guide preview', relatedPreview: 'Related discovery preview', viewProfile: 'View profile', directions: 'Directions',
+    faq: [['Are DrMuscat articles medical advice?', 'No. Articles provide general discovery information only.'], ['Who writes or reviews the guides?', 'These are DrMuscat editorial previews reviewed for clarity before publishing.'], ['Can providers contribute articles?', 'Future contributions should be reviewed before public display.'], ['Are videos supported?', 'Yes. Video guides can use a clearly labeled editorial video block.'], ['How do I find related doctors or centers?', 'Use the internal discovery links and verify details directly with providers.']],
   },
   ar: {
-    title: 'أدلة ومقالات صحية',
-    lead: 'محتوى عام من دكتور مسقط يساعد على اكتشاف خيارات الرعاية الصحية في عُمان. ليس نصيحة طبية.',
-    filters: ['الكل', 'أدلة صحية', 'العناية بالأسنان', 'فحوصات المختبر', 'رعاية الحيوانات', 'العافية', 'دليل العيادات', 'دليل الصيدليات'],
-    search: 'ابحث في المقالات والأدلة', featured: 'دليل مميز', updatedLabel: 'تم التحديث', inlineImage: 'موضع صورة داخلية',
-    read: 'قراءة الدليل',
-    disclaimer: 'مساعدة عامة للاكتشاف فقط. لا يشخص هذا المحتوى أو يعالج أو يستبدل النصيحة الطبية المتخصصة.',
-    updated: 'تم التحديث في يونيو 2026',
-    toc: 'في هذه الصفحة',
-    sections: ['البحث حسب الحاجة', 'اختيار المدينة والمنطقة', 'التواصل مع مقدمي الرعاية بأمان'],
-    faqTitle: 'الأسئلة الشائعة',
-    faq: ['هل هذه نصيحة طبية؟', 'هل يمكنني استخدام هذا لمقارنة المناطق؟', 'هل تُنشر التعليقات فورًا؟'],
-    relatedArticles: 'مقالات ذات صلة',
-    relatedProviders: 'مقدمو رعاية وروابط اكتشاف ذات صلة',
-    comments: 'تتم مراجعة التعليقات قبل عرضها للعامة. لا تُنشر مراجعات من هذا العنصر التمهيدي.',
-    video: 'موضع فيديو تمهيدي',
-    indexFaq: [['هل المقالات نصيحة طبية؟', 'لا. المقالات معلومات عامة فقط.'], ['من يكتب الأدلة؟', 'يتم إعداد المعاينات التحريرية من دكتور مسقط للاكتشاف وينبغي مراجعتها قبل النشر.'], ['هل يمكن لمقدمي الرعاية المساهمة بمقالات؟', 'ينبغي مراجعة أي مساهمات مستقبلية قبل عرضها للعامة.'], ['هل يتم دعم الفيديو؟', 'يدعم تخطيط المقال موضع فيديو واضح التسمية.']],
-    seoTitle: 'أدلة اكتشاف الرعاية الصحية في عُمان',
-    seoBody: 'تساعد مقالات دكتور مسقط المستخدمين على فهم كيفية اكتشاف الأطباء والعيادات والصيدليات والمختبرات والخدمات والمدن والمناطق في عُمان. ولا تستبدل نصيحة مقدم رعاية صحي مؤهل.',
+    home: 'الرئيسية', eyebrow: 'أدلة دكتور مسقط الصحية', title: 'أدلة ومقالات صحية', subtitle: 'أدلة اكتشاف عملية للعثور على الأطباء والعيادات والصيدليات والمختبرات وخدمات الرعاية الصحية في عُمان. معلومات عامة فقط وليست نصيحة طبية.', search: 'ابحث في المقالات والأدلة الصحية', categories: ['الكل', 'أدلة صحية', 'العناية بالأسنان', 'فحوصات المختبر', 'رعاية الحيوانات', 'العافية', 'دليل العيادات', 'دليل الصيدليات'], trust: 'تتم مراجعتها من أجل الوضوح قبل النشر. يتم تجنب الادعاءات الطبية ما لم تتم مراجعتها.', featured: 'دليل مميز', read: 'قراءة الدليل', browseDoctors: 'تصفح الأطباء', videoGuide: 'دليل فيديو', editorialPreview: 'معاينة تحريرية من دكتور مسقط', categoriesTitle: 'استكشف الفئات التحريرية', faqTitle: 'أسئلة المقالات', seoTitle: 'أدلة اكتشاف الرعاية الصحية في عُمان', seoParagraphs: ['تساعد أدلة دكتور مسقط الصحية المستخدمين على اكتشاف فئات الرعاية ومقدميها والمدن والمناطق في عُمان بطريقة هادئة وعملية.', 'استخدم هذه الأدلة مع ملفات مقدمي الرعاية والمرشحات المحلية، ثم أكد الخدمات والساعات والتوفر والاعتمادات مباشرة مع مقدم الرعاية.', 'المقالات معلومات اكتشاف عامة فقط ولا تقدم تشخيصاً أو علاجاً أو إرشاداً للطوارئ.'], ctaTitle: 'هل تحتاج إلى مساعدة للعثور على المكان المناسب؟', ctaBody: 'استخدم بحث دكتور مسقط أو تصفح مقدمي الرعاية أو تواصل مع دعم دكتور مسقط عبر واتساب.', searchHealthcare: 'البحث عن الرعاية', browseCenters: 'تصفح المراكز', whatsapp: 'دعم واتساب', disclaimer: 'مساعدة عامة للاكتشاف فقط. لا يشخص هذا المحتوى أو يعالج أو يستبدل النصيحة الطبية المتخصصة.', share: 'معاينة المشاركة', toc: 'في هذه الصفحة', checklist: 'قائمة اكتشاف عملية', safety: 'ملاحظة السلامة', safetyBody: 'أكد تفاصيل الرعاية الصحية مباشرة مع مقدمي الرعاية. هذا الدليل ليس نصيحة طبية أو تشخيصاً أو علاجاً أو إرشاداً للطوارئ.', relatedProviders: 'اكتشاف مقدمي رعاية ذوي صلة', relatedArticles: 'مقالات ذات صلة', articleFaq: 'أسئلة الدليل', media: 'تصميم بصري للدليل التحريري', inlineMedia: 'تصميم بصري داعم', play: 'تشغيل معاينة دليل الفيديو', relatedPreview: 'معاينة اكتشاف ذات صلة', viewProfile: 'عرض الملف', directions: 'الاتجاهات',
+    faq: [['هل مقالات دكتور مسقط نصيحة طبية؟', 'لا. تقدم المقالات معلومات اكتشاف عامة فقط.'], ['من يكتب أو يراجع الأدلة؟', 'هذه معاينات تحريرية من دكتور مسقط تتم مراجعتها من أجل الوضوح قبل النشر.'], ['هل يمكن لمقدمي الرعاية المساهمة بمقالات؟', 'ينبغي مراجعة أي مساهمات مستقبلية قبل عرضها للعامة.'], ['هل يتم دعم الفيديو؟', 'نعم. يمكن لأدلة الفيديو استخدام قسم فيديو تحريري واضح التسمية.'], ['كيف أجد أطباء أو مراكز ذات صلة؟', 'استخدم روابط الاكتشاف الداخلية وأكد التفاصيل مباشرة مع مقدمي الرعاية.']],
   },
 } as const;
 
+const categoryRoutes = ['doctors', 'centers', 'pharmacies', 'labs', 'services', 'search'] as const;
+
 export function ArticlesIndexPage2026({ locale, country }: ArticlesPageProps) {
-  const copy = articlesCopy[locale];
-  const articles = articleSamples[locale];
+  const text = copy[locale];
+  const items = articles[locale];
+  const featured = items[0]!;
+  const whatsappUrl = drMuscatSupportWhatsAppUrl(locale);
+  const categoryLabels = locale === 'ar' ? ['الأطباء', 'العيادات والمراكز', 'الصيدليات', 'المختبرات', 'خدمات الرعاية', 'المناطق والبحث'] : ['Doctors', 'Clinics and centers', 'Pharmacies', 'Labs', 'Healthcare services', 'Local areas'];
 
   return (
-    <main className="dm2026-page dm2026-articles-page" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <section className="dm2026-articles-hero">
-        <p className="dm2026-eyebrow">DrMuscat</p>
-        <h1>{copy.title}</h1>
-        <p>{copy.lead}</p>
-        <label className="sr-only" htmlFor="article-search">{copy.search}</label>
-        <input id="article-search" className="mt-6 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white px-5 py-3 text-slate-950 shadow-sm outline-none focus:border-emerald-500" placeholder={copy.search} />
-        <div className="dm2026-filter-row" aria-label={locale === 'ar' ? 'مرشحات المقالات' : 'Article filters'}>
-          {copy.filters.map((filter) => (
-            <button key={filter} type="button">{filter}</button>
-          ))}
+    <main dir={locale === 'ar' ? 'rtl' : 'ltr'} className="bg-slate-50/70 text-slate-950">
+      <section className="border-b border-emerald-100 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.20),transparent_38%),linear-gradient(135deg,#ecfdf5,#ffffff_55%,#f0fdfa)] px-4 py-10 sm:py-16">
+        <div className="mx-auto max-w-7xl">
+          <nav className="text-sm font-semibold text-emerald-800" aria-label="Breadcrumb"><Link href={homeRoute(locale, country)}>{text.home}</Link><span className="mx-2">/</span><span>{text.title}</span></nav>
+          <p className="mt-8 text-xs font-black uppercase tracking-[0.22em] text-emerald-700">{text.eyebrow}</p>
+          <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">{text.title}</h1>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">{text.subtitle}</p>
+          <label className="sr-only" htmlFor="article-search">{text.search}</label><input id="article-search" className="mt-7 w-full max-w-2xl rounded-2xl border border-emerald-100 bg-white px-5 py-4 text-base shadow-lg outline-none focus:border-emerald-500" placeholder={text.search} />
+          <div className="mt-5 flex flex-wrap gap-2">{text.categories.map((item) => <button type="button" key={item} className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-900 shadow-sm">{item}</button>)}</div>
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-emerald-900">✓ {text.trust}</p>
         </div>
       </section>
-      <section className="mx-auto max-w-7xl px-4 pt-10"><article className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm sm:p-8"><p className="dm2026-eyebrow">{copy.featured}</p><h2 className="mt-2 text-2xl font-bold text-slate-950">{articles[0].title}</h2><p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{articles[0].description}</p><div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span>{articles[0].author}</span><span>{copy.updated}</span><span>{articles[0].readTime}</span></div><Link className="mt-5 inline-flex rounded-full bg-emerald-800 px-5 py-3 text-sm font-bold text-white" href={publicArticleDetailRoute(locale, country, articles[0].slug)}>{copy.read}</Link></article></section>
-      <section className="dm2026-article-grid" aria-label={copy.title}>
-        {articles.map((article) => (
-          <article key={article.slug} className="dm2026-article-preview-card">
-            <div className="dm2026-article-media" aria-hidden="true"><span>{copy.video}</span></div>
-            <p className="dm2026-eyebrow">{article.category}</p>
-            <h2>{article.title}</h2>
-            <p>{article.description}</p>
-            <div className="dm2026-article-meta"><span>{article.readTime}</span><span>{article.author}</span><span>{copy.updated}</span></div>
-            <Link href={publicArticleDetailRoute(locale, country, article.slug)}>{copy.read}</Link>
-          </article>
-        ))}
-      </section>
-      <section className="mx-auto max-w-7xl px-4 pb-10"><div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-2xl font-bold text-slate-950">{copy.faqTitle}</h2><div className="mt-5 grid gap-3 md:grid-cols-2">{copy.indexFaq.map(([question, answer]) => <details key={question} className="rounded-2xl border border-slate-200 p-4"><summary className="cursor-pointer font-bold text-slate-950">{question}</summary><p className="mt-2 text-sm leading-7 text-slate-600">{answer}</p></details>)}</div></div></section>
-      <section className="mx-auto max-w-7xl px-4 pb-10"><div className="rounded-3xl bg-emerald-950 p-6 text-white sm:p-8"><h2 className="text-2xl font-bold">{copy.seoTitle}</h2><p className="mt-3 max-w-4xl text-sm leading-7 text-emerald-50">{copy.seoBody}</p><div className="mt-5 flex flex-wrap gap-3"><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'doctors')}>{locale === 'ar' ? 'الأطباء' : 'Doctors'}</Link><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'centers')}>{locale === 'ar' ? 'المراكز' : 'Centers'}</Link><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'services')}>{locale === 'ar' ? 'الخدمات' : 'Services'}</Link></div></div></section>
-      <p className="dm2026-disclaimer-note">{copy.disclaimer}</p>
+
+      <section className="mx-auto max-w-7xl px-4 py-12"><article className="grid overflow-hidden rounded-[2rem] border border-emerald-200 bg-white shadow-xl lg:grid-cols-[1.1fr_0.9fr]"><div className="p-7 sm:p-10"><span className="rounded-full bg-amber-100 px-3 py-1.5 text-xs font-black text-amber-900">{text.featured}</span><h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">{featured.title}</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">{featured.excerpt}</p><div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span>{featured.updated}</span><span>{featured.readTime}</span><span>{text.editorialPreview}</span></div><div className="mt-7 flex flex-wrap gap-3"><Link href={publicArticleDetailRoute(locale, country, featured.slug)} className="rounded-full bg-emerald-800 px-5 py-3 text-sm font-bold text-white">{text.read}</Link><Link href={publicDiscoveryRoute(locale, country, 'doctors')} className="rounded-full border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700">{text.browseDoctors}</Link></div></div><EditorialMedia label={text.media} large /></article></section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12"><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{items.map((article) => <ArticleCard key={article.slug} article={article} locale={locale} country={country} />)}</div></section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12"><h2 className="text-3xl font-bold tracking-tight">{text.categoriesTitle}</h2><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{categoryLabels.map((label, index) => <Link key={label} href={publicDiscoveryRoute(locale, country, categoryRoutes[index % categoryRoutes.length]!)} className="rounded-2xl border border-slate-200 bg-white p-5 font-bold text-slate-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50">{label}<span className="mt-2 block text-sm font-medium text-emerald-700">→</span></Link>)}</div></section>
+
+      <FaqBlock title={text.faqTitle} items={text.faq} />
+
+      <section className="mx-auto max-w-7xl px-4 pb-12"><div className="rounded-[2rem] border border-emerald-100 bg-white p-7 shadow-sm sm:p-10"><h2 className="text-3xl font-bold">{text.seoTitle}</h2><div className="mt-5 max-w-4xl space-y-4 text-sm leading-8 text-slate-600">{text.seoParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div><div className="mt-6 flex flex-wrap gap-3">{categoryRoutes.map((route, index) => <Link key={route} href={publicDiscoveryRoute(locale, country, route)} className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-900">{categoryLabels[index]}</Link>)}</div></div></section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12"><div className="rounded-[2rem] bg-slate-950 p-7 text-white sm:p-10"><h2 className="text-3xl font-bold">{text.ctaTitle}</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">{text.ctaBody}</p><div className="mt-6 flex flex-wrap gap-3"><Link href={publicDiscoveryRoute(locale, country, 'search')} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-950">{text.searchHealthcare}</Link><Link href={publicDiscoveryRoute(locale, country, 'centers')} className="rounded-full border border-white/30 px-5 py-3 text-sm font-bold text-white">{text.browseCenters}</Link><a href={whatsappUrl} target="_blank" rel="noreferrer" className="rounded-full bg-green-600 px-5 py-3 text-sm font-bold text-white">{text.whatsapp}</a></div></div></section>
+      <p className="mx-auto max-w-7xl px-4 pb-16 text-sm leading-7 text-slate-500">{text.disclaimer}</p>
     </main>
   );
 }
 
 export function ArticleDetailPage2026({ locale, country, slug }: ArticleDetailPageProps) {
-  const copy = articlesCopy[locale];
-  const article = articleSamples[locale].find((item) => item.slug === slug) ?? articleSamples[locale][0];
+  const text = copy[locale];
+  const items = articles[locale];
+  const article = items.find((item) => item.slug === slug) ?? items[0]!;
+  const related = items.filter((item) => item.slug !== article.slug).slice(0, 3);
+  const detailFaq: readonly (readonly [string, string])[] = locale === 'ar' ? [['هل هذا الدليل نصيحة طبية؟', 'لا. هو دليل اكتشاف عام فقط.'], ['كيف أؤكد تفاصيل مقدم الرعاية؟', 'تواصل مباشرة مع مقدم الرعاية قبل الزيارة.'], ['هل يمكن الاعتماد على التوفر المذكور؟', 'يجب دائماً تأكيد التوفر والساعات مباشرة.'], ['هل يتم نشر التعليقات فوراً؟', 'لا. التعليقات قيد المراجعة قبل العرض العام.']] : [['Is this guide medical advice?', 'No. It is a general discovery guide only.'], ['How do I confirm provider details?', 'Contact the provider directly before visiting.'], ['Can I rely on listed availability?', 'Always confirm availability and hours directly.'], ['Are comments published immediately?', 'No. Comments are moderated before public display.']];
 
   return (
-    <main className="dm2026-page dm2026-article-detail" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <article className="dm2026-article-detail-card">
-        <Link className="dm2026-back-link" href={publicArticlesRoute(locale, country)}>{copy.title}</Link>
-        <p className="dm2026-eyebrow">{article.category}</p>
-        <h1>{article.title}</h1>
-        <p>{article.description}</p>
-        <div className="dm2026-article-meta"><span>{article.author}</span><span>{copy.updated}</span><span>{article.readTime}</span></div>
-        <div className="dm2026-article-media dm2026-article-media--large" aria-hidden="true"><span>{copy.video}</span></div>
-        <aside className="dm2026-toc">
-          <h2>{copy.toc}</h2>
-          <ol>{copy.sections.map((section) => <li key={section}>{section}</li>)}</ol>
-        </aside>
-        {copy.sections.map((section, index) => (
-          <section key={section}>
-            <h2>{section}</h2>
-            <p>{copy.lead}</p>
-            {index === 0 ? <div className="dm2026-article-media" aria-hidden="true"><span>{copy.inlineImage}</span></div> : null}
-          </section>
-        ))}
-        <section className="dm2026-related-box">
-          <h2>{copy.faqTitle}</h2>
-          <ul>{copy.faq.map((item) => <li key={item}>{item}</li>)}</ul>
-        </section>
-        <section className="dm2026-related-box">
-          <h2>{copy.relatedArticles}</h2>
-          <Link href={publicArticleDetailRoute(locale, country, articleSamples[locale][1]?.slug ?? 'health-guide')}>{articleSamples[locale][1]?.title ?? copy.title}</Link>
-        </section>
-        <section className="dm2026-related-box">
-          <h2>{copy.relatedProviders}</h2>
-          <Link href={publicDiscoveryRoute(locale, country, 'search')}>{locale === 'ar' ? 'ابدأ البحث' : 'Start searching'}</Link>
-        </section>
-        <section className="dm2026-comments-box">
-          <ModeratedComments2026 locale={locale} />
-        </section>
-        <p className="dm2026-disclaimer-note">{copy.disclaimer}</p>
+    <main dir={locale === 'ar' ? 'rtl' : 'ltr'} className="bg-slate-50/70 text-slate-950">
+      <article>
+        <header className="border-b border-emerald-100 bg-white px-4 py-10 sm:py-14"><div className="mx-auto max-w-7xl"><nav className="text-sm font-semibold text-emerald-800" aria-label="Breadcrumb"><Link href={homeRoute(locale, country)}>{text.home}</Link><span className="mx-2">/</span><Link href={publicArticlesRoute(locale, country)}>{text.title}</Link><span className="mx-2">/</span><span>{article.title}</span></nav><p className="mt-8 text-xs font-black uppercase tracking-[0.18em] text-emerald-700">{article.category}</p><h1 className="mt-4 max-w-5xl text-4xl font-bold tracking-tight sm:text-5xl">{article.title}</h1><p className="mt-5 max-w-3xl text-base leading-8 text-slate-600">{article.excerpt}</p><div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span>{text.editorialPreview}</span><span>{article.updated}</span><span>{article.readTime}</span></div><button type="button" className="mt-6 rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700">{text.share}</button></div></header>
+        <div className="mx-auto max-w-7xl px-4 py-10"><EditorialMedia label={article.video ? text.videoGuide : text.media} large video={!!article.video} /></div>
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 pb-12 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start"><div className="space-y-8"><section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">{['Search by need', 'Choose city and area', 'Contact providers safely'].map((section, index) => <div key={section} className="mb-8 last:mb-0"><h2 className="text-2xl font-bold">{locale === 'ar' ? ['البحث حسب الحاجة', 'اختيار المدينة والمنطقة', 'التواصل مع مقدمي الرعاية بأمان'][index] : section}</h2><p className="mt-3 text-sm leading-8 text-slate-600">{article.excerpt} {text.disclaimer}</p>{index === 0 ? <div className="mt-5"><EditorialMedia label={text.inlineMedia} /></div> : null}{index === 1 ? <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5"><h3 className="font-bold text-emerald-950">{text.checklist}</h3><ul className="mt-3 space-y-2 text-sm text-emerald-900"><li>✓ {locale === 'ar' ? 'أكد الموقع والمنطقة.' : 'Confirm the location and area.'}</li><li>✓ {locale === 'ar' ? 'أكد الخدمات والساعات مباشرة.' : 'Confirm services and hours directly.'}</li><li>✓ {locale === 'ar' ? 'تجنب مشاركة معلومات طبية خاصة.' : 'Avoid sharing private medical information.'}</li></ul></div> : null}</div>)}</section><section className="rounded-3xl bg-amber-50 p-6"><h2 className="text-xl font-bold text-amber-950">{text.safety}</h2><p className="mt-3 text-sm leading-7 text-amber-900">{text.safetyBody}</p></section></div><aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24"><h2 className="font-bold">{text.toc}</h2><ol className="mt-4 space-y-3 text-sm text-emerald-800"><li>{locale === 'ar' ? 'البحث حسب الحاجة' : 'Search by need'}</li><li>{locale === 'ar' ? 'اختيار المدينة والمنطقة' : 'Choose city and area'}</li><li>{locale === 'ar' ? 'التواصل بأمان' : 'Contact providers safely'}</li></ol></aside></div>
+
+        <section className="mx-auto max-w-7xl px-4 pb-12"><h2 className="text-3xl font-bold">{text.relatedProviders}</h2><div className="mt-6 grid gap-5 md:grid-cols-3">{(['doctors', 'centers', 'labs'] as const).map((route) => <div key={route} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">{text.relatedPreview}</span><h3 className="mt-4 text-xl font-bold">{locale === 'ar' ? 'معاينة اكتشاف مقدم رعاية' : 'Provider discovery preview'}</h3><p className="mt-3 text-sm leading-7 text-slate-600">{locale === 'ar' ? 'استخدم ملفات الاكتشاف المعتمدة وأكد التفاصيل مباشرة.' : 'Use approved discovery profiles and confirm details directly.'}</p><div className="mt-5 flex flex-wrap gap-2"><Link href={publicDiscoveryRoute(locale, country, route)} className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-bold text-white">{text.viewProfile}</Link><Link href={publicDiscoveryRoute(locale, country, 'search')} className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700">{text.directions}</Link></div></div>)}</div></section>
+        <section className="mx-auto max-w-7xl px-4 pb-12"><h2 className="text-3xl font-bold">{text.relatedArticles}</h2><div className="mt-6 grid gap-5 md:grid-cols-3">{related.map((item) => <ArticleCard key={item.slug} article={item} locale={locale} country={country} />)}</div></section>
+        <FaqBlock title={text.articleFaq} items={detailFaq} />
+        <section className="mx-auto max-w-4xl px-4 pb-12"><div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><ModeratedComments2026 locale={locale} /></div></section>
+        <p className="mx-auto max-w-7xl px-4 pb-16 text-sm leading-7 text-slate-500">{text.disclaimer}</p>
       </article>
     </main>
   );
+}
+
+function ArticleCard({ article, locale, country }: { article: Article; locale: SupportedLocale; country: SupportedCountry }) {
+  const text = copy[locale];
+  return <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"><EditorialMedia label={article.video ? text.videoGuide : article.category} video={!!article.video} /><div className="p-6"><div className="flex flex-wrap items-center gap-2"><span className="text-xs font-black uppercase tracking-wider text-emerald-700">{article.category}</span>{article.video ? <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-800">▶ {text.videoGuide}</span> : null}</div><h2 className="mt-3 text-xl font-bold leading-8">{article.title}</h2><p className="mt-3 text-sm leading-7 text-slate-600">{article.excerpt}</p><div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span>{article.updated}</span><span>{article.readTime}</span><span>{article.related}</span></div><Link href={publicArticleDetailRoute(locale, country, article.slug)} className="mt-5 inline-flex rounded-full bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white">{text.read}</Link></div></article>;
+}
+
+function EditorialMedia({ label, large = false, video = false }: { label: string; large?: boolean; video?: boolean }) {
+  return <div aria-label={label} role="img" className={`relative flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.8),transparent_25%),linear-gradient(135deg,#d1fae5,#ccfbf1_55%,#e0f2fe)] ${large ? 'min-h-72 lg:min-h-full' : 'aspect-[16/10]'}`}><div className="absolute -end-10 -top-10 h-36 w-36 rounded-full bg-emerald-300/30" /><div className="absolute -bottom-10 -start-10 h-40 w-40 rounded-full bg-cyan-300/30" /><div className="relative text-center"><span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 text-2xl text-emerald-800 shadow-lg">{video ? '▶' : '✦'}</span><p className="mt-4 px-4 text-sm font-bold text-emerald-950">{label}</p></div></div>;
+}
+
+function FaqBlock({ title, items }: { title: string; items: readonly (readonly [string, string])[] }) {
+  return <section className="mx-auto max-w-7xl px-4 pb-12"><div className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm sm:p-10"><h2 className="text-3xl font-bold">{title}</h2><div className="mt-6 grid gap-3 md:grid-cols-2">{items.map(([question, answer]) => <details key={question} className="rounded-2xl border border-slate-200 p-5 open:border-emerald-200 open:bg-emerald-50"><summary className="cursor-pointer font-bold text-slate-950">{question}</summary><p className="mt-3 text-sm leading-7 text-slate-600">{answer}</p></details>)}</div></div></section>;
 }
