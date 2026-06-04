@@ -83,7 +83,7 @@ const fallbackAreas = {
 
 export const omanAreaOptionsByCity2026 = {
   en: {
-    Muscat: ['Al Khuwair', 'Azaiba', 'Qurum', 'Al Ghubrah', 'Madinat Qaboos', 'Ruwi', 'Muttrah', 'Bausher', 'Al Hail', 'Mawaleh', 'Muscat Hills'],
+    Muscat: ['Al Khuwair', 'Azaiba', 'Qurum', 'Al Ghubrah', 'Madinat Qaboos', 'Ruwi', 'Muttrah', 'Bausher', 'Al Hail', 'Mawaleh', 'Muscat Hills', 'Wadi Kabir', 'Al Khoudh', 'Al Mouj', 'Ghala'],
     Seeb: ['Al Hail', 'Mawaleh', 'Al Khoud', 'Seeb Souq', 'Sur Al Hadid'],
     Bausher: ['Al Ghubrah', 'Bausher Heights', 'Ghala', 'Al Khuwair'],
     Muttrah: ['Muttrah Corniche', 'Ruwi', 'Wadi Kabir'],
@@ -101,7 +101,7 @@ export const omanAreaOptionsByCity2026 = {
     Duqm: fallbackAreas.en,
   },
   ar: {
-    Muscat: ['الخوير', 'العذيبة', 'القرم', 'الغبرة', 'مدينة قابوس', 'روي', 'مطرح', 'بوشر', 'الحيل', 'الموالح', 'مرتفعات مسقط'],
+    Muscat: ['الخوير', 'العذيبة', 'القرم', 'الغبرة', 'مدينة قابوس', 'روي', 'مطرح', 'بوشر', 'الحيل', 'الموالح', 'مرتفعات مسقط', 'وادي الكبير', 'الخوض', 'الموج', 'غلا'],
     Seeb: ['الحيل', 'الموالح', 'الخوض', 'سوق السيب', 'سور الحديد'],
     Bausher: ['الغبرة', 'مرتفعات بوشر', 'غلا', 'الخوير'],
     Muttrah: ['كورنيش مطرح', 'روي', 'وادي الكبير'],

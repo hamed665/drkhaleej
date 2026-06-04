@@ -55,7 +55,8 @@ const articlesCopy = {
   en: {
     title: 'Health guides and articles',
     lead: 'General DrMuscat discovery content for navigating healthcare options in Oman. Not medical advice.',
-    filters: ['All', 'Guides', 'Local discovery', 'Video'],
+    filters: ['All', 'Health guides', 'Dental care', 'Lab tests', 'Pet care', 'Wellness', 'Clinics guide', 'Pharmacy guide'],
+    search: 'Search articles and guides', featured: 'Featured guide', updatedLabel: 'Updated', inlineImage: 'Inline image placeholder',
     read: 'Read guide',
     disclaimer: 'General discovery help only. This content does not diagnose, treat, or replace professional medical advice.',
     updated: 'Updated June 2026',
@@ -71,7 +72,8 @@ const articlesCopy = {
   ar: {
     title: 'أدلة ومقالات صحية',
     lead: 'محتوى عام من دكتور مسقط يساعد على اكتشاف خيارات الرعاية الصحية في عُمان. ليس نصيحة طبية.',
-    filters: ['الكل', 'أدلة', 'اكتشاف محلي', 'فيديو'],
+    filters: ['الكل', 'أدلة صحية', 'العناية بالأسنان', 'فحوصات المختبر', 'رعاية الحيوانات', 'العافية', 'دليل العيادات', 'دليل الصيدليات'],
+    search: 'ابحث في المقالات والأدلة', featured: 'دليل مميز', updatedLabel: 'تم التحديث', inlineImage: 'موضع صورة داخلية',
     read: 'قراءة الدليل',
     disclaimer: 'مساعدة عامة للاكتشاف فقط. لا يشخص هذا المحتوى أو يعالج أو يستبدل النصيحة الطبية المتخصصة.',
     updated: 'تم التحديث في يونيو 2026',
@@ -96,12 +98,15 @@ export function ArticlesIndexPage2026({ locale, country }: ArticlesPageProps) {
         <p className="dm2026-eyebrow">DrMuscat</p>
         <h1>{copy.title}</h1>
         <p>{copy.lead}</p>
+        <label className="sr-only" htmlFor="article-search">{copy.search}</label>
+        <input id="article-search" className="mt-6 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white px-5 py-3 text-slate-950 shadow-sm outline-none focus:border-emerald-500" placeholder={copy.search} />
         <div className="dm2026-filter-row" aria-label={locale === 'ar' ? 'مرشحات المقالات' : 'Article filters'}>
           {copy.filters.map((filter) => (
             <button key={filter} type="button">{filter}</button>
           ))}
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-4 pt-10"><article className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm sm:p-8"><p className="dm2026-eyebrow">{copy.featured}</p><h2 className="mt-2 text-2xl font-bold text-slate-950">{articles[0].title}</h2><p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{articles[0].description}</p><div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span>{articles[0].author}</span><span>{copy.updated}</span><span>{articles[0].readTime}</span></div><Link className="mt-5 inline-flex rounded-full bg-emerald-800 px-5 py-3 text-sm font-bold text-white" href={publicArticleDetailRoute(locale, country, articles[0].slug)}>{copy.read}</Link></article></section>
       <section className="dm2026-article-grid" aria-label={copy.title}>
         {articles.map((article) => (
           <article key={article.slug} className="dm2026-article-preview-card">
@@ -109,7 +114,7 @@ export function ArticlesIndexPage2026({ locale, country }: ArticlesPageProps) {
             <p className="dm2026-eyebrow">{article.category}</p>
             <h2>{article.title}</h2>
             <p>{article.description}</p>
-            <div className="dm2026-article-meta"><span>{article.readTime}</span><span>{article.author}</span></div>
+            <div className="dm2026-article-meta"><span>{article.readTime}</span><span>{article.author}</span><span>{copy.updated}</span></div>
             <Link href={publicArticleDetailRoute(locale, country, article.slug)}>{copy.read}</Link>
           </article>
         ))}
@@ -136,10 +141,11 @@ export function ArticleDetailPage2026({ locale, country, slug }: ArticleDetailPa
           <h2>{copy.toc}</h2>
           <ol>{copy.sections.map((section) => <li key={section}>{section}</li>)}</ol>
         </aside>
-        {copy.sections.map((section) => (
+        {copy.sections.map((section, index) => (
           <section key={section}>
             <h2>{section}</h2>
             <p>{copy.lead}</p>
+            {index === 0 ? <div className="dm2026-article-media" aria-hidden="true"><span>{copy.inlineImage}</span></div> : null}
           </section>
         ))}
         <section className="dm2026-related-box">

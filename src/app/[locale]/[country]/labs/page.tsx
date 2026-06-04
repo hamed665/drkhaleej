@@ -1,84 +1,26 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PublicPageShell } from '@/components/public/public-page-shell';
-import {
-  isSupportedCountry,
-  isSupportedLocale,
-  localeDirection,
-  type SupportedLocale
-} from '@/lib/i18n/config';
+
+import { DiscoveryPage2026 } from '@/components/public-2026/pages/DiscoveryPages2026';
+import { isSupportedCountry, isSupportedLocale, type SupportedLocale } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
 type Params = { locale: string; country: string };
 
-type RouteCopy = {
-  title: string;
-  description: string;
-  badge: string;
-  panelHeading: string;
-  panelBody: string;
-  gridTitle: string;
-  gridItems: readonly string[];
-};
-
-const copyByLocale: Record<SupportedLocale, RouteCopy> = {
-  en: {
-    title: 'Laboratories in Oman',
-    description: 'Laboratory discovery pages are being prepared for structured provider data.',
-    badge: 'Public discovery route',
-    panelHeading: 'Provider data preparation in progress',
-    panelBody: 'Laboratory discovery pages are being prepared for structured provider data.',
-    gridTitle: 'Planned route structure',
-    gridItems: ['Bilingual route foundation', 'SEO-safe metadata baseline', 'Responsive public page skeleton']
-  },
-  ar: {
-    title: 'المختبرات الطبية في عُمان',
-    description: 'يتم تجهيز صفحات اكتشاف المختبرات لعرض بيانات مقدمي الخدمة المنظمة في مراحل قادمة.',
-    badge: 'مسار استكشاف عام',
-    panelHeading: 'جاري تجهيز بيانات مقدمي الخدمة',
-    panelBody: 'يتم تجهيز صفحات اكتشاف المختبرات لعرض بيانات مقدمي الخدمة المنظمة.',
-    gridTitle: 'الهيكل المخطط للمسار',
-    gridItems: ['أساس مسار ثنائي اللغة', 'خط أساس آمن لبيانات SEO', 'هيكل صفحة عامة متجاوب']
-  }
-};
+const copyByLocale = {
+  en: { title: 'Find medical laboratories in Oman | DrMuscat', description: 'Discover laboratory profiles by city, area, and test category in Oman.' },
+  ar: { title: 'ابحث عن مختبرات طبية في عُمان | دكتور مسقط', description: 'اكتشف ملفات المختبرات الطبية حسب المدينة والمنطقة وفئة الفحص في عُمان.' },
+} as const satisfies Record<SupportedLocale, { title: string; description: string }>;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country } = await params;
-
-  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) {
-    return {};
-  }
-
+  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
   const copy = copyByLocale[locale];
-
-  return buildLocalizedMetadata({
-    locale,
-    country,
-    pathname: '/labs',
-    title: copy.title,
-    description: copy.description
-  });
+  return buildLocalizedMetadata({ locale, country, pathname: '/labs', title: copy.title, description: copy.description });
 }
 
-export default async function PublicRoutePage({ params }: { params: Promise<Params> }) {
+export default async function PublicDiscoveryPage({ params }: { params: Promise<Params> }) {
   const { locale, country } = await params;
-
-  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) {
-    notFound();
-  }
-
-  const copy = copyByLocale[locale];
-
-  return (
-    <PublicPageShell
-      dir={localeDirection(locale)}
-      heroBadge={copy.badge}
-      heroTitle={copy.title}
-      heroDescription={copy.description}
-      panelHeading={copy.panelHeading}
-      panelBody={copy.panelBody}
-      gridTitle={copy.gridTitle}
-      gridItems={copy.gridItems}
-    />
-  );
+  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
+  return <DiscoveryPage2026 locale={locale} country={country} kind="labs" />;
 }
