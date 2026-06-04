@@ -27,12 +27,12 @@ export function HomePage2026({ locale, country }: HomePage2026Props) {
     <main className="dm2026-home relative min-w-0 overflow-x-hidden" dir={dir} data-country={country} data-locale={locale}>
       <Container2026>
         <HomeHeroSearch2026 locale={locale} country={country} copy={copy} />
-        <HomeTrustBar2026 items={copy.trustBar} />
         <FeaturedCentersCarousel2026 locale={locale} country={country} copy={copy.carousel} actions={copy.actions} />
-        <FeaturedProviders2026 locale={locale} country={country} copy={copy.featured} actions={copy.actions} />
         <BrowseCategories2026 locale={locale} country={country} copy={copy.categories} />
         <BrowseAreas2026 locale={locale} country={country} copy={copy.areas} />
+        <FeaturedProviders2026 locale={locale} country={country} copy={copy.featured} actions={copy.actions} />
         <HomeArticles2026 copy={copy.articles} />
+        <HomeTrustBar2026 items={copy.trustBar} />
         <TrustAndSafety2026 copy={copy.safety} />
         <FaqSection2026 copy={copy.faq} />
         <section className="dm2026-provider-cta my-10 rounded-[2rem] border border-dm-border bg-[linear-gradient(135deg,var(--dm-teal-800),var(--dm-teal-600))] p-6 text-white shadow-dm-lg sm:p-8 lg:p-10" aria-labelledby="dm2026-provider-title">

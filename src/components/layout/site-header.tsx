@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { LanguageSwitch } from '@/components/layout/language-switch';
@@ -37,6 +38,8 @@ const navCopy: Record<
     switchLabel: string;
     brandLabel: string;
     localeSwitch: string;
+    menu: string;
+    closeMenu: string;
   }
 > = {
   en: {
@@ -58,6 +61,8 @@ const navCopy: Record<
     switchLabel: 'Switch language to Arabic',
     brandLabel: 'DrMuscat home',
     localeSwitch: 'العربية',
+    menu: 'Menu',
+    closeMenu: 'Close menu',
   },
   ar: {
     ariaLabel: 'التنقل العام الرئيسي',
@@ -78,6 +83,8 @@ const navCopy: Record<
     switchLabel: 'تبديل اللغة إلى الإنجليزية',
     brandLabel: 'الرئيسية دكتور مسقط',
     localeSwitch: 'English',
+    menu: 'القائمة',
+    closeMenu: 'إغلاق القائمة',
   },
 };
 
@@ -88,6 +95,7 @@ function getLocaleFromPathname(pathname: string | null): SupportedLocale {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const safeLocale = getLocaleFromPathname(pathname);
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
@@ -116,7 +124,7 @@ export function SiteHeader() {
             <span className="site-header__brand-subtitle">{copy.secondaryBrand}</span>
           </span>
         </Link>
-        <nav aria-label={copy.ariaLabel} className="site-header__nav">
+        <nav aria-label={copy.ariaLabel} className="site-header__nav site-header__nav--desktop">
           <ul>
             {navItems.map((item) => (
               <li key={item.href}>
@@ -125,20 +133,39 @@ export function SiteHeader() {
             ))}
           </ul>
         </nav>
-        <div className="site-header__actions" aria-label={safeLocale === 'ar' ? 'روابط الحساب والإدراج' : 'Account and listing links'}>
-          <Link className="site-header__action-link" href={publicSignInRoute(safeLocale, 'om')}>
-            {copy.signIn}
-          </Link>
-          <Link className="site-header__action-link" href={publicRegisterRoute(safeLocale, 'om')}>
-            {copy.register}
-          </Link>
-          <Link className="site-header__action-link site-header__action-link--primary" href={publicListYourCenterRoute(safeLocale, 'om')}>
-            {copy.listYourCenter}
-          </Link>
+        <div className="site-header__actions site-header__actions--desktop" aria-label={safeLocale === 'ar' ? 'روابط الحساب والإدراج' : 'Account and listing links'}>
+          <Link className="site-header__action-link" href={publicSignInRoute(safeLocale, 'om')}>{copy.signIn}</Link>
+          <Link className="site-header__action-link" href={publicRegisterRoute(safeLocale, 'om')}>{copy.register}</Link>
+          <Link className="site-header__action-link site-header__action-link--primary" href={publicListYourCenterRoute(safeLocale, 'om')}>{copy.listYourCenter}</Link>
         </div>
         <div className="site-header__locale" aria-label={copy.switchLabel}>
           <LanguageSwitch locale={safeLocale} label={copy.localeSwitch} ariaLabel={copy.switchLabel} className="site-header__locale-switch" />
         </div>
+        <button
+          type="button"
+          className="site-header__menu-button"
+          aria-expanded={isMenuOpen}
+          aria-controls="site-header-mobile-menu"
+          aria-label={isMenuOpen ? copy.closeMenu : copy.menu}
+          onClick={() => setIsMenuOpen((open) => !open)}
+        >
+          <span aria-hidden="true">{isMenuOpen ? '×' : '☰'}</span>
+          <span>{copy.menu}</span>
+        </button>
+        {isMenuOpen ? (
+          <nav id="site-header-mobile-menu" aria-label={copy.ariaLabel} className="site-header__mobile-menu">
+            <ul>
+              {navItems.map((item) => (
+                <li key={item.href}><Link href={item.href} onClick={() => setIsMenuOpen(false)}>{item.label}</Link></li>
+              ))}
+            </ul>
+            <div className="site-header__mobile-actions">
+              <Link href={publicSignInRoute(safeLocale, 'om')} onClick={() => setIsMenuOpen(false)}>{copy.signIn}</Link>
+              <Link href={publicRegisterRoute(safeLocale, 'om')} onClick={() => setIsMenuOpen(false)}>{copy.register}</Link>
+              <Link className="site-header__mobile-primary" href={publicListYourCenterRoute(safeLocale, 'om')} onClick={() => setIsMenuOpen(false)}>{copy.listYourCenter}</Link>
+            </div>
+          </nav>
+        ) : null}
       </Container>
     </header>
   );

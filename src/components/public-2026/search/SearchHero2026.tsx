@@ -11,8 +11,8 @@ export function SearchHero2026({ locale, country, copy }: SearchHero2026Props) {
   const searchHref = publicDiscoveryRoute(locale, country, 'search');
 
   return (
-    <div className="dm2026-search-hero mx-auto mt-7 w-full max-w-[1000px] rounded-[2rem] border border-white/90 bg-white/95 p-3 shadow-[0_24px_70px_rgba(11,40,38,0.15)] backdrop-blur sm:p-4 lg:p-5">
-      <div className="rounded-[1.75rem] border border-dm-border bg-[linear-gradient(180deg,#fff,var(--dm-bg-warm))] p-4 sm:p-5 lg:p-6">
+    <div className="dm2026-search-hero mx-auto mt-6 w-full max-w-[1000px] rounded-[2rem] border border-white/90 bg-white/95 p-3 shadow-[0_24px_70px_rgba(11,40,38,0.15)] backdrop-blur sm:p-4 lg:p-5">
+      <div className="rounded-[1.75rem] border border-dm-border bg-[linear-gradient(180deg,#fff,var(--dm-bg-warm))] p-3.5 sm:p-5 lg:p-6">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <label className="dm2026-search-input grid gap-2 text-xs font-bold uppercase tracking-[0.08em] text-dm-text-soft">
             {copy.hero.searchLabel}

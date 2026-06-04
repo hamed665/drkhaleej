@@ -29,7 +29,7 @@ export function FloatingActions2026({ locale, copy }: FloatingActions2026Props) 
   return (
     <div className={`dm2026-floating fixed bottom-4 z-30 grid gap-2 ${sideClass}`} dir={dir}>
       {openPanel ? (
-        <section className="dm2026-floating-panel" aria-live="polite">
+        <section className="dm2026-floating-panel" aria-live="polite" role="dialog" aria-label={openPanel === 'whatsapp' ? copy.whatsappTitle : copy.aiTitle}>
           <button type="button" className="dm2026-floating-close" onClick={() => setOpenPanel(null)} aria-label={copy.close}>
             ×
           </button>
