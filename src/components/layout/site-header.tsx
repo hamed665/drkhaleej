@@ -1,9 +1,11 @@
+'use client';
+
 import Link from 'next/link';
-import { headers } from 'next/headers';
+import { usePathname } from 'next/navigation';
 
 import { LanguageSwitch } from '@/components/layout/language-switch';
 import { Container } from '@/components/ui/container';
-import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
+import { localeDirection, SupportedLocale } from '@/lib/i18n/config';
 import {
   homeRoute,
   publicArticlesRoute,
@@ -79,9 +81,14 @@ const navCopy: Record<
   },
 };
 
-export async function SiteHeader() {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
+function getLocaleFromPathname(pathname: string | null): SupportedLocale {
+  const firstSegment = pathname?.split('/').filter(Boolean)[0];
+  return firstSegment === 'ar' ? 'ar' : 'en';
+}
+
+export function SiteHeader() {
+  const pathname = usePathname();
+  const safeLocale = getLocaleFromPathname(pathname);
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');
