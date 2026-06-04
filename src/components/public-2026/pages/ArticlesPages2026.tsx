@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { ModeratedComments2026 } from '@/components/public-2026/ui/ModeratedComments2026';
+
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 import { publicArticleDetailRoute, publicArticlesRoute, publicDiscoveryRoute } from '@/lib/routes/public';
 
@@ -68,6 +70,9 @@ const articlesCopy = {
     relatedProviders: 'Related providers and discovery links',
     comments: 'Comments are moderated before public display. No reviews are published from this placeholder.',
     video: 'Video placeholder',
+    indexFaq: [['Are articles medical advice?', 'No. Articles are general information only.'], ['Who writes the guides?', 'DrMuscat editorial previews are prepared for discovery and should be reviewed before publishing.'], ['Can providers contribute articles?', 'Future provider contributions should be reviewed before public display.'], ['Are videos supported?', 'The article layout supports a clearly labeled video placeholder.']],
+    seoTitle: 'Healthcare discovery guides for Oman',
+    seoBody: 'DrMuscat articles help users understand how to discover doctors, clinics, pharmacies, laboratories, services, cities, and areas in Oman. They do not replace advice from a qualified healthcare professional.',
   },
   ar: {
     title: 'أدلة ومقالات صحية',
@@ -85,6 +90,9 @@ const articlesCopy = {
     relatedProviders: 'مقدمو رعاية وروابط اكتشاف ذات صلة',
     comments: 'تتم مراجعة التعليقات قبل عرضها للعامة. لا تُنشر مراجعات من هذا العنصر التمهيدي.',
     video: 'موضع فيديو تمهيدي',
+    indexFaq: [['هل المقالات نصيحة طبية؟', 'لا. المقالات معلومات عامة فقط.'], ['من يكتب الأدلة؟', 'يتم إعداد المعاينات التحريرية من دكتور مسقط للاكتشاف وينبغي مراجعتها قبل النشر.'], ['هل يمكن لمقدمي الرعاية المساهمة بمقالات؟', 'ينبغي مراجعة أي مساهمات مستقبلية قبل عرضها للعامة.'], ['هل يتم دعم الفيديو؟', 'يدعم تخطيط المقال موضع فيديو واضح التسمية.']],
+    seoTitle: 'أدلة اكتشاف الرعاية الصحية في عُمان',
+    seoBody: 'تساعد مقالات دكتور مسقط المستخدمين على فهم كيفية اكتشاف الأطباء والعيادات والصيدليات والمختبرات والخدمات والمدن والمناطق في عُمان. ولا تستبدل نصيحة مقدم رعاية صحي مؤهل.',
   },
 } as const;
 
@@ -119,6 +127,8 @@ export function ArticlesIndexPage2026({ locale, country }: ArticlesPageProps) {
           </article>
         ))}
       </section>
+      <section className="mx-auto max-w-7xl px-4 pb-10"><div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-2xl font-bold text-slate-950">{copy.faqTitle}</h2><div className="mt-5 grid gap-3 md:grid-cols-2">{copy.indexFaq.map(([question, answer]) => <details key={question} className="rounded-2xl border border-slate-200 p-4"><summary className="cursor-pointer font-bold text-slate-950">{question}</summary><p className="mt-2 text-sm leading-7 text-slate-600">{answer}</p></details>)}</div></div></section>
+      <section className="mx-auto max-w-7xl px-4 pb-10"><div className="rounded-3xl bg-emerald-950 p-6 text-white sm:p-8"><h2 className="text-2xl font-bold">{copy.seoTitle}</h2><p className="mt-3 max-w-4xl text-sm leading-7 text-emerald-50">{copy.seoBody}</p><div className="mt-5 flex flex-wrap gap-3"><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'doctors')}>{locale === 'ar' ? 'الأطباء' : 'Doctors'}</Link><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'centers')}>{locale === 'ar' ? 'المراكز' : 'Centers'}</Link><Link className="rounded-full bg-white px-4 py-2 text-sm font-bold text-emerald-950" href={publicDiscoveryRoute(locale, country, 'services')}>{locale === 'ar' ? 'الخدمات' : 'Services'}</Link></div></div></section>
       <p className="dm2026-disclaimer-note">{copy.disclaimer}</p>
     </main>
   );
@@ -161,8 +171,7 @@ export function ArticleDetailPage2026({ locale, country, slug }: ArticleDetailPa
           <Link href={publicDiscoveryRoute(locale, country, 'search')}>{locale === 'ar' ? 'ابدأ البحث' : 'Start searching'}</Link>
         </section>
         <section className="dm2026-comments-box">
-          <h2>{locale === 'ar' ? 'التعليقات' : 'Comments'}</h2>
-          <p>{copy.comments}</p>
+          <ModeratedComments2026 locale={locale} />
         </section>
         <p className="dm2026-disclaimer-note">{copy.disclaimer}</p>
       </article>

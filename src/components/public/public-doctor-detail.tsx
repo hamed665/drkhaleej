@@ -1,3 +1,5 @@
+import { ModeratedComments2026 } from '@/components/public-2026/ui/ModeratedComments2026';
+import { ReviewsRatings2026 } from '@/components/public-2026/ui/ReviewsRatings2026';
 import { formatPublicLocationSummary, getPublicDirectionsUrl } from '@/lib/catalog/public-location';
 import type { PublicCatalogLocale, PublicDoctorDetail } from '@/lib/catalog/public-types';
 import { publicCenterDetailRoute } from '@/lib/routes/public';
@@ -274,14 +276,20 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
         </p>
       </PublicCenterDetailSection>
 
-      <PublicCenterDetailSection title={copy.futureTitle} description={copy.futureDescription}>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" role="list">
-          {copy.futureSlots.map((slot) => (
-            <li key={slot} className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-4 py-3 text-sm text-slate-600">
-              {slot}
-            </li>
-          ))}
-        </ul>
+      <PublicCenterDetailSection title={locale === 'ar' ? 'الوسائط والعروض' : 'Media and offers'} description={locale === 'ar' ? 'تظهر الصور والفيديو والعروض فقط بعد اعتمادها.' : 'Photos, video, and offers appear only after they are approved.'}>
+        <div className="grid gap-3 sm:grid-cols-2"><div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">{locale === 'ar' ? 'لا توجد وسائط عامة معتمدة بعد.' : 'No approved public media yet.'}</div><div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">{locale === 'ar' ? 'لا توجد عروض عامة معتمدة بعد.' : 'No approved public offers yet.'}</div></div>
+      </PublicCenterDetailSection>
+
+      <PublicCenterDetailSection title={locale === 'ar' ? 'التقييمات والمراجعات' : 'Ratings and reviews'}>
+        <ReviewsRatings2026 locale={locale} />
+      </PublicCenterDetailSection>
+
+      <PublicCenterDetailSection title={locale === 'ar' ? 'تعليقات الملف' : 'Profile comments'}>
+        <ModeratedComments2026 locale={locale} />
+      </PublicCenterDetailSection>
+
+      <PublicCenterDetailSection title={locale === 'ar' ? 'الأسئلة الشائعة' : 'Frequently asked questions'}>
+        <div className="grid gap-3 md:grid-cols-2">{(locale === 'ar' ? [['هل هذا الملف توصية طبية؟', 'لا. الملف مخصص للاكتشاف فقط.'], ['كيف أؤكد ساعات العمل؟', 'تواصل مباشرة مع موقع الممارسة.'], ['هل التقييمات تصنيف للجودة الطبية؟', 'لا. تتم مراجعة التقييمات وليست تصنيفاً للجودة الطبية.'], ['كيف أجد مقدمي رعاية قريبين؟', 'استخدم روابط المركز والمنطقة ومواقع الممارسة.']] : [['Is this profile medical advice?', 'No. This profile is for discovery only.'], ['How do I confirm working hours?', 'Contact the practice location directly.'], ['Are ratings medical quality rankings?', 'No. Ratings are moderated and are not medical quality rankings.'], ['How do I find nearby providers?', 'Use the center, area, and practice-location links.']]).map(([question, answer]) => <details key={question} className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold text-slate-950">{question}</summary><p className="mt-2 text-sm leading-6 text-slate-600">{answer}</p></details>)}</div>
       </PublicCenterDetailSection>
 
       <PublicCenterDetailSection title={copy.disclaimerTitle}>

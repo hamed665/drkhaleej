@@ -29,6 +29,8 @@ const listingCopy = {
     providersLink: 'See provider options',
     stepsTitle: 'How listing works',
     steps: ['Submit essential details', 'DrMuscat reviews the listing', 'Approved public information can be displayed', 'Growth and featured placement options remain placeholders until approved'],
+    faqTitle: 'Listing request FAQ',
+    faqs: [['Does submission guarantee public display?', 'No. Listings are reviewed before public display.'], ['Can I claim an existing profile?', 'Use the authorization confirmation and provide accurate contact details.'], ['Are ratings added from this form?', 'No. Ratings, reviews, and medical claims are not added from this form.'], ['How should I correct information?', 'Submit accurate details or contact DrMuscat support for review.']],
     types: ['Clinic / medical center', 'Doctor', 'Pharmacy', 'Laboratory', 'Dental clinic', 'Beauty / wellness', 'Pet clinic', 'Other healthcare-related service'],
   },
   ar: {
@@ -50,6 +52,8 @@ const listingCopy = {
     providersLink: 'اطلع على خيارات مقدمي الرعاية',
     stepsTitle: 'كيف يعمل الإدراج',
     steps: ['إرسال التفاصيل الأساسية', 'يراجع دكتور مسقط الإدراج', 'يمكن عرض المعلومات العامة المعتمدة', 'تبقى خيارات النمو والظهور المميز كعناصر تمهيدية حتى اعتمادها'],
+    faqTitle: 'أسئلة طلب الإدراج',
+    faqs: [['هل يضمن الإرسال العرض العام؟', 'لا. تتم مراجعة الإدراجات قبل عرضها للعامة.'], ['هل يمكنني المطالبة بملف موجود؟', 'استخدم تأكيد التفويض وقدم بيانات تواصل دقيقة.'], ['هل تتم إضافة تقييمات من هذا النموذج؟', 'لا. لا تتم إضافة تقييمات أو مراجعات أو ادعاءات طبية من هذا النموذج.'], ['كيف أصحح المعلومات؟', 'أرسل تفاصيل دقيقة أو تواصل مع دعم دكتور مسقط للمراجعة.']],
     types: ['عيادة / مركز طبي', 'طبيب', 'صيدلية', 'مختبر', 'عيادة أسنان', 'تجميل / عافية', 'عيادة بيطرية', 'خدمة صحية مرتبطة أخرى'],
   },
 } as const;
@@ -114,6 +118,7 @@ export function ListYourCenterPage2026({ locale, country }: ListYourCenterPage20
           <p className="dm2026-disclaimer-note">{copy.reviewNote}</p>
         </form>
       </section>
+      <section className="mx-auto max-w-6xl px-4 pb-14"><div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-2xl font-bold text-slate-950">{copy.faqTitle}</h2><div className="mt-5 grid gap-3 md:grid-cols-2">{copy.faqs.map(([question, answer]) => <details key={question} className="rounded-2xl border border-slate-200 p-4"><summary className="cursor-pointer font-bold text-slate-950">{question}</summary><p className="mt-2 text-sm leading-7 text-slate-600">{answer}</p></details>)}</div></div></section>
     </main>
   );
 }
