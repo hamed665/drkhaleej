@@ -11,7 +11,6 @@ import { PublicDisclaimer2026 } from '@/components/public-2026/sections/PublicDi
 import { TrustAndSafety2026 } from '@/components/public-2026/sections/TrustAndSafety2026';
 import { Button2026 } from '@/components/public-2026/ui/Button2026';
 import { Container2026 } from '@/components/public-2026/ui/Container2026';
-import { FloatingActions2026 } from '@/components/public-2026/home/FloatingActions2026';
 import { HomeHeroSearch2026 } from '@/components/public-2026/home/HomeHeroSearch2026';
 import { HomeTrustBar2026 } from '@/components/public-2026/home/HomeTrustBar2026';
 import { home2026CopyByLocale } from '@/components/public-2026/home/HomeCopy2026';
@@ -50,7 +49,6 @@ export function HomePage2026({ locale, country }: HomePage2026Props) {
         </section>
         <PublicDisclaimer2026>{copy.disclaimer}</PublicDisclaimer2026>
       </Container2026>
-      <FloatingActions2026 locale={locale} copy={copy.floating} />
     </main>
   );
 }

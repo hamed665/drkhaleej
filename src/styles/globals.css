@@ -1844,12 +1844,6 @@ body {
 }
 
 @media (max-width: 767px) {
-  html,
-  body {
-    max-width: 100%;
-    overflow-x: clip;
-  }
-
   .site-header__inner {
     position: relative;
     grid-template-columns: minmax(0, 1fr) auto auto;
@@ -2105,3 +2099,44 @@ body {
   }
 }
 /* UI-K-154 END */
+
+
+/* PUBLIC SUPPORT ACTIONS ROUTING FIX START */
+.dm2026-floating-button {
+  text-decoration: none;
+}
+
+.dm2026-floating-button:focus-visible,
+.dm2026-floating-link:focus-visible,
+.dm2026-floating-close:focus-visible {
+  outline: 3px solid rgba(201, 162, 75, 0.55);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .dm2026-floating {
+    inset-inline-end: 1rem;
+    inset-inline-start: auto;
+  }
+
+  [dir='rtl'].dm2026-floating {
+    inset-inline-start: 1rem;
+    inset-inline-end: auto;
+  }
+
+  .dm2026-floating-button {
+    width: 2.7rem;
+    height: 2.7rem;
+    min-height: 2.7rem;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 0;
+  }
+
+  .dm2026-floating-button > span {
+    font-size: 1rem;
+  }
+}
+/* PUBLIC SUPPORT ACTIONS ROUTING FIX END */

@@ -6,6 +6,13 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
 
+  if (pathname === '/' || /^\/(en|ar)\/?$/.test(pathname)) {
+    const targetLocale = pathname.startsWith('/ar') ? 'ar' : 'en';
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${targetLocale}/om`;
+    return NextResponse.redirect(redirectUrl);
+  }
+
   const match = pathname.match(localeCountryPattern);
   if (match) {
     const locale = match[1];

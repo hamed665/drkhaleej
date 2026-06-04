@@ -255,7 +255,7 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
       cta: 'For Providers',
       note: 'No payment gateway, AI chat, backend search, or provider dashboard feature is added here.'
     },
-    floating: { whatsapp: 'WhatsApp help', ai: 'AI assistant', whatsappTitle: 'WhatsApp support preview', whatsappBody: 'WhatsApp support preview. A real number will be connected later.', whatsappCta: 'Open WhatsApp placeholder', aiTitle: 'DrMuscat AI assistant', aiBody: 'Ask about doctors, clinics, pharmacies, labs, areas, or articles.', aiPlaceholder: 'Preview only — type is disabled', send: 'Send', close: 'Close', disclaimer: 'General discovery help only, not medical advice.' }
+    floating: { whatsapp: 'WhatsApp help', ai: 'AI assistant', whatsappTitle: 'WhatsApp support preview', whatsappBody: 'WhatsApp support preview. A real number will be connected later.', whatsappCta: 'Open WhatsApp placeholder', aiTitle: 'DrMuscat AI assistant', aiBody: 'AI assistant preview. This will help users find care, compare options, and ask questions.', aiPlaceholder: 'Preview only — type is disabled', send: 'Send', close: 'Close', disclaimer: 'General discovery help only, not medical advice.' }
   },
   ar: {
     metadataTitle: 'DrMuscat عُمان | أساس اكتشاف الرعاية الصحية',
@@ -396,6 +396,6 @@ export const home2026CopyByLocale: Record<SupportedLocale, Home2026Copy> = {
       cta: 'لمقدمي الرعاية',
       note: 'لا تتم إضافة بوابة دفع أو دردشة ذكاء اصطناعي أو بحث خلفي أو لوحة مقدمي خدمة هنا.'
     },
-    floating: { whatsapp: 'مساعدة واتساب', ai: 'مساعد الذكاء', whatsappTitle: 'معاينة دعم واتساب', whatsappBody: 'معاينة دعم واتساب. سيتم ربط رقم حقيقي لاحقاً.', whatsappCta: 'فتح معاينة واتساب', aiTitle: 'مساعد دكتور مسقط', aiBody: 'اسأل عن الأطباء أو العيادات أو الصيدليات أو المختبرات أو المناطق أو المقالات.', aiPlaceholder: 'معاينة فقط — الكتابة معطلة', send: 'إرسال', close: 'إغلاق', disclaimer: 'مساعدة عامة للاكتشاف فقط وليست نصيحة طبية.' }
+    floating: { whatsapp: 'مساعدة واتساب', ai: 'مساعد الذكاء', whatsappTitle: 'معاينة دعم واتساب', whatsappBody: 'معاينة دعم واتساب. سيتم ربط رقم حقيقي لاحقاً.', whatsappCta: 'فتح معاينة واتساب', aiTitle: 'مساعد دكتور مسقط', aiBody: 'معاينة مساعد الذكاء الاصطناعي. سيساعد المستخدمين في العثور على الرعاية ومقارنة الخيارات وطرح الأسئلة.', aiPlaceholder: 'معاينة فقط — الكتابة معطلة', send: 'إرسال', close: 'إغلاق', disclaimer: 'مساعدة عامة للاكتشاف فقط وليست نصيحة طبية.' }
   }
 };
