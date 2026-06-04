@@ -1,8 +1,18 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
+
+import { LanguageSwitch } from '@/components/layout/language-switch';
 import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
-import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
+import {
+  homeRoute,
+  publicArticlesRoute,
+  publicDiscoveryRoute,
+  publicListYourCenterRoute,
+  publicProviderRoute,
+  publicRegisterRoute,
+  publicSignInRoute,
+} from '@/lib/routes/public';
 
 const navCopy: Record<
   SupportedLocale,
@@ -17,7 +27,11 @@ const navCopy: Record<
     labs: string;
     services: string;
     search: string;
+    articles: string;
     forProviders: string;
+    signIn: string;
+    register: string;
+    listYourCenter: string;
     switchLabel: string;
     brandLabel: string;
     localeSwitch: string;
@@ -34,10 +48,14 @@ const navCopy: Record<
     labs: 'Labs',
     services: 'Services',
     search: 'Search',
+    articles: 'Articles',
     forProviders: 'For Providers',
+    signIn: 'Sign in',
+    register: 'Create account',
+    listYourCenter: 'List your center',
     switchLabel: 'Switch language to Arabic',
     brandLabel: 'DrMuscat home',
-    localeSwitch: 'العربية'
+    localeSwitch: 'العربية',
   },
   ar: {
     ariaLabel: 'التنقل العام الرئيسي',
@@ -50,11 +68,15 @@ const navCopy: Record<
     labs: 'المختبرات',
     services: 'الخدمات',
     search: 'البحث',
+    articles: 'المقالات',
     forProviders: 'لمقدمي الرعاية',
+    signIn: 'تسجيل الدخول',
+    register: 'إنشاء حساب',
+    listYourCenter: 'أدرج مركزك',
     switchLabel: 'تبديل اللغة إلى الإنجليزية',
     brandLabel: 'الرئيسية دكتور مسقط',
-    localeSwitch: 'English'
-  }
+    localeSwitch: 'English',
+  },
 };
 
 export async function SiteHeader() {
@@ -63,7 +85,6 @@ export async function SiteHeader() {
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');
-  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
   const navItems = [
     { href: homeHref, label: copy.home },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'doctors'), label: copy.doctors },
@@ -72,14 +93,17 @@ export async function SiteHeader() {
     { href: publicDiscoveryRoute(safeLocale, 'om', 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'services'), label: copy.services },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search },
-    { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders }
+    { href: publicArticlesRoute(safeLocale, 'om'), label: copy.articles },
+    { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders },
   ] as const;
 
   return (
     <header className="site-header site-header--premium" role="banner" dir={dir}>
       <Container className="site-header__inner">
         <Link href={homeHref} className="site-header__brand" aria-label={copy.brandLabel}>
-          <span className="dm-logo__mark" aria-hidden="true">DM</span>
+          <span className="dm-logo__mark" aria-hidden="true">
+            DM
+          </span>
           <span className="site-header__wordmark-wrap">
             <span className="dm-logo__wordmark">{copy.brand}</span>
             <span className="site-header__brand-subtitle">{copy.secondaryBrand}</span>
@@ -94,10 +118,19 @@ export async function SiteHeader() {
             ))}
           </ul>
         </nav>
-        <div className="site-header__locale" aria-label={copy.switchLabel}>
-          <Link href={switchHref} className="site-header__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'}>
-            <span>{copy.localeSwitch}</span>
+        <div className="site-header__actions" aria-label={safeLocale === 'ar' ? 'روابط الحساب والإدراج' : 'Account and listing links'}>
+          <Link className="site-header__action-link" href={publicSignInRoute(safeLocale, 'om')}>
+            {copy.signIn}
           </Link>
+          <Link className="site-header__action-link" href={publicRegisterRoute(safeLocale, 'om')}>
+            {copy.register}
+          </Link>
+          <Link className="site-header__action-link site-header__action-link--primary" href={publicListYourCenterRoute(safeLocale, 'om')}>
+            {copy.listYourCenter}
+          </Link>
+        </div>
+        <div className="site-header__locale" aria-label={copy.switchLabel}>
+          <LanguageSwitch locale={safeLocale} label={copy.localeSwitch} ariaLabel={copy.switchLabel} className="site-header__locale-switch" />
         </div>
       </Container>
     </header>

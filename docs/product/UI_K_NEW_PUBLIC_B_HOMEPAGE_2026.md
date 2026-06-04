@@ -145,3 +145,11 @@ No backend, database, Supabase, RLS, sitemap, robots, llms, route-check, package
 - Polished category cards, carousel cards, floating panels, and RTL typography with scoped `dm2026-*` CSS only.
 
 No database, Supabase, RLS, backend API, auth backend, payment backend, sitemap, robots, `llms.txt`, package, lockfile, or route-check files were changed in FIX02.
+
+## UI-K-ALIGN-FIX-PUBLIC-PAGES-BLOCKERS-A notes
+
+- Added a route-preserving frontend language switch so Arabic pages expose an English switch and English pages expose العربية while keeping the same locale/country route where available.
+- Expanded the localized public header/footer links to include Articles, Sign in, Create account/Register, List your center, and For Providers without changing sitemap, robots, llms.txt, or route-check guardrails.
+- Added frontend-only approved public pages for Articles, article detail, Sign in, Register, and List your center. These pages are UI placeholders only and do not connect to auth, AI, payment, Supabase, database, or API logic.
+- Centralized the 2026 Country → City → Area data used by homepage/search/listing/register UI. Oman remains active, coming-soon countries are visible but disabled, city dropdowns contain only the approved Oman cities, and areas depend on the selected city.
+- Confirmed the homepage featured centers carousel and floating WhatsApp/AI UI remain in the isolated public-2026 tree and are not backend-connected.

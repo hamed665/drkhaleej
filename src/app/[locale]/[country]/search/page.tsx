@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { LocationSelect2026 } from '@/components/public-2026/search/LocationSelect2026';
+import { home2026CopyByLocale } from '@/components/public-2026/home/HomeCopy2026';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import {
   isSupportedCountry,
@@ -68,17 +70,26 @@ export default async function PublicRoutePage({ params }: { params: Promise<Para
   }
 
   const copy = copyByLocale[locale];
+  const homeCopy = home2026CopyByLocale[locale];
 
   return (
-    <PublicPageShell
+    <>
+      <PublicPageShell
       dir={localeDirection(locale)}
       heroBadge={copy.badge}
       heroTitle={copy.title}
       heroDescription={copy.description}
       panelHeading={copy.panelHeading}
       panelBody={copy.panelBody}
-      gridTitle={copy.gridTitle}
-      gridItems={copy.gridItems}
-    />
+        gridTitle={copy.gridTitle}
+        gridItems={copy.gridItems}
+      />
+      <section className="dm2026-search-route-location" dir={localeDirection(locale)} aria-label={homeCopy.location.countryHelp}>
+        <div className="dm2026-search-route-card">
+          <h2>{homeCopy.hero.searchLabel}</h2>
+          <LocationSelect2026 locale={locale} copy={homeCopy.location} />
+        </div>
+      </section>
+    </>
   );
 }

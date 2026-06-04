@@ -1,8 +1,17 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
+import { LanguageSwitch } from '@/components/layout/language-switch';
 import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
-import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
+import {
+  homeRoute,
+  publicArticlesRoute,
+  publicDiscoveryRoute,
+  publicListYourCenterRoute,
+  publicProviderRoute,
+  publicRegisterRoute,
+  publicSignInRoute,
+} from '@/lib/routes/public';
 
 type FooterColumn = { title: string; items: readonly { label: string; href?: string }[] };
 
@@ -23,7 +32,11 @@ const footerCopy: Record<
     labs: string;
     services: string;
     search: string;
+    articles: string;
     forProviders: string;
+    signIn: string;
+    register: string;
+    listYourCenter: string;
     contact: string;
     privacy: string;
     terms: string;
@@ -48,7 +61,11 @@ const footerCopy: Record<
     labs: 'Labs',
     services: 'Services',
     search: 'Search',
+    articles: 'Articles',
     forProviders: 'For Providers',
+    signIn: 'Sign in',
+    register: 'Create account',
+    listYourCenter: 'List your center',
     contact: 'Contact options coming soon',
     privacy: 'Privacy',
     terms: 'Terms',
@@ -72,7 +89,11 @@ const footerCopy: Record<
     labs: 'المختبرات',
     services: 'الخدمات',
     search: 'البحث',
+    articles: 'المقالات',
     forProviders: 'لمقدمي الرعاية',
+    signIn: 'تسجيل الدخول',
+    register: 'إنشاء حساب',
+    listYourCenter: 'أدرج مركزك',
     contact: 'خيارات التواصل قريباً',
     privacy: 'الخصوصية',
     terms: 'الشروط',
@@ -89,7 +110,6 @@ export async function SiteFooter() {
   const copy = footerCopy[safeLocale];
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');
-  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
   const columns: FooterColumn[] = [
     {
       title: copy.discover,
@@ -100,16 +120,26 @@ export async function SiteFooter() {
         { href: publicDiscoveryRoute(safeLocale, 'om', 'pharmacies'), label: copy.pharmacies },
         { href: publicDiscoveryRoute(safeLocale, 'om', 'labs'), label: copy.labs },
         { href: publicDiscoveryRoute(safeLocale, 'om', 'services'), label: copy.services },
-        { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search }
+        { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search },
+        { href: publicArticlesRoute(safeLocale, 'om'), label: copy.articles }
       ]
     },
     {
       title: copy.providers,
-      items: [{ href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders }]
+      items: [
+        { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders },
+        { href: publicListYourCenterRoute(safeLocale, 'om'), label: copy.listYourCenter }
+      ]
     },
     {
       title: copy.support,
-      items: [{ label: copy.contact }, { label: copy.privacy }, { label: copy.terms }]
+      items: [
+        { href: publicSignInRoute(safeLocale, 'om'), label: copy.signIn },
+        { href: publicRegisterRoute(safeLocale, 'om'), label: copy.register },
+        { label: copy.contact },
+        { label: copy.privacy },
+        { label: copy.terms }
+      ]
     },
     {
       title: copy.about,
@@ -123,9 +153,12 @@ export async function SiteFooter() {
         <div className="site-footer__brand">
           <strong>{copy.brand}</strong>
           <p>{copy.tagline}</p>
-          <Link href={switchHref} className="site-footer__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'} aria-label={copy.switchLabel}>
-            {copy.localeSwitch}
-          </Link>
+          <LanguageSwitch
+            locale={safeLocale}
+            label={copy.localeSwitch}
+            ariaLabel={copy.switchLabel}
+            className="site-footer__locale-switch"
+          />
         </div>
         <nav className="site-footer__links" aria-label={copy.navLabel}>
           {columns.map((column) => (

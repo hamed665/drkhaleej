@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const localeCountryPattern = /^\/(en|ar)\/(.+?)(?:\/)?$/;
+const localeCountryPattern = /^\/(en|ar)\/([^/]+)(?:\/.*)?$/;
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
