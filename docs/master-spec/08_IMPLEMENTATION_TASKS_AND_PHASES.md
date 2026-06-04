@@ -76,3 +76,16 @@ Every task must report:
 - typecheck result
 - lint result
 - remaining blockers
+
+## UI-K-ROUTE-CONTRACT-A Public UI Route Readiness
+
+Approved route-contract readiness for a later frontend-only UI implementation phase:
+
+- `/[locale]/[country]/articles`
+- `/[locale]/[country]/articles/[slug]`
+- `/[locale]/[country]/sign-in`
+- `/[locale]/[country]/register`
+- `/[locale]/[country]/list-your-center`
+- `/[locale]/[country]/for-providers`
+
+These are exact locale/country public UI route families only. Locale remains first, country remains second, `en`/`ar` and `om` remain the only active public launch dimensions, and Persian/Hindi routes remain forbidden. This phase does not authorize UI page creation, backend APIs, auth backend, payment backend, dashboards, database/RLS changes, sitemap output, robots changes, or `llms.txt` changes.

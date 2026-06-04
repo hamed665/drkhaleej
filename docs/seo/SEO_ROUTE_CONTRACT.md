@@ -2,7 +2,7 @@
 
 ## 1. Status and Authority
 
-This document is documentation-only for SEO-C. It does not authorize implementation, product features, route creation, migrations, API handlers, UI changes, business logic, Supabase generated types, validators, route checks, RLS tests, SEO checks, seed rows, database imports, CMS records, public SEO pages, article routes, provider pages, branded hospital pages, programmatic pages, schema output, sitemap changes, robots changes, `llms.txt` changes, analytics events, crawlers, background jobs, AI chat, or payment/business workflows.
+This document is documentation-only for SEO-C and later route-contract alignment tasks. `UI-K-ROUTE-CONTRACT-A` updates the contract to allow exact future frontend-only public UI routes for articles, sign-in, register, list-your-center, and for-providers. This document still does not authorize migrations, API handlers, backend auth, payment logic, business logic, Supabase generated types, RLS changes, seed rows, database imports, CMS records, provider dashboards, branded hospital pages, unsafe programmatic pages, schema output, sitemap changes, robots changes, `llms.txt` changes, analytics events, crawlers, background jobs, AI chat, or payment/business workflows.
 
 The URL strategy in this document does not authorize route creation. Canonical pattern documentation does not authorize sitemap, schema, robots, or `llms.txt` changes.
 
@@ -37,7 +37,7 @@ Future route tables should use this classification schema when evaluating curren
 
 ## 4. Current Public Route Contract Table
 
-These route families are current approved public route families for the current repository state. SEO-C does not authorize expansion or new implementation.
+These route families are current approved public route families for the current repository state. `UI-K-ROUTE-CONTRACT-A` also records exact future frontend-only public UI route allowances; it does not create pages or authorize backend implementation.
 
 | route_family | status | exists_now | public_or_private | indexability_status | sitemap_eligible | hreflang_allowed | canonical_family | implementation_authorization | human_review_required | notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -51,6 +51,11 @@ These route families are current approved public route families for the current 
 | `/[locale]/[country]/pharmacies` | `current_approved` | yes | public | `indexable_candidate` | yes, if quality-gated | yes, approved `en`/`ar` counterparts only | `/[locale]/[country]/pharmacies` | none | may be required for pharmacy, medicine, availability, or regulated claims | Public pharmacies discovery/catalog route family. |
 | `/[locale]/[country]/search` | `current_approved_discovery_search_shell` | yes | public | `indexable_candidate_for_shell`; query URLs are `noindex_required` unless later approved | shell may be eligible; search-query URLs are not eligible | yes for shell only, approved `en`/`ar` counterparts only | `/[locale]/[country]/search` | none | yes if future implementation exposes medical or sensitive result content | Public search shell only; query/result URL indexation is not approved. |
 | `/[locale]/[country]/services` | `current_approved` | yes | public | `indexable_candidate` | yes, if quality-gated | yes, approved `en`/`ar` counterparts only | `/[locale]/[country]/services` | none | may be required for medical service claims | Public services discovery/catalog route family. |
+| `/[locale]/[country]/articles` | `approved_future_frontend_ui_route` | no | public | `indexable_candidate_after_quality_gate` | not until implemented and quality-gated | yes, approved `en`/`ar` counterparts only after implementation | `/[locale]/[country]/articles` | route-contract only | yes for medical-content safety | Approved as a future frontend article index route. Must include disclaimers and no diagnosis/treatment claims when implemented. |
+| `/[locale]/[country]/articles/[slug]` | `approved_future_frontend_ui_route` | no | public | `indexable_candidate_after_quality_gate` | not until implemented and quality-gated | yes, approved `en`/`ar` counterparts only after implementation | `/[locale]/[country]/articles/[slug]` | route-contract only | yes for medical-content safety | Approved as a future frontend article detail route. Reviews/comments must be moderated; no fabricated ratings or medical claims. |
+| `/[locale]/[country]/sign-in` | `approved_future_frontend_ui_route` | no | public | `noindex_or_auth_utility_recommended` | no unless later explicitly approved | no | `/[locale]/[country]/sign-in` | route-contract only | yes for auth/privacy UX | Frontend auth UI placeholder route only; backend auth changes require separate approval. |
+| `/[locale]/[country]/register` | `approved_future_frontend_ui_route` | no | public | `noindex_or_auth_utility_recommended` | no unless later explicitly approved | no | `/[locale]/[country]/register` | route-contract only | yes for auth/privacy UX | Frontend registration/onboarding placeholder route only; backend auth changes require separate approval. |
+| `/[locale]/[country]/list-your-center` | `approved_future_frontend_ui_route` | no | public | `indexable_candidate_after_quality_gate` | not until implemented and quality-gated | yes, approved `en`/`ar` counterparts only after implementation | `/[locale]/[country]/list-your-center` | route-contract only | yes for provider, pricing, compliance, and claim language | Frontend provider listing request UI route only; payments, claims, dashboards, and mutations require later approval. |
 
 ## 5. Admin Route Contract Table
 
@@ -92,7 +97,6 @@ These route families do not exist now and are marked `future_approval_required`.
 | `/[locale]/[country]/areas/[areaSlug]` | `future_approval_required` | does_not_exist_now | public_planning_only | `future_approval_required` | no | no, until approved and implemented | pending_future_contract | none unless medical/branded content is added | Future area page planning only. |
 | `/[locale]/[country]/services/[serviceSlug]` | `future_approval_required` | does_not_exist_now | public_planning_only | `future_approval_required` | no | no, until approved and implemented | pending_future_contract | yes for medical service claims | Future service page planning only. |
 | `/[locale]/[country]/services/[serviceSlug]/[areaSlug]` | `future_approval_required` | does_not_exist_now | public_planning_only | `future_approval_required` | no | no, until approved and implemented | pending_future_contract | yes for medical service/location claims | Future service + area planning only. |
-| `/[locale]/[country]/articles/[articleSlug]` | `future_approval_required` | does_not_exist_now | public_planning_only | `future_approval_required` | no | no, until approved and implemented | pending_future_contract | yes | Article route planning only; article routes are not approved. |
 
 ## 9. Forbidden Route Families
 
@@ -109,7 +113,6 @@ These route families do not exist now and are marked `future_approval_required`.
 | unsupported GCC country routes unless future approved | `unsupported_country` | no | blocked | `unsupported_country` | no | no | not_applicable | none | yes | GCC expansion is future-only. |
 | public SEO routes for unsupported languages/countries | `unsupported_locale` / `unsupported_country` | no | blocked | `unsupported_locale` / `unsupported_country` | no | no | not_applicable | none | yes | Only `en`, `ar`, and `om` are approved. |
 | branded hospital/clinic pages unless explicitly approved later | `future_approval_required` | no | public_planning_only | `future_approval_required` | no | no | pending_future_contract | none | yes | Branded pages require future legal/ethical/compliance approval. |
-| article routes unless explicitly approved later | `future_approval_required` | no | public_planning_only | `future_approval_required` | no | no | pending_future_contract | none | yes | Article routes are not approved by SEO-C. |
 | `/[locale]/[country]/doctors/[doctorSlug]` | `blocked` | no | blocked | `blocked` | no | no | not_applicable | none | yes for any route-contract change | Plural doctor detail route is forbidden unless future explicit approval changes the route contract. |
 
 ## 10. Doctor Detail Route Conflict Resolution
@@ -217,3 +220,11 @@ Stop rather than guessing if any of these occur:
 - need to edit files outside the approved scope
 
 The smallest safe response is to report the blocker, identify the conflicting file/rule/route, and request explicit human approval for the narrowest safe next step.
+
+## UI-K-ROUTE-CONTRACT-A Notes
+
+- Article, sign-in, register, list-your-center, and for-providers route families are approved only under the exact `/(en|ar)/(om)/...` locale/country prefix.
+- This route-contract update does not create pages and does not add sitemap, robots, `llms.txt`, schema, backend, auth, payment, database, Supabase, RLS, seed, CMS, analytics, or dashboard scope.
+- Article implementations must include a visible medical disclaimer, avoid diagnosis/treatment claims, avoid unsupported schema, and avoid fabricated ratings/reviews/counts.
+- Sign-in and register implementations are frontend UI placeholders until a separate auth backend phase is approved.
+- List-your-center and for-providers implementations are frontend UI/product routes only until separate provider onboarding, claims, billing, payment, entitlement, or dashboard phases are approved.

@@ -97,3 +97,16 @@ Current validation gate:
 - Stop on blockers, conflicts, missing dependencies, unclear requirements, route ambiguity, schema conflict, or RLS ambiguity.
 - Do not fake passing tests.
 - Do not weaken TypeScript, lint, build, route, env, migration, seed, SEO, RLS, or validation checks to force progress.
+
+## UI-K-ROUTE-CONTRACT-A — Public UI Route Contract Alignment
+
+- Route contract now allows future frontend-only public UI page creation for:
+  - `/[locale]/[country]/articles`
+  - `/[locale]/[country]/articles/[slug]`
+  - `/[locale]/[country]/sign-in`
+  - `/[locale]/[country]/register`
+  - `/[locale]/[country]/list-your-center`
+  - `/[locale]/[country]/for-providers` remains approved.
+- This alignment does not create UI pages, sitemap entries, robots changes, `llms.txt` changes, backend handlers, auth backend, payment backend, database schema, seed data, Supabase access, or RLS policies.
+- The route-check contract allows only the exact approved locale/country route families and continues to reject countryless localized public UI routes, unsupported `fa`/`hi` routes, localized admin routes, deprecated shortcut routes, and duplicate doctor detail route patterns.
+- Articles remain subject to public medical-content safety: disclaimers are required when implemented, diagnosis/treatment claims are forbidden, and reviews/comments must remain moderated with no fabricated ratings.

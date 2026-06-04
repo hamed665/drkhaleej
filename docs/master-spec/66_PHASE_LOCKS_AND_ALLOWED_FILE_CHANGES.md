@@ -209,3 +209,18 @@ Forbidden:
 
 ## 15. Violation Rule
 If a phase requires changes outside allowed files, stop and create a `SCOPE_EXTENSION_REQUEST`.
+
+## UI-K-ROUTE-CONTRACT-A — Public UI Route Contract Allowance
+
+This route-contract phase explicitly allows updating route-contract and documentation files so later frontend-only UI phases may create the following exact public route families without broad wildcard allowance:
+
+```txt
+src/app/[locale]/[country]/articles/page.tsx
+src/app/[locale]/[country]/articles/[slug]/page.tsx
+src/app/[locale]/[country]/sign-in/page.tsx
+src/app/[locale]/[country]/register/page.tsx
+src/app/[locale]/[country]/list-your-center/page.tsx
+src/app/[locale]/[country]/for-providers/page.tsx
+```
+
+This allowance is route-contract-only. It does not implement pages, UI, backend APIs, auth backend, dashboards, payment logic, database schema, migrations, generated types, seed data, Supabase access, or RLS policies. It does not authorize sitemap, robots, or `llms.txt` changes. Future page implementation must remain frontend-only unless a later task explicitly approves backend/auth/payment/database scope. Article pages must include medical disclaimers and must not make diagnosis, treatment, fake rating, fake review, or unsupported medical claims.

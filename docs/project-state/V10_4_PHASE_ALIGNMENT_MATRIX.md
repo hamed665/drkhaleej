@@ -251,3 +251,9 @@ Validation commands must not be faked or skipped silently. If a command cannot r
 - Stop if the work would implement sales, referral, billing, analytics, SEO AI, provider dashboard, payment, admin mutation, provider marketing hub, or any business feature without explicit approval.
 - Stop rather than guessing.
 - Do not fake passing tests.
+
+## UI-K-ROUTE-CONTRACT-A Mapping
+
+| Task | Execution Phase | Lock Scope | Product Module | Subphase ID | Database/RLS | Public Routes | SEO/Content Safety | Approval Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Public UI route contract update for articles/auth/listing placeholders | Phase 3 — Public SEO Platform route contract alignment | Route-contract/documentation only; no UI implementation | Public route shell planning and UI navigation readiness | `UI-K-ROUTE-CONTRACT-A` | No migrations, seed rows, Supabase changes, generated types, RLS, backend APIs, auth backend, or payment backend | Allows future exact frontend UI routes `/[locale]/[country]/articles`, `/[locale]/[country]/articles/[slug]`, `/[locale]/[country]/sign-in`, `/[locale]/[country]/register`, `/[locale]/[country]/list-your-center`, and existing `/[locale]/[country]/for-providers`; no wildcard route allowance | Articles require disclaimers and no diagnosis/treatment claims; reviews/comments must remain moderated and cannot fabricate ratings | This mapping authorizes route-check/documentation alignment only. Page UI requires a later approved implementation phase. |

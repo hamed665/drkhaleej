@@ -11,6 +11,37 @@ const readSourceIfExists = (relativePath) => {
   return readFileSync(absolutePath, "utf8");
 };
 
+const directoryHasOnlyEntries = (absolutePath, allowedEntries) => {
+  if (!existsSync(absolutePath) || !statSync(absolutePath).isDirectory()) {
+    return false;
+  }
+
+  const allowed = new Set(allowedEntries);
+  return readdirSync(absolutePath).every((entry) => allowed.has(entry));
+};
+
+const exactOptionalPageRoute = (relativePath) => {
+  const routeDir = resolve(projectRoot, relativePath);
+  return (
+    !existsSync(routeDir) ||
+    (directoryHasOnlyEntries(routeDir, ["page.tsx"]) &&
+      existsSync(resolve(routeDir, "page.tsx")))
+  );
+};
+
+const exactOptionalArticleRoutes = () => {
+  const articlesDir = resolve(projectRoot, "src/app/[locale]/[country]/articles");
+  const articleSlugDir = resolve(articlesDir, "[slug]");
+
+  return (
+    !existsSync(articlesDir) ||
+    (directoryHasOnlyEntries(articlesDir, ["page.tsx", "[slug]"]) &&
+      existsSync(resolve(articlesDir, "page.tsx")) &&
+      directoryHasOnlyEntries(articleSlugDir, ["page.tsx"]) &&
+      existsSync(resolve(articleSlugDir, "page.tsx")))
+  );
+};
+
 const sourceIncludesForbiddenServiceRoleImport = (source) =>
   /from\s+["'](?:@\/lib\/supabase\/service-role|\.\.?\/.*supabase\/service-role)["']/.test(
     source,
@@ -484,10 +515,26 @@ const checks = [
     ),
   },
   {
-    name: "article routes do not exist",
-    pass: !existsSync(
-      resolve(projectRoot, "src/app/[locale]/[country]/articles"),
+    name: "approved public articles route is absent or exact approved scaffold",
+    pass: exactOptionalArticleRoutes(),
+  },
+  {
+    name: "approved public auth and listing routes are absent or exact approved frontend pages",
+    pass: ["sign-in", "register", "list-your-center"].every((slug) =>
+      exactOptionalPageRoute(`src/app/[locale]/[country]/${slug}`),
     ),
+  },
+  {
+    name: "approved public UI routes keep locale-country prefix only",
+    pass:
+      !existsSync(resolve(projectRoot, "src/app/[locale]/articles")) &&
+      !existsSync(resolve(projectRoot, "src/app/[locale]/sign-in")) &&
+      !existsSync(resolve(projectRoot, "src/app/[locale]/register")) &&
+      !existsSync(resolve(projectRoot, "src/app/[locale]/list-your-center")) &&
+      !existsSync(resolve(projectRoot, "src/app/articles")) &&
+      !existsSync(resolve(projectRoot, "src/app/sign-in")) &&
+      !existsSync(resolve(projectRoot, "src/app/register")) &&
+      !existsSync(resolve(projectRoot, "src/app/list-your-center")),
   },
   {
     name: "branded hospital and clinic route directories do not exist",

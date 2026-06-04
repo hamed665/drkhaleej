@@ -54,6 +54,7 @@ The repository now includes approved public and admin baselines. These are not p
 - public center detail pages
 - public doctor detail pages
 - public provider plans/onboarding page at `/:locale/:country/for-providers`
+- route-contract-approved future frontend UI routes under `/:locale/:country` for `articles`, `articles/:slug`, `sign-in`, `register`, and `list-your-center`; these are contract allowances only until a later UI phase creates pages
 - contact/callback, media, and license display foundations
 - public callback request API
 - public provider onboarding lead capture API
