@@ -56,6 +56,7 @@ export async function SiteHeader() {
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');
   const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
+  const providerHref = publicProviderRoute(safeLocale, 'om');
   const navItems = [
     { href: homeHref, label: copy.home },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'doctors'), label: copy.doctors },
@@ -63,8 +64,7 @@ export async function SiteHeader() {
     { href: publicDiscoveryRoute(safeLocale, 'om', 'pharmacies'), label: copy.pharmacies },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'services'), label: copy.services },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search },
-    { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders }
+    { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search }
   ] as const;
 
   return (
@@ -82,9 +82,12 @@ export async function SiteHeader() {
             ))}
           </ul>
         </nav>
-        <div className="site-header__locale" aria-label={copy.switchLabel}>
+        <div className="site-header__locale dm2026-site-header__actions" aria-label={copy.switchLabel}>
           <Link href={switchHref} className="site-header__locale-switch dm2026-site-header__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'}>
             <span>{safeLocale === 'en' ? 'العربية' : 'English'}</span>
+          </Link>
+          <Link href={providerHref} className="dm2026-site-header__provider">
+            {copy.forProviders}
           </Link>
         </div>
       </Container>

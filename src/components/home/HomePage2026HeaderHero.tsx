@@ -39,7 +39,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     search: {
       eyebrow: 'Search DrMuscat',
       title: 'Start with what you need, then narrow by place and provider type.',
-      description: 'Use general examples to begin exploring healthcare options in Oman. Results open the approved public search route.',
+      description: 'Choose a care need, provider type and Muscat area to start exploring public healthcare options in Oman.',
       careNeedLabel: 'Care need, specialty or service',
       careNeedPlaceholder: 'Dentist, dermatology, lab tests, pharmacy...',
       providerTypeLabel: 'Provider type',
@@ -49,7 +49,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       searchLabel: 'Search',
       providerLabel: 'List your center',
       staticPreviewLabel: 'General example suggestions',
-      staticPreviewNote: 'Suggestions are general examples only. Confirm details directly with providers.',
+      staticPreviewNote: 'Suggestions are general examples. Confirm details directly with providers.',
       providerTypes: ['Doctors', 'Clinics / Centers', 'Labs', 'Pharmacies', 'Services'],
       countries: [
         { label: 'Oman' },
@@ -62,10 +62,10 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       ],
       cities: [
         { label: 'Muscat' },
-        { label: 'Seeb', note: 'preview-safe Oman city' },
-        { label: 'Salalah', note: 'preview-safe Oman city' },
-        { label: 'Sohar', note: 'preview-safe Oman city' },
-        { label: 'Nizwa', note: 'preview-safe Oman city' }
+        { label: 'Seeb' },
+        { label: 'Salalah' },
+        { label: 'Sohar' },
+        { label: 'Nizwa' }
       ],
       areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Seeb', 'Madinat Sultan Qaboos'],
       suggestions: ['Dentist', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy', 'Pet clinic', 'Beauty clinic', 'Al Khuwair', 'Qurum']
@@ -86,7 +86,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     search: {
       eyebrow: 'ابحث في DrMuscat',
       title: 'ابدأ بما تحتاجه، ثم حدّد المكان ونوع مقدّم الخدمة.',
-      description: 'استخدم أمثلة عامة لبدء استكشاف خيارات الرعاية في عُمان. يفتح البحث مسار البحث العام المعتمد.',
+      description: 'اختر احتياج الرعاية ونوع مقدّم الخدمة والمنطقة في مسقط لبدء استكشاف خيارات عامة في عُمان.',
       careNeedLabel: 'احتياج الرعاية أو التخصص أو الخدمة',
       careNeedPlaceholder: 'طبيب أسنان، جلدية، فحوصات مختبر، صيدلية...',
       providerTypeLabel: 'نوع مقدّم الخدمة',
@@ -109,10 +109,10 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       ],
       cities: [
         { label: 'مسقط' },
-        { label: 'السيب', note: 'مدينة عُمانية للعرض التمهيدي الآمن' },
-        { label: 'صلالة', note: 'مدينة عُمانية للعرض التمهيدي الآمن' },
-        { label: 'صحار', note: 'مدينة عُمانية للعرض التمهيدي الآمن' },
-        { label: 'نزوى', note: 'مدينة عُمانية للعرض التمهيدي الآمن' }
+        { label: 'السيب' },
+        { label: 'صلالة' },
+        { label: 'صحار' },
+        { label: 'نزوى' }
       ],
       areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'السيب', 'مدينة السلطان قابوس'],
       suggestions: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'فحوصات مختبر', 'صيدلية', 'عيادة بيطرية', 'عيادة تجميل', 'الخوير', 'القرم']
@@ -128,6 +128,8 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
   return (
     <section className="dm2026-home-top dm2026-shell" dir={dir} aria-labelledby="dm2026-home-hero-title">
       <div className="dm2026-container dm2026-home-top__container">
+        <HomeSearch2026 copy={copy.search} dir={dir} searchHref={searchHref} providerHref={providerHref} />
+
         <div className="dm2026-home-hero">
           <div className="dm2026-home-hero__copy">
             <span className="dm2026-badge">{copy.eyebrow}</span>
@@ -156,8 +158,6 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
             </div>
           </aside>
         </div>
-
-        <HomeSearch2026 copy={copy.search} dir={dir} searchHref={searchHref} providerHref={providerHref} />
 
         <div className="dm2026-home-safety dm2026-card-soft" aria-label={copy.safetyTitle}>
           <strong>{copy.safetyTitle}</strong>
