@@ -174,7 +174,7 @@ export async function SiteFooter() {
   ];
 
   return (
-    <footer className="site-footer site-footer--premium" role="contentinfo" dir={dir}>
+    <footer className="site-footer site-footer--premium" role="contentinfo" dir={dir} lang={safeLocale}>
       <Container className="site-footer__inner">
         <div className="site-footer__brand">
           <strong>{copy.brand}</strong>

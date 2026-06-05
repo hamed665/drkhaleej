@@ -113,7 +113,7 @@ export function SiteHeader() {
   ] as const;
 
   return (
-    <header className="site-header site-header--premium" role="banner" dir={dir}>
+    <header className="site-header site-header--premium" role="banner" dir={dir} lang={safeLocale}>
       <Container className="site-header__inner">
         <Link href={homeHref} className="site-header__brand" aria-label={copy.brandLabel}>
           <span className="dm-logo__mark" aria-hidden="true">
