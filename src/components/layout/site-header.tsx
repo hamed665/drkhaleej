@@ -43,7 +43,7 @@ const navCopy: Record<
     labs: 'المختبرات',
     services: 'الخدمات',
     search: 'البحث',
-    forProviders: 'لمقدمي الرعاية',
+    forProviders: 'للمقدّمين',
     switchLabel: 'تبديل اللغة إلى الإنجليزية',
     brandLabel: 'الرئيسية DrMuscat'
   }
@@ -68,12 +68,12 @@ export async function SiteHeader() {
   ] as const;
 
   return (
-    <header className="site-header site-header--premium" role="banner" dir={dir}>
-      <Container className="site-header__inner">
+    <header className="site-header site-header--premium dm2026-site-header" role="banner" dir={dir}>
+      <Container className="site-header__inner dm2026-site-header__inner">
         <Link href={homeHref} className="site-header__brand" aria-label={copy.brandLabel}>
           <Logo />
         </Link>
-        <nav aria-label={copy.ariaLabel} className="site-header__nav">
+        <nav aria-label={copy.ariaLabel} className="site-header__nav dm2026-site-header__nav">
           <ul>
             {navItems.map((item) => (
               <li key={item.href}>
@@ -83,7 +83,7 @@ export async function SiteHeader() {
           </ul>
         </nav>
         <div className="site-header__locale" aria-label={copy.switchLabel}>
-          <Link href={switchHref} className="site-header__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'}>
+          <Link href={switchHref} className="site-header__locale-switch dm2026-site-header__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'}>
             <span>{safeLocale === 'en' ? 'العربية' : 'English'}</span>
           </Link>
         </div>

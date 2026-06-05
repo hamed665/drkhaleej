@@ -140,3 +140,94 @@ Content safety scan confirmed no fake ratings, fake review counts, fake provider
 ## 11. Recommended next PR
 
 PR #156-B — Homepage Stories + Categories + Care Journey
+
+---
+
+# PR #157-FIX01 Update — Duplicate Header, Arabic Header Localization, Hero/Search Polish
+
+## 1. What was wrong before fix
+
+- The homepage 2026 component rendered its own full header/nav/language switch while the global layout `SiteHeader` also rendered, creating duplicated visible navigation.
+- The internal homepage header duplicated route links and the language switch instead of keeping the global layout header as the only official site header.
+- The Arabic global header provider label needed to match the approved copy exactly.
+- Static suggestion micro-copy was too technical and looked like implementation/debug text.
+- The hero/search top area needed tighter laptop-friendly spacing and cleaner search alignment.
+
+## 2. Files changed by fix
+
+- `src/components/layout/site-header.tsx`
+- `src/components/home/HomePage2026HeaderHero.tsx`
+- `src/styles/dm2026-home.css`
+- `docs/product/UI_K_HOME_2026_A_COMPLETION.md`
+
+No `HomeSearch2026.tsx` code change was required because suggestion safety copy is supplied by the localized homepage hero/search copy object.
+
+## 3. Duplicate-header resolution
+
+- Removed the internal full navigation/header from `HomePage2026HeaderHero`.
+- Kept `SiteHeader` as the only official header rendered by the global app shell.
+- Kept the homepage component focused on hero, visual accent card, search surface, and safety micro-copy.
+- Verified via built-page HTML checks that `/en/om` and `/ar/om` contain one `site-header` element and no `dm2026-home-header` internal header class.
+
+## 4. Arabic header localization result
+
+- Updated the Arabic global header provider label to the approved `للمقدّمين` wording.
+- The existing `src/proxy.ts` locale-header flow remains the source that allows `SiteHeader` to render Arabic labels on `/ar/om`.
+- Visual QA confirmed `/ar/om` contains Arabic header labels including `الرئيسية`, `الأطباء`, `المراكز`, `الصيدليات`, `المختبرات`, `الخدمات`, `البحث`, and `للمقدّمين`.
+- Language switch remains:
+  - `/en/om`: `العربية`
+  - `/ar/om`: `English`
+
+## 5. Hero/search polish summary
+
+- Replaced technical static suggestion wording with user-friendly safety copy:
+  - English: “Suggestions are general examples only. Confirm details directly with providers.”
+  - Arabic: “الاقتراحات أمثلة عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّمي الخدمة.”
+- Kept suggestions generic categories/services/areas only.
+- Reduced hero title maximum size and visual-card height for laptop safety.
+- Tightened hero top spacing now that the duplicate internal header is gone.
+- Adjusted desktop search grid spacing so controls align more cleanly and avoid an overly empty panel.
+- Preserved mobile stacking and RTL line-height comfort.
+
+## 6. Visual QA results
+
+- `/en/om` desktop built-page check: only one official `site-header` element is present; no internal homepage header class is present.
+- `/ar/om` desktop built-page check: only one official `site-header` element is present; no internal homepage header class is present.
+- `/ar/om` header labels are Arabic and not the English global navigation set.
+- Language switch labels are present as required for English and Arabic pages.
+- Static CSS review confirms laptop/mobile safeguards: reduced hero max title size, smaller visual card, responsive search grid, mobile single-column search controls, and RTL-specific title/line-height rules.
+- No fake ratings, reviews, provider names, provider counts, availability, phone numbers, WhatsApp numbers, or live autocomplete behavior were added.
+
+## 7. Validation results
+
+- `git status --short` — completed and showed only scoped fix files.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — one initial run failed because a temporary `src/middleware.ts` conflicted with the repository’s existing `src/proxy.ts`; the temporary file was removed and the rerun passed.
+- `pnpm routes:check` — passed.
+- Built-page curl/Python HTML checks for `/en/om` and `/ar/om` — passed for single-header and localized-label checks.
+
+## 8. Forbidden areas confirmed untouched
+
+Confirmed no changes to:
+
+- `supabase/**`
+- `migrations/**`
+- `scripts/db/**`
+- generated database types
+- API routes
+- auth backend
+- payment backend
+- `src/app/sitemap.ts`
+- `src/app/robots.ts`
+- `public/llms.txt`
+- `package.json`
+- `pnpm-lock.yaml`
+- database schema
+- seed data
+- route-check scripts
+- `src/proxy.ts`
+
+## 9. Remaining known issue
+
+Lower homepage sections are still old-template and will be addressed in PR #156-B / the next homepage sections PR.

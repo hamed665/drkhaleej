@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { HomeSearch2026 } from '@/components/home/HomeSearch2026';
 import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
-import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
+import { publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
 
 type HomePage2026HeaderHeroProps = {
   locale: SupportedLocale;
@@ -9,19 +9,7 @@ type HomePage2026HeaderHeroProps = {
   dir: 'ltr' | 'rtl';
 };
 
-type NavItem = {
-  label: string;
-  href?: string;
-  status?: string;
-};
-
 type HeaderHeroCopy = {
-  logoKicker: string;
-  logoLabel: string;
-  navLabel: string;
-  actionsLabel: string;
-  hospitalsStatus: string;
-  languageLabel: string;
   eyebrow: string;
   title: string;
   subtitle: string;
@@ -37,12 +25,6 @@ type HeaderHeroCopy = {
 
 const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
   en: {
-    logoKicker: 'Oman healthcare discovery',
-    logoLabel: 'DrMuscat',
-    navLabel: 'Primary homepage navigation',
-    actionsLabel: 'Homepage actions',
-    hospitalsStatus: 'Coming soon',
-    languageLabel: 'العربية',
     eyebrow: 'Oman-first public discovery',
     title: 'Find healthcare options in Oman with a calmer search-first experience.',
     subtitle:
@@ -51,18 +33,13 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     secondaryCta: 'For providers',
     heroNote: 'Public discovery information only. Confirm details directly with the provider. Not medical advice.',
     safetyTitle: 'Discovery safety',
-    safetyItems: [
-      'Public discovery only',
-      'Confirm details with the provider',
-      'Not medical advice'
-    ],
+    safetyItems: ['Public discovery only', 'Confirm details with the provider', 'Not medical advice'],
     visualTitle: 'Muscat-focused discovery',
     visualItems: ['English + Arabic', 'Mobile-safe search', 'No fake ratings'],
     search: {
       eyebrow: 'Search DrMuscat',
       title: 'Start with what you need, then narrow by place and provider type.',
-      description:
-        'This is a static-safe search surface for public discovery. Suggestions are generic categories, services and areas only.',
+      description: 'Use general examples to begin exploring healthcare options in Oman. Results open the approved public search route.',
       careNeedLabel: 'Care need, specialty or service',
       careNeedPlaceholder: 'Dentist, dermatology, lab tests, pharmacy...',
       providerTypeLabel: 'Provider type',
@@ -71,8 +48,8 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       areaLabel: 'Area',
       searchLabel: 'Search',
       providerLabel: 'List your center',
-      staticPreviewLabel: 'Static example suggestions',
-      staticPreviewNote: 'Static suggestions only — no live provider names or availability claims.',
+      staticPreviewLabel: 'General example suggestions',
+      staticPreviewNote: 'Suggestions are general examples only. Confirm details directly with providers.',
       providerTypes: ['Doctors', 'Clinics / Centers', 'Labs', 'Pharmacies', 'Services'],
       countries: [
         { label: 'Oman' },
@@ -95,12 +72,6 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     }
   },
   ar: {
-    logoKicker: 'اكتشاف الرعاية في عُمان',
-    logoLabel: 'DrMuscat',
-    navLabel: 'التنقل الرئيسي في الصفحة الرئيسية',
-    actionsLabel: 'إجراءات الصفحة الرئيسية',
-    hospitalsStatus: 'قريباً',
-    languageLabel: 'English',
     eyebrow: 'اكتشاف عام يبدأ من عُمان',
     title: 'ابحث عن خيارات الرعاية الصحية في عُمان بتجربة هادئة تبدأ من البحث.',
     subtitle:
@@ -115,7 +86,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     search: {
       eyebrow: 'ابحث في DrMuscat',
       title: 'ابدأ بما تحتاجه، ثم حدّد المكان ونوع مقدّم الخدمة.',
-      description: 'واجهة بحث آمنة وثابتة للاكتشاف العام. الاقتراحات فئات وخدمات ومناطق عامة فقط.',
+      description: 'استخدم أمثلة عامة لبدء استكشاف خيارات الرعاية في عُمان. يفتح البحث مسار البحث العام المعتمد.',
       careNeedLabel: 'احتياج الرعاية أو التخصص أو الخدمة',
       careNeedPlaceholder: 'طبيب أسنان، جلدية، فحوصات مختبر، صيدلية...',
       providerTypeLabel: 'نوع مقدّم الخدمة',
@@ -124,8 +95,8 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       areaLabel: 'المنطقة',
       searchLabel: 'بحث',
       providerLabel: 'أدرج مركزك',
-      staticPreviewLabel: 'اقتراحات أمثلة ثابتة',
-      staticPreviewNote: 'اقتراحات ثابتة فقط — دون أسماء مقدّمين أو ادعاءات توفر مباشرة.',
+      staticPreviewLabel: 'اقتراحات عامة',
+      staticPreviewNote: 'الاقتراحات أمثلة عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّمي الخدمة.',
       providerTypes: ['الأطباء', 'العيادات / المراكز', 'المختبرات', 'الصيدليات', 'الخدمات'],
       countries: [
         { label: 'عُمان' },
@@ -151,60 +122,12 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
 
 export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026HeaderHeroProps) {
   const copy = home2026Copy[locale];
-  const oppositeLocale: SupportedLocale = locale === 'en' ? 'ar' : 'en';
-  const languageHref = homeRoute(oppositeLocale, country);
   const searchHref = publicDiscoveryRoute(locale, country, 'search');
   const providerHref = publicProviderRoute(locale, country);
-
-  const navItems: readonly NavItem[] = [
-    { label: locale === 'ar' ? 'الأطباء' : 'Doctors', href: publicDiscoveryRoute(locale, country, 'doctors') },
-    { label: locale === 'ar' ? 'المراكز / العيادات' : 'Centers / Clinics', href: publicDiscoveryRoute(locale, country, 'centers') },
-    { label: locale === 'ar' ? 'المستشفيات' : 'Hospitals', status: copy.hospitalsStatus },
-    { label: locale === 'ar' ? 'المختبرات' : 'Labs', href: publicDiscoveryRoute(locale, country, 'labs') },
-    { label: locale === 'ar' ? 'الصيدليات' : 'Pharmacies', href: publicDiscoveryRoute(locale, country, 'pharmacies') },
-    { label: locale === 'ar' ? 'الخدمات' : 'Services', href: publicDiscoveryRoute(locale, country, 'services') },
-    { label: locale === 'ar' ? 'للمقدّمين' : 'For Providers', href: providerHref }
-  ];
 
   return (
     <section className="dm2026-home-top dm2026-shell" dir={dir} aria-labelledby="dm2026-home-hero-title">
       <div className="dm2026-container dm2026-home-top__container">
-        <header className="dm2026-home-header dm2026-card-glass">
-          <Link href={homeRoute(locale, country)} className="dm2026-home-brand" aria-label={copy.logoLabel}>
-            <span className="dm2026-home-brand__mark" aria-hidden="true">
-              <span />
-            </span>
-            <span className="dm2026-home-brand__text">
-              <strong>{copy.logoLabel}</strong>
-              <small>{copy.logoKicker}</small>
-            </span>
-          </Link>
-
-          <nav className="dm2026-home-nav" aria-label={copy.navLabel}>
-            {navItems.map((item) =>
-              item.href ? (
-                <Link key={item.label} href={item.href} className="dm2026-home-nav__link">
-                  {item.label}
-                </Link>
-              ) : (
-                <span key={item.label} className="dm2026-home-nav__link dm2026-home-nav__link--disabled" aria-disabled="true">
-                  {item.label}
-                  <small>{item.status}</small>
-                </span>
-              )
-            )}
-          </nav>
-
-          <div className="dm2026-home-header__actions" aria-label={copy.actionsLabel}>
-            <Link href={languageHref} hrefLang={oppositeLocale} className="dm2026-button dm2026-button-secondary dm2026-home-language">
-              {copy.languageLabel}
-            </Link>
-            <Link href={providerHref} className="dm2026-button dm2026-button-primary dm2026-home-provider">
-              {copy.secondaryCta}
-            </Link>
-          </div>
-        </header>
-
         <div className="dm2026-home-hero">
           <div className="dm2026-home-hero__copy">
             <span className="dm2026-badge">{copy.eyebrow}</span>
