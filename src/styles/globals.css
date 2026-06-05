@@ -5,17 +5,17 @@
   color-scheme: light;
 
   /* Brand: calm teal-green primary, with Omani gold used sparingly. */
-  --dm-teal-950: #07302c;
-  --dm-teal-900: #0a3d39;
-  --dm-teal-800: #0b4f4a;
-  --dm-teal-700: #0e6e64;
-  --dm-teal-600: #14857a;
-  --dm-teal-500: #2aa192;
-  --dm-teal-400: #5bbeb1;
-  --dm-teal-300: #8ecec2;
-  --dm-teal-200: #b9ded8;
-  --dm-teal-100: #dceeeb;
-  --dm-teal-50: #eff6f4;
+  --dm-teal-950: #042f2e;
+  --dm-teal-900: #134e4a;
+  --dm-teal-800: #115e59;
+  --dm-teal-700: #0f766e;
+  --dm-teal-600: #0d9488;
+  --dm-teal-500: #14b8a6;
+  --dm-teal-400: #2dd4bf;
+  --dm-teal-300: #5eead4;
+  --dm-teal-200: #99f6e4;
+  --dm-teal-100: #ccfbf1;
+  --dm-teal-50: #ecfdf5;
 
   --dm-gold-700: #9c7327;
   --dm-gold-600: #b4862f;
@@ -48,6 +48,10 @@
   --dm-text: var(--dm-ink-900);
   --dm-text-soft: var(--dm-ink-500);
   --dm-text-muted: var(--dm-ink-400);
+  --dm-color-primary: var(--dm-teal-700);
+  --dm-color-primary-strong: var(--dm-teal-800);
+  --dm-color-text: var(--dm-ink-900);
+  --dm-color-text-soft: var(--dm-ink-500);
   --dm-border: var(--dm-line);
   --dm-border-soft: var(--dm-line-soft);
 
@@ -85,7 +89,7 @@
 
   /* Typography foundation: no external font import is added in this phase. */
   --dm-font-sans: "Readex Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --dm-font-arabic: "Readex Pro", "Noto Naskh Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  --dm-font-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
   --dm-font-display: var(--dm-font-sans);
   --dm-type-display: clamp(2.5rem, 5vw, 3.5rem);
   --dm-type-display-line: 1.05;
@@ -2675,3 +2679,234 @@ body {
   }
 }
 /* UI-LUX-A premium interaction foundation END */
+
+
+/* PR-153-FIX00 global Arabic typography, brand consistency, and footer localization START */
+:root {
+  --dm2026-arabic-stack: var(--dm-font-arabic);
+}
+
+[dir='rtl'] .site-header,
+[dir='rtl'] .site-footer,
+[dir='rtl'] .dm2026-home,
+[dir='rtl'] .dm2026-page,
+[dir='rtl'] .dm2026-floating,
+[dir='rtl'] .dm2026-stories,
+[dir='rtl'] .dm2026-article-detail-card,
+[dir='rtl'] .dm2026-auth-card,
+[dir='rtl'] .dm2026-listing-shell {
+  font-family: var(--dm-font-arabic);
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 1.72;
+}
+
+[dir='rtl'] .dm2026-home h1,
+[dir='rtl'] .dm2026-hero h1,
+[dir='rtl'] .dm2026-page h1,
+[dir='rtl'] .dm2026-articles-hero h1,
+[dir='rtl'] .dm2026-article-detail-card h1,
+[dir='rtl'] .dm2026-auth-card h1,
+[dir='rtl'] .dm2026-listing-shell h1 {
+  max-width: 16ch;
+  font-family: var(--dm-font-arabic);
+  font-size: clamp(2.3rem, 4vw, 3.4rem) !important;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+[dir='rtl'] .dm2026-home h2,
+[dir='rtl'] .dm2026-page h2,
+[dir='rtl'] .dm2026-section-title,
+[dir='rtl'] .dm2026-stories__header h2,
+[dir='rtl'] .site-footer__column h2 {
+  font-family: var(--dm-font-arabic);
+  font-size: clamp(1.45rem, 2.7vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+[dir='rtl'] .site-header__nav a,
+[dir='rtl'] .site-header__action-link,
+[dir='rtl'] .site-header__locale-switch,
+[dir='rtl'] .site-header__mobile-menu a,
+[dir='rtl'] .site-footer__links a,
+[dir='rtl'] .site-footer__links span,
+[dir='rtl'] .dm2026-home button,
+[dir='rtl'] .dm2026-home a,
+[dir='rtl'] .dm2026-floating-button,
+[dir='rtl'] .dm2026-floating-link {
+  font-family: var(--dm-font-arabic);
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+
+[dir='rtl'] .site-header__nav a {
+  font-size: 0.9rem;
+  padding-inline: 0.64rem;
+}
+
+[dir='rtl'] .dm-logo__wordmark {
+  font-family: var(--dm-font-arabic);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+[dir='rtl'] .dm2026-home p,
+[dir='rtl'] .dm2026-home li,
+[dir='rtl'] .dm2026-page p,
+[dir='rtl'] .dm2026-page li,
+[dir='rtl'] .site-footer p,
+[dir='rtl'] .site-footer li {
+  font-family: var(--dm-font-arabic);
+  letter-spacing: 0;
+  line-height: 1.75;
+}
+
+.site-header__action-link--primary,
+.site-header__mobile-actions .site-header__mobile-primary,
+.dm2026-search-button,
+.dm2026-carousel-action--profile,
+.dm2026-story-sheet__actions a,
+.dm2026-provider-cta,
+.dm2026-floating-button--ai {
+  background: linear-gradient(135deg, var(--dm-teal-800), var(--dm-teal-600));
+  color: #fff;
+}
+
+.site-header__action-link--primary:hover,
+.site-header__action-link--primary:focus-visible,
+.dm2026-search-button:hover,
+.dm2026-floating-button--ai:hover {
+  background: linear-gradient(135deg, var(--dm-teal-900), var(--dm-teal-700));
+}
+
+.dm-logo__mark,
+.site-header__locale-switch,
+.dm2026-floating-link,
+.dm2026-story-pill,
+.dm2026-carousel-action,
+.dm2026-category-card,
+.dm2026-area-card {
+  border-color: rgba(15, 118, 110, 0.18);
+}
+
+.site-header__nav a:hover,
+.site-header__nav a:focus-visible,
+.site-header__locale-switch:hover,
+.site-header__locale-switch:focus-visible,
+.site-footer__links a:hover,
+.site-footer__links a:focus-visible {
+  color: var(--dm-teal-700);
+}
+
+.site-footer,
+.site-footer--premium {
+  background:
+    radial-gradient(760px circle at 10% 0%, rgba(20, 184, 166, 0.2), transparent 45%),
+    linear-gradient(135deg, var(--dm-teal-950), var(--dm-teal-800));
+}
+
+.site-footer__brand strong {
+  font-family: var(--dm-font-arabic), var(--dm-font-sans);
+}
+
+.site-footer__brand p {
+  max-width: 28rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.98rem;
+}
+
+.site-footer__column h2 {
+  font-size: 0.86rem;
+  color: var(--dm-gold-300);
+}
+
+[dir='rtl'] .site-footer__column h2 {
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.site-footer__links span,
+.site-footer__links a {
+  overflow-wrap: anywhere;
+}
+
+.site-footer__utility {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.85rem 1rem;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+[dir='rtl'] .site-footer,
+[dir='rtl'] .site-footer__brand,
+[dir='rtl'] .site-footer__column,
+[dir='rtl'] .site-footer__utility {
+  text-align: right;
+}
+
+[dir='rtl'] .site-footer__links ul {
+  padding-inline-start: 0;
+}
+
+@media (min-width: 768px) {
+  [dir='rtl'] .site-footer__inner {
+    grid-template-columns: minmax(0, 2fr) minmax(12rem, 0.85fr);
+  }
+
+  [dir='rtl'] .site-footer__brand {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  [dir='rtl'] .site-footer__links {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  [dir='rtl'] .dm2026-home h1,
+  [dir='rtl'] .dm2026-hero h1,
+  [dir='rtl'] .dm2026-page h1,
+  [dir='rtl'] .dm2026-articles-hero h1,
+  [dir='rtl'] .dm2026-article-detail-card h1,
+  [dir='rtl'] .dm2026-auth-card h1,
+  [dir='rtl'] .dm2026-listing-shell h1 {
+    font-size: clamp(2rem, 9vw, 2.7rem) !important;
+    line-height: 1.32;
+  }
+
+  [dir='rtl'] .site-header__nav a,
+  [dir='rtl'] .site-header__action-link,
+  [dir='rtl'] .site-header__locale-switch,
+  [dir='rtl'] .site-header__mobile-menu a {
+    font-size: 0.9rem;
+  }
+}
+/* PR-153-FIX00 global Arabic typography, brand consistency, and footer localization END */
+
+/* PR-153-FIX00 footer contrast/type polish START */
+.site-footer__brand strong {
+  font-family: var(--dm-font-sans);
+}
+
+[dir='rtl'] .site-footer__brand strong {
+  font-family: var(--dm-font-arabic);
+}
+
+.site-footer .site-footer__links a:hover,
+.site-footer .site-footer__links a:focus-visible,
+.site-footer .site-footer__locale-switch:hover,
+.site-footer .site-footer__locale-switch:focus-visible {
+  color: #fff;
+}
+/* PR-153-FIX00 footer contrast/type polish END */

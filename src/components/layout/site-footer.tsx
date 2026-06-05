@@ -9,8 +9,6 @@ import {
   publicDiscoveryRoute,
   publicListYourCenterRoute,
   publicProviderRoute,
-  publicRegisterRoute,
-  publicSignInRoute,
 } from '@/lib/routes/public';
 
 type FooterColumn = { title: string; items: readonly { label: string; href?: string }[] };
@@ -37,9 +35,16 @@ const footerCopy: Record<
     signIn: string;
     register: string;
     listYourCenter: string;
-    contact: string;
+    whatsappHelp: string;
+    faq: string;
+    reportIssue: string;
+    suggestEdit: string;
+    aboutDrMuscat: string;
     privacy: string;
     terms: string;
+    disclaimerLabel: string;
+    pricingPlans: string;
+    profileUpdate: string;
     aboutText: string;
     utility: string;
     switchLabel: string;
@@ -48,7 +53,7 @@ const footerCopy: Record<
 > = {
   en: {
     brand: 'DrMuscat',
-    tagline: 'Calm, bilingual healthcare discovery for Oman.',
+    tagline: 'A healthcare discovery directory for doctors, clinics, pharmacies, labs, and healthcare services in Oman.',
     navLabel: 'Footer public navigation',
     discover: 'Discover',
     providers: 'For Providers',
@@ -66,17 +71,24 @@ const footerCopy: Record<
     signIn: 'Sign in',
     register: 'Create account',
     listYourCenter: 'List your center',
-    contact: 'Contact options coming soon',
-    privacy: 'Privacy',
+    whatsappHelp: 'WhatsApp support',
+    faq: 'FAQ',
+    reportIssue: 'Report an issue',
+    suggestEdit: 'Suggest an edit',
+    aboutDrMuscat: 'About DrMuscat',
+    privacy: 'Privacy policy',
     terms: 'Terms',
-    aboutText: 'Oman-focused public discovery for doctors, clinics, pharmacies, labs and healthcare services.',
-    utility: 'No emergency, diagnosis, rating, or booking claims are made from this footer.',
+    disclaimerLabel: 'Disclaimer',
+    pricingPlans: 'Pricing and plans',
+    profileUpdate: 'Request profile update',
+    aboutText: 'DrMuscat helps people discover doctors, clinics, pharmacies, labs, and healthcare services in Oman. It is a discovery platform, not a medical advice service.',
+    utility: 'DrMuscat is a healthcare discovery platform only. Published information is not medical advice, diagnosis, or treatment. Always confirm details directly with the provider.',
     switchLabel: 'Switch language to Arabic',
     localeSwitch: 'العربية'
   },
   ar: {
     brand: 'دكتور مسقط',
-    tagline: 'اكتشاف صحي هادئ وثنائي اللغة في عُمان.',
+    tagline: 'دليل لاكتشاف الأطباء والعيادات والصيدليات والمختبرات والخدمات الصحية في عُمان.',
     navLabel: 'تنقل التذييل العام',
     discover: 'اكتشف',
     providers: 'لمقدمي الرعاية',
@@ -94,11 +106,18 @@ const footerCopy: Record<
     signIn: 'تسجيل الدخول',
     register: 'إنشاء حساب',
     listYourCenter: 'أدرج مركزك',
-    contact: 'خيارات التواصل قريباً',
-    privacy: 'الخصوصية',
+    whatsappHelp: 'مساعدة واتساب',
+    faq: 'الأسئلة الشائعة',
+    reportIssue: 'الإبلاغ عن مشكلة',
+    suggestEdit: 'اقتراح تعديل',
+    aboutDrMuscat: 'عن دكتور مسقط',
+    privacy: 'سياسة الخصوصية',
     terms: 'الشروط',
-    aboutText: 'دليل عام مخصص لعُمان لاكتشاف الأطباء والعيادات والصيدليات والمختبرات وخدمات الرعاية الصحية.',
-    utility: 'لا يقدم هذا التذييل ادعاءات طوارئ أو تشخيص أو تقييمات أو حجز.',
+    disclaimerLabel: 'إخلاء المسؤولية',
+    pricingPlans: 'الأسعار والخطط',
+    profileUpdate: 'طلب تحديث الملف',
+    aboutText: 'دكتور مسقط منصة لاكتشاف الأطباء والعيادات والصيدليات والمختبرات والخدمات الصحية في عُمان. المنصة مخصصة للاكتشاف وليست بديلاً عن النصيحة الطبية.',
+    utility: 'دكتور مسقط منصة لاكتشاف خدمات الرعاية الصحية فقط. لا تُعد المعلومات المنشورة نصيحة طبية أو تشخيصاً أو علاجاً. يرجى تأكيد التفاصيل مباشرة مع مقدم الخدمة.',
     switchLabel: 'تبديل اللغة إلى الإنجليزية',
     localeSwitch: 'English'
   }
@@ -127,23 +146,30 @@ export async function SiteFooter() {
     {
       title: copy.providers,
       items: [
+        { href: publicListYourCenterRoute(safeLocale, 'om'), label: copy.listYourCenter },
         { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders },
-        { href: publicListYourCenterRoute(safeLocale, 'om'), label: copy.listYourCenter }
+        { href: publicProviderRoute(safeLocale, 'om'), label: copy.pricingPlans },
+        { href: publicListYourCenterRoute(safeLocale, 'om'), label: copy.profileUpdate }
       ]
     },
     {
       title: copy.support,
       items: [
-        { href: publicSignInRoute(safeLocale, 'om'), label: copy.signIn },
-        { href: publicRegisterRoute(safeLocale, 'om'), label: copy.register },
-        { label: copy.contact },
-        { label: copy.privacy },
-        { label: copy.terms }
+        { label: copy.whatsappHelp },
+        { label: copy.faq },
+        { label: copy.reportIssue },
+        { label: copy.suggestEdit }
       ]
     },
     {
       title: copy.about,
-      items: [{ label: copy.aboutText }]
+      items: [
+        { label: copy.aboutDrMuscat },
+        { label: copy.privacy },
+        { label: copy.terms },
+        { label: copy.disclaimerLabel },
+        { label: copy.aboutText }
+      ]
     }
   ];
 
