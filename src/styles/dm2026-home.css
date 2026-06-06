@@ -3575,3 +3575,229 @@
     animation: none;
   }
 }
+
+/* PR #159 reference-inspired sculpted tile pass: calm editorial relief panels. */
+.dm2026-discovery-categories__module::after {
+  content: '';
+  position: absolute;
+  inset: 9% -8% auto -8%;
+  z-index: -1;
+  block-size: 52%;
+  background:
+    radial-gradient(42% 72% at 18% 42%, rgba(255, 255, 255, 0.48), transparent 72%),
+    radial-gradient(42% 72% at 82% 38%, rgba(42, 161, 146, 0.07), transparent 70%),
+    linear-gradient(116deg, transparent 0 18%, rgba(255, 255, 255, 0.34) 31%, rgba(14, 110, 100, 0.035) 48%, rgba(201, 162, 75, 0.04) 65%, transparent 82%);
+  filter: blur(22px);
+  opacity: 0.72;
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+
+.dm2026-discovery-card {
+  overflow: hidden;
+  border-color: rgba(226, 233, 231, 0.78);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(250, 252, 250, 0.74) 52%, rgba(239, 246, 244, 0.7)),
+    var(--dm-color-surface-glass);
+  box-shadow:
+    0 18px 42px rgba(11, 40, 38, 0.075),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    inset 0 -1px 0 rgba(14, 110, 100, 0.04);
+}
+
+.dm2026-discovery-card--hero {
+  border-color: rgba(14, 110, 100, 0.18);
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(255, 255, 255, 0.86), transparent 62%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(250, 252, 250, 0.78) 50%, rgba(239, 246, 244, 0.74)),
+    var(--dm-color-surface-glass);
+  box-shadow:
+    0 26px 62px rgba(11, 40, 38, 0.11),
+    0 1px 0 rgba(255, 255, 255, 0.94) inset,
+    inset 0 -1px 0 rgba(14, 110, 100, 0.06);
+}
+
+.dm2026-discovery-card--secondary {
+  border-radius: clamp(var(--dm-radius-lg), 1.5vw, var(--dm-radius-xl));
+}
+
+.dm2026-discovery-card::before {
+  opacity: 1;
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.78), transparent 30%, rgba(14, 110, 100, 0.032) 54%, rgba(255, 255, 255, 0.38)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 48%);
+}
+
+.dm2026-discovery-card--hero::after {
+  inline-size: 36%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.16), transparent);
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__scene {
+  border-color: rgba(255, 255, 255, 0.72);
+  background:
+    radial-gradient(80% 95% at 50% 12%, rgba(255, 255, 255, 0.98), transparent 64%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(239, 246, 244, 0.46) 52%, rgba(14, 110, 100, 0.035)),
+    rgba(255, 255, 255, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 10px 12px 28px rgba(255, 255, 255, 0.34),
+    inset -16px -18px 38px rgba(11, 40, 38, 0.045),
+    0 18px 42px rgba(11, 40, 38, 0.07);
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__scene {
+  border-color: rgba(255, 255, 255, 0.64);
+  background:
+    radial-gradient(78% 90% at 50% 14%, rgba(255, 255, 255, 0.9), transparent 64%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(239, 246, 244, 0.44) 56%, rgba(14, 110, 100, 0.032));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 8px 10px 24px rgba(255, 255, 255, 0.24),
+    inset -12px -14px 30px rgba(11, 40, 38, 0.035),
+    0 12px 26px rgba(11, 40, 38, 0.055);
+}
+
+.dm2026-discovery-card__scene::before {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 0 42px rgba(255, 255, 255, 0.22),
+    0 1px 0 rgba(14, 110, 100, 0.035);
+}
+
+.dm2026-discovery-card__scene::after {
+  background: linear-gradient(108deg, transparent 0 18%, rgba(255, 255, 255, 0.34) 42%, rgba(255, 255, 255, 0.1) 56%, transparent 82%);
+  opacity: 0.5;
+}
+
+.dm2026-discovery-card__scene-halo {
+  opacity: 0.86;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.22) 58%, transparent 100%),
+    radial-gradient(closest-side, rgba(14, 110, 100, 0.095), transparent 72%);
+  box-shadow:
+    inset 0 1px 10px rgba(255, 255, 255, 0.74),
+    0 14px 32px rgba(11, 40, 38, 0.065);
+}
+
+.dm2026-discovery-card__scene-object svg {
+  transform-origin: 50% 54%;
+}
+
+.dm2026-discovery-card__aura,
+.dm2026-discovery-card__halo {
+  filter: drop-shadow(0 18px 22px rgba(11, 40, 38, 0.08));
+}
+
+.dm2026-discovery-card__tooth-glass,
+.dm2026-discovery-card__serum-drop,
+.dm2026-discovery-card__jewel,
+.dm2026-discovery-card__paw,
+.dm2026-discovery-card__fluid,
+.dm2026-discovery-card__dot,
+.dm2026-discovery-card__molecule,
+.dm2026-discovery-card__toe {
+  filter:
+    drop-shadow(0 14px 16px rgba(11, 40, 38, 0.105))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.55));
+}
+
+.dm2026-discovery-card__line,
+.dm2026-discovery-card__beauty-contour,
+.dm2026-discovery-card__tooth-edge,
+.dm2026-discovery-card__tooth-core,
+.dm2026-discovery-card__jewel-facet,
+.dm2026-discovery-card__pulse,
+.dm2026-discovery-card__beacon {
+  filter:
+    drop-shadow(0 8px 10px rgba(11, 40, 38, 0.08))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.38));
+}
+
+.dm2026-discovery-card--dental .dm2026-discovery-card__tooth-glass {
+  fill: rgba(255, 255, 255, 0.68);
+  stroke: rgba(11, 79, 74, 0.72);
+}
+
+.dm2026-discovery-card--beauty .dm2026-discovery-card__beauty-contour--primary {
+  stroke: rgba(11, 79, 74, 0.76);
+}
+
+.dm2026-discovery-card--beauty .dm2026-discovery-card__serum-drop {
+  fill: rgba(255, 255, 255, 0.58);
+  stroke: rgba(11, 79, 74, 0.62);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__jewel {
+  fill: rgba(255, 250, 238, 0.78);
+  stroke: rgba(201, 162, 75, 0.88);
+  filter:
+    drop-shadow(0 18px 20px rgba(77, 57, 13, 0.13))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.65));
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__scene::before {
+  border-color: rgba(255, 250, 238, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 0 42px rgba(201, 162, 75, 0.08),
+    0 1px 0 rgba(201, 162, 75, 0.06);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__copy strong::after {
+  content: '';
+  display: inline-block;
+  inline-size: 0.42rem;
+  block-size: 0.42rem;
+  margin-inline-start: 0.42rem;
+  border-radius: 50%;
+  background: var(--dm-color-accent-gold);
+  box-shadow: 0 0 0 4px rgba(201, 162, 75, 0.12);
+  vertical-align: 0.12em;
+}
+
+[dir='rtl'] .dm2026-discovery-card--offers .dm2026-discovery-card__copy strong::after {
+  margin-inline: 0.42rem 0;
+}
+
+.dm2026-discovery-card__cta {
+  backdrop-filter: blur(10px) saturate(118%);
+  -webkit-backdrop-filter: blur(10px) saturate(118%);
+  border-color: rgba(255, 255, 255, 0.62);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 244, 0.76)),
+    rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 10px 24px rgba(11, 40, 38, 0.07);
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__cta {
+  color: var(--dm-color-brand-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 12px 28px rgba(11, 40, 38, 0.085);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__cta {
+  color: var(--dm-gold-700);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 238, 0.8)),
+    rgba(255, 250, 238, 0.64);
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__scene,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__scene {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 10px 12px 28px rgba(255, 255, 255, 0.38),
+    inset -18px -20px 40px rgba(11, 40, 38, 0.05),
+    0 20px 46px rgba(11, 40, 38, 0.09);
+}
+
+@media (max-width: 48rem) {
+  .dm2026-discovery-card--hero .dm2026-discovery-card__scene {
+    min-block-size: 8.4rem;
+  }
+}

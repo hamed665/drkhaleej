@@ -192,3 +192,13 @@ A second focused visual pass moved the section further away from simple icon car
 - Dental, Beauty & Aesthetics, and Special Offers retain their distinct SVG objects while gaining more immersive lighting, reflection, and depth composition.
 - Secondary cards keep a calmer visual hierarchy but no longer read as plain icon boxes because they share the same premium glass stage system.
 - Reduced-motion coverage was extended to the new scene layers.
+
+## 19. Sculpted reference-inspired card pass
+
+A third focused visual pass adapted the newly shared reference direction into the DrMuscat system without copying it literally.
+
+- Added explicit `hero` and `secondary` card variant classes for clearer hierarchy and maintainable styling.
+- Shifted cards toward calmer sculpted editorial tiles with softer relief surfaces, disciplined borders, stronger whitespace, and embossed scene panels.
+- Strengthened SVG object material quality using subtle relief shadows, inner highlights, and restrained brand-compatible teal/champagne accents.
+- Added a minimal premium Special Offers cue while preserving the exact “Special Offers” wording and avoiding discount-style visuals.
+- Refined CTA pills to feel more crisp, glassy, and modern while preserving accessibility and reduced-motion behavior.

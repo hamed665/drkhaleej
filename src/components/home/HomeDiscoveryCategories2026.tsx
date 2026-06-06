@@ -240,7 +240,8 @@ export function HomeDiscoveryCategories2026({ locale, country, dir }: HomeDiscov
 
           <div className="dm2026-discovery-categories__grid" aria-label={copy.ariaLabel}>
             {discoveryCards.map((card) => {
-              const className = `dm2026-discovery-card dm2026-discovery-card--${card.size} dm2026-discovery-card--${card.id} dm2026-card-glass`;
+              const variant = card.size === 'large' ? 'hero' : 'secondary';
+              const className = `dm2026-discovery-card dm2026-discovery-card--${variant} dm2026-discovery-card--${card.size} dm2026-discovery-card--${card.id} dm2026-card-glass`;
               const content = (
                 <>
                   <span className="dm2026-discovery-card__scene" aria-hidden="true">
@@ -260,14 +261,14 @@ export function HomeDiscoveryCategories2026({ locale, country, dir }: HomeDiscov
 
               if (card.routeSlug) {
                 return (
-                  <Link key={card.id} className={className} href={publicDiscoveryRoute(locale, country, card.routeSlug)}>
+                  <Link key={card.id} className={className} data-card-variant={variant} href={publicDiscoveryRoute(locale, country, card.routeSlug)}>
                     {content}
                   </Link>
                 );
               }
 
               return (
-                <article key={card.id} className={className}>
+                <article key={card.id} className={className} data-card-variant={variant}>
                   {content}
                 </article>
               );
