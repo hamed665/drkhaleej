@@ -197,7 +197,72 @@ UI-K-HOME-2026-POLISH — final visual QA and Claude UI Kit alignment pass
 - `pnpm build` — passed.
 - `pnpm routes:check` — passed.
 - Built-page HTML checks for `/en/om` and `/ar/om` — passed.
+- Source checks confirmed smart suggestion filtering hooks, city-area dependency mappings and preview labels are present.
+- Interactive browser typing QA was not run because no browser/screenshot binary is installed in the container.
 
 ### Forbidden areas untouched
 
 No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check or migration files were changed.
+
+## 17. Search Fix — PR #157-FIX06
+
+### Reduced search height/spacing summary
+
+- Tightened the search panel spacing again while preserving the main command input as the visual hero.
+- Kept content/provider chips compact and horizontally scrollable to reduce vertical height on desktop, laptop and tablet.
+
+### Smart suggestions added
+
+- Added UI-only client-side suggestion filtering from static data.
+- English matching is case-insensitive through normalized text.
+- Arabic matching uses the same static label/helper text matching and remains backend-free.
+- Suggestions are grouped by Services, Provider types, Areas, Offers and Guides, with Arabic equivalents.
+
+### City/area dependency added
+
+- City selection now controls the Area options in UI state.
+- Muscat, Salalah, Sohar and Seeb each expose city-specific areas.
+- Other Oman cities fall back to `City-wide discovery` / `اكتشاف على مستوى المدينة`.
+- Changing city resets the area to the first valid option for that city.
+
+### Suggestion overflow fix
+
+- Popular suggestions are capped to a curated visible set and include a `More` / `المزيد` chip.
+- Suggestion rows use horizontal scrolling and fade-edge masking to prevent clipped text and line-break clutter.
+
+### Hover/focus preview behavior
+
+- Added an in-panel glass preview card that updates on suggestion hover/focus.
+- Preview content includes the suggestion label, type, safe helper sentence and a `Use this suggestion` / `استخدام هذا الاقتراح` submit action.
+- The preview stays inside the search panel and stacks below suggestions on smaller widths.
+
+### Search preview decision
+
+- Full search result preview after submit was not implemented in this fix to avoid fake result behavior.
+- Search still submits to the existing approved search route with query parameters only.
+
+### Arabic/RTL notes
+
+- Arabic suggestions, chips and preview content use the same compact layout and avoid negative letter spacing.
+- RTL layout remains scoped to the search component and CSS only.
+
+### Accessibility/performance notes
+
+- Search uses a client component only for local UI state; no API, Supabase, backend search or dependency was added.
+- Form labels, fieldsets, radio controls, selects, submit buttons and focusable suggestion controls remain semantic.
+- Hover/focus micro-interactions respect reduced-motion CSS safeguards.
+
+### Validation results
+
+- `git status --short` — run before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML checks for `/en/om` and `/ar/om` — passed.
+- Source checks confirmed smart suggestion filtering hooks, city-area dependency mappings and preview labels are present.
+- Interactive browser typing QA was not run because no browser/screenshot binary is installed in the container.
+
+### Forbidden areas untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, header, footer or other homepage section files were changed.

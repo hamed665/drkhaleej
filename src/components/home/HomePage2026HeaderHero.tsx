@@ -52,6 +52,9 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       providerLabel: 'List your center',
       staticPreviewLabel: 'General example suggestions',
       staticPreviewNote: 'Suggestions are general examples. Confirm details directly with providers.',
+      moreLabel: 'More',
+      suggestionPreviewCta: 'Use this suggestion',
+      cityWideAreaLabel: 'City-wide discovery',
       providerTypes: ['Doctors', 'Clinics / Centers', 'Hospitals', 'Labs', 'Pharmacies', 'Beauty & Wellness', 'Pet Clinics', 'Services'],
       countries: [
         { label: 'Oman' },
@@ -64,8 +67,33 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       ],
       cities: ['Muscat', 'Seeb', 'Bawshar', 'Muttrah', 'Salalah', 'Sohar', 'Nizwa', 'Sur', 'Ibri', 'Rustaq', 'Barka', 'Duqm'],
       areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Muttrah', 'Seeb', 'Bawshar', 'Madinat Sultan Qaboos', 'Ghala', 'Al Hail', 'Al Mouj', 'Muscat Hills', 'Wadi Kabir', 'Darsait', 'Al Amerat', 'Mabela'],
+      cityAreas: {
+        Muscat: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Muttrah', 'Seeb', 'Bawshar', 'Madinat Sultan Qaboos', 'Ghala', 'Al Hail', 'Al Mouj', 'Muscat Hills', 'Wadi Kabir', 'Darsait', 'Al Amerat', 'Mabela'],
+        Salalah: ['Al Haffa', 'Salalah Gardens', 'Al Wadi', 'Awqad', 'Dahariz', 'Raysut'],
+        Sohar: ['Sohar Center', 'Al Hambar', 'Falaj Al Qabail', 'Al Batinah'],
+        Seeb: ['Al Hail', 'Al Mouj', 'Mabela', 'Al Khoudh', 'Seeb Souq']
+      },
       contentTypes: ['Doctors', 'Clinics', 'Hospitals', 'Labs', 'Pharmacies', 'Services', 'Offers', 'Articles'],
-      specialties: ['Dentist', 'Dermatology', 'Pediatrics', 'Gynecology', 'ENT', 'Orthopedics', 'General Practice', 'Lab tests', 'Dental cleaning', 'Skin clinic', 'Pharmacy', 'Pet clinic', 'Beauty clinic', 'Wellness center']
+      specialties: ['Dentist', 'Dermatology', 'Pediatrics', 'Gynecology', 'ENT', 'Orthopedics', 'General Practice', 'Lab tests', 'Dental cleaning', 'Skin clinic', 'Pharmacy', 'Pet clinic', 'Beauty clinic', 'Wellness center'],
+      suggestions: [
+        { label: 'Dentist', group: 'Services', helper: 'Explore dental care options' },
+        { label: 'Dermatology', group: 'Services', helper: 'Browse skin clinic discovery paths' },
+        { label: 'Lab tests', group: 'Services', helper: 'Find laboratory-related discovery paths' },
+        { label: 'Laser hair removal', group: 'Services', helper: 'Explore beauty and wellness service paths' },
+        { label: 'Doctors', group: 'Provider types', helper: 'Explore doctor discovery pages' },
+        { label: 'Labs', group: 'Provider types', helper: 'Explore laboratory provider paths' },
+        { label: 'Pet clinic', group: 'Provider types', helper: 'Explore pet care discovery paths' },
+        { label: 'Al Khuwair', group: 'Areas', helper: 'Explore public discovery around Al Khuwair' },
+        { label: 'Qurum', group: 'Areas', helper: 'Explore public discovery around Qurum' },
+        { label: 'Al Hail', group: 'Areas', helper: 'Explore public discovery around Al Hail' },
+        { label: 'Clinics in Qurum', group: 'Areas', helper: 'Generic clinic discovery around Qurum' },
+        { label: 'Pharmacy near Qurum', group: 'Areas', helper: 'Generic pharmacy discovery around Qurum' },
+        { label: 'Dental offers', group: 'Offers', helper: 'Provider-approved offers can appear after review' },
+        { label: 'Pet clinic offers', group: 'Offers', helper: 'Approved pet care offers can appear after review' },
+        { label: 'Dental guide', group: 'Guides', helper: 'Educational guide preview' },
+        { label: 'Choosing a clinic', group: 'Guides', helper: 'Educational guide preview' },
+        { label: 'Pet care guide', group: 'Guides', helper: 'Educational guide preview' }
+      ]
     }
   },
   ar: {
@@ -96,6 +124,9 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       providerLabel: 'أدرج مركزك',
       staticPreviewLabel: 'اقتراحات عامة',
       staticPreviewNote: 'الاقتراحات أمثلة عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّمي الخدمة.',
+      moreLabel: 'المزيد',
+      suggestionPreviewCta: 'استخدام هذا الاقتراح',
+      cityWideAreaLabel: 'اكتشاف على مستوى المدينة',
       providerTypes: ['الأطباء', 'العيادات / المراكز', 'المستشفيات', 'المختبرات', 'الصيدليات', 'الجمال والرفاهية', 'العيادات البيطرية', 'الخدمات'],
       countries: [
         { label: 'عُمان' },
@@ -108,8 +139,33 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       ],
       cities: ['مسقط', 'السيب', 'بوشر', 'مطرح', 'صلالة', 'صحار', 'نزوى', 'صور', 'عبري', 'الرستاق', 'بركاء', 'الدقم'],
       areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'مطرح', 'السيب', 'بوشر', 'مدينة السلطان قابوس', 'غلا', 'الحيل', 'الموج', 'مسقط هيلز', 'وادي الكبير', 'دارسيت', 'العامرات', 'المعبيلة'],
+      cityAreas: {
+        'مسقط': ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'مطرح', 'السيب', 'بوشر', 'مدينة السلطان قابوس', 'غلا', 'الحيل', 'الموج', 'مسقط هيلز', 'وادي الكبير', 'دارسيت', 'العامرات', 'المعبيلة'],
+        'صلالة': ['الحافة', 'صلالة جاردنز', 'الوادي', 'عوقد', 'الدهاريز', 'ريسوت'],
+        'صحار': ['مركز صحار', 'الهمبار', 'فلج القبائل', 'الباطنة'],
+        'السيب': ['الحيل', 'الموج', 'المعبيلة', 'الخوض', 'سوق السيب']
+      },
       contentTypes: ['الأطباء', 'العيادات', 'المستشفيات', 'المختبرات', 'الصيدليات', 'الخدمات', 'العروض', 'المقالات'],
-      specialties: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'طب عام', 'فحوصات مختبر', 'تنظيف الأسنان', 'عيادة جلدية', 'صيدلية', 'عيادة بيطرية', 'عيادة تجميل', 'مركز رفاهية']
+      specialties: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'طب عام', 'فحوصات مختبر', 'تنظيف الأسنان', 'عيادة جلدية', 'صيدلية', 'عيادة بيطرية', 'عيادة تجميل', 'مركز رفاهية'],
+      suggestions: [
+        { label: 'طبيب أسنان', group: 'الخدمات', helper: 'استكشف خيارات رعاية الأسنان' },
+        { label: 'جلدية', group: 'الخدمات', helper: 'استكشف مسارات عيادات الجلدية' },
+        { label: 'فحوصات مختبر', group: 'الخدمات', helper: 'مسارات اكتشاف مرتبطة بالمختبرات' },
+        { label: 'تنظيف الأسنان', group: 'الخدمات', helper: 'استكشف خيارات رعاية الأسنان' },
+        { label: 'الأطباء', group: 'أنواع المقدمين', helper: 'استكشف صفحات اكتشاف الأطباء' },
+        { label: 'المختبرات', group: 'أنواع المقدمين', helper: 'استكشف مسارات مقدّمي المختبرات' },
+        { label: 'عيادة بيطرية', group: 'أنواع المقدمين', helper: 'استكشف مسارات رعاية الحيوانات' },
+        { label: 'الخوير', group: 'المناطق', helper: 'استكشف خيارات الاكتشاف حول الخوير' },
+        { label: 'القرم', group: 'المناطق', helper: 'استكشف خيارات الاكتشاف حول القرم' },
+        { label: 'الحيل', group: 'المناطق', helper: 'استكشف خيارات الاكتشاف حول الحيل' },
+        { label: 'عيادات في القرم', group: 'المناطق', helper: 'اكتشاف عام للعيادات حول القرم' },
+        { label: 'صيدلية قرب القرم', group: 'المناطق', helper: 'اكتشاف عام للصيدليات حول القرم' },
+        { label: 'عروض الأسنان', group: 'العروض', helper: 'تظهر العروض المعتمدة بعد المراجعة' },
+        { label: 'عروض العيادات البيطرية', group: 'العروض', helper: 'تظهر عروض رعاية الحيوانات بعد المراجعة' },
+        { label: 'دليل الأسنان', group: 'الأدلة', helper: 'دليل تعليمي مختصر' },
+        { label: 'اختيار عيادة', group: 'الأدلة', helper: 'دليل تعليمي مختصر' },
+        { label: 'دليل رعاية الحيوانات', group: 'الأدلة', helper: 'دليل تعليمي مختصر' }
+      ]
     }
   }
 };
