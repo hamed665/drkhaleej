@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HeaderLanguageSwitch } from '@/components/layout/header-language-switch';
 import { headers } from 'next/headers';
 import { Logo } from '@/components/brand/logo';
 import { Container } from '@/components/ui/container';
@@ -97,7 +98,6 @@ export async function SiteHeader() {
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');
-  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
   const providerHref = publicProviderRoute(safeLocale, 'om');
   const mobileMenuId = `dm2026-mobile-menu-${safeLocale}`;
   const linkedNavItems = [
@@ -142,15 +142,7 @@ export async function SiteHeader() {
           <span className="dm2026-site-header__account dm2026-site-header__account--primary" aria-disabled="true" title={copy.comingSoon}>
             {copy.createAccount}
           </span>
-          <Link
-            href={switchHref}
-            className="site-header__locale-switch dm2026-site-header__locale-switch"
-            hrefLang={safeLocale === 'en' ? 'ar' : 'en'}
-            aria-label={copy.switchLabel}
-            data-dm2026-locale-switch
-          >
-            <span>{safeLocale === 'en' ? 'العربية' : 'English'}</span>
-          </Link>
+          <HeaderLanguageSwitch className="site-header__locale-switch dm2026-site-header__locale-switch" />
         </div>
         <button
           type="button"

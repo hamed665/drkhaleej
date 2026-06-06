@@ -589,3 +589,38 @@ No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, 
 ### Merge-readiness recommendation
 
 PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; the request locale source is now proxy-based for Next 16 build compatibility while preserving `/en/om` and `/ar/om` language-switch behavior.
+
+## 26. FIX17 — Pathname-based visible language switch
+
+### Root cause
+
+- The visible header language switch was still tied to the server-resolved `safeLocale`, which can fall back to `en` if `x-drmuscat-locale` is unavailable or unreliable during deployment/static rendering.
+- When that happened on `/ar/om`, the visible language switch could still render `العربية` instead of `English`.
+
+### Client pathname language switch
+
+- Added `HeaderLanguageSwitch` as a small client component dedicated to the visible language switch.
+- The component uses `usePathname()` and derives the current locale from the actual browser pathname instead of request headers, proxy headers, `referer`, or `x-next-url` fallbacks.
+- `/en/om` displays `العربية` and links to `/ar/om`.
+- `/ar/om` displays `English` and links to `/en/om`.
+- The switch intentionally uses the safe localized homepage target (`/{targetLocale}/{country}`) because preserving nested public discovery paths can require runtime Supabase configuration in local/preview environments.
+
+### Scope preserved
+
+- The desktop nav structure, mobile hamburger, mobile close-on-click behavior, proxy locale source, homepage top shell and Smart Search were not redesigned.
+- Full root `<html lang>` / `dir` architecture cleanup remains deferred to `UI-K-I18N-ROOT-LAYOUT-A` if the global layout needs a future pathname-aware architecture pass.
+
+### Validation results
+
+- `git status --short` showed only the scoped header language-switch component, header import/render update and completion-report update before commit.
+- `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm routes:check` passed during FIX17.
+- Built-page/source checks passed for `/en/om` and `/ar/om`, including visible language-switch labels/hrefs, mobile menu markers, Smart Search markers and absence of deferred lower-section markers.
+- Forbidden-area checks passed for database, Supabase, RLS, API, sitemap, robots, llms, package, lockfile, proxy, route-check, Smart Search, hero/top shell, route page, style and lower-section files.
+
+### Forbidden files untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, proxy, route-check, migration, footer, route page, lower homepage section file, Smart Search file, search logic or homepage redesign file was changed in FIX17.
+
+### Merge-readiness recommendation
+
+PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; the visible language switch now derives from the actual pathname while the broader root layout locale architecture can be handled separately if needed.
