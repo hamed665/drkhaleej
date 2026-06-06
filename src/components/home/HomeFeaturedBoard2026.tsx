@@ -16,7 +16,11 @@ type LocalizedPreview = {
   city: string;
   area: string;
   chips: readonly string[];
-  visibilityContext: string;
+  ratingLabel: string;
+  ratingValue: string;
+  ratingNote: string;
+  providerContext: string;
+  offerTitle: string;
   offerContext: readonly string[];
 };
 
@@ -35,7 +39,8 @@ type FeaturedBoardCopy = {
   activeLabel: string;
   profileLabel: string;
   locationLabel: string;
-  visibilityLabel: string;
+  servicesLabel: string;
+  ratingAriaLabel: string;
   offerHeading: string;
   offerKicker: string;
   offerNote: string;
@@ -51,207 +56,272 @@ type FeaturedBoardCopy = {
 
 const previewInventory: readonly VisibilityPreviewItem[] = [
   {
-    id: 'premium-clinic-preview',
+    id: 'muscat-dental-clinic-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Premium Clinic Preview',
-      subtitle: 'A reviewed public profile surface for an approved clinic or medical center.',
+      providerKind: 'Dental clinic',
+      title: 'Muscat Dental Clinic Preview',
+      subtitle: 'Approved dental profile preview with services, offer context and contact actions.',
       city: 'Muscat',
-      area: 'Area preview',
-      chips: ['Profile actions preview', 'Public discovery only', 'Appears after approval'],
-      visibilityContext: 'Homepage, area, and category visibility can be presented with sponsored context clearly marked.',
-      offerContext: ['Provider-approved offer preview', 'Appears after review', 'Supports profile discovery']
+      area: 'Muscat area preview',
+      chips: ['Dental care', 'Cleaning package preview', 'Profile actions after approval'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'This preview shows how a dental profile can present services and contact actions without live listing data.',
+      offerTitle: 'Dental cleaning package',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'Sponsored placement is clearly marked']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة عيادة مميزة',
-      subtitle: 'واجهة ملف عام قيد المراجعة لعيادة أو مركز طبي معتمد.',
+      providerKind: 'عيادة أسنان',
+      title: 'معاينة عيادة أسنان في مسقط',
+      subtitle: 'معاينة ملف أسنان معتمد مع الخدمات وسياق العرض وإجراءات التواصل.',
       city: 'مسقط',
-      area: 'معاينة منطقة',
-      chips: ['معاينة إجراءات الملف', 'اكتشاف عام فقط', 'يظهر بعد الاعتماد'],
-      visibilityContext: 'يمكن عرض الظهور في الرئيسية والمنطقة والفئة مع توضيح سياق الظهور المدعوم.',
-      offerContext: ['معاينة عرض معتمد من المقدّم', 'يظهر بعد المراجعة', 'يدعم اكتشاف الملف']
+      area: 'معاينة منطقة في مسقط',
+      chips: ['رعاية الأسنان', 'معاينة باقة تنظيف', 'الإجراءات بعد الاعتماد'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'توضح هذه المعاينة كيف يمكن لملف أسنان عرض الخدمات وإجراءات التواصل بدون بيانات قائمة مباشرة.',
+      offerTitle: 'باقة تنظيف الأسنان',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'يتم توضيح الظهور المدعوم بوضوح']
     }
   },
   {
-    id: 'specialist-profile-preview',
+    id: 'al-khuwair-medical-center-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Specialist Profile Preview',
-      subtitle: 'A calm action-ready profile preview for an approved specialist listing.',
+      providerKind: 'Medical center',
+      title: 'Al Khuwair Medical Center Preview',
+      subtitle: 'Approved center profile preview with service chips and clear contact actions.',
       city: 'Muscat',
-      area: 'Specialty preview',
-      chips: ['Reviewed public profile', 'Contact actions preview', 'Confirm details with provider'],
-      visibilityContext: 'Specialty and area discovery can highlight approved profile actions without implying quality ranking.',
-      offerContext: ['Sponsored context clearly marked', 'Profile actions after approval', 'No quality-ranking implication']
+      area: 'Al Khuwair preview',
+      chips: ['General care', 'Family services', 'Confirm details with provider'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'A center profile can highlight approved services, location context and action buttons in one calm card.',
+      offerTitle: 'Family care package',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'No prices or discounts shown']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة ملف اختصاصي',
-      subtitle: 'معاينة هادئة لملف اختصاصي معتمد وجاهز لإجراءات الملف.',
+      providerKind: 'مركز طبي',
+      title: 'معاينة مركز طبي في الخوير',
+      subtitle: 'معاينة ملف مركز معتمد مع شرائح الخدمات وإجراءات تواصل واضحة.',
       city: 'مسقط',
-      area: 'معاينة تخصص',
-      chips: ['ملف عام قيد المراجعة', 'معاينة إجراءات التواصل', 'أكّد التفاصيل مع المقدّم'],
-      visibilityContext: 'يمكن لإظهار التخصص والمنطقة إبراز إجراءات الملف المعتمدة بدون الإيحاء بترتيب جودة.',
-      offerContext: ['توضيح سياق الظهور المدعوم', 'إجراءات الملف بعد الاعتماد', 'لا يعني ترتيباً للجودة']
+      area: 'معاينة الخوير',
+      chips: ['رعاية عامة', 'خدمات عائلية', 'أكّد التفاصيل مع المقدّم'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لملف المركز إبراز الخدمات المعتمدة وسياق الموقع وأزرار الإجراءات في بطاقة هادئة واحدة.',
+      offerTitle: 'باقة رعاية عائلية',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'لا يتم عرض أسعار أو خصومات']
     }
   },
   {
-    id: 'lab-visibility-preview',
+    id: 'qurum-wellness-clinic-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Lab Visibility Preview',
-      subtitle: 'A review-first discovery surface for an approved laboratory profile.',
+      providerKind: 'Wellness clinic',
+      title: 'Qurum Wellness Clinic Preview',
+      subtitle: 'Approved wellness profile preview for calm services and reviewed offers.',
       city: 'Muscat',
-      area: 'Testing preview',
-      chips: ['Lab discovery surface', 'Review-first offers', 'Public discovery only'],
-      visibilityContext: 'Package and test discovery context can appear after review without prices or unsupported claims.',
-      offerContext: ['Reviewed package visibility', 'Appears after review', 'Discovery context stays clear']
+      area: 'Qurum preview',
+      chips: ['Wellness services', 'Reviewed offer preview', 'Public profile only'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'Wellness providers can show approved profile details while avoiding unsupported health promises.',
+      offerTitle: 'Wellness package',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'Offer wording stays review-first']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة ظهور مختبر',
-      subtitle: 'واجهة اكتشاف تعتمد المراجعة أولاً لملف مختبر معتمد.',
+      providerKind: 'عيادة رفاهية',
+      title: 'معاينة عيادة رفاهية في القرم',
+      subtitle: 'معاينة ملف رفاهية معتمد للخدمات الهادئة والعروض بعد المراجعة.',
       city: 'مسقط',
-      area: 'معاينة فحوصات',
-      chips: ['واجهة اكتشاف مختبر', 'العروض بعد المراجعة', 'اكتشاف عام فقط'],
-      visibilityContext: 'يمكن ظهور سياق الباقات والفحوصات بعد المراجعة بدون أسعار أو ادعاءات غير مدعومة.',
-      offerContext: ['ظهور باقات بعد المراجعة', 'يظهر بعد المراجعة', 'يبقى سياق الاكتشاف واضحاً']
+      area: 'معاينة القرم',
+      chips: ['خدمات رفاهية', 'معاينة عرض بعد المراجعة', 'ملف عام فقط'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لمقدّمي الرفاهية عرض تفاصيل ملف معتمدة مع تجنّب الوعود الصحية غير المدعومة.',
+      offerTitle: 'باقة رفاهية',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'تبقى صياغة العرض خاضعة للمراجعة']
     }
   },
   {
-    id: 'pharmacy-visibility-preview',
+    id: 'seeb-lab-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Pharmacy Visibility Preview',
-      subtitle: 'A local public discovery preview for an approved pharmacy profile.',
+      providerKind: 'Laboratory',
+      title: 'Seeb Lab Preview',
+      subtitle: 'Approved lab profile preview with package wording reviewed before publishing.',
       city: 'Muscat',
-      area: 'Area preview',
-      chips: ['Public pharmacy discovery', 'Actions after approval', 'Confirm details with provider'],
-      visibilityContext: 'Area and category placement can support public discovery while keeping provider details review-gated.',
-      offerContext: ['Approved visibility context', 'Sponsored context clearly marked', 'Supports public discovery']
+      area: 'Seeb preview',
+      chips: ['Lab tests', 'Package preview', 'No prices shown'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'A lab profile can present service categories and package previews without making clinical claims.',
+      offerTitle: 'Lab test package',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'No fake prices or availability']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة ظهور صيدلية',
-      subtitle: 'معاينة اكتشاف عامة محلية لملف صيدلية معتمد.',
+      providerKind: 'مختبر',
+      title: 'معاينة مختبر في السيب',
+      subtitle: 'معاينة ملف مختبر معتمد مع صياغة الباقات بعد المراجعة قبل النشر.',
       city: 'مسقط',
-      area: 'معاينة منطقة',
-      chips: ['اكتشاف عام للصيدلية', 'الإجراءات بعد الاعتماد', 'أكّد التفاصيل مع المقدّم'],
-      visibilityContext: 'يمكن لمواضع المنطقة والفئة دعم الاكتشاف العام مع بقاء تفاصيل المقدّم مرتبطة بالمراجعة.',
-      offerContext: ['سياق ظهور معتمد', 'توضيح سياق الظهور المدعوم', 'يدعم الاكتشاف العام']
+      area: 'معاينة السيب',
+      chips: ['فحوصات مختبر', 'معاينة باقة', 'بدون أسعار'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لملف المختبر عرض فئات الخدمات ومعاينات الباقات بدون ادعاءات طبية.',
+      offerTitle: 'باقة فحوصات المختبر',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'بدون أسعار أو توفر وهمي']
     }
   },
   {
-    id: 'wellness-profile-preview',
+    id: 'bausher-specialist-clinic-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Wellness Profile Preview',
-      subtitle: 'A polished profile preview for approved wellness and care services.',
+      providerKind: 'Specialist clinic',
+      title: 'Bausher Specialist Clinic Preview',
+      subtitle: 'Approved specialist profile preview with reviewed service and contact context.',
       city: 'Muscat',
-      area: 'Wellness preview',
-      chips: ['Premium profile surface', 'Approved content only', 'Public discovery only'],
-      visibilityContext: 'Wellness discovery can be presented as provider-approved public information without medical claims.',
-      offerContext: ['Provider-approved offer preview', 'Appears after review', 'Supports profile discovery']
+      area: 'Bausher preview',
+      chips: ['Specialist care', 'Service chips', 'Actions after approval'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'A specialist card can keep the provider profile prominent while clearly marking preview-only content.',
+      offerTitle: 'Skin consultation offer',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'No medical promise included']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة ملف رفاهية',
-      subtitle: 'معاينة ملف مصقولة لخدمات الرفاهية والرعاية المعتمدة.',
+      providerKind: 'عيادة تخصصية',
+      title: 'معاينة عيادة تخصصية في بوشر',
+      subtitle: 'معاينة ملف تخصصي معتمد مع سياق خدمة وتواصل بعد المراجعة.',
       city: 'مسقط',
-      area: 'معاينة رفاهية',
-      chips: ['واجهة ملف مميزة', 'محتوى معتمد فقط', 'اكتشاف عام فقط'],
-      visibilityContext: 'يمكن عرض اكتشاف الرفاهية كمعلومات عامة معتمدة من المقدّم بدون ادعاءات طبية.',
-      offerContext: ['معاينة عرض معتمد من المقدّم', 'يظهر بعد المراجعة', 'يدعم اكتشاف الملف']
+      area: 'معاينة بوشر',
+      chips: ['رعاية تخصصية', 'شرائح خدمات', 'الإجراءات بعد الاعتماد'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'تحافظ بطاقة الاختصاصي على بروز ملف المقدّم مع توضيح أن المحتوى للمعاينة فقط.',
+      offerTitle: 'عرض استشارة جلدية',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'بدون وعود طبية']
     }
   },
   {
-    id: 'pet-clinic-preview',
+    id: 'azaiba-pharmacy-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Pet Clinic Preview',
-      subtitle: 'A safe public discovery preview for an approved pet care provider.',
+      providerKind: 'Pharmacy',
+      title: 'Azaiba Pharmacy Preview',
+      subtitle: 'Approved pharmacy profile preview with clear area and contact action context.',
       city: 'Muscat',
-      area: 'Pet care preview',
-      chips: ['Pet care discovery', 'Profile actions preview', 'Confirm details with provider'],
-      visibilityContext: 'Pet care providers can use the same premium visibility surface with approved public profile actions.',
-      offerContext: ['Approved offer preview', 'Appears after review', 'Sponsored context clearly marked']
+      area: 'Azaiba preview',
+      chips: ['Pharmacy profile', 'Area context', 'Confirm details with provider'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'Pharmacy profiles can show public information and actions only after provider approval.',
+      offerTitle: 'Pharmacy offer preview',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'Sponsored placement is clearly marked']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
+      providerKind: 'صيدلية',
+      title: 'معاينة صيدلية في العذيبة',
+      subtitle: 'معاينة ملف صيدلية معتمد مع سياق واضح للمنطقة وإجراءات التواصل.',
+      city: 'مسقط',
+      area: 'معاينة العذيبة',
+      chips: ['ملف صيدلية', 'سياق المنطقة', 'أكّد التفاصيل مع المقدّم'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لملفات الصيدليات عرض المعلومات العامة والإجراءات فقط بعد اعتماد المقدّم.',
+      offerTitle: 'معاينة عرض صيدلية',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'يتم توضيح الظهور المدعوم بوضوح']
+    }
+  },
+  {
+    id: 'pet-care-clinic-preview',
+    en: {
+      providerKind: 'Pet clinic',
+      title: 'Pet Care Clinic Preview',
+      subtitle: 'Approved pet care profile preview with profile actions and service chips.',
+      city: 'Muscat',
+      area: 'Muscat area preview',
+      chips: ['Pet care', 'Service chips', 'Public profile only'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'Pet care providers can use the same polished profile format with safe preview wording.',
+      offerTitle: 'Pet care package',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'No fake availability shown']
+    },
+    ar: {
+      providerKind: 'عيادة بيطرية',
       title: 'معاينة عيادة بيطرية',
-      subtitle: 'معاينة اكتشاف عامة وآمنة لمقدّم رعاية حيوانات معتمد.',
+      subtitle: 'معاينة ملف رعاية حيوانات معتمد مع إجراءات الملف وشرائح الخدمات.',
       city: 'مسقط',
-      area: 'معاينة رعاية حيوانات',
-      chips: ['اكتشاف رعاية الحيوانات', 'معاينة إجراءات الملف', 'أكّد التفاصيل مع المقدّم'],
-      visibilityContext: 'يمكن لمقدّمي رعاية الحيوانات استخدام نفس واجهة الظهور المميزة مع إجراءات ملف عامة معتمدة.',
-      offerContext: ['معاينة عرض معتمد', 'يظهر بعد المراجعة', 'توضيح سياق الظهور المدعوم']
+      area: 'معاينة منطقة في مسقط',
+      chips: ['رعاية الحيوانات', 'شرائح خدمات', 'ملف عام فقط'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لمقدّمي رعاية الحيوانات استخدام نفس تنسيق الملف المصقول مع صياغة آمنة للمعاينة.',
+      offerTitle: 'باقة رعاية الحيوانات',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'بدون توفر وهمي']
     }
   },
   {
-    id: 'dental-center-preview',
+    id: 'medical-service-provider-preview',
     en: {
-      providerKind: 'Provider visibility board',
-      title: 'Dental Center Preview',
-      subtitle: 'A review-first visibility preview for an approved dental center profile.',
+      providerKind: 'Medical service',
+      title: 'Medical Service Provider Preview',
+      subtitle: 'Approved service profile preview for future provider inventory beyond clinics.',
       city: 'Muscat',
-      area: 'Dental preview',
-      chips: ['Dental discovery surface', 'Reviewed profile actions', 'Public discovery only'],
-      visibilityContext: 'Dental discovery can connect profile actions, area visibility, and sponsored context after approval.',
-      offerContext: ['Provider-approved offer preview', 'Appears after review', 'Supports profile discovery']
+      area: 'Oman preview',
+      chips: ['Service profile', 'Reviewed content', 'Clear contact actions'],
+      ratingLabel: 'Rating preview',
+      ratingValue: '4.8 sample rating',
+      ratingNote: 'Verified reviews appear after approval',
+      providerContext: 'The preview inventory can scale to more providers while keeping each card profile-led.',
+      offerTitle: 'Service offer preview',
+      offerContext: ['Provider offer preview', 'Appears after provider approval', 'Sponsored placement is clearly marked']
     },
     ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة مركز أسنان',
-      subtitle: 'معاينة ظهور تعتمد المراجعة أولاً لملف مركز أسنان معتمد.',
+      providerKind: 'خدمة طبية',
+      title: 'معاينة مقدم خدمة طبية',
+      subtitle: 'معاينة ملف خدمة معتمد لمخزون مقدّمين مستقبلي يتجاوز العيادات.',
       city: 'مسقط',
-      area: 'معاينة أسنان',
-      chips: ['واجهة اكتشاف أسنان', 'إجراءات ملف قيد المراجعة', 'اكتشاف عام فقط'],
-      visibilityContext: 'يمكن لاكتشاف الأسنان ربط إجراءات الملف وظهور المنطقة وسياق الظهور المدعوم بعد الاعتماد.',
-      offerContext: ['معاينة عرض معتمد من المقدّم', 'يظهر بعد المراجعة', 'يدعم اكتشاف الملف']
-    }
-  },
-  {
-    id: 'medical-service-preview',
-    en: {
-      providerKind: 'Provider visibility board',
-      title: 'Medical Service Preview',
-      subtitle: 'A flexible discovery preview for approved public service pages and provider actions.',
-      city: 'Muscat',
-      area: 'Service preview',
-      chips: ['Service discovery surface', 'Approval-gated actions', 'Confirm details with provider'],
-      visibilityContext: 'Service discovery can support many future provider entries while keeping sponsored labels clear.',
-      offerContext: ['Approved service visibility', 'Appears after review', 'Supports public discovery']
-    },
-    ar: {
-      providerKind: 'لوحة ظهور للمقدّمين',
-      title: 'معاينة خدمة طبية',
-      subtitle: 'معاينة اكتشاف مرنة لصفحات خدمات عامة وإجراءات مقدّمين معتمدة.',
-      city: 'مسقط',
-      area: 'معاينة خدمة',
-      chips: ['واجهة اكتشاف خدمة', 'الإجراءات بعد الاعتماد', 'أكّد التفاصيل مع المقدّم'],
-      visibilityContext: 'يمكن لاكتشاف الخدمات دعم العديد من إدخالات المقدّمين المستقبلية مع وضوح وسم الظهور المدعوم.',
-      offerContext: ['ظهور خدمة معتمد', 'يظهر بعد المراجعة', 'يدعم الاكتشاف العام']
+      area: 'معاينة عُمان',
+      chips: ['ملف خدمة', 'محتوى بعد المراجعة', 'إجراءات تواصل واضحة'],
+      ratingLabel: 'معاينة التقييم',
+      ratingValue: 'تقييم تجريبي 4.8',
+      ratingNote: 'تظهر المراجعات الموثقة بعد الاعتماد',
+      providerContext: 'يمكن لمخزون المعاينات التوسع لمقدّمين أكثر مع بقاء كل بطاقة متمحورة حول الملف.',
+      offerTitle: 'معاينة عرض خدمة',
+      offerContext: ['معاينة عرض مقدم الخدمة', 'يظهر بعد اعتماد مقدم الخدمة', 'يتم توضيح الظهور المدعوم بوضوح']
     }
   }
 ] as const;
 
 const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
   en: {
-    ariaLabel: 'Premium provider visibility preview board',
-    badge: 'Featured visibility preview',
-    title: 'Premium visibility that matches DrMuscat discovery',
-    subtitle: 'A compact preview of how approved providers can appear with profile actions, sponsored context and reviewed offer visibility.',
-    trustNote: 'Sponsored visibility does not mean quality ranking. Public discovery only — confirm details with provider.',
-    activeLabel: 'Active preview',
-    profileLabel: 'Reviewed public profile',
-    locationLabel: 'Oman visibility preview',
-    visibilityLabel: 'Visibility context',
-    offerHeading: 'Provider-approved offer preview',
-    offerKicker: 'Monetization surface',
-    offerNote: 'Offers and profile actions appear only after provider review and approval.',
-    railLabel: 'Flexible rotating inventory previews',
-    actionsLabel: 'Profile actions preview',
+    ariaLabel: 'Featured provider previews board',
+    badge: 'Featured preview',
+    title: 'Featured provider previews',
+    subtitle: 'See how approved healthcare profiles can appear with rating, services, offers and clear contact actions.',
+    trustNote: 'Preview content only. Ratings, offers and contact actions appear after provider approval.',
+    activeLabel: 'Active provider preview',
+    profileLabel: 'Approved profile preview',
+    locationLabel: 'Provider preview location',
+    servicesLabel: 'Provider preview services',
+    ratingAriaLabel: 'Safe sample rating preview',
+    offerHeading: 'Provider offer preview',
+    offerKicker: 'Offer preview',
+    offerNote: 'No real prices, discounts, availability or medical promises are shown in this static preview.',
+    railLabel: 'Provider preview carousel',
+    actionsLabel: 'Preview profile actions',
     actions: [
       { label: 'View Profile', symbol: '↗', tone: 'primary', aria: 'Preview action. Provider profile appears after provider approval.' },
       { label: 'Directions', symbol: '⌖', tone: 'neutral', aria: 'Preview action. Directions appear after provider approval.' },
@@ -260,19 +330,20 @@ const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
     ]
   },
   ar: {
-    ariaLabel: 'لوحة معاينة الظهور المميز للمقدّمين',
-    badge: 'معاينة الظهور المميز',
-    title: 'ظهور مميز ينسجم مع اكتشاف DrMuscat',
-    subtitle: 'معاينة مدمجة لكيفية ظهور المقدّمين المعتمدين مع إجراءات الملف وسياق الظهور المدعوم والعروض بعد المراجعة.',
-    trustNote: 'الظهور المدعوم لا يعني ترتيباً للجودة. اكتشاف عام فقط — أكّد التفاصيل مع مقدّم الخدمة.',
-    activeLabel: 'المعاينة النشطة',
-    profileLabel: 'ملف عام قيد المراجعة',
-    locationLabel: 'معاينة ظهور لعُمان',
-    visibilityLabel: 'سياق الظهور',
-    offerHeading: 'معاينة عرض معتمد من المقدّم',
-    offerKicker: 'واجهة قيمة تجارية',
-    offerNote: 'تظهر العروض وإجراءات الملف فقط بعد مراجعة واعتماد مقدّم الخدمة.',
-    railLabel: 'معاينات مخزون ظهور مرنة ومتتابعة',
+    ariaLabel: 'لوحة معاينات مميزة لمقدمي الرعاية',
+    badge: 'معاينة مميزة',
+    title: 'معاينات مميزة لمقدمي الرعاية',
+    subtitle: 'شاهد كيف يمكن أن تظهر الملفات المعتمدة مع التقييم والخدمات والعروض وإجراءات التواصل الواضحة.',
+    trustNote: 'محتوى معاينة فقط. تظهر التقييمات والعروض وإجراءات التواصل بعد اعتماد مقدّم الخدمة.',
+    activeLabel: 'معاينة مقدم نشطة',
+    profileLabel: 'معاينة ملف معتمد',
+    locationLabel: 'موقع معاينة مقدم الخدمة',
+    servicesLabel: 'خدمات معاينة مقدم الخدمة',
+    ratingAriaLabel: 'معاينة تقييم تجريبية وآمنة',
+    offerHeading: 'معاينة عرض مقدم الخدمة',
+    offerKicker: 'معاينة عرض',
+    offerNote: 'لا يتم عرض أسعار أو خصومات أو توفر أو وعود طبية حقيقية في هذه المعاينة الثابتة.',
+    railLabel: 'شريط معاينات مقدمي الرعاية',
     actionsLabel: 'معاينة إجراءات الملف',
     actions: [
       { label: 'عرض الملف', symbol: '↗', tone: 'primary', aria: 'إجراء معاينة. يظهر ملف مقدّم الخدمة بعد الاعتماد.' },
@@ -349,17 +420,26 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
               </div>
 
               <div className="dm2026-featured-board__meta" aria-label={copy.locationLabel}>
+                <span>{activePreview.providerKind}</span>
                 <span>{activePreview.city}</span>
                 <span>{activePreview.area}</span>
               </div>
 
-              <div className="dm2026-featured-board__chips" aria-label={copy.visibilityLabel}>
+              <div className="dm2026-featured-board__rating" aria-label={copy.ratingAriaLabel}>
+                <span className="dm2026-featured-board__rating-stars" aria-hidden="true">
+                  ★★★★★
+                </span>
+                <span className="dm2026-featured-board__rating-value">{activePreview.ratingValue}</span>
+                <span className="dm2026-featured-board__rating-note">{activePreview.ratingNote}</span>
+              </div>
+
+              <div className="dm2026-featured-board__chips" aria-label={copy.servicesLabel}>
                 {activePreview.chips.map((chip) => (
                   <span key={chip}>{chip}</span>
                 ))}
               </div>
 
-              <p className="dm2026-featured-board__visibility-copy">{activePreview.visibilityContext}</p>
+              <p className="dm2026-featured-board__visibility-copy">{activePreview.providerContext}</p>
 
               <div className="dm2026-featured-board__actions" aria-label={copy.actionsLabel}>
                 {copy.actions.map((action) => (
@@ -385,6 +465,7 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                 <span aria-hidden="true">✦</span>
               </div>
               <h3 id="dm2026-featured-offer-title">{copy.offerHeading}</h3>
+              <p className="dm2026-featured-board__offer-title">{activePreview.offerTitle}</p>
               <ul>
                 {activePreview.offerContext.map((item) => (
                   <li key={item}>{item}</li>
@@ -409,7 +490,8 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                     <span className="dm2026-featured-board__slot-dot" aria-hidden="true" />
                     <span>
                       <strong>{preview.title}</strong>
-                      <small>{preview.area}</small>
+                      <small>{preview.providerKind}</small>
+                      <small>{`${preview.area} · ${preview.ratingLabel}`}</small>
                     </span>
                   </button>
                 );

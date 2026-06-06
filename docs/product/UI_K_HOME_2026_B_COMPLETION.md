@@ -392,3 +392,76 @@ Manual browser QA should confirm:
 ### Merge readiness recommendation
 
 Merge readiness is recommended after validation passes and visual QA confirms the Featured Board feels like a natural monetization-ready continuation of the approved Smart Search section while preserving static-safe preview content and all forbidden-area boundaries.
+
+## 18. FIX03 — Provider-Led Premium Visibility Board Polish
+
+### FIX03 summary
+
+FIX03 polishes the existing Premium Visibility Board without rebuilding the homepage section, changing the header, changing Smart Search, changing fonts, or touching backend/SEO infrastructure. The visible UI now leads with provider profile previews instead of internal product-surface language.
+
+### Exact files changed
+
+- `src/components/home/HomeFeaturedBoard2026.tsx`
+- `src/styles/dm2026-home.css`
+- `docs/product/UI_K_HOME_2026_B_COMPLETION.md`
+
+### Fonts were not changed
+
+No font imports, Google Fonts, remote fonts, new `font-family` declarations, or font-token changes were added. The board continues to inherit the approved DrMuscat 2026 English and Arabic typography from the existing homepage system.
+
+### Search/header/language/footer unchanged
+
+FIX03 does not edit Smart Search, header, hamburger, language switch, or footer files. The board remains mounted below the approved search/safety shell and does not change search behavior or language behavior.
+
+### DB/API/SEO/auth unchanged
+
+FIX03 does not modify database files, Supabase files, migrations, RLS policies, API routes, auth files, route helpers, sitemap, robots, `llms.txt`, package files, or lockfiles.
+
+### Safe rating preview handling
+
+The main provider card now includes a visible rating-style area using clearly marked preview wording only:
+
+- English: `Rating preview`, `4.8 sample rating`, and `Verified reviews appear after approval`.
+- Arabic: `معاينة التقييم`, `تقييم تجريبي 4.8`, and `تظهر المراجعات الموثقة بعد الاعتماد`.
+
+The rating presentation is static and explicitly sample/preview. It does not include fake production review counts or imply live provider performance.
+
+### Provider-led preview rail
+
+The rotating rail now shows provider preview names, provider types, area/city context, and a small rating-preview indicator. It no longer presents the visible rail as generic internal visibility labels such as lab/pharmacy visibility surfaces. The local static inventory remains safe and scalable for future 20–40 provider entries without adding routes, APIs, Supabase, or database work.
+
+### Offer panel behavior
+
+The right-side panel now follows the active provider preview and displays provider-specific offer context such as dental cleaning, lab test, wellness, pharmacy, and pet care package previews. Offers remain approval-gated and contain no real prices, fake discounts, fake availability, booking promises, or medical claims.
+
+### Validation results
+
+Required FIX03 validation commands:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+- `git status --short`: showed only the three approved FIX03 files changed.
+- `pnpm lint`: passed with pre-existing warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+
+### Manual QA notes
+
+Manual browser QA should confirm:
+
+- `/en/om` and `/ar/om` show the provider-led board directly below Smart Search.
+- The board uses the same DrMuscat 2026 font system and does not introduce new typography.
+- The main card reads as a provider profile preview with rating, services, offer context, and polished actions.
+- The rail shows provider previews, not internal product/system labels.
+- Arabic text remains controlled, readable, and unclipped.
+- No horizontal overflow appears on desktop or mobile.
+- Search, header, language switch, hamburger, and footer behavior remain unchanged.
+
+### Merge readiness recommendation
+
+FIX03 is merge-ready after lint, typecheck, build, route checks, and final visual QA confirm the board feels provider-led, premium, compact, static-safe, and aligned with the approved DrMuscat 2026 design system.
