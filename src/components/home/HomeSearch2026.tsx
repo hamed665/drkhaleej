@@ -17,18 +17,21 @@ type SearchCopy = {
   careNeedLabel: string;
   careNeedPlaceholder: string;
   providerTypeLabel: string;
+  specialtyLabel: string;
   countryLabel: string;
   cityLabel: string;
   areaLabel: string;
+  contentTypeLabel: string;
   searchLabel: string;
   providerLabel: string;
   staticPreviewLabel: string;
   staticPreviewNote: string;
   providerTypes: readonly string[];
   countries: readonly { label: string; disabled?: boolean }[];
-  cities: readonly { label: string; note?: string }[];
+  cities: readonly string[];
   areas: readonly string[];
-  suggestions: readonly string[];
+  contentTypes: readonly string[];
+  specialties: readonly string[];
 };
 
 type HomeSearch2026Props = {
@@ -41,8 +44,9 @@ type HomeSearch2026Props = {
 export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSearch2026Props) {
   const defaultProviderType = firstValue(copy.providerTypes);
   const defaultCountry = firstValue(copy.countries).label;
-  const defaultCity = firstValue(copy.cities).label;
+  const defaultCity = firstValue(copy.cities);
   const defaultArea = firstValue(copy.areas);
+  const defaultContentType = firstValue(copy.contentTypes);
 
   return (
     <section className="dm2026-home-search dm2026-search" dir={dir} aria-labelledby="dm2026-home-search-title">
@@ -53,74 +57,97 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
       </div>
 
       <form className="dm2026-search-surface dm2026-home-search__surface" action={searchHref} method="get">
-        <div className="dm2026-home-search__field dm2026-home-search__field--need">
+        <div className="dm2026-home-search__command">
           <label htmlFor="dm2026-home-care-need">{copy.careNeedLabel}</label>
-          <input
-            id="dm2026-home-care-need"
-            name="q"
-            className="dm2026-input"
-            type="search"
-            placeholder={copy.careNeedPlaceholder}
-            autoComplete="off"
-          />
-          <div
-            className="dm2026-home-search__suggestions"
-            aria-label={copy.staticPreviewLabel}
-            data-static-preview="true"
-          >
-            <p>{copy.staticPreviewNote}</p>
-            <ul>
-              {copy.suggestions.map((suggestion) => (
-                <li key={suggestion}>
-                  <span>{suggestion}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="dm2026-home-search__command-input">
+            <span aria-hidden="true">⌕</span>
+            <input
+              id="dm2026-home-care-need"
+              name="q"
+              className="dm2026-input"
+              type="search"
+              placeholder={copy.careNeedPlaceholder}
+              autoComplete="off"
+            />
+            <button type="submit" className="dm2026-button dm2026-button-primary">
+              {copy.searchLabel}
+            </button>
           </div>
         </div>
 
-        <div className="dm2026-home-search__field">
-          <label htmlFor="dm2026-home-provider-type">{copy.providerTypeLabel}</label>
-          <select id="dm2026-home-provider-type" name="type" className="dm2026-select" defaultValue={defaultProviderType}>
+        <fieldset className="dm2026-home-search__segment" aria-label={copy.contentTypeLabel}>
+          <legend>{copy.contentTypeLabel}</legend>
+          <div>
+            {copy.contentTypes.map((contentType) => (
+              <label key={contentType} className="dm2026-home-search__chip">
+                <input type="radio" name="contentType" value={contentType} defaultChecked={contentType === defaultContentType} />
+                <span>{contentType}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="dm2026-home-search__segment" aria-label={copy.providerTypeLabel}>
+          <legend>{copy.providerTypeLabel}</legend>
+          <div>
             {copy.providerTypes.map((providerType) => (
-              <option key={providerType} value={providerType}>
-                {providerType}
-              </option>
+              <label key={providerType} className="dm2026-home-search__chip">
+                <input type="radio" name="type" value={providerType} defaultChecked={providerType === defaultProviderType} />
+                <span>{providerType}</span>
+              </label>
             ))}
-          </select>
+          </div>
+        </fieldset>
+
+        <div className="dm2026-home-search__select-grid">
+          <div className="dm2026-home-search__field">
+            <label htmlFor="dm2026-home-country">{copy.countryLabel}</label>
+            <select id="dm2026-home-country" name="country" className="dm2026-select" defaultValue={defaultCountry}>
+              {copy.countries.map((country) => (
+                <option key={country.label} value={country.label} disabled={country.disabled}>
+                  {country.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="dm2026-home-search__field">
+            <label htmlFor="dm2026-home-city">{copy.cityLabel}</label>
+            <select id="dm2026-home-city" name="city" className="dm2026-select" defaultValue={defaultCity}>
+              {copy.cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="dm2026-home-search__field">
+            <label htmlFor="dm2026-home-area">{copy.areaLabel}</label>
+            <select id="dm2026-home-area" name="area" className="dm2026-select" defaultValue={defaultArea}>
+              {copy.areas.map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="dm2026-home-search__field">
-          <label htmlFor="dm2026-home-country">{copy.countryLabel}</label>
-          <select id="dm2026-home-country" name="country" className="dm2026-select" defaultValue={defaultCountry}>
-            {copy.countries.map((country) => (
-              <option key={country.label} value={country.label} disabled={country.disabled}>
-                {country.label}
-              </option>
+        <div className="dm2026-home-search__suggestions" aria-label={copy.staticPreviewLabel} data-static-preview="true">
+          <div>
+            <strong>{copy.staticPreviewLabel}</strong>
+            <p>{copy.staticPreviewNote}</p>
+          </div>
+          <ul>
+            {copy.specialties.map((specialty) => (
+              <li key={specialty}>
+                <button type="submit" name="q" value={specialty} className="dm2026-home-search__suggestion-chip">
+                  {specialty}
+                </button>
+              </li>
             ))}
-          </select>
-        </div>
-
-        <div className="dm2026-home-search__field">
-          <label htmlFor="dm2026-home-city">{copy.cityLabel}</label>
-          <select id="dm2026-home-city" name="city" className="dm2026-select" defaultValue={defaultCity}>
-            {copy.cities.map((city) => (
-              <option key={city.label} value={city.label}>
-                {city.note ? `${city.label} — ${city.note}` : city.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="dm2026-home-search__field">
-          <label htmlFor="dm2026-home-area">{copy.areaLabel}</label>
-          <select id="dm2026-home-area" name="area" className="dm2026-select" defaultValue={defaultArea}>
-            {copy.areas.map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-          </select>
+          </ul>
         </div>
 
         <div className="dm2026-home-search__actions">

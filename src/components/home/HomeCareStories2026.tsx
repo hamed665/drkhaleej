@@ -10,13 +10,13 @@ const copy = {
     eyebrow: 'Care stories',
     title: 'Start with the kind of care you are exploring',
     subtitle: 'Quick visual prompts for common public discovery paths. These are browsing examples, not provider recommendations.',
-    stories: ['Dental', 'Beauty', 'Kids', 'Labs', 'Pharmacies', 'Pet Clinics', 'Offers', 'For Providers']
+    stories: ['Dental', 'Beauty', 'Kids', 'Pet Clinic', 'Labs', 'Offers', 'Articles', 'For Providers']
   },
   ar: {
     eyebrow: 'قصص الرعاية',
     title: 'ابدأ بنوع الرعاية التي تستكشفها',
     subtitle: 'إشارات تصفح سريعة لمسارات اكتشاف عامة. هذه أمثلة للتصفح وليست توصيات بمقدّمين.',
-    stories: ['الأسنان', 'الجمال', 'الأطفال', 'المختبرات', 'الصيدليات', 'عيادات بيطرية', 'العروض', 'للمقدّمين']
+    stories: ['الأسنان', 'الجمال', 'الأطفال', 'عيادات بيطرية', 'المختبرات', 'العروض', 'المقالات', 'للمقدّمين']
   }
 } as const;
 

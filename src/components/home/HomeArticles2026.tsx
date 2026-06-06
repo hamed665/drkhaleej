@@ -11,24 +11,14 @@ const copy = {
     title: 'Educational guides for safer public discovery',
     subtitle: 'Health guides are educational and do not replace professional medical advice.',
     planned: 'Planned article preview',
-    articles: [
-      'How to compare clinics in Muscat',
-      'What to check before visiting a dental clinic',
-      'Understanding lab test preparation',
-      'How DrMuscat public discovery works'
-    ]
+    articles: ['Dental guide', 'Lab tests guide', 'Choosing a clinic', 'Pharmacy guide', 'Kids health guide', 'Pet care guide']
   },
   ar: {
     eyebrow: 'أدلة صحية',
     title: 'أدلة تعليمية لاكتشاف عام أكثر وضوحاً',
     subtitle: 'الأدلة الصحية تعليمية ولا تغني عن النصيحة الطبية المهنية.',
     planned: 'معاينة مقال مخطط',
-    articles: [
-      'كيفية مقارنة العيادات في مسقط',
-      'ما الذي يجب التحقق منه قبل زيارة عيادة أسنان',
-      'فهم التحضير لفحوصات المختبر',
-      'كيف يعمل الاكتشاف العام في DrMuscat'
-    ]
+    articles: ['دليل الأسنان', 'دليل فحوصات المختبر', 'اختيار عيادة', 'دليل الصيدلية', 'دليل صحة الأطفال', 'دليل رعاية الحيوانات الأليفة']
   }
 } as const;
 

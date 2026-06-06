@@ -26,31 +26,33 @@ type HeaderHeroCopy = {
 const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
   en: {
     eyebrow: 'Oman-first public discovery',
-    title: 'Find healthcare options in Oman with a calmer search-first experience.',
+    title: 'Discover doctors, clinics, labs, pharmacies and care services in Oman.',
     subtitle:
-      'Explore doctors, clinics, labs, pharmacies and services through a bilingual DrMuscat homepage designed for clear public discovery in Muscat.',
+      'A premium bilingual DrMuscat experience for Muscat and Oman discovery. Start broad, compare public options, then confirm details directly with providers.',
     primaryCta: 'Search healthcare options',
     secondaryCta: 'For providers',
     heroNote: 'Public discovery information only. Confirm details directly with the provider. Not medical advice.',
     safetyTitle: 'Discovery safety',
     safetyItems: ['Public discovery only', 'Confirm details with the provider', 'Not medical advice'],
-    visualTitle: 'Muscat-focused discovery',
-    visualItems: ['English + Arabic', 'Mobile-safe search', 'No fake ratings'],
+    visualTitle: 'Premium Oman discovery shell',
+    visualItems: ['English + Arabic', 'Search-first command center', 'Provider visibility ready'],
     search: {
       eyebrow: 'Search DrMuscat',
-      title: 'Start with what you need, then narrow by place and provider type.',
-      description: 'Choose a care need, provider type and Muscat area to start exploring public healthcare options in Oman.',
+      title: 'Search doctors, clinics, services, offers and guides from one command center.',
+      description: 'Use the premium filters to explore by provider type, specialty, country, city, area and content type. This is public discovery, not live booking.',
       careNeedLabel: 'Care need, specialty or service',
-      careNeedPlaceholder: 'Dentist, dermatology, lab tests, pharmacy...',
+      careNeedPlaceholder: 'Search doctors, clinics, services, areas…',
       providerTypeLabel: 'Provider type',
+      specialtyLabel: 'Specialty or service',
       countryLabel: 'Country',
       cityLabel: 'City',
       areaLabel: 'Area',
+      contentTypeLabel: 'Content type',
       searchLabel: 'Search',
       providerLabel: 'List your center',
       staticPreviewLabel: 'General example suggestions',
       staticPreviewNote: 'Suggestions are general examples. Confirm details directly with providers.',
-      providerTypes: ['Doctors', 'Clinics / Centers', 'Labs', 'Pharmacies', 'Services'],
+      providerTypes: ['Doctors', 'Clinics / Centers', 'Hospitals', 'Labs', 'Pharmacies', 'Beauty & Wellness', 'Pet Clinics', 'Services'],
       countries: [
         { label: 'Oman' },
         { label: 'UAE — coming soon', disabled: true },
@@ -60,44 +62,41 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
         { label: 'Kuwait — coming soon', disabled: true },
         { label: 'Iran — coming soon', disabled: true }
       ],
-      cities: [
-        { label: 'Muscat' },
-        { label: 'Seeb' },
-        { label: 'Salalah' },
-        { label: 'Sohar' },
-        { label: 'Nizwa' }
-      ],
-      areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Seeb', 'Madinat Sultan Qaboos'],
-      suggestions: ['Dentist', 'Dermatology', 'Pediatrics', 'Lab tests', 'Pharmacy', 'Pet clinic', 'Beauty clinic', 'Al Khuwair', 'Qurum']
+      cities: ['Muscat', 'Seeb', 'Bawshar', 'Muttrah', 'Salalah', 'Sohar', 'Nizwa', 'Sur', 'Ibri', 'Rustaq', 'Barka', 'Duqm'],
+      areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Muttrah', 'Seeb', 'Bawshar', 'Madinat Sultan Qaboos', 'Ghala', 'Al Hail', 'Al Mouj', 'Muscat Hills', 'Wadi Kabir', 'Darsait', 'Al Amerat', 'Mabela'],
+      contentTypes: ['Doctors', 'Clinics', 'Hospitals', 'Labs', 'Pharmacies', 'Services', 'Offers', 'Articles'],
+      specialties: ['Dentist', 'Dermatology', 'Pediatrics', 'Gynecology', 'ENT', 'Orthopedics', 'Ophthalmology', 'General Practice', 'Cardiology', 'Physiotherapy', 'Lab tests', 'Dental cleaning', 'Skin clinic', 'Laser hair removal', 'Pharmacy', 'Pet clinic', 'Nutrition', 'Mental health', 'Beauty clinic', 'Wellness center']
     }
   },
   ar: {
     eyebrow: 'اكتشاف عام يبدأ من عُمان',
-    title: 'ابحث عن خيارات الرعاية الصحية في عُمان بتجربة هادئة تبدأ من البحث.',
+    title: 'اكتشف خيارات الرعاية الصحية في عُمان',
     subtitle:
-      'استكشف الأطباء والعيادات والمختبرات والصيدليات والخدمات عبر صفحة DrMuscat ثنائية اللغة والمصممة لاكتشاف عام أوضح في مسقط.',
+      'تجربة DrMuscat مميزة بثنائية اللغة لاكتشاف الرعاية في مسقط وعُمان. ابدأ من البحث ثم أكّد التفاصيل مباشرة مع مقدّمي الخدمة.',
     primaryCta: 'ابحث عن خيارات الرعاية',
     secondaryCta: 'للمقدّمين',
     heroNote: 'معلومات اكتشاف عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّم الخدمة. ليست نصيحة طبية.',
     safetyTitle: 'سلامة الاكتشاف',
     safetyItems: ['اكتشاف عام فقط', 'أكّد التفاصيل مع مقدّم الخدمة', 'ليست نصيحة طبية'],
-    visualTitle: 'اكتشاف يركّز على مسقط',
-    visualItems: ['العربية + الإنجليزية', 'بحث مناسب للجوال', 'دون تقييمات وهمية'],
+    visualTitle: 'واجهة اكتشاف مميزة لعُمان',
+    visualItems: ['العربية + الإنجليزية', 'مركز بحث متقدم', 'جاهزية لظهور المقدّمين'],
     search: {
       eyebrow: 'ابحث في DrMuscat',
-      title: 'ابدأ بما تحتاجه، ثم حدّد المكان ونوع مقدّم الخدمة.',
-      description: 'اختر احتياج الرعاية ونوع مقدّم الخدمة والمنطقة في مسقط لبدء استكشاف خيارات عامة في عُمان.',
+      title: 'ابحث عن الأطباء والعيادات والخدمات والعروض والأدلة من مركز واحد.',
+      description: 'استخدم المرشحات المميزة للاستكشاف حسب نوع المقدّم والتخصص والدولة والمدينة والمنطقة ونوع المحتوى. هذه تجربة اكتشاف عام وليست حجزاً مباشراً.',
       careNeedLabel: 'احتياج الرعاية أو التخصص أو الخدمة',
-      careNeedPlaceholder: 'طبيب أسنان، جلدية، فحوصات مختبر، صيدلية...',
+      careNeedPlaceholder: 'ابحث عن طبيب، عيادة، خدمة أو منطقة…',
       providerTypeLabel: 'نوع مقدّم الخدمة',
+      specialtyLabel: 'التخصص أو الخدمة',
       countryLabel: 'الدولة',
       cityLabel: 'المدينة',
       areaLabel: 'المنطقة',
+      contentTypeLabel: 'نوع المحتوى',
       searchLabel: 'بحث',
       providerLabel: 'أدرج مركزك',
       staticPreviewLabel: 'اقتراحات عامة',
       staticPreviewNote: 'الاقتراحات أمثلة عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّمي الخدمة.',
-      providerTypes: ['الأطباء', 'العيادات / المراكز', 'المختبرات', 'الصيدليات', 'الخدمات'],
+      providerTypes: ['الأطباء', 'العيادات / المراكز', 'المستشفيات', 'المختبرات', 'الصيدليات', 'الجمال والرفاهية', 'العيادات البيطرية', 'الخدمات'],
       countries: [
         { label: 'عُمان' },
         { label: 'الإمارات — قريباً', disabled: true },
@@ -107,15 +106,10 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
         { label: 'الكويت — قريباً', disabled: true },
         { label: 'إيران — قريباً', disabled: true }
       ],
-      cities: [
-        { label: 'مسقط' },
-        { label: 'السيب' },
-        { label: 'صلالة' },
-        { label: 'صحار' },
-        { label: 'نزوى' }
-      ],
-      areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'السيب', 'مدينة السلطان قابوس'],
-      suggestions: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'فحوصات مختبر', 'صيدلية', 'عيادة بيطرية', 'عيادة تجميل', 'الخوير', 'القرم']
+      cities: ['مسقط', 'السيب', 'بوشر', 'مطرح', 'صلالة', 'صحار', 'نزوى', 'صور', 'عبري', 'الرستاق', 'بركاء', 'الدقم'],
+      areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'مطرح', 'السيب', 'بوشر', 'مدينة السلطان قابوس', 'غلا', 'الحيل', 'الموج', 'مسقط هيلز', 'وادي الكبير', 'دارسيت', 'العامرات', 'المعبيلة'],
+      contentTypes: ['الأطباء', 'العيادات', 'المستشفيات', 'المختبرات', 'الصيدليات', 'الخدمات', 'العروض', 'المقالات'],
+      specialties: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'عيون', 'طب عام', 'قلب', 'علاج طبيعي', 'فحوصات مختبر', 'تنظيف الأسنان', 'عيادة جلدية', 'إزالة الشعر بالليزر', 'صيدلية', 'عيادة بيطرية', 'تغذية', 'صحة نفسية', 'عيادة تجميل', 'مركز رفاهية']
     }
   }
 };

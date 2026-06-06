@@ -9,16 +9,16 @@ const copy = {
   en: {
     eyebrow: 'Advertising previews',
     title: 'Sponsored visibility spaces for future reviewed placements',
-    subtitle: 'Sponsored visibility is paid placement, not a quality ranking.',
+    subtitle: 'Sponsored visibility is paid placement, not quality ranking.',
     note: 'Preview only — no billing, wallet, checkout or ad backend is implemented.',
-    placements: ['Homepage Featured', 'Homepage Top', 'Category Featured', 'Area Featured', 'Article Sponsored Placement', 'Provider Spotlight']
+    placements: ['Homepage featured', 'Category featured', 'Area featured', 'Article sponsored placement']
   },
   ar: {
     eyebrow: 'معاينات الإعلانات',
     title: 'مساحات ظهور إعلاني لمواضع مستقبلية بعد المراجعة',
-    subtitle: 'الظهور الإعلاني موضع مدفوع وليس ترتيباً لجودة الخدمة.',
+    subtitle: 'الظهور المموّل مساحة مدفوعة وليس ترتيباً لجودة الخدمة.',
     note: 'معاينة فقط — لا توجد فوترة أو محفظة أو دفع أو نظام إعلانات خلفي.',
-    placements: ['مميز الصفحة الرئيسية', 'أعلى الصفحة الرئيسية', 'مميز الفئة', 'مميز المنطقة', 'موضع مقال ممول', 'تسليط الضوء على مقدّم']
+    placements: ['مميز الصفحة الرئيسية', 'مميز الفئة', 'مميز المنطقة', 'موضع مقال ممول']
   }
 } as const;
 

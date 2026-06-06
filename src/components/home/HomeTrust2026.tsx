@@ -10,13 +10,13 @@ const copy = {
     eyebrow: 'Trust layer',
     title: 'Clear boundaries for public healthcare discovery',
     subtitle: 'DrMuscat helps organize public discovery information without replacing provider confirmation or professional care.',
-    items: ['Public discovery only', 'Confirm details with provider', 'Not medical advice', 'Sponsored placement is not quality ranking', 'No fake ratings']
+    items: ['Public discovery only', 'Confirm details with provider', 'Not medical advice', 'Emergency: use local emergency services', 'No fake ratings', 'Sponsored is not quality ranking']
   },
   ar: {
     eyebrow: 'طبقة الثقة',
     title: 'حدود واضحة لاكتشاف الرعاية الصحية العامة',
     subtitle: 'يساعد DrMuscat على تنظيم معلومات الاكتشاف العامة دون أن يحل محل تأكيد المقدّم أو الرعاية المهنية.',
-    items: ['اكتشاف عام فقط', 'أكّد التفاصيل مع مقدّم الخدمة', 'ليست نصيحة طبية', 'الموضع المدفوع ليس ترتيب جودة', 'لا توجد تقييمات وهمية']
+    items: ['اكتشاف عام فقط', 'أكّد التفاصيل مع مقدّم الخدمة', 'ليست نصيحة طبية', 'للطوارئ استخدم خدمات الطوارئ المحلية', 'لا توجد تقييمات وهمية', 'الظهور المموّل ليس ترتيب جودة']
   }
 } as const;
 

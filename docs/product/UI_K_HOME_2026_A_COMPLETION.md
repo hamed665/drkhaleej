@@ -1,5 +1,7 @@
 # UI-K-HOME-2026-A Completion Report — PR #156-A
 
+> Superseded note (PR #157-FIX03): This report is retained for audit history. The current scope is now documented as the **Premium Full Homepage Shell** in `docs/product/UI_K_HOME_2026_FULL_COMPLETION.md`.
+
 ## 1. Files read
 
 Read in the required guardrail/reference order before implementation:

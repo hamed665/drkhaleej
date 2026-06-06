@@ -11,7 +11,7 @@ const copy = {
     title: 'Provider-approved offers can be presented clearly after review',
     subtitle: 'No prices or guaranteed results are shown. These are generic offer preview categories only.',
     review: 'Provider-approved offers will appear here after review.',
-    offers: ['Dental packages', 'Lab packages', 'Beauty offers', 'Pet clinic offers', 'Wellness packages']
+    offers: ['Dental offers', 'Lab packages', 'Beauty packages', 'Pet clinic offers', 'Wellness packages']
   },
   ar: {
     eyebrow: 'معاينة العروض',

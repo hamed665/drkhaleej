@@ -11,19 +11,19 @@ type HomeForProviders2026Props = {
 const copy = {
   en: {
     eyebrow: 'For providers',
-    title: 'Prepare your public presence on DrMuscat',
-    subtitle: 'A premium growth path for centers, clinics, labs and pharmacies — without payments or claim automation in this phase.',
-    cta: 'For Providers',
-    items: ['List your center', 'Claim your profile', 'Add offers after approval', 'Get featured placement', 'Receive public discovery leads later'],
-    note: 'No real claim backend, payment backend, subscription activation or lead delivery is implemented here.'
+    title: 'Build a premium public profile for your healthcare center in Oman.',
+    subtitle: 'Prepare visibility for doctors, clinics, labs, pharmacies, beauty, wellness and pet care providers — with public profile, offers, call, directions and sponsored visibility prepared for later approved phases.',
+    cta: 'View provider options',
+    items: ['List your center', 'Create account preview', 'Add offers after approval', 'Prepare WhatsApp, call and directions later', 'Sponsored visibility later'],
+    note: 'No dashboard, auth backend, payment backend, subscription activation or lead delivery is active in this UI shell.'
   },
   ar: {
     eyebrow: 'للمقدّمين',
-    title: 'جهّز حضورك العام على DrMuscat',
-    subtitle: 'مسار نمو مميز للمراكز والعيادات والمختبرات والصيدليات — دون دفع أو أتمتة مطالبات في هذه المرحلة.',
-    cta: 'للمقدّمين',
-    items: ['أدرج مركزك', 'طالب بملفك', 'أضف عروضاً بعد الموافقة', 'احصل على موضع مميز', 'استقبل لاحقاً فرص اكتشاف عامة'],
-    note: 'لا يتم تنفيذ نظام مطالبات حقيقي أو دفع أو تفعيل اشتراكات أو تسليم فرص هنا.'
+    title: 'ابنِ حضوراً رقمياً أوضح لمركزك الصحي في عُمان',
+    subtitle: 'جهّز الظهور للأطباء والعيادات والمختبرات والصيدليات والجمال والرفاهية ورعاية الحيوانات — مع ملفات عامة وعروض واتصال واتجاهات وظهور ممول لمراحل لاحقة معتمدة.',
+    cta: 'عرض خيارات المقدمين',
+    items: ['أدرج مركزك', 'معاينة إنشاء حساب', 'أضف عروضاً بعد الموافقة', 'جهّز واتساب والاتصال والاتجاهات لاحقاً', 'ظهور ممول لاحقاً'],
+    note: 'لا توجد لوحة تحكم أو نظام تسجيل دخول أو دفع أو تفعيل اشتراكات أو تسليم فرص في هذا الغلاف الواجهاتي.'
   }
 } as const;
 
