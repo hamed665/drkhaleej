@@ -243,7 +243,13 @@ export function HomeDiscoveryCategories2026({ locale, country, dir }: HomeDiscov
               const className = `dm2026-discovery-card dm2026-discovery-card--${card.size} dm2026-discovery-card--${card.id} dm2026-card-glass`;
               const content = (
                 <>
-                  <span className="dm2026-discovery-card__scene" aria-hidden="true">{sceneById[card.id]}</span>
+                  <span className="dm2026-discovery-card__scene" aria-hidden="true">
+                    <span className="dm2026-discovery-card__scene-ambient" />
+                    <span className="dm2026-discovery-card__scene-halo" />
+                    <span className="dm2026-discovery-card__scene-ribbon" />
+                    <span className="dm2026-discovery-card__scene-floor" />
+                    <span className="dm2026-discovery-card__scene-object">{sceneById[card.id]}</span>
+                  </span>
                   <span className="dm2026-discovery-card__copy">
                     <strong>{card.title[locale]}</strong>
                     <span>{card.description[locale]}</span>

@@ -3339,3 +3339,239 @@
     transition: none;
   }
 }
+
+/* PR #159 high-fidelity pass: turn category art into layered motion panels, not icon boxes. */
+.dm2026-discovery-card__scene {
+  isolation: isolate;
+  perspective: 680px;
+  transform-style: preserve-3d;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.12) 36%, rgba(14, 110, 100, 0.055) 100%),
+    radial-gradient(220px circle at 52% 30%, rgba(255, 255, 255, 0.92), transparent 58%),
+    radial-gradient(180px circle at 86% 10%, rgba(42, 161, 146, 0.14), transparent 58%),
+    rgba(239, 246, 244, 0.62);
+}
+
+.dm2026-discovery-card__scene > :not(.dm2026-discovery-card__scene-object) {
+  position: absolute;
+  pointer-events: none;
+}
+
+.dm2026-discovery-card__scene-ambient {
+  inset: -22%;
+  z-index: 0;
+  border-radius: 42%;
+  background:
+    conic-gradient(from 210deg at 52% 48%, transparent 0 22%, rgba(255, 255, 255, 0.62) 30%, rgba(42, 161, 146, 0.12) 43%, transparent 58%, rgba(255, 255, 255, 0.42) 74%, transparent 100%);
+  filter: blur(18px);
+  opacity: 0.72;
+  transform: translate3d(0, 0, -38px) rotate(0deg);
+  animation: dm2026-discovery-ambient-orbit 18s linear infinite;
+}
+
+.dm2026-discovery-card__scene-halo {
+  inset-block-start: 8%;
+  inset-inline: 14%;
+  z-index: 1;
+  block-size: 62%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.16) 58%, transparent 100%),
+    radial-gradient(closest-side, rgba(42, 161, 146, 0.13), transparent 72%);
+  box-shadow: inset 0 1px 10px rgba(255, 255, 255, 0.64), 0 16px 34px rgba(11, 40, 38, 0.07);
+  transform: translate3d(0, 0, -20px) rotateX(58deg);
+  animation: dm2026-discovery-depth-drift 10.5s var(--dm-ease) infinite;
+}
+
+.dm2026-discovery-card__scene-ribbon {
+  inset-block-start: 12%;
+  inset-inline-start: -20%;
+  z-index: 3;
+  inline-size: 58%;
+  block-size: 120%;
+  border-radius: var(--dm-radius-pill);
+  background: linear-gradient(112deg, transparent 0 24%, rgba(255, 255, 255, 0.34) 43%, rgba(255, 255, 255, 0.08) 58%, transparent 82%);
+  filter: blur(1px);
+  opacity: 0.72;
+  transform: translate3d(-38%, 0, 44px) rotate(21deg);
+  animation: dm2026-discovery-cinematic-ribbon 10.8s var(--dm-ease) infinite;
+}
+
+.dm2026-discovery-card__scene-floor {
+  inset-inline: 18%;
+  inset-block-end: 10%;
+  z-index: 1;
+  block-size: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(11, 40, 38, 0.13), rgba(11, 40, 38, 0.045) 54%, transparent 82%);
+  filter: blur(8px);
+  opacity: 0.62;
+  transform: translate3d(0, 0, -8px) rotateX(72deg);
+  animation: dm2026-discovery-floor-breathe 8.6s var(--dm-ease) infinite;
+}
+
+.dm2026-discovery-card__scene-object {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  transform: translate3d(0, 0, 36px) rotateX(0deg) rotateY(0deg);
+  transform-style: preserve-3d;
+  animation: dm2026-discovery-object-parallax 9.4s var(--dm-ease) infinite;
+}
+
+.dm2026-discovery-card--large .dm2026-discovery-card__scene {
+  min-block-size: clamp(9.4rem, 12.5vw, 10.75rem);
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.14) 38%, rgba(14, 110, 100, 0.07) 100%),
+    radial-gradient(260px circle at 52% 24%, rgba(255, 255, 255, 0.96), transparent 58%),
+    radial-gradient(220px circle at 88% 8%, rgba(42, 161, 146, 0.18), transparent 60%),
+    rgba(239, 246, 244, 0.68);
+}
+
+.dm2026-discovery-card--large .dm2026-discovery-card__scene-object {
+  animation-duration: 10.4s;
+}
+
+.dm2026-discovery-card--dental .dm2026-discovery-card__scene-ambient {
+  background:
+    conic-gradient(from 222deg at 52% 50%, transparent 0 18%, rgba(255, 255, 255, 0.78) 29%, rgba(42, 161, 146, 0.16) 45%, transparent 60%, rgba(255, 255, 255, 0.46) 82%, transparent 100%);
+}
+
+.dm2026-discovery-card--dental .dm2026-discovery-card__scene-halo {
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.88), rgba(239, 246, 244, 0.34) 58%, transparent 100%),
+    radial-gradient(closest-side, rgba(42, 161, 146, 0.16), transparent 72%);
+}
+
+.dm2026-discovery-card--dental .dm2026-discovery-card__scene::before {
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 0 32px rgba(255, 255, 255, 0.34), inset 0 -18px 34px rgba(42, 161, 146, 0.055);
+}
+
+.dm2026-discovery-card--beauty .dm2026-discovery-card__scene-ambient {
+  background:
+    conic-gradient(from 170deg at 50% 48%, transparent 0 20%, rgba(255, 255, 255, 0.7) 31%, rgba(201, 162, 75, 0.095) 42%, rgba(42, 161, 146, 0.13) 55%, transparent 72%, rgba(255, 255, 255, 0.5) 86%, transparent 100%);
+}
+
+.dm2026-discovery-card--beauty .dm2026-discovery-card__scene-halo {
+  inset-inline: 10% 18%;
+  border-radius: 44% 56% 48% 52%;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18) 60%, transparent 100%),
+    radial-gradient(closest-side, rgba(201, 162, 75, 0.095), transparent 72%);
+}
+
+.dm2026-discovery-card--beauty .dm2026-discovery-card__scene-ribbon {
+  background: linear-gradient(112deg, transparent 0 24%, rgba(255, 255, 255, 0.4) 40%, rgba(201, 162, 75, 0.08) 56%, transparent 82%);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__scene-ambient {
+  background:
+    conic-gradient(from 218deg at 52% 50%, transparent 0 16%, rgba(255, 250, 238, 0.84) 28%, rgba(201, 162, 75, 0.24) 42%, transparent 58%, rgba(255, 255, 255, 0.48) 76%, transparent 100%);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__scene-halo {
+  background:
+    radial-gradient(closest-side, rgba(255, 250, 238, 0.86), rgba(201, 162, 75, 0.13) 58%, transparent 100%),
+    radial-gradient(closest-side, rgba(42, 161, 146, 0.08), transparent 72%);
+  box-shadow: inset 0 1px 12px rgba(255, 255, 255, 0.72), 0 18px 38px rgba(77, 57, 13, 0.09);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__scene-ribbon {
+  background: linear-gradient(112deg, transparent 0 22%, rgba(255, 255, 255, 0.52) 39%, rgba(201, 162, 75, 0.12) 57%, transparent 82%);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__scene-floor {
+  background: radial-gradient(closest-side, rgba(77, 57, 13, 0.16), rgba(77, 57, 13, 0.05) 54%, transparent 82%);
+}
+
+.dm2026-discovery-card--medium .dm2026-discovery-card__scene {
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.12) 38%, rgba(14, 110, 100, 0.045) 100%),
+    radial-gradient(170px circle at 54% 30%, rgba(255, 255, 255, 0.82), transparent 60%),
+    rgba(239, 246, 244, 0.56);
+}
+
+.dm2026-discovery-card--medium .dm2026-discovery-card__scene-halo {
+  inset-inline: 20%;
+  inset-block-start: 14%;
+  block-size: 56%;
+  opacity: 0.78;
+}
+
+.dm2026-discovery-card--medium .dm2026-discovery-card__scene-ribbon {
+  inline-size: 46%;
+  opacity: 0.48;
+  animation-duration: 13s;
+}
+
+.dm2026-discovery-card--medium .dm2026-discovery-card__scene-object {
+  animation-duration: 11.6s;
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__scene-object,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__scene-object {
+  animation-duration: 6.8s;
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__scene-ribbon,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__scene-ribbon {
+  opacity: 0.9;
+  animation-duration: 6.5s;
+}
+
+@keyframes dm2026-discovery-ambient-orbit {
+  0% { transform: translate3d(-1%, 0, -38px) rotate(0deg) scale(1); }
+  50% { transform: translate3d(1%, -1%, -38px) rotate(180deg) scale(1.04); }
+  100% { transform: translate3d(-1%, 0, -38px) rotate(360deg) scale(1); }
+}
+
+@keyframes dm2026-discovery-depth-drift {
+  0%, 100% { transform: translate3d(-1%, 1%, -20px) rotateX(58deg) scale(0.98); opacity: 0.72; }
+  50% { transform: translate3d(1%, -1%, -20px) rotateX(58deg) scale(1.04); opacity: 0.95; }
+}
+
+@keyframes dm2026-discovery-cinematic-ribbon {
+  0%, 22%, 100% { transform: translate3d(-56%, 0, 44px) rotate(21deg); opacity: 0; }
+  42% { opacity: 0.7; }
+  72% { transform: translate3d(245%, 0, 44px) rotate(21deg); opacity: 0; }
+}
+
+@keyframes dm2026-discovery-floor-breathe {
+  0%, 100% { transform: translate3d(0, 0, -8px) rotateX(72deg) scale(0.92); opacity: 0.46; }
+  50% { transform: translate3d(0, 1px, -8px) rotateX(72deg) scale(1.08); opacity: 0.68; }
+}
+
+@keyframes dm2026-discovery-object-parallax {
+  0%, 100% { transform: translate3d(0, 0, 36px) rotateX(0deg) rotateY(-1.2deg); }
+  38% { transform: translate3d(1px, -2px, 42px) rotateX(1.1deg) rotateY(1.4deg); }
+  72% { transform: translate3d(-1px, -1px, 39px) rotateX(-0.7deg) rotateY(0.8deg); }
+}
+
+@media (max-width: 48rem) {
+  .dm2026-discovery-card--large .dm2026-discovery-card__scene {
+    min-block-size: 8rem;
+  }
+
+  .dm2026-discovery-card__scene-ambient {
+    inset: -18%;
+    filter: blur(16px);
+  }
+
+  .dm2026-discovery-card__scene-ribbon {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm2026-discovery-card__scene-ambient,
+  .dm2026-discovery-card__scene-halo,
+  .dm2026-discovery-card__scene-ribbon,
+  .dm2026-discovery-card__scene-floor,
+  .dm2026-discovery-card__scene-object {
+    animation: none;
+  }
+}

@@ -182,3 +182,13 @@ A focused polish pass upgraded the existing discovery category section without c
 - Special Offers now uses a champagne-gold jewel/diamond scene with facets, shine, sparkle, and premium glow.
 - Secondary cards received cleaner glass stages, stronger icon treatment, and calmer premium motion while remaining visually subordinate to the hero row.
 - Reduced-motion handling remains enabled for the added motion classes.
+
+## 18. High-fidelity graphic scene pass
+
+A second focused visual pass moved the section further away from simple icon cards and toward layered premium motion panels. The card content, routes, fonts, brand palette, backend, SEO, and i18n logic were not changed.
+
+- Added reusable cinematic scene layers around every category SVG: ambient light field, dimensional halo, reflective ribbon, contact shadow, and foreground object stage.
+- Hero cards now read more like 2.5D graphic panels with deeper material layering, controlled parallax, natural light travel, and stronger premium presence.
+- Dental, Beauty & Aesthetics, and Special Offers retain their distinct SVG objects while gaining more immersive lighting, reflection, and depth composition.
+- Secondary cards keep a calmer visual hierarchy but no longer read as plain icon boxes because they share the same premium glass stage system.
+- Reduced-motion coverage was extended to the new scene layers.
