@@ -185,3 +185,116 @@ Manual visual checks:
 ## 15. Next PR recommendation
 
 UI-K-HOME-2026-C — Discovery Categories / Browse Paths
+
+## 16. FIX01 — Compact Premium Rotating Visibility Surface
+
+### Problems fixed from first PR #158 attempt
+
+FIX01 addresses the first implementation review concerns:
+
+- Replaced the oversized section headline with a compact premium header row.
+- Reworked the board from loose placeholder-feeling cards into one unified glass module.
+- Moved the action dock into the immediately visible main profile area.
+- Strengthened the right-side monetization/offer surface so sponsored visibility value is clear.
+- Reduced vertical heaviness and removed the hero-like feel from the section.
+- Added a rotating/active provider slot model while keeping all content preview-safe.
+
+### New compact board layout
+
+The updated board uses a single max-width glass module aligned with the homepage search container. The top row contains the badge, compact title, subtitle, and trust note. The main board uses a desktop two-column layout:
+
+- Left/main area for the active provider visibility preview, abstract logo tile, category context, safe description, status chips, and action dock.
+- Right/offer area for provider-approved offer preview, sponsored visibility context, review status, and Homepage / Area / Category placement labels.
+- Bottom mini rail for four compact visibility slots with an active state.
+
+### Rotation/active slot behavior
+
+The board now includes a tiny local client-side rotation. It rotates between four static-safe preview slots every 4.5 seconds unless the user hovers or focuses within the module. It also respects `prefers-reduced-motion` by not auto-rotating for users who request reduced motion.
+
+Rotating slots:
+
+1. Premium Clinic Preview / معاينة عيادة مميزة
+2. Specialist Profile Preview / معاينة ملف اختصاصي
+3. Lab Visibility Preview / معاينة ظهور مختبر
+4. Pharmacy Visibility Preview / معاينة ظهور صيدلية
+
+The active slot updates:
+
+- Main card title and category.
+- Main safe preview description.
+- Status chips.
+- Right-side offer/visibility context.
+- Mini rail active state.
+
+### Action button behavior
+
+The action dock remains preview-safe and uses real buttons, not links:
+
+- View Profile / عرض الملف
+- Directions / الاتجاهات
+- Call / اتصال
+- WhatsApp / واتساب
+
+All four actions use `button type="button"`, avoid fake hrefs, fake phone numbers, fake maps, fake WhatsApp links, and fake profile destinations. Each action includes `aria-label` and `title` text explaining that the action appears after provider approval.
+
+### Offer/right-side card behavior
+
+The right card now functions as the monetization/value area. It clearly communicates:
+
+- Provider-approved offer preview.
+- Appears after review.
+- Sponsored context is clearly marked.
+- Offer visibility can support profile discovery.
+- Placement preview can include Homepage, Area, Category, Specialty, Tests, or related discovery context depending on the active static slot.
+
+No fake prices, fake discounts, fake provider names, fake ratings, fake availability, or fake medical claims are used.
+
+### Arabic/RTL status
+
+Arabic copy was updated for the compact redesign. RTL styling remains intentional, with no negative Arabic letter spacing. Arabic action labels and slot labels are kept short enough for the compact action dock and mobile layouts.
+
+### Responsive status
+
+The updated CSS keeps the board compact across breakpoints:
+
+- Desktop/laptop: two-column board with visible action dock and right-side offer card.
+- Tablet: main and offer cards stack; action dock becomes 2x2.
+- Mobile: stacked layout; action dock remains 2x2; slot rail becomes horizontal scroll to avoid overflow and oversized typography.
+
+### Validation results
+
+Required FIX01 validation commands:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Observed FIX01 outcomes in this implementation pass:
+
+- `git status --short`: showed only the three approved FIX01 files changed.
+- `pnpm lint`: passed with pre-existing warnings only.
+- `pnpm typecheck`: passed after tightening the active-slot fallback for TypeScript safety.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Local render smoke check: `/en/om` and `/ar/om` returned the compact FIX01 board copy from `next start`.
+- Screenshot capture warning: no Chromium/Playwright browser binary is available in this container, and adding one would require an unapproved dependency/tooling change.
+
+### Forbidden files untouched
+
+FIX01 does not change:
+
+- `src/components/home/HomeSearch2026.tsx`
+- Header, hamburger, language switch, or footer files
+- Proxy/middleware files
+- Routes or route-check scripts
+- API routes
+- Supabase files
+- Database schema, migrations, generated DB types, seed files, or RLS policies
+- Sitemap, robots, or `public/llms.txt`
+- `package.json` or `pnpm-lock.yaml`
+
+### Merge readiness recommendation
+
+Merge readiness is recommended after validation passes and browser QA confirms that `/en/om` and `/ar/om` show a compact premium board directly below Smart Search, with the action dock and right-side offer card visible and no horizontal overflow.
