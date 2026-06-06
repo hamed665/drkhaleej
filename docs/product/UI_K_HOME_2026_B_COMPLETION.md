@@ -549,3 +549,52 @@ Required FIX05 validation commands:
 - `pnpm typecheck`: passed.
 - `pnpm build`: passed.
 - `pnpm routes:check`: passed.
+
+## 21. FIX05 — Photo Overlay and Glass Action Button Strengthening
+
+### Photo-led enhancement
+
+This pass keeps the current provider-led board and strengthens the media story without rebuilding the layout. The existing two-image mock media area remains compact, rotates locally, and now presents short overlay labels that explain what the media represents, such as service focus and area context.
+
+### Image overlay treatment
+
+The main media tile now displays the active provider service chip as a subtle glass overlay. The secondary media tile displays the active provider area as a smaller glass overlay. Overlays are localized through the active English/Arabic provider data and remain short, readable, and static-safe.
+
+### Glass action button polish
+
+The action dock keeps the required four preview-safe button actions:
+
+- View Profile / عرض الملف
+- Directions / الاتجاهات
+- Call / اتصال
+- WhatsApp / واتساب
+
+The buttons now use inline SVG icons for profile, map pin/directions, phone, and WhatsApp-style chat/phone recognition. The WhatsApp and Directions buttons receive subtle recognisable accent cues while preserving the DrMuscat 2026 glass style and avoiding loud brand-sticker treatment.
+
+### Provider-led content emphasis
+
+The provider name, provider type, city/area, rating preview, service chips, short provider copy, offer preview, media preview, and actions remain the primary hierarchy. Generic product-surface wording remains minimized.
+
+### Guardrails confirmed
+
+No fonts were added or changed. Header, Smart Search, language switch, footer, i18n/routing, SEO infrastructure, backend, database, Supabase, API routes, package files, and lockfile were not changed.
+
+### Validation results
+
+Required FIX05 validation commands:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+- `git status --short`: showed only the three approved FIX05 action/media polish files changed.
+- `pnpm lint`: passed with pre-existing warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+
+### Merge readiness recommendation
+
+Merge readiness is recommended after validation passes and visual QA confirms that `/en/om` and `/ar/om` show meaningful image overlays, recognisable WhatsApp/Directions/Call/Profile icons, compact desktop and mobile layouts, and no regression to header, search, font, route, SEO, or backend boundaries.

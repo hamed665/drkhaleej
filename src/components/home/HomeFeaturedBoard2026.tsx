@@ -55,7 +55,7 @@ type FeaturedBoardCopy = {
   actionsLabel: string;
   actions: readonly {
     label: string;
-    symbol: string;
+    icon: 'profile' | 'directions' | 'call' | 'whatsapp';
     tone: 'primary' | 'neutral' | 'contact' | 'whatsapp';
     aria: string;
   }[];
@@ -427,10 +427,10 @@ const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
     railLabel: 'Provider preview selector',
     actionsLabel: 'Preview profile actions',
     actions: [
-      { label: 'View Profile', symbol: '↗', tone: 'primary', aria: 'Preview action. Provider profile appears after provider approval.' },
-      { label: 'Directions', symbol: '⌖', tone: 'neutral', aria: 'Preview action. Directions appear after provider approval.' },
-      { label: 'Call', symbol: '◌', tone: 'contact', aria: 'Preview action. Call action appears after provider approval.' },
-      { label: 'WhatsApp', symbol: '◍', tone: 'whatsapp', aria: 'Preview action. WhatsApp action appears after provider approval.' }
+      { label: 'View Profile', icon: 'profile', tone: 'primary', aria: 'Preview action. Provider profile appears after provider approval.' },
+      { label: 'Directions', icon: 'directions', tone: 'neutral', aria: 'Preview action. Directions appear after provider approval.' },
+      { label: 'Call', icon: 'call', tone: 'contact', aria: 'Preview action. Call action appears after provider approval.' },
+      { label: 'WhatsApp', icon: 'whatsapp', tone: 'whatsapp', aria: 'Preview action. WhatsApp action appears after provider approval.' }
     ]
   },
   ar: {
@@ -451,13 +451,52 @@ const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
     railLabel: 'محدد معاينات مقدمي الرعاية',
     actionsLabel: 'معاينة إجراءات الملف',
     actions: [
-      { label: 'عرض الملف', symbol: '↗', tone: 'primary', aria: 'إجراء معاينة. يظهر ملف مقدّم الخدمة بعد الاعتماد.' },
-      { label: 'الاتجاهات', symbol: '⌖', tone: 'neutral', aria: 'إجراء معاينة. تظهر الاتجاهات بعد اعتماد مقدّم الخدمة.' },
-      { label: 'اتصال', symbol: '◌', tone: 'contact', aria: 'إجراء معاينة. يظهر إجراء الاتصال بعد اعتماد مقدّم الخدمة.' },
-      { label: 'واتساب', symbol: '◍', tone: 'whatsapp', aria: 'إجراء معاينة. يظهر إجراء واتساب بعد اعتماد مقدّم الخدمة.' }
+      { label: 'عرض الملف', icon: 'profile', tone: 'primary', aria: 'إجراء معاينة. يظهر ملف مقدّم الخدمة بعد الاعتماد.' },
+      { label: 'الاتجاهات', icon: 'directions', tone: 'neutral', aria: 'إجراء معاينة. تظهر الاتجاهات بعد اعتماد مقدّم الخدمة.' },
+      { label: 'اتصال', icon: 'call', tone: 'contact', aria: 'إجراء معاينة. يظهر إجراء الاتصال بعد اعتماد مقدّم الخدمة.' },
+      { label: 'واتساب', icon: 'whatsapp', tone: 'whatsapp', aria: 'إجراء معاينة. يظهر إجراء واتساب بعد اعتماد مقدّم الخدمة.' }
     ]
   }
 };
+
+
+function HomeFeaturedActionIcon({ icon }: { icon: FeaturedBoardCopy['actions'][number]['icon'] }) {
+  if (icon === 'profile') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7.5 7.8a4.5 4.5 0 0 1 9 0v.3a4.5 4.5 0 0 1-9 0z" />
+        <path d="M5.2 20.2c.7-3.3 3.1-5.2 6.8-5.2 1.4 0 2.6.27 3.6.8" />
+        <path d="M16.4 13.6h4v4" />
+        <path d="m20.2 13.8-5.4 5.4" />
+      </svg>
+    );
+  }
+
+  if (icon === 'directions') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 21s6.2-5.4 6.2-11.2A6.2 6.2 0 0 0 5.8 9.8C5.8 15.6 12 21 12 21z" />
+        <path d="M12 12.2a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6z" />
+        <path d="m14.3 14.5 3.4 1.2" />
+      </svg>
+    );
+  }
+
+  if (icon === 'call') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7.4 4.8 9.6 4c.8-.3 1.7.1 2 .9l.9 2.1c.3.7.1 1.5-.5 2l-1.1.9a9.8 9.8 0 0 0 4.2 4.2l.9-1.1c.5-.6 1.3-.8 2-.5l2.1.9c.8.3 1.2 1.2.9 2l-.8 2.2c-.3.8-1 1.3-1.8 1.3A14.4 14.4 0 0 1 6.1 6.6c0-.8.5-1.5 1.3-1.8z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M5.6 19.2 6.7 16A8 8 0 1 1 10 18.3z" />
+      <path d="M9.5 8.2c.3 2.6 2.1 4.7 4.5 5.4l1.4-1.2 2.1 1.1c-.4 1.5-1.4 2.3-2.8 2.3-3.7 0-7.2-3.6-7.2-7.3 0-1.4.8-2.4 2.3-2.8z" />
+    </svg>
+  );
+}
 
 export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoard2026Props) {
   const copy = featuredBoardCopy[locale];
@@ -535,6 +574,7 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                   aria-label={primaryPhoto.label}
                 >
                   <span aria-hidden="true" />
+                  <span className="dm2026-featured-board__photo-label">{activePreview.chips[0]}</span>
                 </div>
                 <div
                   key={`${activeEntry.id}-${secondaryPhoto.label}-side`}
@@ -543,6 +583,7 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                   aria-label={secondaryPhoto.label}
                 >
                   <span aria-hidden="true" />
+                  <span className="dm2026-featured-board__photo-label dm2026-featured-board__photo-label--side">{activePreview.area}</span>
                 </div>
               </div>
 
@@ -588,8 +629,8 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                     aria-label={action.aria}
                     title={action.aria}
                   >
-                    <span className="dm2026-featured-board__action-symbol" aria-hidden="true">
-                      {action.symbol}
+                    <span className={`dm2026-featured-board__action-symbol dm2026-featured-board__action-symbol--${action.tone}`} aria-hidden="true">
+                      <HomeFeaturedActionIcon icon={action.icon} />
                     </span>
                     <span>{action.label}</span>
                   </button>
