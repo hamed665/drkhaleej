@@ -171,3 +171,14 @@ Checklist:
 ## 16. Next PR recommendation
 
 UI-K-HOME-2026-D — Provider CTA / List Your Center Section
+
+## 17. UI polish follow-up
+
+A focused polish pass upgraded the existing discovery category section without changing routes, data, backend, SEO infrastructure, fonts, category hierarchy, or surrounding homepage sections.
+
+- Hero cards now have stronger glass depth, larger visual stages, elevated CTA pills, and more premium idle/hover motion.
+- Dental now uses a refined glass tooth scene with enamel sweep, chrome arcs, internal glow, and tiny glints.
+- Beauty & Aesthetics now uses elegant facial contour linework, serum-drop motion, shimmer, and soft glow.
+- Special Offers now uses a champagne-gold jewel/diamond scene with facets, shine, sparkle, and premium glow.
+- Secondary cards received cleaner glass stages, stronger icon treatment, and calmer premium motion while remaining visually subordinate to the hero row.
+- Reduced-motion handling remains enabled for the added motion classes.

@@ -106,37 +106,55 @@ const discoveryCards: readonly DiscoveryCard[] = [
 
 function DentalScene() {
   return (
-    <svg className="dm2026-discovery-card__svg" viewBox="0 0 120 96" aria-hidden="true" focusable="false">
-      <path className="dm2026-discovery-card__halo" d="M28 28c12-17 43-22 62-4 19 18 7 48-11 55-12 5-12-12-18-12s-6 17-18 12C24 72 16 45 28 28Z" />
-      <path className="dm2026-discovery-card__line dm2026-discovery-card__line--float" d="M38 27c7-8 18-8 25-3 7-5 18-4 25 4 12 15 3 38-8 47-8 6-11-12-17-12s-9 18-17 12c-12-9-20-34-8-48Z" />
-      <path className="dm2026-discovery-card__shine" d="M42 37c6-8 16-10 25-5" />
-      <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--one" d="M91 19v10M86 24h10" />
-      <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--two" d="M27 63v8M23 67h8" />
+    <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--wide" d="M24 49c5-30 36-44 67-35 31 9 46 41 31 67-14 25-52 33-79 15C25 84 20 67 24 49Z" />
+      <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--tight" d="M39 36c11-18 44-22 64-5 19 16 14 45-3 58-16 13-44 13-62-3-18-16-19-35 1-50Z" />
+      <path className="dm2026-discovery-card__tooth-glass dm2026-discovery-card__tooth-glass--breathe" d="M44 30c8-9 20-10 29-4 9-6 22-5 30 5 14 17 4 46-10 58-9 8-14-14-21-14s-12 22-21 14C36 77 30 47 44 30Z" />
+      <path className="dm2026-discovery-card__tooth-edge" d="M48 33c7-7 17-7 25-2 8-5 18-5 25 3" />
+      <path className="dm2026-discovery-card__tooth-core" d="M55 42c6 6 14 8 23 5 7-2 12-1 17 3" />
+      <path className="dm2026-discovery-card__enamel-sweep" d="M48 61c18-13 39-18 63-12" />
+      <path className="dm2026-discovery-card__chrome-arc dm2026-discovery-card__chrome-arc--one" d="M28 42c8-17 24-28 45-30" />
+      <path className="dm2026-discovery-card__chrome-arc dm2026-discovery-card__chrome-arc--two" d="M106 27c12 10 18 24 16 40" />
+      <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--one" d="M113 22v12M107 28h12" />
+      <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--two" d="M35 76v9M30.5 80.5h9" />
+      <circle className="dm2026-discovery-card__micro-glint dm2026-discovery-card__micro-glint--one" cx="94" cy="39" r="2" />
+      <circle className="dm2026-discovery-card__micro-glint dm2026-discovery-card__micro-glint--two" cx="56" cy="52" r="1.8" />
     </svg>
   );
 }
 
 function BeautyScene() {
   return (
-    <svg className="dm2026-discovery-card__svg" viewBox="0 0 120 96" aria-hidden="true" focusable="false">
-      <path className="dm2026-discovery-card__halo" d="M29 24c15-18 53-18 67 3 14 20-3 52-28 57-31 5-53-31-39-60Z" />
-      <path className="dm2026-discovery-card__line dm2026-discovery-card__line--draw" d="M65 18c-18 9-25 27-20 42 4 12 13 19 27 22" />
-      <path className="dm2026-discovery-card__line dm2026-discovery-card__line--soft" d="M71 30c8 9 9 26-4 36" />
-      <path className="dm2026-discovery-card__line dm2026-discovery-card__line--soft" d="M52 43c6 2 13 2 19-1" />
-      <path className="dm2026-discovery-card__droplet" d="M89 34c7 9 11 16 11 22a11 11 0 0 1-22 0c0-6 4-13 11-22Z" />
-      <path className="dm2026-discovery-card__shine" d="M82 51c3 3 8 4 12 1" />
+    <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--wide" d="M30 26c20-19 62-21 85 3 20 22 8 61-28 76-32 13-71-9-78-39-3-15 4-30 21-40Z" />
+      <path className="dm2026-discovery-card__beauty-glow" d="M42 24c19-14 51-12 70 5 18 17 20 45 2 66" />
+      <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--primary" d="M74 18c-22 11-33 31-29 50 3 17 16 27 35 31" />
+      <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--secondary" d="M83 30c11 10 13 30-2 46-5 5-10 8-16 10" />
+      <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--soft" d="M56 51c8 3 19 2 28-2" />
+      <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--soft" d="M58 66c8 5 18 5 28 0" />
+      <path className="dm2026-discovery-card__serum-drop dm2026-discovery-card__serum-drop--float" d="M107 32c8 10 13 19 13 27a13 13 0 0 1-26 0c0-8 5-17 13-27Z" />
+      <path className="dm2026-discovery-card__serum-highlight" d="M101 55c4 4 10 5 15 1" />
+      <path className="dm2026-discovery-card__enamel-sweep dm2026-discovery-card__enamel-sweep--beauty" d="M43 36c28-14 58-12 86 7" />
+      <circle className="dm2026-discovery-card__micro-glint dm2026-discovery-card__micro-glint--one" cx="98" cy="28" r="2" />
+      <circle className="dm2026-discovery-card__micro-glint dm2026-discovery-card__micro-glint--two" cx="52" cy="80" r="1.7" />
     </svg>
   );
 }
 
 function OffersScene() {
   return (
-    <svg className="dm2026-discovery-card__svg" viewBox="0 0 120 96" aria-hidden="true" focusable="false">
-      <path className="dm2026-discovery-card__halo dm2026-discovery-card__halo--gold" d="M26 23h50l21 21-42 42-42-42 13-21Z" />
-      <path className="dm2026-discovery-card__line dm2026-discovery-card__line--gold dm2026-discovery-card__line--float" d="M31 25h43l18 18-38 38-38-38 15-18Z" />
-      <circle className="dm2026-discovery-card__dot" cx="70" cy="38" r="5" />
-      <path className="dm2026-discovery-card__shine dm2026-discovery-card__shine--gold" d="M34 45h48" />
-      <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--gold" d="M92 24v9M87.5 28.5h9" />
+    <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--gold dm2026-discovery-card__aura--wide" d="M25 35c19-26 66-32 93-9 23 20 17 57-8 78-28 23-77 13-93-17-10-19-7-39 8-52Z" />
+      <path className="dm2026-discovery-card__jewel-shadow" d="M70 92 27 47l17-25h69l17 25Z" />
+      <path className="dm2026-discovery-card__jewel dm2026-discovery-card__jewel--breathe" d="M43 22h70l17 25-60 61-60-61Z" />
+      <path className="dm2026-discovery-card__jewel-facet" d="M43 22 58 47 70 22 84 47 113 22M10 47h120M58 47l12 61 14-61M43 22 10 47M113 22l17 25" />
+      <path className="dm2026-discovery-card__jewel-core" d="M58 47h26l-14 34Z" />
+      <path className="dm2026-discovery-card__jewel-shine" d="M36 41c19-11 42-16 70-13" />
+      <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--one" d="M72 9v10M67 14h10" />
+      <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--two" d="M119 29v10M114 34h10" />
+      <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--three" d="M28 67v9M23.5 71.5h9" />
+      <circle className="dm2026-discovery-card__champagne-glint dm2026-discovery-card__champagne-glint--one" cx="101" cy="51" r="2.3" />
+      <circle className="dm2026-discovery-card__champagne-glint dm2026-discovery-card__champagne-glint--two" cx="49" cy="37" r="1.8" />
     </svg>
   );
 }
