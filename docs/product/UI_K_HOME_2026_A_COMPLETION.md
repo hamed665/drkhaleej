@@ -541,3 +541,51 @@ No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, 
 ### Merge-readiness recommendation
 
 PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; root middleware now provides the request locale header required by the global layout/header.
+
+## 25. FIX16 — Next 16 proxy locale source and Vercel middleware build fix
+
+### Vercel middleware build error root cause
+
+- The FIX15B root-level `middleware.ts` activated the legacy middleware artifact path referenced by the Vercel failure: `.next/server/middleware.js.nft.json`.
+- The project is on Next `16.2.7`, where the installed framework documentation and local build output support the `proxy.ts` convention for request-boundary work.
+- Keeping root `middleware.ts` was therefore the likely source of the Vercel middleware packaging failure.
+
+### Middleware removed / proxy added
+
+- Removed root `middleware.ts` so the build no longer produces the failing middleware artifact path.
+- Added root `proxy.ts` as the request-header source for the global layout/header locale.
+- The proxy reads pathname segments and forwards `x-drmuscat-locale` for `en`/`ar` and `x-drmuscat-country` when the second segment exists.
+- The proxy does not redirect, rewrite, change pathnames, add routes, add locales, change countries, or touch SEO files.
+
+### Locale header behavior preserved
+
+- `/en/om...` forwards `x-drmuscat-locale: en` and `x-drmuscat-country: om`.
+- `/ar/om...` forwards `x-drmuscat-locale: ar` and `x-drmuscat-country: om`.
+- `SiteHeader` continues to derive the language switch from the server locale header on first render.
+
+### Language switch QA result
+
+- `/en/om` renders `العربية` targeting `/ar/om`.
+- `/ar/om` renders `English` targeting `/en/om`.
+- Mobile menu behavior and hamburger styling were not redesigned in FIX16.
+- Smart Search was not changed.
+
+### Validation results
+
+- `git status --short` showed only the scoped middleware removal, root proxy addition and completion-report update before commit.
+- `pnpm lint`, `pnpm typecheck`, `pnpm build`, and `pnpm routes:check` passed during FIX16.
+- Built-page checks for `/en/om` and `/ar/om` passed for exact language-switch labels/hrefs, mobile menu markers, Smart Search render marker and absence of deferred lower-section markers.
+- Forbidden-area checks passed for database, Supabase, RLS, API, sitemap, robots, llms, package, lockfile, route-check, Smart Search, hero/search top shell, route page and lower-section files.
+
+### Vercel deployment result
+
+- A local production build passes with `proxy.ts` and without root `middleware.ts`.
+- Live Vercel deployment execution is not available from this container, but the failing root middleware source has been removed and replaced with the Next 16 proxy convention.
+
+### Forbidden files untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page, lower homepage section file, Smart Search file, search logic or homepage redesign file was changed in FIX16.
+
+### Merge-readiness recommendation
+
+PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; the request locale source is now proxy-based for Next 16 build compatibility while preserving `/en/om` and `/ar/om` language-switch behavior.

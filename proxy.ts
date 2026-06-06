@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const SUPPORTED_LOCALES = new Set(['en', 'ar']);
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   const segments = request.nextUrl.pathname.split('/').filter(Boolean);
   const locale = segments[0];
