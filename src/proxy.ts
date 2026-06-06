@@ -1,26 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const localeCountryPattern = /^\/(en|ar)\/(.+?)(?:\/)?$/;
+const SUPPORTED_LOCALES = new Set(['en', 'ar']);
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
+  const segments = request.nextUrl.pathname.split('/').filter(Boolean);
+  const locale = segments[0];
+  const country = segments[1];
 
-  const match = pathname.match(localeCountryPattern);
-  if (match) {
-    const locale = match[1];
-    const country = match[2];
-
-    if (!locale || !country) {
-      return NextResponse.rewrite(new URL('/404', request.url));
-    }
-
-    const isAllowedCountry = country === 'om';
-    if (!isAllowedCountry) {
-      return NextResponse.rewrite(new URL('/404', request.url));
-    }
-
+  if (locale && SUPPORTED_LOCALES.has(locale)) {
     requestHeaders.set('x-drmuscat-locale', locale);
+  }
+
+  if (country) {
+    requestHeaders.set('x-drmuscat-country', country);
   }
 
   return NextResponse.next({
@@ -31,5 +24,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|llms.txt).*)'
+  ]
 };
