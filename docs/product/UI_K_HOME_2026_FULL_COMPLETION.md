@@ -150,3 +150,54 @@ Confirmed untouched:
 ## 15. Next PR recommendation
 
 UI-K-HOME-2026-POLISH — final visual QA and Claude UI Kit alignment pass
+
+## 16. Search Fix — PR #157-FIX05
+
+### What was wrong with the previous search
+
+- The search command center was premium in direction but still too tall, too form-like and too visually spread out.
+- Content/provider chips, location filters and suggestions consumed too much vertical space on laptop widths.
+- Suggestions were complete but too noisy for the primary homepage search surface.
+
+### What changed
+
+- Search markup was tightened so the badge, title, subtitle, dominant input, chips, location controls, suggestions and CTAs live inside one compact premium glass command panel.
+- The main input remains the visual hero, with a pill/glass shell, search icon, strong Search button and clearer focus state.
+- Content type chips are the primary compact segmented row; provider type chips are visually secondary.
+- Country, city and area are presented as compact pill-like selects.
+- Popular suggestions were reduced to curated rows that stay horizontally scrollable instead of noisy.
+
+### Search layout summary
+
+- Main input: dominant horizontal command bar.
+- Row 1: compact content type chips.
+- Row 2: secondary provider type chips.
+- Row 3: Country, City and Area location controls.
+- Row 4: curated suggestion chips and small user-facing safety copy.
+- Bottom CTAs: Search and List your center.
+
+### English/Arabic behavior
+
+- English placeholder remains: “Search doctors, clinics, services, offers or areas…”
+- Arabic placeholder remains: “ابحث عن طبيب، عيادة، خدمة، عرض أو منطقة…”
+- Arabic labels use the same command-center layout with smaller RTL heading sizing and no negative letter spacing.
+
+### RTL/mobile/accessibility notes
+
+- Search fields keep labels, semantic fieldsets, real radio controls, real submit buttons and real provider link.
+- Chip rows are horizontally scrollable where needed and avoid horizontal overflow.
+- Mobile stacks the main input button and keeps touch targets at least 44px where interactive.
+- Focus states remain visible on the command input and chips.
+
+### Validation results
+
+- `git status --short` — run before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML checks for `/en/om` and `/ar/om` — passed.
+
+### Forbidden areas untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check or migration files were changed.

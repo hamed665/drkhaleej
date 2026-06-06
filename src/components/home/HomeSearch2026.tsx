@@ -50,13 +50,15 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
 
   return (
     <section className="dm2026-home-search dm2026-search" dir={dir} aria-labelledby="dm2026-home-search-title">
-      <div className="dm2026-home-search__intro">
-        <span className="dm2026-badge">{copy.eyebrow}</span>
-        <h2 id="dm2026-home-search-title">{copy.title}</h2>
-        <p>{copy.description}</p>
-      </div>
-
       <form className="dm2026-search-surface dm2026-home-search__surface" action={searchHref} method="get">
+        <div className="dm2026-home-search__header">
+          <span className="dm2026-badge">{copy.eyebrow}</span>
+          <div>
+            <h2 id="dm2026-home-search-title">{copy.title}</h2>
+            <p>{copy.description}</p>
+          </div>
+        </div>
+
         <div className="dm2026-home-search__command">
           <label htmlFor="dm2026-home-care-need">{copy.careNeedLabel}</label>
           <div className="dm2026-home-search__command-input">
@@ -75,31 +77,33 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
           </div>
         </div>
 
-        <fieldset className="dm2026-home-search__segment" aria-label={copy.contentTypeLabel}>
-          <legend>{copy.contentTypeLabel}</legend>
-          <div>
-            {copy.contentTypes.map((contentType) => (
-              <label key={contentType} className="dm2026-home-search__chip">
-                <input type="radio" name="contentType" value={contentType} defaultChecked={contentType === defaultContentType} />
-                <span>{contentType}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <div className="dm2026-home-search__chip-rows">
+          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={copy.contentTypeLabel}>
+            <legend>{copy.contentTypeLabel}</legend>
+            <div>
+              {copy.contentTypes.map((contentType) => (
+                <label key={contentType} className="dm2026-home-search__chip">
+                  <input type="radio" name="contentType" value={contentType} defaultChecked={contentType === defaultContentType} />
+                  <span>{contentType}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
-        <fieldset className="dm2026-home-search__segment" aria-label={copy.providerTypeLabel}>
-          <legend>{copy.providerTypeLabel}</legend>
-          <div>
-            {copy.providerTypes.map((providerType) => (
-              <label key={providerType} className="dm2026-home-search__chip">
-                <input type="radio" name="type" value={providerType} defaultChecked={providerType === defaultProviderType} />
-                <span>{providerType}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.providerTypeLabel}>
+            <legend>{copy.providerTypeLabel}</legend>
+            <div>
+              {copy.providerTypes.map((providerType) => (
+                <label key={providerType} className="dm2026-home-search__chip">
+                  <input type="radio" name="type" value={providerType} defaultChecked={providerType === defaultProviderType} />
+                  <span>{providerType}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
 
-        <div className="dm2026-home-search__select-grid">
+        <div className="dm2026-home-search__select-grid" aria-label={`${copy.countryLabel}, ${copy.cityLabel}, ${copy.areaLabel}`}>
           <div className="dm2026-home-search__field">
             <label htmlFor="dm2026-home-country">{copy.countryLabel}</label>
             <select id="dm2026-home-country" name="country" className="dm2026-select" defaultValue={defaultCountry}>

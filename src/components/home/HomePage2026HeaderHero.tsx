@@ -65,7 +65,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       cities: ['Muscat', 'Seeb', 'Bawshar', 'Muttrah', 'Salalah', 'Sohar', 'Nizwa', 'Sur', 'Ibri', 'Rustaq', 'Barka', 'Duqm'],
       areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi', 'Muttrah', 'Seeb', 'Bawshar', 'Madinat Sultan Qaboos', 'Ghala', 'Al Hail', 'Al Mouj', 'Muscat Hills', 'Wadi Kabir', 'Darsait', 'Al Amerat', 'Mabela'],
       contentTypes: ['Doctors', 'Clinics', 'Hospitals', 'Labs', 'Pharmacies', 'Services', 'Offers', 'Articles'],
-      specialties: ['Dentist', 'Dermatology', 'Pediatrics', 'Gynecology', 'ENT', 'Orthopedics', 'Ophthalmology', 'General Practice', 'Cardiology', 'Physiotherapy', 'Lab tests', 'Dental cleaning', 'Skin clinic', 'Laser hair removal', 'Pharmacy', 'Pet clinic', 'Nutrition', 'Mental health', 'Beauty clinic', 'Wellness center']
+      specialties: ['Dentist', 'Dermatology', 'Pediatrics', 'Gynecology', 'ENT', 'Orthopedics', 'General Practice', 'Lab tests', 'Dental cleaning', 'Skin clinic', 'Pharmacy', 'Pet clinic', 'Beauty clinic', 'Wellness center']
     }
   },
   ar: {
@@ -109,7 +109,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
       cities: ['مسقط', 'السيب', 'بوشر', 'مطرح', 'صلالة', 'صحار', 'نزوى', 'صور', 'عبري', 'الرستاق', 'بركاء', 'الدقم'],
       areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي', 'مطرح', 'السيب', 'بوشر', 'مدينة السلطان قابوس', 'غلا', 'الحيل', 'الموج', 'مسقط هيلز', 'وادي الكبير', 'دارسيت', 'العامرات', 'المعبيلة'],
       contentTypes: ['الأطباء', 'العيادات', 'المستشفيات', 'المختبرات', 'الصيدليات', 'الخدمات', 'العروض', 'المقالات'],
-      specialties: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'عيون', 'طب عام', 'قلب', 'علاج طبيعي', 'فحوصات مختبر', 'تنظيف الأسنان', 'عيادة جلدية', 'إزالة الشعر بالليزر', 'صيدلية', 'عيادة بيطرية', 'تغذية', 'صحة نفسية', 'عيادة تجميل', 'مركز رفاهية']
+      specialties: ['طبيب أسنان', 'جلدية', 'طب الأطفال', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'طب عام', 'فحوصات مختبر', 'تنظيف الأسنان', 'عيادة جلدية', 'صيدلية', 'عيادة بيطرية', 'عيادة تجميل', 'مركز رفاهية']
     }
   }
 };
