@@ -693,3 +693,45 @@ Required FIX07 validation commands:
 ### Merge readiness recommendation
 
 Merge readiness is recommended after validation and visual QA confirm that `/en/om` and `/ar/om` retain the approved homepage/search foundation, show a premium Special Offer stamp, provider-linked offer panel, recognizable WhatsApp/Directions/Call buttons, meaningful media overlay labels, readable provider rail items, and no horizontal overflow on mobile.
+
+## 24. Final Featured Provider Preview Refinement
+
+### Single hero image direction
+
+The featured provider card now presents one prominent rotating hero image instead of a two-tile gallery. The image remains static-safe and CSS-generated, while still using the existing lightweight photo rotation data so future provider profiles can support multiple approved photos without cluttering the current design.
+
+### Provider-led framing and copy
+
+The top framing was shortened to keep the section premium and profile-led. The visible copy now emphasizes approved profile preview, photos, rating, services, offers, and clear contact actions without overexplaining monetization mechanics.
+
+### Special Offer and CTA polish
+
+The Special Offer title stays linked to the active provider and uses a warm premium accent. The CTA row remains four preview-safe buttons only—View Profile, Directions, Call, and WhatsApp—with no fake profile, map, phone, or WhatsApp links.
+
+### Provider rail and responsive status
+
+The bottom rail continues to show sample provider/center names rather than generic category placeholders. The rail remains compact, horizontally scrollable on mobile, and keeps active provider selection clear.
+
+### Guardrails confirmed
+
+No font changes, search changes, header changes, language switch changes, footer changes, SEO/routing changes, backend/database/Supabase/API changes, package changes, fake prices, fake discounts, fake availability, fake medical promises, fake phone numbers, fake map URLs, or fake WhatsApp URLs were introduced.
+
+### Validation results
+
+Required final refinement validation commands:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+- `git status --short`: showed only the three approved featured-board files changed before commit.
+- `pnpm lint`: passed with pre-existing warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+
+### Merge readiness recommendation
+
+Merge readiness is recommended after visual QA confirms that `/en/om` and `/ar/om` retain the approved header, Smart Search, language switch, mobile menu, typography, and responsive behavior while showing a single premium hero image, visible rating, provider-linked Special Offer, clear WhatsApp/Directions actions, and provider-name rail previews.

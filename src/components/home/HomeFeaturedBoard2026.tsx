@@ -434,12 +434,12 @@ const previewInventory: readonly VisibilityPreviewItem[] = [
 const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
   en: {
     ariaLabel: 'Featured provider previews board',
-    badge: 'Featured preview',
-    title: 'Featured provider previews',
-    subtitle: 'See how approved healthcare profiles can appear with rating, services, offers and clear contact actions.',
-    trustNote: 'Demo preview. Photos, ratings, offers and contact actions appear after approval.',
+    badge: 'Featured provider preview',
+    title: 'Premium provider discovery',
+    subtitle: 'Photos, rating, services, offers and contact actions in one approved profile preview.',
+    trustNote: 'Demo profile. Confirm details with the provider after approval.',
     activeLabel: 'Featured now',
-    profileLabel: 'Featured profile',
+    profileLabel: 'Approved profile preview',
     locationLabel: 'Provider preview location',
     servicesLabel: 'Provider preview services',
     ratingAriaLabel: 'Safe sample rating preview',
@@ -458,12 +458,12 @@ const featuredBoardCopy: Record<SupportedLocale, FeaturedBoardCopy> = {
   },
   ar: {
     ariaLabel: 'لوحة معاينات مميزة لمقدمي الرعاية',
-    badge: 'معاينة مميزة',
-    title: 'معاينات مميزة لمقدمي الرعاية',
-    subtitle: 'شاهد كيف يمكن أن تظهر الملفات المعتمدة مع التقييم والخدمات والعروض وإجراءات التواصل الواضحة.',
-    trustNote: 'معاينة تجريبية. تظهر الصور والتقييمات والعروض وإجراءات التواصل بعد الاعتماد.',
+    badge: 'معاينة مقدم مميز',
+    title: 'اكتشاف مميز لمقدمي الرعاية',
+    subtitle: 'صور وتقييم وخدمات وعروض وإجراءات تواصل ضمن معاينة ملف معتمد.',
+    trustNote: 'ملف تجريبي. أكّد التفاصيل مع مقدم الخدمة بعد الاعتماد.',
     activeLabel: 'مميز الآن',
-    profileLabel: 'ملف مميز',
+    profileLabel: 'معاينة ملف معتمد',
     locationLabel: 'موقع معاينة مقدم الخدمة',
     servicesLabel: 'خدمات معاينة مقدم الخدمة',
     ratingAriaLabel: 'معاينة تقييم تجريبية وآمنة',
@@ -533,12 +533,10 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
   const activeEntry = previewInventory[activeIndex] ?? previewInventory[0]!;
   const activePreview = activeEntry[locale];
   const primaryPhoto = activePreview.photos[activePhotoIndex] ?? activePreview.photos[0]!;
-  const secondaryPhoto = activePreview.photos[(activePhotoIndex + 1) % activePreview.photos.length] ?? activePreview.photos[0]!;
   const primaryPhotoOverlay = photoOverlayLabels[locale][primaryPhoto.tone];
-  const secondaryPhotoOverlay = photoOverlayLabels[locale][secondaryPhoto.tone];
   const hasSpecialOffer = Boolean(activePreview.offerTitle);
   const specialOfferStamp = locale === 'ar' ? 'عرض خاص' : 'Special Offer';
-  const specialOfferTitle = locale === 'ar' ? `عرض خاص من ${activePreview.title}` : `${activePreview.title} Special Offer`;
+  const specialOfferTitle = locale === 'ar' ? `عرض خاص من ${activePreview.title}` : `Special Offer from ${activePreview.title}`;
   const specialOfferSubtitle = locale === 'ar' ? `${activePreview.offerTitle} من ${activePreview.title}` : `${activePreview.offerTitle} from ${activePreview.title}`;
   const specialOfferBullets =
     locale === 'ar'
@@ -612,15 +610,6 @@ export function HomeFeaturedBoard2026({ locale, country, dir }: HomeFeaturedBoar
                 >
                   <span aria-hidden="true" />
                   <span className="dm2026-featured-board__photo-label">{primaryPhotoOverlay}</span>
-                </div>
-                <div
-                  key={`${activeEntry.id}-${secondaryPhoto.label}-side`}
-                  className={`dm2026-featured-board__photo dm2026-featured-board__photo--side dm2026-featured-board__photo--${secondaryPhoto.tone}`}
-                  role="img"
-                  aria-label={secondaryPhoto.label}
-                >
-                  <span aria-hidden="true" />
-                  <span className="dm2026-featured-board__photo-label dm2026-featured-board__photo-label--side">{secondaryPhotoOverlay}</span>
                 </div>
               </div>
 
