@@ -178,9 +178,7 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
   return (
     <section className="dm2026-home-top dm2026-shell" dir={dir} aria-labelledby="dm2026-home-hero-title">
       <div className="dm2026-container dm2026-home-top__container">
-        <HomeSearch2026 copy={copy.search} dir={dir} searchHref={searchHref} providerHref={providerHref} />
-
-        <div className="dm2026-home-hero">
+        <div className="dm2026-home-hero dm2026-home-hero--compact">
           <div className="dm2026-home-hero__copy">
             <span className="dm2026-badge">{copy.eyebrow}</span>
             <h1 id="dm2026-home-hero-title">{copy.title}</h1>
@@ -195,19 +193,9 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
             </div>
             <p className="dm2026-home-hero__note">{copy.heroNote}</p>
           </div>
-
-          <aside className="dm2026-home-visual dm2026-card-glass" aria-label={copy.visualTitle}>
-            <div className="dm2026-home-visual__orb" aria-hidden="true" />
-            <div className="dm2026-home-visual__panel">
-              <span className="dm2026-badge">{copy.visualTitle}</span>
-              <ul>
-                {copy.visualItems.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </aside>
         </div>
+
+        <HomeSearch2026 copy={copy.search} dir={dir} searchHref={searchHref} providerHref={providerHref} />
 
         <div className="dm2026-home-safety dm2026-card-soft" aria-label={copy.safetyTitle}>
           <strong>{copy.safetyTitle}</strong>

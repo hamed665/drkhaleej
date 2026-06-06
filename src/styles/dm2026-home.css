@@ -745,3 +745,111 @@
     transition-duration: 1ms;
   }
 }
+
+/* PR #157-FIX08: layout repair after cleanup. */
+.site-header.dm2026-site-header {
+  inline-size: min(100% - 1rem, 82rem);
+}
+
+.site-header .dm2026-site-header__inner {
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+  grid-auto-flow: column;
+  grid-auto-rows: min-content;
+  overflow: hidden;
+}
+
+.site-header .dm2026-site-header__nav,
+.site-header .dm2026-site-header__actions {
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+
+.site-header .dm2026-site-header__nav ul,
+.site-header .dm2026-site-header__actions {
+  flex-wrap: nowrap;
+}
+
+.site-header .dm2026-site-header__nav a,
+.site-header .dm2026-site-header__pending,
+.site-header .dm2026-site-header__account,
+.site-header .dm2026-site-header__provider,
+.site-header .dm2026-site-header__locale-switch {
+  min-block-size: 2.18rem;
+  font-size: clamp(0.74rem, 0.82vw, 0.82rem);
+  padding: 0.4rem clamp(0.52rem, 0.72vw, 0.68rem);
+}
+
+.site-header .dm2026-site-header__account {
+  max-inline-size: 8.5rem;
+}
+
+.dm2026-home-top {
+  padding-block-start: clamp(0.9rem, 2vw, 1.55rem);
+}
+
+.dm2026-home-top__container {
+  gap: clamp(0.8rem, 1.7vw, 1.25rem);
+}
+
+.dm2026-home-hero,
+.dm2026-home-hero--compact {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.dm2026-home-hero__copy {
+  justify-items: center;
+  max-inline-size: 66rem;
+}
+
+.dm2026-home-hero h1 {
+  max-inline-size: 18ch;
+  font-size: clamp(2rem, 4.6vw, 4.1rem);
+  line-height: 1.02;
+}
+
+.dm2026-home-hero__subtitle {
+  max-inline-size: 56rem;
+  font-size: clamp(0.95rem, 1.25vw, 1.08rem);
+}
+
+.dm2026-home-hero__note {
+  max-inline-size: 48rem;
+}
+
+.dm2026-home-search {
+  inline-size: 100%;
+}
+
+.dm2026-home-search__surface {
+  inline-size: min(100%, 72rem);
+}
+
+.dm2026-home-visual {
+  display: none;
+}
+
+@media (max-width: 68rem) {
+  .site-header .dm2026-site-header__inner {
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+  }
+}
+
+@media (max-width: 48rem) {
+  .site-header .dm2026-site-header__inner {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    overflow: visible;
+  }
+
+  .site-header .dm2026-site-header__nav,
+  .site-header .dm2026-site-header__actions {
+    inline-size: 100%;
+  }
+}
+
+[dir='rtl'] .dm2026-home-hero,
+[dir='rtl'] .dm2026-home-hero--compact {
+  text-align: center;
+}

@@ -160,3 +160,46 @@ Deferred for future PRs:
 ## 15. Next PR recommendation
 
 `UI-K-HOME-2026-B — Featured Provider Board / Ads Board`
+
+## 16. FIX08 — Header wrapping and top/search layout repair
+
+### Layout regression found after cleanup
+
+- Cleanup correctly removed lower homepage scope, but the visual top shell needed a final layout repair.
+- Header navigation could wrap into multiple rows on laptop/desktop widths.
+- The hero/search stack needed to be explicitly vertical so the smart search command center stays full-width and readable.
+
+### Header wrapping fix
+
+- Header CSS was tightened so desktop/laptop keeps Brand | nav links | actions in one glass-pill row.
+- Nav and action groups use internal horizontal overflow instead of expanding the header into multiple rows.
+- Disabled preview-safe items remain compact and no new routes or auth pages were added.
+
+### Hero/search vertical layout fix
+
+- `HomePage2026HeaderHero` now renders compact hero intro first, the approved smart search full-width below it, then the minimal safety strip.
+- The decorative side visual was removed from the rendered top shell so the search is no longer squeezed by a two-column hero layout.
+
+### Smart search preserved
+
+- No smart search state/autocomplete logic was rewritten.
+- Controlled input, one-character suggestions, Arabic matching, suggestion grouping, hover/focus preview, click-to-fill, popular More handling and city/area dependency remain intact.
+
+### Arabic/RTL status
+
+- Header and top shell remain RTL-safe.
+- Arabic title sizing remains compact.
+- Arabic language switch continues to show `English`.
+
+### Validation results
+
+- `git status --short` — run during FIX08.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML checks for `/en/om` and `/ar/om` confirmed top shell/search render and deferred lower-section markers remain absent.
+
+### Forbidden files untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page or lower homepage section files were changed in FIX08.
