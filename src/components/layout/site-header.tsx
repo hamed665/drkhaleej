@@ -5,6 +5,16 @@ import { Container } from '@/components/ui/container';
 import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
 import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
 
+
+const localeFromPath = (value: string | null): SupportedLocale | null => {
+  if (!value) return null;
+
+  const path = value.startsWith('http') ? new URL(value).pathname : value;
+  const locale = path.match(/^\/(en|ar)(?:\/|$)/)?.[1];
+
+  return locale && isSupportedLocale(locale) ? locale : null;
+};
+
 const navCopy: Record<
   SupportedLocale,
   {
@@ -74,8 +84,16 @@ const navCopy: Record<
 };
 
 export async function SiteHeader() {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
+  const requestHeaders = await headers();
+  const localeHeader = requestHeaders.get('x-drmuscat-locale');
+  const fallbackLocale = localeFromPath(
+    requestHeaders.get('x-next-url')
+      ?? requestHeaders.get('next-url')
+      ?? requestHeaders.get('x-invoke-path')
+      ?? requestHeaders.get('x-matched-path')
+      ?? requestHeaders.get('referer')
+  );
+  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : fallbackLocale ?? 'en';
   const copy = navCopy[safeLocale];
   const dir = localeDirection(safeLocale);
   const homeHref = homeRoute(safeLocale, 'om');

@@ -1366,3 +1366,17 @@
     inline-size: calc(100vw - 1rem);
   }
 }
+
+/* PR #157-FIX13: compact premium hamburger strokes. */
+@media (max-width: 48rem) {
+  .site-header .dm2026-site-header__menu-button {
+    gap: 0.33rem;
+  }
+
+  .site-header .dm2026-site-header__menu-button span {
+    inline-size: 1.45rem;
+    block-size: 2px;
+    border-radius: 999px;
+    background: var(--dm-teal-950, #07302c);
+  }
+}

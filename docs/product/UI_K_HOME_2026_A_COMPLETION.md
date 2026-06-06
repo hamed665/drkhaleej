@@ -388,3 +388,31 @@ Full header navigation/i18n refinement remains deferred to a future header/navig
 ### Merge-readiness recommendation
 
 PR #157 remains recommended as `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`. Lower homepage sections, footer redesign, full navigation/i18n polish and production logo work remain future PRs.
+
+## 21. FIX13 — Hamburger icon polish and Arabic language switch hardening
+
+### Arabic language switch fix
+
+- Hardened `SiteHeader` locale detection by keeping the existing `x-drmuscat-locale` header and adding safe pathname-header fallbacks before defaulting to English.
+- `/en/om` continues to render the language switch as `العربية` with `/ar/om` as the target.
+- `/ar/om` now has a stronger server-side fallback path to render the language switch as `English` with `/en/om` as the target if the primary locale header is unavailable.
+- No new locales, routes, route helpers or i18n config changes were added.
+
+### Hamburger icon polish
+
+- The existing mobile hamburger button behavior was preserved.
+- The three strokes were made shorter, cleaner, centered and more compact with a dark teal color and softly rounded ends.
+- No icon package, SVG asset or dependency was added.
+
+### Validation results
+
+- `git status --short` — run during FIX13 and showed only scoped header/CSS/report changes before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML/source checks passed for `/en/om`, `/ar/om`, language switch labels/hrefs, mobile menu markers, deferred lower-section absence and unchanged smart-search markers.
+
+### Merge-readiness note
+
+PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; full navigation translation, production logo work and lower homepage sections remain future PRs.
