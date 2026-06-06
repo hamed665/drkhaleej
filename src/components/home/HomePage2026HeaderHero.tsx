@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { HomeSearch2026 } from '@/components/home/HomeSearch2026';
 import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 import { publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
@@ -176,28 +175,11 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
   const providerHref = publicProviderRoute(locale, country);
 
   return (
-    <section className="dm2026-home-top dm2026-shell" dir={dir} aria-labelledby="dm2026-home-hero-title">
-      <div className="dm2026-container dm2026-home-top__container">
-        <div className="dm2026-home-hero dm2026-home-hero--compact">
-          <div className="dm2026-home-hero__copy">
-            <span className="dm2026-badge">{copy.eyebrow}</span>
-            <h1 id="dm2026-home-hero-title">{copy.title}</h1>
-            <p className="dm2026-home-hero__subtitle">{copy.subtitle}</p>
-            <div className="dm2026-home-hero__actions">
-              <Link href={searchHref} className="dm2026-button dm2026-button-primary">
-                {copy.primaryCta}
-              </Link>
-              <Link href={providerHref} className="dm2026-button dm2026-button-secondary">
-                {copy.secondaryCta}
-              </Link>
-            </div>
-            <p className="dm2026-home-hero__note">{copy.heroNote}</p>
-          </div>
-        </div>
-
+    <section className="dm2026-home-top dm2026-shell" dir={dir} aria-label={copy.search.title}>
+      <div className="dm2026-container dm2026-home-top__container dm2026-home-top__container--search-first">
         <HomeSearch2026 copy={copy.search} dir={dir} searchHref={searchHref} providerHref={providerHref} />
 
-        <div className="dm2026-home-safety dm2026-card-soft" aria-label={copy.safetyTitle}>
+        <div className="dm2026-home-safety dm2026-home-safety--compact dm2026-card-soft" aria-label={copy.safetyTitle}>
           <strong>{copy.safetyTitle}</strong>
           <ul>
             {copy.safetyItems.map((item) => (

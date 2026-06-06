@@ -203,3 +203,48 @@ Deferred for future PRs:
 ### Forbidden files untouched
 
 No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page or lower homepage section files were changed in FIX08.
+
+## 17. FIX09 — Restore search-first top layout
+
+### Regression reason
+
+- The previous layout repair still allowed the marketing hero to dominate the first viewport.
+- Search was pushed down by a large centered headline, making the page feel less search-first and less like the approved command center presentation.
+
+### Oversized hero removed
+
+- The rendered oversized hero block was removed from the current top shell.
+- The search component's compact badge/title/subtitle now acts as the search-first intro for this scoped PR.
+
+### Search-first layout restored
+
+- The top shell now renders the approved full-width `HomeSearch2026` command center first, followed by the compact safety strip.
+- Search is not placed beside hero text and is not squeezed into a two-column grid.
+
+### Approved smart search preserved
+
+- `HomeSearch2026` state, autocomplete, one-character matching, Arabic normalization, suggestion grouping, hover/focus preview, click-to-fill behavior, popular More handling and city/area dependency were not changed.
+
+### Header balance status
+
+- Header CSS was tightened again for desktop/laptop balance.
+- Brand, nav and actions remain in one glass-pill row with internal overflow available for tight widths.
+
+### Arabic/RTL status
+
+- Arabic top layout remains search-first and compact.
+- Arabic search intro uses smaller line-height-aware sizing.
+- Language switch behavior remains unchanged.
+
+### Validation results
+
+- `git status --short` — run during FIX09.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML checks for `/en/om` and `/ar/om` confirmed search renders before the safety strip and deferred lower-section markers remain absent.
+
+### Forbidden areas untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page, lower homepage section file or search logic file was changed in FIX09.

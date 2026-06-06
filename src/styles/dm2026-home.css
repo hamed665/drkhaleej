@@ -853,3 +853,86 @@
 [dir='rtl'] .dm2026-home-hero--compact {
   text-align: center;
 }
+
+/* PR #157-FIX09: restore search-first top layout. */
+.dm2026-home-top {
+  padding-block: clamp(0.55rem, 1.4vw, 1rem) clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.dm2026-home-top__container--search-first {
+  gap: clamp(0.55rem, 1.2vw, 0.9rem);
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-search {
+  order: 1;
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-safety {
+  order: 2;
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-search__surface {
+  inline-size: min(100%, 74rem);
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-search__header {
+  padding-inline: 0.12rem;
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-search__header h2 {
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  line-height: 1.2;
+}
+
+.dm2026-home-top__container--search-first .dm2026-home-search__header p {
+  font-size: clamp(0.78rem, 0.98vw, 0.86rem);
+  line-height: 1.42;
+}
+
+.dm2026-home-safety--compact {
+  justify-content: center;
+  margin-inline: auto;
+  inline-size: min(100%, 74rem);
+  padding: 0.62rem 0.76rem;
+}
+
+.dm2026-home-safety--compact strong,
+.dm2026-home-safety--compact li {
+  font-size: 0.78rem;
+}
+
+.site-header.dm2026-site-header {
+  inline-size: min(100% - 0.85rem, 86rem);
+}
+
+.site-header .dm2026-site-header__inner {
+  gap: clamp(0.32rem, 0.7vw, 0.62rem);
+  min-block-size: 3.72rem;
+  padding: 0.42rem clamp(0.5rem, 1vw, 0.78rem);
+}
+
+.site-header .dm2026-site-header__nav ul,
+.site-header .dm2026-site-header__actions {
+  gap: 0.22rem;
+}
+
+.site-header .dm2026-site-header__nav a,
+.site-header .dm2026-site-header__pending,
+.site-header .dm2026-site-header__account,
+.site-header .dm2026-site-header__provider,
+.site-header .dm2026-site-header__locale-switch {
+  min-block-size: 2.05rem;
+  font-size: clamp(0.7rem, 0.76vw, 0.78rem);
+  padding: 0.34rem clamp(0.42rem, 0.6vw, 0.58rem);
+}
+
+@media (min-width: 48.01rem) {
+  .site-header .dm2026-site-header__inner {
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+  }
+}
+
+[dir='rtl'] .dm2026-home-top__container--search-first .dm2026-home-search__header h2 {
+  font-size: clamp(0.96rem, 1.28vw, 1.14rem);
+  line-height: 1.42;
+}
