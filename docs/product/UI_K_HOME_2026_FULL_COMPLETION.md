@@ -266,3 +266,85 @@ No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, 
 ### Forbidden areas untouched
 
 No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, header, footer or other homepage section files were changed.
+
+## 18. Search Fix — PR #157-FIX07
+
+### Problems fixed
+
+- Tightened the search command center so it is slimmer, less form-like and less vertically bulky.
+- Replaced the previous simple suggestion filtering with deterministic one-character autocomplete from a richer static dataset.
+- Kept the city-to-area dependency from FIX06 and expanded Bawshar-specific area support inside the search layer.
+
+### Files changed
+
+- `src/components/home/HomeSearch2026.tsx`
+- `src/styles/dm2026-home.css`
+- `docs/product/UI_K_HOME_2026_FULL_COMPLETION.md`
+
+### Controlled input/autocomplete behavior
+
+- The main input remains controlled by local React state only.
+- Local state now covers query, selected content type, selected provider type, selected country, selected city, selected area, active/focused suggestion, selected suggestion, suggestion panel visibility and discovery preview visibility.
+- Typing one or more characters opens the smart suggestion panel immediately.
+- Clicking a suggestion updates the input and mapped filters where safe, then collapses the suggestion panel.
+
+### Suggestion dataset and groups
+
+- Added an internal static suggestion dataset inside `HomeSearch2026.tsx` with IDs, English/Arabic labels, groups, helpers, keyword lists and optional mapped filters.
+- Groups are Services, Provider types, Areas, Offers and Guides with Arabic equivalents.
+- The dataset includes the required services, provider types, Muscat/Oman areas, offers and guide suggestions without fake providers, fake ratings or backend data.
+
+### One-character suggestion behavior
+
+- English filtering is case-insensitive.
+- Arabic filtering removes common diacritics and normalizes common variants such as `أ/إ/آ` to `ا`, `ة` to `ه`, and related forms.
+- Ranking prioritizes label starts-with, keyword starts-with, label contains, keyword contains and helper contains matches.
+- Source checks cover expected examples for `D`, `B`, `L`, `pet`, `q`, `ط`, `أس` / `اس`, and `مخت` matching paths.
+
+### Popular suggestions overflow fix
+
+- Empty-query popular suggestions are capped to the curated list and include a `More` / `المزيد` button.
+- The `More` button expands additional suggestions inside the search card on desktop while mobile keeps a horizontal rail with fade edges.
+- Chip text is no longer dumped into one long clipped row.
+
+### Hover/focus preview behavior
+
+- Hovering or keyboard-focusing a suggestion updates the in-panel glass preview.
+- The preview remains inside the search panel with label, group, helper sentence and a safe `Use this suggestion` / `استخدام هذا الاقتراح` action.
+
+### City/area dependency preservation
+
+- City changes reset the area to the first valid area for the selected city.
+- Muscat, Sohar, Salalah, Seeb and Bawshar use city-specific areas.
+- Limited-data cities fall back to `City-wide discovery` / `اكتشاف على مستوى المدينة`.
+
+### Search preview decision
+
+- A compact local discovery preview was added after Search click.
+- It summarizes query/content type/city/area and states that reviewed public profiles will appear after provider data is approved.
+- No fake result cards, provider names, doctor names, ratings, reviews or availability are shown.
+
+### Arabic/RTL notes
+
+- Arabic matching handles common spelling variants without external libraries.
+- Arabic suggestion rows, preview and discovery preview remain RTL-safe with compact typography and no negative letter spacing.
+
+### Accessibility/performance notes
+
+- The input, chips, select controls, suggestion rows, More control and preview actions are real form controls/buttons.
+- The autocomplete input uses `aria-expanded` and `aria-controls`; suggestion rows are keyboard-focusable and update preview on focus.
+- All behavior is local UI state only; no API, Supabase, backend search, new dependency or route change was added.
+
+### Validation results
+
+- `git status --short` — run before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Source checks confirmed deterministic matching, city-area maps, More expansion, preview state and forbidden-area safety.
+- Browser screenshot tooling remains unavailable in the container; interactive visual typing QA is documented as an environment limitation.
+
+### Forbidden areas untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, header, footer, route page or other homepage section files were changed.
