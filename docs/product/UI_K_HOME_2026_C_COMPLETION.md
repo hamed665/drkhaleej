@@ -202,3 +202,54 @@ A third focused visual pass adapted the newly shared reference direction into th
 - Strengthened SVG object material quality using subtle relief shadows, inner highlights, and restrained brand-compatible teal/champagne accents.
 - Added a minimal premium Special Offers cue while preserving the exact “Special Offers” wording and avoiding discount-style visuals.
 - Refined CTA pills to feel more crisp, glassy, and modern while preserving accessibility and reduced-motion behavior.
+
+## 20. PR #159-FIX02 layered graphic scene replacement
+
+FIX02 directly addresses the remaining simple icon-card concern. The discovery categories section now treats each card visual as a composed premium graphic scene instead of a lone outline icon.
+
+### Simple icon-card issue fixed
+
+- The scene stage now includes multiple visible layers before the SVG object: ambient light, a frosted inner glass panel, rear/front depth layers, halo, ribbon, floor/contact shadow, foreground object, and vignette.
+- Hero SVGs were expanded with material surfaces and object-specific depth layers so the static screenshot reads as a premium graphic panel even before animation.
+- Secondary cards retain simpler hierarchy but share the same layered glass-panel system so Doctors, Labs, Pet Clinic, and Hospitals no longer read as isolated icon blocks.
+
+### Layered graphic scene strategy
+
+- Dental now uses an enamel/glass tooth composition with a translucent shell, inner lumen, contour lines, material shadow, teal halo, and reflective sheen.
+- Beauty & Aesthetics now uses a skin-surface panel, facial contour linework, luminous droplet, warm/teal glass layers, and a soft editorial ribbon.
+- Special Offers now uses a champagne-gold faceted jewel with a back plate, filled facet surfaces, inner reflections, gold halo, and refined glints.
+- Doctors, Labs, Pet Clinic, and Hospitals remain subordinate in scale while gaining the same premium scene frame, depth, and soft medical glow treatment.
+
+### Motion strategy
+
+- Motion remains CSS/SVG-only: slow depth drift, reflective surface sheen, existing float/glow/pulse movement, CTA light sweep, and reduced hover parallax.
+- No animation libraries, images, canvas, video, external icons, or dependencies were added.
+- `prefers-reduced-motion` disables the added depth drift, sheen, and CTA sweep motion.
+
+### Scope confirmations
+
+- No font changes were made.
+- No header, Smart Search, Featured Provider Board, route, SEO infrastructure, i18n logic, backend, API, database, Supabase, RLS, migration, package, or lockfile files were changed.
+- The approved seven categories and hierarchy remain unchanged.
+
+### Validation results
+
+FIX02 validation commands:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after FIX02 command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX02 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended after the required automated validation passes and human browser QA confirms `/en/om` and `/ar/om` desktop/mobile views now read as layered premium graphic category scenes rather than simple icon cards.

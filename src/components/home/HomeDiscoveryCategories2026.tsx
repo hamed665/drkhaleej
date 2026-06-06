@@ -107,12 +107,18 @@ const discoveryCards: readonly DiscoveryCard[] = [
 function DentalScene() {
   return (
     <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__scene-plate-svg" d="M20 53c5-31 36-47 71-39 32 8 50 38 38 65-12 28-50 40-81 25C26 93 15 73 20 53Z" />
       <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--wide" d="M24 49c5-30 36-44 67-35 31 9 46 41 31 67-14 25-52 33-79 15C25 84 20 67 24 49Z" />
       <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--tight" d="M39 36c11-18 44-22 64-5 19 16 14 45-3 58-16 13-44 13-62-3-18-16-19-35 1-50Z" />
-      <path className="dm2026-discovery-card__tooth-glass dm2026-discovery-card__tooth-glass--breathe" d="M44 30c8-9 20-10 29-4 9-6 22-5 30 5 14 17 4 46-10 58-9 8-14-14-21-14s-12 22-21 14C36 77 30 47 44 30Z" />
-      <path className="dm2026-discovery-card__tooth-edge" d="M48 33c7-7 17-7 25-2 8-5 18-5 25 3" />
-      <path className="dm2026-discovery-card__tooth-core" d="M55 42c6 6 14 8 23 5 7-2 12-1 17 3" />
-      <path className="dm2026-discovery-card__enamel-sweep" d="M48 61c18-13 39-18 63-12" />
+      <path className="dm2026-discovery-card__material-shadow" d="M45 89c14 10 39 11 54 0" />
+      <path className="dm2026-discovery-card__tooth-shell" d="M42 29c8-10 21-12 31-6 10-6 23-4 31 6 15 18 5 48-10 61-10 9-15-14-22-14s-12 23-22 14C35 77 27 48 42 29Z" />
+      <path className="dm2026-discovery-card__tooth-glass dm2026-discovery-card__tooth-glass--breathe" d="M48 33c6-7 16-8 24-3 9-5 19-4 26 4 12 14 4 38-8 48-7 6-11-13-18-13s-10 19-18 13C43 72 36 47 48 33Z" />
+      <path className="dm2026-discovery-card__tooth-lumen" d="M54 35c5-5 13-6 20-2 7-4 14-3 20 2-6 6-17 9-26 8-6-1-10-4-14-8Z" />
+      <path className="dm2026-discovery-card__tooth-edge" d="M49 34c7-7 17-7 24-2 9-5 19-4 26 3" />
+      <path className="dm2026-discovery-card__tooth-core" d="M55 43c6 6 14 8 23 5 7-2 12-1 17 3" />
+      <path className="dm2026-discovery-card__tooth-core dm2026-discovery-card__tooth-core--soft" d="M58 58c8 4 17 5 28 2" />
+      <path className="dm2026-discovery-card__enamel-sweep" d="M44 60c20-14 43-19 69-12" />
+      <path className="dm2026-discovery-card__surface-sheen" d="M51 35c24 6 43 4 56-5" />
       <path className="dm2026-discovery-card__chrome-arc dm2026-discovery-card__chrome-arc--one" d="M28 42c8-17 24-28 45-30" />
       <path className="dm2026-discovery-card__chrome-arc dm2026-discovery-card__chrome-arc--two" d="M106 27c12 10 18 24 16 40" />
       <path className="dm2026-discovery-card__sparkle dm2026-discovery-card__sparkle--one" d="M113 22v12M107 28h12" />
@@ -126,12 +132,15 @@ function DentalScene() {
 function BeautyScene() {
   return (
     <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__scene-plate-svg dm2026-discovery-card__scene-plate-svg--beauty" d="M27 25c21-21 65-23 89 0 22 21 13 60-23 78-33 17-75-2-84-32-5-17 1-33 18-46Z" />
       <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--wide" d="M30 26c20-19 62-21 85 3 20 22 8 61-28 76-32 13-71-9-78-39-3-15 4-30 21-40Z" />
+      <path className="dm2026-discovery-card__skin-surface" d="M45 24c20-12 50-10 67 8 16 17 17 42 1 61-21 17-54 14-68-8-12-20-12-45 0-61Z" />
       <path className="dm2026-discovery-card__beauty-glow" d="M42 24c19-14 51-12 70 5 18 17 20 45 2 66" />
       <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--primary" d="M74 18c-22 11-33 31-29 50 3 17 16 27 35 31" />
       <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--secondary" d="M83 30c11 10 13 30-2 46-5 5-10 8-16 10" />
       <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--soft" d="M56 51c8 3 19 2 28-2" />
       <path className="dm2026-discovery-card__beauty-contour dm2026-discovery-card__beauty-contour--soft" d="M58 66c8 5 18 5 28 0" />
+      <path className="dm2026-discovery-card__beauty-ribbon" d="M31 72c19-23 45-33 79-30" />
       <path className="dm2026-discovery-card__serum-drop dm2026-discovery-card__serum-drop--float" d="M107 32c8 10 13 19 13 27a13 13 0 0 1-26 0c0-8 5-17 13-27Z" />
       <path className="dm2026-discovery-card__serum-highlight" d="M101 55c4 4 10 5 15 1" />
       <path className="dm2026-discovery-card__enamel-sweep dm2026-discovery-card__enamel-sweep--beauty" d="M43 36c28-14 58-12 86 7" />
@@ -144,12 +153,18 @@ function BeautyScene() {
 function OffersScene() {
   return (
     <svg className="dm2026-discovery-card__svg dm2026-discovery-card__svg--hero" viewBox="0 0 140 108" aria-hidden="true" focusable="false">
+      <path className="dm2026-discovery-card__scene-plate-svg dm2026-discovery-card__scene-plate-svg--gold" d="M24 35c20-28 68-34 96-10 25 21 19 59-8 79-30 23-78 14-95-17-10-19-8-39 7-52Z" />
       <path className="dm2026-discovery-card__aura dm2026-discovery-card__aura--gold dm2026-discovery-card__aura--wide" d="M25 35c19-26 66-32 93-9 23 20 17 57-8 78-28 23-77 13-93-17-10-19-7-39 8-52Z" />
       <path className="dm2026-discovery-card__jewel-shadow" d="M70 92 27 47l17-25h69l17 25Z" />
+      <path className="dm2026-discovery-card__jewel-back" d="M43 22h70l17 25-60 61-60-61Z" />
       <path className="dm2026-discovery-card__jewel dm2026-discovery-card__jewel--breathe" d="M43 22h70l17 25-60 61-60-61Z" />
+      <path className="dm2026-discovery-card__jewel-facet-fill dm2026-discovery-card__jewel-facet-fill--one" d="M43 22h27L58 47Z" />
+      <path className="dm2026-discovery-card__jewel-facet-fill dm2026-discovery-card__jewel-facet-fill--two" d="M70 22h43L84 47Z" />
+      <path className="dm2026-discovery-card__jewel-facet-fill dm2026-discovery-card__jewel-facet-fill--three" d="M58 47h26l-14 61Z" />
       <path className="dm2026-discovery-card__jewel-facet" d="M43 22 58 47 70 22 84 47 113 22M10 47h120M58 47l12 61 14-61M43 22 10 47M113 22l17 25" />
       <path className="dm2026-discovery-card__jewel-core" d="M58 47h26l-14 34Z" />
       <path className="dm2026-discovery-card__jewel-shine" d="M36 41c19-11 42-16 70-13" />
+      <path className="dm2026-discovery-card__surface-sheen dm2026-discovery-card__surface-sheen--gold" d="M48 27c22 10 45 9 67-2" />
       <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--one" d="M72 9v10M67 14h10" />
       <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--two" d="M119 29v10M114 34h10" />
       <path className="dm2026-discovery-card__jewel-ray dm2026-discovery-card__jewel-ray--three" d="M28 67v9M23.5 71.5h9" />
@@ -246,10 +261,14 @@ export function HomeDiscoveryCategories2026({ locale, country, dir }: HomeDiscov
                 <>
                   <span className="dm2026-discovery-card__scene" aria-hidden="true">
                     <span className="dm2026-discovery-card__scene-ambient" />
+                    <span className="dm2026-discovery-card__scene-glass-panel" />
+                    <span className="dm2026-discovery-card__scene-depth dm2026-discovery-card__scene-depth--back" />
                     <span className="dm2026-discovery-card__scene-halo" />
+                    <span className="dm2026-discovery-card__scene-depth dm2026-discovery-card__scene-depth--front" />
                     <span className="dm2026-discovery-card__scene-ribbon" />
                     <span className="dm2026-discovery-card__scene-floor" />
                     <span className="dm2026-discovery-card__scene-object">{sceneById[card.id]}</span>
+                    <span className="dm2026-discovery-card__scene-vignette" />
                   </span>
                   <span className="dm2026-discovery-card__copy">
                     <strong>{card.title[locale]}</strong>
