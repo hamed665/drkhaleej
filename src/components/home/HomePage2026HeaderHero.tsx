@@ -38,7 +38,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     search: {
       eyebrow: 'Search DrMuscat',
       title: 'Search doctors, clinics, services, offers and guides from one command center.',
-      description: 'Use the premium filters to explore by provider type, specialty, country, city, area and content type. This is public discovery, not live booking.',
+      description: 'Use premium filters to explore public discovery by provider type, specialty, city and area.',
       careNeedLabel: 'Care need, specialty or service',
       careNeedPlaceholder: 'Search doctors, clinics, services, offers or areas…',
       providerTypeLabel: 'Provider type',
@@ -110,7 +110,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     search: {
       eyebrow: 'ابحث في DrMuscat',
       title: 'ابحث عن الأطباء والعيادات والخدمات والعروض والأدلة من مركز واحد.',
-      description: 'استخدم المرشحات المميزة للاستكشاف حسب نوع المقدّم والتخصص والدولة والمدينة والمنطقة ونوع المحتوى. هذه تجربة اكتشاف عام وليست حجزاً مباشراً.',
+      description: 'استخدم المرشحات لاستكشاف الخيارات العامة حسب نوع المقدم والتخصص والمدينة والمنطقة.',
       careNeedLabel: 'احتياج الرعاية أو التخصص أو الخدمة',
       careNeedPlaceholder: 'ابحث عن طبيب، عيادة، خدمة، عرض أو منطقة…',
       providerTypeLabel: 'نوع مقدّم الخدمة',

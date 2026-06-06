@@ -248,3 +248,49 @@ No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, 
 ### Forbidden areas untouched
 
 No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page, lower homepage section file or search logic file was changed in FIX09.
+
+## 18. FIX10 — Unified smart search card layout
+
+### Problem fixed
+
+- The approved smart search card visually read as split/two-column because the intro, command input, chips and location filters did not feel like one unified command center.
+- Arabic felt busier because the intro and controls had too much competing horizontal structure.
+
+### Unified vertical command-center layout
+
+- The search card now uses a single vertical flow: compact badge/title/subtitle, full-width command input, content chips, provider chips, location row, popular suggestions and actions.
+- The main input remains the strongest element inside the card and is not squeezed beside intro text.
+- Suggestions are kept as a compact unified row/rail with the existing More behavior.
+
+### Smart search behavior preserved
+
+- `HomeSearch2026` search state, autocomplete, one-character matching, Arabic normalization, suggestion grouping, hover/focus preview, click-to-fill behavior, popular More handling and city/area dependency were not changed.
+
+### City/area dependency preserved
+
+- Country, city and area controls remain dependent and UI-only.
+- Muscat, Sohar, Salalah, Seeb and Bawshar city-specific area behavior remains unchanged.
+- Limited-data cities still fall back to `City-wide discovery` / `اكتشاف على مستوى المدينة`.
+
+### Arabic/RTL status
+
+- Arabic search intro uses the same vertical structure and avoids the previous split layout.
+- Arabic title/subtitle remain compact and line-height-aware.
+- Arabic autocomplete and chips remain RTL-safe.
+
+### Validation results
+
+- `git status --short` — run during FIX10.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML checks for `/en/om` and `/ar/om` confirmed the search card renders, deferred lower-section markers remain absent and approved smart-search source markers remain present.
+
+### Forbidden files untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page, lower homepage section file or search logic was changed in FIX10.
+
+### Remaining deferred sections
+
+Ads / Featured Board, Care Stories, Categories, Areas, Featured Doctors, Featured Centers, Offers, Articles, Provider CTA and Footer redesign remain deferred.
