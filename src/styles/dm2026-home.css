@@ -1207,3 +1207,162 @@
     font-size: 0.98rem;
   }
 }
+
+/* PR #157-FIX12: mobile language + hamburger safety. */
+.site-header .dm2026-site-header__menu-button {
+  display: none;
+}
+
+.dm2026-site-header__mobile-menu {
+  inline-size: min(calc(100vw - 1.5rem), 24rem);
+  max-block-size: min(78vh, 34rem);
+  overflow: auto;
+  border: 1px solid rgba(14, 110, 100, 0.16);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(280px circle at 10% 0%, rgba(42, 161, 146, 0.12), transparent 48%),
+    rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 70px rgba(11, 40, 38, 0.2);
+  color: var(--dm-teal-950, #07302c);
+  inset: 5rem auto auto 50%;
+  padding: 0;
+  transform: translateX(-50%);
+}
+
+.dm2026-site-header__mobile-menu:not(:popover-open) {
+  display: none;
+}
+
+.dm2026-site-header__mobile-menu::backdrop {
+  background: rgba(7, 48, 44, 0.18);
+}
+
+.dm2026-site-header__mobile-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-block-end: 1px solid rgba(14, 110, 100, 0.1);
+  padding: 0.85rem;
+}
+
+.dm2026-site-header__mobile-menu-head button {
+  inline-size: 2.45rem;
+  block-size: 2.45rem;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(14, 110, 100, 0.14);
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(239, 246, 244, 0.9);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.dm2026-site-header__mobile-menu nav {
+  padding: 0.65rem;
+}
+
+.dm2026-site-header__mobile-menu ul {
+  display: grid;
+  gap: 0.32rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dm2026-site-header__mobile-menu a,
+.dm2026-site-header__mobile-menu nav span {
+  min-block-size: 2.8rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(14, 110, 100, 0.09);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--dm-ink-700, #2e3a3b);
+  font-size: 0.92rem;
+  font-weight: 760;
+  padding: 0.72rem 0.85rem;
+  text-decoration: none;
+}
+
+.dm2026-site-header__mobile-menu a:hover,
+.dm2026-site-header__mobile-menu a:focus-visible {
+  border-color: rgba(14, 110, 100, 0.24);
+  background: rgba(239, 246, 244, 0.92);
+  color: var(--dm-color-brand-strong, #0b6f63);
+}
+
+.dm2026-site-header__mobile-menu nav span[aria-disabled='true'] {
+  border-style: dashed;
+  color: var(--dm-color-text-muted, #66736f);
+}
+
+@media (max-width: 48rem) {
+  .site-header.dm2026-site-header {
+    inset-block-start: 0.5rem;
+    inline-size: min(100% - 0.75rem, 30rem);
+    border-radius: 1.35rem;
+  }
+
+  .site-header .dm2026-site-header__inner {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-auto-flow: column;
+    align-items: center;
+    overflow: visible;
+    padding: 0.44rem 0.54rem;
+  }
+
+  .site-header .dm2026-site-header__nav {
+    display: none;
+  }
+
+  .site-header .dm2026-site-header__actions {
+    inline-size: auto;
+    justify-content: end;
+    overflow: visible;
+  }
+
+  .site-header .dm2026-site-header__provider,
+  .site-header .dm2026-site-header__account {
+    display: none;
+  }
+
+  .site-header .dm2026-site-header__locale-switch {
+    min-block-size: 2.35rem;
+    padding-inline: 0.72rem;
+  }
+
+  .site-header .dm2026-site-header__menu-button {
+    inline-size: 2.45rem;
+    block-size: 2.45rem;
+    display: inline-grid;
+    place-items: center;
+    gap: 0.18rem;
+    border: 1px solid rgba(14, 110, 100, 0.14);
+    border-radius: var(--dm-radius-pill, 999px);
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--dm-color-brand-strong, #0b6f63);
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(11, 40, 38, 0.08);
+  }
+
+  .site-header .dm2026-site-header__menu-button span {
+    inline-size: 1rem;
+    block-size: 2px;
+    border-radius: var(--dm-radius-pill, 999px);
+    background: currentColor;
+  }
+}
+
+@media (max-width: 27rem) {
+  .site-header .dm2026-site-header__locale-switch {
+    padding-inline: 0.58rem;
+  }
+
+  .dm2026-site-header__mobile-menu {
+    inline-size: calc(100vw - 1rem);
+  }
+}

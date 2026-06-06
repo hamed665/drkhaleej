@@ -350,3 +350,41 @@ Ads / Featured Board, Care Stories, Categories, Areas, Featured Doctors, Feature
 ### Merge-readiness recommendation
 
 PR #157 is recommended to remain scoped as `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; future visual/product work should continue in `UI-K-HOME-2026-B — Featured Provider Board / Ads Board` or a dedicated header polish PR if a production logo asset is approved.
+
+## 20. FIX12 — Language switch, mobile hamburger header and responsive safety
+
+### Language switch status
+
+- The header keeps the existing locale/country route structure and does not add new locales or routes.
+- `/en/om` renders the language switch as `العربية` and points to `/ar/om`.
+- `/ar/om` renders the language switch as `English` and points to `/en/om`.
+
+### Mobile hamburger header status
+
+- Narrow viewport header now shows the compact brand, the language switch and a real hamburger `<button>` instead of exposing the full desktop nav inline.
+- The hamburger uses native popover behavior for a lightweight mobile menu, with no external library and no new dependency.
+- The mobile menu contains the existing desktop destinations plus preview-safe pending/account items, reusing the same approved route helpers and disabled states.
+- Desktop/laptop navigation remains visible and unchanged in behavior.
+
+### Responsive safety status
+
+- Mobile header CSS hides desktop nav links inline to prevent crowding and clipping.
+- The mobile menu is constrained to the viewport, scrolls internally when needed and uses premium glass styling consistent with the top shell.
+- Search component logic and approved search layout were not changed.
+
+### Navigation translation deferred note
+
+Full header navigation/i18n refinement remains deferred to a future header/navigation polish PR. FIX12 only guarantees the language-switch label/href correctness and mobile header safety required for PR #157.
+
+### Validation results
+
+- `git status --short` — run during FIX12 and showed only scoped header/CSS/report changes before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed after adding native popover attributes.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML/source checks passed for `/en/om`, `/ar/om`, language switch labels/hrefs, mobile menu markers, deferred lower-section absence and approved smart-search markers.
+
+### Merge-readiness recommendation
+
+PR #157 remains recommended as `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`. Lower homepage sections, footer redesign, full navigation/i18n polish and production logo work remain future PRs.

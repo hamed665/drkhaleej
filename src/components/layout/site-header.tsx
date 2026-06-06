@@ -25,6 +25,8 @@ const navCopy: Record<
     comingSoon: string;
     switchLabel: string;
     brandLabel: string;
+    menuLabel: string;
+    closeMenu: string;
   }
 > = {
   en: {
@@ -44,7 +46,9 @@ const navCopy: Record<
     createAccount: 'Create account',
     comingSoon: 'coming soon',
     switchLabel: 'Switch language to Arabic',
-    brandLabel: 'DrMuscat home'
+    brandLabel: 'DrMuscat home',
+    menuLabel: 'Open navigation',
+    closeMenu: 'Close navigation'
   },
   ar: {
     ariaLabel: 'التنقل العام الرئيسي',
@@ -63,7 +67,9 @@ const navCopy: Record<
     createAccount: 'إنشاء حساب',
     comingSoon: 'قريباً',
     switchLabel: 'تبديل اللغة إلى الإنجليزية',
-    brandLabel: 'الرئيسية DrMuscat'
+    brandLabel: 'الرئيسية DrMuscat',
+    menuLabel: 'فتح القائمة',
+    closeMenu: 'إغلاق القائمة'
   }
 };
 
@@ -75,6 +81,7 @@ export async function SiteHeader() {
   const homeHref = homeRoute(safeLocale, 'om');
   const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
   const providerHref = publicProviderRoute(safeLocale, 'om');
+  const mobileMenuId = `dm2026-mobile-menu-${safeLocale}`;
   const linkedNavItems = [
     { href: homeHref, label: copy.home },
     { href: publicDiscoveryRoute(safeLocale, 'om', 'doctors'), label: copy.doctors },
@@ -121,7 +128,50 @@ export async function SiteHeader() {
             <span>{safeLocale === 'en' ? 'العربية' : 'English'}</span>
           </Link>
         </div>
+        <button
+          type="button"
+          className="dm2026-site-header__menu-button"
+          popoverTarget={mobileMenuId}
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-label={copy.menuLabel}
+        >
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+        </button>
       </Container>
+      <div id={mobileMenuId} className="dm2026-site-header__mobile-menu" popover="auto" dir={dir}>
+        <div className="dm2026-site-header__mobile-menu-head">
+          <Logo />
+          <button type="button" popoverTarget={mobileMenuId} popoverTargetAction="hide" aria-label={copy.closeMenu}>
+            ×
+          </button>
+        </div>
+        <nav aria-label={copy.ariaLabel}>
+          <ul>
+            {linkedNavItems.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href}>{item.label}</Link>
+              </li>
+            ))}
+            {pendingNavItems.map((item) => (
+              <li key={item}>
+                <span aria-disabled="true" title={copy.comingSoon}>{item}</span>
+              </li>
+            ))}
+            <li>
+              <Link href={providerHref}>{copy.forProviders}</Link>
+            </li>
+            <li>
+              <span aria-disabled="true" title={copy.comingSoon}>{copy.signIn}</span>
+            </li>
+            <li>
+              <span aria-disabled="true" title={copy.comingSoon}>{copy.createAccount}</span>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 }
