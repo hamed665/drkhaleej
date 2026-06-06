@@ -142,7 +142,13 @@ export async function SiteHeader() {
           <span className="dm2026-site-header__account dm2026-site-header__account--primary" aria-disabled="true" title={copy.comingSoon}>
             {copy.createAccount}
           </span>
-          <Link href={switchHref} className="site-header__locale-switch dm2026-site-header__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'} aria-label={copy.switchLabel}>
+          <Link
+            href={switchHref}
+            className="site-header__locale-switch dm2026-site-header__locale-switch"
+            hrefLang={safeLocale === 'en' ? 'ar' : 'en'}
+            aria-label={copy.switchLabel}
+            data-dm2026-locale-switch
+          >
             <span>{safeLocale === 'en' ? 'العربية' : 'English'}</span>
           </Link>
         </div>
@@ -154,12 +160,14 @@ export async function SiteHeader() {
           aria-expanded="false"
           aria-label={copy.menuLabel}
         >
-          <span aria-hidden="true" />
-          <span aria-hidden="true" />
-          <span aria-hidden="true" />
+          <span className="dm2026-hamburger-icon" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
       </Container>
-      <div id={mobileMenuId} className="dm2026-site-header__mobile-menu" popover="auto" dir={dir}>
+      <div id={mobileMenuId} className="dm2026-site-header__mobile-menu" popover="auto" dir={dir} data-dm2026-mobile-menu>
         <div className="dm2026-site-header__mobile-menu-head">
           <Logo />
           <button type="button" popoverTarget={mobileMenuId} popoverTargetAction="hide" aria-label={copy.closeMenu}>
@@ -170,26 +178,57 @@ export async function SiteHeader() {
           <ul>
             {linkedNavItems.map((item) => (
               <li key={item.href}>
-                <Link href={item.href}>{item.label}</Link>
+                <Link href={item.href} data-dm2026-mobile-menu-close>{item.label}</Link>
               </li>
             ))}
             {pendingNavItems.map((item) => (
               <li key={item}>
-                <span aria-disabled="true" title={copy.comingSoon}>{item}</span>
+                <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>{item}</span>
               </li>
             ))}
             <li>
-              <Link href={providerHref}>{copy.forProviders}</Link>
+              <Link href={providerHref} data-dm2026-mobile-menu-close>{copy.forProviders}</Link>
             </li>
             <li>
-              <span aria-disabled="true" title={copy.comingSoon}>{copy.signIn}</span>
+              <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>{copy.signIn}</span>
             </li>
             <li>
-              <span aria-disabled="true" title={copy.comingSoon}>{copy.createAccount}</span>
+              <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>{copy.createAccount}</span>
             </li>
           </ul>
         </nav>
       </div>
+
+      <script
+        id="dm2026-site-header-mobile-fixes"
+        dangerouslySetInnerHTML={{
+          __html: `(() => {
+  const getLocale = () => window.location.pathname.startsWith('/ar/') || window.location.pathname === '/ar' ? 'ar' : 'en';
+  const syncLanguageSwitch = () => {
+    const locale = getLocale();
+    document.querySelectorAll('[data-dm2026-locale-switch]').forEach((link) => {
+      const label = locale === 'ar' ? 'English' : 'العربية';
+      const href = locale === 'ar' ? '/en/om' : '/ar/om';
+      link.setAttribute('href', href);
+      link.setAttribute('hreflang', locale === 'ar' ? 'en' : 'ar');
+      link.setAttribute('aria-label', locale === 'ar' ? 'Switch language to English' : 'Switch language to Arabic');
+      const labelNode = link.querySelector('span') ?? link;
+      labelNode.textContent = label;
+    });
+  };
+  const closeMenu = (target) => {
+    if (!(target instanceof Element)) return;
+    const trigger = target.closest('[data-dm2026-mobile-menu-close]');
+    if (!trigger) return;
+    const menu = target.closest('[data-dm2026-mobile-menu]');
+    if (menu && typeof menu.hidePopover === 'function') menu.hidePopover();
+  };
+  syncLanguageSwitch();
+  window.addEventListener('pageshow', syncLanguageSwitch);
+  document.addEventListener('click', (event) => closeMenu(event.target));
+})();`
+        }}
+      />
     </header>
   );
 }

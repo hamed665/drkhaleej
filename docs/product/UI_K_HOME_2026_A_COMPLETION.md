@@ -416,3 +416,46 @@ PR #157 remains recommended as `UI-K-HOME-2026-A — Premium Homepage Top Shell 
 ### Merge-readiness note
 
 PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; full navigation translation, production logo work and lower homepage sections remain future PRs.
+
+## 22. FIX14 — Hard mobile menu close, hamburger icon and Arabic switch fix
+
+### Arabic language switch fixed
+
+- Kept the server-side `SiteHeader` locale resolution and added a tiny header-scoped browser sync as a hard fallback so `/ar/om` visibly resolves the language switch to `English` with `/en/om` as the target.
+- `/en/om` continues to show `العربية` with `/ar/om` as the target.
+- No new locale, route, route helper or i18n config was added.
+
+### Mobile menu closes after nav click
+
+- Mobile menu links and preview-safe menu items now carry a close marker.
+- A small delegated header script calls the native popover `hidePopover()` when a marked mobile menu item is clicked, while preserving the link href navigation.
+- Desktop navigation behavior is unchanged.
+
+### Hamburger icon compacted
+
+- The hamburger button now uses an explicit `dm2026-hamburger-icon` wrapper with three centered strokes.
+- Stroke width, height and gap are constrained to compact premium dimensions and use the DrMuscat dark teal color.
+- No external icon, SVG asset, dependency or image was added.
+
+### Validation results
+
+- `git status --short` — run during FIX14 and showed only scoped header/CSS/report changes before commit.
+- `pnpm lint` — passed with existing repository warnings and no errors.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+- Built-page HTML/source checks passed for `/en/om`, `/ar/om`, exact language switch labels/hrefs, mobile close markers, hamburger icon markers, deferred lower-section absence and unchanged smart-search markers.
+
+### Manual QA results
+
+- `/en/om` and `/ar/om` desktop/mobile language switch labels and hrefs were checked through built-page HTML/source validation.
+- Mobile menu close behavior is implemented through the native popover close script and marked mobile menu items.
+- Smart Search source markers remained unchanged.
+
+### Forbidden files untouched
+
+No database, Supabase, RLS, API, auth, payment, sitemap, robots, llms, package, lockfile, route helper, i18n config, route-check, migration, footer, route page, lower homepage section file or search logic was changed in FIX14.
+
+### Merge-readiness note
+
+PR #157 remains scoped to `UI-K-HOME-2026-A — Premium Homepage Top Shell + Smart Search`; remaining navigation/i18n polish and lower homepage sections should proceed in future PRs.

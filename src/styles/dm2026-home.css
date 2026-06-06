@@ -1380,3 +1380,30 @@
     background: var(--dm-teal-950, #07302c);
   }
 }
+
+/* PR #157-FIX14: hard compact hamburger icon dimensions. */
+@media (max-width: 48rem) {
+  .site-header .dm2026-site-header__menu-button {
+    gap: 0;
+  }
+
+  .site-header .dm2026-site-header__menu-button .dm2026-hamburger-icon {
+    inline-size: 22px;
+    block-size: 18px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .site-header .dm2026-site-header__menu-button .dm2026-hamburger-icon span {
+    inline-size: 21px;
+    block-size: 2px;
+    display: block;
+    border-radius: 999px;
+    background: var(--dm-teal-950, #07302c);
+  }
+}
