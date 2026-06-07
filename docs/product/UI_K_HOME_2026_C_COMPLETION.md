@@ -248,3 +248,44 @@ Results after command execution:
 - `pnpm typecheck`: passed.
 - `pnpm build`: passed.
 - Additional guardrail checks: `pnpm routes:check`, `git diff --check`, and localized HTML smoke checks also passed.
+
+## 19. Final embossed icon-surface redesign
+
+This pass replaces the previous weak icon direction rather than slightly tweaking it. The existing card grid, card sizes, titles, descriptions, Explore actions, route-safe behavior, homepage section architecture, and approved typography remain unchanged.
+
+### Card-by-card changes
+
+- Dental was fully redesigned into a more elegant sculpted tooth form with a stronger premium silhouette, recessed contour grooves, and icon-level relief shadow.
+- Beauty & Aesthetics was fully redesigned into a clearer face-based aesthetic mark with a calm facial silhouette, refined contour grooves, and a restrained droplet form.
+- Doctors was replaced with a stronger doctor-care emblem using a shield-like medical form, raised cross, and pulse mark so it no longer resembles an unclear body/organ shape.
+- Special Offers keeps the diamond/luxury direction but now uses the final emboss classes for a cleaner raised gemstone surface without glitter or cheap shine.
+- Labs keeps the lab identity while refining the vessel, liquid surface, molecule mark, and raised icon relief.
+- Pet Clinic keeps the pet-health identity while refining the paw/cross geometry and icon-level raised surface.
+- Hospitals keeps the hospital direction while refining the facility geometry and embossed authority mark.
+
+### White shine/streak removal
+
+- The previous visual-plate diagonal shine pseudo-element is disabled.
+- No diagonal white stripe, gloss streak, or fake plastic shine line remains in the active icon surface treatment.
+- Highlights now come from sculpted shadows and controlled embossed strokes rather than a sweeping white line.
+
+### Scope confirmations
+
+- Layout, card content, buttons, routes, fonts, backend, database, SEO, Supabase, RLS, migrations, packages, Header, Smart Search, and Featured Board were not changed.
+
+### Validation results
+
+Validation commands for this refinement:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed icon-surface refinement files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- Additional guardrail checks: `pnpm routes:check`, `git diff --check`, and localized HTML smoke checks also passed.

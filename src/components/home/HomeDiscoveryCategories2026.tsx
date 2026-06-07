@@ -108,72 +108,67 @@ function EmbossedSymbol({ id }: { id: DiscoveryCardTone }) {
     <svg className="dm2026-discovery-card__embossed-svg" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
       {id === 'dental' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M31 24c6.5-8 15.5-9 23-4.5C61.5 15 70.5 16 77 24c12 15 4.5 39-8 50-8 7-12-13-21-13S35 81 27 74c-12.5-11-8-35 4-50Z" />
-          <path className="dm2026-discovery-card__relief-fill dm2026-discovery-card__relief-fill--hero" d="M31 22c6.5-8 15.5-9 23-4.5C61.5 13 70.5 14 77 22c12 15 4.5 39-8 50-8 7-12-13-21-13S35 79 27 72c-12.5-11-8-35 4-50Z" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M36 27c5-4.5 12-5 18-1.5 6-3.5 13-3 18 1.5" />
-          <path className="dm2026-discovery-card__relief-line dm2026-discovery-card__relief-line--soft" d="M38 42c9 5 20 5 30 0M39 53c8 4 18 5 28 1" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M30 23c7-8 16-9 24-4.5C62 14 71 15 78 23c12 15 5 39-8 51-8 8-13-12-22-12S34 82 26 74c-13-12-8-36 4-51Z" />
+          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M30 20c7-8 16-9 24-4.5C62 11 71 12 78 20c12 15 5 39-8 51-8 8-13-12-22-12S34 79 26 71c-13-12-8-36 4-51Z" />
+          <path className="dm2026-discovery-card__emboss-groove" d="M36 27c5-5 12-6 18-2.5 6-3.5 13-2.5 18 2.5" />
+          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--fine" d="M39 42c8 4 18 5 28 0M42 56c5 2 9 2 12 0" />
         </>
       ) : null}
 
       {id === 'beauty' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M53 16c-15 5-25 18-26 34-1 17 9 30 27 36 15-5 25-17 28-33 2-15-5-29-20-36" />
-          <path className="dm2026-discovery-card__relief-fill dm2026-discovery-card__relief-fill--hero" d="M53 14c-15 5-25 18-26 34-1 17 9 30 27 36 15-5 25-17 28-33 2-15-5-29-20-36" />
-          <path className="dm2026-discovery-card__relief-line dm2026-discovery-card__relief-line--face" d="M56 23c-9 8-13 18-11 30 2 12 10 20 24 24" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M59 35c7 6 8 16 0 25M49 48c6 2 13 1 19-2M51 62c6 3 13 3 20-1" />
-          <path className="dm2026-discovery-card__relief-accent dm2026-discovery-card__relief-accent--drop" d="M75 28c5.5 7 8.5 12 8.5 17.5a8.5 8.5 0 0 1-17 0c0-5.5 3-10.5 8.5-17.5Z" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M52 14c-17 5-28 20-28 38 0 18 12 30 31 36 17-7 27-22 28-39 1-17-10-30-31-35Z" />
+          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M52 11c-17 5-28 20-28 38 0 18 12 30 31 36 17-7 27-22 28-39 1-17-10-30-31-35Z" />
+          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--face" d="M57 21c-10 8-15 20-13 33 2 13 11 22 26 26" />
+          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--fine" d="M51 47c6 2 12 1 18-2M52 62c6 3 13 3 20-1" />
+          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--drop" d="M75 28c5.5 7 8.5 12.5 8.5 18a8.5 8.5 0 0 1-17 0c0-5.5 3-11 8.5-18Z" />
         </>
       ) : null}
 
       {id === 'offers' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M28 26h40l12 16-32 34-32-34Z" />
-          <path className="dm2026-discovery-card__relief-fill dm2026-discovery-card__relief-fill--hero" d="M28 24h40l12 16-32 34-32-34Z" />
-          <path className="dm2026-discovery-card__relief-line" d="M28 24 38 40 48 24 58 40 68 24M16 40h64M38 40l10 34 10-34" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M33 31c10 4 20 4 31 0" />
-          <path className="dm2026-discovery-card__relief-accent" d="M73 21v8M69 25h8" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M28 25h40l12 16-32 35-32-35Z" />
+          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M28 22h40l12 16-32 35-32-35Z" />
+          <path className="dm2026-discovery-card__emboss-groove" d="M28 22 38 38 48 22 58 38 68 22M16 38h64M38 38l10 35 10-35" />
+          <path className="dm2026-discovery-card__emboss-mark" d="M74 20v8M70 24h8" />
         </>
       ) : null}
 
       {id === 'doctors' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M28 24v21c0 13 19 13 19 0V24M47 45c1 18 26 22 35 7" />
-          <path className="dm2026-discovery-card__relief-line dm2026-discovery-card__relief-line--stethoscope" d="M28 22v21c0 13 19 13 19 0V22M47 43c1 18 26 22 35 7" />
-          <circle className="dm2026-discovery-card__relief-fill" cx="82" cy="48" r="6" />
-          <path className="dm2026-discovery-card__relief-accent" d="M21 70h16l5-10 7 18 7-12h22" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M23 29h10M42 29h10M74 48h16" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M48 15c16 6 27 15 27 31 0 17-11 30-27 37-16-7-27-20-27-37 0-16 11-25 27-31Z" />
+          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M48 12c16 6 27 15 27 31 0 17-11 30-27 37-16-7-27-20-27-37 0-16 11-25 27-31Z" />
+          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--medical" d="M48 27v22M37 38h22" />
+          <path className="dm2026-discovery-card__emboss-mark" d="M24 63h14l5-9 7 17 7-12h16" />
         </>
       ) : null}
 
       {id === 'labs' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M35 22h26M43 22v28L31 72c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 50V22" />
-          <path className="dm2026-discovery-card__relief-line" d="M35 20h26M43 20v28L31 70c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 48V20" />
-          <path className="dm2026-discovery-card__relief-fill" d="M36 64c8 4 19-3 30 2l3 8H33Z" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M42 32h17M39 70c8 3 18 2 27 0" />
-          <path className="dm2026-discovery-card__relief-accent" d="M73 27a3 3 0 1 0 0 .1M81 40a4 4 0 1 0 0 .1M75 30l5 8" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M36 21h25M43 21v28L31 71c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 49V21" />
+          <path className="dm2026-discovery-card__emboss-groove" d="M36 18h25M43 18v28L31 68c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 46V18" />
+          <path className="dm2026-discovery-card__emboss-form" d="M36 63c8 4 19-3 30 2l3 8H33Z" />
+          <path className="dm2026-discovery-card__emboss-mark" d="M73 27a3 3 0 1 0 0 .1M81 40a4 4 0 1 0 0 .1M75 30l5 8" />
         </>
       ) : null}
 
       {id === 'pet' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M35 58c3-9 17-9 20 0 3 8-3 15-10 15S32 66 35 58Z" />
-          <path className="dm2026-discovery-card__relief-fill" d="M35 56c3-9 17-9 20 0 3 8-3 15-10 15S32 64 35 56Z" />
-          <circle className="dm2026-discovery-card__relief-dot" cx="33" cy="41" r="5" />
-          <circle className="dm2026-discovery-card__relief-dot" cx="46" cy="34" r="5" />
-          <circle className="dm2026-discovery-card__relief-dot" cx="59" cy="41" r="5" />
-          <path className="dm2026-discovery-card__relief-accent" d="M73 33v19M64 42.5h18" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M38 57c5-4 10-4 15 0" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M35 58c3-9 17-9 20 0 3 8-3 15-10 15S32 66 35 58Z" />
+          <path className="dm2026-discovery-card__emboss-form" d="M35 55c3-9 17-9 20 0 3 8-3 15-10 15S32 63 35 55Z" />
+          <circle className="dm2026-discovery-card__emboss-dot" cx="33" cy="40" r="5" />
+          <circle className="dm2026-discovery-card__emboss-dot" cx="46" cy="33" r="5" />
+          <circle className="dm2026-discovery-card__emboss-dot" cx="59" cy="40" r="5" />
+          <path className="dm2026-discovery-card__emboss-mark" d="M73 32v19M64 41.5h18" />
         </>
       ) : null}
 
       {id === 'hospitals' ? (
         <>
-          <path className="dm2026-discovery-card__relief-shadow" d="M28 78V34h40v44M39 78V55h18v23M48 42v17M40 50.5h16M35 34V24h26v10" />
-          <path className="dm2026-discovery-card__relief-line" d="M28 76V32h40v44M39 76V53h18v23M48 40v17M40 48.5h16M35 32V22h26v10" />
-          <path className="dm2026-discovery-card__relief-fill" d="M31 76h34" />
-          <path className="dm2026-discovery-card__relief-accent" d="M25 26c7-7 16-10 28-9 10 1 18 6 23 13" />
-          <path className="dm2026-discovery-card__relief-highlight" d="M35 40h26M35 66h10M58 66h10" />
+          <path className="dm2026-discovery-card__emboss-shadow" d="M28 78V33h40v45M39 78V54h18v24M48 41v17M40 49.5h16M35 33V23h26v10" />
+          <path className="dm2026-discovery-card__emboss-groove" d="M28 75V30h40v45M39 75V51h18v24M48 38v17M40 46.5h16M35 30V20h26v10" />
+          <path className="dm2026-discovery-card__emboss-form" d="M31 75h34" />
+          <path className="dm2026-discovery-card__emboss-mark" d="M25 25c7-7 16-10 28-9 10 1 18 6 23 13" />
         </>
       ) : null}
     </svg>
