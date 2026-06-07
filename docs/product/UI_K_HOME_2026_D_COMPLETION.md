@@ -126,3 +126,56 @@ Validation completed after implementation:
 ## 16. Next PR recommendation
 
 UI-K-HOME-2026-E — List Your Center Request Page / Form UI
+
+---
+
+## FIX01 — Final Typography, CTA and Profile Preview Polish
+
+### Scope
+
+FIX01 applied targeted final polish only to the existing Provider CTA section. The section was not rebuilt, the homepage layout structure was not changed, and the Header, Smart Search, Featured Provider Board, and Discovery Categories sections remain untouched.
+
+### Typography consistency polish
+
+- Reduced the Provider CTA heading scale to better align with the approved DrMuscat homepage typography behavior.
+- Kept all typography inheriting from the existing site system.
+- Added no fonts, no font imports, no fallback font stack changes, and no global typography changes.
+- Removed negative Arabic heading letter-spacing and kept Arabic line-height more formal and readable.
+
+### Primary CTA polish
+
+- Strengthened the primary CTA surface, border, and shadow so “List your center” / “أدرج مركزك” reads clearly as the primary action.
+- Kept the secondary CTA quieter and supportive.
+- Preserved the existing CTA text and existing approved provider route behavior.
+
+### Profile preview readability polish
+
+- Increased readability of the profile preview action labels.
+- Made the Special Offer stamp clearer while keeping it calm and champagne-accented.
+- Improved rating preview contrast and readability while preserving sample/preview-safe wording.
+- Kept the media/photo preview CSS-only with no real provider images or assets.
+
+### Premium color/life polish
+
+- Added subtle DrMuscat teal and warm champagne richness using existing palette behavior only.
+- Avoided loud gradients, noisy colors, ad-like treatment, or new visual language.
+
+### Responsive polish
+
+- Refined mobile heading size and Arabic line-height to prevent the heading from dominating small screens.
+- Preserved full-width mobile CTAs and single-column stacking.
+- Kept the profile preview readable on smaller screens without introducing horizontal overflow.
+
+### FIX01 validation results
+
+- PASS — `git status --short` showed only allowed FIX01 files changed.
+- PASS with pre-existing warnings only — `pnpm lint`.
+- PASS — `pnpm typecheck`.
+- PASS — `pnpm build`.
+- PASS — `pnpm routes:check`.
+- PASS — `/en/om` and `/ar/om` server-rendered smoke checks confirmed localized CTA content remains present.
+- WARNING — screenshot tooling was unavailable in this environment (`chromium`, `google-chrome`, `playwright`, and `wkhtmltoimage` were not installed).
+
+### Merge readiness recommendation
+
+After validation passes, PR #160 is recommended for merge as the final homepage Provider CTA section baseline. The next product step remains: UI-K-HOME-2026-E — List Your Center Request Page / Form UI.
