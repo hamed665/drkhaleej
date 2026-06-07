@@ -108,67 +108,68 @@ function EmbossedSymbol({ id }: { id: DiscoveryCardTone }) {
     <svg className="dm2026-discovery-card__embossed-svg" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
       {id === 'dental' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M30 23c7-8 16-9 24-4.5C62 14 71 15 78 23c12 15 5 39-8 51-8 8-13-12-22-12S34 82 26 74c-13-12-8-36 4-51Z" />
-          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M30 20c7-8 16-9 24-4.5C62 11 71 12 78 20c12 15 5 39-8 51-8 8-13-12-22-12S34 79 26 71c-13-12-8-36 4-51Z" />
-          <path className="dm2026-discovery-card__emboss-groove" d="M36 27c5-5 12-6 18-2.5 6-3.5 13-2.5 18 2.5" />
-          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--fine" d="M39 42c8 4 18 5 28 0M42 56c5 2 9 2 12 0" />
+          <path className="dm2026-symbol__cast" d="M29 20c7-8 17-9 25-4 8-5 18-4 25 4 12 14 6 38-8 52-9 9-14-13-23-13S34 81 25 72C11 58 17 34 29 20Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero" d="M29 17c7-8 17-9 25-4 8-5 18-4 25 4 12 14 6 38-8 52-9 9-14-13-23-13S34 78 25 69C11 55 17 31 29 17Z" />
+          <path className="dm2026-symbol__ridge" d="M35 26c6-6 13-7 19-3 6-4 14-3 20 3" />
+          <path className="dm2026-symbol__carve" d="M40 41c8 5 18 5 28 0M42 52c6 3 13 3 20 0" />
         </>
       ) : null}
 
       {id === 'beauty' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M52 14c-17 5-28 20-28 38 0 18 12 30 31 36 17-7 27-22 28-39 1-17-10-30-31-35Z" />
-          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M52 11c-17 5-28 20-28 38 0 18 12 30 31 36 17-7 27-22 28-39 1-17-10-30-31-35Z" />
-          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--face" d="M57 21c-10 8-15 20-13 33 2 13 11 22 26 26" />
-          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--fine" d="M51 47c6 2 12 1 18-2M52 62c6 3 13 3 20-1" />
-          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--drop" d="M75 28c5.5 7 8.5 12.5 8.5 18a8.5 8.5 0 0 1-17 0c0-5.5 3-11 8.5-18Z" />
+          <path className="dm2026-symbol__cast" d="M49 12c-18 6-28 21-28 39 0 18 12 30 32 36 18-7 28-22 30-40 1-17-11-30-34-35Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero" d="M49 9c-18 6-28 21-28 39 0 18 12 30 32 36 18-7 28-22 30-40 1-17-11-30-34-35Z" />
+          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--face" d="M57 19c-10 8-16 21-14 34 2 14 12 23 28 27" />
+          <path className="dm2026-symbol__carve" d="M50 45c7 2 14 1 20-2M52 60c6 3 14 3 22-1" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--small" d="M76 28c6 8 9 13 9 19a9 9 0 0 1-18 0c0-6 3-11 9-19Z" />
         </>
       ) : null}
 
       {id === 'offers' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M28 25h40l12 16-32 35-32-35Z" />
-          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M28 22h40l12 16-32 35-32-35Z" />
-          <path className="dm2026-discovery-card__emboss-groove" d="M28 22 38 38 48 22 58 38 68 22M16 38h64M38 38l10 35 10-35" />
-          <path className="dm2026-discovery-card__emboss-mark" d="M74 20v8M70 24h8" />
+          <path className="dm2026-symbol__cast" d="M28 24h40l13 17-33 36-33-36Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero" d="M28 21h40l13 17-33 36-33-36Z" />
+          <path className="dm2026-symbol__ridge" d="M28 21 38 38 48 21 58 38 68 21M15 38h66M38 38l10 36 10-36" />
+          <path className="dm2026-symbol__mark" d="M74 19v8M70 23h8" />
         </>
       ) : null}
 
       {id === 'doctors' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M48 15c16 6 27 15 27 31 0 17-11 30-27 37-16-7-27-20-27-37 0-16 11-25 27-31Z" />
-          <path className="dm2026-discovery-card__emboss-form dm2026-discovery-card__emboss-form--hero" d="M48 12c16 6 27 15 27 31 0 17-11 30-27 37-16-7-27-20-27-37 0-16 11-25 27-31Z" />
-          <path className="dm2026-discovery-card__emboss-groove dm2026-discovery-card__emboss-groove--medical" d="M48 27v22M37 38h22" />
-          <path className="dm2026-discovery-card__emboss-mark" d="M24 63h14l5-9 7 17 7-12h16" />
+          <path className="dm2026-symbol__cast" d="M27 20v22c0 14 20 14 20 0V20M47 42c2 18 27 22 35 6" />
+          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--doctor" d="M27 17v22c0 14 20 14 20 0V17M47 39c2 18 27 22 35 6" />
+          <circle className="dm2026-symbol__mass" cx="82" cy="45" r="6" />
+          <path className="dm2026-symbol__mark" d="M22 67h15l5-10 7 18 7-12h19" />
+          <path className="dm2026-symbol__carve" d="M22 24h10M42 24h10" />
         </>
       ) : null}
 
       {id === 'labs' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M36 21h25M43 21v28L31 71c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 49V21" />
-          <path className="dm2026-discovery-card__emboss-groove" d="M36 18h25M43 18v28L31 68c-3 5 1 9 6 9h28c5 0 9-4 6-9L55 46V18" />
-          <path className="dm2026-discovery-card__emboss-form" d="M36 63c8 4 19-3 30 2l3 8H33Z" />
-          <path className="dm2026-discovery-card__emboss-mark" d="M73 27a3 3 0 1 0 0 .1M81 40a4 4 0 1 0 0 .1M75 30l5 8" />
+          <path className="dm2026-symbol__cast" d="M35 20h27M43 20v28L31 70c-3 6 1 10 7 10h28c6 0 10-4 7-10L55 48V20" />
+          <path className="dm2026-symbol__ridge" d="M35 17h27M43 17v28L31 67c-3 6 1 10 7 10h28c6 0 10-4 7-10L55 45V17" />
+          <path className="dm2026-symbol__mass" d="M36 62c9 5 20-3 31 2l4 9H33Z" />
+          <path className="dm2026-symbol__mark" d="M74 26a3.5 3.5 0 1 0 0 .1M82 40a4.5 4.5 0 1 0 0 .1M76 30l5 8" />
         </>
       ) : null}
 
       {id === 'pet' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M35 58c3-9 17-9 20 0 3 8-3 15-10 15S32 66 35 58Z" />
-          <path className="dm2026-discovery-card__emboss-form" d="M35 55c3-9 17-9 20 0 3 8-3 15-10 15S32 63 35 55Z" />
-          <circle className="dm2026-discovery-card__emboss-dot" cx="33" cy="40" r="5" />
-          <circle className="dm2026-discovery-card__emboss-dot" cx="46" cy="33" r="5" />
-          <circle className="dm2026-discovery-card__emboss-dot" cx="59" cy="40" r="5" />
-          <path className="dm2026-discovery-card__emboss-mark" d="M73 32v19M64 41.5h18" />
+          <path className="dm2026-symbol__cast" d="M34 57c4-10 18-10 22 0 3 9-3 16-11 16s-14-7-11-16Z" />
+          <path className="dm2026-symbol__mass" d="M34 54c4-10 18-10 22 0 3 9-3 16-11 16s-14-7-11-16Z" />
+          <circle className="dm2026-symbol__dot" cx="32" cy="39" r="5.4" />
+          <circle className="dm2026-symbol__dot" cx="46" cy="32" r="5.4" />
+          <circle className="dm2026-symbol__dot" cx="60" cy="39" r="5.4" />
+          <path className="dm2026-symbol__mark" d="M74 31v20M64 41h20" />
         </>
       ) : null}
 
       {id === 'hospitals' ? (
         <>
-          <path className="dm2026-discovery-card__emboss-shadow" d="M28 78V33h40v45M39 78V54h18v24M48 41v17M40 49.5h16M35 33V23h26v10" />
-          <path className="dm2026-discovery-card__emboss-groove" d="M28 75V30h40v45M39 75V51h18v24M48 38v17M40 46.5h16M35 30V20h26v10" />
-          <path className="dm2026-discovery-card__emboss-form" d="M31 75h34" />
-          <path className="dm2026-discovery-card__emboss-mark" d="M25 25c7-7 16-10 28-9 10 1 18 6 23 13" />
+          <path className="dm2026-symbol__cast" d="M28 78V32h40v46M39 78V53h18v25M48 40v18M39 49h18M35 32V21h26v11" />
+          <path className="dm2026-symbol__ridge" d="M28 75V29h40v46M39 75V50h18v25M48 37v18M39 46h18M35 29V18h26v11" />
+          <path className="dm2026-symbol__mass" d="M31 75h34" />
+          <path className="dm2026-symbol__mark" d="M24 25c7-7 17-10 29-9 11 1 19 6 24 13" />
         </>
       ) : null}
     </svg>

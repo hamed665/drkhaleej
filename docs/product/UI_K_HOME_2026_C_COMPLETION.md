@@ -289,3 +289,48 @@ Results after command execution:
 - `pnpm typecheck`: passed.
 - `pnpm build`: passed.
 - Additional guardrail checks: `pnpm routes:check`, `git diff --check`, and localized HTML smoke checks also passed.
+
+## 20. PR #159-FIX03 strengthened embossed symbols
+
+FIX03 keeps the existing grid, card sizes, titles, descriptions, Explore actions, routes, fonts, and homepage section structure unchanged. The work is limited to the internal category symbol artwork and embossed surface treatment.
+
+### Icon visibility and relief improvements
+
+- Replaced the previous pale symbol classes with stronger `dm2026-symbol-*` emboss primitives for cast shadows, raised masses, ridges, carved detail, marks, and dots.
+- Increased icon-level contrast using controlled DrMuscat teal/green strokes, stronger low/right cast shadows, and soft top/left highlights through shadow layering rather than a gloss streak.
+- Enlarged the SVG symbol presence inside the existing plate so the symbols read clearly on desktop and mobile while staying minimal and premium.
+- Kept Special Offers on a restrained champagne/gold variant without loud color or glitter.
+
+### Dental / Beauty / Doctors corrections
+
+- Dental was corrected into a cleaner sculpted tooth emblem with stronger proportions, raised mass, enamel-like carved grooves, and clearer premium dental identity.
+- Beauty & Aesthetics was corrected into a clearer face/aesthetic mark with a stronger facial silhouette, refined contour, and restrained droplet accent.
+- Doctors was corrected into a recognizable professional stethoscope plus pulse/care mark so it no longer reads as a vague organ/body shape.
+
+### Scope confirmations
+
+- No font, layout, text, button, header, Smart Search, Featured Board, route, SEO, backend, database, Supabase, RLS, migration, package, or lockfile changes were made.
+- The diagonal white shine/streak remains removed; the icon plate pseudo-element is disabled in the active FIX03 CSS.
+
+### Validation results
+
+Validation commands for FIX03:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX03 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks also passed.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show stronger premium embossed symbols without diagonal shine streaks or layout/text/button/font regressions.
