@@ -646,3 +646,43 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the Beauty mirror emblem, cleaned Dental tooth, all other cards unchanged, and no typography/layout/global regressions.
+
+## 28. PR #159-FIX09 Beauty lotus aesthetic glow replacement
+
+FIX09 is a single-card visual fix for Beauty & Aesthetics only. Dental, Special Offers, Doctors, Labs, Pet Clinic, Hospitals, card layout, card text, Explore actions, typography, routes, backend, SEO, and homepage structure remain unchanged.
+
+### Beauty & Aesthetics lotus replacement
+
+- The rejected Beauty mirror/magnifier-like icon was removed completely.
+- Beauty & Aesthetics now uses a premium abstract lotus / layered petal / aesthetic glow emblem centered in the existing inner tile.
+- The replacement avoids face profiles, woman-face marks, mirrors, magnifiers, droplets, leaf-face compositions, random stars, and reused prior icon concepts.
+- The symbol itself uses raised pearl fills, muted teal/sage strokes, subtle internal petal contouring, and soft shadow/highlight treatment to stay within the existing embossed visual language.
+
+### Preserved scope
+
+- Dental and all other category icons are unchanged in FIX09.
+- No font family, typography sizing, card layout, grid structure, spacing system, button style, header, Search, Featured Board, route, SEO, backend, database, Supabase, migration, dependency, package, or lockfile changes were made.
+
+### Validation results
+
+Validation commands for FIX09:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX09 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks for the Beauty lotus replacement passed.
+- Screenshot capture was attempted, but the local environment does not include the `playwright` executable.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the Beauty lotus/petal aesthetic glow emblem, all other cards unchanged, and no typography/layout/global regressions.

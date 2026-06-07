@@ -3459,3 +3459,47 @@
   stroke-linejoin: round;
   opacity: 0.8;
 }
+
+/* FIX09: Beauty lotus / petal aesthetic glow emblem only. */
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty-lotus {
+  fill: rgba(6, 45, 41, 0.055);
+  stroke: rgba(6, 45, 41, 0.18);
+  stroke-width: 4.5;
+  filter: drop-shadow(4px 7px 7px rgba(7, 43, 40, 0.13));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty-lotus,
+.dm2026-discovery-card--beauty .dm2026-symbol__petal--beauty {
+  fill: rgba(247, 252, 250, 0.99);
+  stroke: rgba(11, 94, 87, 0.45);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__petal--beauty {
+  fill: rgba(242, 250, 247, 0.96);
+  stroke: rgba(8, 91, 83, 0.5);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__ridge--beauty-lotus {
+  stroke: rgba(7, 84, 77, 0.5);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.78;
+  filter:
+    drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.12))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.92));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.56);
+  stroke-width: 2.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.78;
+}
