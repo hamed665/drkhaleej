@@ -1,5 +1,6 @@
 import { HomeDiscoveryCategories2026 } from '@/components/home/HomeDiscoveryCategories2026';
 import { HomeFeaturedBoard2026 } from '@/components/home/HomeFeaturedBoard2026';
+import { HomeProviderCTA2026 } from '@/components/home/HomeProviderCTA2026';
 import { HomeSearch2026 } from '@/components/home/HomeSearch2026';
 import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 import { publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
@@ -193,6 +194,7 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
 
       <HomeFeaturedBoard2026 locale={locale} country={country} dir={dir} />
       <HomeDiscoveryCategories2026 locale={locale} country={country} dir={dir} />
+      <HomeProviderCTA2026 locale={locale} dir={dir} providerHref={providerHref} />
     </section>
   );
 }
