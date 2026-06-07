@@ -1,3 +1,4 @@
+import { HomeDiscoveryCategories2026 } from '@/components/home/HomeDiscoveryCategories2026';
 import { HomeFeaturedBoard2026 } from '@/components/home/HomeFeaturedBoard2026';
 import { HomeSearch2026 } from '@/components/home/HomeSearch2026';
 import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
@@ -191,6 +192,7 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
       </div>
 
       <HomeFeaturedBoard2026 locale={locale} country={country} dir={dir} />
+      <HomeDiscoveryCategories2026 locale={locale} country={country} dir={dir} />
     </section>
   );
 }

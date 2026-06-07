@@ -2374,3 +2374,1132 @@
     transform: none;
   }
 }
+
+
+/* Discovery categories: premium minimal embossed reference style. */
+.dm2026-discovery-categories {
+  position: relative;
+  padding-block: clamp(2.4rem, 5vw, 4.7rem);
+}
+
+.dm2026-discovery-categories__module {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.1rem, 2.8vw, 2rem);
+  border-color: rgba(14, 110, 100, 0.11);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.78), transparent 34%),
+    radial-gradient(circle at 88% 10%, rgba(14, 110, 100, 0.055), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(248, 250, 247, 0.58));
+  box-shadow: 0 22px 60px rgba(11, 40, 38, 0.075);
+}
+
+.dm2026-discovery-categories__module::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), transparent 34%, rgba(14, 110, 100, 0.035));
+}
+
+.dm2026-discovery-categories__glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+  filter: blur(28px);
+  opacity: 0.28;
+}
+
+.dm2026-discovery-categories__glow--teal {
+  inset-block-start: 10%;
+  inset-inline-end: 8%;
+  inline-size: 11rem;
+  block-size: 11rem;
+  background: rgba(14, 110, 100, 0.14);
+}
+
+.dm2026-discovery-categories__glow--gold {
+  inset-block-end: 8%;
+  inset-inline-start: 10%;
+  inline-size: 9rem;
+  block-size: 9rem;
+  background: rgba(201, 162, 75, 0.09);
+}
+
+.dm2026-discovery-categories__header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--dm-space-2);
+  max-inline-size: 42rem;
+  margin-block-end: clamp(1.1rem, 2.5vw, 1.75rem);
+}
+
+.dm2026-discovery-categories__badge {
+  inline-size: max-content;
+  background: rgba(255, 255, 255, 0.66);
+  border-color: rgba(14, 110, 100, 0.14);
+  color: var(--dm-color-primary-700);
+}
+
+.dm2026-discovery-categories__header h2,
+.dm2026-discovery-categories__header p {
+  margin: 0;
+}
+
+.dm2026-discovery-categories__header h2 {
+  color: var(--dm-color-ink);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+}
+
+[dir='rtl'] .dm2026-discovery-categories__header h2 {
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.dm2026-discovery-categories__header p {
+  max-inline-size: 34rem;
+  color: var(--dm-color-muted);
+  font-size: clamp(0.98rem, 1.4vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.dm2026-discovery-categories__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(0.85rem, 1.7vw, 1.1rem);
+}
+
+.dm2026-discovery-card {
+  position: relative;
+  display: grid;
+  gap: var(--dm-space-3);
+  min-block-size: 100%;
+  padding: clamp(1rem, 1.7vw, 1.35rem);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(14, 110, 100, 0.1);
+  border-radius: calc(var(--dm-radius-xl) + 0.15rem);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(247, 250, 248, 0.67)),
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.72), transparent 38%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 16px 38px rgba(11, 40, 38, 0.06);
+  transition: transform var(--dm-motion-fast) var(--dm-ease), border-color var(--dm-motion-fast) var(--dm-ease), box-shadow var(--dm-motion-fast) var(--dm-ease), background-color var(--dm-motion-fast) var(--dm-ease);
+}
+
+.dm2026-discovery-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent 38%, rgba(14, 110, 100, 0.026));
+}
+
+.dm2026-discovery-card--hero,
+.dm2026-discovery-card--large {
+  grid-column: span 4;
+  min-block-size: 20rem;
+}
+
+.dm2026-discovery-card--secondary,
+.dm2026-discovery-card--medium {
+  grid-column: span 3;
+  min-block-size: 15rem;
+}
+
+.dm2026-discovery-card--offers {
+  border-color: rgba(201, 162, 75, 0.18);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(250, 247, 239, 0.7)),
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.74), transparent 38%);
+}
+
+.dm2026-discovery-card[href]:hover,
+.dm2026-discovery-card:hover,
+.dm2026-discovery-card[href]:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(14, 110, 100, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 22px 50px rgba(11, 40, 38, 0.085);
+}
+
+.dm2026-discovery-card[href]:focus-visible {
+  outline: 3px solid rgba(14, 110, 100, 0.24);
+  outline-offset: 4px;
+}
+
+.dm2026-discovery-card__visual,
+.dm2026-discovery-card__copy,
+.dm2026-discovery-card__cta {
+  position: relative;
+  z-index: 1;
+}
+
+.dm2026-discovery-card__visual {
+  display: grid;
+  place-items: center;
+  min-block-size: 8.7rem;
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__visual {
+  min-block-size: 10.6rem;
+}
+
+.dm2026-discovery-card__visual-plate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: min(10.4rem, 78%);
+  aspect-ratio: 1;
+  border-radius: 2rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(235, 245, 242, 0.66)),
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.9), transparent 42%);
+  box-shadow:
+    14px 18px 34px rgba(11, 40, 38, 0.085),
+    -10px -10px 24px rgba(255, 255, 255, 0.72),
+    inset 6px 6px 14px rgba(11, 40, 38, 0.035),
+    inset -7px -7px 16px rgba(255, 255, 255, 0.82);
+  transition: transform var(--dm-motion-fast) var(--dm-ease), box-shadow var(--dm-motion-fast) var(--dm-ease);
+}
+
+.dm2026-discovery-card__visual-plate::before {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border-radius: 1.45rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.42), rgba(14, 110, 100, 0.045));
+  box-shadow:
+    inset 5px 5px 12px rgba(11, 40, 38, 0.045),
+    inset -5px -5px 13px rgba(255, 255, 255, 0.78);
+}
+
+.dm2026-discovery-card__visual-plate::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -58%;
+  inline-size: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  opacity: 0;
+  transform: skewX(-16deg);
+  transition: opacity var(--dm-motion-fast) var(--dm-ease), transform 0.85s var(--dm-ease);
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__visual-plate {
+  inline-size: min(11.7rem, 82%);
+  border-radius: 2.25rem;
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__visual-plate {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(250, 243, 226, 0.72)),
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.9), transparent 42%);
+  box-shadow:
+    14px 18px 34px rgba(77, 57, 13, 0.075),
+    -10px -10px 24px rgba(255, 255, 255, 0.72),
+    inset 6px 6px 14px rgba(77, 57, 13, 0.035),
+    inset -7px -7px 16px rgba(255, 255, 255, 0.84);
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__visual-plate,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__visual-plate {
+  transform: translateY(-2px);
+  box-shadow:
+    18px 24px 42px rgba(11, 40, 38, 0.1),
+    -11px -11px 26px rgba(255, 255, 255, 0.76),
+    inset 7px 7px 15px rgba(11, 40, 38, 0.04),
+    inset -8px -8px 17px rgba(255, 255, 255, 0.86);
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__visual-plate::after,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__visual-plate::after {
+  opacity: 0.62;
+  transform: translateX(390%) skewX(-16deg);
+}
+
+.dm2026-discovery-card__embossed-svg {
+  position: relative;
+  z-index: 1;
+  inline-size: 68%;
+  block-size: 68%;
+  overflow: visible;
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__embossed-svg {
+  inline-size: 64%;
+  block-size: 64%;
+}
+
+.dm2026-discovery-card__relief-fill,
+.dm2026-discovery-card__relief-line,
+.dm2026-discovery-card__relief-accent,
+.dm2026-discovery-card__relief-dot {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(2px 3px 3px rgba(11, 40, 38, 0.12))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.88));
+}
+
+.dm2026-discovery-card__relief-fill {
+  fill: rgba(238, 247, 244, 0.72);
+  stroke: rgba(14, 110, 100, 0.18);
+  stroke-width: 2.4;
+}
+
+.dm2026-discovery-card__relief-line {
+  fill: none;
+  stroke: rgba(14, 110, 100, 0.32);
+  stroke-width: 4.2;
+}
+
+.dm2026-discovery-card__relief-accent {
+  fill: none;
+  stroke: rgba(14, 110, 100, 0.27);
+  stroke-width: 3.5;
+}
+
+.dm2026-discovery-card__relief-dot {
+  fill: rgba(238, 247, 244, 0.74);
+  stroke: rgba(14, 110, 100, 0.2);
+  stroke-width: 2.2;
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-fill,
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-line,
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-accent {
+  stroke: rgba(172, 132, 46, 0.36);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-fill {
+  fill: rgba(250, 243, 226, 0.78);
+}
+
+.dm2026-discovery-card__copy {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.dm2026-discovery-card__copy strong {
+  color: var(--dm-color-ink);
+  font-size: clamp(1.08rem, 1.6vw, 1.35rem);
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+}
+
+[dir='rtl'] .dm2026-discovery-card__copy strong {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.dm2026-discovery-card__copy span {
+  color: var(--dm-color-muted);
+  font-size: 0.95rem;
+  line-height: 1.62;
+}
+
+.dm2026-discovery-card__cta {
+  align-self: end;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-block-size: 2.25rem;
+  padding-inline: 0.85rem;
+  border: 1px solid rgba(14, 110, 100, 0.15);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--dm-color-primary-700);
+  font-size: 0.88rem;
+  font-weight: 750;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 8px 18px rgba(11, 40, 38, 0.045);
+  transition: transform var(--dm-motion-fast) var(--dm-ease), border-color var(--dm-motion-fast) var(--dm-ease), box-shadow var(--dm-motion-fast) var(--dm-ease);
+}
+
+.dm2026-discovery-card__cta::after {
+  content: '→';
+  opacity: 0.68;
+  transition: transform var(--dm-motion-fast) var(--dm-ease), opacity var(--dm-motion-fast) var(--dm-ease);
+}
+
+[dir='rtl'] .dm2026-discovery-card__cta::after {
+  content: '←';
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__cta {
+  border-color: rgba(201, 162, 75, 0.24);
+  color: rgb(125, 93, 26);
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__cta,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__cta {
+  transform: translateY(-1px);
+  border-color: rgba(14, 110, 100, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 10px 22px rgba(11, 40, 38, 0.06);
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__cta::after,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__cta::after {
+  opacity: 0.92;
+  transform: translateX(2px);
+}
+
+[dir='rtl'] .dm2026-discovery-card:hover .dm2026-discovery-card__cta::after,
+[dir='rtl'] .dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__cta::after {
+  transform: translateX(-2px);
+}
+
+@media (max-width: 64rem) {
+  .dm2026-discovery-card--hero,
+  .dm2026-discovery-card--large {
+    grid-column: span 6;
+  }
+
+  .dm2026-discovery-card--secondary,
+  .dm2026-discovery-card--medium {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 48rem) {
+  .dm2026-discovery-categories {
+    padding-block: 2rem;
+  }
+
+  .dm2026-discovery-categories__module {
+    padding: var(--dm-space-3);
+  }
+
+  .dm2026-discovery-categories__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dm2026-discovery-card--hero,
+  .dm2026-discovery-card--large,
+  .dm2026-discovery-card--secondary,
+  .dm2026-discovery-card--medium {
+    grid-column: 1;
+    min-block-size: auto;
+  }
+
+  .dm2026-discovery-card__visual,
+  .dm2026-discovery-card--hero .dm2026-discovery-card__visual {
+    min-block-size: 7.7rem;
+  }
+
+  .dm2026-discovery-card__visual-plate,
+  .dm2026-discovery-card--hero .dm2026-discovery-card__visual-plate {
+    inline-size: min(9rem, 68%);
+    border-radius: 1.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dm2026-discovery-card,
+  .dm2026-discovery-card__visual-plate,
+  .dm2026-discovery-card__visual-plate::after,
+  .dm2026-discovery-card__cta,
+  .dm2026-discovery-card__cta::after {
+    transition: none;
+  }
+
+  .dm2026-discovery-card[href]:hover,
+  .dm2026-discovery-card:hover,
+  .dm2026-discovery-card[href]:focus-visible,
+  .dm2026-discovery-card:hover .dm2026-discovery-card__visual-plate,
+  .dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__visual-plate,
+  .dm2026-discovery-card:hover .dm2026-discovery-card__cta,
+  .dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__cta,
+  .dm2026-discovery-card:hover .dm2026-discovery-card__cta::after,
+  .dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__cta::after {
+    transform: none;
+  }
+
+  .dm2026-discovery-card:hover .dm2026-discovery-card__visual-plate::after,
+  .dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__visual-plate::after {
+    opacity: 0;
+  }
+}
+
+/* Discovery category icon relief refinement: make symbols themselves feel raised, not just their plates. */
+.dm2026-discovery-card__embossed-svg {
+  inline-size: 72%;
+  block-size: 72%;
+  filter: drop-shadow(0 10px 14px rgba(11, 40, 38, 0.075));
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__embossed-svg {
+  inline-size: 68%;
+  block-size: 68%;
+}
+
+.dm2026-discovery-card__relief-shadow,
+.dm2026-discovery-card__relief-highlight {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dm2026-discovery-card__relief-shadow {
+  fill: none;
+  stroke: rgba(11, 40, 38, 0.12);
+  stroke-width: 5.6;
+  opacity: 0.42;
+  transform: translate(1.8px, 2.2px);
+  filter: blur(0.15px);
+}
+
+.dm2026-discovery-card__relief-fill,
+.dm2026-discovery-card__relief-line,
+.dm2026-discovery-card__relief-accent,
+.dm2026-discovery-card__relief-dot {
+  filter:
+    drop-shadow(3px 4px 4px rgba(11, 40, 38, 0.15))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.95));
+}
+
+.dm2026-discovery-card__relief-fill {
+  fill: rgba(241, 249, 247, 0.86);
+  stroke: rgba(14, 110, 100, 0.23);
+  stroke-width: 3;
+}
+
+.dm2026-discovery-card__relief-fill--hero {
+  stroke-width: 3.4;
+}
+
+.dm2026-discovery-card__relief-line {
+  stroke: rgba(14, 110, 100, 0.42);
+  stroke-width: 4.7;
+}
+
+.dm2026-discovery-card__relief-line--soft,
+.dm2026-discovery-card__relief-line--face {
+  stroke-width: 3.6;
+  opacity: 0.88;
+}
+
+.dm2026-discovery-card__relief-line--stethoscope {
+  stroke-width: 4.9;
+}
+
+.dm2026-discovery-card__relief-accent {
+  stroke: rgba(14, 110, 100, 0.36);
+  stroke-width: 3.9;
+}
+
+.dm2026-discovery-card__relief-accent--drop {
+  fill: rgba(241, 249, 247, 0.64);
+}
+
+.dm2026-discovery-card__relief-highlight {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.86);
+  stroke-width: 2.8;
+  opacity: 0.92;
+  filter: drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.9));
+}
+
+.dm2026-discovery-card__relief-dot {
+  fill: rgba(241, 249, 247, 0.88);
+  stroke: rgba(14, 110, 100, 0.24);
+  stroke-width: 2.8;
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-shadow {
+  stroke: rgba(77, 57, 13, 0.13);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-fill,
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-line,
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-accent {
+  stroke: rgba(150, 111, 34, 0.42);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-fill {
+  fill: rgba(252, 246, 231, 0.9);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__relief-highlight {
+  stroke: rgba(255, 255, 255, 0.9);
+}
+
+/* Final icon-surface reset: premium embossed symbols only; no diagonal shine streaks. */
+.dm2026-discovery-card__visual-plate::after {
+  display: none;
+}
+
+.dm2026-discovery-card:hover .dm2026-discovery-card__visual-plate::after,
+.dm2026-discovery-card[href]:focus-visible .dm2026-discovery-card__visual-plate::after {
+  opacity: 0;
+  transform: none;
+}
+
+.dm2026-discovery-card__embossed-svg {
+  inline-size: 74%;
+  block-size: 74%;
+  filter: drop-shadow(0 14px 18px rgba(11, 40, 38, 0.09));
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__embossed-svg {
+  inline-size: 69%;
+  block-size: 69%;
+}
+
+.dm2026-discovery-card__emboss-shadow,
+.dm2026-discovery-card__emboss-form,
+.dm2026-discovery-card__emboss-groove,
+.dm2026-discovery-card__emboss-mark,
+.dm2026-discovery-card__emboss-dot {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dm2026-discovery-card__emboss-shadow {
+  fill: none;
+  stroke: rgba(8, 47, 43, 0.16);
+  stroke-width: 6.2;
+  opacity: 0.48;
+  transform: translate(2.2px, 2.8px);
+  filter: blur(0.18px);
+}
+
+.dm2026-discovery-card__emboss-form,
+.dm2026-discovery-card__emboss-dot {
+  fill: rgba(242, 249, 247, 0.94);
+  stroke: rgba(14, 110, 100, 0.28);
+  stroke-width: 3.2;
+  filter:
+    drop-shadow(4px 5px 5px rgba(8, 47, 43, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card__emboss-form--hero {
+  stroke-width: 3.7;
+}
+
+.dm2026-discovery-card__emboss-form--drop {
+  fill: rgba(238, 247, 245, 0.88);
+  stroke-width: 2.8;
+}
+
+.dm2026-discovery-card__emboss-groove,
+.dm2026-discovery-card__emboss-mark {
+  fill: none;
+  stroke: rgba(14, 110, 100, 0.43);
+  stroke-width: 4.2;
+  filter:
+    drop-shadow(2px 3px 3px rgba(8, 47, 43, 0.13))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.9));
+}
+
+.dm2026-discovery-card__emboss-groove--fine,
+.dm2026-discovery-card__emboss-groove--face {
+  stroke-width: 3.3;
+  opacity: 0.9;
+}
+
+.dm2026-discovery-card__emboss-groove--medical {
+  stroke-width: 5.4;
+}
+
+.dm2026-discovery-card__emboss-mark {
+  stroke-width: 3.5;
+  opacity: 0.92;
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__emboss-shadow {
+  stroke: rgba(77, 57, 13, 0.15);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__emboss-form,
+.dm2026-discovery-card--offers .dm2026-discovery-card__emboss-dot {
+  fill: rgba(252, 246, 231, 0.94);
+  stroke: rgba(150, 111, 34, 0.42);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__emboss-groove,
+.dm2026-discovery-card--offers .dm2026-discovery-card__emboss-mark {
+  stroke: rgba(150, 111, 34, 0.46);
+}
+
+/* FIX03: stronger premium embossed symbol visibility without shine streaks. */
+.dm2026-discovery-card__visual-plate::after {
+  content: none;
+  display: none;
+}
+
+.dm2026-discovery-card__embossed-svg {
+  inline-size: 78%;
+  block-size: 78%;
+  filter: drop-shadow(0 16px 22px rgba(8, 47, 43, 0.12));
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__embossed-svg {
+  inline-size: 72%;
+  block-size: 72%;
+}
+
+.dm2026-symbol__cast,
+.dm2026-symbol__mass,
+.dm2026-symbol__ridge,
+.dm2026-symbol__carve,
+.dm2026-symbol__mark,
+.dm2026-symbol__dot {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dm2026-symbol__cast {
+  fill: none;
+  stroke: rgba(7, 43, 40, 0.22);
+  stroke-width: 7;
+  opacity: 0.58;
+  transform: translate(2.5px, 3px);
+  filter: blur(0.12px);
+}
+
+.dm2026-symbol__mass,
+.dm2026-symbol__dot {
+  fill: rgba(239, 248, 245, 0.98);
+  stroke: rgba(12, 96, 88, 0.38);
+  stroke-width: 3.9;
+  filter:
+    drop-shadow(4px 5px 5px rgba(7, 43, 40, 0.18))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-symbol__mass--hero {
+  stroke-width: 4.25;
+}
+
+.dm2026-symbol__mass--small {
+  fill: rgba(239, 248, 245, 0.94);
+  stroke-width: 3.1;
+}
+
+.dm2026-symbol__ridge,
+.dm2026-symbol__carve,
+.dm2026-symbol__mark {
+  fill: none;
+  stroke: rgba(8, 91, 83, 0.58);
+  stroke-width: 4.6;
+  filter:
+    drop-shadow(2px 3px 3px rgba(7, 43, 40, 0.16))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.92));
+}
+
+.dm2026-symbol__ridge--face,
+.dm2026-symbol__carve {
+  stroke-width: 3.65;
+}
+
+.dm2026-symbol__ridge--doctor {
+  stroke-width: 5.2;
+}
+
+.dm2026-symbol__mark {
+  stroke-width: 3.75;
+  stroke: rgba(8, 91, 83, 0.54);
+}
+
+.dm2026-discovery-card--offers .dm2026-symbol__cast {
+  stroke: rgba(86, 62, 12, 0.22);
+}
+
+.dm2026-discovery-card--offers .dm2026-symbol__mass,
+.dm2026-discovery-card--offers .dm2026-symbol__dot {
+  fill: rgba(253, 247, 231, 0.98);
+  stroke: rgba(139, 101, 27, 0.52);
+}
+
+.dm2026-discovery-card--offers .dm2026-symbol__ridge,
+.dm2026-discovery-card--offers .dm2026-symbol__mark {
+  stroke: rgba(139, 101, 27, 0.58);
+}
+
+/* FIX04: typography consistency lock and fully replaced Beauty symbol. */
+.dm2026-discovery-categories,
+.dm2026-discovery-categories__header,
+.dm2026-discovery-card,
+.dm2026-discovery-card__copy,
+.dm2026-discovery-card__cta {
+  font-family: inherit;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+.dm2026-discovery-categories__header h2 {
+  font-weight: var(--dm-weight-bold, 800);
+  letter-spacing: var(--dm-letter-snug, -0.025em);
+}
+
+.dm2026-discovery-categories__header p,
+.dm2026-discovery-card__copy span {
+  font-weight: var(--dm-weight-regular, 400);
+  letter-spacing: 0;
+}
+
+.dm2026-discovery-card__copy strong {
+  font-weight: var(--dm-weight-semibold, 600);
+  letter-spacing: var(--dm-letter-snug, -0.012em);
+}
+
+.dm2026-discovery-card__cta,
+.dm2026-discovery-categories__badge {
+  font-weight: var(--dm-weight-semibold, 600);
+  letter-spacing: 0;
+}
+
+[dir='rtl'] .dm2026-discovery-categories__header h2,
+[dir='rtl'] .dm2026-discovery-card__copy strong,
+[dir='rtl'] .dm2026-discovery-card__copy span,
+[dir='rtl'] .dm2026-discovery-card__cta,
+[dir='rtl'] .dm2026-discovery-categories__badge {
+  letter-spacing: var(--dm-arabic-letter-spacing, 0);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty {
+  stroke: rgba(7, 43, 40, 0.2);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
+  fill: rgba(240, 248, 246, 0.98);
+  stroke: rgba(12, 96, 88, 0.36);
+}
+
+.dm2026-symbol__profile {
+  fill: none;
+  stroke: rgba(8, 91, 83, 0.6);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter:
+    drop-shadow(2px 3px 3px rgba(7, 43, 40, 0.15))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.94));
+}
+
+.dm2026-symbol__profile--detail {
+  stroke-width: 3.25;
+  opacity: 0.94;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.48);
+  stroke-width: 3.35;
+}
+
+/* FIX04 final polish: icon clarity, rhythm, and CTA surface without layout rebuild. */
+.dm2026-discovery-categories__header {
+  margin-block-end: clamp(1.2rem, 2.35vw, 1.65rem);
+}
+
+.dm2026-discovery-card {
+  align-content: start;
+  grid-template-rows: auto minmax(5.15rem, auto) auto;
+}
+
+.dm2026-discovery-card--secondary,
+.dm2026-discovery-card--medium {
+  grid-template-rows: auto minmax(5.65rem, auto) auto;
+}
+
+.dm2026-discovery-card__visual {
+  min-block-size: 8.9rem;
+  align-self: start;
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__visual {
+  min-block-size: 10.85rem;
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__visual {
+  min-block-size: 8.45rem;
+}
+
+.dm2026-discovery-card__copy {
+  align-self: start;
+}
+
+.dm2026-discovery-card__cta {
+  min-block-size: 2.28rem;
+  border-color: rgba(14, 110, 100, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(241, 248, 246, 0.68));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 9px 20px rgba(11, 40, 38, 0.055);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__cta {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(253, 247, 231, 0.7));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 9px 20px rgba(77, 57, 13, 0.055);
+}
+
+.dm2026-symbol__mass,
+.dm2026-symbol__dot {
+  stroke-width: 4.05;
+  filter:
+    drop-shadow(4px 5px 5px rgba(7, 43, 40, 0.17))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-symbol__mass--hero {
+  stroke-width: 4.4;
+}
+
+.dm2026-symbol__ridge,
+.dm2026-symbol__carve,
+.dm2026-symbol__mark {
+  stroke-width: 4.7;
+}
+
+.dm2026-symbol__carve,
+.dm2026-symbol__profile--detail {
+  stroke-width: 3.5;
+}
+
+.dm2026-symbol__profile {
+  stroke-width: 4.55;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
+  stroke: rgba(12, 96, 88, 0.4);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke-width: 3.55;
+}
+
+.dm2026-symbol__mass--doctor {
+  stroke-width: 3.5;
+}
+
+.dm2026-symbol__mark--pulse {
+  stroke-width: 3.95;
+}
+
+@media (max-width: 48rem) {
+  .dm2026-discovery-card,
+  .dm2026-discovery-card--secondary,
+  .dm2026-discovery-card--medium {
+    grid-template-rows: auto auto auto;
+  }
+
+  .dm2026-discovery-card__visual,
+  .dm2026-discovery-card--hero .dm2026-discovery-card__visual,
+  .dm2026-discovery-card--secondary .dm2026-discovery-card__visual {
+    min-block-size: 7.9rem;
+  }
+}
+
+/* FIX07: rebuilt Dental and Beauty symbols from scratch only. */
+.dm2026-discovery-card--dental .dm2026-symbol__cast--dental {
+  stroke: rgba(6, 45, 41, 0.22);
+  filter: drop-shadow(4px 7px 7px rgba(7, 43, 40, 0.14));
+}
+
+.dm2026-discovery-card--dental .dm2026-symbol__mass--dental {
+  fill: rgba(246, 252, 250, 0.99);
+  stroke: rgba(10, 98, 90, 0.48);
+  stroke-width: 4.75;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.17))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--dental .dm2026-symbol__ridge--dental,
+.dm2026-discovery-card--dental .dm2026-symbol__carve--dental {
+  stroke: rgba(8, 91, 83, 0.56);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.12))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.93));
+}
+
+.dm2026-discovery-card--dental .dm2026-symbol__carve--dental {
+  stroke-width: 3;
+  opacity: 0.76;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
+  fill: rgba(246, 252, 250, 0.99);
+  stroke: rgba(11, 94, 87, 0.44);
+  stroke-width: 4.55;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__profile--beauty {
+  stroke: rgba(7, 84, 77, 0.67);
+  stroke-width: 4.75;
+  filter:
+    drop-shadow(3px 4px 3px rgba(7, 43, 40, 0.15))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.95));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__profile--detail {
+  stroke: rgba(7, 84, 77, 0.55);
+  stroke-width: 3;
+  opacity: 0.82;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.43);
+  stroke-width: 3;
+  opacity: 0.7;
+}
+
+/* FIX06 micro: Beauty icon replacement only; Dental and all other cards preserved. */
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty {
+  fill: none;
+  stroke: rgba(6, 45, 41, 0.2);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(4px 6px 6px rgba(7, 43, 40, 0.14));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__profile--beauty {
+  stroke: rgba(7, 84, 77, 0.7);
+  stroke-width: 5.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(4px 5px 4px rgba(7, 43, 40, 0.18))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.96));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__profile--detail {
+  stroke: rgba(7, 84, 77, 0.52);
+  stroke-width: 3.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.78;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.62);
+  stroke-width: 2.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.86;
+  filter:
+    drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.13))
+    drop-shadow(-1px -1px 1px rgba(255, 255, 255, 0.92));
+}
+
+/* FIX08: hard replace Beauty with mirror emblem and clean Dental only. */
+.dm2026-discovery-card--dental .dm2026-symbol__mass--dental {
+  fill: rgba(247, 252, 250, 0.99);
+  stroke: rgba(10, 98, 90, 0.46);
+  stroke-width: 4.55;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--dental .dm2026-symbol__ridge--dental {
+  stroke: rgba(8, 91, 83, 0.48);
+  stroke-width: 3.15;
+  opacity: 0.7;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty-mirror {
+  fill: rgba(6, 45, 41, 0.06);
+  stroke: rgba(6, 45, 41, 0.2);
+  stroke-width: 4.6;
+  filter: drop-shadow(4px 6px 6px rgba(7, 43, 40, 0.13));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty-mirror {
+  fill: rgba(247, 252, 250, 0.99);
+  stroke: rgba(11, 94, 87, 0.44);
+  stroke-width: 4.65;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__ridge--beauty-mirror {
+  stroke: rgba(7, 84, 77, 0.54);
+  stroke-width: 3.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.82;
+  filter:
+    drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.12))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.92));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.58);
+  stroke-width: 2.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
+}
+
+/* FIX09: Beauty lotus / petal aesthetic glow emblem only. */
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty-lotus {
+  fill: rgba(6, 45, 41, 0.055);
+  stroke: rgba(6, 45, 41, 0.18);
+  stroke-width: 4.5;
+  filter: drop-shadow(4px 7px 7px rgba(7, 43, 40, 0.13));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty-lotus,
+.dm2026-discovery-card--beauty .dm2026-symbol__petal--beauty {
+  fill: rgba(247, 252, 250, 0.99);
+  stroke: rgba(11, 94, 87, 0.45);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__petal--beauty {
+  fill: rgba(242, 250, 247, 0.96);
+  stroke: rgba(8, 91, 83, 0.5);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__ridge--beauty-lotus {
+  stroke: rgba(7, 84, 77, 0.5);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.78;
+  filter:
+    drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.12))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.92));
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.56);
+  stroke-width: 2.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.78;
+}
