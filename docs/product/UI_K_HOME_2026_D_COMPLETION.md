@@ -4,7 +4,7 @@
 
 Implemented and refined a UI-only homepage Provider CTA section for DrMuscat 2026. The section promotes a reviewed public provider profile with photos, services, special offers and direct contact actions for healthcare providers in Oman.
 
-Final scope is homepage Provider CTA only. The full `/for-providers` landing page with plans, pricing, comparison, onboarding form, claim policy, sponsored visibility and provider product decisions is explicitly moved to a future dedicated PR. No backend, dashboard, form submission, payment, subscription, database, Supabase, API, SEO infrastructure, route creation, package or migration work was included.
+Final scope is homepage Provider CTA only. FIX04 hard scope cleanup disables the existing `/for-providers` public page so it fails closed instead of rendering provider plans, pricing/product cards, comparison tables, onboarding/request forms, safety-note page sections, or the dark provider product hero. The full `/for-providers` landing page with plans, pricing, comparison, onboarding form, claim policy, sponsored visibility and provider product decisions is explicitly moved to a future dedicated PR. No backend, dashboard, form submission, payment, subscription, database, Supabase, API, SEO infrastructure, route creation, package or migration work was included.
 
 ## 2. Files changed
 
@@ -12,6 +12,7 @@ Final scope is homepage Provider CTA only. The full `/for-providers` landing pag
 - `src/components/home/HomePage2026HeaderHero.tsx`
 - `src/styles/dm2026-home.css`
 - `docs/product/UI_K_HOME_2026_D_COMPLETION.md`
+- `src/app/[locale]/[country]/for-providers/page.tsx`
 
 ## 3. Asset existence check result
 
@@ -65,11 +66,11 @@ Arabic copy is included inside the component and selected by locale. The compone
 
 ## 10. CTA behavior
 
-Because the full `/for-providers` product page is not ready for this PR, the Provider CTA renders preview-safe CTA buttons instead of linking to the unfinished provider page. No new route was created, no dead link was added, and no fake backend action was introduced.
+Because the full `/for-providers` product page is not ready for this PR, the Provider CTA renders preview-safe CTA buttons instead of linking to the unfinished provider page. The `/for-providers` route file now fails closed with `notFound()` so provider plans, pricing, comparison, onboarding form and provider product content are not publicly exposed by this PR. No new route was created, no dead link was added, and no fake backend action was introduced.
 
 ## 11. No backend/database/SEO changes confirmation
 
-Confirmed: this implementation does not change backend code, API routes, Supabase files, migrations, schema, seed data, SEO infrastructure, sitemap, robots, route-check scripts, package files or lockfiles. It does not ship pricing plans, comparison tables, onboarding forms, payment flows or provider product-page scope.
+Confirmed: this implementation does not change backend code, API routes, Supabase files, migrations, schema, seed data, SEO infrastructure files, sitemap, robots, route-check scripts, package files or lockfiles. It does not ship pricing plans, comparison tables, onboarding forms, payment flows or provider product-page scope; the existing provider page route fails closed.
 
 ## 12. Validation results
 
@@ -81,7 +82,7 @@ Required validation commands were run after implementation:
 - `pnpm build`
 - `pnpm routes:check`
 
-Validation was rerun after the scope cleanup and targeted UI polish pass.
+Validation was rerun after the FIX04 hard scope cleanup and targeted UI polish pass.
 
 ## 13. Manual QA notes
 
@@ -97,15 +98,16 @@ Manual/browser QA checklist for `/en/om` and `/ar/om` desktop/mobile:
 - Text remains readable on desktop and mobile.
 - Arabic layout uses RTL direction and tuned headline sizing.
 - CTA buttons use the existing premium DrMuscat button language and do not link to an unfinished `/for-providers` page.
+- `/en/om/for-providers` and `/ar/om/for-providers` are expected to fail closed rather than render provider plans, pricing cards, comparison tables or onboarding/request forms.
 - Feature pills wrap cleanly.
 - No search/header/language/footer files were changed.
 - No DB/API/Supabase/migration changes were made.
 - No SEO infrastructure changes were made.
 - No package changes were made.
 - No fake provider counts, fake ratings, fake reviews or booking claims are included.
-- No pricing/plans/comparison/onboarding form scope is shipped in this PR.
+- No pricing/plans/comparison/onboarding form scope is shipped or publicly exposed in this PR.
 - CSS uses clipped overflow and responsive stacking to avoid horizontal overflow.
 
 ## 14. Next PR recommendation
 
-UI-K-HOME-2026-E — Dedicated `/for-providers` landing page with plans, pricing, comparison, onboarding form, and safety policy.
+UI-K-HOME-2026-E — Dedicated `/for-providers` landing page with product decisions for plans, pricing, comparison, onboarding form, claim policy, sponsored visibility rules, Arabic/English sales copy, and safety policy.
