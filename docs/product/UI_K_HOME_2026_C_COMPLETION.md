@@ -600,3 +600,49 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the new Beauty side-profile/sparkle icon, Dental unchanged, other cards untouched, and no typography/layout/global regressions.
+
+## 27. PR #159-FIX08 Beauty mirror replacement and Dental cleanup
+
+FIX08 is limited to the Beauty & Aesthetics and Dental internal icon artwork. It does not change the card shell, grid, spacing, titles, descriptions, Explore buttons, fonts, routes, section structure, or any other category card.
+
+### Beauty & Aesthetics hard replacement
+
+- The rejected Beauty face/profile symbol was removed completely.
+- Beauty & Aesthetics now uses a safer premium embossed mirror/aesthetic emblem with an oval mirror face, short handle, restrained inner highlight, and a tiny sparkle accent.
+- The replacement avoids face profiles, woman-face marks, droplets, leaves, rings around a face, abstract contours, and messy facial geometry.
+- The icon itself is raised through pearl fill, muted teal stroke, and soft shadow/highlight treatment without diagonal shine streaks.
+
+### Dental cleanup
+
+- Dental was cleaned to a simpler premium tooth silhouette with a balanced crown and cleaner roots.
+- Awkward internal marks were removed; only a restrained crown contour remains for a subtle embossed premium cue.
+- No cartoon smile line, sparkle, decorative clutter, or childish tooth detail was added.
+
+### Preserved scope
+
+- Special Offers, Doctors, Labs, Pet Clinic, and Hospitals are untouched.
+- No font family, typography sizing, card layout, grid structure, spacing system, button style, header, Search, Featured Board, route, SEO, backend, database, Supabase, migration, dependency, package, or lockfile changes were made.
+
+### Validation results
+
+Validation commands for FIX08:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX08 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks for the Beauty mirror/Dental cleanup passed.
+- Screenshot capture was attempted, but the local environment does not include the `playwright` executable.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the Beauty mirror emblem, cleaned Dental tooth, all other cards unchanged, and no typography/layout/global regressions.

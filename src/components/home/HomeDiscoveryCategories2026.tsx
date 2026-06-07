@@ -108,19 +108,18 @@ function EmbossedSymbol({ id }: { id: DiscoveryCardTone }) {
     <svg className="dm2026-discovery-card__embossed-svg" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
       {id === 'dental' ? (
         <>
-          <path className="dm2026-symbol__cast dm2026-symbol__cast--dental" d="M30 24c5-9 15-12 24-6 9-6 19-3 24 6 8 14 2 35-8 49-5 7-11 7-14-3-3-11-5-17-8-17s-5 6-8 17c-3 10-9 10-14 3-10-14-16-35-8-49Z" />
-          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--dental" d="M30 21c5-9 15-12 24-6 9-6 19-3 24 6 8 14 2 35-8 49-5 7-11 7-14-3-3-11-5-17-8-17s-5 6-8 17c-3 10-9 10-14 3-10-14-16-35-8-49Z" />
-          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--dental" d="M36 31c5-4 12-5 18-1 6-4 13-3 18 1" />
-          <path className="dm2026-symbol__carve dm2026-symbol__carve--dental" d="M48 38c1 5 1 10 0 15" />
+          <path className="dm2026-symbol__cast dm2026-symbol__cast--dental" d="M31 24c6-9 15-11 23-5 8-6 17-4 23 5 8 13 4 33-7 48-5 7-10 6-13-3-3-10-5-16-9-16s-6 6-9 16c-3 9-8 10-13 3-11-15-15-35-7-48Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--dental" d="M31 21c6-9 15-11 23-5 8-6 17-4 23 5 8 13 4 33-7 48-5 7-10 6-13-3-3-10-5-16-9-16s-6 6-9 16c-3 9-8 10-13 3-11-15-15-35-7-48Z" />
+          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--dental" d="M37 31c5-4 11-4 17-1 6-3 12-3 17 1" />
         </>
       ) : null}
 
       {id === 'beauty' ? (
         <>
-          <path className="dm2026-symbol__cast dm2026-symbol__cast--beauty" d="M60 21c-12 4-21 15-21 29 0 14 9 24 25 28" />
-          <path className="dm2026-symbol__profile dm2026-symbol__profile--beauty" d="M59 18c-12 4-20 14-20 27 5 1 10 4 13 8-2 4-6 7-12 7 3 9 12 16 25 19" />
-          <path className="dm2026-symbol__profile dm2026-symbol__profile--detail" d="M46 38c5-3 10-3 16 1" />
-          <path className="dm2026-symbol__mark dm2026-symbol__mark--beauty" d="M73 19v9M68.5 23.5h9M70 21l6 6M76 21l-6 6" />
+          <ellipse className="dm2026-symbol__cast dm2026-symbol__cast--beauty-mirror" cx="48" cy="40" rx="20" ry="24" />
+          <ellipse className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--beauty-mirror" cx="48" cy="37" rx="20" ry="24" />
+          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--beauty-mirror" d="M39 35c4-7 12-10 20-7M43 59l-8 16c-2 4 2 8 6 5l13-12" />
+          <path className="dm2026-symbol__mark dm2026-symbol__mark--beauty" d="M75 21v8M71 25h8M72.5 22.5l5 5M77.5 22.5l-5 5" />
         </>
       ) : null}
 
