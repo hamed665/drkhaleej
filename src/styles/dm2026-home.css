@@ -3205,3 +3205,108 @@
   stroke: rgba(8, 91, 83, 0.48);
   stroke-width: 3.35;
 }
+
+/* FIX04 final polish: icon clarity, rhythm, and CTA surface without layout rebuild. */
+.dm2026-discovery-categories__header {
+  margin-block-end: clamp(1.2rem, 2.35vw, 1.65rem);
+}
+
+.dm2026-discovery-card {
+  align-content: start;
+  grid-template-rows: auto minmax(5.15rem, auto) auto;
+}
+
+.dm2026-discovery-card--secondary,
+.dm2026-discovery-card--medium {
+  grid-template-rows: auto minmax(5.65rem, auto) auto;
+}
+
+.dm2026-discovery-card__visual {
+  min-block-size: 8.9rem;
+  align-self: start;
+}
+
+.dm2026-discovery-card--hero .dm2026-discovery-card__visual {
+  min-block-size: 10.85rem;
+}
+
+.dm2026-discovery-card--secondary .dm2026-discovery-card__visual {
+  min-block-size: 8.45rem;
+}
+
+.dm2026-discovery-card__copy {
+  align-self: start;
+}
+
+.dm2026-discovery-card__cta {
+  min-block-size: 2.28rem;
+  border-color: rgba(14, 110, 100, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(241, 248, 246, 0.68));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 9px 20px rgba(11, 40, 38, 0.055);
+}
+
+.dm2026-discovery-card--offers .dm2026-discovery-card__cta {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(253, 247, 231, 0.7));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 9px 20px rgba(77, 57, 13, 0.055);
+}
+
+.dm2026-symbol__mass,
+.dm2026-symbol__dot {
+  stroke-width: 4.05;
+  filter:
+    drop-shadow(4px 5px 5px rgba(7, 43, 40, 0.17))
+    drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
+}
+
+.dm2026-symbol__mass--hero {
+  stroke-width: 4.4;
+}
+
+.dm2026-symbol__ridge,
+.dm2026-symbol__carve,
+.dm2026-symbol__mark {
+  stroke-width: 4.7;
+}
+
+.dm2026-symbol__carve,
+.dm2026-symbol__profile--detail {
+  stroke-width: 3.5;
+}
+
+.dm2026-symbol__profile {
+  stroke-width: 4.55;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
+  stroke: rgba(12, 96, 88, 0.4);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke-width: 3.55;
+}
+
+.dm2026-symbol__mass--doctor {
+  stroke-width: 3.5;
+}
+
+.dm2026-symbol__mark--pulse {
+  stroke-width: 3.95;
+}
+
+@media (max-width: 48rem) {
+  .dm2026-discovery-card,
+  .dm2026-discovery-card--secondary,
+  .dm2026-discovery-card--medium {
+    grid-template-rows: auto auto auto;
+  }
+
+  .dm2026-discovery-card__visual,
+  .dm2026-discovery-card--hero .dm2026-discovery-card__visual,
+  .dm2026-discovery-card--secondary .dm2026-discovery-card__visual {
+    min-block-size: 7.9rem;
+  }
+}

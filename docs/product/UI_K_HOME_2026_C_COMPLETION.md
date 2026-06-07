@@ -379,3 +379,48 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show typography consistent with the rest of DrMuscat and the fully replaced Beauty icon reads as premium, elegant, and embossed.
+
+## 22. PR #159-FIX04 final embossed card polish
+
+This final polish keeps the existing layout, grid, titles, descriptions, Explore actions, routes, fonts, and homepage architecture unchanged. The scope is limited to internal icon clarity, card rhythm, CTA surface polish, and documentation.
+
+### Final embossed icon polish
+
+- Beauty & Aesthetics was refined again with a clearer premium side-profile contour, stronger profile stroke, cleaner face detail lines, and a restrained brow/beauty mark.
+- Doctors was polished with a clearer stethoscope form, larger chest piece, stronger pulse/care mark, and more professional medical-care identity.
+- Dental was lightly polished with a clearer tooth mass, stronger enamel grooves, and a slightly stronger raised contour while staying minimal.
+- Special Offers, Labs, Pet Clinic, and Hospitals were preserved, with only shared embossed weight refinements from the final symbol CSS.
+
+### Secondary rhythm and CTA polish
+
+- Secondary card rhythm was improved through consistent grid row rhythm and visual-area alignment for Doctors, Labs, Pet Clinic, and Hospitals.
+- Explore pills retain the same text and behavior but now have a slightly cleaner glass surface, subtle border, and softer premium shadow.
+- Section spacing was adjusted minimally to keep the heading-to-card rhythm consistent with the surrounding homepage.
+
+### Scope confirmations
+
+- No font family, layout structure, grid structure, card content, route, header, Smart Search, Featured Board, SEO, backend, database, Supabase, migration, package, or lockfile changes were made.
+- No diagonal white shine/streak was reintroduced.
+
+### Validation results
+
+Validation commands for this final polish:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed final-polish files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks also passed.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the final embossed symbols, aligned secondary card rhythm, premium Explore pills, and no header/search/featured-board regressions.
