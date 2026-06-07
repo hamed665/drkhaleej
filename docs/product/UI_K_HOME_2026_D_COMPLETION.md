@@ -241,3 +241,51 @@ FIX02 applied targeted visual polish only to the already-approved Provider CTA s
 ### Merge readiness recommendation
 
 After validation passes, PR #160 is recommended for merge as the final premium Provider CTA homepage baseline. The next product step remains: UI-K-HOME-2026-E — List Your Center Request Page / Form UI.
+
+---
+
+## FIX03 — Stronger Provider CTA Distinction and Premium Contrast
+
+### Scope
+
+FIX03 applied very targeted visual polish only to the existing Provider CTA section. No layout, copy, route behavior, component structure, homepage order, or product scope was changed.
+
+### Stronger provider CTA background tint
+
+- Increased the Provider CTA-only background richness with a soft teal-gray / mist-green / pearl-teal treatment.
+- Made the section more visually distinct from the surrounding homepage while keeping it light, medical, calm, and premium.
+- Avoided dark colors, loud gradients, saturated teal blocks, and ad-banner treatment.
+
+### Section depth refinement
+
+- Strengthened the main surface border, soft outer shadow, inner glow, and background layering.
+- Kept the existing DrMuscat glass visual language and RTL-aware accent rail.
+
+### Preview card readability polish
+
+- Increased preview card border clarity, surface contrast, media/photo preview visibility, and label readability.
+- Made the reviewed profile preview label, Gallery preview label, Special Offer stamp, rating preview, and disabled action labels clearer while preserving preview-safe static content.
+
+### CTA contrast polish
+
+- Strengthened the primary CTA teal fill, border, and hover/focus shadow so “List your center” / “أدرج مركزك” reads more confidently.
+- Kept the secondary CTA softer and supportive.
+- Preserved existing CTA text and approved provider route behavior.
+
+### No global/system changes
+
+- No typography system changes, font-family changes, new fonts, global styles, Search, Header, Featured Board, Discovery Categories, Footer, language switch, route/i18n, SEO, backend, API, Supabase, database, migration, package, form, payment, pricing table, dashboard, or copy changes were made.
+
+### FIX03 validation results
+
+- PASS — `git status --short` showed only allowed FIX03 files changed.
+- PASS with pre-existing warnings only — `pnpm lint`.
+- PASS — `pnpm typecheck`.
+- PASS — `pnpm build`.
+- PASS — `pnpm routes:check`.
+- PASS — `/en/om` and `/ar/om` server-rendered smoke checks confirmed localized Provider CTA content, CTAs, preview labels, offer stamp, rating sample, and action labels remain present.
+- WARNING — screenshot tooling remains unavailable in this environment; no browser/screenshot dependency was added.
+
+### Merge readiness recommendation
+
+After validation passes, PR #160 is recommended for merge as the final premium Provider CTA homepage baseline. The next product step remains: UI-K-HOME-2026-E — List Your Center Request Page / Form UI.
