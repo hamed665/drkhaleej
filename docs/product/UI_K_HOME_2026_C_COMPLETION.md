@@ -424,3 +424,48 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show the final embossed symbols, aligned secondary card rhythm, premium Explore pills, and no header/search/featured-board regressions.
+
+## 23. PR #159-FIX05 Dental and Beauty targeted redesign
+
+FIX05 is limited to the internal visual treatment of the Dental and Beauty & Aesthetics cards. The card grid, section heading, other category cards, card titles, descriptions, Explore actions, routes, responsive structure, and font family are unchanged.
+
+### Dental icon redesign
+
+- Dental now uses a cleaner embossed tooth silhouette with a more balanced crown, clearer lower tooth structure, and refined enamel groove lines.
+- The tooth artwork itself has stronger raised relief through controlled teal stroke contrast, soft directional shadow, and light surface highlight.
+- No sparkle, diagonal shine streak, cartoon treatment, bulky outline, or extra illustration layer was added.
+
+### Beauty & Aesthetics icon redesign
+
+- Beauty & Aesthetics now uses a fully replaced premium aesthetic symbol: a calm side-profile / facial contour mark inside a soft sculpted medallion.
+- The face contour is clearer and less abstract, with restrained brow and facial-detail cues that read as premium medical aesthetics rather than spa/cartoon illustration.
+- The icon relief is strengthened with subtle embossed shadow/highlight treatment while remaining within the DrMuscat teal, sage, and pearl palette.
+
+### Preserved scope
+
+- Special Offers, Doctors, Labs, Pet Clinic, and Hospitals were not redesigned.
+- No font family, card layout, grid structure, button system, header, Smart Search, Featured Board, routes, SEO, backend, database, Supabase, migration, dependency, package, or lockfile changes were made.
+
+### Validation results
+
+Validation commands for FIX05:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX05 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks for the redesigned Dental/Beauty symbols passed.
+- Screenshot capture was attempted, but the local environment does not include the `playwright` executable.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show only Dental and Beauty internally redesigned, no other category card rebuilt, no diagonal white shine/streak, and no typography/layout regressions.
