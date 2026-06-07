@@ -82,8 +82,11 @@ const providerCTACopy: Record<SupportedLocale, ProviderCTACopy> = {
 export function HomeProviderCTA2026({ locale, dir, providerHref }: HomeProviderCTA2026Props) {
   const copy = providerCTACopy[locale];
 
+  const titleId = `dm2026-provider-cta-title-${locale}`;
+  const trustId = `dm2026-provider-cta-trust-${locale}`;
+
   return (
-    <section className="dm2026-provider-cta dm2026-container" dir={dir} aria-labelledby="dm2026-provider-cta-title">
+    <section className="dm2026-provider-cta dm2026-container" dir={dir} aria-labelledby={titleId} aria-describedby={trustId}>
       <div className="dm2026-provider-cta__shell">
         <div className="dm2026-provider-cta__glow dm2026-provider-cta__glow--primary" aria-hidden="true" />
         <div className="dm2026-provider-cta__glow dm2026-provider-cta__glow--accent" aria-hidden="true" />
@@ -91,7 +94,7 @@ export function HomeProviderCTA2026({ locale, dir, providerHref }: HomeProviderC
         <div className="dm2026-provider-cta__copy">
           <span className="dm2026-badge dm2026-provider-cta__badge">{copy.badge}</span>
           <div className="dm2026-provider-cta__headline-group">
-            <h2 id="dm2026-provider-cta-title">{copy.headline}</h2>
+            <h2 id={titleId}>{copy.headline}</h2>
             <p>{copy.subtitle}</p>
           </div>
           <p className="dm2026-provider-cta__supporting-line">{copy.supportingLine}</p>
@@ -111,10 +114,10 @@ export function HomeProviderCTA2026({ locale, dir, providerHref }: HomeProviderC
             </Link>
           </div>
 
-          <p className="dm2026-provider-cta__trust">{copy.trustMicrocopy}</p>
+          <p id={trustId} className="dm2026-provider-cta__trust">{copy.trustMicrocopy}</p>
         </div>
 
-        <div className="dm2026-provider-cta__visual" aria-label={copy.imageAlt}>
+        <div className="dm2026-provider-cta__visual">
           <picture className="dm2026-provider-cta__picture">
             <source media="(max-width: 42rem)" srcSet="/images/home/provider-cta-healthcare-platform-preview-mobile.webp" type="image/webp" />
             <source srcSet="/images/home/provider-cta-healthcare-platform-preview.webp" type="image/webp" />
@@ -133,11 +136,11 @@ export function HomeProviderCTA2026({ locale, dir, providerHref }: HomeProviderC
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <div className="dm2026-provider-cta__preview-actions" aria-hidden="true">
+            <ul className="dm2026-provider-cta__preview-actions" aria-label={copy.previewLabel}>
               {copy.previewActions.map((action) => (
-                <span key={action}>{action}</span>
+                <li key={action}>{action}</li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 ## 1. Final scope
 
-Implemented a UI-only homepage Provider CTA section for DrMuscat 2026. The section promotes a reviewed public provider profile with photos, services, special offers and direct contact actions for healthcare providers in Oman.
+Implemented and refined a UI-only homepage Provider CTA section for DrMuscat 2026. The section promotes a reviewed public provider profile with photos, services, special offers and direct contact actions for healthcare providers in Oman.
 
 No backend, dashboard, form submission, payment, subscription, database, Supabase, API, SEO infrastructure, route creation, package or migration work was included.
 
@@ -45,10 +45,10 @@ The healthcare-platform image is art-directed as a supporting visual rather than
 
 ## 7. Accessibility notes
 
-- The section has an accessible heading via `aria-labelledby`.
+- The section has a locale-stable accessible heading via `aria-labelledby` and trust note via `aria-describedby`.
 - The image has concise localized alt text because it provides contextual support.
 - CTA links have visible, localized accessible names.
-- Feature and preview items are semantic lists.
+- Feature, preview item and preview action chips are semantic lists.
 - Focus-visible styling is included for CTA links.
 - The content does not require hover or motion to understand.
 
@@ -57,7 +57,7 @@ The healthcare-platform image is art-directed as a supporting visual rather than
 - Only local committed images are used.
 - No video, remote media, new dependencies or animation libraries were added.
 - The visual area has controlled dimensions to reduce layout shift.
-- CSS is scoped to the `dm2026-provider-cta-*` namespace.
+- CSS is scoped to the `dm2026-provider-cta-*` namespace and does not add broad global selectors.
 
 ## 9. Arabic/RTL status
 
@@ -81,11 +81,11 @@ Required validation commands were run after implementation:
 - `pnpm build`
 - `pnpm routes:check`
 
-All validation commands passed.
+All validation commands passed after the refinement pass.
 
 ## 13. Manual QA notes
 
-Code-level and build QA confirms the Provider CTA is mounted after Discovery Categories and uses responsive LTR/RTL-safe markup and scoped CSS. Browser screenshot capture was attempted for desktop and mobile, but the workspace does not provide the Playwright CLI, so visual screenshot artifacts could not be produced in this environment.
+Code-level and build QA confirms the Provider CTA remains mounted after Discovery Categories and uses responsive LTR/RTL-safe markup and scoped CSS. Browser screenshot capture was attempted for desktop and mobile, but the workspace does not provide the Playwright CLI, so visual screenshot artifacts could not be produced in this environment.
 
 Manual/browser QA checklist for `/en/om` and `/ar/om` desktop/mobile:
 

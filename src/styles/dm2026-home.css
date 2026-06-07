@@ -3504,6 +3504,7 @@
   opacity: 0.78;
 }
 
+/* UI-K-HOME-2026-D: scoped Provider CTA section. */
 .dm2026-provider-cta {
   position: relative;
   padding-block: clamp(1.4rem, 4vw, 3.25rem) clamp(2.5rem, 6vw, 4.75rem);
@@ -3738,7 +3739,7 @@
 .dm2026-provider-cta__preview-head span,
 .dm2026-provider-cta__preview-head strong,
 .dm2026-provider-cta__preview-items li,
-.dm2026-provider-cta__preview-actions span {
+.dm2026-provider-cta__preview-actions li {
   display: inline-flex;
   align-items: center;
   border-radius: var(--dm-radius-pill, 999px);
@@ -3792,7 +3793,7 @@
   padding: 0.3rem 0.48rem;
 }
 
-.dm2026-provider-cta__preview-actions span {
+.dm2026-provider-cta__preview-actions li {
   border: 1px solid rgba(14, 110, 100, 0.12);
   background: rgba(255, 255, 255, 0.7);
   color: var(--dm-ink-700, #2e3a3b);
