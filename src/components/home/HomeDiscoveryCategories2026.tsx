@@ -108,20 +108,20 @@ function EmbossedSymbol({ id }: { id: DiscoveryCardTone }) {
     <svg className="dm2026-discovery-card__embossed-svg" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
       {id === 'dental' ? (
         <>
-          <path className="dm2026-symbol__cast dm2026-symbol__cast--dental" d="M30 23c5-8 14-10 22-5 8-5 17-3 22 5 9 12 6 32-4 46-4 6-8 8-11 2-2-4-3-16-11-16S39 67 37 71c-3 6-7 4-11-2-10-14-13-34-4-46Z" />
-          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--dental" d="M30 20c5-8 14-10 22-5 8-5 17-3 22 5 9 12 6 32-4 46-4 6-8 8-11 2-2-4-3-16-11-16S39 64 37 68c-3 6-7 4-11-2-10-14-13-34-4-46Z" />
-          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--dental" d="M35 29c5-4 11-4 17-1 6-3 12-3 18 1" />
-          <path className="dm2026-symbol__carve dm2026-symbol__carve--dental" d="M48 40c0 5 0 9-1 13M39 41c6 3 13 3 19 0" />
+          <path className="dm2026-symbol__cast dm2026-symbol__cast--dental" d="M31 24c6-8 14-10 23-5 9-5 17-3 23 5 10 13 5 33-4 47-5 7-11 7-14-2-3-10-5-15-11-15s-8 5-11 15c-3 9-9 9-14 2-9-14-14-34-4-47Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--dental" d="M31 21c6-8 14-10 23-5 9-5 17-3 23 5 10 13 5 33-4 47-5 7-11 7-14-2-3-10-5-15-11-15s-8 5-11 15c-3 9-9 9-14 2-9-14-14-34-4-47Z" />
+          <path className="dm2026-symbol__ridge dm2026-symbol__ridge--dental" d="M36 30c5-4 12-5 18-1 6-4 13-3 18 1" />
+          <path className="dm2026-symbol__carve dm2026-symbol__carve--dental" d="M48 38c1 5 1 10 0 15M40 43c5 3 11 3 16 0" />
         </>
       ) : null}
 
       {id === 'beauty' ? (
         <>
-          <path className="dm2026-symbol__cast dm2026-symbol__cast--beauty" d="M48 17c17 0 29 13 29 31 0 19-13 33-29 33S19 67 19 48c0-18 12-31 29-31Z" />
-          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--beauty" d="M48 14c17 0 29 13 29 31 0 19-13 33-29 33S19 64 19 45c0-18 12-31 29-31Z" />
-          <path className="dm2026-symbol__profile dm2026-symbol__profile--beauty" d="M56 24c-8 5-13 13-13 23 4 1 8 3 10 6-2 3-5 5-9 6 2 7 8 12 17 15" />
-          <path className="dm2026-symbol__profile dm2026-symbol__profile--detail" d="M45 36c5-2 10-2 15 1M45 61c5 3 10 3 16 0" />
-          <path className="dm2026-symbol__mark dm2026-symbol__mark--beauty" d="M29 45c3-11 11-20 23-24" />
+          <path className="dm2026-symbol__cast dm2026-symbol__cast--beauty" d="M48 18c17 0 29 13 29 30S65 78 48 78 19 65 19 48s12-30 29-30Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero dm2026-symbol__mass--beauty" d="M48 15c17 0 29 13 29 30S65 75 48 75 19 62 19 45s12-30 29-30Z" />
+          <path className="dm2026-symbol__profile dm2026-symbol__profile--beauty" d="M58 23c-9 5-15 14-15 25 5 1 9 3 11 6-2 4-6 6-10 6 3 7 10 12 20 15" />
+          <path className="dm2026-symbol__profile dm2026-symbol__profile--detail" d="M46 36c5-2 10-2 15 1M46 62c5 3 10 3 16 0" />
+          <path className="dm2026-symbol__mark dm2026-symbol__mark--beauty" d="M30 47c2-12 10-21 23-26" />
         </>
       ) : null}
 

@@ -3311,61 +3311,61 @@
   }
 }
 
-/* FIX05: targeted Dental and Beauty replacement symbols only. */
+/* FIX06: full targeted Dental and Beauty internal symbol redesign only. */
 .dm2026-discovery-card--dental .dm2026-symbol__cast--dental {
-  stroke: rgba(6, 45, 41, 0.2);
-  filter: drop-shadow(3px 5px 5px rgba(7, 43, 40, 0.13));
+  stroke: rgba(6, 45, 41, 0.21);
+  filter: drop-shadow(4px 6px 6px rgba(7, 43, 40, 0.14));
 }
 
 .dm2026-discovery-card--dental .dm2026-symbol__mass--dental {
-  fill: rgba(244, 250, 248, 0.99);
-  stroke: rgba(10, 98, 90, 0.44);
-  stroke-width: 4.45;
+  fill: rgba(245, 251, 249, 0.99);
+  stroke: rgba(10, 98, 90, 0.47);
+  stroke-width: 4.65;
   filter:
-    drop-shadow(4px 6px 6px rgba(7, 43, 40, 0.16))
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.17))
     drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
 }
 
 .dm2026-discovery-card--dental .dm2026-symbol__ridge--dental,
 .dm2026-discovery-card--dental .dm2026-symbol__carve--dental {
-  stroke: rgba(8, 91, 83, 0.55);
+  stroke: rgba(8, 91, 83, 0.56);
   stroke-linecap: round;
   stroke-linejoin: round;
   filter:
     drop-shadow(2px 3px 2px rgba(7, 43, 40, 0.12))
-    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.92));
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.93));
 }
 
 .dm2026-discovery-card--dental .dm2026-symbol__carve--dental {
-  stroke-width: 3.15;
-  opacity: 0.82;
+  stroke-width: 3.05;
+  opacity: 0.78;
 }
 
 .dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
-  fill: rgba(244, 250, 248, 0.99);
-  stroke: rgba(11, 94, 87, 0.42);
-  stroke-width: 4.35;
+  fill: rgba(245, 251, 249, 0.99);
+  stroke: rgba(11, 94, 87, 0.44);
+  stroke-width: 4.5;
   filter:
-    drop-shadow(4px 6px 6px rgba(7, 43, 40, 0.16))
+    drop-shadow(5px 7px 7px rgba(7, 43, 40, 0.16))
     drop-shadow(-3px -3px 3px rgba(255, 255, 255, 0.98));
 }
 
 .dm2026-discovery-card--beauty .dm2026-symbol__profile--beauty {
-  stroke: rgba(7, 84, 77, 0.64);
-  stroke-width: 4.55;
+  stroke: rgba(7, 84, 77, 0.66);
+  stroke-width: 4.65;
   filter:
     drop-shadow(3px 4px 3px rgba(7, 43, 40, 0.15))
     drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.95));
 }
 
 .dm2026-discovery-card--beauty .dm2026-symbol__profile--detail {
-  stroke: rgba(7, 84, 77, 0.54);
-  stroke-width: 3.15;
-  opacity: 0.86;
+  stroke: rgba(7, 84, 77, 0.55);
+  stroke-width: 3.05;
+  opacity: 0.84;
 }
 
 .dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
-  stroke: rgba(8, 91, 83, 0.42);
-  stroke-width: 3.1;
+  stroke: rgba(8, 91, 83, 0.43);
+  stroke-width: 3.05;
   opacity: 0.72;
 }

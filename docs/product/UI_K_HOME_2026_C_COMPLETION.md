@@ -468,3 +468,49 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show only Dental and Beauty internally replaced, no other category card rebuilt, no diagonal white shine/streak, and no typography/layout regressions.
+
+## 24. PR #159-FIX06 full targeted Dental and Beauty card redesign
+
+FIX06 fully redesigns only the internal visual treatment for the Dental and Beauty & Aesthetics cards. The outer card shells, grid, section heading, titles, descriptions, Explore actions, responsive structure, font family, button system, and all other category cards remain unchanged.
+
+### Dental full redesign
+
+- Dental now uses a new premium dental-clinic brand mark with a smoother, broader tooth silhouette, cleaner crown geometry, and more intentional lower-root structure.
+- The symbol detail is limited to a restrained crown contour and one subtle enamel line so the tooth reads clearly without awkward smile-like or busy internal strokes.
+- The tooth itself carries the embossed effect through raised pearl fill, controlled teal stroke, and soft directional shadow/highlight treatment.
+
+### Beauty & Aesthetics full redesign
+
+- Beauty & Aesthetics now uses a newly balanced oval aesthetics medallion with a clearer luxury side-profile contour.
+- The internal profile mark was rebuilt for stronger proportions, a cleaner brow/lip cue, and better mobile legibility without droplet-heavy, leaf-like, or broken-face shapes.
+- The symbol stays in the DrMuscat teal, sage, and pearl palette and uses the same minimal embossed treatment as the section.
+
+### Preserved scope
+
+- Special Offers, Doctors, Labs, Pet Clinic, and Hospitals were not redesigned or rebuilt.
+- No font family, global typography, card layout, grid structure, spacing system, button system, header, Smart Search, Featured Board, routes, SEO, backend, database, Supabase, migration, dependency, package, or lockfile changes were made.
+- No diagonal white shine/streak, playful sparkle, external image, icon library, or new animation dependency was introduced.
+
+### Validation results
+
+Validation commands for FIX06:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX06 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks for the redesigned Dental/Beauty symbols passed.
+- Screenshot capture was attempted, but the local environment does not include the `playwright` executable.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended once validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show Dental and Beauty fully redesigned internally, all other cards stable, and no font/layout/global regressions.
