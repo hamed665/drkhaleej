@@ -3133,3 +3133,75 @@
 .dm2026-discovery-card--offers .dm2026-symbol__mark {
   stroke: rgba(139, 101, 27, 0.58);
 }
+
+/* FIX04: typography consistency lock and fully replaced Beauty symbol. */
+.dm2026-discovery-categories,
+.dm2026-discovery-categories__header,
+.dm2026-discovery-card,
+.dm2026-discovery-card__copy,
+.dm2026-discovery-card__cta {
+  font-family: inherit;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+.dm2026-discovery-categories__header h2 {
+  font-weight: var(--dm-weight-bold, 800);
+  letter-spacing: var(--dm-letter-snug, -0.025em);
+}
+
+.dm2026-discovery-categories__header p,
+.dm2026-discovery-card__copy span {
+  font-weight: var(--dm-weight-regular, 400);
+  letter-spacing: 0;
+}
+
+.dm2026-discovery-card__copy strong {
+  font-weight: var(--dm-weight-semibold, 600);
+  letter-spacing: var(--dm-letter-snug, -0.012em);
+}
+
+.dm2026-discovery-card__cta,
+.dm2026-discovery-categories__badge {
+  font-weight: var(--dm-weight-semibold, 600);
+  letter-spacing: 0;
+}
+
+[dir='rtl'] .dm2026-discovery-categories__header h2,
+[dir='rtl'] .dm2026-discovery-card__copy strong,
+[dir='rtl'] .dm2026-discovery-card__copy span,
+[dir='rtl'] .dm2026-discovery-card__cta,
+[dir='rtl'] .dm2026-discovery-categories__badge {
+  letter-spacing: var(--dm-arabic-letter-spacing, 0);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__cast--beauty {
+  stroke: rgba(7, 43, 40, 0.2);
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mass--beauty {
+  fill: rgba(240, 248, 246, 0.98);
+  stroke: rgba(12, 96, 88, 0.36);
+}
+
+.dm2026-symbol__profile {
+  fill: none;
+  stroke: rgba(8, 91, 83, 0.6);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter:
+    drop-shadow(2px 3px 3px rgba(7, 43, 40, 0.15))
+    drop-shadow(-2px -2px 2px rgba(255, 255, 255, 0.94));
+}
+
+.dm2026-symbol__profile--detail {
+  stroke-width: 3.25;
+  opacity: 0.94;
+}
+
+.dm2026-discovery-card--beauty .dm2026-symbol__mark--beauty {
+  stroke: rgba(8, 91, 83, 0.48);
+  stroke-width: 3.35;
+}

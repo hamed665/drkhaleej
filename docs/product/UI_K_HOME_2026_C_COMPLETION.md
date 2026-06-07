@@ -334,3 +334,48 @@ Results after command execution:
 ### Merge-readiness recommendation
 
 Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show stronger premium embossed symbols without diagonal shine streaks or layout/text/button/font regressions.
+
+## 21. PR #159-FIX04 font consistency lock and Beauty icon replacement
+
+FIX04 keeps the existing card grid, card sizes, titles, descriptions, Explore actions, routes, homepage section structure, and all non-Beauty card artwork stable. The work is limited to section typography consistency and the Beauty & Aesthetics icon.
+
+### Font consistency lock
+
+- The discovery section now explicitly inherits the approved site typography behavior instead of introducing a local font stack.
+- Headings, descriptions, card titles, and Explore pills were normalized to existing DrMuscat typography weight/letter-spacing tokens where applicable.
+- Arabic/RTL letter spacing remains tied to the approved Arabic letter-spacing token.
+- No new font family, remote font, fallback stack, or typography system was introduced.
+
+### Beauty & Aesthetics icon replacement
+
+- The previous face-plus-droplet composition was fully removed.
+- Beauty & Aesthetics now uses a new sculpted side-profile/aesthetic contour symbol with a raised mass, profile line, refined face details, and a restrained brow/beauty mark.
+- The new icon preserves the same premium embossed visual language as the other cards while improving clarity and elegance on desktop and mobile.
+
+### Preserved cards and scope
+
+- Dental, Special Offers, Doctors, Labs, Pet Clinic, and Hospitals were preserved.
+- No layout, text, button, route, header, Smart Search, Featured Board, SEO, backend, database, Supabase, migration, package, or lockfile changes were made.
+
+### Validation results
+
+Validation commands for FIX04:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Results after command execution:
+
+- `git status --short`: completed and showed only the three allowed FIX04 files modified before commit.
+- `pnpm lint`: passed with existing repository warnings only.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm routes:check`: passed.
+- Additional checks: `git diff --check` and localized HTML smoke checks also passed.
+
+### Merge-readiness recommendation
+
+Merge-readiness is recommended after automated validation passes and human QA confirms `/en/om` and `/ar/om` desktop/mobile views show typography consistent with the rest of DrMuscat and the fully replaced Beauty icon reads as premium, elegant, and embossed.
