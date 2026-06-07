@@ -179,3 +179,65 @@ FIX01 applied targeted final polish only to the existing Provider CTA section. T
 ### Merge readiness recommendation
 
 After validation passes, PR #160 is recommended for merge as the final homepage Provider CTA section baseline. The next product step remains: UI-K-HOME-2026-E — List Your Center Request Page / Form UI.
+
+---
+
+## FIX02 — Premium Atmosphere Polish for Provider CTA Section
+
+### Scope
+
+FIX02 applied targeted visual polish only to the already-approved Provider CTA section. The section structure, homepage order, route behavior, and product scope remain unchanged.
+
+### Premium atmosphere polish
+
+- Added a Provider CTA-only ambient backdrop to create a more intentional premium conversion zone during scroll.
+- Increased controlled surface depth using soft pearl, light teal haze, warm off-white, and restrained champagne accents.
+- Kept the section light, calm, medical/trustworthy, and aligned with the DrMuscat 2026 visual system.
+
+### Background/depth refinement
+
+- Refined the main glass surface border, shadow stack, and internal highlight layers.
+- Added a subtle side accent rail that respects LTR/RTL direction.
+- Avoided dark, noisy, loud, ad-like, or disconnected visual treatment.
+
+### Preview card readability improvements
+
+- Increased the profile preview card contrast and depth without turning it into a real provider card.
+- Improved the CSS-only media/photo preview treatment with richer teal/pearl/champagne layering.
+- Made the reviewed profile label, Special Offer stamp, sample rating, chips, and disabled action labels easier to read.
+- Preserved all preview-only safeguards: no real provider data, no live links, no claims, no prices, and no discounts.
+
+### CTA polish
+
+- Made the primary CTA more confident through stronger border, shadow, and glass highlight treatment.
+- Kept the secondary CTA quieter while still polished and readable.
+- Preserved existing CTA text and approved provider route behavior.
+
+### Value point polish
+
+- Improved value point cards with more intentional surface depth, spacing, and subtle teal marker treatment.
+- Preserved the approved six English and Arabic value points without adding new items or crowding the section.
+
+### Typography consistency confirmation
+
+- The Provider CTA continues to inherit the approved DrMuscat typography system.
+- No new font-family, Google Fonts, remote fonts, custom fallback stack, or global typography changes were introduced.
+- Arabic heading treatment remains formal and readable with no negative Arabic letter-spacing.
+
+### No global/system changes
+
+- No Search, Header, Featured Board, Discovery Categories, Footer, language switch, route/i18n, SEO, backend, API, Supabase, database, migration, package, form, payment, pricing table, or dashboard files were changed.
+
+### FIX02 validation results
+
+- PASS — `git status --short` showed only allowed FIX02 files changed.
+- PASS with pre-existing warnings only — `pnpm lint`.
+- PASS — `pnpm typecheck`.
+- PASS — `pnpm build`.
+- PASS — `pnpm routes:check`.
+- PASS — `/en/om` and `/ar/om` server-rendered smoke checks confirmed localized Provider CTA content, CTAs, preview labels, offer stamp, rating sample, and action labels remain present.
+- WARNING — screenshot tooling was unavailable in this environment (`chromium`, `google-chrome`, `playwright`, and `wkhtmltoimage` were not installed).
+
+### Merge readiness recommendation
+
+After validation passes, PR #160 is recommended for merge as the final premium Provider CTA homepage baseline. The next product step remains: UI-K-HOME-2026-E — List Your Center Request Page / Form UI.
