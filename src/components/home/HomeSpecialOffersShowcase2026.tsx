@@ -477,7 +477,6 @@ function OfferCard({ copy, locale, offer, slot, isActive, slideIndex, onPreview 
       <div className="dm2026-special-offers-card__body">
         <div className="dm2026-special-offers-card__meta-row">
           <span className="dm2026-special-offers-card__offer-badge">{copy.offerBadge}</span>
-          <span className="dm2026-special-offers-card__media-pill">{mediaLabel}</span>
         </div>
 
         <div className="dm2026-special-offers-card__provider">

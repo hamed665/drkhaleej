@@ -234,3 +234,82 @@ Validation completed for FIX01:
 ## 23. FIX01 merge-readiness recommendation
 
 PR #162-FIX01 is intended to be merge-ready if visual QA confirms the mobile heading is readable, mobile cards feel shorter and cleaner, media slots feel premium, desktop hierarchy is clear, Arabic/RTL remains unclipped, and validation passes.
+
+## 24. FIX02 summary
+
+PR #162-FIX02 fixes the mobile card rendering blocker and applies final Special Offers-only polish. The carousel remains provider-led, preview-safe, route-free, backend-free, and dependency-free.
+
+FIX02 changes:
+
+- restored reliable mobile card rendering by forcing the active mobile card into a normal visible flex/block flow;
+- made the mobile stage and shell overflow-visible where card content needs normal page scroll;
+- disabled the full-card preview overlay on the active/mobile card so it cannot interfere with mobile stacking or content visibility;
+- removed the duplicate in-body media badge so cards now keep one category badge, one Special Offer badge, and one media badge;
+- strengthened the desktop headline locally without changing font family or global typography;
+- improved active/side-card hierarchy while keeping side cards readable;
+- added final mobile CTA, Arabic wrapping, media slot, and safe-area polish.
+
+## 25. FIX02 mobile card rendering bug root cause
+
+The mobile bug came from the showcase inheriting too much desktop carousel structure on small screens: grid-row sizing, transformed carousel cards, `overflow: hidden` shells/cards, and the full-card absolute preview overlay created a fragile stacking/clipping context. In that state the colored card/media surface could remain visible while the body content appeared clipped or not reliably visible in mobile layouts.
+
+FIX02 addresses the root cause by switching the active mobile card to a normal visible column flow, making the mobile shell/stage/card overflow visible, explicitly restoring body visibility, and disabling the full-card preview overlay on mobile/active cards.
+
+## 26. FIX02 mobile visibility fix
+
+Mobile now guarantees the active card can show:
+
+- media slot;
+- category badge;
+- Special Offer preview badge;
+- Photo-ready or Video-ready badge;
+- provider name;
+- provider type;
+- area/city;
+- offer title;
+- short description;
+- chips;
+- View offer / عرض التفاصيل CTA;
+- View profile / عرض الملف CTA;
+- trust note;
+- dots/progress indicator.
+
+The card remains compact but is not clipped into a fixed carousel viewport.
+
+## 27. FIX02 heading typography polish
+
+The desktop section headline now has stronger local weight and balanced line wrapping while keeping the existing DrMuscat font family and typography system. Arabic receives a separate local weight/line-height treatment with zero negative letter spacing.
+
+## 28. FIX02 media slot polish
+
+The media placeholder remains asset-free. FIX02 keeps the premium layered gradient/photo/video treatment and improves stacking so glass labels, play/photo elements, and media depth stay visible above decorative layers.
+
+## 29. FIX02 carousel hierarchy polish
+
+Desktop keeps the three-card stage. The active card is more clearly featured through elevation and scale, while side cards remain readable with calmer opacity and subtle hover/focus recovery.
+
+## 30. FIX02 Arabic/RTL notes
+
+FIX02 adds mobile wrapping protections for Arabic provider names, descriptions, labels, chips, and CTA buttons. RTL headline letter spacing remains zero, alignment stays logical-start, and CTA buttons remain visible and tappable.
+
+## 31. FIX02 validation results
+
+Required validation commands for FIX02:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Validation completed for FIX02:
+
+- `git status --short` showed only the approved Special Offers component, CSS, and completion documentation changed before commit.
+- `pnpm lint` passed with existing repository warnings only.
+- `pnpm typecheck` passed.
+- `pnpm build` passed.
+- `pnpm routes:check` passed.
+
+## 32. FIX02 merge-readiness recommendation
+
+PR #162-FIX02 is intended to be merge-ready if visual QA confirms the active mobile card fully renders on `/en/om` and `/ar/om`, CTAs are visible/tappable, desktop headline and carousel hierarchy feel premium, media placeholders feel photo/video-ready, Arabic is unclipped, and validation passes.
