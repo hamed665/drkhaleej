@@ -1,95 +1,75 @@
+'use client';
+
 import Link from 'next/link';
-import { headers } from 'next/headers';
+import { usePathname } from 'next/navigation';
+import { HeaderLanguageSwitch } from '@/components/layout/header-language-switch';
+import { footerCopy, resolveLayoutPathnameI18n } from '@/components/layout/layout-i18n-copy';
 import { Container } from '@/components/ui/container';
-import { isSupportedLocale, localeDirection, SupportedLocale } from '@/lib/i18n/config';
-import { homeRoute, publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
+import { publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
 
-const footerCopy: Record<
-  SupportedLocale,
-  {
-    tagline: string;
-    navLabel: string;
-    home: string;
-    doctors: string;
-    centers: string;
-    pharmacies: string;
-    labs: string;
-    services: string;
-    search: string;
-    forProviders: string;
-    utility: string;
-    switchLabel: string;
-  }
-> = {
-  en: {
-    tagline: 'Healthcare discovery foundation for Oman.',
-    navLabel: 'Footer public navigation',
-    home: 'Home',
-    doctors: 'Doctors',
-    centers: 'Centers',
-    pharmacies: 'Pharmacies',
-    labs: 'Labs',
-    services: 'Services',
-    search: 'Search',
-    forProviders: 'For Providers',
-    utility: 'Oman-first public healthcare discovery in English and Arabic.',
-    switchLabel: 'Switch language to Arabic'
-  },
-  ar: {
-    tagline: 'أساس لاكتشاف الرعاية الصحية في عُمان.',
-    navLabel: 'تنقل التذييل العام',
-    home: 'الرئيسية',
-    doctors: 'الأطباء',
-    centers: 'المراكز',
-    pharmacies: 'الصيدليات',
-    labs: 'المختبرات',
-    services: 'الخدمات',
-    search: 'البحث',
-    forProviders: 'لمقدمي الرعاية',
-    utility: 'اكتشاف الرعاية الصحية في عُمان بالعربية والإنجليزية.',
-    switchLabel: 'تبديل اللغة إلى الإنجليزية'
-  }
-};
-
-export async function SiteFooter() {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const safeLocale: SupportedLocale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
-  const copy = footerCopy[safeLocale];
-  const dir = localeDirection(safeLocale);
-  const homeHref = homeRoute(safeLocale, 'om');
-  const switchHref = homeRoute(safeLocale === 'en' ? 'ar' : 'en', 'om');
-  const navItems = [
-    { href: homeHref, label: copy.home },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'doctors'), label: copy.doctors },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'centers'), label: copy.centers },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'pharmacies'), label: copy.pharmacies },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'labs'), label: copy.labs },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'services'), label: copy.services },
-    { href: publicDiscoveryRoute(safeLocale, 'om', 'search'), label: copy.search },
-    { href: publicProviderRoute(safeLocale, 'om'), label: copy.forProviders }
+export function SiteFooter() {
+  const pathname = usePathname();
+  const { locale, country, dir } = resolveLayoutPathnameI18n(pathname);
+  const copy = footerCopy[locale];
+  const browseLinks = [
+    { href: publicDiscoveryRoute(locale, country, 'doctors'), label: copy.doctors },
+    { href: publicDiscoveryRoute(locale, country, 'centers'), label: copy.centers },
+    { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
+    { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
+    { href: publicDiscoveryRoute(locale, country, 'services'), label: copy.services }
   ] as const;
+  const disabledBrowseItems = [copy.hospitals, copy.offers] as const;
+  const providerLinks = [{ href: publicProviderRoute(locale, country), label: copy.listYourCenter }] as const;
+  const disabledProviderItems = [copy.reviewedProfile, copy.photosGallery, copy.offers, copy.whatsappCallDirections] as const;
+  const trustItems = [copy.publicDiscoveryOnly, copy.notMedicalAdvice, copy.confirmWithProvider, copy.sponsoredVisibility] as const;
 
   return (
     <footer className="site-footer site-footer--premium" role="contentinfo" dir={dir}>
       <Container className="site-footer__inner">
         <div className="site-footer__brand">
           <strong>DrMuscat</strong>
-          <p>{copy.tagline}</p>
+          <p>{copy.brandText}</p>
         </div>
         <nav className="site-footer__links" aria-label={copy.navLabel}>
-          <ul>
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <strong>{copy.browseHeading}</strong>
+            <ul>
+              {browseLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+              {disabledBrowseItems.map((item) => (
+                <li key={item}>
+                  <span aria-disabled="true" title={copy.comingSoon}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <strong>{copy.providersHeading}</strong>
+            <ul>
+              {providerLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+              {disabledProviderItems.map((item) => (
+                <li key={item}>
+                  <span aria-disabled="true" title={copy.comingSoon}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
         <div className="site-footer__utility">
-          <p>{copy.utility}</p>
-          <Link href={switchHref} className="site-footer__locale-switch" hrefLang={safeLocale === 'en' ? 'ar' : 'en'}>
-            {safeLocale === 'en' ? 'العربية' : 'English'}
-          </Link>
+          <strong>{copy.trustHeading}</strong>
+          <ul>
+            {trustItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <HeaderLanguageSwitch className="site-footer__locale-switch" />
         </div>
       </Container>
     </footer>
