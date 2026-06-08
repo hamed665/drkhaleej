@@ -26,7 +26,7 @@ const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
     badge: 'FAQ',
     headline: 'Questions before you explore care',
     subtitle: 'Clear answers about DrMuscat, provider information, offers, and safe public discovery in Oman.',
-    trustChips: ['Oman public discovery', 'Arabic + English', 'Medical-safe guidance'],
+    trustChips: ['Oman public discovery', 'English + Arabic', 'Medical-safe guidance'],
     items: [
       {
         question: 'What is DrMuscat?',
@@ -73,7 +73,7 @@ const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
     badge: 'الأسئلة الشائعة',
     headline: 'أسئلة قبل استكشاف الرعاية',
     subtitle: 'إجابات واضحة حول DrMuscat ومعلومات مقدمي الخدمة والعروض والاكتشاف العام الآمن في عُمان.',
-    trustChips: ['اكتشاف عام في عُمان', 'العربية + الإنجليزية', 'محتوى آمن طبياً'],
+    trustChips: ['اكتشاف عام في عُمان', 'العربية + الإنجليزية', 'إرشاد آمن طبياً'],
     items: [
       {
         question: 'ما هو DrMuscat؟',
@@ -141,7 +141,7 @@ export function HomeFAQ2026({ locale, dir }: HomeFAQ2026Props) {
           </ul>
         </div>
 
-        <div className="dm2026-home-faq__accordion" aria-label={copy.headline}>
+        <div className="dm2026-home-faq__accordion" aria-label={copy.headline} data-count={copy.items.length}>
           {copy.items.map((item, index) => {
             const isOpen = openIndex === index;
             const panelId = `dm2026-home-faq-panel-${locale}-${index}`;
