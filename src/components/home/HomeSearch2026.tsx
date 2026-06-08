@@ -85,6 +85,84 @@ type HomeSearch2026Props = {
   providerHref: string;
 };
 
+type SearchChipOption = {
+  label: string;
+  value: string;
+};
+
+type PremiumHeroCopy = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  placeholder: string;
+  searchInLabel: string;
+  moreFiltersLabel: string;
+  trustItems: readonly string[];
+  visualKicker: string;
+  visualTitle: string;
+  visualBody: string;
+  visualBadge: string;
+  visualTrust: string;
+  secondaryFilterNote: string;
+};
+
+const premiumHeroCopy: Record<'ltr' | 'rtl', PremiumHeroCopy> = {
+  ltr: {
+    eyebrow: 'Healthcare discovery for Oman',
+    title: 'Find trusted care, all in one place.',
+    description: 'Search doctors, clinics, labs, pharmacies, services and offers by country, city and area.',
+    placeholder: 'Search doctors, centers, services, offers or areas...',
+    searchInLabel: 'Search in',
+    moreFiltersLabel: 'More filters',
+    trustItems: ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+    visualKicker: 'Image-ready',
+    visualTitle: 'Premium healthcare discovery surface',
+    visualBody: 'A calm media slot for future verified provider, location, or campaign imagery.',
+    visualBadge: 'Oman-first',
+    visualTrust: 'Verified information',
+    secondaryFilterNote: 'Secondary provider filters stay tucked away until needed.'
+  },
+  rtl: {
+    eyebrow: 'اكتشاف الرعاية الصحية في عُمان',
+    title: 'ابحث عن رعاية موثوقة في مكان واحد.',
+    description: 'ابحث عن الأطباء والعيادات والمختبرات والصيدليات والخدمات والعروض حسب الدولة والمدينة والمنطقة.',
+    placeholder: 'ابحث عن أطباء أو مراكز أو خدمات أو عروض أو مناطق...',
+    searchInLabel: 'ابحث في',
+    moreFiltersLabel: 'المزيد من الفلاتر',
+    trustItems: ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'],
+    visualKicker: 'جاهز للصورة',
+    visualTitle: 'واجهة اكتشاف صحية فاخرة',
+    visualBody: 'مساحة إعلامية هادئة قابلة للاستبدال لاحقًا بصورة مقدم أو موقع أو حملة معتمدة.',
+    visualBadge: 'الأولوية لعُمان',
+    visualTrust: 'معلومات موثقة',
+    secondaryFilterNote: 'تبقى الفلاتر الثانوية مخفية حتى تحتاج إليها.'
+  }
+};
+
+const primaryChipBlueprint: Record<'ltr' | 'rtl', readonly { label: string; fallbackValue: string }[]> = {
+  ltr: [
+    { label: 'Doctors', fallbackValue: 'Doctors' },
+    { label: 'Centers', fallbackValue: 'Clinics' },
+    { label: 'Labs', fallbackValue: 'Labs' },
+    { label: 'Pharmacies', fallbackValue: 'Pharmacies' },
+    { label: 'Services', fallbackValue: 'Services' },
+    { label: 'Offers', fallbackValue: 'Offers' }
+  ],
+  rtl: [
+    { label: 'الأطباء', fallbackValue: 'الأطباء' },
+    { label: 'المراكز', fallbackValue: 'العيادات' },
+    { label: 'المختبرات', fallbackValue: 'المختبرات' },
+    { label: 'الصيدليات', fallbackValue: 'الصيدليات' },
+    { label: 'الخدمات', fallbackValue: 'الخدمات' },
+    { label: 'العروض', fallbackValue: 'العروض' }
+  ]
+};
+
+const primaryChipOptions = (contentTypes: readonly string[], dir: 'ltr' | 'rtl'): readonly SearchChipOption[] =>
+  primaryChipBlueprint[dir]
+    .map((chip) => ({ label: chip.label, value: contentTypes.includes(chip.label) ? chip.label : chip.fallbackValue }))
+    .filter((chip) => contentTypes.includes(chip.value));
+
 const groupLabels: Record<SmartSuggestion['group'], LocalizedText> = {
   services: { en: 'Services', ar: 'الخدمات' },
   providers: { en: 'Provider types', ar: 'أنواع المقدمين' },
@@ -216,7 +294,6 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   const [selectedCity, setSelectedCity] = useState(defaultCity);
   const areaOptions = cityAreas[selectedCity] ?? [copy.cityWideAreaLabel];
   const [selectedArea, setSelectedArea] = useState(firstValue(areaOptions));
-  const [showMorePopular, setShowMorePopular] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] = useState<SearchSuggestionView>(() => toView(firstValue(smartSuggestions), dir));
   const [activeSuggestion, setActiveSuggestion] = useState<SearchSuggestionView>(() => toView(firstValue(smartSuggestions), dir));
@@ -237,13 +314,11 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
       .map(({ suggestion }) => toView(suggestion, dir));
   }, [dir, query]);
 
-  const popularSuggestions = useMemo(() => smartSuggestions
-    .filter((suggestion) => ['dentist', 'dermatology', 'pediatrics', 'lab-tests', 'pharmacy', 'pet-clinic', 'beauty-clinic', 'al-khuwair', 'qurum'].includes(suggestion.id))
-    .map((suggestion) => toView(suggestion, dir)), [dir]);
-  const expandedPopularSuggestions = showMorePopular ? smartSuggestions.slice(0, 18).map((suggestion) => toView(suggestion, dir)) : popularSuggestions;
   const hasTypedQuery = normalizeSearch(query).length > 0;
   const visibleSuggestions = hasTypedQuery ? matchingSuggestions : [];
   const suggestionPanelId = 'dm2026-home-search-smart-panel';
+  const heroCopy = premiumHeroCopy[dir];
+  const chipOptions = useMemo(() => primaryChipOptions(copy.contentTypes, dir), [copy.contentTypes, dir]);
 
   const resetAreaForCity = (city: string) => {
     const nextAreas = cityAreas[city] ?? [copy.cityWideAreaLabel];
@@ -291,171 +366,175 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   return (
     <section className="dm2026-home-search dm2026-search" dir={dir} aria-labelledby="dm2026-home-search-title">
       <form className="dm2026-search-surface dm2026-home-search__surface" action={searchHref} method="get" onSubmit={handleSubmit}>
-        <div className="dm2026-home-search__header">
-          <span className="dm2026-badge">{copy.eyebrow}</span>
-          <div>
-            <h2 id="dm2026-home-search-title">{copy.title}</h2>
-            <p>{copy.description}</p>
+        <div className="dm2026-home-search__main">
+          <div className="dm2026-home-search__header">
+            <span className="dm2026-badge">{heroCopy.eyebrow}</span>
+            <div>
+              <h2 id="dm2026-home-search-title">{heroCopy.title}</h2>
+              <p>{heroCopy.description}</p>
+            </div>
           </div>
-        </div>
 
-        <div className="dm2026-home-search__command">
-          <label htmlFor="dm2026-home-care-need">{copy.careNeedLabel}</label>
-          <div className="dm2026-home-search__command-input" role="combobox" aria-expanded={showSuggestions && visibleSuggestions.length > 0} aria-controls={suggestionPanelId}>
-            <span aria-hidden="true">⌕</span>
-            <input
-              id="dm2026-home-care-need"
-              name="q"
-              className="dm2026-input"
-              type="search"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setShowSuggestions(event.target.value.trim().length > 0);
-                setSearchPreviewVisible(false);
-              }}
-              onFocus={() => setShowSuggestions(normalizeSearch(query).length > 0)}
-              placeholder={copy.careNeedPlaceholder}
-              autoComplete="off"
-            />
+          <div className="dm2026-home-search__command">
+            <label htmlFor="dm2026-home-care-need">{copy.careNeedLabel}</label>
+            <div className="dm2026-home-search__command-input" role="combobox" aria-expanded={showSuggestions && visibleSuggestions.length > 0} aria-controls={suggestionPanelId}>
+              <span aria-hidden="true">⌕</span>
+              <input
+                id="dm2026-home-care-need"
+                name="q"
+                className="dm2026-input"
+                type="search"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setShowSuggestions(event.target.value.trim().length > 0);
+                  setSearchPreviewVisible(false);
+                }}
+                onFocus={() => setShowSuggestions(normalizeSearch(query).length > 0)}
+                placeholder={heroCopy.placeholder}
+                autoComplete="off"
+              />
+              <button type="submit" className="dm2026-button dm2026-button-primary">
+                {copy.searchLabel}
+              </button>
+            </div>
+          </div>
+
+          {showSuggestions && visibleSuggestions.length > 0 ? (
+            <div id={suggestionPanelId} className="dm2026-home-search__smart-panel dm2026-home-search__smart-panel--active" aria-live="polite">
+              <div className="dm2026-home-search__smart-list" role="listbox" aria-label={copy.staticPreviewLabel}>
+                {visibleSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion.id}
+                    type="button"
+                    className="dm2026-home-search__smart-item"
+                    onClick={() => applySuggestion(suggestion)}
+                    onMouseEnter={() => setActiveSuggestion(suggestion)}
+                    onFocus={() => setActiveSuggestion(suggestion)}
+                    role="option"
+                    aria-selected={activeSuggestion.id === suggestion.id}
+                  >
+                    <span aria-hidden="true" />
+                    <strong>{suggestion.label}</strong>
+                    <small>{suggestion.group} · {suggestion.helper}</small>
+                  </button>
+                ))}
+              </div>
+              <aside className="dm2026-home-search__preview" aria-label={activeSuggestion.label}>
+                <span aria-hidden="true" />
+                <small>{activeSuggestion.group}</small>
+                <strong>{activeSuggestion.label}</strong>
+                <p>{activeSuggestion.helper}</p>
+                <button type="button" className="dm2026-home-search__preview-cta" onClick={() => applySuggestion(activeSuggestion)}>
+                  {copy.suggestionPreviewCta}
+                </button>
+              </aside>
+            </div>
+          ) : null}
+
+          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={copy.contentTypeLabel}>
+            <legend>{heroCopy.searchInLabel}</legend>
+            <div>
+              {chipOptions.map((contentType) => (
+                <label key={contentType.label} className="dm2026-home-search__chip">
+                  <input type="radio" name="contentType" value={contentType.value} checked={contentType.value === selectedContentType} onChange={() => setSelectedContentType(contentType.value)} />
+                  <span>{contentType.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="dm2026-home-search__select-grid" aria-label={`${copy.countryLabel}, ${copy.cityLabel}, ${copy.areaLabel}`}>
+            <div className="dm2026-home-search__field">
+              <label htmlFor="dm2026-home-country">{copy.countryLabel}</label>
+              <select id="dm2026-home-country" name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => handleCountryChange(event.target.value)}>
+                {copy.countries.map((country) => (
+                  <option key={country.label} value={country.label} disabled={country.disabled}>
+                    {country.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="dm2026-home-search__field">
+              <label htmlFor="dm2026-home-city">{copy.cityLabel}</label>
+              <select id="dm2026-home-city" name="city" className="dm2026-select" value={selectedCity} onChange={(event) => resetAreaForCity(event.target.value)}>
+                {copy.cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="dm2026-home-search__field">
+              <label htmlFor="dm2026-home-area">{copy.areaLabel}</label>
+              <select id="dm2026-home-area" name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>
+                {areaOptions.map((area) => (
+                  <option key={area} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <details className="dm2026-home-search__more-filters">
+            <summary>{heroCopy.moreFiltersLabel}</summary>
+            <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.providerTypeLabel}>
+              <legend>{copy.providerTypeLabel}</legend>
+              <div>
+                {copy.providerTypes.map((providerType) => (
+                  <label key={providerType} className="dm2026-home-search__chip">
+                    <input type="radio" name="type" value={providerType} checked={providerType === selectedProviderType} onChange={() => setSelectedProviderType(providerType)} />
+                    <span>{providerType}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <p>{heroCopy.secondaryFilterNote}</p>
+          </details>
+
+          <div className="dm2026-home-search__actions">
             <button type="submit" className="dm2026-button dm2026-button-primary">
               {copy.searchLabel}
             </button>
+            <Link href={providerHref} className="dm2026-button dm2026-button-secondary">
+              {copy.providerLabel}
+            </Link>
           </div>
+
+          <ul className="dm2026-home-search__trust-row" aria-label={dir === 'rtl' ? 'ملاحظات الثقة' : 'Trust notes'}>
+            {heroCopy.trustItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+
+          {searchPreviewVisible ? (
+            <div className="dm2026-home-search__discovery-preview" role="status">
+              <strong>{dir === 'rtl' ? 'معاينة الاكتشاف' : 'Discovery preview'}</strong>
+              <p>{[query || selectedSuggestion.label, selectedContentType, selectedCity, selectedArea].filter(Boolean).join(' · ')}</p>
+              <small>{dir === 'rtl' ? 'ستظهر الملفات العامة بعد مراجعة بيانات المقدمين واعتمادها.' : 'Reviewed public profiles will appear here after provider data is approved.'}</small>
+            </div>
+          ) : null}
         </div>
 
-        {showSuggestions && visibleSuggestions.length > 0 ? (
-          <div id={suggestionPanelId} className="dm2026-home-search__smart-panel dm2026-home-search__smart-panel--active" aria-live="polite">
-            <div className="dm2026-home-search__smart-list" role="listbox" aria-label={copy.staticPreviewLabel}>
-              {visibleSuggestions.map((suggestion) => (
-                <button
-                  key={suggestion.id}
-                  type="button"
-                  className="dm2026-home-search__smart-item"
-                  onClick={() => applySuggestion(suggestion)}
-                  onMouseEnter={() => setActiveSuggestion(suggestion)}
-                  onFocus={() => setActiveSuggestion(suggestion)}
-                  role="option"
-                  aria-selected={activeSuggestion.id === suggestion.id}
-                >
-                  <span aria-hidden="true" />
-                  <strong>{suggestion.label}</strong>
-                  <small>{suggestion.group} · {suggestion.helper}</small>
-                </button>
-              ))}
-            </div>
-            <aside className="dm2026-home-search__preview" aria-label={activeSuggestion.label}>
-              <span aria-hidden="true" />
-              <small>{activeSuggestion.group}</small>
-              <strong>{activeSuggestion.label}</strong>
-              <p>{activeSuggestion.helper}</p>
-              <button type="button" className="dm2026-home-search__preview-cta" onClick={() => applySuggestion(activeSuggestion)}>
-                {copy.suggestionPreviewCta}
-              </button>
-            </aside>
+        <aside className="dm2026-home-search__visual" aria-label={heroCopy.visualTitle}>
+          <div className="dm2026-home-search__visual-media" aria-hidden="true">
+            <span className="dm2026-home-search__visual-pulse" />
+            <span className="dm2026-home-search__visual-pin" />
+            <span className="dm2026-home-search__visual-cross">+</span>
           </div>
-        ) : null}
-
-        <div className="dm2026-home-search__chip-rows">
-          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={copy.contentTypeLabel}>
-            <legend>{copy.contentTypeLabel}</legend>
-            <div>
-              {copy.contentTypes.map((contentType) => (
-                <label key={contentType} className="dm2026-home-search__chip">
-                  <input type="radio" name="contentType" value={contentType} checked={contentType === selectedContentType} onChange={() => setSelectedContentType(contentType)} />
-                  <span>{contentType}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.providerTypeLabel}>
-            <legend>{copy.providerTypeLabel}</legend>
-            <div>
-              {copy.providerTypes.map((providerType) => (
-                <label key={providerType} className="dm2026-home-search__chip">
-                  <input type="radio" name="type" value={providerType} checked={providerType === selectedProviderType} onChange={() => setSelectedProviderType(providerType)} />
-                  <span>{providerType}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        </div>
-
-        <div className="dm2026-home-search__select-grid" aria-label={`${copy.countryLabel}, ${copy.cityLabel}, ${copy.areaLabel}`}>
-          <div className="dm2026-home-search__field">
-            <label htmlFor="dm2026-home-country">{copy.countryLabel}</label>
-            <select id="dm2026-home-country" name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => handleCountryChange(event.target.value)}>
-              {copy.countries.map((country) => (
-                <option key={country.label} value={country.label} disabled={country.disabled}>
-                  {country.label}
-                </option>
-              ))}
-            </select>
+          <div className="dm2026-home-search__visual-card">
+            <span>{heroCopy.visualKicker}</span>
+            <strong>{heroCopy.visualTitle}</strong>
+            <p>{heroCopy.visualBody}</p>
           </div>
-
-          <div className="dm2026-home-search__field">
-            <label htmlFor="dm2026-home-city">{copy.cityLabel}</label>
-            <select id="dm2026-home-city" name="city" className="dm2026-select" value={selectedCity} onChange={(event) => resetAreaForCity(event.target.value)}>
-              {copy.cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+          <div className="dm2026-home-search__visual-footer">
+            <span>{heroCopy.visualBadge}</span>
+            <span>{heroCopy.visualTrust}</span>
           </div>
-
-          <div className="dm2026-home-search__field">
-            <label htmlFor="dm2026-home-area">{copy.areaLabel}</label>
-            <select id="dm2026-home-area" name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>
-              {areaOptions.map((area) => (
-                <option key={area} value={area}>
-                  {area}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {!hasTypedQuery ? (
-          <div className="dm2026-home-search__suggestions" aria-label={copy.staticPreviewLabel} data-static-preview="true">
-            <div>
-              <strong>{copy.staticPreviewLabel}</strong>
-              <p>{copy.staticPreviewNote}</p>
-            </div>
-            <ul className="dm2026-home-search__popular-list" data-expanded={showMorePopular ? 'true' : 'false'}>
-              {expandedPopularSuggestions.map((suggestion) => (
-                <li key={suggestion.id}>
-                  <button type="button" className="dm2026-home-search__suggestion-chip" onClick={() => applySuggestion(suggestion)}>
-                    {suggestion.label}
-                  </button>
-                </li>
-              ))}
-              <li>
-                <button type="button" className="dm2026-home-search__more-chip" aria-expanded={showMorePopular} onClick={() => setShowMorePopular((value) => !value)}>
-                  {copy.moreLabel}
-                </button>
-              </li>
-            </ul>
-          </div>
-        ) : null}
-
-        <div className="dm2026-home-search__actions">
-          <button type="submit" className="dm2026-button dm2026-button-primary">
-            {copy.searchLabel}
-          </button>
-          <Link href={providerHref} className="dm2026-button dm2026-button-secondary">
-            {copy.providerLabel}
-          </Link>
-        </div>
-
-        {searchPreviewVisible ? (
-          <div className="dm2026-home-search__discovery-preview" role="status">
-            <strong>{dir === 'rtl' ? 'معاينة الاكتشاف' : 'Discovery preview'}</strong>
-            <p>{[query || selectedSuggestion.label, selectedContentType, selectedCity, selectedArea].filter(Boolean).join(' · ')}</p>
-            <small>{dir === 'rtl' ? 'ستظهر الملفات العامة بعد مراجعة بيانات المقدمين واعتمادها.' : 'Reviewed public profiles will appear here after provider data is approved.'}</small>
-          </div>
-        ) : null}
+        </aside>
       </form>
     </section>
   );
