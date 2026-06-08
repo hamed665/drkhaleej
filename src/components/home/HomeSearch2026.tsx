@@ -87,7 +87,8 @@ type HomeSearch2026Props = {
 
 type SearchChipOption = {
   label: string;
-  value: string;
+  contentTypeValue: string;
+  providerTypeValue?: string;
 };
 
 type PremiumHeroCopy = {
@@ -103,6 +104,8 @@ type PremiumHeroCopy = {
   visualBody: string;
   visualBadge: string;
   visualTrust: string;
+  visualMetricPrimary: string;
+  visualMetricSecondary: string;
   secondaryFilterNote: string;
 };
 
@@ -120,6 +123,8 @@ const premiumHeroCopy: Record<'ltr' | 'rtl', PremiumHeroCopy> = {
     visualBody: 'A calm media slot for future verified provider, location, or campaign imagery.',
     visualBadge: 'Oman-first',
     visualTrust: 'Verified information',
+    visualMetricPrimary: 'Country · City · Area',
+    visualMetricSecondary: 'Ready for curated provider media',
     secondaryFilterNote: 'Secondary provider filters stay tucked away until needed.'
   },
   rtl: {
@@ -135,33 +140,47 @@ const premiumHeroCopy: Record<'ltr' | 'rtl', PremiumHeroCopy> = {
     visualBody: 'مساحة إعلامية هادئة قابلة للاستبدال لاحقًا بصورة مقدم أو موقع أو حملة معتمدة.',
     visualBadge: 'الأولوية لعُمان',
     visualTrust: 'معلومات موثقة',
+    visualMetricPrimary: 'الدولة · المدينة · المنطقة',
+    visualMetricSecondary: 'جاهز لوسائط مقدمي الخدمة المختارة',
     secondaryFilterNote: 'تبقى الفلاتر الثانوية مخفية حتى تحتاج إليها.'
   }
 };
 
-const primaryChipBlueprint: Record<'ltr' | 'rtl', readonly { label: string; fallbackValue: string }[]> = {
+const primaryChipBlueprint: Record<'ltr' | 'rtl', readonly { label: string; contentTypeValue: string; providerTypeValue?: string }[]> = {
   ltr: [
-    { label: 'Doctors', fallbackValue: 'Doctors' },
-    { label: 'Centers', fallbackValue: 'Clinics' },
-    { label: 'Labs', fallbackValue: 'Labs' },
-    { label: 'Pharmacies', fallbackValue: 'Pharmacies' },
-    { label: 'Services', fallbackValue: 'Services' },
-    { label: 'Offers', fallbackValue: 'Offers' }
+    { label: 'Doctors', contentTypeValue: 'Doctors' },
+    { label: 'Centers', contentTypeValue: 'Clinics' },
+    { label: 'Labs', contentTypeValue: 'Labs' },
+    { label: 'Pharmacies', contentTypeValue: 'Pharmacies' },
+    { label: 'Beauty', contentTypeValue: 'Services', providerTypeValue: 'Beauty & Wellness' },
+    { label: 'Pet Clinic', contentTypeValue: 'Services', providerTypeValue: 'Pet Clinics' },
+    { label: 'Services', contentTypeValue: 'Services' },
+    { label: 'Offers', contentTypeValue: 'Offers' }
   ],
   rtl: [
-    { label: 'الأطباء', fallbackValue: 'الأطباء' },
-    { label: 'المراكز', fallbackValue: 'العيادات' },
-    { label: 'المختبرات', fallbackValue: 'المختبرات' },
-    { label: 'الصيدليات', fallbackValue: 'الصيدليات' },
-    { label: 'الخدمات', fallbackValue: 'الخدمات' },
-    { label: 'العروض', fallbackValue: 'العروض' }
+    { label: 'الأطباء', contentTypeValue: 'الأطباء' },
+    { label: 'المراكز', contentTypeValue: 'العيادات' },
+    { label: 'المختبرات', contentTypeValue: 'المختبرات' },
+    { label: 'الصيدليات', contentTypeValue: 'الصيدليات' },
+    { label: 'التجميل', contentTypeValue: 'الخدمات', providerTypeValue: 'الجمال والرفاهية' },
+    { label: 'العيادات البيطرية', contentTypeValue: 'الخدمات', providerTypeValue: 'العيادات البيطرية' },
+    { label: 'الخدمات', contentTypeValue: 'الخدمات' },
+    { label: 'العروض', contentTypeValue: 'العروض' }
   ]
 };
 
-const primaryChipOptions = (contentTypes: readonly string[], dir: 'ltr' | 'rtl'): readonly SearchChipOption[] =>
+const primaryChipOptions = (contentTypes: readonly string[], providerTypes: readonly string[], dir: 'ltr' | 'rtl'): readonly SearchChipOption[] =>
   primaryChipBlueprint[dir]
-    .map((chip) => ({ label: chip.label, value: contentTypes.includes(chip.label) ? chip.label : chip.fallbackValue }))
-    .filter((chip) => contentTypes.includes(chip.value));
+    .filter((chip) => contentTypes.includes(chip.contentTypeValue) && (!chip.providerTypeValue || providerTypes.includes(chip.providerTypeValue)))
+    .map((chip) => {
+      const option: SearchChipOption = { label: chip.label, contentTypeValue: chip.contentTypeValue };
+
+      if (chip.providerTypeValue) {
+        option.providerTypeValue = chip.providerTypeValue;
+      }
+
+      return option;
+    });
 
 const groupLabels: Record<SmartSuggestion['group'], LocalizedText> = {
   services: { en: 'Services', ar: 'الخدمات' },
@@ -290,6 +309,7 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   const [query, setQuery] = useState('');
   const [selectedContentType, setSelectedContentType] = useState(defaultContentType);
   const [selectedProviderType, setSelectedProviderType] = useState(defaultProviderType);
+  const [selectedSearchChip, setSelectedSearchChip] = useState(() => primaryChipBlueprint[dir][0]?.label ?? defaultContentType);
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
   const [selectedCity, setSelectedCity] = useState(defaultCity);
   const areaOptions = cityAreas[selectedCity] ?? [copy.cityWideAreaLabel];
@@ -318,7 +338,7 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   const visibleSuggestions = hasTypedQuery ? matchingSuggestions : [];
   const suggestionPanelId = 'dm2026-home-search-smart-panel';
   const heroCopy = premiumHeroCopy[dir];
-  const chipOptions = useMemo(() => primaryChipOptions(copy.contentTypes, dir), [copy.contentTypes, dir]);
+  const chipOptions = useMemo(() => primaryChipOptions(copy.contentTypes, copy.providerTypes, dir), [copy.contentTypes, copy.providerTypes, dir]);
 
   const resetAreaForCity = (city: string) => {
     const nextAreas = cityAreas[city] ?? [copy.cityWideAreaLabel];
@@ -341,8 +361,15 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
     setActiveSuggestion(view);
     setSearchPreviewVisible(false);
 
-    safeSetIfAvailable(localized(suggestion.suggestedContentType ?? { en: '', ar: '' }, dir), copy.contentTypes, setSelectedContentType);
-    safeSetIfAvailable(localized(suggestion.suggestedProviderType ?? { en: '', ar: '' }, dir), copy.providerTypes, setSelectedProviderType);
+    const nextContentType = localized(suggestion.suggestedContentType ?? { en: '', ar: '' }, dir);
+    const nextProviderType = localized(suggestion.suggestedProviderType ?? { en: '', ar: '' }, dir);
+    safeSetIfAvailable(nextContentType, copy.contentTypes, setSelectedContentType);
+    safeSetIfAvailable(nextProviderType, copy.providerTypes, setSelectedProviderType);
+
+    const matchingChip = chipOptions.find((chip) => chip.contentTypeValue === nextContentType && (!chip.providerTypeValue || chip.providerTypeValue === nextProviderType));
+    if (matchingChip) {
+      setSelectedSearchChip(matchingChip.label);
+    }
 
     const nextCity = suggestion.suggestedCity ? localized(suggestion.suggestedCity, dir) : undefined;
     if (nextCity && copy.cities.includes(nextCity)) {
@@ -437,7 +464,20 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
             <div>
               {chipOptions.map((contentType) => (
                 <label key={contentType.label} className="dm2026-home-search__chip">
-                  <input type="radio" name="contentType" value={contentType.value} checked={contentType.value === selectedContentType} onChange={() => setSelectedContentType(contentType.value)} />
+                  <input
+                    type="radio"
+                    name="contentType"
+                    value={contentType.contentTypeValue}
+                    checked={contentType.label === selectedSearchChip}
+                    onChange={() => {
+                      setSelectedSearchChip(contentType.label);
+                      setSelectedContentType(contentType.contentTypeValue);
+
+                      if (contentType.providerTypeValue) {
+                        setSelectedProviderType(contentType.providerTypeValue);
+                      }
+                    }}
+                  />
                   <span>{contentType.label}</span>
                 </label>
               ))}
@@ -529,6 +569,11 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
             <span>{heroCopy.visualKicker}</span>
             <strong>{heroCopy.visualTitle}</strong>
             <p>{heroCopy.visualBody}</p>
+          </div>
+          <div className="dm2026-home-search__visual-card dm2026-home-search__visual-card--trust">
+            <span>{heroCopy.visualTrust}</span>
+            <strong>{heroCopy.visualMetricPrimary}</strong>
+            <p>{heroCopy.visualMetricSecondary}</p>
           </div>
           <div className="dm2026-home-search__visual-footer">
             <span>{heroCopy.visualBadge}</span>

@@ -131,3 +131,91 @@ Manual QA checklist status:
 ## 14. Next PR recommendation
 
 `UI-K-HOME-2026-H — Homepage FAQ + Trust/Safety Foundation`
+
+## 15. FIX01 summary — Compact and Polish Premium Homepage Search Hero
+
+FIX01 keeps the approved premium hero direction and applies targeted polish only to the existing homepage search hero.
+
+### Beauty and Pet Clinic chip addition
+
+The visible `Search in` chip set now includes Beauty and Pet Clinic in the requested order.
+
+English order:
+
+1. Doctors
+2. Centers
+3. Labs
+4. Pharmacies
+5. Beauty
+6. Pet Clinic
+7. Services
+8. Offers
+
+Arabic order:
+
+1. الأطباء
+2. المراكز
+3. المختبرات
+4. الصيدليات
+5. التجميل
+6. العيادات البيطرية
+7. الخدمات
+8. العروض
+
+Beauty and Pet Clinic use the existing services/provider-type state only; no backend, route, query, database, or search infrastructure was added.
+
+### Mobile height reduction
+
+- Reduced mobile hero padding, vertical gaps, heading size, subtitle line-height, chip height, select height, More filters height, CTA height, trust-chip height, and visual-placeholder height.
+- Kept the main search, Country, City, Area, More filters, Search in chips, CTAs, and trust messages visible.
+- Mobile now treats the hero as a compact premium search surface instead of a tall form wall.
+
+### Mobile search/input polish
+
+- Mobile search input and Search button now share one integrated compact row at normal mobile widths.
+- The input uses ellipsis-friendly sizing to avoid clipped/overflowing placeholder text.
+- The Search button remains tappable but no longer defaults to an oversized full-width block except on very narrow screens.
+
+### Mobile chip row polish
+
+- The primary Search in row is intentionally horizontally scrollable with tighter spacing and an edge fade affordance.
+- Doctors, Centers, Labs, Pharmacies, Beauty, Pet Clinic, Services, and Offers remain accessible without adding Articles or other default chips.
+- Horizontal page overflow is avoided by constraining scrolling to the chip row.
+
+### Country/City/Area compact treatment
+
+- Country, City, and Area remain visible outside More filters.
+- On mobile, the three controls use a compact three-column layout with smaller labels and shorter selects while preserving readable values and RTL support.
+- On very narrow screens, the controls can stack to prevent clipping.
+
+### Trust/safety deduplication
+
+- The hero keeps one compact inline trust row with the required messages:
+  - Public discovery only / اكتشاف عام فقط
+  - Confirm details with provider / أكد التفاصيل مع مقدم الخدمة
+  - Not medical advice / ليست نصيحة طبية
+- The duplicate compact safety panel in the search-first top container is hidden via scoped CSS so the messages are not repeated heavily.
+
+### Visual placeholder refinement
+
+- The right-side placeholder remains CSS-only and image-ready.
+- FIX01 adds more purposeful internal composition: subtle guide lines, healthcare/location motifs, a compact verified-information card, and tighter glass-card spacing.
+- On mobile, the visual placeholder becomes shorter and secondary while retaining an image-ready cue.
+- No real image, remote asset, admin/CMS integration, upload logic, or backend was added.
+
+### Arabic/RTL notes
+
+- Arabic chips now include `التجميل` and `العيادات البيطرية`.
+- RTL headline sizing, chip scrolling, compact selects, CTA row, trust row, and visual placeholder remain scoped for natural RTL layout and no horizontal page overflow.
+
+### FIX01 validation results
+
+- `git status --short` — completed; expected modified files only (`HomeSearch2026.tsx`, `dm2026-home.css`, and this completion report).
+- `pnpm lint` — passed with pre-existing warnings outside FIX01 scope.
+- `pnpm typecheck` — passed.
+- `pnpm build` — passed.
+- `pnpm routes:check` — passed.
+
+### FIX01 merge-readiness recommendation
+
+Merge-ready. Required validation commands pass; final reviewer visual QA should confirm the compact mobile hero density on target devices before release.
