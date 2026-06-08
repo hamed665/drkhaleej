@@ -170,3 +170,67 @@ Manual QA checklist for reviewers:
 ## 15. Next PR recommendation
 
 UI-K-HOME-2026-F — Offers Page Planning or Footer/Trust Polish
+
+## 16. FIX01 polish summary
+
+PR #162-FIX01 keeps the existing provider-led carousel implementation and applies targeted polish only to the Special Offers Showcase.
+
+FIX01 changes:
+
+- improved mobile top rhythm with local section `scroll-margin-block-start` and tighter-but-safe mobile top padding so the badge/headline remains readable under the sticky mobile header;
+- reduced mobile card height by tightening media height, body gaps, chip spacing, CTA sizing, and card max width;
+- upgraded image/video-ready placeholders with richer layered gradients, category accent depth, glass highlights, refined play/photo treatments, and softer premium shadows;
+- enhanced controlled emotional color by refining dental, beauty, labs, pet, center, doctor, and wellness accent tokens without introducing loud discount styling;
+- strengthened desktop hierarchy with clearer active-card scale/elevation and calmer side cards that remain visible and readable;
+- refined arrows/dots so carousel controls feel integrated and do not dominate the section;
+- preserved preview-safe non-navigating CTAs, no fake prices/discounts/ratings/availability, and no route/backend behavior.
+
+## 17. FIX01 mobile spacing and card-height polish
+
+Mobile spacing now gives the section enough local top breathing room for sticky-header contexts without adding a large blank gap. The mobile card is shorter and cleaner: the media area remains prominent, while provider name, offer title, chips, CTAs, and trust note sit closer together with compact but tappable controls.
+
+## 18. FIX01 media slot visual polish
+
+The media slot remains asset-free and future-ready. FIX01 adds layered ivory/teal/champagne gradients, subtle category accent orbs, glass panels, refined label pills, a more premium video play button, and a more polished photo-frame shape. No real images, generated images, remote assets, video files, or autoplay were added.
+
+## 19. FIX01 controlled color enhancement
+
+The section now uses slightly warmer and more emotional accent tuning while staying premium:
+
+- dental: soft aqua/teal;
+- beauty: restrained rose/champagne;
+- labs: clean clinical blue/cyan;
+- pet: soft green/mint;
+- centers: teal/ivory/champagne;
+- doctors: blue-teal trust tone;
+- wellness: sage/warm neutral.
+
+## 20. FIX01 desktop active-card hierarchy
+
+Desktop keeps the three-card carousel but gives the active card clearer elevation, scale, and saturation. Side cards are calmer through subtle opacity, scale, and shadow reduction while remaining visible and readable.
+
+## 21. FIX01 Arabic/RTL notes
+
+Arabic and RTL behavior remains local to the showcase. FIX01 preserves logical-start alignment, avoids negative Arabic letter spacing, keeps CTAs compact, and maintains flexible wrapping for Arabic labels/chips to avoid clipping.
+
+## 22. FIX01 validation results
+
+Required validation commands for FIX01:
+
+- `git status --short`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm routes:check`
+
+Validation completed for FIX01:
+
+- `git status --short` showed only the approved Special Offers CSS and completion documentation changed before commit.
+- `pnpm lint` passed with existing repository warnings only.
+- `pnpm typecheck` passed.
+- `pnpm build` passed.
+- `pnpm routes:check` passed.
+
+## 23. FIX01 merge-readiness recommendation
+
+PR #162-FIX01 is intended to be merge-ready if visual QA confirms the mobile heading is readable, mobile cards feel shorter and cleaner, media slots feel premium, desktop hierarchy is clear, Arabic/RTL remains unclipped, and validation passes.
