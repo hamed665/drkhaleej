@@ -16,6 +16,8 @@ export function SiteHeader() {
   const homeHref = homeRoute(locale, country);
   const providerHref = publicProviderRoute(locale, country);
   const mobileMenuId = `dm2026-mobile-menu-${locale}`;
+  const accountPopoverId = `dm2026-account-menu-${locale}`;
+  const accountLabel = locale === 'ar' ? 'الحساب' : 'Account';
   const linkedNavItems = [
     { href: homeHref, label: copy.home },
     { href: publicDiscoveryRoute(locale, country, 'doctors'), label: copy.doctors },
@@ -72,12 +74,23 @@ export function SiteHeader() {
           <Link href={providerHref} className="dm2026-site-header__provider">
             {copy.forProviders}
           </Link>
-          <span className="dm2026-site-header__account" aria-disabled="true" title={copy.comingSoon}>
-            {copy.signIn}
-          </span>
-          <span className="dm2026-site-header__account dm2026-site-header__account--primary" aria-disabled="true" title={copy.comingSoon}>
-            {copy.createAccount}
-          </span>
+          <button
+            type="button"
+            className="dm2026-site-header__account-trigger"
+            popoverTarget={accountPopoverId}
+            aria-haspopup="menu"
+          >
+            {accountLabel}
+          </button>
+          <div id={accountPopoverId} className="dm2026-site-header__account-popover" popover="auto" dir={dir}>
+            <strong>{accountLabel}</strong>
+            <span aria-disabled="true" title={copy.comingSoon}>
+              {copy.signIn}
+            </span>
+            <span aria-disabled="true" title={copy.comingSoon}>
+              {copy.createAccount}
+            </span>
+          </div>
           <HeaderLanguageSwitch className="site-header__locale-switch dm2026-site-header__locale-switch" />
         </div>
         <button
@@ -102,6 +115,17 @@ export function SiteHeader() {
             ×
           </button>
         </div>
+        <div className="dm2026-site-header__mobile-account" aria-label={accountLabel}>
+          <strong>{accountLabel}</strong>
+          <div>
+            <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>
+              {copy.signIn}
+            </span>
+            <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>
+              {copy.createAccount}
+            </span>
+          </div>
+        </div>
         <nav aria-label={copy.ariaLabel}>
           <ul>
             {linkedNavItems.map((item) => (
@@ -122,16 +146,6 @@ export function SiteHeader() {
               <Link href={providerHref} data-dm2026-mobile-menu-close>
                 {copy.forProviders}
               </Link>
-            </li>
-            <li>
-              <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>
-                {copy.signIn}
-              </span>
-            </li>
-            <li>
-              <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>
-                {copy.createAccount}
-              </span>
             </li>
           </ul>
         </nav>
