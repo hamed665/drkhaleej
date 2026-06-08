@@ -5809,3 +5809,51 @@
     padding-inline: 0.52rem;
   }
 }
+
+/* PR #164-FIX03: account popover positioning and compact mobile sizing only. */
+.dm2026-site-header__account-popover {
+  position-area: block-end span-inline-end;
+  position-try-fallbacks: flip-inline, flip-block;
+  inset: auto;
+  inline-size: max-content;
+  max-inline-size: min(13rem, calc(100vw - 1.5rem));
+  min-block-size: 0;
+  max-block-size: min(14rem, calc(100dvh - 5.5rem));
+  overflow: auto;
+}
+
+[dir='rtl'].dm2026-site-header__account-popover {
+  position-area: block-end span-inline-start;
+  inset: auto;
+}
+
+@media (max-width: 48rem) {
+  .dm2026-site-header__account-popover,
+  [dir='rtl'].dm2026-site-header__account-popover {
+    position-area: block-end center;
+    inset: auto;
+    inline-size: min(12rem, calc(100vw - 1.25rem));
+    min-inline-size: 0;
+    max-inline-size: min(12rem, calc(100vw - 1.25rem));
+    min-block-size: 0;
+    max-block-size: min(11rem, calc(100dvh - 5rem));
+    padding: 0.56rem;
+  }
+
+  .dm2026-site-header__account-popover:popover-open {
+    gap: 0.32rem;
+  }
+
+  .dm2026-site-header__account-popover strong {
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  .dm2026-site-header__account-popover span[aria-disabled='true'] {
+    min-block-size: 2rem;
+    border-radius: 0.72rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    padding-inline: 0.62rem;
+  }
+}

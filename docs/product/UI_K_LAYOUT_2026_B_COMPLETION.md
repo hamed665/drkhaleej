@@ -39,9 +39,15 @@ Out of scope and not implemented:
 `src/components/layout/layout-i18n-copy.ts` was not changed.
 `src/components/layout/header-language-switch.tsx` was not changed.
 
-## 3. FIX02 summary
+## 3. FIX02/FIX03 summary
 
-FIX02 addresses the post-polish density and account-access concerns without rebuilding the header/footer:
+FIX03 account-menu bugfix scope:
+
+- Desktop RTL account popover positioning was corrected with logical CSS anchoring so الحساب opens near the trigger instead of jumping to the wrong side.
+- Mobile account popover sizing was constrained so the Account menu stays compact instead of stretching into a tall panel.
+- No header/footer redesign, color, typography, logo, heartbeat, route, i18n, or language-switch changes were made in FIX03.
+
+FIX02 addressed the post-polish density and account-access concerns without rebuilding the header/footer:
 
 - Desktop nav typography was dialed back from the prior over-heavy state.
 - Desktop nav and action spacing were refined to reduce crowding around `Articles` and `For Providers`.
@@ -140,7 +146,15 @@ No i18n or route logic was changed.
 - No upload/storage logic was added.
 - No database, Supabase, RLS, migration, seed, API, SEO infrastructure, package, or lockfile files were changed.
 
-## 12. Validation results
+## 12. FIX03 account menu bugfix notes
+
+- English desktop Account menu uses logical popover anchoring near the trigger.
+- Arabic desktop الحساب menu uses RTL logical anchoring near the trigger.
+- Mobile Account popover has explicit inline and block size constraints, compact padding, and short disabled rows.
+- The larger hamburger mobile menu layout is not reused for the account popover.
+- Header glass/gradient, footer styling, heartbeat line, logo fallback/image slot, i18n logic, and language switch behavior were preserved.
+
+## 13. Validation results
 
 Required validation commands:
 
@@ -156,7 +170,7 @@ Additional smoke checks:
 - `/ar/om` rendered successfully with Arabic header/footer/account labels.
 - Changed-file safety searches confirmed no `/offers`, Supabase, RLS, route-header, request-header label dependency, admin, storage, package, or forbidden homepage source changes.
 
-## 13. Manual QA notes
+## 14. Manual QA notes
 
 Manual/code QA completed:
 
@@ -182,7 +196,7 @@ Environment limitation:
 
 - No Chromium/Chrome binary was available in this environment, so screenshots could not be captured without adding/downloading tooling.
 
-## 14. Merge-readiness recommendation
+## 15. Merge-readiness recommendation
 
 Merge-ready after human visual review.
 
