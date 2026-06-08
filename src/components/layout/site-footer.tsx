@@ -24,8 +24,8 @@ export function SiteFooter() {
   const trustItems = [copy.publicDiscoveryOnly, copy.notMedicalAdvice, copy.confirmWithProvider, copy.sponsoredVisibility] as const;
 
   return (
-    <footer className="site-footer site-footer--premium" role="contentinfo" dir={dir}>
-      <Container className="site-footer__inner">
+    <footer className="site-footer site-footer--premium dm2026-site-footer" role="contentinfo" dir={dir}>
+      <Container className="site-footer__inner dm2026-site-footer__inner">
         <div className="site-footer__brand">
           <strong>DrMuscat</strong>
           <p>{copy.brandText}</p>

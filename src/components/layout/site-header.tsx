@@ -66,6 +66,7 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
+          <span className="dm2026-site-header__ecg-line" aria-hidden="true" />
         </nav>
         <div className="site-header__locale dm2026-site-header__actions" aria-label={copy.actionsLabel}>
           <Link href={providerHref} className="dm2026-site-header__provider">
