@@ -13,15 +13,17 @@ type LogoProps = HTMLAttributes<HTMLDivElement> & {
   imageAlt?: string;
 };
 
+const DEFAULT_LOGO_MARK_SRC = '/brand/drmuscat-logo-mark.svg';
+
 export function Logo({ variant = 'full', className, imageSrc, imageAlt, ...props }: LogoProps) {
-  const hasImage = Boolean(imageSrc);
   const accessibleName = imageAlt ?? 'DrMuscat';
-  const classes = ['dm-logo', hasImage ? 'dm-logo--has-image' : null, className].filter(Boolean).join(' ');
+  const classes = ['dm-logo', 'dm-logo--has-image', className].filter(Boolean).join(' ');
+  const markSrc = imageSrc ?? DEFAULT_LOGO_MARK_SRC;
 
   return (
     <div className={classes} {...props}>
       <span className="dm-logo__mark" aria-hidden="true">
-        {hasImage ? <Image src={imageSrc ?? ''} alt="" fill sizes="44px" className="dm-logo__image" /> : 'DM'}
+        <Image src={markSrc} alt="" width={44} height={44} sizes="44px" className="dm-logo__image" priority={false} />
       </span>
       {variant === 'full' ? <span className="dm-logo__wordmark" aria-hidden="true">DrMuscat</span> : null}
       <span className="sr-only">{accessibleName}</span>

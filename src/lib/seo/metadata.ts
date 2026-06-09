@@ -49,6 +49,10 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
       card: 'summary_large_image',
       title,
       description
+    },
+    icons: {
+      icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+      other: [{ rel: 'mask-icon', url: '/brand/drmuscat-app-icon.svg', color: '#0e7469' }]
     }
   };
 }

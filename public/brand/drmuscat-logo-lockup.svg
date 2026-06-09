@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 326 96" role="img" aria-labelledby="title desc">
+  <title id="title">DrMuscat logo lockup</title>
+  <desc id="desc">DrMuscat D and M monogram beside the DrMuscat wordmark.</desc>
+  <defs>
+    <linearGradient id="bg" x1="12" y1="10" x2="84" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1cb6a3"/>
+      <stop offset="0.48" stop-color="#0e7469"/>
+      <stop offset="1" stop-color="#07302c"/>
+    </linearGradient>
+    <linearGradient id="soft" x1="22" y1="12" x2="62" y2="74" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.98"/>
+      <stop offset="1" stop-color="#dff7f2" stop-opacity="0.88"/>
+    </linearGradient>
+  </defs>
+  <g aria-hidden="true">
+    <rect x="6" y="6" width="84" height="84" rx="25" fill="url(#bg)"/>
+    <path d="M23 71V25h20c15.4 0 27 9.7 27 23s-11.6 23-27 23H23Zm13.2-11.6h6.2c8.7 0 14.3-4.6 14.3-11.4 0-6.8-5.6-11.4-14.3-11.4h-6.2v22.8Z" fill="url(#soft)"/>
+    <path d="M47.2 70.8V46.1c0-2.7 3.3-4 5.2-2.1l10.3 10.3L73 44c1.9-1.9 5.2-.6 5.2 2.1v24.7H66.4V61.4l-3.7 3.7-3.7-3.7v9.4H47.2Z" fill="#f3fffc" opacity="0.96"/>
+    <path d="M70.4 19.5h7.8v7.4h7.3v7.7h-7.3V42h-7.8v-7.4h-7.3v-7.7h7.3v-7.4Z" fill="#c9f4e8"/>
+    <path d="M21.5 26.5c5.6-7.1 14-11.5 23.8-11.5 9.5 0 17.9 4.2 23.4 10.8" fill="none" stroke="#baf1e5" stroke-width="4.6" stroke-linecap="round" opacity="0.34"/>
+    <path d="M116 23c10.4-8.1 22.2-12.2 35.5-12.2 12.8 0 24.4 3.8 34.6 11.4" fill="none" stroke="#0e7469" stroke-width="4" stroke-linecap="round" opacity="0.16"/>
+    <text x="116" y="63" fill="#07302c" font-family="Avenir Next, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="42" font-weight="800" letter-spacing="-1.2">DrMuscat</text>
+    <path d="M128 78c18 8.6 38.2 9.4 60.6 2.4" fill="none" stroke="#c9a24b" stroke-width="3.4" stroke-linecap="round" opacity="0.35"/>
+  </g>
+</svg>

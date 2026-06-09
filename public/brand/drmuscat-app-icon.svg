@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">DrMuscat app icon</title>
+  <desc id="desc">Square DrMuscat D and M monogram app icon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="42" x2="448" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1cb6a3"/>
+      <stop offset="0.5" stop-color="#0e7469"/>
+      <stop offset="1" stop-color="#07302c"/>
+    </linearGradient>
+    <linearGradient id="white" x1="110" y1="82" x2="330" y2="405" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dff7f2"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <path d="M119 379V133h108c82 0 145 52 145 123S309 379 227 379H119Zm71-62h34c46 0 76-25 76-61s-30-61-76-61h-34v122Z" fill="url(#white)"/>
+  <path d="M248 378V246c0-15 18-22 28-11l55 55 55-55c10-11 28-4 28 11v132h-63v-51l-20 20-20-20v51h-63Z" fill="#f3fffc" opacity="0.96"/>
+  <path d="M374 104h42v40h39v42h-39v40h-42v-40h-39v-42h39v-40Z" fill="#c9f4e8"/>
+  <path d="M114 139c30-38 75-62 128-62 51 0 96 22 126 58" fill="none" stroke="#baf1e5" stroke-width="24" stroke-linecap="round" opacity="0.34"/>
+</svg>
