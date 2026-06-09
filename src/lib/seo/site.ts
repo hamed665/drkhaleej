@@ -9,17 +9,35 @@ export type LocaleCountry = {
   country: SiteCountry;
 };
 
+const PRODUCTION_FALLBACK_URL = 'https://drmuscat.com';
 const LOCAL_FALLBACK_URL = 'http://localhost:3000';
 
-function getBaseUrl(): URL {
-  const envUrl = process.env.NEXT_PUBLIC_APP_URL;
-  if (!envUrl) return new URL(LOCAL_FALLBACK_URL);
+function normalizeBaseUrl(url: URL): URL {
+  return new URL(url.origin);
+}
+
+function parsePublicAppUrl(envUrl: string | undefined): URL | null {
+  if (!envUrl) return null;
 
   try {
-    return new URL(envUrl);
+    const parsedUrl = new URL(envUrl);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) return null;
+
+    return normalizeBaseUrl(parsedUrl);
   } catch {
+    return null;
+  }
+}
+
+function getBaseUrl(): URL {
+  const envBaseUrl = parsePublicAppUrl(process.env.NEXT_PUBLIC_APP_URL);
+  if (envBaseUrl) return envBaseUrl;
+
+  if (process.env.NODE_ENV === 'development') {
     return new URL(LOCAL_FALLBACK_URL);
   }
+
+  return new URL(PRODUCTION_FALLBACK_URL);
 }
 
 export const siteConfig = {
