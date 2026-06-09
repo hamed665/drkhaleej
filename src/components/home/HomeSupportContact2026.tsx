@@ -131,31 +131,33 @@ export function HomeSupportContact2026({ locale, dir }: HomeSupportContact2026Pr
         </div>
       </section>
 
-      <div className="dm2026-home-whatsapp-float" dir={dir}>
+      <div className="dm2026-home-whatsapp-float" dir={dir} data-whatsapp-state={whatsAppState}>
         {userHref ? (
-          <a
-            className="dm2026-home-whatsapp-float__button dm2026-home-whatsapp-float__button--active"
-            href={userHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={copy.quickAriaLabel}
-            data-whatsapp-state="active"
-          >
-            <span className="dm2026-home-whatsapp-float__glyph" aria-hidden="true">
-              <span />
-            </span>
-            <span className="dm2026-home-whatsapp-float__label">{copy.quickLabel}</span>
-          </a>
+          <>
+            <span className="dm2026-home-whatsapp-float__companion" aria-hidden="true">{copy.quickLabel}</span>
+            <a
+              className="dm2026-home-whatsapp-float__fab dm2026-home-whatsapp-float__fab--active"
+              href={userHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={copy.quickAriaLabel}
+              data-whatsapp-state="active"
+            >
+              <span className="dm2026-home-whatsapp-float__glyph" aria-hidden="true">
+                <span />
+              </span>
+            </a>
+          </>
         ) : (
           <span
-            className="dm2026-home-whatsapp-float__button dm2026-home-whatsapp-float__button--disabled"
+            className="dm2026-home-whatsapp-float__fab dm2026-home-whatsapp-float__fab--disabled"
             aria-disabled="true"
             data-whatsapp-state="disabled"
+            title={copy.unavailable}
           >
             <span className="dm2026-home-whatsapp-float__glyph" aria-hidden="true">
               <span />
             </span>
-            <span className="dm2026-home-whatsapp-float__label">{copy.quickLabel}</span>
           </span>
         )}
       </div>

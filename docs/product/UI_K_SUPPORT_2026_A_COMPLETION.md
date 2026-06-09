@@ -377,3 +377,104 @@ Checklist:
 - `pnpm build` — passed with the local missing-env fallback.
 - `pnpm routes:check` — passed.
 - `pnpm seo:check` — passed.
+
+---
+
+# FIX02 — Functional WhatsApp Support + Circular FAB
+
+## FIX02 summary
+
+FIX02 keeps the homepage support section structure unchanged and targets only the WhatsApp support CTA behavior and floating visual treatment.
+
+Changed in FIX02:
+
+- Tightened `normalizeWhatsAppNumber` so it only returns a safe Oman WhatsApp number.
+- Supported production international input `96877402910`, plus-sign input `+96877402910`, and local Oman 8-digit input `77402910` by normalizing it to `96877402910`.
+- Kept the floating CTA as a real anchor only when a valid env-derived WhatsApp URL exists.
+- Converted the floating CTA from a pill into a fully circular premium WhatsApp FAB on desktop and mobile.
+- Moved the desktop label into a secondary companion bubble and hid it on mobile so the main control remains circular.
+- Preserved safe disabled fallback behavior for missing or invalid env values.
+
+## Root cause of broken WhatsApp click behavior
+
+The local QA environment did not have `NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER` set, so the component correctly rendered the inactive fallback rather than an anchor.
+
+A second reliability issue was identified in the original helper: it stripped non-digits but accepted any non-empty digit value. That meant an Oman local value such as `77402910` could produce `https://wa.me/77402910?...` instead of the required international `https://wa.me/96877402910?...` URL. FIX02 now rejects invalid lengths and prepends `968` for valid 8-digit Oman local inputs.
+
+## FIX02 normalization rules
+
+`normalizeWhatsAppNumber` now follows these rules:
+
+- Strip all non-digits.
+- If the cleaned value is exactly 8 digits, treat it as an Oman local mobile number and prepend `968`.
+- If the cleaned value starts with `968` and is exactly 11 digits, use it as-is.
+- Otherwise return `null`.
+- Never generate `wa.me/undefined`.
+- Never generate an active href from invalid input.
+
+Accepted examples:
+
+- `96877402910` → `96877402910`
+- `+96877402910` → `96877402910`
+- `77402910` → `96877402910`
+
+## Env var requirement
+
+Vercel must set:
+
+```env
+NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER=96877402910
+```
+
+Expected format remains digits-only with country code included. FIX02 also safely supports plus-sign and 8-digit local input, but production should use the full international digits-only value above.
+
+## Desktop/mobile circular FAB behavior
+
+The floating WhatsApp support CTA now renders as:
+
+- a fully circular active anchor when the env var normalizes successfully
+- a fully circular inactive fallback when the env var is missing or invalid
+- bottom-right placement on desktop
+- safe-area-aware bottom-right placement on mobile
+- a centered WhatsApp-like chat/phone glyph
+- a vivid WhatsApp green surface with DrMuscat-style depth, glow, shadow and glass polish
+- visible keyboard focus, hover elevation and tap feedback
+- a desktop companion label only; mobile remains a single circular FAB
+
+## FIX02 manual QA notes
+
+Reviewer should check:
+
+- `/en/om` desktop
+- `/ar/om` desktop
+- `/en/om` mobile
+- `/ar/om` mobile
+- `/` after redirect
+
+Checklist:
+
+- Floating WhatsApp FAB opens WhatsApp on desktop when env is configured.
+- Floating WhatsApp FAB opens WhatsApp on mobile when env is configured.
+- User inline support button opens the user WhatsApp message.
+- Provider inline support button opens the provider WhatsApp message.
+- `96877402910`, `+96877402910`, and `77402910` normalize safely.
+- `wa.me` link includes encoded `text` parameter.
+- No `wa.me/undefined` link exists.
+- Desktop FAB is fully circular.
+- Mobile FAB is fully circular.
+- FAB is premium, vivid, centered and not gray/dead.
+- No horizontal overflow.
+- No RTL drift or label collision.
+- No SEO/database/API/Supabase/package/route/redirect changes were made.
+
+## FIX02 validation results
+
+- `node - <<'NODE' ...` helper normalization check — passed for `96877402910`, `+96877402910`, `77402910`, invalid short input, missing input and encoded URL output.
+- `git status --short` — pending local FIX02 files only at documentation time.
+- `pnpm lint` — passed with existing warnings in prototype/public files.
+- `pnpm typecheck` — passed.
+- `NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER=96877402910 pnpm build` — passed with production-format env.
+- `NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER=77402910 pnpm build` — passed with local 8-digit normalization.
+- `pnpm build` — passed with missing-env fallback.
+- `pnpm routes:check` — passed.
+- `pnpm seo:check` — passed.
