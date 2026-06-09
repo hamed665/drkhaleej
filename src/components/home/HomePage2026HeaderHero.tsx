@@ -1,4 +1,5 @@
 import { HomeDiscoveryCategories2026 } from '@/components/home/HomeDiscoveryCategories2026';
+import { HomeEntityClarity2026 } from '@/components/home/HomeEntityClarity2026';
 import { HomeFAQ2026 } from '@/components/home/HomeFAQ2026';
 import { HomeFeaturedBoard2026 } from '@/components/home/HomeFeaturedBoard2026';
 import { HomeProviderCTA2026 } from '@/components/home/HomeProviderCTA2026';
@@ -195,6 +196,7 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
         </div>
       </div>
 
+      <HomeEntityClarity2026 locale={locale} dir={dir} />
       <HomeFeaturedBoard2026 locale={locale} country={country} dir={dir} />
       <HomeDiscoveryCategories2026 locale={locale} country={country} dir={dir} />
       <HomeSpecialOffersShowcase2026 locale={locale} country={country} dir={dir} />

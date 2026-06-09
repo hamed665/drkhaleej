@@ -7190,3 +7190,101 @@
     padding: 0.3rem 0.48rem;
   }
 }
+
+/* PR #169: compact homepage entity clarity strip. */
+.dm2026-home-entity {
+  inline-size: min(100% - 1rem, 72rem);
+  display: grid;
+  gap: clamp(0.72rem, 1.6vw, 1rem);
+  margin: clamp(0.9rem, 2vw, 1.35rem) auto clamp(1.05rem, 2.4vw, 1.6rem);
+  border: 1px solid rgba(226, 233, 231, 0.82);
+  border-radius: clamp(1.2rem, 2.4vw, 1.75rem);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(251, 247, 239, 0.72)),
+    radial-gradient(420px circle at 12% 18%, rgba(42, 161, 146, 0.12), transparent 58%);
+  box-shadow: 0 22px 54px rgba(11, 40, 38, 0.09);
+  padding: clamp(0.86rem, 2vw, 1.15rem);
+}
+
+.dm2026-home-entity__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.48rem 0.85rem;
+}
+
+.dm2026-home-entity__eyebrow {
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(14, 110, 100, 0.1);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: 0.74rem;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  padding: 0.34rem 0.62rem;
+  text-transform: uppercase;
+}
+
+.dm2026-home-entity h2,
+.dm2026-home-entity h3,
+.dm2026-home-entity p {
+  margin: 0;
+}
+
+.dm2026-home-entity h2 {
+  color: var(--dm-teal-950, #07302c);
+  font-size: clamp(1rem, 1.7vw, 1.18rem);
+  font-weight: 820;
+  letter-spacing: -0.02em;
+}
+
+.dm2026-home-entity__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.55rem, 1.4vw, 0.78rem);
+}
+
+.dm2026-home-entity__card {
+  min-inline-size: 0;
+  display: grid;
+  gap: 0.38rem;
+  border: 1px solid rgba(14, 110, 100, 0.1);
+  border-radius: clamp(0.95rem, 1.8vw, 1.2rem);
+  background: rgba(255, 255, 255, 0.68);
+  padding: clamp(0.78rem, 1.8vw, 0.96rem);
+}
+
+.dm2026-home-entity__card h3 {
+  color: var(--dm-teal-950, #07302c);
+  font-size: 0.94rem;
+  font-weight: 820;
+  line-height: 1.25;
+}
+
+.dm2026-home-entity__card p {
+  color: var(--dm-color-text-muted, #66736f);
+  font-size: 0.83rem;
+  line-height: 1.58;
+}
+
+[dir='rtl'] .dm2026-home-entity__eyebrow {
+  letter-spacing: 0;
+}
+
+@media (max-width: 56rem) {
+  .dm2026-home-entity__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 42rem) {
+  .dm2026-home-entity {
+    inline-size: min(100% - 0.75rem, 72rem);
+    border-radius: var(--dm-radius-xl, 1.5rem);
+  }
+
+  .dm2026-home-entity__header {
+    align-items: start;
+    flex-direction: column;
+  }
+}

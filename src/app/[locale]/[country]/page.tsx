@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { HomePage2026HeaderHero } from '@/components/home/HomePage2026HeaderHero';
+import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -14,18 +15,26 @@ type Params = { locale: string; country: string };
 type HomeMetadataCopy = {
   metadataTitle: string;
   metadataDescription: string;
+  openGraphTitle: string;
+  openGraphDescription: string;
 };
 
 const homeMetadataByLocale: Record<SupportedLocale, HomeMetadataCopy> = {
   en: {
-    metadataTitle: 'DrMuscat Oman | Healthcare Discovery in Muscat',
+    metadataTitle: 'DrMuscat | Healthcare Discovery in Oman',
     metadataDescription:
-      'Find healthcare options in Oman with DrMuscat public discovery for doctors, clinics, labs, pharmacies, services and care areas.'
+      'Explore doctors, clinics, labs, pharmacies, beauty centers, pet clinics, wellness providers and offers in Oman. Public discovery only, not medical advice.',
+    openGraphTitle: 'DrMuscat | Healthcare Discovery in Oman',
+    openGraphDescription:
+      'Explore healthcare, beauty, wellness and pet care providers across Oman. Public discovery only, not medical advice.'
   },
   ar: {
-    metadataTitle: 'DrMuscat عُمان | اكتشاف الرعاية الصحية في مسقط',
+    metadataTitle: 'DrMuscat | اكتشاف الرعاية الصحية في عُمان',
     metadataDescription:
-      'استكشف خيارات الرعاية الصحية في عُمان عبر DrMuscat لاكتشاف الأطباء والعيادات والمختبرات والصيدليات والخدمات والمناطق.'
+      'استكشف الأطباء والعيادات والمختبرات والصيدليات ومراكز التجميل والعيادات البيطرية ومقدمي خدمات الرفاهية والعروض في عُمان. اكتشاف عام فقط، وليس نصيحة طبية.',
+    openGraphTitle: 'DrMuscat | اكتشاف الرعاية الصحية في عُمان',
+    openGraphDescription:
+      'استكشف مقدمي الرعاية الصحية والتجميل والرفاهية ورعاية الحيوانات الأليفة في عُمان. اكتشاف عام فقط، وليس نصيحة طبية.'
   }
 };
 
@@ -38,11 +47,24 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const copy = homeMetadataByLocale[locale as SupportedLocale];
 
-  return {
+  const localizedMetadata = buildLocalizedMetadata({
+    locale: locale as SupportedLocale,
+    country: country as SupportedCountry,
     title: copy.metadataTitle,
-    description: copy.metadataDescription,
-    alternates: {
-      canonical: `/${locale}/${country}`
+    description: copy.metadataDescription
+  });
+
+  return {
+    ...localizedMetadata,
+    openGraph: {
+      ...localizedMetadata.openGraph,
+      title: copy.openGraphTitle,
+      description: copy.openGraphDescription
+    },
+    twitter: {
+      ...localizedMetadata.twitter,
+      title: copy.openGraphTitle,
+      description: copy.openGraphDescription
     }
   };
 }
