@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="180" viewBox="0 0 720 180" role="img" aria-label="DrMuscat logo">
+  <defs>
+    <linearGradient id="dmGreen" x1="70" y1="20" x2="70" y2="156" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#20D184"/>
+      <stop offset="0.48" stop-color="#12AE6B"/>
+      <stop offset="1" stop-color="#08724F"/>
+    </linearGradient>
+
+    <linearGradient id="dmWordGreen" x1="260" y1="38" x2="690" y2="138" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#18C779"/>
+      <stop offset="0.55" stop-color="#0FA869"/>
+      <stop offset="1" stop-color="#087A54"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="180" fill="none"/>
+
+  <g transform="translate(18 16)">
+    <path
+      d="M34 146 V76 C34 24 126 24 126 76 V146"
+      fill="none"
+      stroke="url(#dmGreen)"
+      stroke-width="30"
+      stroke-linecap="butt"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M48 96 H75 L85 73 L103 125 L118 96 H144"
+      fill="none"
+      stroke="#16C978"
+      stroke-width="12"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <text
+    x="185"
+    y="114"
+    font-family="Avenir Next, Nunito Sans, Inter, Segoe UI, Arial, sans-serif"
+    font-size="92"
+    font-weight="700"
+    letter-spacing="-4"
+  >
+    <tspan fill="#111827">Dr</tspan><tspan fill="url(#dmWordGreen)">Muscat</tspan>
+  </text>
+</svg>

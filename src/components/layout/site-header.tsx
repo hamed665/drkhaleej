@@ -110,7 +110,7 @@ export function SiteHeader() {
       </Container>
       <div id={mobileMenuId} className="dm2026-site-header__mobile-menu" popover="auto" dir={dir} data-dm2026-mobile-menu>
         <div className="dm2026-site-header__mobile-menu-head">
-          <Logo />
+          <Logo variant="compact" />
           <button type="button" popoverTarget={mobileMenuId} popoverTargetAction="hide" aria-label={copy.closeMenu}>
             ×
           </button>
