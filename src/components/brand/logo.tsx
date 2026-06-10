@@ -25,16 +25,44 @@ export function Logo({ variant = 'full', className, imageSrc, imageAlt, ...props
   const height = isCompact ? 44 : 45;
 
   return (
-    <div className={classes} {...props}>
-      <span className="dm-logo__mark" aria-hidden="true">
+    <div
+      className={classes}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        inlineSize: isCompact ? '44px' : '180px',
+        blockSize: isCompact ? '44px' : '45px',
+        overflow: 'visible',
+        flexShrink: 0
+      }}
+      {...props}
+    >
+      <span
+        className="dm-logo__mark"
+        aria-hidden="true"
+        style={{
+          display: 'inline-flex',
+          inlineSize: isCompact ? '44px' : '180px',
+          blockSize: isCompact ? '44px' : '45px',
+          overflow: 'visible',
+          flexShrink: 0
+        }}
+      >
         <Image
           src={logoSrc}
           alt=""
           width={width}
           height={height}
-          sizes={isCompact ? '44px' : '(min-width: 768px) 180px, 150px'}
+          sizes={isCompact ? '44px' : '180px'}
           className="dm-logo__image"
           priority={false}
+          style={{
+            display: 'block',
+            inlineSize: isCompact ? '44px' : '180px',
+            blockSize: isCompact ? '44px' : '45px',
+            maxInlineSize: 'none',
+            objectFit: 'contain'
+          }}
         />
       </span>
       <span className="sr-only">{accessibleName}</span>
