@@ -8,6 +8,7 @@ Canonical specification path:
 - `docs/platform/DRMUSCAT_PLATFORM_ARCHITECTURE_V1.md` — documentation-only future platform architecture map.
 - `docs/platform/DRMUSCAT_ROLES_AND_PERMISSIONS_SPEC_V1.md` — documentation-only role, permission, ownership, audit, and RLS implication spec.
 - `docs/platform/DRMUSCAT_PROVIDER_ENTITY_MODEL_SPEC_V1.md` — documentation-only provider, doctor, center, branch, claim, verification, and public/private entity model spec.
+- `docs/platform/DRMUSCAT_SEO_AI_CONTENT_OPERATING_SYSTEM_SPEC_V1.md` — documentation-only SEO, AI content, CMS, media, review, and reporting operating system specification.
 
 Build mode:
 
