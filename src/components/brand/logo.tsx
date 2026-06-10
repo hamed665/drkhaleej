@@ -13,8 +13,8 @@ type LogoProps = HTMLAttributes<HTMLDivElement> & {
   imageAlt?: string;
 };
 
-const DEFAULT_LOGO_LOCKUP_SRC = '/brand/drmuscat-logo-lockup.svg';
-const DEFAULT_LOGO_MARK_SRC = '/brand/drmuscat-logo-mark.svg';
+const DEFAULT_LOGO_LOCKUP_SRC = '/brand/drmuscat-logo-lockup.svg?v=final-20260610';
+const DEFAULT_LOGO_MARK_SRC = '/brand/drmuscat-logo-mark.svg?v=final-20260610';
 
 export function Logo({ variant = 'full', className, imageSrc, imageAlt, ...props }: LogoProps) {
   const accessibleName = imageAlt ?? 'DrMuscat';
