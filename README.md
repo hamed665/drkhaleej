@@ -6,6 +6,7 @@ Canonical specification path:
 
 - `docs/master-spec/`
 - `docs/platform/DRMUSCAT_PLATFORM_ARCHITECTURE_V1.md` — documentation-only future platform architecture map.
+- `docs/platform/DRMUSCAT_ROLES_AND_PERMISSIONS_SPEC_V1.md` — documentation-only role, permission, ownership, audit, and RLS implication spec.
 
 Build mode:
 
