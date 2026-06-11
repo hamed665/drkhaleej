@@ -13,8 +13,8 @@
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0051`.
-- Migration validation is expected through `0051_landing_page_contents.sql`.
+- Completed migration set: `0001` through `0052`.
+- Migration validation is expected through `0052_review_companion_tables.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Implemented public app surface
@@ -40,10 +40,10 @@
 
 ## Data/RLS foundations
 
-- Database foundations now validate through `0051_landing_page_contents.sql`.
-- Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, and landing content foundations exist.
-- Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`.
-- Further review system work is blocked until existing review schema reconciliation is approved.
+- Database foundations now validate through `0052_review_companion_tables.sql`.
+- Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, landing content foundations, and review companion table foundations exist.
+- Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
+- Further review system work remains incomplete and blocked until explicitly approved: no full moderation UI, no public review display workflow, no provider reply workflow, and no complete review operations are implemented yet.
 - Private-data access remains phase-gated.
 - `CREATE POLICY` and `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` remain allowed only in explicitly approved RLS phases.
 - No real seed rows are allowed unless a seed phase is explicitly approved.
@@ -64,6 +64,7 @@
 - Real seed rows are not implemented.
 - Provider dashboard mutations are not implemented.
 - Admin lead mutation workflows are not implemented.
+- Full review moderation UI, public review display workflow, provider reply workflow, and complete review operations are not implemented.
 - Sales, referral, billing, analytics, SEO AI, provider dashboard, payment, and admin mutation features remain out of scope unless explicitly approved.
 - Business expansion features remain out of scope unless explicitly approved.
 
@@ -82,7 +83,7 @@ Current validation gate:
 ## Last known validation status
 
 - Environment check passes.
-- Migration validation passes through `0051_landing_page_contents.sql`.
+- Migration validation passes through `0052_review_companion_tables.sql`.
 - RLS static tests pass.
 - Route contract check passes.
 - Typecheck passes.

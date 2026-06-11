@@ -20,8 +20,8 @@ Build mode:
 ## Current project phase status
 
 - Current repo state: **after the admin provider onboarding lead detail baseline**
-- Database/migration status: **validates through `0050_provider_onboarding_leads.sql`**
-- Completed migration set: **`0001` through `0050`** (expected to exist)
+- Database/migration status: **validates through `0052_review_companion_tables.sql`**
+- Completed migration set: **`0001` through `0052`** (expected to exist)
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 ## Completed database and platform foundation scope
@@ -49,6 +49,8 @@ Build mode:
 - provider license verification foundation
 - media public visibility/RLS hardening
 - provider onboarding lead database/RLS foundation through `0050_provider_onboarding_leads.sql`
+- landing content foundation through `0051_landing_page_contents.sql`
+- review companion table foundation through `0052_review_companion_tables.sql` only; this does not complete the review feature
 
 ## Current implemented app surface
 
@@ -86,6 +88,7 @@ The repository now includes approved public and admin baselines. These are not p
 - no provider dashboard mutation workflows yet
 - no admin provider onboarding lead mutation/status/update actions yet
 - no admin lead assignment, conversion, contact-action, or audit-write workflows yet
+- no full review moderation UI, public review display workflow, provider reply workflow, or complete review operations yet
 - no broad sales, referral, billing, analytics, SEO AI, provider dashboard, or business expansion features unless explicitly approved
 - no medical records/diagnoses/prescriptions/lab results yet
 - private-data access remains phase-gated and must not be expanded without explicit approval
