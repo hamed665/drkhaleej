@@ -56,7 +56,7 @@ Do not build the full platform in one pass.
 
 Current repo state: **after the admin provider onboarding lead detail baseline**.
 
-Completed migrations: **`0001` through `0050`**. Migration validation is expected through `0050_provider_onboarding_leads.sql`.
+Completed migrations: **`0001` through `0052`**. Migration validation is expected through `0052_review_companion_tables.sql`. Migration `0052_review_companion_tables.sql` adds review companion tables only; it does not complete the review feature.
 
 Do not implement business features yet.
 Do not implement payment gateways.
@@ -69,8 +69,9 @@ Do not fake passing tests.
 Do not disable TypeScript, lint, RLS, or validation to make the build pass.
 
 Private data RLS remains phase-gated and must not be expanded without explicit approval.
-Approved public and admin baselines now exist: localized public catalog/detail surfaces, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, and read-only admin provider onboarding lead list/detail.
+Approved public and admin baselines now exist: localized public catalog/detail surfaces, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, read-only admin provider onboarding lead list/detail, landing content foundations, and review companion table foundations.
 New frontend/backend/business features remain out of scope until explicitly approved.
+Review feature implementation remains incomplete and out of scope: no full moderation UI, no public review display workflow, no provider reply workflow, and no complete review operations are implemented yet.
 No seed rows are allowed yet unless a seed phase is explicitly approved.
 
 Future phases must not modify existing SQL migrations unless explicitly approved.
