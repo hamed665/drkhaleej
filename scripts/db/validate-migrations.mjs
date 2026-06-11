@@ -54,7 +54,8 @@ const required = [
   '0048_media_public_visibility_hardening.sql',
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
-  '0051_landing_page_contents.sql'
+  '0051_landing_page_contents.sql',
+  '0052_review_companion_tables.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -144,7 +145,8 @@ const rlsPolicyFiles = new Set([
   '0047_provider_license_verification_foundation.sql',
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
-  '0051_landing_page_contents.sql'
+  '0051_landing_page_contents.sql',
+  '0052_review_companion_tables.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -169,6 +171,7 @@ const mediaPublicVisibilityHardeningFile = '0048_media_public_visibility_hardeni
 const mediaPublicRlsHardeningFile = '0049_media_public_rls_hardening.sql';
 const providerOnboardingLeadsFile = '0050_provider_onboarding_leads.sql';
 const landingPageContentsFile = '0051_landing_page_contents.sql';
+const reviewCompanionTablesFile = '0052_review_companion_tables.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1751,6 +1754,63 @@ for (const forbidden of [
 ]) {
   requireCondition(!forbidden.test(landingPageContentsContent), `0051_landing_page_contents.sql contains forbidden pattern: ${forbidden}`);
 }
+
+const reviewCompanionTablesContent = readFileSync(`${dir}/${reviewCompanionTablesFile}`, 'utf8');
+const reviewCompanionTables = [
+  'review_policy_versions',
+  'review_moderation_events',
+  'review_disputes',
+  'provider_review_replies',
+  'review_fraud_signals',
+  'review_eligibility_snapshots',
+  'review_aggregate_snapshots',
+  'review_audit_events',
+];
+
+for (const table of reviewCompanionTables) {
+  requireCondition(
+    new RegExp(`create\\s+table\\s+if\\s+not\\s+exists\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent),
+    `0052_review_companion_tables.sql must create public.${table}`,
+  );
+  requireCondition(
+    new RegExp(`alter\\s+table\\s+public\\.${table}\\s+enable\\s+row\\s+level\\s+security`, 'i').test(reviewCompanionTablesContent),
+    `0052_review_companion_tables.sql must enable RLS on public.${table}`,
+  );
+  requireCondition(
+    !new RegExp(`create\\s+policy[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent),
+    `0052_review_companion_tables.sql must not create policies on public.${table}`,
+  );
+  requireCondition(
+    !new RegExp(`\\bgrant\\b[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent)
+      && !new RegExp(`on\\s+public\\.${table}\\b[\\s\\S]*?to\\s+(anon|authenticated)`, 'i').test(reviewCompanionTablesContent),
+    `0052_review_companion_tables.sql must not grant anon/authenticated access to public.${table}`,
+  );
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\bgrant\b/i,
+  /\bcreate\s+(or\s+replace\s+)?view\b/i,
+  /\balter\s+table\s+public\.reviews\b/i,
+  /\balter\s+table\s+public\.review_reports\b/i,
+  /\bcreate\s+table\s+if\s+not\s+exists\s+public\.(reviews|review_reports|review_ratings|review_verifications|review_notification_events)\b/i,
+  /\bcreate\s+type\b/i,
+  /\binsert\s+into\b/i,
+]) {
+  requireCondition(!forbidden.test(reviewCompanionTablesContent), `0052_review_companion_tables.sql contains forbidden pattern: ${forbidden}`);
+}
+
+for (const requiredPattern of [
+  /review_policy_versions_name_version_unique[\s\S]*?unique\s*\(\s*policy_name\s*,\s*policy_version\s*\)/i,
+  /review_id\s+uuid\s+not\s+null\s+references\s+public\.reviews\s*\(\s*id\s*\)\s+on\s+delete\s+cascade/i,
+  /provider_id\s+uuid\s+null/i,
+  /review_aggregate_snapshots_eligible_count_check[\s\S]*?eligible_review_count\s*>=\s*0/i,
+  /review_aggregate_snapshots_rating_scale_check[\s\S]*?rating_scale\s*>\s*0/i,
+  /review_aggregate_snapshots_average_rating_check[\s\S]*?average_overall_rating\s+is\s+null[\s\S]*?average_overall_rating\s*>=\s*1[\s\S]*?average_overall_rating\s*<=\s*rating_scale/i,
+]) {
+  requireCondition(requiredPattern.test(reviewCompanionTablesContent), `0052_review_companion_tables.sql missing required pattern: ${requiredPattern}`);
+}
+
 
 console.log(`Phase ${PHASE} migration validation passed.`);
 console.log(`Validated files: ${required.join(', ')}`);

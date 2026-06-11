@@ -29,6 +29,7 @@ const REQUIRED_FILES = [
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
+  '0052_review_companion_tables.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([
@@ -44,6 +45,7 @@ const APPROVED_POLICY_FILES = new Set([
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
+  '0052_review_companion_tables.sql',
 ]);
 
 const HELPER_FILES = new Set([
@@ -99,6 +101,14 @@ const SENSITIVE_TABLES_NO_ANON = new Set([
   'callback_requests',
   'provider_onboarding_leads',
   'landing_page_contents',
+  'review_policy_versions',
+  'review_moderation_events',
+  'review_disputes',
+  'provider_review_replies',
+  'review_fraud_signals',
+  'review_eligibility_snapshots',
+  'review_aggregate_snapshots',
+  'review_audit_events',
 ]);
 
 const ALLOWED_ANON_POLICIES = new Set([
@@ -406,5 +416,51 @@ assert(
   !/create\s+policy(?!\s+provider_license_records_public_select_anon|\s+provider_license_records_public_select_authenticated)[\s\S]*?on\s+public\.provider_license_records[\s\S]*?for\s+select/i.test(providerLicenseRecordsContent),
   'provider_license_records must not include broad or unexpected SELECT policies',
 );
+
+const reviewCompanionTablesContent = contentsByFile.get('0052_review_companion_tables.sql') ?? '';
+const reviewCompanionTables = [
+  'review_policy_versions',
+  'review_moderation_events',
+  'review_disputes',
+  'provider_review_replies',
+  'review_fraud_signals',
+  'review_eligibility_snapshots',
+  'review_aggregate_snapshots',
+  'review_audit_events',
+];
+
+for (const table of reviewCompanionTables) {
+  assert(
+    new RegExp(`alter\\s+table\\s+public\\.${table}\\s+enable\\s+row\\s+level\\s+security`, 'i').test(reviewCompanionTablesContent),
+    `0052 must enable RLS on public.${table}`,
+  );
+  assert(
+    !new RegExp(`create\\s+policy[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent),
+    `0052 must not create policies on public.${table}`,
+  );
+  assert(
+    !new RegExp(`to\\s+anon[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent)
+      && !new RegExp(`on\\s+public\\.${table}\\b[\\s\\S]*?to\\s+anon`, 'i').test(reviewCompanionTablesContent),
+    `${table} must not grant anon access`,
+  );
+  assert(
+    !new RegExp(`to\\s+authenticated[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent)
+      && !new RegExp(`on\\s+public\\.${table}\\b[\\s\\S]*?to\\s+authenticated`, 'i').test(reviewCompanionTablesContent),
+    `${table} must not grant authenticated broad access`,
+  );
+  assert(
+    !new RegExp(`on\\s+public\\.${table}\\b[\\s\\S]*?for\\s+(select|insert|update|delete)`, 'i').test(reviewCompanionTablesContent)
+      && !new RegExp(`for\\s+(select|insert|update|delete)[\\s\\S]*?on\\s+public\\.${table}\\b`, 'i').test(reviewCompanionTablesContent),
+    `${table} must not define public SELECT or mutation policies`,
+  );
+}
+
+assert(!/\bgrant\b/i.test(reviewCompanionTablesContent), '0052 must not create grants');
+assert(!/\bcreate\s+(or\s+replace\s+)?view\b/i.test(reviewCompanionTablesContent), '0052 must not create views');
+assert(!/\balter\s+table\s+public\.reviews\b/i.test(reviewCompanionTablesContent), '0052 must not alter public.reviews');
+assert(!/\balter\s+table\s+public\.review_reports\b/i.test(reviewCompanionTablesContent), '0052 must not alter public.review_reports');
+assert(!/\bcreate\s+table\s+if\s+not\s+exists\s+public\.(reviews|review_reports|review_ratings|review_verifications|review_notification_events)\b/i.test(reviewCompanionTablesContent), '0052 must not create forbidden review tables');
+assert(!/\binsert\s+into\b/i.test(reviewCompanionTablesContent), '0052 must not seed review companion rows');
+
 
 console.log('✅ RLS static harness checks passed for required Phase 3 policy/helper migration rules.');

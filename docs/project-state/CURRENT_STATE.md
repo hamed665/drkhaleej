@@ -13,8 +13,8 @@
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0051`.
-- Migration validation is expected through `0051_landing_page_contents.sql`.
+- Completed migration set: `0001` through `0052`.
+- Migration validation is expected through `0052_review_companion_tables.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Implemented public app surface
@@ -40,7 +40,7 @@
 
 ## Data/RLS foundations
 
-- Database foundations now validate through `0051_landing_page_contents.sql`.
+- Database foundations now validate through `0052_review_companion_tables.sql`.
 - Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, and landing content foundations exist.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`.
 - Further review system work is blocked until existing review schema reconciliation is approved.
