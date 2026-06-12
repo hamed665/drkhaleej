@@ -313,20 +313,16 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   const defaultProviderType = firstValue(copy.providerTypes);
   const defaultCountry = firstValue(copy.countries).label;
   const defaultCity = firstValue(copy.cities);
-  const defaultContentType = firstValue(copy.contentTypes);
   const cityAreas = useMemo(() => ({ ...copy.cityAreas, ...extraCityAreas(dir) }), [copy.cityAreas, dir]);
   const [query, setQuery] = useState('');
-  const [selectedContentType, setSelectedContentType] = useState(defaultContentType);
   const [selectedProviderType, setSelectedProviderType] = useState(defaultProviderType);
-  const [selectedSearchChip, setSelectedSearchChip] = useState(() => primaryChipBlueprint[dir][0]?.label ?? defaultContentType);
+  const [selectedSearchChip, setSelectedSearchChip] = useState(() => primaryChipBlueprint[dir][0]?.label ?? firstValue(copy.contentTypes));
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry);
   const [selectedCity, setSelectedCity] = useState(defaultCity);
   const areaOptions = cityAreas[selectedCity] ?? [copy.cityWideAreaLabel];
   const [selectedArea, setSelectedArea] = useState(firstValue(areaOptions));
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedSuggestion, setSelectedSuggestion] = useState<SearchSuggestionView>(() => toView(firstValue(smartSuggestions), dir));
   const [activeSuggestion, setActiveSuggestion] = useState<SearchSuggestionView>(() => toView(firstValue(smartSuggestions), dir));
-  const [searchPreviewVisible, setSearchPreviewVisible] = useState(false);
 
   const matchingSuggestions = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);
@@ -368,13 +364,10 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
   const applySuggestion = (view: SearchSuggestionView) => {
     const suggestion = view.suggestion;
     setQuery(view.label);
-    setSelectedSuggestion(view);
     setActiveSuggestion(view);
-    setSearchPreviewVisible(false);
 
     const nextContentType = localized(suggestion.suggestedContentType ?? { en: '', ar: '' }, dir);
     const nextProviderType = localized(suggestion.suggestedProviderType ?? { en: '', ar: '' }, dir);
-    safeSetIfAvailable(nextContentType, copy.contentTypes, setSelectedContentType);
     safeSetIfAvailable(nextProviderType, copy.providerTypes, setSelectedProviderType);
 
     const matchingChip = chipOptions.find((chip) => chip.contentTypeValue === nextContentType && (!chip.providerTypeValue || chip.providerTypeValue === nextProviderType));
@@ -395,15 +388,9 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
     setShowSuggestions(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setShowSuggestions(false);
-    setSearchPreviewVisible(true);
-  };
-
   return (
     <section className="dm2026-home-search dm2026-search" dir={dir} aria-labelledby="dm2026-home-search-title">
-      <form className="dm2026-search-surface dm2026-home-search__surface" action={searchHref} method="get" onSubmit={handleSubmit}>
+      <form className="dm2026-search-surface dm2026-home-search__surface" action={searchHref} method="get">
         <div className="dm2026-home-search__main">
           <div className="dm2026-home-search__header">
             <span className="dm2026-badge">{heroCopy.eyebrow}</span>
@@ -426,7 +413,6 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
                 onChange={(event) => {
                   setQuery(event.target.value);
                   setShowSuggestions(event.target.value.trim().length > 0);
-                  setSearchPreviewVisible(false);
                 }}
                 onFocus={() => setShowSuggestions(normalizeSearch(query).length > 0)}
                 placeholder={heroCopy.placeholder}
@@ -482,7 +468,6 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
                     checked={contentType.label === selectedSearchChip}
                     onChange={() => {
                       setSelectedSearchChip(contentType.label);
-                      setSelectedContentType(contentType.contentTypeValue);
 
                       if (contentType.providerTypeValue) {
                         setSelectedProviderType(contentType.providerTypeValue);
@@ -544,7 +529,6 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
                       checked={servicesFilterOption.label === selectedSearchChip}
                       onChange={() => {
                         setSelectedSearchChip(servicesFilterOption.label);
-                        setSelectedContentType(servicesFilterOption.contentTypeValue);
                       }}
                     />
                     <span>{servicesFilterOption.label}</span>
@@ -557,7 +541,7 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
               <div>
                 {secondaryProviderTypes.map((providerType) => (
                   <label key={providerType} className="dm2026-home-search__chip">
-                    <input type="radio" name="type" value={providerType} checked={providerType === selectedProviderType} onChange={() => setSelectedProviderType(providerType)} />
+                    <input type="radio" name="providerType" value={providerType} checked={providerType === selectedProviderType} onChange={() => setSelectedProviderType(providerType)} />
                     <span>{providerType}</span>
                   </label>
                 ))}
@@ -580,14 +564,6 @@ export function HomeSearch2026({ copy, dir, searchHref, providerHref }: HomeSear
               <li key={item}>{item}</li>
             ))}
           </ul>
-
-          {searchPreviewVisible ? (
-            <div className="dm2026-home-search__discovery-preview" role="status">
-              <strong>{dir === 'rtl' ? 'معاينة الاكتشاف' : 'Discovery preview'}</strong>
-              <p>{[query || selectedSuggestion.label, selectedContentType, selectedCity, selectedArea].filter(Boolean).join(' · ')}</p>
-              <small>{dir === 'rtl' ? 'ستظهر الملفات العامة بعد مراجعة بيانات المقدمين واعتمادها.' : 'Reviewed public profiles will appear here after provider data is approved.'}</small>
-            </div>
-          ) : null}
         </div>
 
         <aside className="dm2026-home-search__visual" aria-label={heroCopy.visualTitle}>
