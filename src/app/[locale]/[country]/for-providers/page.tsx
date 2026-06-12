@@ -599,71 +599,100 @@ function HeroNetworkVisual({ copy }: { copy: ProviderPageCopy }) {
   return (
     <div className="provider-hero-visual" aria-hidden="true">
       <svg
-        className="provider-hero-visual__network"
-        viewBox="0 0 420 360"
+        className="provider-hero-visual__map"
+        viewBox="0 0 520 360"
         focusable="false"
       >
         <defs>
           <linearGradient
-            id="providerNetworkLine"
-            x1="40"
-            x2="360"
-            y1="40"
-            y2="300"
+            id="providerGraphStroke"
+            x1="82"
+            x2="428"
+            y1="72"
+            y2="285"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#2aa192" stopOpacity="0.2" />
-            <stop offset="1" stopColor="#0e6e64" stopOpacity="0.72" />
+            <stop stopColor="#8ecec2" stopOpacity="0.26" />
+            <stop offset="0.55" stopColor="#2aa192" stopOpacity="0.66" />
+            <stop offset="1" stopColor="#0e6e64" stopOpacity="0.78" />
           </linearGradient>
+          <radialGradient id="providerGraphGlow" cx="50%" cy="44%" r="58%">
+            <stop stopColor="#ffffff" stopOpacity="0.98" />
+            <stop offset="1" stopColor="#eff6f4" stopOpacity="0.42" />
+          </radialGradient>
         </defs>
         <path
-          d="M67 246C111 159 163 99 250 87c49-7 93 12 122 48"
+          d="M91 244C130 160 186 107 262 95c69-11 124 19 162 86"
           fill="none"
-          stroke="url(#providerNetworkLine)"
-          strokeWidth="2"
+          stroke="url(#providerGraphStroke)"
+          strokeLinecap="round"
+          strokeWidth="2.6"
         />
         <path
-          d="M87 235c45 20 92 24 141 10 50-15 87-47 113-97"
+          d="M112 256c50 22 107 24 166 5 58-19 99-54 126-107"
           fill="none"
           stroke="#8ecec2"
-          strokeOpacity="0.45"
-          strokeWidth="2"
+          strokeLinecap="round"
+          strokeOpacity="0.55"
+          strokeWidth="1.8"
         />
         <path
-          d="M133 114c30 61 66 96 129 127"
+          d="M166 124c27 58 72 99 135 126"
           fill="none"
           stroke="#c9a24b"
-          strokeOpacity="0.32"
-          strokeWidth="2"
+          strokeLinecap="round"
+          strokeOpacity="0.34"
+          strokeWidth="1.8"
         />
-        {[67, 133, 212, 295, 350].map((x, index) => (
-          <circle
-            key={x}
-            cx={x}
-            cy={[246, 114, 248, 91, 143][index]}
-            r="7"
-            fill="#ffffff"
-            stroke="#0e6e64"
-            strokeWidth="3"
-          />
+        <path
+          d="M252 64c-34 50-43 109-26 177"
+          fill="none"
+          stroke="#b9ded8"
+          strokeDasharray="4 9"
+          strokeLinecap="round"
+          strokeWidth="1.8"
+        />
+        {(
+          [
+            [91, 244, 11],
+            [166, 124, 8],
+            [250, 96, 10],
+            [301, 250, 9],
+            [404, 154, 11],
+          ] as const
+        ).map(([cx, cy, r]) => (
+          <g key={`${cx}-${cy}`}>
+            <circle cx={cx} cy={cy} r={r + 9} fill="#2aa192" opacity="0.08" />
+            <circle
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="url(#providerGraphGlow)"
+              stroke="#0e6e64"
+              strokeWidth="2.2"
+            />
+          </g>
         ))}
+        <path
+          d="M74 76c48-31 101-43 160-34M362 298c37-8 66-28 87-58"
+          fill="none"
+          stroke="#0e6e64"
+          strokeLinecap="round"
+          strokeOpacity="0.12"
+          strokeWidth="10"
+        />
       </svg>
-      <div className="provider-hero-visual__card provider-hero-visual__card--main">
+      <div className="provider-hero-visual__label provider-hero-visual__label--profile">
+        <ProviderLineIcon name="profile" />
         <span>{copy.heroVisualTitle}</span>
-        <strong>{copy.heroVisualSubtitle}</strong>
-        <div>
-          {copy.heroVisualPills.map((pill) => (
-            <small key={pill}>{pill}</small>
-          ))}
-        </div>
       </div>
-      <div className="provider-hero-visual__card provider-hero-visual__card--contact">
+      <div className="provider-hero-visual__label provider-hero-visual__label--contact">
         <ProviderLineIcon name="contact" />
-        <span>Call · WhatsApp · Directions</span>
+        <span>{copy.heroVisualPills.slice(1, 3).join(" · ")}</span>
       </div>
-      <div className="provider-hero-visual__card provider-hero-visual__card--review">
-        <ProviderLineIcon name="review" />
-        <span>Review before public listing</span>
+      <div className="provider-hero-visual__summary">
+        <strong>{copy.heroVisualSubtitle}</strong>
+        <span>{copy.heroVisualPills.join(" · ")}</span>
       </div>
     </div>
   );
@@ -856,6 +885,14 @@ export default async function PublicProviderPlansPage({
         <div className="provider-form-section__copy">
           <h2 id="provider-form-section-title">{copy.formSectionTitle}</h2>
           <p>{copy.formSectionHelper}</p>
+          <ul>
+            {copy.processSteps.map((step) => (
+              <li key={step.title}>
+                <span aria-hidden="true">✓</span>
+                {step.title}
+              </li>
+            ))}
+          </ul>
         </div>
         <ProviderOnboardingForm locale={locale} copy={copy.form} />
       </section>
@@ -924,26 +961,26 @@ export default async function PublicProviderPlansPage({
           overflow: hidden;
           min-height: 100vh;
           background:
-            radial-gradient(circle at 7% 3%, rgba(91, 190, 177, 0.2), transparent 26rem),
-            radial-gradient(circle at 91% 12%, rgba(201, 162, 75, 0.12), transparent 24rem),
-            linear-gradient(180deg, var(--dm-bg-warm, #fbfbf8) 0%, var(--dm-bg, #f7faf9) 47%, #ffffff 100%);
+            radial-gradient(circle at 8% 2%, rgba(91, 190, 177, 0.16), transparent 22rem),
+            radial-gradient(circle at 92% 8%, rgba(201, 162, 75, 0.09), transparent 20rem),
+            linear-gradient(180deg, var(--dm-bg-warm, #fbfbf8) 0%, var(--dm-bg, #f7faf9) 52%, #ffffff 100%);
           color: var(--dm-teal-950, #07302c);
-          padding: clamp(1rem, 2.5vw, 2rem);
+          padding: clamp(0.9rem, 2vw, 1.5rem);
         }
 
         .provider-hero,
         .provider-section,
         .provider-medical-disclaimer {
-          width: min(1160px, 100%);
+          width: min(1080px, 100%);
           margin-inline: auto;
         }
 
         .provider-hero {
           display: grid;
-          grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
-          gap: clamp(1rem, 3vw, 2rem);
+          grid-template-columns: minmax(0, 1.02fr) minmax(18rem, 0.82fr);
+          gap: clamp(1rem, 2.6vw, 1.7rem);
           align-items: center;
-          padding-block: clamp(2rem, 6vw, 5.4rem) clamp(1.5rem, 4vw, 3.8rem);
+          padding-block: clamp(1.15rem, 3.4vw, 2.7rem) clamp(1rem, 2.7vw, 2rem);
         }
 
         .provider-hero__copy,
@@ -957,39 +994,37 @@ export default async function PublicProviderPlansPage({
         .provider-final-cta,
         .provider-medical-disclaimer,
         .provider-onboarding-form {
-          border: 1px solid rgba(14, 110, 100, 0.13);
-          background: rgba(255, 255, 255, 0.82);
-          box-shadow: 0 24px 70px rgba(11, 40, 38, 0.08);
-          backdrop-filter: blur(14px);
+          border: 1px solid rgba(14, 110, 100, 0.12);
+          background: rgba(255, 255, 255, 0.84);
+          box-shadow: 0 18px 48px rgba(11, 40, 38, 0.065);
+          backdrop-filter: blur(10px);
         }
 
         .provider-hero__copy {
-          position: relative;
-          z-index: 1;
-          border-radius: clamp(1.5rem, 3vw, 2.4rem);
-          padding: clamp(1.35rem, 4vw, 3rem);
+          border-radius: 1.65rem;
+          padding: clamp(1.15rem, 3vw, 2rem);
         }
 
         .provider-badge,
         .provider-section-header__eyebrow {
-          border: 1px solid rgba(14, 110, 100, 0.14);
-          background: rgba(239, 246, 244, 0.78);
+          border: 1px solid rgba(14, 110, 100, 0.12);
+          background: rgba(239, 246, 244, 0.82);
           color: var(--dm-teal-800, #0b4f4a);
           box-shadow: none;
         }
 
         .provider-hero h1 {
-          max-width: 15ch;
-          margin: 1rem 0;
+          max-width: 18ch;
+          margin: 0.75rem 0 0.75rem;
           color: var(--dm-teal-950, #07302c);
-          font-size: clamp(2.2rem, 5vw, 4.25rem);
-          line-height: 1.02;
-          letter-spacing: -0.055em;
+          font-size: clamp(1.95rem, 3.55vw, 3.2rem);
+          line-height: 1.08;
+          letter-spacing: -0.044em;
         }
 
         [dir='rtl'] .provider-hero h1 {
-          max-width: 17ch;
-          line-height: 1.16;
+          max-width: 19ch;
+          line-height: 1.22;
           letter-spacing: 0;
         }
 
@@ -1004,27 +1039,34 @@ export default async function PublicProviderPlansPage({
         .provider-onboarding-form p,
         .provider-onboarding-form span {
           color: var(--dm-ink-500, #5c6b6b);
-          line-height: 1.75;
+          line-height: 1.66;
         }
 
         .provider-hero__description {
-          max-width: 66ch;
+          max-width: 62ch;
           margin: 0;
-          font-size: clamp(1rem, 1.7vw, 1.14rem);
+          font-size: clamp(0.96rem, 1.35vw, 1.05rem);
         }
 
         .provider-hero__actions {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.85rem;
-          margin-block: 1.5rem 1.1rem;
+          gap: 0.7rem;
+          margin-block: 1.15rem 0.85rem;
+        }
+
+        .provider-hero__actions .dm2026-button,
+        .provider-final-cta .dm2026-button,
+        .provider-onboarding-form__submit {
+          min-height: 2.75rem;
+          padding-block: 0.72rem;
         }
 
         .provider-hero__micro-benefits {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.65rem;
-          margin: 0 0 1rem;
+          gap: 0.5rem;
+          margin: 0 0 0.8rem;
           padding: 0;
           list-style: none;
         }
@@ -1032,144 +1074,157 @@ export default async function PublicProviderPlansPage({
         .provider-hero__micro-benefits li {
           display: inline-flex;
           align-items: center;
-          gap: 0.45rem;
+          gap: 0.42rem;
           border-radius: var(--dm-radius-pill, 999px);
-          background: rgba(14, 110, 100, 0.08);
+          background: rgba(14, 110, 100, 0.07);
           color: var(--dm-teal-800, #0b4f4a);
-          padding: 0.58rem 0.8rem;
-          font-size: 0.9rem;
-          font-weight: 700;
+          padding: 0.42rem 0.62rem;
+          font-size: 0.82rem;
+          font-weight: 750;
         }
 
         .provider-hero__micro-benefits span {
-          inline-size: 0.45rem;
-          block-size: 0.45rem;
+          inline-size: 0.38rem;
+          block-size: 0.38rem;
           border-radius: 999px;
           background: var(--dm-brand-mint, #2aa192);
         }
 
         .provider-hero__note {
           margin: 0;
-          max-width: 70ch;
+          max-width: 67ch;
           color: var(--dm-ink-600, #45514f);
-          font-size: 0.93rem;
+          font-size: 0.86rem;
+          line-height: 1.62;
         }
 
         .provider-hero-visual {
           position: relative;
-          min-height: clamp(27rem, 46vw, 34rem);
-          border-radius: clamp(1.5rem, 3vw, 2.5rem);
+          min-height: clamp(20.5rem, 34vw, 25rem);
+          border-radius: 1.65rem;
           background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 244, 0.76)),
-            radial-gradient(circle at 70% 15%, rgba(91, 190, 177, 0.22), transparent 13rem);
+            radial-gradient(circle at 52% 38%, rgba(91, 190, 177, 0.18), transparent 13rem),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 244, 0.74));
           overflow: hidden;
         }
 
         .provider-hero-visual::before {
           content: '';
           position: absolute;
-          inset: 1rem;
-          border: 1px solid rgba(14, 110, 100, 0.1);
-          border-radius: 2rem;
+          inset: 0.9rem;
+          border: 1px solid rgba(14, 110, 100, 0.08);
+          border-radius: 1.25rem;
           background-image:
-            linear-gradient(rgba(14, 110, 100, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(14, 110, 100, 0.05) 1px, transparent 1px);
-          background-size: 38px 38px;
+            linear-gradient(rgba(14, 110, 100, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(14, 110, 100, 0.035) 1px, transparent 1px);
+          background-size: 32px 32px;
         }
 
-        .provider-hero-visual__network {
+        .provider-hero-visual__map {
           position: absolute;
-          inset: 1.5rem 0 auto;
+          inset: 0.35rem 0 0;
           inline-size: 100%;
-          opacity: 0.96;
+          block-size: calc(100% - 0.5rem);
         }
 
-        .provider-hero-visual__card {
+        .provider-hero-visual__label,
+        .provider-hero-visual__summary {
           position: absolute;
+          border: 1px solid rgba(14, 110, 100, 0.13);
+          border-radius: 1rem;
+          background: rgba(255, 255, 255, 0.74);
+          box-shadow: 0 14px 34px rgba(11, 40, 38, 0.08);
+          backdrop-filter: blur(14px);
+        }
+
+        .provider-hero-visual__label {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.55rem;
+          padding: 0.58rem 0.68rem;
+          color: var(--dm-teal-900, #0a3d39);
+          font-size: 0.78rem;
+          font-weight: 850;
+        }
+
+        .provider-hero-visual__label--profile {
+          top: 2.2rem;
+          inset-inline-start: clamp(1rem, 5vw, 2.2rem);
+        }
+
+        .provider-hero-visual__label--contact {
+          bottom: 5.7rem;
+          inset-inline-end: clamp(1rem, 5vw, 2rem);
+        }
+
+        .provider-hero-visual__label .provider-icon {
+          inline-size: 1.65rem;
+          block-size: 1.65rem;
+          border-radius: 0.65rem;
+          padding: 0.3rem;
+        }
+
+        .provider-hero-visual__summary {
+          inset-inline: clamp(1rem, 5vw, 2.2rem);
+          bottom: 1.15rem;
           display: grid;
-          gap: 0.65rem;
-          border: 1px solid rgba(14, 110, 100, 0.14);
-          border-radius: 1.45rem;
-          background: rgba(255, 255, 255, 0.72);
-          box-shadow: 0 18px 50px rgba(11, 40, 38, 0.1);
-          backdrop-filter: blur(18px);
-          padding: 1rem;
+          gap: 0.25rem;
+          padding: 0.82rem 0.95rem;
         }
 
-        .provider-hero-visual__card--main {
-          inset-inline: clamp(1rem, 4vw, 3rem);
-          bottom: 3rem;
-          padding: clamp(1rem, 3vw, 1.4rem);
-        }
-
-        .provider-hero-visual__card--main span,
-        .provider-hero-visual__card--contact span,
-        .provider-hero-visual__card--review span {
-          color: var(--dm-ink-500, #5c6b6b);
-          font-size: 0.86rem;
-          font-weight: 700;
-        }
-
-        .provider-hero-visual__card--main strong {
-          max-width: 20ch;
+        .provider-hero-visual__summary strong {
           color: var(--dm-teal-950, #07302c);
-          font-size: clamp(1.35rem, 3vw, 2rem);
-          line-height: 1.15;
-          letter-spacing: -0.03em;
+          font-size: clamp(1rem, 2vw, 1.2rem);
+          line-height: 1.25;
         }
 
-        .provider-hero-visual__card--main div {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.45rem;
-        }
-
-        .provider-hero-visual__card--main small {
-          border-radius: 999px;
-          background: rgba(14, 110, 100, 0.08);
-          color: var(--dm-teal-800, #0b4f4a);
-          padding: 0.4rem 0.6rem;
-          font-weight: 800;
-        }
-
-        .provider-hero-visual__card--contact {
-          top: 3rem;
-          inset-inline-start: clamp(1rem, 4vw, 3rem);
-          inline-size: min(15rem, calc(100% - 2rem));
-        }
-
-        .provider-hero-visual__card--review {
-          top: 10rem;
-          inset-inline-end: clamp(1rem, 4vw, 2.2rem);
-          inline-size: min(14rem, calc(100% - 2rem));
+        .provider-hero-visual__summary span {
+          color: var(--dm-ink-500, #5c6b6b);
+          font-size: 0.78rem;
+          font-weight: 750;
         }
 
         .provider-section {
-          padding-block: clamp(1.4rem, 4vw, 3.2rem);
+          padding-block: clamp(1rem, 2.7vw, 2rem);
         }
 
         .provider-section-header {
-          max-width: 760px;
-          margin-block-end: clamp(1rem, 3vw, 1.6rem);
+          display: grid;
+          gap: 0.55rem;
+          max-width: 720px;
+          margin-block-end: clamp(0.85rem, 2vw, 1.2rem);
+        }
+
+        .provider-section-header::before {
+          content: '';
+          inline-size: 2.5rem;
+          block-size: 2px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, var(--dm-teal-700, #0e6e64), rgba(14, 110, 100, 0));
+        }
+
+        [dir='rtl'] .provider-section-header::before {
+          background: linear-gradient(270deg, var(--dm-teal-700, #0e6e64), rgba(14, 110, 100, 0));
         }
 
         .provider-section-header__eyebrow {
           display: inline-flex;
+          justify-self: start;
           border-radius: var(--dm-radius-pill, 999px);
-          padding: 0.38rem 0.72rem;
-          font-size: 0.78rem;
-          font-weight: 800;
+          padding: 0.32rem 0.62rem;
+          font-size: 0.74rem;
+          font-weight: 850;
         }
 
         .provider-section-header h2,
         .provider-form-section__copy h2,
         .provider-final-cta h2,
         .provider-onboarding-form h2 {
-          margin: 0 0 0.7rem;
+          margin: 0;
           color: var(--dm-teal-950, #07302c);
-          font-size: clamp(1.65rem, 3.2vw, 2.55rem);
-          line-height: 1.14;
-          letter-spacing: -0.035em;
+          font-size: clamp(1.35rem, 2.35vw, 2rem);
+          line-height: 1.18;
+          letter-spacing: -0.028em;
         }
 
         [dir='rtl'] .provider-section-header h2,
@@ -1177,21 +1232,21 @@ export default async function PublicProviderPlansPage({
         [dir='rtl'] .provider-final-cta h2,
         [dir='rtl'] .provider-onboarding-form h2 {
           letter-spacing: 0;
-          line-height: 1.28;
+          line-height: 1.32;
         }
 
         .provider-section-header p,
         .provider-form-section__copy p,
         .provider-final-cta p {
           margin: 0;
-          font-size: clamp(0.98rem, 1.8vw, 1.08rem);
+          font-size: clamp(0.94rem, 1.35vw, 1.02rem);
         }
 
         .provider-category-grid,
         .provider-benefit-grid,
         .provider-faq__grid {
           display: grid;
-          gap: 1rem;
+          gap: 0.75rem;
         }
 
         .provider-category-grid {
@@ -1201,16 +1256,16 @@ export default async function PublicProviderPlansPage({
         .provider-category-card,
         .provider-benefit-card,
         .provider-faq__item {
-          border-radius: 1.45rem;
-          padding: 1.05rem;
+          border-radius: 1.1rem;
+          padding: 0.82rem;
         }
 
         .provider-category-card {
           display: flex;
           align-items: center;
-          gap: 0.85rem;
-          min-height: 6.3rem;
-          background: rgba(255, 255, 255, 0.78);
+          gap: 0.65rem;
+          min-height: 4.75rem;
+          background: rgba(255, 255, 255, 0.76);
         }
 
         .provider-category-card h3,
@@ -1219,18 +1274,18 @@ export default async function PublicProviderPlansPage({
         .provider-faq__item h3 {
           margin: 0;
           color: var(--dm-teal-950, #07302c);
-          font-size: 1.05rem;
+          font-size: 0.98rem;
           line-height: 1.28;
         }
 
         .provider-icon {
           flex: 0 0 auto;
-          inline-size: 2.35rem;
-          block-size: 2.35rem;
-          border-radius: 0.95rem;
-          background: linear-gradient(135deg, rgba(220, 238, 235, 0.95), rgba(255, 255, 255, 0.9));
+          inline-size: 2rem;
+          block-size: 2rem;
+          border-radius: 0.75rem;
+          background: linear-gradient(135deg, rgba(220, 238, 235, 0.92), rgba(255, 255, 255, 0.88));
           color: var(--dm-teal-700, #0e6e64);
-          padding: 0.46rem;
+          padding: 0.38rem;
         }
 
         .provider-icon path {
@@ -1246,30 +1301,32 @@ export default async function PublicProviderPlansPage({
         }
 
         .provider-benefit-card {
-          min-height: 15rem;
-          background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(239, 246, 244, 0.5));
+          display: grid;
+          align-content: start;
+          gap: 0.55rem;
+          min-height: 11rem;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(239, 246, 244, 0.42));
         }
 
         .provider-benefit-card p,
         .provider-faq__item p,
         .provider-process__step p {
-          margin: 0.7rem 0 0;
+          margin: 0;
+          font-size: 0.9rem;
         }
 
         .provider-process {
           position: relative;
-          border-radius: 2rem;
-          padding: clamp(1.2rem, 4vw, 2rem);
-          background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(239, 246, 244, 0.72));
+          border-radius: 1.45rem;
+          padding: clamp(1rem, 2.6vw, 1.45rem);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(239, 246, 244, 0.68));
         }
 
         .provider-process__steps {
           position: relative;
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 1rem;
+          gap: 0.75rem;
           margin: 0;
           padding: 0;
           list-style: none;
@@ -1278,47 +1335,48 @@ export default async function PublicProviderPlansPage({
         .provider-process__steps::before {
           content: '';
           position: absolute;
-          top: 2rem;
-          inset-inline: 10%;
-          block-size: 2px;
-          background: linear-gradient(90deg, transparent, rgba(14, 110, 100, 0.35), transparent);
+          top: 1.48rem;
+          inset-inline: 9%;
+          block-size: 1px;
+          background: linear-gradient(90deg, transparent, rgba(14, 110, 100, 0.32), transparent);
         }
 
         .provider-process__step {
           position: relative;
           display: grid;
-          gap: 1rem;
-          border: 1px solid rgba(14, 110, 100, 0.11);
-          border-radius: 1.35rem;
-          background: rgba(255, 255, 255, 0.75);
-          padding: 1rem;
-          box-shadow: 0 14px 40px rgba(11, 40, 38, 0.06);
+          gap: 0.72rem;
+          border: 1px solid rgba(14, 110, 100, 0.1);
+          border-radius: 1rem;
+          background: rgba(255, 255, 255, 0.72);
+          padding: 0.85rem;
+          box-shadow: 0 10px 28px rgba(11, 40, 38, 0.05);
         }
 
         .provider-process__number {
           display: inline-grid;
           place-items: center;
-          inline-size: 3rem;
-          block-size: 3rem;
-          border-radius: 1rem;
+          inline-size: 2.35rem;
+          block-size: 2.35rem;
+          border-radius: 0.78rem;
           background: var(--dm-teal-800, #0b4f4a);
           color: #ffffff;
+          font-size: 0.82rem;
           font-weight: 900;
         }
 
         .provider-review {
           display: grid;
-          grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr);
-          gap: clamp(1rem, 4vw, 2rem);
+          grid-template-columns: minmax(0, 1.22fr) minmax(15rem, 0.58fr);
+          gap: clamp(0.9rem, 3vw, 1.5rem);
           align-items: center;
-          border-radius: 2rem;
-          padding: clamp(1.2rem, 4vw, 2rem);
+          border-radius: 1.45rem;
+          padding: clamp(1rem, 3vw, 1.5rem);
         }
 
         .provider-review__checklist {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 0.75rem;
+          gap: 0.55rem;
           margin: 0;
           padding: 0;
           list-style: none;
@@ -1327,11 +1385,12 @@ export default async function PublicProviderPlansPage({
         .provider-review__checklist li {
           display: flex;
           align-items: flex-start;
-          gap: 0.6rem;
-          border-radius: 1rem;
-          background: rgba(14, 110, 100, 0.07);
+          gap: 0.48rem;
+          border-radius: 0.85rem;
+          background: rgba(14, 110, 100, 0.065);
           color: var(--dm-ink-700, #2e3a3b);
-          padding: 0.78rem;
+          padding: 0.62rem;
+          font-size: 0.9rem;
           font-weight: 700;
         }
 
@@ -1343,70 +1402,95 @@ export default async function PublicProviderPlansPage({
           position: relative;
           display: grid;
           place-items: center;
-          min-height: 18rem;
-          border-radius: 1.6rem;
+          min-height: 13.5rem;
+          border-radius: 1.15rem;
           background:
-            radial-gradient(circle at 50% 32%, rgba(91, 190, 177, 0.22), transparent 9rem),
+            radial-gradient(circle at 50% 32%, rgba(91, 190, 177, 0.2), transparent 7rem),
             linear-gradient(180deg, rgba(239, 246, 244, 0.82), rgba(255, 255, 255, 0.78));
         }
 
         .provider-review__visual .provider-icon {
-          inline-size: 6.5rem;
-          block-size: 6.5rem;
-          border-radius: 2rem;
-          padding: 1.35rem;
-          box-shadow: 0 20px 55px rgba(11, 40, 38, 0.12);
+          inline-size: 4.75rem;
+          block-size: 4.75rem;
+          border-radius: 1.35rem;
+          padding: 1rem;
+          box-shadow: 0 16px 40px rgba(11, 40, 38, 0.1);
         }
 
         .provider-review__visual div {
           position: absolute;
-          inline-size: 5.5rem;
-          block-size: 0.7rem;
+          inline-size: 4.4rem;
+          block-size: 0.48rem;
           border-radius: 999px;
-          background: rgba(14, 110, 100, 0.14);
+          background: rgba(14, 110, 100, 0.13);
         }
 
-        .provider-review__visual div:nth-of-type(1) { top: 3rem; inset-inline-start: 2rem; }
-        .provider-review__visual div:nth-of-type(2) { bottom: 4.5rem; inset-inline-end: 2.4rem; }
-        .provider-review__visual div:nth-of-type(3) { bottom: 2.8rem; inset-inline-end: 5.4rem; inline-size: 3.5rem; }
+        .provider-review__visual div:nth-of-type(1) { top: 2.4rem; inset-inline-start: 1.6rem; }
+        .provider-review__visual div:nth-of-type(2) { bottom: 3.4rem; inset-inline-end: 1.7rem; }
+        .provider-review__visual div:nth-of-type(3) { bottom: 2.15rem; inset-inline-end: 4.2rem; inline-size: 2.8rem; }
 
         .provider-form-section {
           display: grid;
-          grid-template-columns: minmax(16rem, 0.42fr) minmax(0, 0.58fr);
-          gap: clamp(1rem, 4vw, 2rem);
+          grid-template-columns: minmax(14rem, 0.38fr) minmax(0, 0.62fr);
+          gap: clamp(0.85rem, 2.6vw, 1.35rem);
           align-items: start;
-          border-radius: 2rem;
-          padding: clamp(1rem, 4vw, 1.5rem);
-          background:
-            linear-gradient(135deg, rgba(239, 246, 244, 0.86), rgba(255, 255, 255, 0.76));
+          border-radius: 1.45rem;
+          padding: clamp(0.9rem, 2.6vw, 1.25rem);
+          background: linear-gradient(135deg, rgba(239, 246, 244, 0.84), rgba(255, 255, 255, 0.78));
         }
 
         .provider-form-section__copy {
-          padding: clamp(0.8rem, 2vw, 1rem);
+          display: grid;
+          gap: 0.8rem;
+          padding: 0.45rem;
+        }
+
+        .provider-form-section__copy ul {
+          display: grid;
+          gap: 0.5rem;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .provider-form-section__copy li {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+          border-radius: 0.85rem;
+          background: rgba(255, 255, 255, 0.62);
+          color: var(--dm-teal-900, #0a3d39);
+          padding: 0.58rem 0.65rem;
+          font-size: 0.88rem;
+          font-weight: 760;
+        }
+
+        .provider-form-section__copy li span {
+          color: var(--dm-teal-700, #0e6e64);
         }
 
         .provider-onboarding-form {
           display: grid;
-          gap: 1rem;
-          border-radius: 1.7rem;
-          padding: clamp(1.1rem, 3vw, 1.6rem);
-          background: rgba(255, 255, 255, 0.88);
+          gap: 0.85rem;
+          border-radius: 1.25rem;
+          padding: clamp(0.95rem, 2.5vw, 1.25rem);
+          background: rgba(255, 255, 255, 0.9);
         }
 
         .provider-onboarding-form__intro {
           display: grid;
-          gap: 0.45rem;
+          gap: 0.38rem;
         }
 
         .provider-onboarding-form__eyebrow {
           display: inline-flex;
           justify-self: start;
           border-radius: 999px;
-          background: rgba(14, 110, 100, 0.08);
+          background: rgba(14, 110, 100, 0.075);
           color: var(--dm-teal-800, #0b4f4a) !important;
-          padding: 0.34rem 0.64rem;
-          font-size: 0.76rem;
-          font-weight: 900;
+          padding: 0.3rem 0.58rem;
+          font-size: 0.72rem;
+          font-weight: 850;
         }
 
         [dir='rtl'] .provider-onboarding-form__eyebrow {
@@ -1419,43 +1503,50 @@ export default async function PublicProviderPlansPage({
         }
 
         .provider-onboarding-form__intro > span:not(.provider-onboarding-form__eyebrow) {
-          font-size: 0.88rem;
+          font-size: 0.82rem;
         }
 
         .provider-onboarding-form__grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 0.82rem;
+          gap: 0.68rem;
         }
 
         .provider-onboarding-form label {
           display: grid;
-          gap: 0.42rem;
+          gap: 0.34rem;
           color: var(--dm-teal-950, #07302c);
-          font-weight: 800;
+          font-weight: 700;
         }
 
         .provider-onboarding-form label > span {
           color: var(--dm-teal-950, #07302c);
-          font-size: 0.9rem;
-          line-height: 1.35;
+          font-size: 0.84rem;
+          line-height: 1.34;
         }
 
         .provider-onboarding-form input,
         .provider-onboarding-form select,
         .provider-onboarding-form textarea {
           width: 100%;
-          border: 1px solid rgba(14, 110, 100, 0.22);
-          border-radius: 0.95rem;
+          border: 1px solid rgba(14, 110, 100, 0.19);
+          border-radius: 0.78rem;
           background: rgba(255, 255, 255, 0.96);
           color: var(--dm-teal-950, #07302c);
           font: inherit;
-          padding: 0.78rem 0.88rem;
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+          font-size: 0.92rem;
+          padding: 0.66rem 0.74rem;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        }
+
+        .provider-onboarding-form input::placeholder,
+        .provider-onboarding-form textarea::placeholder {
+          color: var(--dm-ink-400, #7d8a89);
+          font-weight: 450;
         }
 
         .provider-onboarding-form textarea {
-          min-height: 8rem;
+          min-height: 6.5rem;
           resize: vertical;
         }
 
@@ -1463,7 +1554,7 @@ export default async function PublicProviderPlansPage({
         .provider-onboarding-form select:focus,
         .provider-onboarding-form textarea:focus {
           border-color: rgba(14, 110, 100, 0.72);
-          outline: 3px solid rgba(14, 110, 100, 0.18);
+          outline: 3px solid rgba(14, 110, 100, 0.16);
         }
 
         .provider-onboarding-form__message,
@@ -1476,16 +1567,16 @@ export default async function PublicProviderPlansPage({
         .provider-onboarding-form__consent {
           display: flex !important;
           align-items: flex-start;
-          gap: 0.72rem;
-          border: 1px solid rgba(14, 110, 100, 0.12);
-          border-radius: 1.05rem;
-          background: rgba(239, 246, 244, 0.9);
-          padding: 0.9rem;
+          gap: 0.62rem;
+          border: 1px solid rgba(14, 110, 100, 0.11);
+          border-radius: 0.9rem;
+          background: rgba(239, 246, 244, 0.84);
+          padding: 0.72rem;
         }
 
         .provider-onboarding-form__consent input {
           inline-size: auto;
-          margin-top: 0.25rem;
+          margin-top: 0.24rem;
         }
 
         .provider-onboarding-form__website {
@@ -1514,9 +1605,10 @@ export default async function PublicProviderPlansPage({
         }
 
         .provider-onboarding-form__status {
-          min-height: 1.5rem;
+          min-height: 1.35rem;
           margin: 0;
-          font-weight: 900;
+          font-size: 0.9rem;
+          font-weight: 850;
         }
 
         .provider-onboarding-form__status--success { color: var(--dm-teal-700, #0e6e64); }
@@ -1524,17 +1616,29 @@ export default async function PublicProviderPlansPage({
 
         .provider-faq__grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.72rem;
         }
 
         .provider-faq__item {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          column-gap: 0.68rem;
+          row-gap: 0.35rem;
+          align-items: start;
           background: rgba(255, 255, 255, 0.78);
+          box-shadow: 0 14px 36px rgba(11, 40, 38, 0.052);
         }
 
         .provider-faq__item .provider-icon {
-          inline-size: 2rem;
-          block-size: 2rem;
-          border-radius: 0.8rem;
-          padding: 0.38rem;
+          grid-row: span 2;
+          inline-size: 1.75rem;
+          block-size: 1.75rem;
+          border-radius: 0.65rem;
+          padding: 0.34rem;
+        }
+
+        .provider-faq__item h3 {
+          font-size: 0.96rem;
         }
 
         .provider-final-cta {
@@ -1542,32 +1646,31 @@ export default async function PublicProviderPlansPage({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 1.2rem;
-          border-radius: 2rem;
-          padding: clamp(1.2rem, 4vw, 2rem);
+          gap: 1rem;
+          border-radius: 1.45rem;
+          padding: clamp(1rem, 3vw, 1.5rem);
           background:
-            linear-gradient(135deg, rgba(7, 48, 44, 0.96), rgba(14, 110, 100, 0.9)),
-            radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.28), transparent 14rem);
-          color: #ffffff;
+            radial-gradient(circle at 88% 10%, rgba(91, 190, 177, 0.18), transparent 11rem),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 244, 0.88));
+          color: var(--dm-teal-950, #07302c);
           overflow: hidden;
         }
 
-        .provider-final-cta h2,
-        .provider-final-cta p {
-          color: #ffffff;
+        .provider-final-cta h2 {
+          color: var(--dm-teal-950, #07302c);
         }
 
         .provider-final-cta p {
-          max-width: 60ch;
-          opacity: 0.84;
+          max-width: 58ch;
+          color: var(--dm-ink-600, #45514f);
         }
 
         .provider-final-cta__line {
           position: absolute;
           inset-inline-end: -2rem;
-          top: -1rem;
-          inline-size: min(32rem, 60%);
-          color: rgba(255, 255, 255, 0.18);
+          top: -1.2rem;
+          inline-size: min(29rem, 55%);
+          color: rgba(14, 110, 100, 0.14);
         }
 
         .provider-final-cta > *:not(svg) {
@@ -1576,18 +1679,18 @@ export default async function PublicProviderPlansPage({
         }
 
         .provider-medical-disclaimer {
-          margin-block: clamp(1rem, 3vw, 2.5rem) clamp(2rem, 5vw, 4rem);
-          border-radius: 1.35rem;
-          padding: clamp(1rem, 2.5vw, 1.2rem);
+          margin-block: clamp(0.85rem, 2.3vw, 1.7rem) clamp(1.6rem, 4vw, 3rem);
+          border-radius: 1rem;
+          padding: clamp(0.85rem, 2vw, 1rem);
           background: rgba(255, 250, 235, 0.84);
-          border-color: rgba(180, 83, 9, 0.18);
-          box-shadow: 0 14px 35px rgba(120, 53, 15, 0.06);
+          border-color: rgba(180, 83, 9, 0.16);
+          box-shadow: 0 10px 28px rgba(120, 53, 15, 0.045);
         }
 
         .provider-medical-disclaimer p {
           margin: 0;
           color: #71490d;
-          font-size: 0.94rem;
+          font-size: 0.86rem;
           font-weight: 650;
         }
 
@@ -1614,15 +1717,15 @@ export default async function PublicProviderPlansPage({
 
         @media (max-width: 720px) {
           .provider-onboarding-page {
-            padding: 0.85rem;
+            padding: 0.75rem;
           }
 
           .provider-hero {
-            padding-block-start: 1.2rem;
+            padding-block-start: 0.8rem;
           }
 
           .provider-hero-visual {
-            min-height: 29rem;
+            min-height: 22.5rem;
           }
 
           .provider-category-grid,
@@ -1656,11 +1759,11 @@ export default async function PublicProviderPlansPage({
           .provider-review,
           .provider-form-section,
           .provider-final-cta {
-            border-radius: 1.35rem;
+            border-radius: 1.1rem;
           }
 
-          .provider-hero-visual__card--review {
-            top: 11rem;
+          .provider-hero-visual__label--contact {
+            bottom: 5.35rem;
           }
         }
       `}</style>
