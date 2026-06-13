@@ -166,17 +166,17 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     onboarding: {
       badge: 'How onboarding works',
       title: 'Three careful steps before public preparation.',
-      subtitle: 'The flow stays intentionally simple and review-led.',
+      subtitle: 'The process stays intentionally simple and review-led.',
       steps: [
-        { title: 'Submit onboarding request', description: 'Send business, location, contact and category information through the existing safe form.' },
-        { title: 'DrMuscat reviews public information', description: 'The team checks whether submitted information is complete enough for discovery preparation.' },
+        { title: 'Submit onboarding request', description: 'Share business, location, contact, and category information through the existing safe form.' },
+        { title: 'DrMuscat reviews public information', description: 'The team checks whether the submitted information is complete enough for discovery preparation.' },
         { title: 'Approved details can be prepared', description: 'Reviewed public details can then be prepared for future DrMuscat discovery pages.' }
       ]
     },
     reviewed: {
       badge: 'What gets reviewed',
       title: 'The first review focuses on public basics.',
-      subtitle: 'No private dashboard, payment, booking or claim workflow is part of this page.',
+      subtitle: 'No private dashboard, payment, booking, or claim workflow is part of this page.',
       items: [
         'Business/provider name',
         'Provider category',
@@ -352,28 +352,28 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       ]
     },
     onboarding: {
-      badge: 'كيف يعمل الانضمام',
-      title: 'ثلاث خطوات حذرة قبل تجهيز الظهور العام.',
-      subtitle: 'يبقى المسار بسيطاً وقائماً على المراجعة.',
+      badge: 'كيف تتم المراجعة',
+      title: 'ثلاث خطوات بعناية قبل إعداد الظهور العام.',
+      subtitle: 'تم تصميم هذه العملية لتبقى بسيطة وتعتمد على المراجعة أولًا.',
       steps: [
-        { title: 'إرسال طلب الانضمام', description: 'أرسل معلومات النشاط والموقع والتواصل والفئة عبر النموذج الآمن الحالي.' },
-        { title: 'تراجع DrMuscat المعلومات العامة', description: 'يتحقق الفريق من اكتمال المعلومات بما يكفي لتجهيز الاكتشاف.' },
-        { title: 'يمكن تجهيز التفاصيل المعتمدة', description: 'بعد المراجعة يمكن تجهيز التفاصيل العامة لصفحات اكتشاف DrMuscat المستقبلية.' }
+        { title: 'إرسال طلب الانضمام', description: 'شارك معلومات النشاط والموقع ووسائل التواصل والتصنيف عبر النموذج الحالي الآمن.' },
+        { title: 'يراجع DrMuscat المعلومات العامة', description: 'يتحقق الفريق مما إذا كانت المعلومات المرسلة مكتملة بما يكفي لإعداد الظهور في صفحات الاكتشاف.' },
+        { title: 'يمكن إعداد التفاصيل المعتمدة', description: 'يمكن بعد ذلك إعداد التفاصيل العامة التي تمت مراجعتها لصفحات الاكتشاف المستقبلية في DrMuscat.' }
       ]
     },
     reviewed: {
       badge: 'ما الذي تتم مراجعته',
-      title: 'تركز المراجعة الأولى على الأساسيات العامة.',
-      subtitle: 'لا تتضمن هذه الصفحة لوحة خاصة أو دفعاً أو حجزاً أو مسار مطالبة.',
+      title: 'تركّز المراجعة الأولى على الأساسيات العامة.',
+      subtitle: 'لا يشمل هذا القسم لوحة تحكم خاصة أو دفعًا أو حجزًا أو مسار claim.',
       items: [
-        'اسم النشاط أو مقدم الخدمة',
-        'فئة مقدم الخدمة',
+        'اسم المنشأة أو مقدم الخدمة',
+        'تصنيف مقدم الخدمة',
         'المدينة والمنطقة',
-        'الهاتف والواتساب العامان',
+        'الهاتف العام وواتساب',
         'الموقع الإلكتروني والعنوان العام',
         'جاهزية الخريطة أو الاتجاهات',
         'فئات الخدمات العامة',
-        'الصياغة ثنائية اللغة عند توفرها'
+        'الصياغة الثنائية اللغة عند توفرها'
       ]
     },
     pricing: {
@@ -726,7 +726,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         </div>
       </section>
 
-      <section className="dm2026-section provider-onboarding-section provider-onboarding-section--compact" aria-labelledby="provider-onboarding-steps-title">
+      <section className="dm2026-section provider-onboarding-section provider-onboarding-section--compact provider-onboarding-review-flow" aria-labelledby="provider-onboarding-steps-title">
         <div className="dm2026-container provider-onboarding-two-column">
           <div>
             <header className="dm2026-section-header provider-onboarding-section__header">
@@ -1521,6 +1521,178 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           padding: 0.44rem 0.68rem;
         }
 
+
+        .provider-onboarding-review-flow {
+          padding-block: clamp(2.2rem, 5vw, 4.1rem);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-two-column {
+          grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 1.04fr);
+          gap: clamp(1rem, 2.6vw, 1.55rem);
+          align-items: stretch;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-section__header {
+          margin-block-end: clamp(0.95rem, 2.5vw, 1.4rem);
+        }
+
+        .provider-onboarding-review-flow .dm2026-badge {
+          border-color: rgba(14, 110, 100, 0.15);
+          background: rgba(236, 248, 245, 0.88);
+          color: var(--dm-color-brand-strong, #0b4f4a);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-section__header h2,
+        .provider-onboarding-review-flow .provider-onboarding-checklist h2 {
+          margin: 0;
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1.58rem, 2.8vw, 2.35rem);
+          font-weight: 740;
+          letter-spacing: -0.034em;
+          line-height: 1.1;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-section__header p,
+        .provider-onboarding-review-flow .provider-onboarding-checklist > p {
+          max-inline-size: 38rem;
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: clamp(0.96rem, 1.08vw, 1.04rem);
+          line-height: 1.62;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-step-list {
+          gap: 0.78rem;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-step-list li {
+          border: 1px solid rgba(14, 110, 100, 0.14);
+          border-radius: clamp(1rem, 1.8vw, 1.28rem);
+          background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.93), rgba(242, 250, 248, 0.8)),
+            radial-gradient(160px circle at 0% 0%, rgba(42, 161, 146, 0.11), transparent 64%);
+          box-shadow:
+            0 12px 30px rgba(11, 40, 38, 0.07),
+            inset 0 1px 0 rgba(255, 255, 255, 0.94);
+          padding: clamp(0.9rem, 1.8vw, 1.08rem);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-step-list li > span {
+          inline-size: 2.25rem;
+          block-size: 2.25rem;
+          border: 1px solid rgba(14, 110, 100, 0.2);
+          background:
+            radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.95), transparent 38%),
+            linear-gradient(135deg, rgba(14, 110, 100, 0.98), rgba(42, 161, 146, 0.9));
+          color: #ffffff;
+          font-size: 0.9rem;
+          font-weight: 800;
+          box-shadow:
+            0 10px 22px rgba(14, 110, 100, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-step-list h3 {
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1rem, 1.1vw, 1.1rem);
+          font-weight: 740;
+          letter-spacing: -0.012em;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-step-list p {
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: var(--dm-type-small, 0.875rem);
+          line-height: 1.6;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist {
+          isolation: isolate;
+          align-self: stretch;
+          gap: 0.78rem;
+          border: 1px solid rgba(14, 110, 100, 0.16);
+          border-radius: clamp(1.2rem, 2.2vw, 1.6rem);
+          background:
+            linear-gradient(150deg, rgba(255, 255, 255, 0.94), rgba(236, 248, 245, 0.86)),
+            radial-gradient(340px circle at 84% 8%, rgba(42, 161, 146, 0.18), transparent 58%);
+          box-shadow:
+            0 20px 54px rgba(11, 40, 38, 0.11),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+          padding: clamp(1.05rem, 2.4vw, 1.45rem);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist::before,
+        .provider-onboarding-review-flow .provider-onboarding-checklist::after {
+          content: '';
+          position: absolute;
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist::before {
+          inset: 0.55rem;
+          border: 1px solid rgba(255, 255, 255, 0.58);
+          border-radius: inherit;
+          background:
+            linear-gradient(115deg, rgba(255, 255, 255, 0.36), transparent 48%),
+            repeating-linear-gradient(90deg, rgba(14, 110, 100, 0.05) 0 1px, transparent 1px 3.1rem);
+          opacity: 0.82;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist::after {
+          inset-block-start: 0.75rem;
+          inset-inline-end: 0.85rem;
+          inline-size: 8rem;
+          block-size: 8rem;
+          border-radius: 999px;
+          background: radial-gradient(circle, rgba(42, 161, 146, 0.2), transparent 66%);
+          filter: blur(1px);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist > * {
+          position: relative;
+          z-index: 1;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist ul {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.54rem;
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist li {
+          display: flex;
+          align-items: center;
+          gap: 0.46rem;
+          border-color: rgba(14, 110, 100, 0.14);
+          border-radius: 0.95rem;
+          background: rgba(255, 255, 255, 0.76);
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: var(--dm-type-small, 0.875rem);
+          font-weight: 720;
+          line-height: 1.42;
+          padding: 0.56rem 0.62rem;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84);
+        }
+
+        .provider-onboarding-review-flow .provider-onboarding-checklist li::before {
+          content: '';
+          flex: 0 0 auto;
+          inline-size: 0.55rem;
+          block-size: 0.55rem;
+          border-radius: 999px;
+          background: var(--dm-color-brand, #0e6e64);
+          box-shadow: 0 0 0 0.24rem rgba(14, 110, 100, 0.09);
+        }
+
+        [dir='rtl'] .provider-onboarding-review-flow .provider-onboarding-section__header h2,
+        [dir='rtl'] .provider-onboarding-review-flow .provider-onboarding-checklist h2,
+        [dir='rtl'] .provider-onboarding-review-flow .provider-onboarding-step-list h3 {
+          letter-spacing: 0;
+          line-height: 1.2;
+        }
+
         .provider-onboarding-plan {
           display: grid;
           gap: 0.78rem;
@@ -1856,6 +2028,14 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           .provider-onboarding-checklist ul,
           .provider-onboarding-addons ul {
             display: grid;
+          }
+
+          .provider-onboarding-review-flow .provider-onboarding-checklist ul {
+            grid-template-columns: 1fr;
+          }
+
+          .provider-onboarding-review-flow .provider-onboarding-step-list li {
+            gap: 0.62rem;
           }
 
           .provider-onboarding-checklist li,
