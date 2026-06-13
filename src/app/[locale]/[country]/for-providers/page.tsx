@@ -203,10 +203,9 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       badge: 'Launch packages',
       title: 'Choose the visibility path that fits your provider presence.',
       subtitle:
-        'Prices are shown as monthly references for easier comparison. Paid plans are billed by the selected 3-month, 6-month, or annual period and remain subject to review and confirmation.',
-      selectorLabel: 'Select pricing view',
+        'Plans show a fixed monthly base rate for easy comparison. Billing starts from 3 months and can be selected as quarterly, half-yearly, or yearly.',
+      selectorLabel: 'Select billing period',
       periods: [
-        { id: 'month', label: '1 month' },
         { id: 'three', label: '3 months' },
         { id: 'six', label: '6 months' },
         { id: 'twelve', label: '12 months' }
@@ -244,7 +243,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'Best for',
           bestFor: 'Small providers that need a clean public profile foundation.',
           cta: 'Choose Starter',
-          monthlyReferenceCta: 'Select billing period',
           note: 'Subject to review and confirmation.',
           baseMonthlyOmr: 20,
           annualDiscount: 0.18,
@@ -273,7 +271,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'Best for',
           bestFor: 'Growing providers that want stronger discovery structure and future offer readiness.',
           cta: 'Choose Growth',
-          monthlyReferenceCta: 'Select billing period',
           note: 'Recommended for active growth planning.',
           baseMonthlyOmr: 35,
           annualDiscount: 0.18,
@@ -300,7 +297,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'Best for',
           bestFor: 'Providers that need premium onboarding, stronger profile preparation, and broader visibility planning.',
           cta: 'Choose Premium',
-          monthlyReferenceCta: 'Select billing period',
           note: 'For eligible providers after review.',
           baseMonthlyOmr: 70,
           annualDiscount: 0.25,
@@ -322,7 +318,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         }
       ],
       disclaimer:
-        'Monthly pricing is shown for comparison only. Monthly billing is not active. Launch packages are subject to review, availability, and confirmation. This page does not activate payment, verified status, ranking, advertising, dashboard access, booking, or guaranteed leads.'
+        'Monthly billing is not active. Prices show a base monthly rate for comparison only. Launch packages are billed by the selected period and remain subject to review, availability, and confirmation. This page does not activate payment, verified status, ranking, advertising, dashboard access, booking, or guaranteed leads.'
     },
     addons: {
       badge: 'Future request-based add-ons',
@@ -540,10 +536,9 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       badge: 'باقات الإطلاق',
       title: 'اختر مسار الظهور المناسب لحضور مقدم الخدمة.',
       subtitle:
-        'تُعرض الأسعار كمرجع شهري لتسهيل المقارنة، بينما يتم دفع الباقات المدفوعة حسب الفترة المحددة: 3 أشهر أو 6 أشهر أو سنوياً، وتبقى خاضعة للمراجعة والتأكيد.',
-      selectorLabel: 'اختر طريقة عرض السعر',
+        'تُعرض الباقات بسعر شهري أساسي لتسهيل المقارنة، بينما يبدأ الدفع من 3 أشهر ويمكن اختياره كدفع ربع سنوي أو نصف سنوي أو سنوي.',
+      selectorLabel: 'اختر فترة الدفع',
       periods: [
-        { id: 'month', label: 'شهر واحد' },
         { id: 'three', label: '3 أشهر' },
         { id: 'six', label: '6 أشهر' },
         { id: 'twelve', label: '12 شهراً' }
@@ -581,7 +576,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة الصغار الذين يحتاجون إلى أساس منظم لملف عام.',
           cta: 'اختر الانطلاقة',
-          monthlyReferenceCta: 'اختر فترة الدفع',
           note: 'تخضع للمراجعة والتأكيد.',
           baseMonthlyOmr: 20,
           annualDiscount: 0.18,
@@ -610,7 +604,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة النامين الذين يريدون بنية أقوى للاكتشاف وجاهزية مستقبلية للعروض.',
           cta: 'اختر شريك النمو',
-          monthlyReferenceCta: 'اختر فترة الدفع',
           note: 'موصى بها لتخطيط النمو النشط.',
           baseMonthlyOmr: 35,
           annualDiscount: 0.18,
@@ -637,7 +630,6 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة الذين يحتاجون إلى إعداد مميز للملف العام وتخطيط أقوى للظهور.',
           cta: 'اختر بريميوم',
-          monthlyReferenceCta: 'اختر فترة الدفع',
           note: 'لمقدمي الخدمة المؤهلين بعد المراجعة.',
           baseMonthlyOmr: 70,
           annualDiscount: 0.25,
@@ -659,7 +651,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         }
       ],
       disclaimer:
-        'تُعرض الأسعار الشهرية للمقارنة فقط. الدفع الشهري غير مفعّل. تخضع باقات الإطلاق للمراجعة والتوفر والتأكيد. لا تقوم هذه الصفحة بتفعيل الدفع أو حالة التوثيق أو الترتيب أو الإعلانات أو لوحة التحكم أو الحجز أو ضمان العملاء المحتملين.'
+        'الدفع الشهري غير مفعّل. تُعرض الأسعار الشهرية الأساسية للمقارنة فقط. يتم دفع باقات الإطلاق حسب الفترة المحددة وتبقى خاضعة للمراجعة والتوفر والتأكيد. لا تقوم هذه الصفحة بتفعيل الدفع أو حالة التوثيق أو الترتيب أو الإعلانات أو لوحة التحكم أو الحجز أو ضمان العملاء المحتملين.'
     },
     addons: {
       badge: 'إضافات مستقبلية حسب الطلب',
@@ -2140,7 +2132,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
         .provider-onboarding-pricing__segments {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 0.25rem;
           inline-size: 100%;
           border-radius: 999px;
@@ -2325,6 +2317,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         }
 
         .provider-onboarding-plan__description,
+        .provider-onboarding-plan__price-helper,
         .provider-onboarding-plan__period-note,
         .provider-onboarding-plan__best-for p,
         .provider-onboarding-plan__footer p {
@@ -2341,14 +2334,9 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         .provider-onboarding-plan__price-block {
           display: grid;
           gap: 0.38rem;
-          min-block-size: 8.6rem;
+          min-block-size: 9.15rem;
           border-block: 1px solid rgba(14, 110, 100, 0.1);
           padding-block: 0.7rem 0.64rem;
-        }
-
-        .provider-onboarding-plan[data-monthly-reference='true'] .provider-onboarding-plan__period-note {
-          color: var(--dm-color-brand-strong, #0b4f4a);
-          font-weight: 780;
         }
 
         .provider-onboarding-plan__price {
