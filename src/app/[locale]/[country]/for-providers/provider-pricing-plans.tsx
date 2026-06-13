@@ -63,6 +63,14 @@ function getPlanPricing(plan: ProviderPricingPlan, period: BillingPeriodId, isAr
     };
   }
 
+  if (plan.baseMonthlyOmr === 0) {
+    return {
+      periodNote: period === 'month' ? (isArabic ? 'مرجع شهري فقط' : 'Monthly reference only') : isArabic ? 'لا يتطلب دفعاً للفترة المحددة' : 'No payment required for the selected period',
+      price: isArabic ? 'مجاني / شهرياً' : 'Free / month',
+      saving: isArabic ? 'مجاني دائماً' : 'Always free'
+    };
+  }
+
   if (period === 'month') {
     return {
       periodNote: isArabic ? 'الدفع الشهري غير مفعّل. اختر 3 أشهر أو 6 أشهر أو 12 شهراً.' : 'Monthly billing is not active. Select 3, 6, or 12 months.',

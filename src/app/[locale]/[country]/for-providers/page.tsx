@@ -221,14 +221,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestFor: 'New providers who want to express interest before choosing a paid launch package.',
           cta: 'Start with Free',
           note: 'Best for early interest only.',
-          prices: { month: 'Free / month', three: 'Free / month', six: 'Free / month', twelve: 'Free / month' },
-          periodNotes: {
-            month: 'Monthly reference only',
-            three: 'No payment required for the selected period',
-            six: 'No payment required for the selected period',
-            twelve: 'No payment required for the selected period'
-          },
-          savings: { month: 'Always free', three: 'Always free', six: 'Always free', twelve: 'Always free' },
+          baseMonthlyOmr: 0,
           features: [
             'Onboarding interest request',
             'Basic public information intake',
@@ -565,14 +558,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           bestFor: 'لمقدمي الخدمة الجدد الذين يريدون إبداء الاهتمام قبل اختيار باقة إطلاق مدفوعة.',
           cta: 'ابدأ مجاناً',
           note: 'مناسب لإبداء الاهتمام الأولي فقط.',
-          prices: { month: 'مجاني / شهرياً', three: 'مجاني / شهرياً', six: 'مجاني / شهرياً', twelve: 'مجاني / شهرياً' },
-          periodNotes: {
-            month: 'مرجع شهري فقط',
-            three: 'لا يتطلب دفعاً للفترة المحددة',
-            six: 'لا يتطلب دفعاً للفترة المحددة',
-            twelve: 'لا يتطلب دفعاً للفترة المحددة'
-          },
-          savings: { month: 'مجاني دائماً', three: 'مجاني دائماً', six: 'مجاني دائماً', twelve: 'مجاني دائماً' },
+          baseMonthlyOmr: 0,
           features: [
             'إرسال طلب اهتمام بالانضمام',
             'استقبال المعلومات العامة الأساسية',
