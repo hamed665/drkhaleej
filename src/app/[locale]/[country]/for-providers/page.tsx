@@ -157,7 +157,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       items: [
         { title: 'Public discovery profile', description: 'Core information can be shaped into a public profile after review.' },
         { title: 'Bilingual presence', description: 'English and Arabic wording can be prepared where information is available.' },
-        { title: 'Contact readiness', description: 'Phone, WhatsApp, website and directions readiness can be checked.' },
+        { title: 'Contact readiness', description: 'Phone, WhatsApp, website, and directions readiness can be checked.' },
         { title: 'Services visibility', description: 'Public service categories can be organized for easier discovery.' },
         { title: 'Reviewed public information', description: 'Submitted details are reviewed before they are prepared for public discovery.' },
         { title: 'Future provider-approved offers', description: 'Offer concepts may be reviewed later only when provider-approved and clearly presented.' }
@@ -339,16 +339,16 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       ]
     },
     benefits: {
-      badge: 'فوائد الاكتشاف',
-      title: 'أساس ظهور محافظ، وليس وعداً بالطلب.',
-      subtitle: 'تجهّز DrMuscat المعلومات العامة كي يفهم المستخدمون التفاصيل ويؤكدوها مباشرة مع مقدمي الخدمة.',
+      badge: 'مزايا الظهور',
+      title: 'أساس متحفظ للظهور، وليس وعدًا بالطلب.',
+      subtitle: 'يُعِدّ DrMuscat المعلومات العامة بحيث يتمكّن المستخدمون من فهم التفاصيل وتأكيدها مباشرةً مع مقدّمي الخدمة.',
       items: [
-        { title: 'ملف اكتشاف عام', description: 'يمكن تحويل المعلومات الأساسية إلى ملف عام بعد المراجعة.' },
-        { title: 'حضور ثنائي اللغة', description: 'يمكن تجهيز الصياغة بالعربية والإنجليزية عند توفر معلومات دقيقة.' },
-        { title: 'جاهزية التواصل', description: 'يمكن مراجعة الهاتف والواتساب والموقع الإلكتروني وجاهزية الاتجاهات.' },
-        { title: 'وضوح الخدمات', description: 'يمكن تنظيم فئات الخدمات العامة لتسهيل الاكتشاف.' },
-        { title: 'معلومات عامة مراجعة', description: 'تتم مراجعة التفاصيل المرسلة قبل تجهيزها للاكتشاف العام.' },
-        { title: 'عروض مستقبلية بموافقة مقدم الخدمة', description: 'يمكن مراجعة أفكار العروض لاحقاً فقط عند موافقة مقدم الخدمة وعرضها بوضوح.' }
+        { title: 'الملف العام للاكتشاف', description: 'يمكن تنظيم المعلومات الأساسية ضمن ملف عام بعد المراجعة.' },
+        { title: 'الحضور الثنائي اللغة', description: 'يمكن إعداد الصياغة بالإنجليزية والعربية عندما تكون المعلومات متاحة.' },
+        { title: 'جاهزية التواصل', description: 'يمكن التحقق من جاهزية الهاتف وواتساب والموقع الإلكتروني والاتجاهات.' },
+        { title: 'وضوح الخدمات', description: 'يمكن تنظيم فئات الخدمات العامة لتسهيل اكتشافها.' },
+        { title: 'معلومات عامة خاضعة للمراجعة', description: 'تُراجَع التفاصيل المرسلة قبل إعدادها للاكتشاف العام.' },
+        { title: 'عروض مستقبلية بموافقة مقدم الخدمة', description: 'قد تُراجَع أفكار العروض لاحقًا فقط عندما تكون معتمدة من مقدم الخدمة ومعروضة بوضوح.' }
       ]
     },
     onboarding: {
@@ -707,7 +707,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         </div>
       </section>
 
-      <section className="dm2026-section provider-onboarding-section" aria-labelledby="provider-benefits-title">
+      <section className="dm2026-section provider-onboarding-section provider-onboarding-benefits" aria-labelledby="provider-benefits-title">
         <div className="dm2026-container">
           <header className="dm2026-section-header provider-onboarding-section__header">
             <span className="dm2026-badge">{copy.benefits.badge}</span>
@@ -1332,6 +1332,123 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           box-shadow: 0 0 0 0.42rem rgba(14, 110, 100, 0.08);
         }
 
+
+        .provider-onboarding-benefits {
+          padding-block: clamp(2rem, 5.2vw, 4.2rem);
+        }
+
+        .provider-onboarding-benefits .dm2026-container {
+          position: relative;
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-section__header {
+          max-inline-size: 45rem;
+          margin-block-end: clamp(1rem, 2.8vw, 1.7rem);
+        }
+
+        .provider-onboarding-benefits .dm2026-badge {
+          background: rgba(239, 246, 244, 0.86);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-section__header h2 {
+          max-inline-size: 18ch;
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1.7rem, 3.1vw, 2.6rem);
+          font-weight: 720;
+          letter-spacing: -0.038em;
+          line-height: 1.08;
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-section__header p {
+          max-inline-size: 41rem;
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+          line-height: 1.62;
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-benefit-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: clamp(0.78rem, 1.6vw, 1.08rem);
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card {
+          isolation: isolate;
+          display: grid;
+          align-content: start;
+          min-block-size: 12.9rem;
+          gap: 0.62rem;
+          border: 1px solid rgba(14, 110, 100, 0.12);
+          border-radius: clamp(1.1rem, 2vw, 1.45rem);
+          background:
+            linear-gradient(150deg, rgba(255, 255, 255, 0.9), rgba(248, 252, 251, 0.78)),
+            radial-gradient(170px circle at 18% 0%, rgba(42, 161, 146, 0.12), transparent 62%);
+          box-shadow:
+            0 14px 34px rgba(11, 40, 38, 0.072),
+            inset 0 1px 0 rgba(255, 255, 255, 0.92);
+          padding: clamp(1rem, 2vw, 1.25rem);
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent 46%, rgba(14, 110, 100, 0.04));
+          pointer-events: none;
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card:hover {
+          border-color: rgba(14, 110, 100, 0.18);
+          box-shadow:
+            0 18px 42px rgba(11, 40, 38, 0.095),
+            inset 0 1px 0 rgba(255, 255, 255, 0.94);
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card__dot {
+          inline-size: 2.15rem;
+          block-size: 2.15rem;
+          border: 1px solid rgba(14, 110, 100, 0.13);
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at 38% 34%, rgba(255, 255, 255, 0.98) 0 24%, rgba(42, 161, 146, 0.2) 25% 42%, transparent 43%),
+            linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(239, 246, 244, 0.9));
+          box-shadow:
+            0 8px 18px rgba(14, 110, 100, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.96);
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card h3 {
+          margin: 0;
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1.02rem, 1.15vw, 1.14rem);
+          font-weight: 720;
+          letter-spacing: -0.014em;
+          line-height: 1.24;
+        }
+
+        .provider-onboarding-benefits .provider-onboarding-mini-card p {
+          margin: 0;
+          color: var(--dm-color-text-muted, #66736f);
+          font-size: var(--dm-type-small, 0.875rem);
+          line-height: 1.58;
+        }
+
+        @supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+          .provider-onboarding-benefits .provider-onboarding-mini-card {
+            -webkit-backdrop-filter: blur(12px) saturate(116%);
+            backdrop-filter: blur(12px) saturate(116%);
+          }
+        }
+
+        [dir='rtl'] .provider-onboarding-benefits .provider-onboarding-section__header h2,
+        [dir='rtl'] .provider-onboarding-benefits .provider-onboarding-mini-card h3 {
+          letter-spacing: 0;
+          line-height: 1.22;
+        }
+
         .provider-onboarding-two-column {
           display: grid;
           grid-template-columns: minmax(0, 0.95fr) minmax(18rem, 1.05fr);
@@ -1647,6 +1764,14 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             min-block-size: 14.8rem;
           }
 
+          .provider-onboarding-benefits .provider-onboarding-benefit-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .provider-onboarding-benefits .provider-onboarding-mini-card {
+            min-block-size: 12.2rem;
+          }
+
           .provider-onboarding-form-copy {
             position: static;
           }
@@ -1705,6 +1830,15 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
           .provider-onboarding-category-card .dm2026-discovery-card__visual {
             min-block-size: 6.2rem;
+          }
+
+          .provider-onboarding-benefits .provider-onboarding-section__header h2 {
+            max-inline-size: 100%;
+          }
+
+          .provider-onboarding-benefits .provider-onboarding-mini-card {
+            min-block-size: auto;
+            padding: 1rem;
           }
 
           .provider-onboarding-form__submit,
