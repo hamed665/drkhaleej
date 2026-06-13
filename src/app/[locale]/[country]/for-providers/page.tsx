@@ -203,8 +203,8 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       badge: 'Launch packages',
       title: 'Choose the visibility path that fits your provider presence.',
       subtitle:
-        'Plans are structured for reviewed public discovery preparation. They do not activate payment, ranking, booking, verified status, dashboard access, or guaranteed leads.',
-      selectorLabel: 'Select duration',
+        'Prices are shown as rounded monthly equivalents for easier comparison. Plans are billed by the selected 3-month, 6-month, or annual period and remain subject to review and confirmation.',
+      selectorLabel: 'Select billing period',
       periods: [
         { id: 'three', label: '3 months' },
         { id: 'six', label: '6 months' },
@@ -214,24 +214,26 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'free',
           name: 'Free Discovery',
+          badge: 'Always free',
           description: 'A basic review-interest path for providers starting with public discovery preparation.',
           bestForLabel: 'Best for',
           bestFor: 'New providers who want to express interest before choosing a paid launch package.',
-          cta: 'Start with free review',
+          cta: 'Start with Free',
           note: 'Best for early interest only.',
-          prices: { three: 'Free', six: 'Free', twelve: 'Free' },
+          prices: { three: 'Free / month', six: 'Free / month', twelve: 'Free / month' },
           periodNotes: {
-            three: 'Review-interest request for the selected duration.',
-            six: 'Review-interest request for the selected duration.',
-            twelve: 'Review-interest request for the selected duration.'
+            three: 'No payment required for the selected period',
+            six: 'No payment required for the selected period',
+            twelve: 'No payment required for the selected period'
           },
           savings: { three: 'Always free', six: 'Always free', twelve: 'Always free' },
           features: [
             'Onboarding interest request',
-            'Basic public information review',
+            'Basic public information intake',
             'Provider category captured',
             'City and area captured',
             'Public contact details submitted',
+            'English / Arabic readiness discussion',
             'No verified badge',
             'No paid placement',
             'No offer placement',
@@ -242,23 +244,25 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'starter',
           name: 'Verified Starter',
+          badge: 'Launch foundation',
           description: 'A compact reviewed presence for small clinics, centers, pharmacies, labs, wellness providers, or pet clinics.',
           bestForLabel: 'Best for',
           bestFor: 'Small providers that need a clean public profile foundation.',
-          cta: 'Request Verified Starter',
+          cta: 'Choose Starter',
           note: 'Subject to review and confirmation.',
-          prices: { three: '49 OMR', six: '89 OMR', twelve: '159 OMR' },
+          prices: { three: '16 OMR / month', six: '14.5 OMR / month', twelve: '13 OMR / month' },
           periodNotes: {
-            three: 'Equivalent to about 16.3 OMR/month.',
-            six: 'Equivalent to about 14.8 OMR/month.',
-            twelve: 'Equivalent to about 13.3 OMR/month.'
+            three: 'Billed 48 OMR every 3 months',
+            six: 'Billed 87 OMR every 6 months',
+            twelve: 'Billed 156 OMR yearly'
           },
           savings: { three: 'Launch comparison', six: 'Save about 9%', twelve: 'Save about 19%' },
           features: [
             'Reviewed public profile preparation',
-            'English + Arabic profile wording readiness',
+            'Category and location structure',
             'Public phone and WhatsApp readiness',
             'Website and directions readiness',
+            'English / Arabic presentation readiness',
             'Up to 5 public photos prepared',
             'Up to 3 doctors or team members listed',
             '1 branch/location',
@@ -271,19 +275,21 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'growth',
           name: 'Growth Partner',
+          badge: 'Recommended',
           recommendedLabel: 'Recommended',
+          supportLabel: 'Best fit for most providers',
           description: 'Expanded visibility readiness for growing providers with more services, doctors, or locations.',
           bestForLabel: 'Best for',
           bestFor: 'Growing providers that want stronger discovery structure and future offer readiness.',
-          cta: 'Request Growth Partner',
+          cta: 'Choose Growth',
           note: 'Recommended for active growth planning.',
-          prices: { three: '99 OMR', six: '179 OMR', twelve: '329 OMR' },
+          prices: { three: '33 OMR / month', six: '29.5 OMR / month', twelve: '27.5 OMR / month' },
           periodNotes: {
-            three: 'Equivalent to 33 OMR/month.',
-            six: 'Equivalent to about 29.8 OMR/month.',
-            twelve: 'Equivalent to about 27.4 OMR/month.'
+            three: 'Billed 99 OMR every 3 months',
+            six: 'Billed 177 OMR every 6 months',
+            twelve: 'Billed 330 OMR yearly'
           },
-          savings: { three: 'Launch comparison', six: 'Save about 10%', twelve: 'Save about 17%' },
+          savings: { three: 'Strongest value', six: 'Save about 11%', twelve: 'Save about 17%' },
           features: [
             'Everything in Verified Starter',
             'Up to 15 public photos prepared',
@@ -302,18 +308,19 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'premium',
           name: 'Premium Pro',
+          badge: 'Premium setup',
           description: 'Higher-touch launch readiness for eligible multi-service or multi-branch providers.',
           bestForLabel: 'Best for',
-          bestFor: 'Providers that need premium onboarding, stronger profile preparation, and visibility planning.',
-          cta: 'Request Premium Pro',
+          bestFor: 'Providers that need premium onboarding, stronger profile preparation, and broader visibility planning.',
+          cta: 'Choose Premium',
           note: 'For eligible providers after review.',
-          prices: { three: '199 OMR', six: '359 OMR', twelve: '659 OMR' },
+          prices: { three: '66 OMR / month', six: '59.5 OMR / month', twelve: '55 OMR / month' },
           periodNotes: {
-            three: 'Equivalent to about 66.3 OMR/month.',
-            six: 'Equivalent to about 59.8 OMR/month.',
-            twelve: 'Equivalent to about 54.9 OMR/month.'
+            three: 'Billed 198 OMR every 3 months',
+            six: 'Billed 357 OMR every 6 months',
+            twelve: 'Billed 660 OMR yearly'
           },
-          savings: { three: 'Launch comparison', six: 'Save about 10%', twelve: 'Save about 17%' },
+          savings: { three: 'Premium readiness', six: 'Save about 10%', twelve: 'Save about 17%' },
           features: [
             'Everything in Growth Partner',
             'Premium public profile preparation',
@@ -550,8 +557,8 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       badge: 'باقات الإطلاق',
       title: 'اختر مسار الظهور المناسب لحضور مقدم الخدمة.',
       subtitle:
-        'تم تنظيم هذه الباقات لإعداد الظهور العام بعد المراجعة، ولا تقوم بتفعيل الدفع أو الترتيب أو الحجز أو حالة التوثيق أو لوحة التحكم أو ضمان العملاء المحتملين.',
-      selectorLabel: 'اختر المدة',
+        'تُعرض الأسعار كقيمة شهرية تقريبية ومبسّطة لتسهيل المقارنة، بينما يتم الدفع حسب الفترة المحددة: 3 أشهر أو 6 أشهر أو سنوياً، وتبقى الباقات خاضعة للمراجعة والتأكيد.',
+      selectorLabel: 'اختر فترة الدفع',
       periods: [
         { id: 'three', label: '3 أشهر' },
         { id: 'six', label: '6 أشهر' },
@@ -561,24 +568,26 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'free',
           name: 'الاكتشاف المجاني',
+          badge: 'مجاني دائماً',
           description: 'مسار أساسي لإبداء الاهتمام بمراجعة معلومات مقدم الخدمة العامة.',
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة الجدد الذين يريدون إبداء الاهتمام قبل اختيار باقة إطلاق مدفوعة.',
-          cta: 'ابدأ بالمراجعة المجانية',
+          cta: 'ابدأ مجاناً',
           note: 'مناسب لإبداء الاهتمام الأولي فقط.',
-          prices: { three: 'مجاني', six: 'مجاني', twelve: 'مجاني' },
+          prices: { three: 'مجاني / شهرياً', six: 'مجاني / شهرياً', twelve: 'مجاني / شهرياً' },
           periodNotes: {
-            three: 'طلب اهتمام بالمراجعة للمدة المختارة.',
-            six: 'طلب اهتمام بالمراجعة للمدة المختارة.',
-            twelve: 'طلب اهتمام بالمراجعة للمدة المختارة.'
+            three: 'لا يتطلب دفعاً للفترة المحددة',
+            six: 'لا يتطلب دفعاً للفترة المحددة',
+            twelve: 'لا يتطلب دفعاً للفترة المحددة'
           },
           savings: { three: 'مجاني دائماً', six: 'مجاني دائماً', twelve: 'مجاني دائماً' },
           features: [
             'إرسال طلب اهتمام بالانضمام',
-            'مراجعة أساسية للمعلومات العامة',
+            'استقبال المعلومات العامة الأساسية',
             'تسجيل تصنيف مقدم الخدمة',
             'تسجيل المدينة والمنطقة',
             'إرسال وسائل التواصل العامة',
+            'مناقشة جاهزية العربية والإنجليزية',
             'لا يشمل شارة توثيق',
             'لا يشمل ظهوراً مدفوعاً',
             'لا يشمل موضع عروض',
@@ -588,24 +597,26 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         },
         {
           id: 'starter',
-          name: 'بداية موثقة',
+          name: 'الانطلاقة الموثقة',
+          badge: 'أساس الإطلاق',
           description: 'حضور مختصر بعد المراجعة للعيادات الصغيرة والمراكز والصيدليات والمختبرات ومقدمي الرفاهية أو عيادات الحيوانات الأليفة.',
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة الصغار الذين يحتاجون إلى أساس منظم لملف عام.',
-          cta: 'طلب باقة بداية موثقة',
+          cta: 'اختر الانطلاقة',
           note: 'تخضع للمراجعة والتأكيد.',
-          prices: { three: '49 OMR', six: '89 OMR', twelve: '159 OMR' },
+          prices: { three: '16 ر.ع / شهرياً', six: '14.5 ر.ع / شهرياً', twelve: '13 ر.ع / شهرياً' },
           periodNotes: {
-            three: 'يعادل نحو 16.3 OMR شهرياً.',
-            six: 'يعادل نحو 14.8 OMR شهرياً.',
-            twelve: 'يعادل نحو 13.3 OMR شهرياً.'
+            three: 'تُدفع 48 ر.ع كل 3 أشهر',
+            six: 'تُدفع 87 ر.ع كل 6 أشهر',
+            twelve: 'تُدفع 156 ر.ع سنوياً'
           },
           savings: { three: 'مقارنة باقات الإطلاق', six: 'وفر حوالي 9%', twelve: 'وفر حوالي 19%' },
           features: [
             'إعداد ملف عام بعد المراجعة',
-            'جاهزية الصياغة بالعربية والإنجليزية',
+            'بنية التصنيف والموقع',
             'جاهزية الهاتف وواتساب',
             'جاهزية الموقع الإلكتروني والاتجاهات',
+            'جاهزية العرض بالعربية والإنجليزية',
             'إعداد ما يصل إلى 5 صور عامة',
             'إدراج ما يصل إلى 3 أطباء أو أعضاء فريق',
             'فرع أو موقع واحد',
@@ -618,27 +629,29 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'growth',
           name: 'شريك النمو',
+          badge: 'موصى بها',
           recommendedLabel: 'موصى بها',
+          supportLabel: 'الأنسب لمعظم مقدمي الخدمة',
           description: 'جاهزية ظهور أوسع لمقدمي الخدمة النامين الذين لديهم خدمات أو أطباء أو مواقع أكثر.',
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة النامين الذين يريدون بنية أقوى للاكتشاف وجاهزية مستقبلية للعروض.',
-          cta: 'طلب باقة شريك النمو',
+          cta: 'اختر شريك النمو',
           note: 'موصى بها لتخطيط النمو النشط.',
-          prices: { three: '99 OMR', six: '179 OMR', twelve: '329 OMR' },
+          prices: { three: '33 ر.ع / شهرياً', six: '29.5 ر.ع / شهرياً', twelve: '27.5 ر.ع / شهرياً' },
           periodNotes: {
-            three: 'يعادل 33 OMR شهرياً.',
-            six: 'يعادل نحو 29.8 OMR شهرياً.',
-            twelve: 'يعادل نحو 27.4 OMR شهرياً.'
+            three: 'تُدفع 99 ر.ع كل 3 أشهر',
+            six: 'تُدفع 177 ر.ع كل 6 أشهر',
+            twelve: 'تُدفع 330 ر.ع سنوياً'
           },
-          savings: { three: 'مقارنة باقات الإطلاق', six: 'وفر حوالي 10%', twelve: 'وفر حوالي 17%' },
+          savings: { three: 'أقوى قيمة', six: 'وفر حوالي 11%', twelve: 'وفر حوالي 17%' },
           features: [
-            'كل ما في باقة بداية موثقة',
+            'كل ما في باقة الانطلاقة الموثقة',
             'إعداد ما يصل إلى 15 صورة عامة',
             'إدراج ما يصل إلى 10 أطباء أو أعضاء فريق',
             'ما يصل إلى 3 فروع أو مواقع',
             'ما يصل إلى 5 أفكار عروض بموافقة مقدم الخدمة قابلة للمراجعة',
             'بنية أكثر تفصيلاً لفئات الخدمات',
-            'أهلية طلب ظهور في المنطقة أو الفئة',
+            'أهلية طلب ظهور حسب المنطقة أو الفئة',
             'أهلية طلب موضع عرض في الصفحة الرئيسية',
             'مسار مراجعة انضمام ذي أولوية',
             'ملاحظات أساسية لجاهزية الأداء',
@@ -649,18 +662,19 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         {
           id: 'premium',
           name: 'بريميوم برو',
+          badge: 'إعداد مميز',
           description: 'جاهزية إطلاق بعناية أعلى لمقدمي الخدمة المؤهلين ذوي الخدمات أو الفروع المتعددة.',
           bestForLabel: 'مناسب لـ',
           bestFor: 'لمقدمي الخدمة الذين يحتاجون إلى إعداد مميز للملف العام وتخطيط أقوى للظهور.',
-          cta: 'طلب باقة بريميوم برو',
+          cta: 'اختر بريميوم',
           note: 'لمقدمي الخدمة المؤهلين بعد المراجعة.',
-          prices: { three: '199 OMR', six: '359 OMR', twelve: '659 OMR' },
+          prices: { three: '66 ر.ع / شهرياً', six: '59.5 ر.ع / شهرياً', twelve: '55 ر.ع / شهرياً' },
           periodNotes: {
-            three: 'يعادل نحو 66.3 OMR شهرياً.',
-            six: 'يعادل نحو 59.8 OMR شهرياً.',
-            twelve: 'يعادل نحو 54.9 OMR شهرياً.'
+            three: 'تُدفع 198 ر.ع كل 3 أشهر',
+            six: 'تُدفع 357 ر.ع كل 6 أشهر',
+            twelve: 'تُدفع 660 ر.ع سنوياً'
           },
-          savings: { three: 'مقارنة باقات الإطلاق', six: 'وفر حوالي 10%', twelve: 'وفر حوالي 17%' },
+          savings: { three: 'جاهزية مميزة', six: 'وفر حوالي 10%', twelve: 'وفر حوالي 17%' },
           features: [
             'كل ما في باقة شريك النمو',
             'إعداد ملف عام مميز',
@@ -2138,14 +2152,16 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           display: grid;
           gap: 0.45rem;
           justify-items: start;
-          min-inline-size: min(100%, 19rem);
-          border: 1px solid rgba(14, 110, 100, 0.13);
-          border-radius: 1.25rem;
-          background: rgba(255, 255, 255, 0.78);
+          min-inline-size: min(100%, 20rem);
+          border: 1px solid rgba(14, 110, 100, 0.18);
+          border-radius: 1.35rem;
+          background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(237, 249, 246, 0.72));
           box-shadow:
-            0 14px 32px rgba(11, 40, 38, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.92);
-          padding: 0.55rem;
+            0 16px 38px rgba(11, 40, 38, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.94);
+          padding: 0.58rem;
+          backdrop-filter: blur(14px);
         }
 
         .provider-onboarding-pricing__selector > span {
@@ -2162,7 +2178,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           gap: 0.25rem;
           inline-size: 100%;
           border-radius: 999px;
-          background: rgba(239, 246, 244, 0.84);
+          background: rgba(223, 244, 240, 0.82);
           padding: 0.22rem;
         }
 
@@ -2175,7 +2191,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           cursor: pointer;
           font: inherit;
           font-size: var(--dm-type-small, 0.875rem);
-          font-weight: 760;
+          font-weight: 820;
           line-height: 1.2;
           padding: 0.45rem 0.58rem;
           transition:
@@ -2186,9 +2202,12 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         }
 
         .provider-onboarding-pricing__segment[data-active='true'] {
-          background: rgba(255, 255, 255, 0.94);
+          background:
+            linear-gradient(135deg, #ffffff, rgba(241, 251, 248, 0.94));
+          color: var(--dm-teal-950, #07302c);
           box-shadow:
-            0 8px 18px rgba(11, 40, 38, 0.08),
+            0 10px 22px rgba(11, 40, 38, 0.1),
+            0 0 0 1px rgba(14, 110, 100, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.96);
         }
 
@@ -2199,33 +2218,62 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
         .provider-onboarding-pricing .provider-onboarding-pricing-grid {
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: clamp(0.7rem, 1.25vw, 0.95rem);
+          gap: clamp(0.58rem, 1vw, 0.82rem);
           align-items: stretch;
         }
 
         .provider-onboarding-pricing .provider-onboarding-plan {
+          --plan-accent: var(--dm-color-brand, #0e6e64);
+          --plan-accent-soft: rgba(42, 161, 146, 0.12);
+          --plan-accent-border: rgba(14, 110, 100, 0.16);
           display: flex;
           flex-direction: column;
           min-block-size: 100%;
-          gap: 0.72rem;
-          border: 1px solid rgba(14, 110, 100, 0.14);
+          gap: 0.62rem;
+          border: 1px solid var(--plan-accent-border);
           border-radius: clamp(1.1rem, 2vw, 1.45rem);
           background:
-            linear-gradient(150deg, rgba(255, 255, 255, 0.94), rgba(241, 250, 248, 0.82)),
-            radial-gradient(220px circle at 20% 0%, rgba(42, 161, 146, 0.12), transparent 64%);
+            linear-gradient(150deg, rgba(255, 255, 255, 0.95), rgba(241, 250, 248, 0.84)),
+            radial-gradient(220px circle at 20% 0%, var(--plan-accent-soft), transparent 64%);
           box-shadow:
-            0 16px 40px rgba(11, 40, 38, 0.085),
+            0 18px 44px rgba(11, 40, 38, 0.09),
             inset 0 1px 0 rgba(255, 255, 255, 0.94);
-          padding: clamp(0.95rem, 1.6vw, 1.15rem);
+          padding: clamp(0.82rem, 1.25vw, 1rem);
+          backdrop-filter: blur(14px);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='free'] {
+          --plan-accent: #2aa192;
+          --plan-accent-soft: rgba(42, 161, 146, 0.1);
+          --plan-accent-border: rgba(42, 161, 146, 0.16);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='starter'] {
+          --plan-accent: #0e6e64;
+          --plan-accent-soft: rgba(14, 110, 100, 0.12);
+          --plan-accent-border: rgba(14, 110, 100, 0.18);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='growth'] {
+          --plan-accent: #08765f;
+          --plan-accent-soft: rgba(8, 118, 95, 0.18);
+          --plan-accent-border: rgba(8, 118, 95, 0.32);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='premium'] {
+          --plan-accent: #07302c;
+          --plan-accent-soft: rgba(184, 137, 47, 0.1);
+          --plan-accent-border: rgba(7, 48, 44, 0.25);
         }
 
         .provider-onboarding-pricing .provider-onboarding-plan[data-recommended='true'] {
-          border-color: rgba(14, 110, 100, 0.25);
+          border-color: rgba(8, 118, 95, 0.36);
           background:
-            linear-gradient(150deg, rgba(255, 255, 255, 0.96), rgba(231, 247, 244, 0.9)),
-            radial-gradient(260px circle at 50% 0%, rgba(42, 161, 146, 0.2), transparent 66%);
+            linear-gradient(150deg, rgba(255, 255, 255, 0.98), rgba(226, 247, 242, 0.94)),
+            radial-gradient(260px circle at 50% 0%, rgba(42, 161, 146, 0.24), transparent 66%);
           box-shadow:
-            0 20px 50px rgba(11, 40, 38, 0.12),
+            0 24px 58px rgba(11, 40, 38, 0.15),
+            0 0 0 3px rgba(42, 161, 146, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.96);
         }
 
@@ -2233,42 +2281,66 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          gap: 0.65rem;
+          gap: 0.5rem;
+          min-block-size: 1.9rem;
         }
 
-        .provider-onboarding-plan__head h3 {
+        .provider-onboarding-plan__name-row {
+          display: grid;
+          gap: 0.36rem;
+          min-block-size: 4.95rem;
+          align-content: start;
+        }
+
+        .provider-onboarding-plan__name-row h3 {
+          width: fit-content;
           margin: 0;
+          border: 1px solid var(--plan-accent-border);
+          border-radius: 999px;
+          padding: 0.46rem 0.72rem;
+          background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.86), var(--plan-accent-soft));
           color: var(--dm-teal-950, #07302c);
           font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
-          font-size: clamp(1.05rem, 1.25vw, 1.22rem);
-          font-weight: 760;
-          letter-spacing: -0.018em;
-          line-height: 1.18;
+          font-size: clamp(0.98rem, 1.08vw, 1.1rem);
+          font-weight: 850;
+          letter-spacing: -0.016em;
+          line-height: 1.08;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
+        .provider-onboarding-plan__name-row span {
+          color: var(--dm-color-brand-strong, #0b4f4a);
+          font-size: 0.76rem;
+          font-weight: 850;
+          line-height: 1.28;
+        }
+
+        .provider-onboarding-plan__badge,
         .provider-onboarding-plan__recommended,
         .provider-onboarding-plan__saving {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(14, 110, 100, 0.14);
+          border: 1px solid var(--plan-accent-border);
           border-radius: 999px;
           background: rgba(239, 246, 244, 0.9);
           color: var(--dm-color-brand-strong, #0b4f4a);
-          font-size: 0.72rem;
-          font-weight: 800;
+          font-size: 0.68rem;
+          font-weight: 900;
           line-height: 1.15;
-          padding: 0.28rem 0.46rem;
+          padding: 0.27rem 0.44rem;
           white-space: nowrap;
         }
 
         .provider-onboarding-plan__recommended {
-          margin-block-end: 0.38rem;
-          background: rgba(14, 110, 100, 0.1);
+          background: linear-gradient(135deg, rgba(14, 110, 100, 0.14), rgba(42, 161, 146, 0.16));
+          color: var(--dm-teal-950, #07302c);
         }
 
         .provider-onboarding-plan__saving {
-          background: rgba(255, 255, 255, 0.72);
+          width: fit-content;
+          background: rgba(255, 255, 255, 0.78);
         }
 
         .provider-onboarding-plan__description,
@@ -2281,25 +2353,33 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           line-height: 1.5;
         }
 
+        .provider-onboarding-plan__description {
+          min-block-size: 5.05rem;
+        }
+
+        .provider-onboarding-plan__price-block {
+          display: grid;
+          gap: 0.38rem;
+          min-block-size: 8.6rem;
+          border-block: 1px solid rgba(14, 110, 100, 0.1);
+          padding-block: 0.7rem 0.64rem;
+        }
+
         .provider-onboarding-plan__price {
           display: flex;
           align-items: baseline;
-          gap: 0.48rem;
-          border-block: 1px solid rgba(14, 110, 100, 0.1);
-          padding-block: 0.62rem 0.5rem;
+          min-block-size: 2.25rem;
         }
 
         .provider-onboarding-plan__price strong {
           color: var(--dm-teal-950, #07302c);
           font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
-          font-size: clamp(1.55rem, 2.25vw, 2.05rem);
-          font-weight: 800;
+          font-size: clamp(1.42rem, 1.75vw, 1.9rem);
+          font-weight: 860;
           letter-spacing: -0.04em;
-          line-height: 1;
-          white-space: nowrap;
+          line-height: 1.05;
         }
 
-        .provider-onboarding-plan__price span,
         .provider-onboarding-plan__best-for span {
           color: var(--dm-color-text-muted, #66736f);
           font-size: 0.78rem;
@@ -2314,11 +2394,12 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           border-radius: 0.95rem;
           background: rgba(255, 255, 255, 0.62);
           padding: 0.62rem;
+          min-block-size: 5.9rem;
         }
 
         .provider-onboarding-plan__features {
           display: grid;
-          gap: 0.42rem;
+          gap: 0.38rem;
           margin: 0;
           padding: 0;
           list-style: none;
@@ -2327,9 +2408,9 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         .provider-onboarding-plan__features li {
           position: relative;
           color: var(--dm-ink-700, #2e3a3b);
-          font-size: 0.81rem;
+          font-size: 0.79rem;
           font-weight: 650;
-          line-height: 1.42;
+          line-height: 1.38;
           padding-inline-start: 1.08rem;
         }
 
@@ -2355,19 +2436,34 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         .provider-onboarding-plan__button {
           inline-size: 100%;
           min-block-size: 2.45rem;
-          border-color: rgba(14, 110, 100, 0.14);
-          background: rgba(255, 255, 255, 0.76);
+          border-color: var(--plan-accent-border);
+          background: rgba(255, 255, 255, 0.82);
           color: var(--dm-color-brand-strong, #0b4f4a);
           font-size: 0.88rem;
-          font-weight: 800;
+          font-weight: 880;
           box-shadow:
             0 10px 24px rgba(11, 40, 38, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.86);
         }
 
-        .provider-onboarding-pricing .provider-onboarding-plan[data-recommended='true'] .provider-onboarding-plan__button {
-          background: linear-gradient(135deg, rgba(14, 110, 100, 0.96), rgba(42, 161, 146, 0.9));
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='starter'] .provider-onboarding-plan__button,
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='premium'] .provider-onboarding-plan__button {
+          background: linear-gradient(135deg, var(--plan-accent), var(--dm-color-brand-strong, #0b4f4a));
           color: #ffffff;
+          box-shadow: 0 14px 30px rgba(14, 110, 100, 0.22);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-plan='premium'] .provider-onboarding-plan__name-row h3 {
+          border-color: rgba(184, 137, 47, 0.2);
+          background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(252, 247, 237, 0.7)),
+            linear-gradient(90deg, rgba(184, 137, 47, 0.1), transparent);
+        }
+
+        .provider-onboarding-pricing .provider-onboarding-plan[data-recommended='true'] .provider-onboarding-plan__button {
+          background: linear-gradient(135deg, #0f8a78, var(--dm-color-brand-strong, #0b4f4a));
+          color: #ffffff;
+          box-shadow: 0 16px 34px rgba(14, 110, 100, 0.28);
         }
 
         .provider-onboarding-pricing .provider-onboarding-pricing-note {

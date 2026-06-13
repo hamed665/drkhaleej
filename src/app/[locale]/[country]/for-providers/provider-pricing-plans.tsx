@@ -7,12 +7,14 @@ export type BillingPeriodId = 'three' | 'six' | 'twelve';
 export type ProviderPricingPlan = {
   id: 'free' | 'starter' | 'growth' | 'premium';
   name: string;
+  badge: string;
   description: string;
   bestForLabel: string;
   bestFor: string;
   cta: string;
   note: string;
   recommendedLabel?: string;
+  supportLabel?: string;
   prices: Record<BillingPeriodId, string>;
   periodNotes: Record<BillingPeriodId, string>;
   savings: Record<BillingPeriodId, string>;
@@ -72,22 +74,26 @@ export function ProviderPricingPlans({ copy }: ProviderPricingPlansProps) {
 
         <div className="provider-onboarding-pricing-grid" data-selected-period={selectedPeriod}>
           {copy.plans.map((plan) => (
-            <article className="dm2026-card-glass provider-onboarding-plan" data-recommended={plan.recommendedLabel ? 'true' : 'false'} key={plan.id}>
+            <article className="dm2026-card-glass provider-onboarding-plan" data-plan={plan.id} data-recommended={plan.recommendedLabel ? 'true' : 'false'} key={plan.id}>
               <div className="provider-onboarding-plan__head">
-                <div>
-                  {plan.recommendedLabel ? <span className="provider-onboarding-plan__recommended">{plan.recommendedLabel}</span> : null}
-                  <h3>{plan.name}</h3>
-                </div>
-                <span className="provider-onboarding-plan__saving">{plan.savings[selectedPeriod]}</span>
+                <span className="provider-onboarding-plan__badge">{plan.badge}</span>
+                {plan.recommendedLabel ? <span className="provider-onboarding-plan__recommended">{plan.recommendedLabel}</span> : null}
+              </div>
+
+              <div className="provider-onboarding-plan__name-row">
+                <h3>{plan.name}</h3>
+                {plan.supportLabel ? <span>{plan.supportLabel}</span> : null}
               </div>
 
               <p className="provider-onboarding-plan__description">{plan.description}</p>
 
-              <div className="provider-onboarding-plan__price" aria-label={`${plan.name} ${selectedPeriodLabel}`}>
-                <strong>{plan.prices[selectedPeriod]}</strong>
-                <span>{selectedPeriodLabel}</span>
+              <div className="provider-onboarding-plan__price-block">
+                <div className="provider-onboarding-plan__price" aria-label={`${plan.name} ${selectedPeriodLabel}`}>
+                  <strong>{plan.prices[selectedPeriod]}</strong>
+                </div>
+                <p className="provider-onboarding-plan__period-note">{plan.periodNotes[selectedPeriod]}</p>
+                <span className="provider-onboarding-plan__saving">{plan.savings[selectedPeriod]}</span>
               </div>
-              <p className="provider-onboarding-plan__period-note">{plan.periodNotes[selectedPeriod]}</p>
 
               <div className="provider-onboarding-plan__best-for">
                 <span>{plan.bestForLabel}</span>
