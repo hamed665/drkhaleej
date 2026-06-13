@@ -84,6 +84,10 @@ type ProviderPageCopy = {
     }[];
     visualLabel: string;
     visualText: string;
+    visualSupportText: string;
+    visualMicroNote: string;
+    visualItems: readonly string[];
+    visualCaption: string;
     cta: string;
     secondaryNote: string;
     disclaimer: string;
@@ -365,8 +369,12 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
           ]
         }
       ],
-      visualLabel: 'Request-based visibility',
+      visualLabel: 'REQUEST-BASED VISIBILITY',
       visualText: 'Extra visibility options can be reviewed after provider information is ready.',
+      visualSupportText: "Add-on requests are only discussed after the provider’s public information has been reviewed, confirmed, and prepared safely.",
+      visualMicroNote: 'Nothing in this section activates placement automatically.',
+      visualItems: ['Featured placement', 'Category discovery', 'Area visibility', 'Offer request', 'Profile expansion'],
+      visualCaption: 'Request-based visibility options are reviewed before activation.',
       cta: 'Request add-on discussion',
       secondaryNote: 'Add-ons are request-based and subject to review, availability, and confirmation.',
       disclaimer:
@@ -704,6 +712,10 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       ],
       visualLabel: 'ظهور حسب الطلب',
       visualText: 'يمكن مراجعة خيارات الظهور الإضافية بعد جاهزية معلومات مقدم الخدمة.',
+      visualSupportText: 'تُناقش طلبات الإضافات فقط بعد مراجعة المعلومات العامة لمقدم الخدمة وتأكيدها وتجهيزها بشكل آمن.',
+      visualMicroNote: 'لا يتم تفعيل أي ظهور تلقائيًا من هذا القسم.',
+      visualItems: ['ظهور مميز', 'اكتشاف حسب الفئة', 'ظهور حسب المنطقة', 'طلب عرض', 'توسيع الملف'],
+      visualCaption: 'تُراجع خيارات الظهور حسب الطلب قبل تفعيلها.',
       cta: 'طلب مناقشة الإضافات',
       secondaryNote: 'الإضافات حسب الطلب وتخضع للمراجعة والتوفر والتأكيد.',
       disclaimer:
@@ -1100,17 +1112,28 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
               ))}
             </div>
 
-            <div className="provider-onboarding-addons__visual" aria-label={copy.addons.visualLabel}>
-              <span className="provider-onboarding-addons__visual-orbit provider-onboarding-addons__visual-orbit--one" aria-hidden="true" />
-              <span className="provider-onboarding-addons__visual-orbit provider-onboarding-addons__visual-orbit--two" aria-hidden="true" />
-              <div className="provider-onboarding-addons__visual-map" aria-hidden="true">
-                <span />
-                <span />
-                <span />
+            <div className="provider-onboarding-addons__close">
+              <div className="provider-onboarding-addons__message-card">
+                <span className="provider-onboarding-addons__message-label">{copy.addons.visualLabel}</span>
+                <h3>{copy.addons.visualText}</h3>
+                <p>{copy.addons.visualSupportText}</p>
+                <span className="provider-onboarding-addons__message-note">{copy.addons.visualMicroNote}</span>
               </div>
-              <div className="provider-onboarding-addons__visual-card">
-                <span>{copy.addons.visualLabel}</span>
-                <p>{copy.addons.visualText}</p>
+
+              <div className="provider-onboarding-addons__visual" aria-label={copy.addons.visualCaption}>
+                <span className="provider-onboarding-addons__visual-orbit provider-onboarding-addons__visual-orbit--one" aria-hidden="true" />
+                <span className="provider-onboarding-addons__visual-orbit provider-onboarding-addons__visual-orbit--two" aria-hidden="true" />
+                <div className="provider-onboarding-addons__request-board" aria-hidden="true">
+                  {copy.addons.visualItems.map((item, index) => (
+                    <span className={`provider-onboarding-addons__request-chip provider-onboarding-addons__request-chip--${index + 1}`} key={item}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                <div className="provider-onboarding-addons__visual-card">
+                  <span>{copy.addons.visualLabel}</span>
+                  <p>{copy.addons.visualCaption}</p>
+                </div>
               </div>
             </div>
 
@@ -1120,7 +1143,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
               </a>
               <p>{copy.addons.secondaryNote}</p>
             </div>
-            <p className="provider-onboarding-addons__disclaimer">{copy.addons.disclaimer}</p>
+            <p className="provider-onboarding-addons__disclaimer"><span aria-hidden="true" />{copy.addons.disclaimer}</p>
           </div>
         </div>
       </section>
@@ -2595,20 +2618,108 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
+        .provider-onboarding-addons__close {
+          display: grid;
+          grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+          gap: clamp(0.9rem, 2vw, 1.18rem);
+          align-items: stretch;
+        }
+
+        .provider-onboarding-addons__message-card {
+          position: relative;
+          overflow: hidden;
+          display: grid;
+          align-content: center;
+          gap: 0.72rem;
+          min-block-size: clamp(15rem, 23vw, 18.5rem);
+          border: 1px solid rgba(14, 110, 100, 0.16);
+          border-radius: clamp(1.25rem, 2.3vw, 1.75rem);
+          padding: clamp(1.05rem, 2.2vw, 1.45rem);
+          background:
+            radial-gradient(circle at 12% 16%, rgba(42, 161, 146, 0.18), transparent 32%),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 248, 245, 0.74));
+          box-shadow:
+            0 22px 54px rgba(11, 40, 38, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(16px);
+        }
+
+        .provider-onboarding-addons__message-card::before {
+          content: '';
+          position: absolute;
+          inset-inline-start: 0;
+          inset-block: 1.2rem;
+          inline-size: 0.22rem;
+          border-radius: 999px;
+          background: linear-gradient(180deg, rgba(42, 161, 146, 0.95), rgba(14, 110, 100, 0.34));
+          box-shadow: 0 0 22px rgba(42, 161, 146, 0.28);
+        }
+
+        .provider-onboarding-addons__message-label {
+          width: fit-content;
+          border: 1px solid rgba(14, 110, 100, 0.16);
+          border-radius: 999px;
+          padding: 0.38rem 0.68rem;
+          background: rgba(255, 255, 255, 0.78);
+          color: var(--dm-color-brand-strong, #0b4f4a);
+          font-size: 0.72rem;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          line-height: 1;
+          text-transform: uppercase;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .provider-onboarding-addons__message-card h3,
+        .provider-onboarding-addons__message-card p,
+        .provider-onboarding-addons__message-note {
+          position: relative;
+          z-index: 1;
+          margin: 0;
+        }
+
+        .provider-onboarding-addons__message-card h3 {
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1.18rem, 2.2vw, 1.62rem);
+          font-weight: 850;
+          letter-spacing: -0.026em;
+          line-height: 1.12;
+        }
+
+        .provider-onboarding-addons__message-card p {
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: 0.94rem;
+          font-weight: 650;
+          line-height: 1.62;
+        }
+
+        .provider-onboarding-addons__message-note {
+          width: fit-content;
+          border: 1px solid rgba(14, 110, 100, 0.13);
+          border-radius: 999px;
+          padding: 0.42rem 0.66rem;
+          background: rgba(255, 255, 255, 0.68);
+          color: var(--dm-color-brand-strong, #0b4f4a);
+          font-size: 0.76rem;
+          font-weight: 850;
+          line-height: 1.25;
+        }
+
         .provider-onboarding-addons__visual {
           position: relative;
           overflow: hidden;
           display: grid;
-          min-block-size: clamp(12rem, 21vw, 16rem);
+          min-block-size: clamp(15rem, 23vw, 18.5rem);
           align-items: end;
-          border: 1px solid rgba(14, 110, 100, 0.16);
+          border: 1px solid rgba(14, 110, 100, 0.18);
           border-radius: clamp(1.25rem, 2.3vw, 1.75rem);
           padding: clamp(1rem, 2vw, 1.35rem);
           background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(238, 248, 245, 0.78)),
-            radial-gradient(circle at 18% 24%, rgba(42, 161, 146, 0.22), transparent 25%),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(238, 248, 245, 0.82)),
+            radial-gradient(circle at 18% 24%, rgba(42, 161, 146, 0.25), transparent 25%),
             radial-gradient(circle at 58% 14%, rgba(228, 184, 92, 0.1), transparent 22%),
-            radial-gradient(circle at 82% 34%, rgba(14, 110, 100, 0.15), transparent 28%);
+            radial-gradient(circle at 82% 34%, rgba(14, 110, 100, 0.18), transparent 28%);
           box-shadow:
             0 22px 54px rgba(11, 40, 38, 0.11),
             inset 0 1px 0 rgba(255, 255, 255, 0.82);
@@ -2647,34 +2758,60 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           block-size: 13rem;
         }
 
-        .provider-onboarding-addons__visual-map {
+        .provider-onboarding-addons__request-board {
           position: absolute;
-          inset-block-start: clamp(1rem, 2vw, 1.3rem);
-          inset-inline-end: clamp(1rem, 2vw, 1.4rem);
+          inset-block-start: clamp(1rem, 2vw, 1.35rem);
+          inset-inline: clamp(1rem, 2vw, 1.35rem);
           display: grid;
-          grid-template-columns: repeat(3, minmax(5rem, 1fr));
-          gap: 0.65rem;
-          inline-size: min(52%, 25rem);
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 0.7rem;
+          align-items: start;
         }
 
-        .provider-onboarding-addons__visual-map span {
-          min-block-size: clamp(3.8rem, 8vw, 5.4rem);
-          border: 1px solid rgba(14, 110, 100, 0.13);
-          border-radius: 1.1rem;
+        .provider-onboarding-addons__request-chip {
+          display: grid;
+          align-items: center;
+          min-block-size: clamp(3.5rem, 6.8vw, 4.8rem);
+          border: 1px solid rgba(14, 110, 100, 0.15);
+          border-radius: 1.05rem;
+          padding: 0.62rem;
           background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(239, 246, 244, 0.66)),
-            linear-gradient(90deg, rgba(14, 110, 100, 0.12), transparent 56%);
-          box-shadow: 0 16px 36px rgba(11, 40, 38, 0.08);
+            linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 244, 0.72)),
+            linear-gradient(90deg, rgba(14, 110, 100, 0.12), transparent 58%);
+          color: var(--dm-teal-950, #07302c);
+          font-size: 0.78rem;
+          font-weight: 850;
+          line-height: 1.22;
+          box-shadow:
+            0 16px 36px rgba(11, 40, 38, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.86);
+          backdrop-filter: blur(12px);
         }
 
-        .provider-onboarding-addons__visual-map span:nth-child(2) {
+        .provider-onboarding-addons__request-chip--1 {
+          grid-column: span 2;
+        }
+
+        .provider-onboarding-addons__request-chip--2 {
+          grid-column: span 2;
+          transform: translateY(0.55rem);
+        }
+
+        .provider-onboarding-addons__request-chip--3 {
+          grid-column: span 2;
+          transform: translateY(0.15rem);
+        }
+
+        .provider-onboarding-addons__request-chip--4 {
+          grid-column: 2 / span 2;
           border-color: rgba(184, 137, 47, 0.16);
           background:
             linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(252, 247, 237, 0.68)),
             linear-gradient(90deg, rgba(228, 184, 92, 0.12), transparent 56%);
         }
 
-        .provider-onboarding-addons__visual-map span:nth-child(3) {
+        .provider-onboarding-addons__request-chip--5 {
+          grid-column: span 2;
           border-color: rgba(8, 118, 95, 0.15);
           background:
             linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(239, 248, 245, 0.7)),
@@ -2723,21 +2860,25 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           align-items: center;
           justify-content: space-between;
           gap: 1rem;
-          border: 1px solid rgba(14, 110, 100, 0.14);
-          border-radius: 1.25rem;
-          padding: clamp(0.88rem, 1.8vw, 1.08rem);
+          border: 1px solid rgba(14, 110, 100, 0.2);
+          border-radius: 1.38rem;
+          padding: clamp(0.95rem, 1.9vw, 1.18rem);
           background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(239, 246, 244, 0.62)),
-            radial-gradient(circle at 5% 20%, rgba(42, 161, 146, 0.12), transparent 35%);
+            linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(237, 249, 246, 0.72)),
+            radial-gradient(circle at 5% 20%, rgba(42, 161, 146, 0.18), transparent 35%);
           box-shadow:
-            0 16px 36px rgba(11, 40, 38, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.82);
+            0 18px 42px rgba(11, 40, 38, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         .provider-onboarding-addons__button {
-          min-block-size: 2.75rem;
-          padding-inline: 1.1rem;
-          box-shadow: 0 14px 30px rgba(14, 110, 100, 0.2);
+          min-block-size: 2.95rem;
+          border: 1px solid rgba(255, 255, 255, 0.38);
+          padding-inline: 1.18rem;
+          font-weight: 900;
+          box-shadow:
+            0 16px 34px rgba(14, 110, 100, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.32);
         }
 
         .provider-onboarding-addons__cta p,
@@ -2750,17 +2891,42 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         }
 
         .provider-onboarding-addons__disclaimer {
-          border-inline-start: 3px solid rgba(14, 110, 100, 0.32);
-          padding-inline-start: 0.82rem;
-          color: var(--dm-color-text-muted, #66736f);
-          font-size: 0.82rem;
+          display: flex;
+          gap: 0.7rem;
+          align-items: flex-start;
+          border: 1px solid rgba(14, 110, 100, 0.13);
+          border-radius: 1rem;
+          padding: 0.84rem 0.92rem;
+          background: rgba(255, 255, 255, 0.7);
+          color: var(--dm-ink-700, #2e3a3b);
+          font-size: 0.84rem;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+        }
+
+        .provider-onboarding-addons__disclaimer span {
+          flex: 0 0 auto;
+          inline-size: 0.58rem;
+          block-size: 0.58rem;
+          margin-block-start: 0.34rem;
+          border: 2px solid rgba(255, 255, 255, 0.94);
+          border-radius: 999px;
+          background: var(--dm-color-brand, #0e6e64);
+          box-shadow:
+            0 0 0 1px rgba(14, 110, 100, 0.18),
+            0 8px 18px rgba(14, 110, 100, 0.16);
         }
 
         [dir='rtl'] .provider-onboarding-addons__header h2,
         [dir='rtl'] .provider-onboarding-addons__group-header h3,
-        [dir='rtl'] .provider-onboarding-addons__card h4 {
+        [dir='rtl'] .provider-onboarding-addons__card h4,
+        [dir='rtl'] .provider-onboarding-addons__message-card h3 {
           letter-spacing: 0;
           line-height: 1.25;
+        }
+
+        [dir='rtl'] .provider-onboarding-addons__message-label {
+          letter-spacing: 0;
+          text-transform: none;
         }
 
         [dir='rtl'] .provider-onboarding-addons__visual-card span {
@@ -2984,8 +3150,8 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             grid-column: 1 / -1;
           }
 
-          .provider-onboarding-addons__visual-map {
-            inline-size: min(62%, 24rem);
+          .provider-onboarding-addons__close {
+            grid-template-columns: 1fr;
           }
 
           .provider-onboarding-form-copy {
@@ -3099,8 +3265,26 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             padding: 0.78rem;
           }
 
+          .provider-onboarding-addons__close {
+            gap: 0.78rem;
+          }
+
+          .provider-onboarding-addons__message-card {
+            min-block-size: auto;
+            border-radius: 1.12rem;
+            padding: 0.92rem;
+          }
+
+          .provider-onboarding-addons__message-card h3 {
+            font-size: clamp(1.05rem, 5.6vw, 1.38rem);
+          }
+
+          .provider-onboarding-addons__message-card p {
+            font-size: 0.88rem;
+          }
+
           .provider-onboarding-addons__visual {
-            min-block-size: 14rem;
+            min-block-size: 15rem;
             padding: 0.78rem;
           }
 
@@ -3109,16 +3293,22 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             background-size: 2.2rem 2.2rem;
           }
 
-          .provider-onboarding-addons__visual-map {
+          .provider-onboarding-addons__request-board {
             inset-inline: 0.8rem;
-            inline-size: auto;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             opacity: 0.72;
           }
 
-          .provider-onboarding-addons__visual-map span {
+          .provider-onboarding-addons__request-chip {
+            grid-column: auto;
             min-block-size: 3.3rem;
             border-radius: 0.85rem;
+            font-size: 0.72rem;
+            transform: none;
+          }
+
+          .provider-onboarding-addons__request-chip--5 {
+            grid-column: 1 / -1;
           }
 
           .provider-onboarding-addons__visual-card {
