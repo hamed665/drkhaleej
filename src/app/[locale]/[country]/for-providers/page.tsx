@@ -1168,11 +1168,36 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
       <style>{`
         .provider-onboarding-page {
+          inline-size: 100%;
+          max-inline-size: 100%;
+          overflow-x: clip;
           padding-block-start: clamp(0.65rem, 2vw, 1.35rem);
+        }
+
+        .provider-onboarding-page *,
+        .provider-onboarding-page *::before,
+        .provider-onboarding-page *::after {
+          box-sizing: border-box;
+        }
+
+        .provider-onboarding-page :where(section, div, article, aside, header, footer, ul, li, form, label, input, select, textarea, a, button, p, h1, h2, h3, span) {
+          min-inline-size: 0;
+        }
+
+        .provider-onboarding-page :where(section, .dm2026-container, .dm2026-glass, .dm2026-card-glass, .dm2026-card-soft) {
+          max-inline-size: 100%;
+        }
+
+        .provider-onboarding-page :where(section, [id]) {
+          scroll-margin-top: clamp(5.25rem, 10vw, 7rem);
         }
 
         .provider-onboarding-hero {
           padding-block: clamp(0.75rem, 2vw, 1.25rem) clamp(1.2rem, 3vw, 2.15rem);
+        }
+
+        .provider-onboarding-page :where(h1, h2, h3, p, li, span, a, button, label) {
+          overflow-wrap: break-word;
         }
 
         .provider-onboarding-hero__shell {
@@ -1905,7 +1930,11 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
         }
 
         .provider-onboarding-review-flow .provider-onboarding-checklist {
+          position: relative;
+          overflow: hidden;
           isolation: isolate;
+          inline-size: 100%;
+          max-inline-size: 100%;
           align-self: stretch;
           gap: 0.78rem;
           border: 1px solid rgba(14, 110, 100, 0.18);
@@ -2905,6 +2934,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
         .provider-onboarding-addons__request-board {
           position: absolute;
+          max-inline-size: calc(100% - 2rem);
           inset-block-start: clamp(1rem, 2vw, 1.35rem);
           inset-inline: clamp(1rem, 2vw, 1.35rem);
           display: grid;
@@ -3466,6 +3496,22 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           flex-direction: row-reverse;
         }
 
+
+        @media (max-width: 56.25rem) {
+          .provider-onboarding-page {
+            overflow-x: clip;
+          }
+
+          .provider-onboarding-page :where(.dm2026-container, .dm2026-provider-cta__shell, .dm2026-discovery-categories__module, .provider-onboarding-addons, .provider-onboarding-form, .provider-onboarding-form-copy, .provider-onboarding-checklist, .provider-onboarding-disclaimer) {
+            inline-size: 100%;
+            max-inline-size: 100%;
+          }
+
+          .provider-onboarding-review-flow .provider-onboarding-checklist {
+            align-self: start;
+          }
+        }
+
         @media (max-width: 68rem) {
           .provider-onboarding-benefit-grid,
           .provider-onboarding-two-column,
@@ -3525,7 +3571,24 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
         @media (max-width: 42rem) {
           .provider-onboarding-page {
-            padding-block-start: 0.4rem;
+            overflow-x: clip;
+            padding-block-start: max(0.9rem, env(safe-area-inset-top, 0px));
+            padding-block-end: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+          }
+
+          .provider-onboarding-page :where(.dm2026-container) {
+            inline-size: 100%;
+            max-inline-size: 100%;
+            padding-inline: clamp(0.82rem, 4vw, 1rem);
+          }
+
+          .provider-onboarding-page :where(section, [id]) {
+            scroll-margin-top: 5.65rem;
+          }
+
+          .provider-onboarding-page :where(.dm2026-provider-cta__shell, .dm2026-discovery-categories__module, .dm2026-card-glass, .dm2026-card-soft, .provider-onboarding-addons, .provider-onboarding-form, .provider-onboarding-form-copy) {
+            max-inline-size: 100%;
+            overflow-x: clip;
           }
 
           .provider-onboarding-hero {
@@ -3535,6 +3598,12 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           .provider-onboarding-hero__shell {
             gap: 0.72rem;
             padding: 0.72rem;
+          }
+
+          .provider-onboarding-hero .dm2026-provider-cta__actions {
+            align-items: stretch;
+            flex-direction: column;
+            inline-size: 100%;
           }
 
           .provider-onboarding-hero .dm2026-provider-cta__copy {
@@ -3553,8 +3622,18 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           }
 
           .provider-onboarding-hero .dm2026-provider-cta__visual {
-            min-block-size: 15.6rem;
+            min-block-size: 13.8rem;
             padding: 0.5rem;
+            overflow: hidden;
+          }
+
+          .provider-onboarding-hero__photo-glow {
+            opacity: 0.5;
+            transform: none;
+          }
+
+          .provider-onboarding-hero__photo-pane--side {
+            display: none;
           }
 
           .provider-onboarding-hero__preview {
@@ -3565,8 +3644,12 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
 
           .provider-onboarding-categories .dm2026-discovery-categories__grid,
           .provider-onboarding-benefit-grid,
-          .provider-onboarding-form__grid {
-            grid-template-columns: 1fr;
+          .provider-onboarding-form__grid,
+          .provider-onboarding-two-column,
+          .provider-onboarding-two-column--form,
+          .provider-onboarding-review-flow .provider-onboarding-two-column,
+          .provider-onboarding-final__shell {
+            grid-template-columns: minmax(0, 1fr);
           }
 
           .provider-onboarding-category-card {
@@ -3599,11 +3682,34 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           .provider-onboarding-pricing__selector {
             inline-size: 100%;
             min-inline-size: 0;
+            padding: 0.48rem;
+          }
+
+          .provider-onboarding-pricing__segments {
+            gap: 0.18rem;
+          }
+
+          .provider-onboarding-pricing__segment {
+            min-block-size: 2.25rem;
+            padding-inline: 0.36rem;
+            white-space: normal;
+          }
+
+          .provider-onboarding-plan__price-block,
+          .provider-onboarding-plan__billing-row,
+          .provider-onboarding-plan__best-for {
+            min-block-size: auto;
           }
 
           .provider-onboarding-addons {
             padding: 0.88rem;
             border-radius: 1.35rem;
+            overflow: hidden;
+          }
+
+          .provider-onboarding-addons__glow,
+          .provider-onboarding-addons__visual-orbit {
+            display: none;
           }
 
           .provider-onboarding-addons__header h2 {
@@ -3735,7 +3841,11 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           }
 
           .provider-onboarding-review-flow .provider-onboarding-checklist {
-            padding: 1rem;
+            position: relative;
+            inline-size: 100%;
+            max-inline-size: 100%;
+            align-self: start;
+            padding: 0.88rem;
           }
 
           .provider-onboarding-review-flow .provider-onboarding-checklist::before {
@@ -3769,10 +3879,63 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             flex-direction: column;
           }
 
+          body:has(.provider-onboarding-page) .dm2026-home-whatsapp-float {
+            z-index: 35;
+            inset-inline-end: max(0.72rem, env(safe-area-inset-right, 0px));
+            inset-block-end: max(0.72rem, env(safe-area-inset-bottom, 0px));
+            max-inline-size: calc(100vw - 1.44rem);
+          }
+
+          body:has(.provider-onboarding-page) .dm2026-home-whatsapp-float__fab {
+            inline-size: 3rem;
+            block-size: 3rem;
+          }
+
+          body:has(.provider-onboarding-page) .dm2026-home-whatsapp-float__glyph {
+            inline-size: 1.85rem;
+            block-size: 1.85rem;
+          }
+
+          body:has(.provider-onboarding-page) .dm2026-floating-dock {
+            inset-inline: 0.75rem;
+            inset-block-end: calc(0.72rem + env(safe-area-inset-bottom, 0px));
+            max-inline-size: calc(100vw - 1.5rem);
+          }
+
           [dir='rtl'] .provider-onboarding-plan li {
             flex-direction: column;
           }
         }
+
+        @media (max-width: 30rem) {
+          .provider-onboarding-page :where(h1, h2) {
+            max-inline-size: 100%;
+          }
+
+          .provider-onboarding-hero .dm2026-provider-cta__headline-group h1,
+          .provider-onboarding-section__header h2,
+          .provider-onboarding-pricing__header h2,
+          .provider-onboarding-addons__header h2,
+          .provider-onboarding-form-copy h2 {
+            letter-spacing: -0.026em;
+          }
+
+          .provider-onboarding-pricing__segment,
+          .provider-onboarding-plan__saving,
+          .provider-onboarding-addons__status {
+            font-size: 0.72rem;
+          }
+
+          .provider-onboarding-review-flow .provider-onboarding-step-list li {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .provider-onboarding-review-flow .provider-onboarding-step-list li > span {
+            inline-size: 1.9rem;
+            block-size: 1.9rem;
+          }
+        }
+
       `}</style>
     </main>
   );
