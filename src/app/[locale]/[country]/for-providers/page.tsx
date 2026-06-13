@@ -324,18 +324,18 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     },
     categories: {
       badge: 'من يمكنه الانضمام',
-      title: 'مصمم لمقدمي الرعاية الذين يبحث عنهم الناس في عُمان.',
-      subtitle: 'يعكس هذا القسم إيقاع بطاقات الاكتشاف في الصفحة الرئيسية حتى تبدو فئات مقدمي الخدمة جزءاً أصيلاً من DrMuscat.',
+      title: 'مصمم لمقدّمي الرعاية الذين يبحث عنهم الناس في عُمان.',
+      subtitle: 'يعكس هذا القسم إيقاع بطاقات الاكتشاف في الصفحة الرئيسية حتى تبدو فئات مقدّمي الخدمة جزءًا طبيعيًا من تجربة DrMuscat.',
       cta: 'نطاق المراجعة',
       items: [
-        { id: 'clinics', title: 'العيادات', description: 'عيادات طبية تجهّز تفاصيل الاكتشاف العامة.', size: 'large' },
-        { id: 'doctors', title: 'الأطباء', description: 'أطباء أفراد وملفات اختصاصيين.', size: 'medium' },
-        { id: 'dental', title: 'عيادات الأسنان', description: 'مراكز أسنان وأطباء أسنان وخدمات رعاية الفم.', size: 'large' },
-        { id: 'pharmacies', title: 'الصيدليات', description: 'تفاصيل عامة للموقع والتواصل مع الصيدلية.', size: 'medium' },
-        { id: 'labs', title: 'المختبرات', description: 'مختبرات تشخيصية وملفات خدمات الفحوصات.', size: 'medium' },
-        { id: 'hospitals', title: 'المستشفيات والمجمعات', description: 'مراكز رعاية أكبر مع فئات خدمات عامة.', size: 'medium' },
-        { id: 'wellness', title: 'مقدمو التجميل والرفاهية', description: 'مقدمو خدمات تجميل ورفاهية بصياغة عامة مراجعة.', size: 'large' },
-        { id: 'pet', title: 'العيادات البيطرية', description: 'عيادات بيطرية ورعاية حيوانات أليفة تجهّز تفاصيل الاكتشاف.', size: 'medium' }
+        { id: 'clinics', title: 'العيادات', description: 'تفاصيل عامة للعيادات الطبية الجاهزة للاكتشاف.', size: 'large' },
+        { id: 'doctors', title: 'الأطباء', description: 'ملفات الأطباء الفرديين والتخصصات.', size: 'medium' },
+        { id: 'dental', title: 'عيادات الأسنان', description: 'مراكز وعيادات وخدمات طب الأسنان.', size: 'large' },
+        { id: 'pharmacies', title: 'الصيدليات', description: 'معلومات مواقع الصيدليات ووسائل التواصل العامة.', size: 'medium' },
+        { id: 'labs', title: 'المختبرات', description: 'ملفات المختبرات وخدمات الفحوصات.', size: 'medium' },
+        { id: 'hospitals', title: 'المستشفيات والمجمعات', description: 'الجهات الطبية الأكبر ذات الفئات الخدمية العامة.', size: 'medium' },
+        { id: 'wellness', title: 'مقدّمو التجميل والرفاهية', description: 'جهات التجميل والعناية والرفاهية بصياغة عامة مدروسة.', size: 'large' },
+        { id: 'pet', title: 'عيادات الحيوانات الأليفة', description: 'ملفات العيادات البيطرية وخدمات رعاية الحيوانات الأليفة.', size: 'medium' }
       ]
     },
     benefits: {
@@ -493,6 +493,12 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
   }
 };
 
+function getProviderCategoryCardClassName(item: ProviderCategory) {
+  const accentClass = item.id === 'dental' ? 'hero' : 'secondary';
+
+  return `dm2026-discovery-card dm2026-discovery-card--medium dm2026-discovery-card--${accentClass} provider-onboarding-category-card provider-onboarding-category-card--${item.id}`;
+}
+
 function ProviderSymbol({ id }: { id: ProviderCategory['id'] }) {
   return (
     <svg className="dm2026-discovery-card__embossed-svg" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
@@ -522,6 +528,16 @@ function ProviderSymbol({ id }: { id: ProviderCategory['id'] }) {
         </>
       ) : null}
 
+      {id === 'pharmacies' ? (
+        <>
+          <path className="dm2026-symbol__cast" d="M31 79V31c0-6 5-11 11-11h12c6 0 11 5 11 11v48H31Z" />
+          <path className="dm2026-symbol__mass dm2026-symbol__mass--hero" d="M34 76V34c0-6 4-10 10-10h8c6 0 10 4 10 10v42H34Z" />
+          <path className="dm2026-symbol__ridge" d="M39 38h18M39 65h18M48 44v15M41 51h14" />
+          <path className="dm2026-symbol__mark" d="M40 24v-6h16v6" />
+          <path className="dm2026-symbol__mark" d="M34 76h28" />
+        </>
+      ) : null}
+
       {id === 'labs' ? (
         <>
           <path className="dm2026-symbol__cast" d="M35 16h26M43 16v23L26 72c-3 6 1 10 7 10h30c6 0 10-4 7-10L53 39V16" />
@@ -542,7 +558,7 @@ function ProviderSymbol({ id }: { id: ProviderCategory['id'] }) {
         </>
       ) : null}
 
-      {!['dental', 'wellness', 'doctors', 'labs', 'pet'].includes(id) ? (
+      {!['dental', 'wellness', 'doctors', 'pharmacies', 'labs', 'pet'].includes(id) ? (
         <>
           <path className="dm2026-symbol__cast" d="M24 78V31l24-15 24 15v47H24Z" />
           <path className="dm2026-symbol__mass dm2026-symbol__mass--hero" d="M24 75V28l24-15 24 15v47H24Z" />
@@ -670,7 +686,7 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             <div className="dm2026-discovery-categories__grid" role="list">
               {copy.categories.items.map((item) => (
                 <article
-                  className={`dm2026-discovery-card dm2026-discovery-card--${item.size === 'large' ? 'large' : 'medium'} dm2026-discovery-card--${item.id === 'wellness' ? 'secondary' : item.id === 'dental' ? 'hero' : item.id === 'pharmacies' ? 'offers' : 'secondary'}`}
+                  className={getProviderCategoryCardClassName(item)}
                   key={item.id}
                   role="listitem"
                 >
@@ -1111,6 +1127,142 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
           line-height: 1.18;
         }
 
+
+        .provider-onboarding-categories {
+          padding-block: clamp(1.8rem, 4.5vw, 3.6rem);
+        }
+
+        .provider-onboarding-categories .dm2026-discovery-categories__module {
+          padding: clamp(1rem, 2.6vw, 1.55rem);
+          border-color: rgba(14, 110, 100, 0.13);
+          background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(247, 251, 250, 0.82)),
+            radial-gradient(540px circle at 15% 0%, rgba(42, 161, 146, 0.12), transparent 52%);
+          box-shadow:
+            0 22px 60px rgba(11, 40, 38, 0.09),
+            inset 0 1px 0 rgba(255, 255, 255, 0.92);
+        }
+
+        .provider-onboarding-categories .dm2026-discovery-categories__header {
+          max-inline-size: 46rem;
+          margin-block-end: clamp(1rem, 2.4vw, 1.45rem);
+        }
+
+        .provider-onboarding-categories .dm2026-discovery-categories__header h2 {
+          margin: 0;
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1.45rem, 2.45vw, 2.12rem);
+          font-weight: 720;
+          letter-spacing: -0.032em;
+          line-height: 1.1;
+        }
+
+        .provider-onboarding-categories .dm2026-discovery-categories__header p {
+          max-inline-size: 41rem;
+          color: var(--dm-color-text-muted, #66736f);
+          font-size: clamp(0.95rem, 1.1vw, 1.04rem);
+          line-height: 1.62;
+        }
+
+        .provider-onboarding-categories .dm2026-discovery-categories__grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: clamp(0.72rem, 1.35vw, 1rem);
+        }
+
+        .provider-onboarding-category-card {
+          grid-column: auto !important;
+          min-block-size: 15.9rem;
+          grid-template-rows: auto minmax(5.75rem, 1fr) auto;
+          gap: 0.78rem;
+          border-color: rgba(14, 110, 100, 0.13);
+          background:
+            linear-gradient(155deg, rgba(255, 255, 255, 0.88), rgba(248, 252, 251, 0.74)),
+            radial-gradient(170px circle at 20% 0%, rgba(42, 161, 146, 0.11), transparent 62%);
+          box-shadow:
+            0 14px 34px rgba(11, 40, 38, 0.075),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+          padding: clamp(0.9rem, 1.35vw, 1.08rem);
+        }
+
+        .provider-onboarding-category-card:hover {
+          border-color: rgba(14, 110, 100, 0.2);
+          box-shadow:
+            0 18px 42px rgba(11, 40, 38, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.94);
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__visual {
+          min-block-size: 6.9rem;
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__visual-plate {
+          inline-size: min(7.2rem, 72%);
+          border-color: rgba(14, 110, 100, 0.12);
+          background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(239, 246, 244, 0.82)),
+            radial-gradient(120px circle at 24% 12%, rgba(42, 161, 146, 0.14), transparent 62%);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.94),
+            0 10px 26px rgba(14, 110, 100, 0.08);
+        }
+
+        .provider-onboarding-category-card--pharmacies .dm2026-discovery-card__visual-plate {
+          background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(236, 248, 245, 0.86)),
+            radial-gradient(128px circle at 24% 12%, rgba(42, 161, 146, 0.17), transparent 62%);
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__embossed-svg {
+          inline-size: 76%;
+          block-size: 76%;
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__copy {
+          gap: 0.38rem;
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__copy strong {
+          color: var(--dm-teal-950, #07302c);
+          font-family: var(--dm-font-display, var(--dm-font-sans, system-ui));
+          font-size: clamp(1rem, 1.1vw, 1.12rem);
+          font-weight: 720;
+          letter-spacing: -0.012em;
+          line-height: 1.24;
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__copy span {
+          color: var(--dm-color-text-muted, #66736f);
+          font-size: var(--dm-type-small, 0.875rem);
+          line-height: 1.55;
+        }
+
+        .provider-onboarding-category-card .dm2026-discovery-card__cta {
+          min-block-size: 2rem;
+          border-color: rgba(14, 110, 100, 0.13);
+          background: rgba(255, 255, 255, 0.72);
+          color: var(--dm-color-brand-strong, #0b4f4a);
+          font-size: var(--dm-type-caption, 0.8125rem);
+          font-weight: 760;
+          letter-spacing: -0.003em;
+          box-shadow:
+            0 8px 18px rgba(11, 40, 38, 0.055),
+            inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        }
+
+        @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+          .provider-onboarding-category-card .dm2026-discovery-card__cta {
+            -webkit-backdrop-filter: blur(10px) saturate(118%);
+            backdrop-filter: blur(10px) saturate(118%);
+          }
+        }
+
+        [dir='rtl'] .provider-onboarding-categories .dm2026-discovery-categories__header h2,
+        [dir='rtl'] .provider-onboarding-category-card .dm2026-discovery-card__copy strong {
+          letter-spacing: 0;
+          line-height: 1.22;
+        }
+
         .provider-onboarding-section {
           padding-block: clamp(2.4rem, 6vw, 4.8rem);
         }
@@ -1487,6 +1639,14 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             min-block-size: clamp(16rem, 42vw, 20rem);
           }
 
+          .provider-onboarding-categories .dm2026-discovery-categories__grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .provider-onboarding-category-card {
+            min-block-size: 14.8rem;
+          }
+
           .provider-onboarding-form-copy {
             position: static;
           }
@@ -1532,10 +1692,19 @@ export default async function ForProvidersPage({ params }: { params: Promise<Par
             padding: 0.74rem;
           }
 
+          .provider-onboarding-categories .dm2026-discovery-categories__grid,
           .provider-onboarding-benefit-grid,
           .provider-onboarding-pricing-grid,
           .provider-onboarding-form__grid {
             grid-template-columns: 1fr;
+          }
+
+          .provider-onboarding-category-card {
+            min-block-size: auto;
+          }
+
+          .provider-onboarding-category-card .dm2026-discovery-card__visual {
+            min-block-size: 6.2rem;
           }
 
           .provider-onboarding-form__submit,
