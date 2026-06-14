@@ -4,7 +4,10 @@ import {
   ProviderOnboardingLeadDetail,
   ProviderOnboardingLeadUnavailable,
 } from "@/components/admin/provider-onboarding-lead-detail";
-import { getAdminProviderOnboardingLeadById } from "@/server/admin/provider-onboarding-leads";
+import {
+  getAdminProviderOnboardingLeadById,
+  listProviderOnboardingLeadEvents,
+} from "@/server/admin/provider-onboarding-leads";
 
 type AdminProviderOnboardingLeadDetailPageProps = {
   params: Promise<{
@@ -26,5 +29,13 @@ export default async function AdminProviderOnboardingLeadDetailPage({
     return <ProviderOnboardingLeadUnavailable />;
   }
 
-  return <ProviderOnboardingLeadDetail lead={result.lead} />;
+  const historyResult = await listProviderOnboardingLeadEvents(leadId);
+  const historyEvents = historyResult.ok ? historyResult.events : [];
+
+  return (
+    <ProviderOnboardingLeadDetail
+      lead={result.lead}
+      historyEvents={historyEvents}
+    />
+  );
 }

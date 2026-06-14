@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import Link from "next/link";
 
+import { ProviderOnboardingLeadHistory } from "@/components/admin/provider-onboarding-lead-history";
 import { ProviderOnboardingLeadStatusPriorityForm } from "@/components/admin/provider-onboarding-lead-status-priority-form";
 
 type ProviderLeadStatus =
@@ -37,8 +38,22 @@ type ProviderOnboardingLeadDetail = {
   metadata: unknown;
 };
 
+type ProviderOnboardingLeadHistoryEvent = {
+  id: string;
+  actorProfileId: string | null;
+  eventType: string;
+  oldStatus: string | null;
+  newStatus: string | null;
+  oldPriority: string | null;
+  newPriority: string | null;
+  noteText: string | null;
+  metadata: unknown;
+  createdAt: string;
+};
+
 type ProviderOnboardingLeadDetailProps = {
   lead: ProviderOnboardingLeadDetail;
+  historyEvents: ProviderOnboardingLeadHistoryEvent[];
 };
 
 const statusStyles: Record<ProviderLeadStatus, string> = {
@@ -91,7 +106,10 @@ function formatBoolean(value: boolean): string {
   return value ? "Yes" : "No";
 }
 
-function locationLabel(areaText: string | null, cityText: string | null): string {
+function locationLabel(
+  areaText: string | null,
+  cityText: string | null,
+): string {
   const parts = [areaText, cityText]
     .filter((part): part is string => typeof part === "string")
     .map((part) => part.trim())
@@ -103,7 +121,11 @@ function locationLabel(areaText: string | null, cityText: string | null): string
 function isPlainMetadataObject(
   metadata: unknown,
 ): metadata is Record<string, unknown> {
-  return typeof metadata === "object" && metadata !== null && !Array.isArray(metadata);
+  return (
+    typeof metadata === "object" &&
+    metadata !== null &&
+    !Array.isArray(metadata)
+  );
 }
 
 function isUnsafeMetadataKey(key: string): boolean {
@@ -134,7 +156,9 @@ function createSafeMetadata(metadata: unknown): Record<string, unknown> | null {
   return Object.fromEntries(safeEntries);
 }
 
-function metadataHasKeys(metadata: unknown): metadata is Record<string, unknown> {
+function metadataHasKeys(
+  metadata: unknown,
+): metadata is Record<string, unknown> {
   return isPlainMetadataObject(metadata) && Object.keys(metadata).length > 0;
 }
 
@@ -208,6 +232,7 @@ export function ProviderOnboardingLeadUnavailable() {
 
 export function ProviderOnboardingLeadDetail({
   lead,
+  historyEvents,
 }: ProviderOnboardingLeadDetailProps) {
   const safeMetadata = createSafeMetadata(lead.metadata);
 
@@ -245,9 +270,9 @@ export function ProviderOnboardingLeadDetail({
       <section className="rounded-3xl border border-cyan-100 bg-cyan-50/80 p-5 text-sm leading-6 text-cyan-950">
         <span className="font-bold">Admin mutation safety note:</span> this page
         only updates the internal lead status and priority after platform-admin
-        authorization. It does not contact the provider, convert the lead, create
-        center or provider records, delete data, send notifications, publish
-        listings, activate billing or badges, or write audit events.
+        authorization. It does not contact the provider, convert the lead,
+        create center or provider records, delete data, send notifications,
+        publish listings, activate billing or badges, or write audit events.
       </section>
 
       <DetailSection title="Status and priority update">
@@ -276,6 +301,8 @@ export function ProviderOnboardingLeadDetail({
         />
       </DetailSection>
 
+      <ProviderOnboardingLeadHistory events={historyEvents} />
+
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <DetailSection title="Provider and contact">
@@ -283,7 +310,10 @@ export function ProviderOnboardingLeadDetail({
               <FieldRow label="Lead ID" value={lead.id} />
               <FieldRow label="Center name" value={lead.centerName} />
               <FieldRow label="Contact name" value={lead.contactName} />
-              <FieldRow label="Provider type" value={formatLabel(lead.providerType)} />
+              <FieldRow
+                label="Provider type"
+                value={formatLabel(lead.providerType)}
+              />
               <FieldRow label="Phone" value={lead.phone} />
               <FieldRow label="Email" value={lead.email ?? "—"} />
               <FieldRow label="WhatsApp" value={lead.whatsapp ?? "—"} />
@@ -306,9 +336,18 @@ export function ProviderOnboardingLeadDetail({
         <div className="space-y-6">
           <DetailSection title="Timeline">
             <dl className="grid gap-4">
-              <FieldRow label="Created" value={formatDateTime(lead.createdAt)} />
-              <FieldRow label="Updated" value={formatDateTime(lead.updatedAt)} />
-              <FieldRow label="Handled" value={formatDateTime(lead.handledAt)} />
+              <FieldRow
+                label="Created"
+                value={formatDateTime(lead.createdAt)}
+              />
+              <FieldRow
+                label="Updated"
+                value={formatDateTime(lead.updatedAt)}
+              />
+              <FieldRow
+                label="Handled"
+                value={formatDateTime(lead.handledAt)}
+              />
             </dl>
           </DetailSection>
 
