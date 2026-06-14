@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PublicEmptyState } from '@/components/public/public-empty-state';
-import { PublicListingError } from '@/components/public/public-listing-error';
-import { PublicListingGrid } from '@/components/public/public-listing-grid';
+import { PublicDirectoryListingContent } from '@/components/public/public-directory-listing-content';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { listPublicDoctors } from '@/lib/catalog/public-queries';
 import {
@@ -43,13 +41,7 @@ export default async function PublicDoctorsPage({ params }: { params: Promise<Pa
   const copy = copyByLocale[locale];
   const result = await listPublicDoctors({ country });
 
-  const content = !result.ok ? (
-    <PublicListingError locale={locale} />
-  ) : result.data.length === 0 ? (
-    <PublicEmptyState locale={locale} />
-  ) : (
-    <PublicListingGrid locale={locale} variant="doctor" items={result.data} />
-  );
+  const content = <PublicDirectoryListingContent locale={locale} variant="doctor" result={result} />;
 
   return (
     <PublicPageShell
