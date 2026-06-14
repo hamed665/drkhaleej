@@ -1,0 +1,87 @@
+name: Supabase Remote DB Push
+
+# OPS-A safety notes:
+# - This workflow is manual-only and must stay workflow_dispatch-only.
+# - It pushes approved local migrations to the linked remote Supabase project.
+# - It requires the exact manual confirmation input PUSH_REMOTE_DB before pushing.
+# - It does not run seeds.
+# - It does not reset the database.
+# - It must not be added to PR/push/schedule triggers without a separate approved ops phase.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type PUSH_REMOTE_DB to push local migrations to the linked remote Supabase project.'
+        required: true
+        type: string
+
+jobs:
+  db-push:
+    name: Validate and push Supabase migrations
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'PUSH_REMOTE_DB' }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Prepare pnpm 10.22.0
+        run: corepack prepare pnpm@10.22.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate migrations before remote push
+        run: pnpm db:validate:migrations
+
+      - name: Run static RLS tests before remote push
+        run: pnpm test:db:rls
+
+      - name: Check routes before remote push
+        run: pnpm routes:check
+
+      - name: Typecheck before remote push
+        run: pnpm typecheck
+
+      - name: Lint before remote push
+        run: pnpm lint
+
+      - name: Build before remote push
+        run: pnpm build
+
+      - name: Check Supabase CLI
+        run: pnpm db:check-cli
+
+      - name: Print Supabase CLI version
+        run: pnpm exec supabase --version
+
+      - name: Link remote Supabase project
+        run: pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD" --yes
+
+      - name: List migrations before remote push
+        run: pnpm exec supabase migration list
+
+      - name: Push migrations to linked remote Supabase project
+        run: pnpm exec supabase db push --linked --password "$SUPABASE_DB_PASSWORD" --yes
+
+      - name: List migrations after remote push
+        run: pnpm exec supabase migration list
+
+      - name: Validate migrations after remote push
+        run: pnpm db:validate:migrations
+
+      - name: Run static RLS tests after remote push
+        run: pnpm test:db:rls

@@ -69,6 +69,11 @@
 - Sales, referral, billing, analytics, SEO AI, provider dashboard, payment, and admin mutation features remain out of scope unless explicitly approved.
 - Business expansion features remain out of scope unless explicitly approved.
 
+## Ops workflow state
+
+- A manual-only Supabase remote migration workflow exists for operator-triggered migration pushes.
+- Remote migration execution remains guarded by GitHub secrets and the exact manual confirmation input `PUSH_REMOTE_DB`.
+
 ## Validation commands
 
 Current validation gate:
