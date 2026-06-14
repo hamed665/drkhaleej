@@ -51,15 +51,21 @@ The lockfile search found no resolved entries for:
 
 The stale Vercel PRs #140 and #141 target older Next.js versions and should not be blindly merged into the current dependency baseline.
 
-The current repository already resolves `next` to `16.2.7`, which is newer than the fixed `16.2.6` security-release baseline identified for the later Next.js 16.x security advisories. The lockfile also contains no standalone `react-server-dom-*` package resolutions at vulnerable versions.
+Current main resolves `next` to `16.2.7`. The stale Vercel PRs #140 and #141 target older `16.0.x` dependency changes and should not be merged blindly into the current dependency baseline.
 
-Because no vulnerable `react-server-dom-webpack`, `react-server-dom-turbopack`, or `react-server-dom-parcel` lockfile entries are present, this audit does not require package changes.
+No standalone `react-server-dom-webpack`, `react-server-dom-turbopack`, or `react-server-dom-parcel` entries were found in `pnpm-lock.yaml`. Because those standalone RSC package entries are absent from the lockfile, this audit does not require package changes based on the local dependency files reviewed.
+
+`pnpm audit --prod --json` returned HTTP 403 in this environment, so npm audit could not be used as confirming evidence for this audit.
 
 ## Recommendation
 
-Close PR #140 and PR #141 as stale/superseded by the current dependency baseline, rather than merging them.
+Do not merge PR #140 or PR #141. Close them only after this audit note is merged, or after a separate dependency PR if a later official advisory requires one.
 
-No replacement dependency PR is needed from this audit unless a future security advisory specifically requires a newer `next`, `react`, `react-dom`, or standalone `react-server-dom-*` version.
+No replacement dependency PR is needed from this audit unless a future advisory specifically requires a newer `next`, `react`, `react-dom`, or standalone `react-server-dom-*` version.
+
+## Limitations
+
+This conclusion is based on `package.json`, `pnpm-lock.yaml`, local validation commands, and manual advisory review. It is not based on a successful npm audit run, because `pnpm audit --prod --json` returned HTTP 403 in this environment.
 
 ## Validation notes
 
@@ -71,4 +77,4 @@ Required validation for this SEC-A audit:
 - `pnpm lint`
 - `pnpm routes:check`
 
-An additional informational `pnpm audit --prod --json` attempt was made during audit triage, but the npm audit endpoint returned HTTP 403 in this environment. This was not part of the required validation gate and did not change the lockfile conclusion above.
+An additional informational `pnpm audit --prod --json` attempt was made during audit triage, but the npm audit endpoint returned HTTP 403 in this environment. This was not part of the required validation gate, could not be used as confirming evidence, and did not change the lockfile conclusion above.
