@@ -2632,6 +2632,63 @@ export type Database = {
           },
         ]
       }
+      provider_onboarding_lead_events: {
+        Row: {
+          actor_profile_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          lead_id: string
+          metadata: Json
+          new_priority: string | null
+          new_status: string | null
+          note_text: string | null
+          old_priority: string | null
+          old_status: string | null
+        }
+        Insert: {
+          actor_profile_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          lead_id: string
+          metadata?: Json
+          new_priority?: string | null
+          new_status?: string | null
+          note_text?: string | null
+          old_priority?: string | null
+          old_status?: string | null
+        }
+        Update: {
+          actor_profile_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          lead_id?: string
+          metadata?: Json
+          new_priority?: string | null
+          new_status?: string | null
+          note_text?: string | null
+          old_priority?: string | null
+          old_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_onboarding_lead_events_actor_profile_id_fkey"
+            columns: ["actor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_onboarding_lead_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "provider_onboarding_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_onboarding_leads: {
         Row: {
           area_text: string | null
@@ -2704,6 +2761,670 @@ export type Database = {
           status?: string
           updated_at?: string
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      provider_review_replies: {
+        Row: {
+          approved_at: string | null
+          center_id: string | null
+          contains_abuse: boolean
+          contains_medical_advice: boolean
+          contains_private_data: boolean
+          created_at: string
+          doctor_id: string | null
+          hidden_at: string | null
+          id: string
+          metadata: Json
+          moderated_by_profile_id: string | null
+          moderation_status: string
+          public_visibility: boolean
+          published_at: string | null
+          rejection_reason: string | null
+          removed_at: string | null
+          reply_author_profile_id: string | null
+          reply_body: string | null
+          review_id: string
+          status: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          center_id?: string | null
+          contains_abuse?: boolean
+          contains_medical_advice?: boolean
+          contains_private_data?: boolean
+          created_at?: string
+          doctor_id?: string | null
+          hidden_at?: string | null
+          id?: string
+          metadata?: Json
+          moderated_by_profile_id?: string | null
+          moderation_status?: string
+          public_visibility?: boolean
+          published_at?: string | null
+          rejection_reason?: string | null
+          removed_at?: string | null
+          reply_author_profile_id?: string | null
+          reply_body?: string | null
+          review_id: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          center_id?: string | null
+          contains_abuse?: boolean
+          contains_medical_advice?: boolean
+          contains_private_data?: boolean
+          created_at?: string
+          doctor_id?: string | null
+          hidden_at?: string | null
+          id?: string
+          metadata?: Json
+          moderated_by_profile_id?: string | null
+          moderation_status?: string
+          public_visibility?: boolean
+          published_at?: string | null
+          rejection_reason?: string | null
+          removed_at?: string | null
+          reply_author_profile_id?: string | null
+          reply_body?: string | null
+          review_id?: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_review_replies_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_review_replies_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_review_replies_moderated_by_profile_id_fkey"
+            columns: ["moderated_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_review_replies_reply_author_profile_id_fkey"
+            columns: ["reply_author_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_review_replies_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_aggregate_snapshots: {
+        Row: {
+          average_overall_rating: number | null
+          calculated_at: string | null
+          calculated_by_profile_id: string | null
+          calculation_policy_version_id: string | null
+          center_id: string | null
+          center_service_id: string | null
+          created_at: string
+          dimension_averages: Json | null
+          doctor_id: string | null
+          doctor_service_id: string | null
+          eligible_review_count: number
+          id: string
+          metadata: Json
+          public_display_eligible: boolean
+          rating_scale: number
+          schema_eligible: boolean
+          target_type: string
+        }
+        Insert: {
+          average_overall_rating?: number | null
+          calculated_at?: string | null
+          calculated_by_profile_id?: string | null
+          calculation_policy_version_id?: string | null
+          center_id?: string | null
+          center_service_id?: string | null
+          created_at?: string
+          dimension_averages?: Json | null
+          doctor_id?: string | null
+          doctor_service_id?: string | null
+          eligible_review_count?: number
+          id?: string
+          metadata?: Json
+          public_display_eligible?: boolean
+          rating_scale?: number
+          schema_eligible?: boolean
+          target_type: string
+        }
+        Update: {
+          average_overall_rating?: number | null
+          calculated_at?: string | null
+          calculated_by_profile_id?: string | null
+          calculation_policy_version_id?: string | null
+          center_id?: string | null
+          center_service_id?: string | null
+          created_at?: string
+          dimension_averages?: Json | null
+          doctor_id?: string | null
+          doctor_service_id?: string | null
+          eligible_review_count?: number
+          id?: string
+          metadata?: Json
+          public_display_eligible?: boolean
+          rating_scale?: number
+          schema_eligible?: boolean
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_aggregate_snapshots_calculated_by_profile_id_fkey"
+            columns: ["calculated_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_aggregate_snapshots_calculation_policy_version_id_fkey"
+            columns: ["calculation_policy_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_policy_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_aggregate_snapshots_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_aggregate_snapshots_center_service_id_fkey"
+            columns: ["center_service_id"]
+            isOneToOne: false
+            referencedRelation: "center_services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_aggregate_snapshots_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_aggregate_snapshots_doctor_service_id_fkey"
+            columns: ["doctor_service_id"]
+            isOneToOne: false
+            referencedRelation: "doctor_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_audit_events: {
+        Row: {
+          action: string
+          actor_profile_id: string | null
+          actor_role: string | null
+          after_value_summary: string | null
+          before_value_summary: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_or_device_context_later_if_policy_approved: string | null
+          metadata: Json
+          policy_version_id: string | null
+          privacy_sensitive: boolean
+          reason_code: string | null
+          reason_note: string | null
+        }
+        Insert: {
+          action: string
+          actor_profile_id?: string | null
+          actor_role?: string | null
+          after_value_summary?: string | null
+          before_value_summary?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_or_device_context_later_if_policy_approved?: string | null
+          metadata?: Json
+          policy_version_id?: string | null
+          privacy_sensitive?: boolean
+          reason_code?: string | null
+          reason_note?: string | null
+        }
+        Update: {
+          action?: string
+          actor_profile_id?: string | null
+          actor_role?: string | null
+          after_value_summary?: string | null
+          before_value_summary?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_or_device_context_later_if_policy_approved?: string | null
+          metadata?: Json
+          policy_version_id?: string | null
+          privacy_sensitive?: boolean
+          reason_code?: string | null
+          reason_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_audit_events_actor_profile_id_fkey"
+            columns: ["actor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_audit_events_policy_version_id_fkey"
+            columns: ["policy_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_policy_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_disputes: {
+        Row: {
+          assigned_admin_profile_id: string | null
+          created_at: string
+          dispute_reason: string
+          evidence_reference: string | null
+          evidence_summary: string | null
+          id: string
+          legal_reviewer_profile_id: string | null
+          medical_reviewer_profile_id: string | null
+          metadata: Json
+          notes_private: string | null
+          opened_by_profile_id: string | null
+          opened_by_role: string | null
+          provider_id: string | null
+          rating_eligibility_action: string | null
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by_profile_id: string | null
+          review_id: string
+          status: string
+          temporary_visibility_action: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_admin_profile_id?: string | null
+          created_at?: string
+          dispute_reason: string
+          evidence_reference?: string | null
+          evidence_summary?: string | null
+          id?: string
+          legal_reviewer_profile_id?: string | null
+          medical_reviewer_profile_id?: string | null
+          metadata?: Json
+          notes_private?: string | null
+          opened_by_profile_id?: string | null
+          opened_by_role?: string | null
+          provider_id?: string | null
+          rating_eligibility_action?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by_profile_id?: string | null
+          review_id: string
+          status?: string
+          temporary_visibility_action?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_admin_profile_id?: string | null
+          created_at?: string
+          dispute_reason?: string
+          evidence_reference?: string | null
+          evidence_summary?: string | null
+          id?: string
+          legal_reviewer_profile_id?: string | null
+          medical_reviewer_profile_id?: string | null
+          metadata?: Json
+          notes_private?: string | null
+          opened_by_profile_id?: string | null
+          opened_by_role?: string | null
+          provider_id?: string | null
+          rating_eligibility_action?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by_profile_id?: string | null
+          review_id?: string
+          status?: string
+          temporary_visibility_action?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_disputes_assigned_admin_profile_id_fkey"
+            columns: ["assigned_admin_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_disputes_legal_reviewer_profile_id_fkey"
+            columns: ["legal_reviewer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_disputes_medical_reviewer_profile_id_fkey"
+            columns: ["medical_reviewer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_disputes_opened_by_profile_id_fkey"
+            columns: ["opened_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_disputes_resolved_by_profile_id_fkey"
+            columns: ["resolved_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_disputes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_eligibility_snapshots: {
+        Row: {
+          aggregate_rating_schema_eligible: boolean
+          calculated_at: string | null
+          calculated_by_profile_id: string | null
+          created_at: string
+          eligibility_reason: string | null
+          id: string
+          metadata: Json
+          policy_version_id: string | null
+          public_display_eligible: boolean
+          rating_average_eligible: boolean
+          reporting_eligible: boolean
+          review_id: string
+          review_schema_eligible: boolean
+        }
+        Insert: {
+          aggregate_rating_schema_eligible?: boolean
+          calculated_at?: string | null
+          calculated_by_profile_id?: string | null
+          created_at?: string
+          eligibility_reason?: string | null
+          id?: string
+          metadata?: Json
+          policy_version_id?: string | null
+          public_display_eligible?: boolean
+          rating_average_eligible?: boolean
+          reporting_eligible?: boolean
+          review_id: string
+          review_schema_eligible?: boolean
+        }
+        Update: {
+          aggregate_rating_schema_eligible?: boolean
+          calculated_at?: string | null
+          calculated_by_profile_id?: string | null
+          created_at?: string
+          eligibility_reason?: string | null
+          id?: string
+          metadata?: Json
+          policy_version_id?: string | null
+          public_display_eligible?: boolean
+          rating_average_eligible?: boolean
+          reporting_eligible?: boolean
+          review_id?: string
+          review_schema_eligible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_eligibility_snapshots_calculated_by_profile_id_fkey"
+            columns: ["calculated_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_eligibility_snapshots_policy_version_id_fkey"
+            columns: ["policy_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_policy_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_eligibility_snapshots_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_fraud_signals: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          privacy_sensitive: boolean
+          requires_human_review: boolean
+          review_id: string
+          reviewed_at: string | null
+          reviewed_by_profile_id: string | null
+          reviewer_decision: string | null
+          signal_score: number | null
+          signal_source: string | null
+          signal_summary: string | null
+          signal_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          privacy_sensitive?: boolean
+          requires_human_review?: boolean
+          review_id: string
+          reviewed_at?: string | null
+          reviewed_by_profile_id?: string | null
+          reviewer_decision?: string | null
+          signal_score?: number | null
+          signal_source?: string | null
+          signal_summary?: string | null
+          signal_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          privacy_sensitive?: boolean
+          requires_human_review?: boolean
+          review_id?: string
+          reviewed_at?: string | null
+          reviewed_by_profile_id?: string | null
+          reviewer_decision?: string | null
+          signal_score?: number | null
+          signal_source?: string | null
+          signal_summary?: string | null
+          signal_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_fraud_signals_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_fraud_signals_reviewed_by_profile_id_fkey"
+            columns: ["reviewed_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_moderation_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          fraud_escalation_required: boolean
+          from_status: string | null
+          id: string
+          legal_privacy_escalation_required: boolean
+          medical_escalation_required: boolean
+          metadata: Json
+          moderator_profile_id: string | null
+          moderator_role: string | null
+          policy_version_id: string | null
+          public_visibility_changed: boolean
+          rating_eligibility_changed: boolean
+          reason_code: string | null
+          reason_note: string | null
+          redaction_required: boolean
+          review_id: string
+          schema_eligibility_changed: boolean
+          to_status: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          fraud_escalation_required?: boolean
+          from_status?: string | null
+          id?: string
+          legal_privacy_escalation_required?: boolean
+          medical_escalation_required?: boolean
+          metadata?: Json
+          moderator_profile_id?: string | null
+          moderator_role?: string | null
+          policy_version_id?: string | null
+          public_visibility_changed?: boolean
+          rating_eligibility_changed?: boolean
+          reason_code?: string | null
+          reason_note?: string | null
+          redaction_required?: boolean
+          review_id: string
+          schema_eligibility_changed?: boolean
+          to_status?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          fraud_escalation_required?: boolean
+          from_status?: string | null
+          id?: string
+          legal_privacy_escalation_required?: boolean
+          medical_escalation_required?: boolean
+          metadata?: Json
+          moderator_profile_id?: string | null
+          moderator_role?: string | null
+          policy_version_id?: string | null
+          public_visibility_changed?: boolean
+          rating_eligibility_changed?: boolean
+          reason_code?: string | null
+          reason_note?: string | null
+          redaction_required?: boolean
+          review_id?: string
+          schema_eligibility_changed?: boolean
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_moderation_events_moderator_profile_id_fkey"
+            columns: ["moderator_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_moderation_events_policy_version_id_fkey"
+            columns: ["policy_version_id"]
+            isOneToOne: false
+            referencedRelation: "review_policy_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_moderation_events_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_policy_versions: {
+        Row: {
+          applies_to: string | null
+          created_at: string
+          decision_context: string | null
+          effective_date: string | null
+          id: string
+          metadata: Json
+          policy_name: string
+          policy_version: string
+          public_visibility: boolean
+          retired_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          applies_to?: string | null
+          created_at?: string
+          decision_context?: string | null
+          effective_date?: string | null
+          id?: string
+          metadata?: Json
+          policy_name: string
+          policy_version: string
+          public_visibility?: boolean
+          retired_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applies_to?: string | null
+          created_at?: string
+          decision_context?: string | null
+          effective_date?: string | null
+          id?: string
+          metadata?: Json
+          policy_name?: string
+          policy_version?: string
+          public_visibility?: boolean
+          retired_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3608,7 +4329,11 @@ export type Database = {
         | "published"
         | "archived"
         | "rejected"
-      landing_editorial_review_status: "missing" | "pending" | "approved" | "rejected"
+      landing_editorial_review_status:
+        | "missing"
+        | "pending"
+        | "approved"
+        | "rejected"
       landing_medical_review_status:
         | "missing"
         | "not_required"
@@ -3971,6 +4696,35 @@ export const Constants = {
         "therapist",
         "dentist",
         "other",
+      ],
+      landing_content_status: [
+        "draft",
+        "in_review",
+        "approved",
+        "published",
+        "archived",
+        "rejected",
+      ],
+      landing_editorial_review_status: [
+        "missing",
+        "pending",
+        "approved",
+        "rejected",
+      ],
+      landing_medical_review_status: [
+        "missing",
+        "not_required",
+        "required",
+        "pending",
+        "approved",
+        "rejected",
+      ],
+      landing_page_family: [
+        "specialty",
+        "specialty_area",
+        "area",
+        "service",
+        "service_area",
       ],
       legal_document_status: ["draft", "active", "archived", "deprecated"],
       media_asset_source: [

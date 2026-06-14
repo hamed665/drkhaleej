@@ -40,8 +40,9 @@
 
 ## Data/RLS foundations
 
-- Database foundations now validate through `0052_review_companion_tables.sql`.
-- Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, landing content foundations, and review companion table foundations exist.
+- Database foundations now validate through `0053_provider_onboarding_lead_events.sql`.
+- Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, provider onboarding lead event-history DB foundation, landing content foundations, and review companion table foundations exist.
+- Provider onboarding lead event read/write UI/actions remain out of scope and are not implemented.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
 - Further review system work remains incomplete and blocked until explicitly approved: no full moderation UI, no public review display workflow, no provider reply workflow, and no complete review operations are implemented yet.
 - Private-data access remains phase-gated.

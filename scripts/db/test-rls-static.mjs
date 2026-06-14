@@ -30,6 +30,7 @@ const REQUIRED_FILES = [
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
   '0052_review_companion_tables.sql',
+  '0053_provider_onboarding_lead_events.sql',
 ];
 
 const APPROVED_POLICY_FILES = new Set([
@@ -46,6 +47,7 @@ const APPROVED_POLICY_FILES = new Set([
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
   '0052_review_companion_tables.sql',
+  '0053_provider_onboarding_lead_events.sql',
 ]);
 
 const HELPER_FILES = new Set([
@@ -100,6 +102,7 @@ const SENSITIVE_TABLES_NO_ANON = new Set([
   'audit_logs',
   'callback_requests',
   'provider_onboarding_leads',
+  'provider_onboarding_lead_events',
   'landing_page_contents',
 ]);
 
@@ -407,6 +410,29 @@ assert(
 assert(
   !/create\s+policy(?!\s+provider_license_records_public_select_anon|\s+provider_license_records_public_select_authenticated)[\s\S]*?on\s+public\.provider_license_records[\s\S]*?for\s+select/i.test(providerLicenseRecordsContent),
   'provider_license_records must not include broad or unexpected SELECT policies',
+);
+
+const providerOnboardingLeadEventsContent = contentsByFile.get('0053_provider_onboarding_lead_events.sql') ?? '';
+assert(
+  /alter\s+table\s+public\.provider_onboarding_lead_events\s+enable\s+row\s+level\s+security/i.test(providerOnboardingLeadEventsContent),
+  '0053 must enable RLS on public.provider_onboarding_lead_events',
+);
+assert(
+  !/create\s+policy[\s\S]*?on\s+public\.provider_onboarding_lead_events/i.test(providerOnboardingLeadEventsContent),
+  '0053 must not create policies on public.provider_onboarding_lead_events',
+);
+assert(
+  !/\bgrant\b[\s\S]*?\b(to\s+)?anon\b/i.test(providerOnboardingLeadEventsContent),
+  'provider_onboarding_lead_events must not grant anon access',
+);
+assert(
+  !/\bgrant\b[\s\S]*?\b(to\s+)?authenticated\b/i.test(providerOnboardingLeadEventsContent),
+  'provider_onboarding_lead_events must not grant authenticated access',
+);
+assert(
+  !/on\s+public\.provider_onboarding_lead_events[\s\S]*?for\s+(select|insert|update|delete)/i.test(providerOnboardingLeadEventsContent)
+    && !/for\s+(select|insert|update|delete)[\s\S]*?on\s+public\.provider_onboarding_lead_events/i.test(providerOnboardingLeadEventsContent),
+  'provider_onboarding_lead_events must not define direct SELECT or mutation policies',
 );
 
 console.log('✅ RLS static harness checks passed for required Phase 3 policy/helper migration rules.');

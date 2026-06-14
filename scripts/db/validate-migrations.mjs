@@ -55,7 +55,8 @@ const required = [
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
-  '0052_review_companion_tables.sql'
+  '0052_review_companion_tables.sql',
+  '0053_provider_onboarding_lead_events.sql'
 ];
 
 const dir = 'supabase/migrations';
@@ -146,7 +147,8 @@ const rlsPolicyFiles = new Set([
   '0049_media_public_rls_hardening.sql',
   '0050_provider_onboarding_leads.sql',
   '0051_landing_page_contents.sql',
-  '0052_review_companion_tables.sql'
+  '0052_review_companion_tables.sql',
+  '0053_provider_onboarding_lead_events.sql'
 ]);
 const catalogRlsPolicyFile = '0032_rls_public_catalog_read_policies.sql';
 const profilesRlsPolicyFile = '0033_profiles_rls.sql';
@@ -171,6 +173,7 @@ const mediaPublicVisibilityHardeningFile = '0048_media_public_visibility_hardeni
 const mediaPublicRlsHardeningFile = '0049_media_public_rls_hardening.sql';
 const providerOnboardingLeadsFile = '0050_provider_onboarding_leads.sql';
 const landingPageContentsFile = '0051_landing_page_contents.sql';
+const providerOnboardingLeadEventsFile = '0053_provider_onboarding_lead_events.sql';
 const createPolicyPattern = /\bcreate\s+policy\b/i;
 const enableRlsPattern = /\benable\s+row\s+level\s+security\b/i;
 
@@ -1752,6 +1755,67 @@ for (const forbidden of [
   /provider\/?center-scoped\s+roles/i,
 ]) {
   requireCondition(!forbidden.test(landingPageContentsContent), `0051_landing_page_contents.sql contains forbidden pattern: ${forbidden}`);
+}
+
+
+const providerOnboardingLeadEventsContent = readFileSync(`${dir}/${providerOnboardingLeadEventsFile}`, 'utf8');
+
+for (const pattern of [
+  /create\s+table\s+if\s+not\s+exists\s+public\.provider_onboarding_lead_events/i,
+  /id\s+uuid\s+primary\s+key\s+default\s+gen_random_uuid\s*\(\s*\)/i,
+  /lead_id\s+uuid\s+not\s+null\s+references\s+public\.provider_onboarding_leads\s*\(\s*id\s*\)\s+on\s+delete\s+cascade/i,
+  /actor_profile_id\s+uuid\s+null\s+references\s+public\.profiles\s*\(\s*id\s*\)/i,
+  /event_type\s+text\s+not\s+null/i,
+  /old_status\s+text\s+null/i,
+  /new_status\s+text\s+null/i,
+  /old_priority\s+text\s+null/i,
+  /new_priority\s+text\s+null/i,
+  /note_text\s+text\s+null/i,
+  /metadata\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i,
+  /created_at\s+timestamptz\s+not\s+null\s+default\s+now\s*\(\s*\)/i,
+  /provider_onboarding_lead_events_event_type_check[\s\S]*?event_type\s+in\s*\(\s*'status_changed'\s*,\s*'priority_changed'\s*,\s*'note_added'\s*\)/i,
+  /provider_onboarding_lead_events_old_status_check[\s\S]*?old_status\s+is\s+null\s+or\s+old_status\s+in\s*\(\s*'new'\s*,\s*'reviewing'\s*,\s*'contacted'\s*,\s*'qualified'\s*,\s*'rejected'\s*,\s*'converted'\s*,\s*'closed'\s*\)/i,
+  /provider_onboarding_lead_events_new_status_check[\s\S]*?new_status\s+is\s+null\s+or\s+new_status\s+in\s*\(\s*'new'\s*,\s*'reviewing'\s*,\s*'contacted'\s*,\s*'qualified'\s*,\s*'rejected'\s*,\s*'converted'\s*,\s*'closed'\s*\)/i,
+  /provider_onboarding_lead_events_old_priority_check[\s\S]*?old_priority\s+is\s+null\s+or\s+old_priority\s+in\s*\(\s*'low'\s*,\s*'normal'\s*,\s*'high'\s*\)/i,
+  /provider_onboarding_lead_events_new_priority_check[\s\S]*?new_priority\s+is\s+null\s+or\s+new_priority\s+in\s*\(\s*'low'\s*,\s*'normal'\s*,\s*'high'\s*\)/i,
+  /provider_onboarding_lead_events_note_text_check[\s\S]*?char_length\s*\(\s*btrim\s*\(\s*note_text\s*\)\s*\)\s+between\s+1\s+and\s+1000[\s\S]*?note_text\s+!~\*\s*'<\[\^>\]\+>'/i,
+  /provider_onboarding_lead_events_metadata_object_check[\s\S]*?jsonb_typeof\s*\(\s*metadata\s*\)\s*=\s*'object'/i,
+  /provider_onboarding_lead_events_shape_check[\s\S]*?event_type\s*=\s*'status_changed'[\s\S]*?new_status\s+is\s+not\s+null[\s\S]*?event_type\s*=\s*'priority_changed'[\s\S]*?new_priority\s+is\s+not\s+null[\s\S]*?event_type\s*=\s*'note_added'[\s\S]*?note_text\s+is\s+not\s+null/i,
+  /comment\s+on\s+table\s+public\.provider_onboarding_lead_events\s+is[\s\S]*?private\/admin-only[\s\S]*?no\s+direct\s+anon\/authenticated\s+access\s+policies[\s\S]*?platform-admin/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_lead_events_lead_id_created_at_idx\s+on\s+public\.provider_onboarding_lead_events\s*\(\s*lead_id\s*,\s*created_at\s+desc\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_lead_events_actor_profile_id_idx\s+on\s+public\.provider_onboarding_lead_events\s*\(\s*actor_profile_id\s*\)[\s\S]*?where\s+actor_profile_id\s+is\s+not\s+null/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_lead_events_event_type_idx\s+on\s+public\.provider_onboarding_lead_events\s*\(\s*event_type\s*\)/i,
+  /create\s+index\s+if\s+not\s+exists\s+provider_onboarding_lead_events_created_at_idx\s+on\s+public\.provider_onboarding_lead_events\s*\(\s*created_at\s+desc\s*\)/i,
+  /alter\s+table\s+public\.provider_onboarding_lead_events\s+enable\s+row\s+level\s+security/i,
+]) {
+  requireCondition(pattern.test(providerOnboardingLeadEventsContent), `0053_provider_onboarding_lead_events.sql missing required pattern: ${pattern}`);
+}
+
+for (const forbidden of [
+  /\bcreate\s+policy\b/i,
+  /\bgrant\b[\s\S]*?\b(to|anon|authenticated)\b/i,
+  /\binsert\s+into\b/i,
+  /seed\s+(data|rows?)/i,
+  /\bdrop\b/i,
+  /\bupdated_at\b/i,
+  /\bdeleted_at\b/i,
+  /public_visibility/i,
+  /provider-facing/i,
+  /contact[-_ ]?action/i,
+  /conversion/i,
+  /assignment/i,
+  /billing/i,
+  /dashboard/i,
+  /for\s+select/i,
+  /for\s+insert/i,
+  /for\s+update/i,
+  /for\s+delete/i,
+  /assignment_changed/i,
+  /conversion_started/i,
+  /conversion_completed/i,
+  /contact_logged/i,
+]) {
+  requireCondition(!forbidden.test(providerOnboardingLeadEventsContent), `0053_provider_onboarding_lead_events.sql contains forbidden pattern: ${forbidden}`);
 }
 
 console.log(`Phase ${PHASE} migration validation passed.`);
