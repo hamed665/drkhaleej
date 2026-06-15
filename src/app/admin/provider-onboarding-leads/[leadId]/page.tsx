@@ -4,6 +4,7 @@ import {
   ProviderOnboardingLeadDetail,
   ProviderOnboardingLeadUnavailable,
 } from "@/components/admin/provider-onboarding-lead-detail";
+import { ProviderOnboardingLeadHistory } from "@/components/admin/provider-onboarding-lead-history";
 import {
   getAdminProviderOnboardingLeadById,
   listProviderOnboardingLeadEvents,
@@ -33,9 +34,9 @@ export default async function AdminProviderOnboardingLeadDetailPage({
   const historyEvents = historyResult.ok ? historyResult.events : [];
 
   return (
-    <ProviderOnboardingLeadDetail
-      lead={result.lead}
-      historyEvents={historyEvents}
-    />
+    <div className="space-y-6">
+      <ProviderOnboardingLeadDetail lead={result.lead} />
+      <ProviderOnboardingLeadHistory events={historyEvents} />
+    </div>
   );
 }
