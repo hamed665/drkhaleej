@@ -112,9 +112,9 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
             <section className="faq-card" aria-labelledby="faq-title">
               <h2 id="faq-title">{detail.faqTitle}</h2>
               <div className="articles-faq-list">
-                {copy.faqs.map((faq) => (
-                  <details className="faq-item" key={faq.question} open>
-                    <summary><span>{faq.question}</span><span aria-hidden="true">+</span></summary>
+                {copy.faqs.map((faq, index) => (
+                  <details className="faq-item" key={faq.question} open={index === 0}>
+                    <summary><span>{faq.question}</span><span className="faq-item__indicator" aria-hidden="true"><span className="faq-item__plus">+</span><span className="faq-item__minus">−</span></span></summary>
                     <p>{faq.answer}</p>
                   </details>
                 ))}

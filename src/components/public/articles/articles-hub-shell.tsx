@@ -158,9 +158,9 @@ export function ArticlesHubShell({ locale, country, dir }: ArticlesHubShellProps
             <p>{copy.faqIntro}</p>
           </div>
           <div className="articles-faq-list">
-            {copy.faqs.map((faq) => (
-              <details className="faq-item" key={faq.question} open>
-                <summary><span>{faq.question}</span><span aria-hidden="true">+</span></summary>
+            {copy.faqs.map((faq, index) => (
+              <details className="faq-item" key={faq.question} open={index === 0}>
+                <summary><span>{faq.question}</span><span className="faq-item__indicator" aria-hidden="true"><span className="faq-item__plus">+</span><span className="faq-item__minus">−</span></span></summary>
                 <p>{faq.answer}</p>
               </details>
             ))}
@@ -221,7 +221,7 @@ export function ArticlesShellStyles() {
       .articles-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.05rem; }
       .areas-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .9rem; }
       .article-card, .area-card { min-height: 100%; }
-      .article-card__cover-link, .area-card { border: 1px solid rgba(14,116,105,.12); background: rgba(255,255,255,.86); border-radius: 24px; box-shadow: 0 16px 42px rgba(15,68,60,.075); overflow: hidden; text-decoration: none; color: inherit; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; height: 100%; }
+      .article-card__cover-link, .area-card { border: 1px solid rgba(14,116,105,.13); background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,255,252,.82)); border-radius: 24px; box-shadow: 0 16px 42px rgba(15,68,60,.075); overflow: hidden; text-decoration: none; color: inherit; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; height: 100%; }
       .article-card__cover-link { display: flex; flex-direction: column; }
       .article-card__cover-link:hover { border-color: rgba(14,116,105,.26); box-shadow: 0 20px 54px rgba(15,68,60,.12); }
       .article-card__media { min-height: 158px; border-radius: 0; position: relative; isolation: isolate; align-items: end; }
@@ -230,6 +230,7 @@ export function ArticlesShellStyles() {
       .article-card__media-orb { position: absolute; z-index: 1; border-radius: 999px; padding: 0 !important; background: rgba(255,255,255,.18) !important; box-shadow: none !important; }
       .article-card__media-orb--one { width: 86px; height: 86px; inset-inline-end: 14px; top: 18px; }
       .article-card__media-orb--two { width: 52px; height: 52px; inset-inline-start: 18px; bottom: 22px; background: rgba(255,255,255,.12) !important; }
+      .article-card__cover-link--teal .article-card__media { background: radial-gradient(circle at 78% 22%, rgba(255,255,255,.28), transparent 7rem), linear-gradient(135deg, rgba(14,116,105,.42), rgba(217,164,65,.25)); }
       .article-card__cover-link--gold .article-card__media { background: radial-gradient(circle at 78% 22%, rgba(255,255,255,.26), transparent 7rem), linear-gradient(135deg, rgba(217,164,65,.58), rgba(14,116,105,.22)); }
       .article-card__cover-link--rose .article-card__media { background: radial-gradient(circle at 78% 22%, rgba(255,255,255,.26), transparent 7rem), linear-gradient(135deg, rgba(190,93,126,.34), rgba(14,116,105,.28)); }
       .article-card__cover-link--mint .article-card__media { background: radial-gradient(circle at 78% 22%, rgba(255,255,255,.26), transparent 7rem), linear-gradient(135deg, rgba(92,197,171,.38), rgba(217,164,65,.25)); }
@@ -240,18 +241,24 @@ export function ArticlesShellStyles() {
       .article-card p, .area-card p, .related-grid p, .faq-card p, .related-articles-card p, .faq-item p { color: #55706b; line-height: 1.62; font-size: .92rem; }
       .article-card__footer { margin-top: auto; padding-top: 1rem; display: flex; align-items: center; justify-content: space-between; color: #0e7469; font-weight: 900; }
       .area-card { padding: 1.15rem; position: relative; overflow: hidden; display: grid; gap: .35rem; }
-      .area-card::after { content: ''; position: absolute; inset-inline-end: -18px; top: -22px; width: 72px; height: 72px; border-radius: 999px; background: rgba(14,116,105,.06); }
+      .area-card::after { content: ''; position: absolute; inset-inline-end: -18px; top: -22px; width: 72px; height: 72px; border-radius: 999px; background: radial-gradient(circle, rgba(217,164,65,.14), rgba(14,116,105,.06)); }
       .area-card__mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 18px; background: linear-gradient(135deg, rgba(14,116,105,.16), rgba(217,164,65,.22)); color: #0e7469; box-shadow: inset 0 1px 12px rgba(255,255,255,.8), 0 14px 30px rgba(15,68,60,.08); }
       .area-card__mark svg { width: 25px; height: 25px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-      .articles-faq-panel { padding: clamp(1.15rem, 3vw, 2rem); display: grid; grid-template-columns: .82fr 1.18fr; gap: 1.15rem; background: radial-gradient(circle at 8% 10%, rgba(217,164,65,.16), transparent 18rem), rgba(255,255,255,.82); position: relative; overflow: hidden; }
+      .articles-faq-panel { padding: clamp(1.25rem, 3.2vw, 2.25rem); display: grid; grid-template-columns: .82fr 1.18fr; gap: 1.25rem; background: radial-gradient(circle at 8% 10%, rgba(217,164,65,.2), transparent 18rem), radial-gradient(circle at 98% 88%, rgba(14,116,105,.13), transparent 16rem), rgba(255,255,255,.86); position: relative; overflow: hidden; border-color: rgba(14,116,105,.18); }
       .articles-faq-panel::before { content: ''; position: absolute; inset-inline-start: 1.2rem; top: 1.2rem; width: 54px; height: 5px; border-radius: 999px; background: linear-gradient(90deg, #0e7469, #d9a441); }
       .articles-faq-panel__intro { padding-top: 1rem; }
       .articles-faq-list { display: grid; gap: .75rem; }
-      .faq-item { border: 1px solid rgba(14,116,105,.12); border-radius: 22px; padding: 0; background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(247,255,252,.74)); box-shadow: 0 12px 30px rgba(15,68,60,.06); overflow: hidden; }
-      .faq-item summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.05rem 1.1rem; color: #103a35; font-weight: 950; }
+      .faq-item { border: 1px solid rgba(14,116,105,.13); border-radius: 22px; padding: 0; background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,255,252,.82)); box-shadow: 0 12px 30px rgba(15,68,60,.06); overflow: hidden; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+      .faq-item[open] { border-color: rgba(14,116,105,.26); box-shadow: 0 18px 42px rgba(15,68,60,.1); }
+      .faq-item:hover { transform: translateY(-1px); border-color: rgba(217,164,65,.34); }
+      .faq-item summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.08rem 1.12rem; color: #103a35; font-weight: 950; }
+      .faq-item summary:focus-visible { outline: 3px solid rgba(217,164,65,.45); outline-offset: -3px; border-radius: 18px; }
       .faq-item summary::-webkit-details-marker { display: none; }
-      .faq-item summary span:last-child { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px; background: rgba(14,116,105,.1); color: #0e7469; flex: 0 0 auto; }
-      .faq-item p { padding: 0 1rem 1rem; margin: 0; }
+      .faq-item__indicator { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; background: linear-gradient(135deg, rgba(14,116,105,.12), rgba(217,164,65,.18)); color: #0e7469; flex: 0 0 auto; font-size: 1.05rem; line-height: 1; }
+      .faq-item__minus { display: none; }
+      .faq-item[open] .faq-item__plus { display: none; }
+      .faq-item[open] .faq-item__minus { display: inline; }
+      .faq-item p { padding: 0 1.12rem 1.12rem; margin: 0; color: #3f5f5a; }
       .faq-item h3 { margin: 0 0 .35rem; color: #103a35; font-size: 1rem; }
       .articles-list-footer { margin-top: 1.1rem; border: 1px solid rgba(14,116,105,.12); background: rgba(255,255,255,.72); border-radius: 24px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; box-shadow: 0 16px 42px rgba(15,68,60,.07); }
       .articles-list-footer h3 { margin: 0 0 .25rem; color: #103a35; font-size: 1.05rem; font-weight: 950; }
