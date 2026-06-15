@@ -1,5 +1,8 @@
 import type { SupportedLocale } from '@/lib/i18n/config';
 
+export type ArticleCategoryIcon = 'dental' | 'beauty' | 'clinic' | 'wellness' | 'lab';
+export type ArticleMediaTone = 'teal' | 'gold' | 'rose' | 'mint';
+
 export type ArticleShellCard = {
   slug: string;
   category: string;
@@ -7,6 +10,8 @@ export type ArticleShellCard = {
   excerpt: string;
   readingTime: string;
   mediaLabel: string;
+  contentLabel: string;
+  tone: ArticleMediaTone;
 };
 
 export type ArticleShellFaq = {
@@ -17,7 +22,7 @@ export type ArticleShellFaq = {
 export type ArticleShellCategory = {
   title: string;
   description: string;
-  shortLabel: string;
+  icon: ArticleCategoryIcon;
 };
 
 export type ArticleShellCopy = {
@@ -33,14 +38,17 @@ export type ArticleShellCopy = {
   latestLabel: string;
   sectionLabel: string;
   categorySectionTitle: string;
+  faqEyebrow: string;
   faqTitle: string;
   faqIntro: string;
   faqs: readonly ArticleShellFaq[];
+  updatesEyebrow: string;
   newsletterTitle: string;
   newsletterBody: string;
   disclaimerTitle: string;
   disclaimerBody: string;
   viewGuide: string;
+  readGuide: string;
   imageReady: string;
   videoReady: string;
   cards: readonly ArticleShellCard[];
@@ -66,6 +74,7 @@ export type ArticleShellCopy = {
     bodySections: readonly string[];
     inlineImage: string;
     inlineCaption: string;
+    relatedSectionTitle: string;
     relatedDoctors: string;
     relatedDoctorsBody: string;
     relatedCenters: string;
@@ -85,209 +94,233 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     eyebrow: 'DrMuscat Articles',
     heroTitle: 'Practical health guides for choosing care in Oman',
     heroIntro:
-      'A polished editorial shell for future reviewed guides about clinics, beauty, wellness, pharmacies, and labs. The content here is safe placeholder structure only, not medical advice.',
+      'Browse clear, locally focused guides about clinics, beauty, wellness, pharmacies, and labs. Content is informational and does not replace professional medical advice.',
     primaryCta: 'Explore guides',
     secondaryCta: 'View featured guide',
-    trustNote: 'Future published articles will require approved editorial review before going live.',
-    filterLabel: 'Guide categories',
+    trustNote: 'Articles are designed for clear decision support and require editorial review before publication.',
+    filterLabel: 'Browse by topic',
     categories: [
-      { title: 'Dental', description: 'Clinic-choice questions, service pages, and booking preparation.', shortLabel: 'D' },
-      { title: 'Dermatology / Beauty', description: 'Consultation preparation and provider information checklists.', shortLabel: 'DB' },
-      { title: 'Clinics & Hospitals', description: 'How to understand services, locations, and care options.', shortLabel: 'CH' },
-      { title: 'Wellness', description: 'Safe appointment-prep prompts for future wellness guides.', shortLabel: 'W' },
-      { title: 'Pharmacies / Labs', description: 'Future explainers for practical service discovery in Oman.', shortLabel: 'PL' }
+      { title: 'Dental', description: 'Clinic-choice questions, service pages, and booking preparation.', icon: 'dental' },
+      { title: 'Dermatology / Beauty', description: 'Consultation preparation and treatment-type research guides.', icon: 'beauty' },
+      { title: 'Clinics & Hospitals', description: 'How to compare services, locations, and practical care options.', icon: 'clinic' },
+      { title: 'Wellness', description: 'Safe appointment-prep prompts for wellness services.', icon: 'wellness' },
+      { title: 'Pharmacies / Labs', description: 'Practical explainers for service discovery in Oman.', icon: 'lab' }
     ],
-    featuredLabel: 'Featured guide shell',
-    latestLabel: 'Latest editorial shells',
-    sectionLabel: 'Image-ready guide cards',
-    categorySectionTitle: 'Editorial categories prepared for review',
-    faqTitle: 'Articles FAQ',
-    faqIntro: 'Safe answers about how this article section will work after future content approval.',
+    featuredLabel: 'Featured guide',
+    latestLabel: 'Latest health guides',
+    sectionLabel: 'Health guides',
+    categorySectionTitle: 'Browse by topic',
+    faqEyebrow: 'Articles FAQ',
+    faqTitle: 'Helpful answers before you read',
+    faqIntro: 'A clear overview of how DrMuscat articles support informed care decisions without replacing professional medical advice.',
     faqs: [
       { question: 'Are DrMuscat articles medical advice?', answer: 'No. They are informational guides and do not replace advice from a qualified healthcare professional.' },
-      { question: 'Will articles include doctors and clinics?', answer: 'Future article pages can link to related doctors, centers, offers, and sponsored placements when approved.' },
-      { question: 'Will videos be included?', answer: 'The article layout is prepared for YouTube/video guides in a later content phase.' },
+      { question: 'Will articles include doctors and clinics?', answer: 'Approved article pages can connect to related doctors, centers, offers, and clearly labeled sponsored placements after approval.' },
+      { question: 'Will videos be included?', answer: 'Yes. The layout is prepared for YouTube/video guides in a later content phase.' },
       { question: 'Are sponsored placements labeled?', answer: 'Yes. Sponsored or promoted placements should be clearly labeled.' }
     ],
-    newsletterTitle: 'Future article updates',
-    newsletterBody: 'A future contact or newsletter experience can connect here after an approved backend phase. No subscription backend is active in this shell.',
+    updatesEyebrow: 'Editorial updates',
+    newsletterTitle: 'Follow upcoming guides',
+    newsletterBody: 'A future approved contact or newsletter experience can connect readers to new guides. No subscription backend is active in this phase.',
     disclaimerTitle: 'Medical disclaimer',
     disclaimerBody:
-      'These article pages are informational placeholders only. They do not diagnose, treat, prescribe, rank providers, or replace advice from a qualified healthcare professional.',
-    viewGuide: 'View guide',
-    imageReady: 'Image-ready',
+      'These article pages are informational only. They do not diagnose, treat, prescribe, rank providers, or replace advice from a qualified healthcare professional.',
+    viewGuide: 'View featured guide',
+    readGuide: 'Read guide',
+    imageReady: 'Editorial image area',
     videoReady: 'Video-ready',
     cards: [
       {
         slug: 'how-to-choose-a-dental-clinic-in-muscat',
         category: 'Dental',
         title: 'How to choose a dental clinic in Muscat',
-        excerpt: 'A future editorial checklist shell for comparing clinic information, location, services, and questions to ask before booking.',
-        readingTime: '5 min shell',
-        mediaLabel: 'Hero image slot'
+        excerpt: 'A practical guide format for comparing clinic information, location, services, and questions to ask before booking.',
+        readingTime: '5 min read',
+        mediaLabel: 'Guide preview',
+        contentLabel: 'Guide',
+        tone: 'teal'
       },
       {
         slug: 'what-to-check-before-booking-dermatology',
         category: 'Dermatology / Beauty',
         title: 'What to check before booking a dermatology consultation',
-        excerpt: 'A safe structure for future non-diagnostic guidance about credentials, consultation goals, and provider information.',
-        readingTime: '4 min shell',
-        mediaLabel: 'Video-ready slot'
+        excerpt: 'A clear guide format for preparing for a dermatology consultation and reviewing provider information.',
+        readingTime: '4 min read',
+        mediaLabel: 'Video guide area',
+        contentLabel: 'Video-ready',
+        tone: 'rose'
       },
       {
         slug: 'understanding-clinic-services-in-oman',
         category: 'Clinics & Hospitals',
         title: 'Understanding clinic services in Oman',
-        excerpt: 'A future explainer shell for helping users read service pages and prepare practical questions for providers.',
-        readingTime: '6 min shell',
-        mediaLabel: 'Editorial image slot'
+        excerpt: 'A service explainer format for understanding clinic pages, service details, and practical care options.',
+        readingTime: '6 min read',
+        mediaLabel: 'Editorial media',
+        contentLabel: 'Guide',
+        tone: 'gold'
       },
       {
         slug: 'questions-before-a-wellness-treatment',
         category: 'Wellness',
         title: 'Questions to ask before a wellness treatment',
-        excerpt: 'A placeholder guide pattern for appointment preparation without treatment instructions or outcome claims.',
-        readingTime: '4 min shell',
-        mediaLabel: 'Image-ready slot'
+        excerpt: 'An appointment-preparation format for wellness services without treatment instructions or outcome claims.',
+        readingTime: '4 min read',
+        mediaLabel: 'Visual guide area',
+        contentLabel: 'Guide',
+        tone: 'mint'
       }
     ],
     detail: {
-      badge: 'Article shell',
-      titlePrefix: 'Guide shell:',
-      excerpt: 'This premium editorial shell reserves safe areas for reviewed copy, media, provider context, and sponsorship labels without publishing medical advice.',
-      authorLabel: 'Author',
-      authorValue: 'DrMuscat editorial team placeholder',
+      badge: 'Health guide',
+      titlePrefix: '',
+      excerpt: 'A premium article template for reviewed guidance, editorial media, related care options, and clearly labeled sponsored placements without publishing medical advice.',
+      authorLabel: 'By',
+      authorValue: 'DrMuscat editorial team',
       reviewerLabel: 'Medical reviewer',
-      reviewerValue: 'Pending approved review workflow',
+      reviewerValue: 'Review workflow pending',
       updatedLabel: 'Last updated',
-      updatedValue: 'Set when real content is approved',
+      updatedValue: 'Set when approved content is published',
       readingLabel: 'Reading time',
-      readingValue: '5 min placeholder',
-      heroImage: 'Future hero image',
-      heroCaption: 'Alt-text and caption-ready media slot for approved editorial imagery.',
-      videoTitle: 'Video guide coming soon',
-      videoBody: 'Future YouTube embed or thumbnail preview slot. No video API integration is active.',
+      readingValue: '5 min read',
+      heroImage: 'Editorial image area',
+      heroCaption: 'Image area prepared for approved editorial media with alt text and caption support.',
+      videoTitle: 'Video guide area',
+      videoBody: 'Prepared for a YouTube embed or thumbnail preview in a later approved content phase. No video integration is active.',
       tocTitle: 'In this guide',
-      bodyTitle: 'Future article body preview',
-      bodyLead: 'Approved editorial content can later explain how to compare provider information, what questions to prepare, and when to speak directly with a qualified professional.',
+      bodyTitle: 'Guide preview',
+      bodyLead: 'Approved editorial content can explain how to compare provider information, what questions to prepare, and when to speak directly with a qualified professional.',
       bodySections: ['Provider information checklist', 'Questions to prepare before booking', 'When to contact a qualified professional'],
-      inlineImage: 'Inline editorial image',
-      inlineCaption: 'Caption-ready image slot for future reviewed content.',
+      inlineImage: 'Editorial media area',
+      inlineCaption: 'Inline image area prepared for future reviewed media and captions.',
+      relatedSectionTitle: 'Related doctors and centers',
       relatedDoctors: 'Related doctors',
-      relatedDoctorsBody: 'Future data-backed provider links can appear here after approval. No recommendations are active yet.',
+      relatedDoctorsBody: 'Approved provider links can appear here in a later phase. No recommendations are active yet.',
       relatedCenters: 'Related centers',
-      relatedCentersBody: 'Future center links can appear here after approval. No clinic recommendations are active yet.',
+      relatedCentersBody: 'Approved center links can appear here in a later phase. No clinic recommendations are active yet.',
       sponsored: 'Sponsored',
       featuredClinic: 'Featured clinic',
       promotedDoctor: 'Promoted doctor',
-      sponsoredBody: 'Future paid placements must remain clearly labeled and separated from editorial content.',
+      sponsoredBody: 'Sponsored placements must remain clearly labeled and visually separated from editorial guidance.',
       faqTitle: 'Article FAQ',
-      relatedArticles: 'Related article placeholders for future data-backed content.',
+      relatedArticles: 'Related articles can appear here when approved content is available.',
       backToArticles: 'Back to articles'
     }
   },
   ar: {
     eyebrow: 'مقالات DrMuscat',
-    heroTitle: 'أدلة عملية لاختيار الرعاية في عُمان',
+    heroTitle: 'أدلة صحية تساعدك على اختيار الرعاية في عُمان',
     heroIntro:
-      'هيكل تحريري مصقول لأدلة مستقبلية مراجعة عن العيادات والتجميل والرفاهية والصيدليات والمختبرات. المحتوى هنا بنية آمنة فقط وليس نصيحة طبية.',
+      'تصفح أدلة واضحة ومحلية عن العيادات والتجميل والرفاهية والصيدليات والمختبرات. المحتوى معلوماتي ولا يغني عن المشورة الطبية المتخصصة.',
     primaryCta: 'استكشف الأدلة',
     secondaryCta: 'عرض الدليل المميز',
-    trustNote: 'أي مقالات فعلية لاحقاً تحتاج مراجعة تحريرية معتمدة قبل النشر.',
-    filterLabel: 'تصنيفات الأدلة',
+    trustNote: 'تهدف المقالات إلى دعم القرار بوضوح وتحتاج مراجعة تحريرية قبل النشر.',
+    filterLabel: 'تصفح حسب الموضوع',
     categories: [
-      { title: 'الأسنان', description: 'أسئلة اختيار العيادات والخدمات والتحضير للحجز.', shortLabel: 'أس' },
-      { title: 'الجلدية / التجميل', description: 'تحضير الاستشارة وقوائم التحقق من معلومات مقدم الخدمة.', shortLabel: 'جت' },
-      { title: 'العيادات والمستشفيات', description: 'فهم الخدمات والمواقع وخيارات الرعاية.', shortLabel: 'عم' },
-      { title: 'الرفاهية', description: 'أسئلة تحضير آمنة لأدلة الرفاهية المستقبلية.', shortLabel: 'رف' },
-      { title: 'الصيدليات / المختبرات', description: 'شروحات مستقبلية لاكتشاف الخدمات العملية في عُمان.', shortLabel: 'صم' }
+      { title: 'الأسنان', description: 'أسئلة اختيار العيادات والخدمات والتحضير للحجز.', icon: 'dental' },
+      { title: 'الجلدية / التجميل', description: 'تحضير الاستشارة وفهم أنواع الخدمات قبل الحجز.', icon: 'beauty' },
+      { title: 'العيادات والمستشفيات', description: 'مقارنة الخدمات والمواقع وخيارات الرعاية العملية.', icon: 'clinic' },
+      { title: 'الرفاهية', description: 'أسئلة تحضير آمنة لخدمات الرفاهية.', icon: 'wellness' },
+      { title: 'الصيدليات / المختبرات', description: 'شروحات عملية لاكتشاف الخدمات في عُمان.', icon: 'lab' }
     ],
-    featuredLabel: 'هيكل دليل مميز',
-    latestLabel: 'أحدث الهياكل التحريرية',
-    sectionLabel: 'بطاقات أدلة جاهزة للصور',
-    categorySectionTitle: 'تصنيفات تحريرية جاهزة للمراجعة',
-    faqTitle: 'أسئلة شائعة عن المقالات',
-    faqIntro: 'إجابات آمنة حول طريقة عمل قسم المقالات بعد اعتماد المحتوى مستقبلاً.',
+    featuredLabel: 'دليل مميز',
+    latestLabel: 'أحدث الأدلة الصحية',
+    sectionLabel: 'الأدلة الصحية',
+    categorySectionTitle: 'تصفح حسب الموضوع',
+    faqEyebrow: 'أسئلة المقالات',
+    faqTitle: 'إجابات مفيدة قبل القراءة',
+    faqIntro: 'ملخص واضح لكيفية دعم مقالات DrMuscat لاختيار الرعاية دون أن تكون بديلاً عن المشورة الطبية المتخصصة.',
     faqs: [
       { question: 'هل مقالات DrMuscat نصيحة طبية؟', answer: 'لا. هي أدلة معلوماتية ولا تغني عن استشارة مختص صحي مؤهل.' },
-      { question: 'هل ستتضمن المقالات أطباء وعيادات؟', answer: 'يمكن للصفحات المستقبلية ربط أطباء ومراكز وعروض ومساحات رعاية عند اعتماد ذلك.' },
-      { question: 'هل ستتوفر فيديوهات؟', answer: 'تم تجهيز تصميم المقال لمساحات فيديو أو YouTube في مرحلة محتوى لاحقة.' },
+      { question: 'هل ستتضمن المقالات أطباء وعيادات؟', answer: 'يمكن للصفحات مستقبلاً ربط أطباء ومراكز وعروض ومساحات رعاية واضحة بعد الاعتماد.' },
+      { question: 'هل ستتوفر فيديوهات؟', answer: 'نعم. التصميم مجهز لمساحات فيديو أو YouTube في مرحلة محتوى لاحقة.' },
       { question: 'هل يتم توضيح المحتوى الممول؟', answer: 'نعم. يجب تمييز أي مساحة رعاية أو ترويج بوضوح.' }
     ],
-    newsletterTitle: 'تنبيهات المقالات لاحقاً',
-    newsletterBody: 'يمكن ربط تجربة تواصل أو نشرة بريدية هنا في مرحلة خلفية معتمدة لاحقاً. لا توجد خدمة اشتراك مفعّلة في هذا الهيكل.',
+    updatesEyebrow: 'تحديثات تحريرية',
+    newsletterTitle: 'تابع الأدلة القادمة',
+    newsletterBody: 'يمكن لاحقاً ربط تجربة تواصل أو نشرة بريدية معتمدة لإبلاغ القراء بالأدلة الجديدة. لا توجد خدمة اشتراك مفعلة في هذه المرحلة.',
     disclaimerTitle: 'تنبيه طبي',
     disclaimerBody:
-      'هذه الصفحات هياكل معلوماتية فقط. لا تقدم تشخيصاً أو علاجاً أو وصفات أو ترتيباً لمقدمي الخدمة، ولا تغني عن استشارة مختص مؤهل.',
-    viewGuide: 'عرض الدليل',
-    imageReady: 'جاهز للصور',
+      'هذه الصفحات معلوماتية فقط. لا تقدم تشخيصاً أو علاجاً أو وصفات أو ترتيباً لمقدمي الخدمة، ولا تغني عن استشارة مختص مؤهل.',
+    viewGuide: 'عرض الدليل المميز',
+    readGuide: 'اقرأ الدليل',
+    imageReady: 'مساحة صورة تحريرية',
     videoReady: 'جاهز للفيديو',
     cards: [
       {
         slug: 'how-to-choose-a-dental-clinic-in-muscat',
         category: 'الأسنان',
         title: 'كيف تختار عيادة أسنان في مسقط',
-        excerpt: 'هيكل تحريري مستقبلي للمقارنة بين معلومات العيادات والموقع والخدمات والأسئلة قبل الحجز.',
-        readingTime: 'هيكل ٥ دقائق',
-        mediaLabel: 'مساحة صورة رئيسية'
+        excerpt: 'صيغة دليل عملية لمقارنة معلومات العيادات والموقع والخدمات والأسئلة قبل الحجز.',
+        readingTime: '٥ دقائق قراءة',
+        mediaLabel: 'معاينة الدليل',
+        contentLabel: 'دليل',
+        tone: 'teal'
       },
       {
         slug: 'what-to-check-before-booking-dermatology',
         category: 'الجلدية / التجميل',
         title: 'ما الذي يمكن التحقق منه قبل حجز استشارة جلدية',
-        excerpt: 'بنية آمنة لمحتوى مستقبلي غير تشخيصي حول معلومات مقدم الخدمة وأهداف الاستشارة.',
-        readingTime: 'هيكل ٤ دقائق',
-        mediaLabel: 'مساحة فيديو لاحقاً'
+        excerpt: 'صيغة واضحة للتحضير لاستشارة جلدية ومراجعة معلومات مقدم الخدمة.',
+        readingTime: '٤ دقائق قراءة',
+        mediaLabel: 'مساحة فيديو',
+        contentLabel: 'جاهز للفيديو',
+        tone: 'rose'
       },
       {
         slug: 'understanding-clinic-services-in-oman',
         category: 'العيادات والمستشفيات',
         title: 'فهم خدمات العيادات في عُمان',
-        excerpt: 'هيكل شرح مستقبلي يساعد المستخدمين على قراءة صفحات الخدمات وتجهيز أسئلة عملية.',
-        readingTime: 'هيكل ٦ دقائق',
-        mediaLabel: 'مساحة صورة تحريرية'
+        excerpt: 'صيغة شرح لفهم صفحات العيادات وتفاصيل الخدمات وخيارات الرعاية العملية.',
+        readingTime: '٦ دقائق قراءة',
+        mediaLabel: 'وسائط تحريرية',
+        contentLabel: 'دليل',
+        tone: 'gold'
       },
       {
         slug: 'questions-before-a-wellness-treatment',
         category: 'الرفاهية',
         title: 'أسئلة قبل اختيار خدمة رفاهية',
-        excerpt: 'نمط إرشادي مبدئي للتحضير للموعد دون تعليمات علاجية أو وعود بنتائج.',
-        readingTime: 'هيكل ٤ دقائق',
-        mediaLabel: 'مساحة صورة لاحقاً'
+        excerpt: 'صيغة تحضير للموعد في خدمات الرفاهية دون تعليمات علاجية أو وعود بنتائج.',
+        readingTime: '٤ دقائق قراءة',
+        mediaLabel: 'مساحة مرئية',
+        contentLabel: 'دليل',
+        tone: 'mint'
       }
     ],
     detail: {
-      badge: 'هيكل مقال',
-      titlePrefix: 'هيكل دليل:',
-      excerpt: 'هيكل تحريري مصقول يحجز أماكن آمنة للنصوص المعتمدة والوسائط وسياق مقدمي الخدمة وعلامات الرعاية دون نشر نصائح طبية.',
-      authorLabel: 'المؤلف',
-      authorValue: 'فريق DrMuscat التحريري - مساحة مؤقتة',
+      badge: 'دليل صحي',
+      titlePrefix: '',
+      excerpt: 'قالب مقال مصقول للإرشاد المراجع والوسائط التحريرية وخيارات الرعاية ذات الصلة ومساحات الرعاية الواضحة دون نشر نصائح طبية.',
+      authorLabel: 'بقلم',
+      authorValue: 'فريق DrMuscat التحريري',
       reviewerLabel: 'المراجع الطبي',
-      reviewerValue: 'بانتظار مسار مراجعة معتمد',
+      reviewerValue: 'مسار المراجعة قيد الاعتماد',
       updatedLabel: 'آخر تحديث',
-      updatedValue: 'يحدد عند اعتماد محتوى فعلي',
+      updatedValue: 'يحدد عند نشر محتوى معتمد',
       readingLabel: 'مدة القراءة',
-      readingValue: '٥ دقائق - مؤقت',
-      heroImage: 'صورة رئيسية مستقبلية',
-      heroCaption: 'مساحة وسائط جاهزة للنص البديل والتعليق عند اعتماد الصور.',
-      videoTitle: 'فيديو إرشادي قريباً',
-      videoBody: 'مساحة مستقبلية لتضمين YouTube أو معاينة مصغرة. لا يوجد تكامل API للفيديو حالياً.',
+      readingValue: '٥ دقائق قراءة',
+      heroImage: 'مساحة صورة تحريرية',
+      heroCaption: 'مساحة صورة مجهزة لوسائط تحريرية معتمدة مع نص بديل وتعليق.',
+      videoTitle: 'مساحة فيديو إرشادي',
+      videoBody: 'مجهزة لتضمين YouTube أو معاينة مصغرة في مرحلة محتوى معتمدة لاحقاً. لا يوجد تكامل فيديو حالياً.',
       tocTitle: 'داخل هذا الدليل',
-      bodyTitle: 'معاينة أقسام المقال المستقبلية',
-      bodyLead: 'يمكن للمحتوى المعتمد لاحقاً شرح كيفية مقارنة معلومات مقدمي الخدمة والأسئلة العملية ومتى يجب التواصل مع مختص مؤهل.',
+      bodyTitle: 'معاينة الدليل',
+      bodyLead: 'يمكن للمحتوى المعتمد توضيح كيفية مقارنة معلومات مقدمي الخدمة والأسئلة المناسبة ومتى يجب التواصل مع مختص مؤهل.',
       bodySections: ['قائمة تحقق لمعلومات مقدم الخدمة', 'أسئلة للتحضير قبل الحجز', 'متى تتواصل مع مختص مؤهل'],
-      inlineImage: 'صورة تحريرية داخلية',
-      inlineCaption: 'مساحة صورة جاهزة للتعليق في محتوى مستقبلي مراجع.',
+      inlineImage: 'مساحة وسائط تحريرية',
+      inlineCaption: 'مساحة صورة داخلية مجهزة لوسائط وتعليقات مراجعة لاحقاً.',
+      relatedSectionTitle: 'أطباء ومراكز ذات صلة',
       relatedDoctors: 'أطباء ذو صلة',
-      relatedDoctorsBody: 'يمكن ظهور روابط أطباء معتمدة لاحقاً. لا توجد توصيات نشطة حالياً.',
+      relatedDoctorsBody: 'يمكن ظهور روابط أطباء معتمدة في مرحلة لاحقة. لا توجد توصيات نشطة حالياً.',
       relatedCenters: 'مراكز ذات صلة',
-      relatedCentersBody: 'يمكن ظهور روابط مراكز معتمدة لاحقاً. لا توجد توصيات عيادات نشطة حالياً.',
+      relatedCentersBody: 'يمكن ظهور روابط مراكز معتمدة في مرحلة لاحقة. لا توجد توصيات عيادات نشطة حالياً.',
       sponsored: 'Sponsored',
       featuredClinic: 'Featured clinic',
       promotedDoctor: 'Promoted doctor',
-      sponsoredBody: 'أي مساحات مدفوعة مستقبلية يجب أن تبقى واضحة ومنفصلة عن المحتوى التحريري.',
+      sponsoredBody: 'يجب أن تبقى مساحات الرعاية واضحة ومنفصلة بصرياً عن الإرشاد التحريري.',
       faqTitle: 'أسئلة شائعة عن المقال',
-      relatedArticles: 'مساحات مقالات ذات صلة لاحقاً عند توفر محتوى فعلي.',
+      relatedArticles: 'يمكن عرض مقالات ذات صلة هنا عند توفر محتوى معتمد.',
       backToArticles: 'العودة إلى المقالات'
     }
   }

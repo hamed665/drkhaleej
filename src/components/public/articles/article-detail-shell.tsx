@@ -21,13 +21,13 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
   ];
 
   return (
-    <main className="articles-shell article-detail-shell" dir={dir} data-locale={locale} data-country={country}>
+    <main className="articles-surface article-detail-surface" dir={dir} data-locale={locale} data-country={country}>
       <article>
         <section className="articles-hero article-detail-hero" aria-labelledby="article-title">
           <div className="articles-container article-detail-hero__grid">
             <div className="articles-hero__copy">
               <span className="articles-badge">{detail.badge}</span>
-              <h1 id="article-title">{detail.titlePrefix} {card.title}</h1>
+              <h1 id="article-title">{detail.titlePrefix ? `${detail.titlePrefix} ${card.title}` : card.title}</h1>
               <p>{detail.excerpt}</p>
               <dl className="article-meta">
                 {articleMeta.map((item) => (
@@ -38,8 +38,8 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
                 ))}
               </dl>
             </div>
-            <figure className="media-placeholder hero-media-placeholder">
-              <div className="media-placeholder__art" aria-hidden="true">
+            <figure className="media-frame hero-media-frame">
+              <div className="media-frame__art" aria-hidden="true">
                 <span className="articles-badge">{detail.heroImage}</span>
               </div>
               <figcaption>{detail.heroCaption}</figcaption>
@@ -61,8 +61,8 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
           </aside>
 
           <div className="article-content-stack">
-            <section className="video-placeholder" aria-labelledby="video-title">
-              <div className="video-placeholder__preview" aria-hidden="true"><span>▶</span></div>
+            <section className="video-guide" aria-labelledby="video-title">
+              <div className="video-guide__preview" aria-hidden="true"><span>▶</span></div>
               <div>
                 <span className="articles-badge">YouTube</span>
                 <h2 id="video-title">{detail.videoTitle}</h2>
@@ -78,15 +78,17 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
                   <li key={section}>{section}</li>
                 ))}
               </ul>
-              <figure className="media-placeholder inline-media-placeholder">
-                <div className="media-placeholder__art" aria-hidden="true">
+              <figure className="media-frame inline-media-frame">
+                <div className="media-frame__art" aria-hidden="true">
                   <span className="articles-badge">{detail.inlineImage}</span>
                 </div>
                 <figcaption>{detail.inlineCaption}</figcaption>
               </figure>
             </section>
 
-            <section className="related-grid" aria-label={locale === 'ar' ? 'مساحات ذات صلة' : 'Related placeholders'}>
+            <section className="related-care-section" aria-labelledby="related-care-title">
+              <h2 id="related-care-title">{detail.relatedSectionTitle}</h2>
+              <div className="related-grid">
               <article>
                 <span>{locale === 'ar' ? 'أطباء' : 'Doctors'}</span>
                 <h3>{detail.relatedDoctors}</h3>
@@ -103,16 +105,17 @@ export function ArticleDetailShell({ locale, country, slug, dir }: ArticleDetail
                 <p>{detail.promotedDoctor}</p>
                 <p>{detail.sponsoredBody}</p>
               </article>
+              </div>
             </section>
 
             <section className="faq-card" aria-labelledby="faq-title">
               <h2 id="faq-title">{detail.faqTitle}</h2>
               <div className="articles-faq-list">
                 {copy.faqs.map((faq) => (
-                  <article className="faq-item" key={faq.question}>
-                    <h3>{faq.question}</h3>
+                  <details className="faq-item" key={faq.question} open>
+                    <summary><span>{faq.question}</span><span aria-hidden="true">+</span></summary>
                     <p>{faq.answer}</p>
-                  </article>
+                  </details>
                 ))}
               </div>
             </section>
