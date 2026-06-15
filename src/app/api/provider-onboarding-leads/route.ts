@@ -10,12 +10,16 @@ function isJsonContentType(contentType: string | null): boolean {
   return mediaType === 'application/json' || Boolean(mediaType?.endsWith('+json'));
 }
 
-function acceptedResponse(): NextResponse<{ ok: true; message: 'provider_onboarding_request_received' }> {
-  return NextResponse.json({ ok: true, message: 'provider_onboarding_request_received' }, { status: 202 });
+function acceptedResponse(): NextResponse<{ ok: true; message: string }> {
+  return NextResponse.json({ ok: true, message: 'Your request has been received.' }, { status: 201 });
 }
 
-function invalidRequestResponse(): NextResponse<{ ok: false; reason: 'invalid_request' }> {
-  return NextResponse.json({ ok: false, reason: 'invalid_request' }, { status: 400 });
+function invalidRequestResponse(): NextResponse<{ ok: false; message: string }> {
+  return NextResponse.json({ ok: false, message: 'Please check the fields and try again.' }, { status: 400 });
+}
+
+function unavailableResponse(): NextResponse<{ ok: false; message: string }> {
+  return NextResponse.json({ ok: false, message: 'We could not send the request. Please try again later.' }, { status: 500 });
 }
 
 export async function POST(request: Request) {
@@ -40,7 +44,7 @@ export async function POST(request: Request) {
       }));
 
       if (result.ok) return acceptedResponse();
-      return NextResponse.json({ ok: false, reason: 'unavailable' }, { status: 503 });
+      return unavailableResponse();
     }
 
     return invalidRequestResponse();
@@ -53,5 +57,5 @@ export async function POST(request: Request) {
 
   if (result.ok) return acceptedResponse();
 
-  return NextResponse.json({ ok: false, reason: 'unavailable' }, { status: 503 });
+  return unavailableResponse();
 }

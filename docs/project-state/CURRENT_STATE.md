@@ -29,6 +29,7 @@
 - Contact/callback, media, and license foundations exist.
 - Public callback request API exists.
 - Public provider onboarding lead capture API exists.
+- Provider onboarding public form success/error handling has been corrected so successful submissions show success instead of a false generic error.
 
 ## Implemented admin surface
 

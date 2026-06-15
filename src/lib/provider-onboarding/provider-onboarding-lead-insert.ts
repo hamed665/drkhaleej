@@ -61,7 +61,7 @@ async function insertProviderOnboardingLead(value: NormalizedProviderOnboardingL
 
   const { error } = await supabase.from('provider_onboarding_leads').insert(insertValue);
 
-  return !error;
+  return error === null;
 }
 
 export async function createProviderOnboardingLead(

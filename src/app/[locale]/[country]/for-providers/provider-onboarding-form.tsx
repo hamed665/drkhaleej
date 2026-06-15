@@ -51,6 +51,10 @@ type ProviderOnboardingFormProps = {
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
+type ProviderOnboardingLeadApiResponse =
+  | { ok: true; message?: string }
+  | { ok: false; message?: string; fieldErrors?: Record<string, string> };
+
 function stringValue(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === 'string' ? value : '';
@@ -62,9 +66,13 @@ export function ProviderOnboardingForm({ locale, copy }: ProviderOnboardingFormP
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (status === 'submitting') return;
+
+    const form = event.currentTarget;
     setStatus('submitting');
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const payload = {
       centerName: stringValue(formData, 'centerName'),
       contactName: stringValue(formData, 'contactName'),
@@ -89,12 +97,20 @@ export function ProviderOnboardingForm({ locale, copy }: ProviderOnboardingFormP
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
+      let responseBody: ProviderOnboardingLeadApiResponse | null = null;
+
+      try {
+        responseBody = (await response.json()) as ProviderOnboardingLeadApiResponse;
+      } catch {
+        responseBody = null;
+      }
+
+      if (!response.ok || responseBody?.ok !== true) {
         setStatus('error');
         return;
       }
 
-      event.currentTarget.reset();
+      form.reset();
       setStatus('success');
     } catch {
       setStatus('error');
