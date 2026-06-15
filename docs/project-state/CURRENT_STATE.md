@@ -108,3 +108,8 @@ Current validation gate:
 - Stop on blockers, conflicts, missing dependencies, unclear requirements, route ambiguity, schema conflict, or RLS ambiguity.
 - Do not fake passing tests.
 - Do not weaken TypeScript, lint, build, route, env, migration, seed, SEO, RLS, or validation checks to force progress.
+
+## ART-A public articles shell
+
+- Article route contract and premium public article shell were added for English/Arabic Oman routes at `/:locale/:country/articles` and `/:locale/:country/articles/:slug`.
+- No article CMS, database, or admin editor exists yet.

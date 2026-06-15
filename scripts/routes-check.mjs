@@ -484,10 +484,28 @@ const checks = [
     ),
   },
   {
-    name: "article routes do not exist",
-    pass: !existsSync(
-      resolve(projectRoot, "src/app/[locale]/[country]/articles"),
-    ),
+    name: "approved article route contract exists",
+    pass:
+      existsSync(
+        resolve(projectRoot, "src/app/[locale]/[country]/articles/page.tsx"),
+      ) &&
+      existsSync(
+        resolve(
+          projectRoot,
+          "src/app/[locale]/[country]/articles/[slug]/page.tsx",
+        ),
+      ),
+  },
+  {
+    name: "article route contract is limited to hub and slug detail",
+    pass:
+      existsSync(resolve(projectRoot, "src/app/[locale]/[country]/articles")) &&
+      readdirSync(resolve(projectRoot, "src/app/[locale]/[country]/articles")).every(
+        (entry) => entry === "page.tsx" || entry === "[slug]",
+      ) &&
+      readdirSync(
+        resolve(projectRoot, "src/app/[locale]/[country]/articles/[slug]"),
+      ).every((entry) => entry === "page.tsx"),
   },
   {
     name: "branded hospital and clinic route directories do not exist",
