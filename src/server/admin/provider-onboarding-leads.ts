@@ -25,6 +25,8 @@ export type ProviderOnboardingLeadPriority = (typeof allowedPriorities)[number];
 
 type ProviderOnboardingLeadRow =
   Database["public"]["Tables"]["provider_onboarding_leads"]["Row"];
+type ProviderOnboardingLeadEventRow =
+  Database["public"]["Tables"]["provider_onboarding_lead_events"]["Row"];
 
 type AdminProviderOnboardingLeadSelectedRow = Pick<
   ProviderOnboardingLeadRow,
@@ -76,6 +78,30 @@ export type AdminProviderOnboardingLeadDetail =
     metadata: ProviderOnboardingLeadRow["metadata"];
   };
 
+export type AdminProviderOnboardingLeadEvent = {
+  id: string;
+  actorProfileId: string | null;
+  eventType: string;
+  oldStatus: string | null;
+  newStatus: string | null;
+  oldPriority: string | null;
+  newPriority: string | null;
+  noteText: string | null;
+  metadata: ProviderOnboardingLeadEventRow["metadata"];
+  createdAt: string;
+};
+
+export type AdminProviderOnboardingLeadEventsResult =
+  | {
+      ok: true;
+      events: AdminProviderOnboardingLeadEvent[];
+    }
+  | {
+      ok: false;
+      reason: "not_found" | "unavailable";
+      events: [];
+    };
+
 export type AdminProviderOnboardingLeadListFilters = {
   status?: ProviderOnboardingLeadStatus | string | null;
   priority?: ProviderOnboardingLeadPriority | string | null;
@@ -112,7 +138,10 @@ export type AdminProviderOnboardingLeadDetailResult =
       reason: "not_found" | "unavailable";
     };
 
-const leadSelectColumns = "id, created_at, updated_at, center_name, contact_name, phone, email, whatsapp, provider_type, area_text, city_text, preferred_language, status, priority, message, request_source, consent_to_contact, handled_at, metadata";
+const leadSelectColumns =
+  "id, created_at, updated_at, center_name, contact_name, phone, email, whatsapp, provider_type, area_text, city_text, preferred_language, status, priority, message, request_source, consent_to_contact, handled_at, metadata";
+const leadEventSelectColumns =
+  "id, actor_profile_id, event_type, old_status, new_status, old_priority, new_priority, note_text, metadata, created_at";
 
 function isAllowedStatus(
   status: string | null | undefined,
@@ -211,6 +240,35 @@ function mapLeadToDetail(
   };
 }
 
+function mapLeadEvent(
+  row: Pick<
+    ProviderOnboardingLeadEventRow,
+    | "id"
+    | "actor_profile_id"
+    | "event_type"
+    | "old_status"
+    | "new_status"
+    | "old_priority"
+    | "new_priority"
+    | "note_text"
+    | "metadata"
+    | "created_at"
+  >,
+): AdminProviderOnboardingLeadEvent {
+  return {
+    id: row.id,
+    actorProfileId: row.actor_profile_id,
+    eventType: row.event_type,
+    oldStatus: row.old_status,
+    newStatus: row.new_status,
+    oldPriority: row.old_priority,
+    newPriority: row.new_priority,
+    noteText: row.note_text,
+    metadata: row.metadata,
+    createdAt: row.created_at,
+  };
+}
+
 function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     value,
@@ -225,7 +283,9 @@ export async function listAdminProviderOnboardingLeads(
   const limit = normalizeLimit(filters.limit);
   const offset = normalizeOffset(filters.offset);
   const status = isAllowedStatus(filters.status) ? filters.status : null;
-  const priority = isAllowedPriority(filters.priority) ? filters.priority : null;
+  const priority = isAllowedPriority(filters.priority)
+    ? filters.priority
+    : null;
   const createdFrom = normalizeIsoDate(filters.createdFrom);
   const createdTo = normalizeIsoDate(filters.createdTo);
 
@@ -305,5 +365,32 @@ export async function getAdminProviderOnboardingLeadById(
   return {
     ok: true,
     lead: mapLeadToDetail(data),
+  };
+}
+
+export async function listProviderOnboardingLeadEvents(
+  leadId: string,
+): Promise<AdminProviderOnboardingLeadEventsResult> {
+  await requirePlatformAdmin();
+
+  if (!isUuid(leadId)) {
+    return { ok: false, reason: "not_found", events: [] };
+  }
+
+  const supabase = createSupabaseServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from("provider_onboarding_lead_events")
+    .select(leadEventSelectColumns)
+    .eq("lead_id", leadId)
+    .order("created_at", { ascending: false });
+
+  if (error !== null || data === null) {
+    return { ok: false, reason: "unavailable", events: [] };
+  }
+
+  return {
+    ok: true,
+    events: data.map(mapLeadEvent),
   };
 }
