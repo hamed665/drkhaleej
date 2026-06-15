@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import type { PlatformAdminProfile } from "@/lib/permissions/admin";
@@ -6,6 +7,19 @@ type AdminShellProps = {
   admin: PlatformAdminProfile;
   children: ReactNode;
 };
+
+const adminNavigationLinks = [
+  {
+    href: "/admin/provider-onboarding-leads",
+    label: "Provider leads",
+    description: "Review onboarding requests",
+  },
+  {
+    href: "/admin/center-subscriptions",
+    label: "Center subscriptions",
+    description: "Read-only plan overview",
+  },
+] as const;
 
 export function AdminShell({ admin, children }: AdminShellProps) {
   const adminLabel =
@@ -34,6 +48,25 @@ export function AdminShell({ admin, children }: AdminShellProps) {
             </strong>
           </div>
         </div>
+        <nav
+          aria-label="Admin quick navigation"
+          className="mt-5 grid gap-3 sm:grid-cols-2"
+        >
+          {adminNavigationLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm transition hover:border-cyan-200 hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+            >
+              <span className="block font-semibold text-slate-950">
+                {link.label}
+              </span>
+              <span className="mt-1 block text-xs text-slate-600">
+                {link.description}
+              </span>
+            </Link>
+          ))}
+        </nav>
       </header>
       <main className="rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-[0_14px_36px_rgba(21,80,107,0.08)]">
         {children}
