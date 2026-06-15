@@ -23,7 +23,7 @@ export async function requirePlatformAdmin(): Promise<PlatformAdminProfile> {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect("/");
+    redirect("/admin/login");
   }
 
   const { data: profile, error: profileError } = await supabase

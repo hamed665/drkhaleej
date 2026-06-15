@@ -33,6 +33,7 @@
 ## Implemented admin surface
 
 - Protected root-level `/admin` baseline exists.
+- Minimal platform-admin sign-in exists at `/admin/login` using Supabase Auth magic links and the server-side `/auth/callback` session exchange.
 - Admin routes are root-level routes and are not localized.
 - Read-only admin provider onboarding lead list/detail exists.
 - Admin provider onboarding lead status/priority mutation baseline exists.
