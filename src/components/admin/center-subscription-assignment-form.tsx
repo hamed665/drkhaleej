@@ -125,6 +125,33 @@ export function CenterSubscriptionAssignmentForm({
             <li>Plans available: {options.plans.length}</li>
           </ul>
 
+          {options.plans.length > 0 ? (
+            <div className="mt-5 rounded-2xl border border-emerald-200 bg-white/80 p-4 text-sm text-slate-800">
+              <h4 className="font-bold text-emerald-900">
+                Base plan catalog is initialized
+              </h4>
+              <p className="mt-1 leading-6 text-slate-600">
+                The plan catalog is ready. A center record is still required
+                before assignment can be saved.
+              </p>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {options.plans.map((plan) => (
+                  <li
+                    key={plan.id}
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2"
+                  >
+                    <span className="block font-semibold text-slate-950">
+                      {plan.name_en}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-slate-600">
+                      {plan.slug} · {formatLabel(plan.status)} · {formatPrice(plan.price_amount, plan.currency_code)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {options.plans.length === 0 ? (
             <form action={catalogAction} className="mt-5 space-y-3">
               <p className="text-sm leading-6">
