@@ -27,10 +27,10 @@ const allowedAddOnTypes: CommercialAddOnType[] = [
   "special_offer_placement",
 ];
 const allowedTerms: CommercialAddOnTerm[] = ["weekly", "monthly", "quarterly"];
-const failure: CommercialAddOnAssignmentState = {
-  ok: false,
-  message: "Commercial add-on assignment could not be saved.",
-};
+
+function failure(message: string): CommercialAddOnAssignmentState {
+  return { ok: false, message };
+}
 
 function formString(formData: FormData, key: string): string | null {
   const value = formData.get(key);
@@ -40,7 +40,7 @@ function formString(formData: FormData, key: string): string | null {
 }
 
 function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
 function isAddOnType(value: string): value is CommercialAddOnType {
@@ -123,16 +123,20 @@ export async function createCommercialAddOnAssignment(
   const note = formString(formData, "note");
   const startsAtDate = parseStartDate(formString(formData, "startsAt")) ?? new Date();
 
-  if (
-    centerId === null ||
-    addOnTypeValue === null ||
-    termValue === null ||
-    !isUuid(centerId) ||
-    !isAddOnType(addOnTypeValue) ||
-    !isTerm(termValue) ||
-    budgetAmount === undefined
-  ) {
-    return failure;
+  if (centerId === null || !isUuid(centerId)) {
+    return failure("Select a valid center before saving this commercial add-on.");
+  }
+
+  if (addOnTypeValue === null || !isAddOnType(addOnTypeValue)) {
+    return failure("Select either Homepage Ads or Special Offer Placement.");
+  }
+
+  if (termValue === null || !isTerm(termValue)) {
+    return failure("Select a weekly, monthly, or quarterly term.");
+  }
+
+  if (budgetAmount === undefined) {
+    return failure("Budget / price must be empty or a non-negative number.");
   }
 
   const supabase = createSupabaseServiceRoleClient();
@@ -144,7 +148,9 @@ export async function createCommercialAddOnAssignment(
     .is("deleted_at", null)
     .maybeSingle();
 
-  if (centerError !== null || center === null) return failure;
+  if (centerError !== null || center === null) {
+    return failure("Selected center could not be loaded. Refresh the page and try again.");
+  }
 
   const startsAt = startsAtDate.toISOString();
   const endsAt = addTerm(startsAtDate, termValue).toISOString();
@@ -181,7 +187,9 @@ export async function createCommercialAddOnAssignment(
     .select("id")
     .maybeSingle();
 
-  if (campaignError !== null || campaign === null) return failure;
+  if (campaignError !== null || campaign === null) {
+    return failure("Commercial add-on campaign could not be saved. Refresh and try again before continuing.");
+  }
 
   const placementPayload: SponsoredPlacementInsert = {
     campaign_id: campaign.id,
@@ -205,11 +213,7 @@ export async function createCommercialAddOnAssignment(
     .insert(placementPayload);
 
   if (placementError !== null) {
-    return {
-      ok: false,
-      message:
-        "Commercial add-on campaign was created, but its placement shell could not be saved. Review before continuing.",
-    };
+    return failure("Commercial add-on campaign was created, but its placement shell could not be saved. Review before continuing.");
   }
 
   revalidatePath("/admin/commercial-addons");
