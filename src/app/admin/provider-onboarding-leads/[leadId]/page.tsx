@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ProviderOnboardingLeadDraftCenterPanel } from "@/components/admin/provider-onboarding-lead-draft-center-panel";
 import {
   ProviderOnboardingLeadDetail,
   ProviderOnboardingLeadUnavailable,
@@ -35,6 +36,11 @@ export default async function AdminProviderOnboardingLeadDetailPage({
 
   return (
     <div className="space-y-6">
+      <ProviderOnboardingLeadDraftCenterPanel
+        centerName={result.lead.centerName}
+        leadId={result.lead.id}
+        metadata={result.lead.metadata}
+      />
       <ProviderOnboardingLeadDetail lead={result.lead} />
       <ProviderOnboardingLeadHistory events={historyEvents} />
     </div>
