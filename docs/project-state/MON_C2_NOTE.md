@@ -24,7 +24,7 @@ This PR also includes a platform-admin-only initializer for the official base su
 - Free Listing
 - Verified Starter
 - Growth Partner
-- Premium / Ads Pro
+- Premium Partner
 
 This initializer uses existing server-side admin write patterns and the existing `subscription_plans` table.
 
@@ -32,15 +32,24 @@ It is intentionally not a migration and not a seed file because the current migr
 
 When plans exist but centers do not, the admin UI shows the initialized plan catalog by name and status so the operator can verify that plan creation worked before moving on to center creation.
 
+## CENTER-A draft center creation
+
+This PR also adds an admin-only draft center creation control on provider onboarding lead detail pages.
+
+The control creates one internal draft center from the lead and links the lead metadata back to the created draft center.
+
+It does not publish the center, verify it, create a claim, assign a subscription, bill, invoice, activate ads, activate offers, or expose public badges.
+
 ## Write behavior
 
 The admin assignment form can:
 
-- initialize the official base plan catalog when no plans are available
+- initialize or sync the official base plan catalog
+- create one internal draft center from a provider onboarding lead
 - select a center
 - select a subscription plan
 - set subscription status
-- set billing interval
+- use the selected plan interval as the subscription billing interval
 - set optional agreed price amount
 - set optional start, end, and trial end dates
 - save optional private notes
@@ -52,6 +61,8 @@ If the selected center has no non-deleted subscription assignment, a new row is 
 The current platform admin profile is stored as `sales_profile_id`.
 
 The selected plan currency is used as `currency_code`.
+
+The selected plan interval is used as `billing_interval`; this prevents annual plan rows from being saved with a quarterly or monthly billing interval unless a future approved phase introduces explicit interval overrides.
 
 ## Guardrails
 
@@ -78,6 +89,7 @@ The selected plan currency is used as `currency_code`.
 - If plans are missing, the admin sees an initializer button instead of dead dropdowns.
 - If plans exist but centers are missing, the admin sees the initialized plan catalog list and the remaining center prerequisite.
 - The assignment form is visible when at least one center and one plan are available.
+- The form explains that billing interval follows the selected plan.
 - The form explains that it does not charge, invoice, publish badges, activate ads, activate offers, enable add-ons, or unlock provider dashboard access.
 - Save returns a safe success or failure message.
 - Raw database errors are not exposed.
