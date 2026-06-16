@@ -28,7 +28,7 @@ This PR also includes a platform-admin-only initializer for the official base su
 
 This initializer uses existing server-side admin write patterns and the existing `subscription_plans` table.
 
-It is intentionally not a migration and not a seed file because the current migration/seed validators remain locked against product-catalog data rows.
+It is intentionally not a migration and not a seed file because the current migration and seed validators remain locked against product-catalog data rows.
 
 ## Write behavior
 
