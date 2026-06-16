@@ -112,7 +112,7 @@ function buildItems(
   const centersById = new Map(centers.map((center) => [center.id, center]));
 
   return campaigns
-    .map((campaign) => {
+    .map((campaign): AdminCommercialAddOnItem | null => {
       const addOnType = normalizeAddOnType(
         metadataString(campaign.metadata, "commercial_add_on_type"),
       );
@@ -138,7 +138,7 @@ function buildItems(
         placementKey: metadataString(campaign.metadata, "placement_key"),
         createdAt: campaign.created_at,
         updatedAt: campaign.updated_at,
-      } satisfies AdminCommercialAddOnItem;
+      };
     })
     .filter((item): item is AdminCommercialAddOnItem => item !== null);
 }
