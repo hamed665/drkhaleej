@@ -123,6 +123,7 @@ const baseSubscriptionPlans: SubscriptionPlanInsert[] = [
 
 export async function initializeBaseSubscriptionPlanCatalog(
   _previousState: BaseSubscriptionPlanCatalogState,
+  _formData: FormData,
 ): Promise<BaseSubscriptionPlanCatalogState> {
   await requirePlatformAdmin();
 
