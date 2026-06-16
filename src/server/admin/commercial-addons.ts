@@ -178,8 +178,8 @@ export async function listAdminCommercialAddOns(): Promise<AdminCommercialAddOns
     };
   }
 
-  const centers = centersResult.data;
-  const campaigns = campaignsResult.data;
+  const centers: AdminCommercialAddOnCenterOption[] = centersResult.data;
+  const campaigns: CampaignSelectedRow[] = campaignsResult.data;
 
   return {
     ok: true,
