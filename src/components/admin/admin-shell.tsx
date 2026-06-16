@@ -19,6 +19,11 @@ const adminNavigationLinks = [
     label: "Center subscriptions",
     description: "Plan assignments",
   },
+  {
+    href: "/admin/commercial-addons",
+    label: "Commercial add-ons",
+    description: "Ads and offer placements",
+  },
 ] as const;
 
 export function AdminShell({ admin, children }: AdminShellProps) {
@@ -50,7 +55,7 @@ export function AdminShell({ admin, children }: AdminShellProps) {
         </div>
         <nav
           aria-label="Admin quick navigation"
-          className="mt-5 grid gap-3 sm:grid-cols-2"
+          className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
         >
           {adminNavigationLinks.map((link) => (
             <Link
