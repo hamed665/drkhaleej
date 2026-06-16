@@ -15,14 +15,7 @@ type SponsoredCampaignInsert =
 type SponsoredPlacementInsert =
   Database["public"]["Tables"]["sponsored_placements"]["Insert"];
 type SponsoredSlotType = Database["public"]["Enums"]["sponsored_slot_type"];
-
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue | undefined };
+type JsonValue = SponsoredCampaignInsert["metadata"];
 
 export type CommercialAddOnAssignmentState = {
   ok: boolean;
@@ -47,7 +40,7 @@ function formString(formData: FormData, key: string): string | null {
 }
 
 function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(value);
 }
 
 function isAddOnType(value: string): value is CommercialAddOnType {
