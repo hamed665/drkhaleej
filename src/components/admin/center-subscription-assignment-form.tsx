@@ -6,7 +6,10 @@ import {
   upsertCenterSubscriptionAssignment,
   type CenterSubscriptionAssignmentState,
 } from "@/server/admin/center-subscription-actions";
-import type { AdminCenterSubscriptionAssignmentOptionsResult } from "@/server/admin/center-subscription-options";
+import type {
+  AdminCenterSubscriptionAssignmentOptionsResult,
+  AdminCenterSubscriptionPlanOption,
+} from "@/server/admin/center-subscription-options";
 import {
   initializeBaseSubscriptionPlanCatalog,
   type BaseSubscriptionPlanCatalogState,
@@ -16,15 +19,7 @@ type CenterSubscriptionAssignmentFormProps = {
   options: AdminCenterSubscriptionAssignmentOptionsResult;
 };
 
-type PlanOption = AdminCenterSubscriptionAssignmentOptionsResult extends {
-  ok: true;
-  plans: infer Plans;
-}
-  ? Plans extends Array<infer Plan>
-    ? Plan
-    : never
-  : never;
-
+type PlanOption = AdminCenterSubscriptionPlanOption;
 type PlanTierKey =
   | "free_listing"
   | "verified_starter"
@@ -42,7 +37,6 @@ const initialCatalogState: BaseSubscriptionPlanCatalogState = {
 };
 
 const statusOptions = ["pending", "active", "paused", "cancelled", "expired"];
-
 const planTiers: Array<{ key: PlanTierKey; label: string }> = [
   { key: "free_listing", label: "Free Listing" },
   { key: "verified_starter", label: "Verified Starter" },
@@ -190,7 +184,8 @@ export function CenterSubscriptionAssignmentForm({
   const visibleTiers = planTiers.filter(
     (tier) => (plansByTier.get(tier.key)?.length ?? 0) > 0,
   );
-  const availableTerms = selectedTier === "" ? [] : plansByTier.get(selectedTier) ?? [];
+  const availableTerms =
+    selectedTier === "" ? [] : plansByTier.get(selectedTier) ?? [];
   const selectedPlan =
     availableTerms.find((plan) => plan.interval === selectedInterval) ?? null;
 
