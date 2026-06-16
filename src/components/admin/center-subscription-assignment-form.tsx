@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 
 import {
   upsertCenterSubscriptionAssignment,
@@ -16,6 +16,21 @@ type CenterSubscriptionAssignmentFormProps = {
   options: AdminCenterSubscriptionAssignmentOptionsResult;
 };
 
+type PlanOption = AdminCenterSubscriptionAssignmentOptionsResult extends {
+  ok: true;
+  plans: infer Plans;
+}
+  ? Plans extends Array<infer Plan>
+    ? Plan
+    : never
+  : never;
+
+type PlanTierKey =
+  | "free_listing"
+  | "verified_starter"
+  | "growth_partner"
+  | "premium_partner";
+
 const initialAssignmentState: CenterSubscriptionAssignmentState = {
   ok: false,
   message: null,
@@ -27,6 +42,20 @@ const initialCatalogState: BaseSubscriptionPlanCatalogState = {
 };
 
 const statusOptions = ["pending", "active", "paused", "cancelled", "expired"];
+
+const planTiers: Array<{ key: PlanTierKey; label: string }> = [
+  { key: "free_listing", label: "Free Listing" },
+  { key: "verified_starter", label: "Verified Starter" },
+  { key: "growth_partner", label: "Growth Partner" },
+  { key: "premium_partner", label: "Premium Partner" },
+];
+
+const intervalSortOrder: Record<string, number> = {
+  monthly: 1,
+  quarterly: 2,
+  semi_annual: 3,
+  annual: 4,
+};
 
 function formatLabel(value: string): string {
   return value
@@ -46,6 +75,37 @@ function formatPrice(amount: number, currencyCode: string): string {
   } catch {
     return `${amount.toLocaleString("en-OM")} ${currencyCode}`;
   }
+}
+
+function tierKeyForPlan(plan: PlanOption): PlanTierKey | null {
+  if (plan.slug === "free-listing" || plan.slug.startsWith("free-listing-")) {
+    return "free_listing";
+  }
+
+  if (
+    plan.slug === "verified-starter" ||
+    plan.slug.startsWith("verified-starter-")
+  ) {
+    return "verified_starter";
+  }
+
+  if (plan.slug === "growth-partner" || plan.slug.startsWith("growth-partner-")) {
+    return "growth_partner";
+  }
+
+  if (plan.slug === "premium-partner" || plan.slug.startsWith("premium-partner-")) {
+    return "premium_partner";
+  }
+
+  return null;
+}
+
+function sortPlansByInterval(plans: PlanOption[]): PlanOption[] {
+  return [...plans].sort(
+    (a, b) =>
+      (intervalSortOrder[a.interval] ?? 99) -
+      (intervalSortOrder[b.interval] ?? 99),
+  );
 }
 
 function AssignmentHeader({
@@ -80,6 +140,8 @@ function AssignmentHeader({
 export function CenterSubscriptionAssignmentForm({
   options,
 }: CenterSubscriptionAssignmentFormProps) {
+  const [selectedTier, setSelectedTier] = useState<PlanTierKey | "">("");
+  const [selectedInterval, setSelectedInterval] = useState("");
   const [assignmentState, assignmentAction, isAssignmentPending] = useActionState(
     upsertCenterSubscriptionAssignment,
     initialAssignmentState,
@@ -88,6 +150,29 @@ export function CenterSubscriptionAssignmentForm({
     initializeBaseSubscriptionPlanCatalog,
     initialCatalogState,
   );
+
+  const plansByTier = useMemo(() => {
+    const map = new Map<PlanTierKey, PlanOption[]>();
+
+    if (!options.ok) return map;
+
+    for (const tier of planTiers) {
+      map.set(tier.key, []);
+    }
+
+    for (const plan of options.plans) {
+      const tierKey = tierKeyForPlan(plan);
+      if (tierKey === null) continue;
+
+      map.get(tierKey)?.push(plan);
+    }
+
+    for (const [tierKey, plans] of map) {
+      map.set(tierKey, sortPlansByInterval(plans));
+    }
+
+    return map;
+  }, [options]);
 
   if (!options.ok) {
     return (
@@ -102,6 +187,12 @@ export function CenterSubscriptionAssignmentForm({
   }
 
   const canSubmit = options.centers.length > 0 && options.plans.length > 0;
+  const visibleTiers = planTiers.filter(
+    (tier) => (plansByTier.get(tier.key)?.length ?? 0) > 0,
+  );
+  const availableTerms = selectedTier === "" ? [] : plansByTier.get(selectedTier) ?? [];
+  const selectedPlan =
+    availableTerms.find((plan) => plan.interval === selectedInterval) ?? null;
 
   if (!canSubmit) {
     return (
@@ -214,6 +305,11 @@ export function CenterSubscriptionAssignmentForm({
       />
 
       <form action={assignmentAction} className="mt-5 space-y-5">
+        <input
+          type="hidden"
+          name="subscriptionPlanId"
+          value={selectedPlan?.id ?? ""}
+        />
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="block text-sm font-semibold text-slate-800">
             Center
@@ -236,23 +332,27 @@ export function CenterSubscriptionAssignmentForm({
           </label>
 
           <label className="block text-sm font-semibold text-slate-800">
-            Subscription plan
+            Plan
             <select
-              name="subscriptionPlanId"
-              defaultValue=""
+              value={selectedTier}
               disabled={isAssignmentPending}
+              onChange={(event) => {
+                const nextTier = event.target.value as PlanTierKey | "";
+                const nextTerms = nextTier === "" ? [] : plansByTier.get(nextTier) ?? [];
+                setSelectedTier(nextTier);
+                setSelectedInterval(
+                  nextTerms.length === 1 ? nextTerms[0]?.interval ?? "" : "",
+                );
+              }}
               className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
               required
             >
               <option value="" disabled>
                 Select plan
               </option>
-              {options.plans.map((plan) => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.name_en} · {formatLabel(plan.interval)} · {formatPrice(
-                    plan.price_amount,
-                    plan.currency_code,
-                  )}
+              {visibleTiers.map((tier) => (
+                <option key={tier.key} value={tier.key}>
+                  {tier.label}
                 </option>
               ))}
             </select>
@@ -260,6 +360,29 @@ export function CenterSubscriptionAssignmentForm({
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <label className="block text-sm font-semibold text-slate-800">
+            Billing term
+            <select
+              value={selectedInterval}
+              disabled={isAssignmentPending || selectedTier === ""}
+              onChange={(event) => setSelectedInterval(event.target.value)}
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+              required
+            >
+              <option value="" disabled>
+                Select billing term
+              </option>
+              {availableTerms.map((plan) => (
+                <option key={plan.id} value={plan.interval}>
+                  {formatLabel(plan.interval)} · {formatPrice(
+                    plan.price_amount,
+                    plan.currency_code,
+                  )}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <label className="block text-sm font-semibold text-slate-800">
             Status
             <select
@@ -289,14 +412,17 @@ export function CenterSubscriptionAssignmentForm({
               className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
             />
           </label>
+        </div>
 
-          <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4 text-sm leading-6 text-cyan-950 xl:col-span-2">
-            <p className="font-bold">Billing interval follows the selected plan.</p>
-            <p className="mt-1 text-cyan-900">
-              In this phase the subscription billing interval is copied from the
-              chosen plan to avoid annual-plan/quarterly-billing mismatches.
-            </p>
-          </div>
+        <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4 text-sm leading-6 text-cyan-950">
+          <p className="font-bold">Subscription plan variant</p>
+          <p className="mt-1 text-cyan-900">
+            {selectedPlan === null
+              ? "Select a plan and billing term. Monthly variants can remain in the database while hidden until approved for sale."
+              : `${selectedPlan.name_en} · ${selectedPlan.slug} · ${formatLabel(
+                  selectedPlan.interval,
+                )}`}
+          </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -344,7 +470,7 @@ export function CenterSubscriptionAssignmentForm({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="submit"
-            disabled={isAssignmentPending}
+            disabled={isAssignmentPending || selectedPlan === null}
             className="inline-flex justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
             {isAssignmentPending ? "Saving…" : "Save subscription assignment"}
