@@ -17,7 +17,7 @@ const adminNavigationLinks = [
   {
     href: "/admin/center-subscriptions",
     label: "Center subscriptions",
-    description: "Read-only plan overview",
+    description: "Plan assignments",
   },
 ] as const;
 
