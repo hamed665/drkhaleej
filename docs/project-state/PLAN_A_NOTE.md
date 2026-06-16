@@ -1,54 +1,29 @@
 # PLAN-A Base Subscription Plan Catalog
 
-Status: implemented in PR scope.
+Status: superseded before merge.
 
-## Scope
+## Outcome
 
-PLAN-A adds the official DrMuscat base subscription plan catalog to the existing `subscription_plans` table.
+The initial PLAN-A migration approach was not merged.
 
-Plans:
+The repository's current migration validator requires an exact migration file list and forbids `INSERT INTO` in SQL migrations. Because PLAN-A is product catalog data rather than a schema change, the safer path is to avoid adding product catalog rows through a migration while this validator contract is still locked.
+
+## Replacement path
+
+PLAN-A should be implemented through an approved platform-admin initializer that writes the official base subscription plan catalog through existing application/admin server-side write patterns.
+
+This keeps:
+
+- no schema changes
+- no RLS changes
+- no generated type changes
+- no seed file changes
+- no migration validator changes
+- no fake provider/center/review data
+
+## Intended plans
 
 - Free Listing
 - Verified Starter
 - Growth Partner
 - Premium / Ads Pro
-
-## Why this is allowed
-
-This is official DrMuscat product catalog data, not fake provider, doctor, center, review, offer, or ranking data.
-
-The plan catalog is required before MON-C2 can assign subscription plans to center records.
-
-## Guardrails
-
-- No schema changes.
-- No RLS changes.
-- No generated Supabase type changes.
-- No seed file changes.
-- No public UI changes.
-- No admin UI changes.
-- No payment gateway.
-- No invoices.
-- No add-on purchases.
-- No ads.
-- No special offers.
-- No provider dashboard.
-- No center or provider records are created.
-
-## Pricing status
-
-- Free Listing is active with a final price of 0 OMR.
-- Paid plans are inserted as draft with price 0 OMR while commercial pricing is pending final approval.
-- Final paid pricing must be approved in a later commercial phase.
-
-## Idempotency
-
-The migration updates existing rows by `slug` and inserts missing rows when no matching slug exists.
-
-This lets the migration be safely re-run without creating duplicate plan rows, assuming the existing database does not already contain duplicate slugs.
-
-## Relationship to MON-C2
-
-After PLAN-A is applied to the target database, `/admin/center-subscriptions` should show available plans in the MON-C2 assignment form.
-
-MON-C2 still also requires at least one non-deleted `centers` row before a subscription can be assigned.
