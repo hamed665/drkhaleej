@@ -209,9 +209,14 @@ export async function createDraftCenterFromLead(
   const events: LeadEventInsert[] = [
     {
       actor_profile_id: admin.id,
-      event_type: "draft_center_created",
+      event_type: "note_added",
       lead_id: leadId,
-      metadata: { center_id: centerId, center_slug: slug, source: "center_a" },
+      metadata: {
+        center_id: centerId,
+        center_slug: slug,
+        event_kind: "draft_center_created",
+        source: "center_a",
+      },
       note_text: "Draft center created from provider onboarding lead.",
     },
   ];
