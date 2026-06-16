@@ -144,7 +144,7 @@ export function CenterSubscriptionAssignmentForm({
                       {plan.name_en}
                     </span>
                     <span className="mt-0.5 block text-xs text-slate-600">
-                      {plan.slug} · {formatLabel(plan.status)} · {formatPrice(plan.price_amount, plan.currency_code)}
+                      {formatLabel(plan.status)} · {formatPrice(plan.price_amount, plan.currency_code)}
                     </span>
                   </li>
                 ))}
@@ -226,7 +226,7 @@ export function CenterSubscriptionAssignmentForm({
               </option>
               {options.plans.map((plan) => (
                 <option key={plan.id} value={plan.id}>
-                  {plan.name_en} · {plan.slug} · {formatLabel(plan.interval)} · {formatPrice(plan.price_amount, plan.currency_code)}
+                  {plan.name_en} · {formatLabel(plan.interval)} · {formatPrice(plan.price_amount, plan.currency_code)}
                 </option>
               ))}
             </select>
