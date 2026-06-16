@@ -4,13 +4,13 @@ Status: superseded before merge.
 
 ## Outcome
 
-The initial PLAN-A migration approach was not merged.
+The initial PLAN-A migration approach must not be merged.
 
-The repository's current migration validator requires an exact migration file list and forbids `INSERT INTO` in SQL migrations. Because PLAN-A is product catalog data rather than a schema change, the safer path is to avoid adding product catalog rows through a migration while this validator contract is still locked.
+The repository's current migration validator is intentionally strict: it requires an exact SQL migration file list and forbids `INSERT INTO` in migrations. Because PLAN-A is official product catalog data rather than a schema change, the safer replacement path is an approved platform-admin initializer that writes the catalog through server-side admin code.
 
 ## Replacement path
 
-PLAN-A should be implemented through an approved platform-admin initializer that writes the official base subscription plan catalog through existing application/admin server-side write patterns.
+Implement PLAN-A as an admin-only catalog initializer in a later PR or as part of the MON-C2 admin workflow.
 
 This keeps:
 
@@ -19,7 +19,7 @@ This keeps:
 - no generated type changes
 - no seed file changes
 - no migration validator changes
-- no fake provider/center/review data
+- no fake provider, center, doctor, review, offer, or ranking data
 
 ## Intended plans
 
