@@ -11,7 +11,7 @@
     "routes:check": "node scripts/routes-check.mjs",
     "env:check": "node scripts/env-check.mjs",
     "db:check-cli": "node scripts/db/check-supabase-cli.mjs",
-    "db:validate:migrations": "node scripts/db/validate-migrations.mjs",
+    "db:validate:migrations": "node scripts/db/validate-migrations-taxc1.mjs",
     "db:validate:seeds": "node scripts/db/validate-seeds.mjs",
     "db:types": "pnpm db:check-cli && supabase gen types typescript --local > supabase/types/database.types.ts",
     "db:reset": "pnpm db:check-cli && supabase db reset",
