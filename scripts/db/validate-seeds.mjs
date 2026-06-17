@@ -3,7 +3,12 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const dir = 'supabase/seed';
-const expectedSeedFile = '0001_taxonomy_verticals_center_categories.sql';
+const expectedSeedFiles = [
+  '0000_oman_geo_foundation.sql',
+  '0001_taxonomy_verticals_center_categories.sql',
+];
+const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
+const geoSeedFile = '0000_oman_geo_foundation.sql';
 const expectedVerticalSlugs = [
   'medical',
   'dental',
@@ -67,6 +72,10 @@ function forbidPattern(content, pattern, message) {
   requireCondition(!pattern.test(content), message);
 }
 
+function readSeed(fileName) {
+  return readFileSync(path.join(dir, fileName), 'utf8');
+}
+
 try {
   if (!statSync(dir).isDirectory()) {
     throw new Error(`${dir} is not a directory`);
@@ -79,11 +88,13 @@ try {
 
 const sqlFiles = readdirSync(dir).filter((name) => name.endsWith('.sql')).sort();
 requireCondition(
-  sqlFiles.length === 1 && sqlFiles[0] === expectedSeedFile,
-  `TAX-SEED-B allows exactly one SQL seed file: ${expectedSeedFile}. Found: ${sqlFiles.join(', ') || '(none)'}`,
+  JSON.stringify(sqlFiles) === JSON.stringify(expectedSeedFiles),
+  `Allowed seed SQL files are exactly: ${expectedSeedFiles.join(', ')}. Found: ${sqlFiles.join(', ') || '(none)'}`,
 );
 
-const content = readFileSync(path.join(dir, expectedSeedFile), 'utf8');
+const geoContent = readSeed(geoSeedFile);
+const taxonomyContent = readSeed(taxonomySeedFile);
+const allContent = `${geoContent}\n${taxonomyContent}`;
 
 for (const [pattern, message] of [
   [/\binsert\s+into\s+public\.centers\b/i, 'Seed must not insert centers.'],
@@ -103,7 +114,20 @@ for (const [pattern, message] of [
   [/\bcreate\s+table\b/i, 'Seed must not create tables.'],
   [/\bdrop\b/i, 'Seed must not drop objects.'],
 ]) {
-  forbidPattern(content, pattern, message);
+  forbidPattern(allContent, pattern, message);
+}
+
+for (const [pattern, message] of [
+  [/insert\s+into\s+public\.geo_countries/i, 'Geo seed must insert countries.'],
+  [/insert\s+into\s+public\.geo_regions/i, 'Geo seed must insert regions.'],
+  [/insert\s+into\s+public\.geo_cities/i, 'Geo seed must insert cities.'],
+  [/insert\s+into\s+public\.geo_areas/i, 'Geo seed must insert areas.'],
+  [/'oman'/i, 'Geo seed must include Oman.'],
+  [/'muscat-governorate'/i, 'Geo seed must include Muscat Governorate.'],
+  [/'muscat'/i, 'Geo seed must include Muscat.'],
+  [/'al-khuwair'/i, 'Geo seed must include Al Khuwair.'],
+]) {
+  requirePattern(geoContent, pattern, message);
 }
 
 for (const [pattern, message] of [
@@ -118,28 +142,28 @@ for (const [pattern, message] of [
   [/where\s+not\s+exists/i, 'Seed must use WHERE NOT EXISTS for idempotent inserts.'],
   [/join\s+public\.healthcare_verticals\s+verticals/i, 'Category seed must resolve verticals by slug.'],
 ]) {
-  requirePattern(content, pattern, message);
+  requirePattern(taxonomyContent, pattern, message);
 }
 
 for (const slug of expectedVerticalSlugs) {
-  requirePattern(content, new RegExp(`'${slug}'`, 'i'), `Missing expected vertical slug in seed: ${slug}`);
+  requirePattern(taxonomyContent, new RegExp(`'${slug}'`, 'i'), `Missing expected vertical slug in seed: ${slug}`);
 }
 
 for (const slug of expectedCategorySlugs) {
-  requirePattern(content, new RegExp(`'${slug}'`, 'i'), `Missing expected category slug in seed: ${slug}`);
+  requirePattern(taxonomyContent, new RegExp(`'${slug}'`, 'i'), `Missing expected category slug in seed: ${slug}`);
 }
 
 for (const disabledSlug of ['veterinary', 'healthy-food', 'pet-clinic', 'veterinary-clinic', 'healthy-restaurant', 'healthy-cafe']) {
   requirePattern(
-    content,
+    taxonomyContent,
     new RegExp(`'${disabledSlug}'[\\s\\S]*?false[\\s\\S]*?false[\\s\\S]*?false`, 'i'),
     `Disabled taxonomy seed must keep ${disabledSlug} inactive/non-public.`,
   );
 }
 
 for (const underscoreSlug of ['home_care', 'mental_health', 'optical_eye_care', 'healthy_food', 'other_health']) {
-  forbidPattern(content, new RegExp(`'${underscoreSlug}'`, 'i'), `Seed must not use underscore slug: ${underscoreSlug}`);
+  forbidPattern(taxonomyContent, new RegExp(`'${underscoreSlug}'`, 'i'), `Seed must not use underscore slug: ${underscoreSlug}`);
 }
 
 console.log('Seed protocol validated.');
-console.log(`Approved TAX-SEED-B SQL seed file found: ${expectedSeedFile}`);
+console.log(`Approved seed files found: ${expectedSeedFiles.join(', ')}`);
