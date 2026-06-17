@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { DraftCenterEditForm } from "@/components/admin/draft-center-edit-form";
+import { DraftCenterWorkflowPanel } from "@/components/admin/draft-center-workflow-panel";
 import { getAdminDraftCenterById } from "@/server/admin/draft-centers";
 
 type AdminDraftCenterEditPageProps = {
@@ -31,5 +32,10 @@ export default async function AdminDraftCenterEditPage({
     );
   }
 
-  return <DraftCenterEditForm center={result.center} />;
+  return (
+    <div className="space-y-6">
+      <DraftCenterWorkflowPanel center={result.center} />
+      <DraftCenterEditForm center={result.center} />
+    </div>
+  );
 }

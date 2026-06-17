@@ -10,6 +10,7 @@ type CenterType = Database["public"]["Enums"]["center_type"];
 type VerificationStatus = Database["public"]["Enums"]["verification_status"];
 type AppLocale = Database["public"]["Enums"]["app_locale"];
 type CountryCode = Database["public"]["Enums"]["country_code"];
+type CenterStatus = Database["public"]["Enums"]["provider_status"];
 type CenterUpdate = Database["public"]["Tables"]["centers"]["Update"];
 
 export type DraftCenterUpdateState = {
@@ -17,6 +18,7 @@ export type DraftCenterUpdateState = {
   message: string | null;
 };
 
+const allowedWorkflowStatuses = ["draft", "pending_review"] as const satisfies readonly CenterStatus[];
 const allowedCenterTypes = [
   "clinic",
   "hospital",
@@ -192,7 +194,7 @@ export async function updateDraftCenterDetails(
     .from("centers")
     .select("id, slug")
     .eq("id", centerId)
-    .eq("status", "draft")
+    .in("status", allowedWorkflowStatuses)
     .is("deleted_at", null)
     .maybeSingle();
 
@@ -201,7 +203,7 @@ export async function updateDraftCenterDetails(
   }
 
   if (existingCenter === null) {
-    return failure("Draft center was not found or is no longer draft.");
+    return failure("Draft center was not found or is no longer in the review workflow.");
   }
 
   if (existingCenter.slug !== slug) {
@@ -246,7 +248,7 @@ export async function updateDraftCenterDetails(
     .from("centers")
     .update(updatePayload)
     .eq("id", centerId)
-    .eq("status", "draft")
+    .in("status", allowedWorkflowStatuses)
     .is("deleted_at", null)
     .select("id")
     .maybeSingle();
