@@ -1,0 +1,195 @@
+#!/usr/bin/env node
+import { execFileSync } from 'node:child_process';
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  statSync,
+} from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, '..', '..');
+const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
+const taxC1Validator = path.join(repoRoot, 'scripts', 'db', 'validate-migrations-taxc1.mjs');
+const taxC1Migration = '0054_healthcare_verticals_center_categories.sql';
+const taxRlsMigration = '0055_taxonomy_public_rls.sql';
+const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
+const hiddenTaxRlsMigrationPath = path.join(
+  migrationsDir,
+  `.taxrlsa-${taxRlsMigration}.hidden`,
+);
+
+const expectedMigrations = [
+  '0001_extensions.sql',
+  '0002_enums.sql',
+  '0003_profiles_auth.sql',
+  '0004_geo.sql',
+  '0005_taxonomy.sql',
+  '0006_centers.sql',
+  '0007_center_locations.sql',
+  '0008_center_services.sql',
+  '0009_center_ownership_claims.sql',
+  '0010_doctors.sql',
+  '0011_doctor_practice_locations.sql',
+  '0012_doctor_services.sql',
+  '0013_doctor_schedules.sql',
+  '0014_doctor_schedule_exceptions.sql',
+  '0015_appointment_slots.sql',
+  '0016_patient_contacts.sql',
+  '0017_appointments.sql',
+  '0018_appointment_status_history.sql',
+  '0019_appointment_cancellations.sql',
+  '0020_reviews.sql',
+  '0021_review_reports.sql',
+  '0022_center_type_expansion.sql',
+  '0023_media_assets.sql',
+  '0024_entity_media.sql',
+  '0025_subscription_plans.sql',
+  '0026_center_subscriptions.sql',
+  '0027_sponsored_campaigns.sql',
+  '0028_legal_documents.sql',
+  '0029_consent_logs.sql',
+  '0030_audit_logs.sql',
+  '0031_rls_auth_helpers.sql',
+  '0032_rls_public_catalog_read_policies.sql',
+  '0033_profiles_rls.sql',
+  '0034_center_access_helpers.sql',
+  '0035_center_claims_memberships_rls.sql',
+  '0036_patient_contacts_profile_link.sql',
+  '0037_patient_appointment_access_helpers.sql',
+  '0038_patient_contacts_appointments_rls.sql',
+  '0039_review_media_access_helpers.sql',
+  '0040_reviews_reports_media_private_rls.sql',
+  '0041_monetization_access_helpers.sql',
+  '0042_monetization_sponsored_rls.sql',
+  '0043_legal_consent_audit_access_helpers.sql',
+  '0044_legal_consent_audit_rls.sql',
+  '0045_contact_visibility_foundation.sql',
+  '0046_callback_request_foundation.sql',
+  '0047_provider_license_verification_foundation.sql',
+  '0048_media_public_visibility_hardening.sql',
+  '0049_media_public_rls_hardening.sql',
+  '0050_provider_onboarding_leads.sql',
+  '0051_landing_page_contents.sql',
+  '0052_review_companion_tables.sql',
+  '0053_provider_onboarding_lead_events.sql',
+  taxC1Migration,
+  taxRlsMigration,
+];
+
+function fail(message) {
+  console.error(`ERROR: TAX-RLS-A: ${message}`);
+  process.exit(1);
+}
+
+function requireCondition(condition, message) {
+  if (!condition) fail(message);
+}
+
+function requirePattern(content, pattern, message) {
+  requireCondition(pattern.test(content), message);
+}
+
+function forbidPattern(content, pattern, message) {
+  requireCondition(!pattern.test(content), message);
+}
+
+function readSqlMigrationFiles() {
+  requireCondition(statSync(migrationsDir).isDirectory(), 'Missing migrations directory.');
+
+  return readdirSync(migrationsDir)
+    .filter((name) => name.endsWith('.sql'))
+    .sort();
+}
+
+function validateMigrationInventory() {
+  const actualMigrations = readSqlMigrationFiles();
+
+  if (actualMigrations.join('|') !== expectedMigrations.join('|')) {
+    const missing = expectedMigrations.filter((name) => !actualMigrations.includes(name));
+    const unexpected = actualMigrations.filter((name) => !expectedMigrations.includes(name));
+
+    if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
+    if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
+
+    fail('Migration inventory must be exactly 0001 through 0055 for TAX-RLS-A.');
+  }
+}
+
+function validateTaxRlsMigration() {
+  requireCondition(existsSync(taxRlsMigrationPath), `${taxRlsMigration} is missing.`);
+
+  const content = readFileSync(taxRlsMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0055 must not seed rows or use INSERT INTO.'],
+    [/\bdrop\b/i, '0055 must not contain DROP statements.'],
+    [/\bfor\s+insert\b/i, '0055 must not add INSERT policies.'],
+    [/\bfor\s+update\b/i, '0055 must not add UPDATE policies.'],
+    [/\bfor\s+delete\b/i, '0055 must not add DELETE policies.'],
+    [/\bpayments?\b/i, '0055 must not include payment scope.'],
+    [/\binvoices?\b/i, '0055 must not include invoice scope.'],
+    [/\bbilling\b/i, '0055 must not include billing scope.'],
+    [/\bprovider\s+dashboard\b/i, '0055 must not include provider dashboard scope.'],
+    [/\bai\b/i, '0055 must not include AI scope.'],
+    [/\bstorage\s+bucket\b/i, '0055 must not include storage scope.'],
+    [/\bupload\b/i, '0055 must not include upload scope.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  const requiredPatterns = [
+    [/alter\s+table\s+public\.healthcare_verticals\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on healthcare_verticals.'],
+    [/alter\s+table\s+public\.center_categories\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on center_categories.'],
+    [/alter\s+table\s+public\.center_category_assignments\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on center_category_assignments.'],
+
+    [/create\s+policy\s+healthcare_verticals_select_public_active\s+on\s+public\.healthcare_verticals/i, '0055 must create healthcare_verticals public select policy.'],
+    [/create\s+policy\s+center_categories_select_public_active\s+on\s+public\.center_categories/i, '0055 must create center_categories public select policy.'],
+    [/create\s+policy\s+center_category_assignments_select_public_approved\s+on\s+public\.center_category_assignments/i, '0055 must create center_category_assignments public select policy.'],
+
+    [/for\s+select/i, '0055 policies must be SELECT policies.'],
+    [/to\s+anon\s*,\s*authenticated/i, '0055 policies must be scoped to anon and authenticated public reads.'],
+    [/deleted_at\s+is\s+null/i, '0055 policies must require deleted_at IS NULL.'],
+    [/is_active\s*=\s*true/i, '0055 taxonomy policies must require is_active = true.'],
+    [/public_directory_enabled\s*=\s*true/i, '0055 policies must respect public_directory_enabled.'],
+    [/public_profile_enabled\s*=\s*true/i, '0055 policies must respect public_profile_enabled.'],
+    [/is_public\s*=\s*true/i, '0055 assignment policy must require is_public = true.'],
+    [/review_status\s*=\s*'approved'/i, '0055 assignment policy must require approved review_status.'],
+    [/centers\.status\s*=\s*'active'/i, '0055 assignment policy must require active centers.'],
+    [/centers\.is_active\s*=\s*true/i, '0055 assignment policy must require center is_active = true.'],
+    [/from\s+public\.healthcare_verticals/i, '0055 must check healthcare_verticals in subqueries.'],
+    [/from\s+public\.center_categories/i, '0055 must check center_categories in subqueries.'],
+    [/from\s+public\.centers/i, '0055 must check centers in assignment policy.'],
+  ];
+
+  for (const [pattern, message] of requiredPatterns) {
+    requirePattern(content, pattern, message);
+  }
+}
+
+function runTaxC1ValidatorWithoutTaxRls() {
+  requireCondition(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
+
+  renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
+
+  try {
+    execFileSync(process.execPath, [taxC1Validator], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    });
+  } finally {
+    if (existsSync(hiddenTaxRlsMigrationPath)) {
+      renameSync(hiddenTaxRlsMigrationPath, taxRlsMigrationPath);
+    }
+  }
+}
+
+validateMigrationInventory();
+validateTaxRlsMigration();
+runTaxC1ValidatorWithoutTaxRls();
+
+console.log('TAX-RLS-A migration validation passed.');
