@@ -62,22 +62,22 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
     <div className="space-y-6">
       <header className="space-y-3">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
-          CENTER-B
+          CENTER-B/D1
         </p>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">
-              Draft centers
+              Draft and review centers
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Read-only review list for centers that are still in draft status.
-              This page does not publish, verify, bill, claim, or activate public
-              center profiles. Draft detail editing is available in a separate
-              guarded CENTER-C form.
+              Review list for centers in draft or pending review status. This
+              page does not publish, verify, bill, claim, or activate public
+              center profiles. Draft detail editing and review readiness are
+              handled in guarded admin forms.
             </p>
           </div>
           <div className="rounded-2xl border border-cyan-100 bg-cyan-50/80 px-4 py-3 text-sm font-medium text-cyan-900">
-            Fixed page size: {result.limit} draft centers
+            Fixed page size: {result.limit} centers
           </div>
         </div>
       </header>
@@ -85,27 +85,28 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
       <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
         <p className="text-sm leading-6 text-slate-700">
           This list reads existing <strong>centers</strong> rows where status is
-          draft. It is an admin review surface; publishing remains a separate
-          future phase.
+          draft or pending review. Public activation remains a separate future
+          phase.
         </p>
       </section>
 
       {!result.ok ? (
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-950">
-          <h3 className="text-lg font-bold">Draft centers unavailable</h3>
+          <h3 className="text-lg font-bold">Center workflow list unavailable</h3>
           <p className="mt-2 max-w-2xl text-sm leading-6">
-            Draft centers could not be loaded right now. No raw database error is
-            exposed here.
+            Draft and pending-review centers could not be loaded right now. No
+            raw database error is exposed here.
           </p>
         </section>
       ) : result.items.length === 0 ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-8 text-center">
           <h3 className="text-xl font-bold text-slate-950">
-            No draft centers found
+            No draft or pending-review centers found
           </h3>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             Draft centers created from provider onboarding leads, or manually
-            created later, will appear here before any publish workflow is added.
+            created later, will appear here before any public activation workflow
+            is added.
           </p>
         </section>
       ) : (
@@ -172,7 +173,7 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
                       href={`/admin/draft-centers/${center.id}`}
                       className="inline-flex rounded-2xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-bold text-cyan-900 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
                     >
-                      Edit details
+                      Review details
                     </Link>
                   </td>
                 </tr>
