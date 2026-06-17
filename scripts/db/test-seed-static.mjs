@@ -9,10 +9,15 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 const seedDir = path.join(repoRoot, 'supabase', 'seed');
 const packageJsonPath = path.join(repoRoot, 'package.json');
+const expectedSeedFile = '0001_taxonomy_verticals_center_categories.sql';
 
 function fail(message) {
   console.error(`❌ ${message}`);
   process.exit(1);
+}
+
+function assert(cond, message) {
+  if (!cond) fail(message);
 }
 
 function walkForSql(dir) {
@@ -31,23 +36,60 @@ function walkForSql(dir) {
     }
   }
 
-  return sqlFiles;
+  return sqlFiles.sort();
 }
 
 if (!statSync(seedDir).isDirectory()) {
   fail(`Missing seed directory: ${seedDir}`);
 }
 
-const topLevelEntries = readdirSync(seedDir, { withFileTypes: true });
-for (const entry of topLevelEntries) {
-  if (entry.isFile() && entry.name.toLowerCase().endsWith('.sql')) {
-    fail(`Top-level seed SQL file is not allowed: supabase/seed/${entry.name}`);
-  }
+const allSqlUnderSeed = walkForSql(seedDir);
+const expectedRelativePath = `supabase/seed/${expectedSeedFile}`;
+assert(
+  allSqlUnderSeed.length === 1 && allSqlUnderSeed[0] === expectedRelativePath,
+  `Expected only approved TAX-SEED-B SQL file ${expectedRelativePath}; found: ${allSqlUnderSeed.join(', ') || '(none)'}`,
+);
+
+const seedContent = readFileSync(path.join(seedDir, expectedSeedFile), 'utf8');
+
+for (const forbidden of [
+  /insert\s+into\s+public\.centers\b/i,
+  /insert\s+into\s+public\.doctors\b/i,
+  /insert\s+into\s+public\.reviews\b/i,
+  /insert\s+into\s+public\.review_reports\b/i,
+  /insert\s+into\s+public\.provider_onboarding_leads\b/i,
+  /insert\s+into\s+public\.media_assets\b/i,
+  /insert\s+into\s+public\.sponsored_campaigns\b/i,
+  /\bratings?\b/i,
+  /\binsurance\b/i,
+  /\blicense_authorities\b/i,
+  /\bcreate\s+policy\b/i,
+  /\balter\s+table\b/i,
+  /\bcreate\s+table\b/i,
+  /\bdrop\b/i,
+]) {
+  assert(!forbidden.test(seedContent), `Forbidden seed scope found: ${forbidden}`);
 }
 
-const allSqlUnderSeed = walkForSql(seedDir);
-if (allSqlUnderSeed.length > 0) {
-  fail(`Seed SQL files found under supabase/seed: ${allSqlUnderSeed.join(', ')}`);
+for (const required of [
+  /insert\s+into\s+public\.healthcare_verticals/i,
+  /insert\s+into\s+public\.center_categories/i,
+  /update\s+public\.healthcare_verticals/i,
+  /update\s+public\.center_categories/i,
+  /'medical'/i,
+  /'dental'/i,
+  /'diagnostics'/i,
+  /'pharmacy'/i,
+  /'veterinary'/i,
+  /'healthy_food'/i,
+  /'medical-laboratory'/i,
+  /'dental-clinic'/i,
+  /'pet-clinic'/i,
+  /'healthy-restaurant'/i,
+  /schema_org_hint\s*=\s*null/i,
+  /where\s+not\s+exists/i,
+]) {
+  assert(required.test(seedContent), `Missing required approved seed pattern: ${required}`);
 }
 
 const packageJson = readFileSync(packageJsonPath, 'utf8');
@@ -55,4 +97,4 @@ if (/Seed test placeholder/i.test(packageJson)) {
   fail('Placeholder string "Seed test placeholder" still present in package.json.');
 }
 
-console.log('✅ Seed static harness checks passed: no seed SQL files and no seed placeholder script text remain.');
+console.log(`✅ Seed static harness checks passed: approved seed file ${expectedRelativePath} only.`);
