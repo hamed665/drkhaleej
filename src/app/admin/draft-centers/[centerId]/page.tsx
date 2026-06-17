@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 
 import { DraftCenterEditForm } from "@/components/admin/draft-center-edit-form";
+import { DraftCenterTaxonomyPanel } from "@/components/admin/draft-center-taxonomy-panel";
 import { DraftCenterWorkflowPanel } from "@/components/admin/draft-center-workflow-panel";
 import { getAdminDraftCenterById } from "@/server/admin/draft-centers";
+import { getAdminDraftCenterTaxonomy } from "@/server/admin/draft-center-taxonomy";
 
 type AdminDraftCenterEditPageProps = {
   params: Promise<{
@@ -32,9 +34,26 @@ export default async function AdminDraftCenterEditPage({
     );
   }
 
+  const taxonomy = await getAdminDraftCenterTaxonomy(centerId);
+
   return (
     <div className="space-y-6">
       <DraftCenterWorkflowPanel center={result.center} />
+      {taxonomy.ok ? (
+        <DraftCenterTaxonomyPanel
+          assignment={taxonomy.assignment}
+          categoryOptions={taxonomy.categoryOptions}
+          center={result.center}
+        />
+      ) : (
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+          <h3 className="text-lg font-bold">Category assignment unavailable</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6">
+            Taxonomy categories could not be loaded right now. You can still edit
+            the draft center details. No public state changed.
+          </p>
+        </section>
+      )}
       <DraftCenterEditForm center={result.center} />
     </div>
   );
