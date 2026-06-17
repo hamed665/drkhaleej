@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type {
   AdminDraftCenterListItem,
   AdminDraftCentersListResult,
@@ -69,8 +71,9 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               Read-only review list for centers that are still in draft status.
-              This page does not publish, edit, verify, bill, claim, or activate
-              public center profiles.
+              This page does not publish, verify, bill, claim, or activate public
+              center profiles. Draft detail editing is available in a separate
+              guarded CENTER-C form.
             </p>
           </div>
           <div className="rounded-2xl border border-cyan-100 bg-cyan-50/80 px-4 py-3 text-sm font-medium text-cyan-900">
@@ -82,8 +85,8 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
       <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
         <p className="text-sm leading-6 text-slate-700">
           This list reads existing <strong>centers</strong> rows where status is
-          draft. It is an admin review surface only; center editing and publish
-          workflows remain separate future phases.
+          draft. It is an admin review surface; publishing remains a separate
+          future phase.
         </p>
       </section>
 
@@ -107,7 +110,7 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
         </section>
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <table className="min-w-[1120px] divide-y divide-slate-200 text-left text-sm">
+          <table className="min-w-[1220px] divide-y divide-slate-200 text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
               <tr>
                 <th scope="col" className="px-4 py-3 font-semibold">Center</th>
@@ -116,6 +119,7 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
                 <th scope="col" className="px-4 py-3 font-semibold">Contact</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Source</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Updated</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -162,6 +166,14 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
                     <div className="mt-1 text-xs text-slate-500">
                       Created: {formatDateTime(center.createdAt)}
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <Link
+                      href={`/admin/draft-centers/${center.id}`}
+                      className="inline-flex rounded-2xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-bold text-cyan-900 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                    >
+                      Edit details
+                    </Link>
                   </td>
                 </tr>
               ))}
