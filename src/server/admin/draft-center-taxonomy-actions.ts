@@ -67,6 +67,10 @@ function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
+function isAllowedWorkflowStatus(status: CenterStatus): boolean {
+  return allowedWorkflowStatuses.some((allowedStatus) => allowedStatus === status);
+}
+
 function revalidateCenterTaxonomy(centerId: string): void {
   revalidatePath("/admin/draft-centers");
   revalidatePath(`/admin/draft-centers/${centerId}`);
@@ -102,7 +106,7 @@ export async function saveDraftCenterPrimaryCategory(
     return failure("Center could not be loaded.");
   }
 
-  if (center === null || !allowedWorkflowStatuses.includes(center.status)) {
+  if (center === null || !isAllowedWorkflowStatus(center.status)) {
     return failure("Only draft or pending-review centers can be categorized here.");
   }
 
