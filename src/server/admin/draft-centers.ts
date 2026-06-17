@@ -6,7 +6,10 @@ import type { Database } from "@/lib/supabase/types";
 
 type CenterRow = Database["public"]["Tables"]["centers"]["Row"];
 
+type AdminCenterWorkflowStatus = Extract<CenterRow["status"], "draft" | "pending_review">;
+
 const fixedLimit = 100;
+const workflowStatuses: AdminCenterWorkflowStatus[] = ["draft", "pending_review"];
 const listSelectColumns =
   "id, slug, name_en, name_ar, center_type, status, verification_status, primary_phone, whatsapp_phone, email, default_locale, default_country, is_active, is_claimable, metadata, created_at, updated_at";
 const detailSelectColumns =
@@ -170,7 +173,7 @@ export async function listAdminDraftCenters(): Promise<AdminDraftCentersListResu
   const { data, error } = await supabase
     .from("centers")
     .select(listSelectColumns)
-    .eq("status", "draft")
+    .in("status", workflowStatuses)
     .is("deleted_at", null)
     .order("updated_at", { ascending: false })
     .limit(fixedLimit);
@@ -196,7 +199,7 @@ export async function getAdminDraftCenterById(
     .from("centers")
     .select(detailSelectColumns)
     .eq("id", centerId)
-    .eq("status", "draft")
+    .in("status", workflowStatuses)
     .is("deleted_at", null)
     .maybeSingle();
 
