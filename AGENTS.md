@@ -32,11 +32,22 @@ Before planning or implementing any future task, agents must read the following 
 14. `docs/master-spec/76_HUMAN_APPROVAL_CHECKPOINTS.md`
 15. `docs/master-spec/82_COMMERCIAL_CONTENT_PLACEMENT_AI_OPERATING_MODEL.md`
 
-### D. V10.5 addendums
+### D. Platform planning specs
 
-16. `docs/addendums/V10_5_BUSINESS_GROWTH_REVENUE_ADDENDUM.md`
-17. `docs/addendums/V10_5_SEO_AI_SEARCH_EXPANSION_ADDENDUM.md`
-18. `docs/addendums/V10_5_MONETIZATION_SALES_REFERRAL_ADDENDUM.md`
+16. `docs/platform/DRMUSCAT_PLATFORM_ARCHITECTURE_V1.md`
+17. `docs/platform/DRMUSCAT_ROLES_AND_PERMISSIONS_SPEC_V1.md`
+18. `docs/platform/DRMUSCAT_PROVIDER_ENTITY_MODEL_SPEC_V1.md`
+19. `docs/platform/DRMUSCAT_TAXONOMY_AND_PROVIDER_PROFILE_MODEL_SPEC_V1.md`
+20. `docs/platform/DRMUSCAT_SEO_AI_CONTENT_OPERATING_SYSTEM_SPEC_V1.md`
+21. `docs/platform/DRMUSCAT_KEYWORD_UNIVERSE_CONTENT_INTELLIGENCE_SPEC_V1.md`
+22. `docs/platform/DRMUSCAT_AI_BRIEF_DRAFT_WORKFLOW_SPEC_V1.md`
+23. `docs/platform/DRMUSCAT_EXISTING_REVIEW_SCHEMA_RECONCILIATION_SPEC_V1.md`
+
+### E. V10.5 addendums
+
+24. `docs/addendums/V10_5_BUSINESS_GROWTH_REVENUE_ADDENDUM.md`
+25. `docs/addendums/V10_5_SEO_AI_SEARCH_EXPANSION_ADDENDUM.md`
+26. `docs/addendums/V10_5_MONETIZATION_SALES_REFERRAL_ADDENDUM.md`
 
 Future tasks must still use the four-axis mapping model:
 

@@ -8,6 +8,7 @@ Canonical specification path:
 - `docs/platform/DRMUSCAT_PLATFORM_ARCHITECTURE_V1.md` — documentation-only future platform architecture map.
 - `docs/platform/DRMUSCAT_ROLES_AND_PERMISSIONS_SPEC_V1.md` — documentation-only role, permission, ownership, audit, and RLS implication spec.
 - `docs/platform/DRMUSCAT_PROVIDER_ENTITY_MODEL_SPEC_V1.md` — documentation-only provider, doctor, center, branch, claim, verification, and public/private entity model spec.
+- `docs/platform/DRMUSCAT_TAXONOMY_AND_PROVIDER_PROFILE_MODEL_SPEC_V1.md` — documentation-only taxonomy, provider profile, doctor, specialty, service, insurance, license, media, review, bilingual label, and WhatsApp CTA planning spec.
 - `docs/platform/DRMUSCAT_SEO_AI_CONTENT_OPERATING_SYSTEM_SPEC_V1.md` — documentation-only SEO, AI content, CMS, media, review, and reporting operating system specification.
 - `docs/platform/DRMUSCAT_KEYWORD_UNIVERSE_CONTENT_INTELLIGENCE_SPEC_V1.md` — documentation-only keyword universe and content intelligence planning specification.
 - `docs/platform/DRMUSCAT_AI_BRIEF_DRAFT_WORKFLOW_SPEC_V1.md` — documentation-only AI brief and draft workflow, prompt governance, output validation, review, and approval specification.
@@ -211,11 +212,12 @@ Future implementation must remain explicitly phase-approved and narrowly scoped.
 
 Recommended next planning order:
 
-1. `OFF-A` — Official Offers admin/data model planning.
-2. `ADS-B` / `MON-D` — fuller Ads and paid placement options planning.
-3. `ART-B` — Article CMS data model planning.
-4. `PLAC-A` — Article placement slot engine planning.
-5. `AI-A` — read-only content intelligence planning only after article/offer/placement foundations are approved.
+1. `TAX-A` / `MODEL-A` — taxonomy, provider profile, doctor, specialty, service, insurance, license, media, review, WhatsApp CTA, and bilingual label planning.
+2. `OFF-A` — Official Offers admin/data model planning.
+3. `ADS-B` / `MON-D` — fuller Ads and paid placement options planning.
+4. `ART-B` — Article CMS data model planning.
+5. `PLAC-A` — Article placement slot engine planning.
+6. `AI-A` — read-only content intelligence planning only after article/offer/placement foundations are approved.
 
 Do not implement sales, referral, billing, analytics, SEO AI, provider dashboard, payment, admin mutation, seed, or other business expansion features unless a future phase specifically approves that scope.
 
