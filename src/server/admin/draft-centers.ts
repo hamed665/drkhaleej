@@ -7,8 +7,10 @@ import type { Database } from "@/lib/supabase/types";
 type CenterRow = Database["public"]["Tables"]["centers"]["Row"];
 
 const fixedLimit = 100;
-const selectColumns =
+const listSelectColumns =
   "id, slug, name_en, name_ar, center_type, status, verification_status, primary_phone, whatsapp_phone, email, default_locale, default_country, is_active, is_claimable, metadata, created_at, updated_at";
+const detailSelectColumns =
+  "id, slug, name_en, name_ar, legal_name, center_type, status, verification_status, primary_phone, secondary_phone, whatsapp_phone, email, website_url, short_description_en, short_description_ar, description_en, description_ar, default_locale, default_country, is_active, is_claimable, metadata, created_at, updated_at";
 
 type CenterListRow = Pick<
   CenterRow,
@@ -22,6 +24,34 @@ type CenterListRow = Pick<
   | "primary_phone"
   | "whatsapp_phone"
   | "email"
+  | "default_locale"
+  | "default_country"
+  | "is_active"
+  | "is_claimable"
+  | "metadata"
+  | "created_at"
+  | "updated_at"
+>;
+
+type CenterDetailRow = Pick<
+  CenterRow,
+  | "id"
+  | "slug"
+  | "name_en"
+  | "name_ar"
+  | "legal_name"
+  | "center_type"
+  | "status"
+  | "verification_status"
+  | "primary_phone"
+  | "secondary_phone"
+  | "whatsapp_phone"
+  | "email"
+  | "website_url"
+  | "short_description_en"
+  | "short_description_ar"
+  | "description_en"
+  | "description_ar"
   | "default_locale"
   | "default_country"
   | "is_active"
@@ -54,9 +84,27 @@ export type AdminDraftCenterListItem = {
   updatedAt: string;
 };
 
+export type AdminDraftCenterDetail = AdminDraftCenterListItem & {
+  legalName: string | null;
+  secondaryPhone: string | null;
+  websiteUrl: string | null;
+  shortDescriptionEn: string | null;
+  shortDescriptionAr: string | null;
+  descriptionEn: string | null;
+  descriptionAr: string | null;
+};
+
 export type AdminDraftCentersListResult =
   | { ok: true; items: AdminDraftCenterListItem[]; limit: number }
   | { ok: false; reason: "unavailable"; items: []; limit: number };
+
+export type AdminDraftCenterDetailResult =
+  | { ok: true; center: AdminDraftCenterDetail }
+  | { ok: false; reason: "not_found" | "unavailable" };
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
 
 function metadataRecord(value: CenterRow["metadata"]): Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -69,9 +117,18 @@ function metadataText(record: Record<string, unknown>, key: string): string | nu
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 }
 
-function mapCenter(row: CenterListRow): AdminDraftCenterListItem {
+function sourceFields(row: Pick<CenterRow, "metadata">) {
   const metadata = metadataRecord(row.metadata);
 
+  return {
+    createdFrom: metadataText(metadata, "created_from"),
+    sourceLeadId: metadataText(metadata, "source_provider_onboarding_lead_id"),
+    sourceProviderType: metadataText(metadata, "source_provider_type"),
+    sourceRequest: metadataText(metadata, "source_request"),
+  };
+}
+
+function mapCenter(row: CenterListRow): AdminDraftCenterListItem {
   return {
     id: row.id,
     slug: row.slug,
@@ -87,12 +144,22 @@ function mapCenter(row: CenterListRow): AdminDraftCenterListItem {
     defaultCountry: row.default_country,
     isActive: row.is_active,
     isClaimable: row.is_claimable,
-    createdFrom: metadataText(metadata, "created_from"),
-    sourceLeadId: metadataText(metadata, "source_provider_onboarding_lead_id"),
-    sourceProviderType: metadataText(metadata, "source_provider_type"),
-    sourceRequest: metadataText(metadata, "source_request"),
+    ...sourceFields(row),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function mapCenterDetail(row: CenterDetailRow): AdminDraftCenterDetail {
+  return {
+    ...mapCenter(row),
+    legalName: row.legal_name,
+    secondaryPhone: row.secondary_phone,
+    websiteUrl: row.website_url,
+    shortDescriptionEn: row.short_description_en,
+    shortDescriptionAr: row.short_description_ar,
+    descriptionEn: row.description_en,
+    descriptionAr: row.description_ar,
   };
 }
 
@@ -102,7 +169,7 @@ export async function listAdminDraftCenters(): Promise<AdminDraftCentersListResu
   const supabase = createSupabaseServiceRoleClient();
   const { data, error } = await supabase
     .from("centers")
-    .select(selectColumns)
+    .select(listSelectColumns)
     .eq("status", "draft")
     .is("deleted_at", null)
     .order("updated_at", { ascending: false })
@@ -113,4 +180,33 @@ export async function listAdminDraftCenters(): Promise<AdminDraftCentersListResu
   }
 
   return { ok: true, items: data.map(mapCenter), limit: fixedLimit };
+}
+
+export async function getAdminDraftCenterById(
+  centerId: string,
+): Promise<AdminDraftCenterDetailResult> {
+  await requirePlatformAdmin();
+
+  if (!isUuid(centerId)) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  const supabase = createSupabaseServiceRoleClient();
+  const { data, error } = await supabase
+    .from("centers")
+    .select(detailSelectColumns)
+    .eq("id", centerId)
+    .eq("status", "draft")
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (error !== null) {
+    return { ok: false, reason: "unavailable" };
+  }
+
+  if (data === null) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  return { ok: true, center: mapCenterDetail(data) };
 }
