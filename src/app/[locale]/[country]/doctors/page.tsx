@@ -19,10 +19,14 @@ type Copy = {
   moreFilters: string;
   specialty: string;
   searchButton: string;
+  trustTitle: string;
   trustItems: readonly string[];
   chips: readonly string[];
   specialties: readonly string[];
   areas: readonly string[];
+  defaultCountry: string;
+  defaultCity: string;
+  defaultArea: string;
 };
 
 const copy: Record<'en' | 'ar', Copy> = {
@@ -45,10 +49,14 @@ const copy: Record<'en' | 'ar', Copy> = {
     moreFilters: 'More filters',
     specialty: 'Specialty paths',
     searchButton: 'Search',
+    trustTitle: 'Discovery safety',
     trustItems: ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
     chips: ['Doctors', 'Clinics', 'Dental', 'Dermatology', 'Pediatrics', 'Women’s health', 'ENT', 'Orthopedics'],
     specialties: ['General Practice', 'Cardiology', 'Ophthalmology', 'Physiotherapy'],
-    areas: ['Muscat', 'Al Khuwair', 'Qurum', 'Azaiba']
+    areas: ['Muscat', 'Al Khuwair', 'Qurum', 'Azaiba'],
+    defaultCountry: 'Oman',
+    defaultCity: 'Muscat',
+    defaultArea: 'Al Khuwair'
   },
   ar: {
     badge: 'الأطباء في عُمان',
@@ -69,10 +77,14 @@ const copy: Record<'en' | 'ar', Copy> = {
     moreFilters: 'المزيد من الفلاتر',
     specialty: 'مسارات التخصص',
     searchButton: 'بحث',
+    trustTitle: 'سلامة الاكتشاف',
     trustItems: ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'],
     chips: ['الأطباء', 'العيادات', 'الأسنان', 'الجلدية', 'طب الأطفال', 'النساء والولادة', 'أنف وأذن وحنجرة', 'العظام'],
     specialties: ['طب عام', 'قلب', 'عيون', 'علاج طبيعي'],
-    areas: ['مسقط', 'الخوير', 'القرم', 'العذيبة']
+    areas: ['مسقط', 'الخوير', 'القرم', 'العذيبة'],
+    defaultCountry: 'عُمان',
+    defaultCity: 'مسقط',
+    defaultArea: 'الخوير'
   }
 };
 
@@ -145,21 +157,21 @@ export default async function DoctorsPage({ params }: { params: Promise<Params> 
                 <div className="dm2026-home-search__select-grid" aria-label={`${t.country}, ${t.city}, ${t.area}`}>
                   <div className="dm2026-home-search__field">
                     <label htmlFor="doctors-a-country">{t.country}</label>
-                    <select id="doctors-a-country" name="country" className="dm2026-select" defaultValue={lang === 'ar' ? 'عُمان' : 'Oman'}>
-                      <option>{lang === 'ar' ? 'عُمان' : 'Oman'}</option>
+                    <select id="doctors-a-country" name="country" className="dm2026-select" defaultValue={t.defaultCountry}>
+                      <option>{t.defaultCountry}</option>
                     </select>
                   </div>
                   <div className="dm2026-home-search__field">
                     <label htmlFor="doctors-a-city">{t.city}</label>
-                    <select id="doctors-a-city" name="city" className="dm2026-select" defaultValue={lang === 'ar' ? 'مسقط' : 'Muscat'}>
-                      <option>{lang === 'ar' ? 'مسقط' : 'Muscat'}</option>
+                    <select id="doctors-a-city" name="city" className="dm2026-select" defaultValue={t.defaultCity}>
+                      <option>{t.defaultCity}</option>
                       <option>{lang === 'ar' ? 'السيب' : 'Seeb'}</option>
                       <option>{lang === 'ar' ? 'بوشر' : 'Bawshar'}</option>
                     </select>
                   </div>
                   <div className="dm2026-home-search__field">
                     <label htmlFor="doctors-a-area">{t.area}</label>
-                    <select id="doctors-a-area" name="area" className="dm2026-select" defaultValue={t.areas[1]}>
+                    <select id="doctors-a-area" name="area" className="dm2026-select" defaultValue={t.defaultArea}>
                       {t.areas.map((area) => <option key={area}>{area}</option>)}
                     </select>
                   </div>
