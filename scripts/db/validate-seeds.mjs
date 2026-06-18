@@ -10,8 +10,10 @@ const expectedSeedFiles = [
   '0003_geo_cities_d1a_oman.sql',
   '0004_geo_cities_d1b_gulf.sql',
   '0005_geo_cities_d2a_saudi.sql',
+  '0006_specialties_seed_a_internal.sql',
 ];
 const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
+const specialtySeedFile = '0006_specialties_seed_a_internal.sql';
 const geoSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0002_geo_regions_c3_north_africa.sql',
@@ -64,6 +66,40 @@ const expectedCategorySlugs = [
   'healthy-cafe',
   'other-health-service',
 ];
+const expectedSpecialtySlugs = [
+  'general-practitioner',
+  'family-medicine',
+  'internal-medicine',
+  'pediatrics',
+  'obstetrics-gynecology',
+  'dermatology',
+  'cardiology',
+  'ent',
+  'ophthalmology',
+  'orthopedics',
+  'general-surgery',
+  'dentistry',
+  'psychiatry',
+  'psychology',
+  'physiotherapy',
+  'radiology',
+  'emergency-medicine',
+  'neurology',
+  'neurosurgery',
+  'gastroenterology',
+  'urology',
+  'nephrology',
+  'endocrinology',
+  'pulmonology',
+  'oncology',
+  'laboratory-medicine',
+  'neonatology',
+  'pediatric-cardiology',
+  'interventional-cardiology',
+  'reproductive-medicine',
+  'orthodontics',
+  'oral-maxillofacial-surgery',
+];
 
 function fail(message) {
   console.error(`ERROR: ${message}`);
@@ -104,7 +140,8 @@ requireCondition(
 
 const geoContent = geoSeedFiles.map(readSeed).join('\n');
 const taxonomyContent = readSeed(taxonomySeedFile);
-const allContent = `${geoContent}\n${taxonomyContent}`;
+const specialtyContent = readSeed(specialtySeedFile);
+const allContent = `${geoContent}\n${taxonomyContent}\n${specialtyContent}`;
 
 for (const [pattern, message] of [
   [/\binsert\s+into\s+public\.centers\b/i, 'Seed must not insert centers.'],
@@ -202,6 +239,37 @@ for (const disabledSlug of ['veterinary', 'healthy-food', 'pet-clinic', 'veterin
 
 for (const underscoreSlug of ['home_care', 'mental_health', 'optical_eye_care', 'healthy_food', 'other_health']) {
   forbidPattern(taxonomyContent, new RegExp(`'${underscoreSlug}'`, 'i'), `Seed must not use underscore slug: ${underscoreSlug}`);
+}
+
+for (const [pattern, message] of [
+  [/with\s+specialty_seed\s*\(/i, 'Specialty seed must define specialty_seed CTE.'],
+  [/insert\s+into\s+public\.specialties/i, 'Specialty seed must insert specialties.'],
+  [/update\s+public\.specialties/i, 'Specialty seed must update specialties idempotently.'],
+  [/insert\s+into\s+public\.specialty_aliases/i, 'Specialty seed must insert specialty aliases.'],
+  [/update\s+public\.specialty_aliases/i, 'Specialty seed must update specialty aliases idempotently.'],
+  [/TAX-SPECIALTY-SEED-A-INTERNAL/i, 'Specialty seed must mark internal seed phase.'],
+  [/public_directory_enabled\s*=\s*false/i, 'Specialty seed must keep public_directory_enabled false.'],
+  [/public_profile_enabled\s*=\s*false/i, 'Specialty seed must keep public_profile_enabled false.'],
+  [/where\s+not\s+exists/i, 'Specialty seed must use WHERE NOT EXISTS for idempotent inserts.'],
+  [/parent_links/i, 'Specialty seed must resolve parent specialty links.'],
+]) {
+  requirePattern(specialtyContent, pattern, message);
+}
+
+for (const slug of expectedSpecialtySlugs) {
+  requirePattern(specialtyContent, new RegExp(`'${slug}'`, 'i'), `Missing expected specialty slug in seed: ${slug}`);
+}
+
+for (const [pattern, message] of [
+  [/'fa'/i, 'Specialty seed must not include Persian locale.'],
+  [/[پچژگک‌یۀ]/, 'Specialty seed must not include Persian-specific characters.'],
+  [/generateMetadata/i, 'Specialty seed must not add metadata routes.'],
+  [/generateStaticParams/i, 'Specialty seed must not add static route params.'],
+  [/sitemap/i, 'Specialty seed must not touch sitemap.'],
+  [/robots/i, 'Specialty seed must not touch robots.'],
+  [/src\/app/i, 'Specialty seed must not reference app routes.'],
+]) {
+  forbidPattern(specialtyContent, pattern, message);
 }
 
 console.log('Seed protocol validated.');
