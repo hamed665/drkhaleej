@@ -1,57 +1,55 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-
-import { DoctorsPage2026 } from '@/components/public/doctors-page-2026';
+import { PublicDirectoryListingContent } from '@/components/public/public-directory-listing-content';
+import { PublicPageShell } from '@/components/public/public-page-shell';
 import { listPublicDoctors } from '@/lib/catalog/public-queries';
 import {
   isSupportedCountry,
   isSupportedLocale,
   localeDirection,
-  type SupportedCountry,
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
 type Params = { locale: string; country: string };
-type RouteCopy = { title: string; description: string };
+type RouteCopy = { title: string; description: string; badge: string };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
-    title: 'Find Doctors in Oman | DrMuscat',
-    description:
-      'Search public doctor listings in Oman with a premium bilingual discovery page, safe profile links, articles, sponsored slots, and offer-ready sections.'
+    title: 'Doctors in Oman | DrMuscat',
+    description: 'Browse public doctor listings in Oman with bilingual-ready, server-rendered pages.',
+    badge: 'Public doctor listings'
   },
   ar: {
-    title: 'ابحث عن أطباء في عُمان | DrMuscat',
-    description:
-      'ابحث في قوائم الأطباء العامة في عُمان من خلال صفحة اكتشاف مميزة ثنائية اللغة مع روابط ملفات آمنة ومقالات ومساحات إعلانات وعروض جاهزة.'
+    title: 'الأطباء في عُمان | DrMuscat',
+    description: 'تصفح القوائم العامة للأطباء في عُمان ضمن صفحات خادمية ثنائية اللغة.',
+    badge: 'قوائم الأطباء العامة'
   }
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
-
-  const safeLocale = locale as SupportedLocale;
-  const safeCountry = country as SupportedCountry;
-  const copy = copyByLocale[safeLocale];
-
-  return buildLocalizedMetadata({
-    locale: safeLocale,
-    country: safeCountry,
-    pathname: '/doctors',
-    title: copy.title,
-    description: copy.description
-  });
+  const copy = copyByLocale[locale];
+  return buildLocalizedMetadata({ locale, country, pathname: '/doctors', title: copy.title, description: copy.description });
 }
 
 export default async function PublicDoctorsPage({ params }: { params: Promise<Params> }) {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
 
-  const safeLocale = locale as SupportedLocale;
-  const safeCountry = country as SupportedCountry;
-  const result = await listPublicDoctors({ country: safeCountry });
+  const copy = copyByLocale[locale];
+  const result = await listPublicDoctors({ country });
 
-  return <DoctorsPage2026 country={safeCountry} dir={localeDirection(safeLocale)} locale={safeLocale} result={result} />;
+  const content = <PublicDirectoryListingContent locale={locale} variant="doctor" result={result} />;
+
+  return (
+    <PublicPageShell
+      dir={localeDirection(locale)}
+      heroBadge={copy.badge}
+      heroTitle={copy.title}
+      heroDescription={copy.description}
+      content={content}
+    />
+  );
 }
