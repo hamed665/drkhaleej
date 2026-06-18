@@ -6,6 +6,7 @@ const root = process.cwd();
 const requiredFiles = [
   'src/app/robots.ts',
   'src/app/sitemap.ts',
+  'src/lib/market/public-market.ts',
   'src/lib/seo/site.ts',
   'src/lib/seo/metadata.ts',
   'public/llms.txt'
@@ -82,6 +83,7 @@ if (
   throw new Error('src/lib/seo/jsonld.ts must not import Supabase or React.');
 }
 
+const marketSource = await readText('src/lib/market/public-market.ts');
 const siteSource = await readText('src/lib/seo/site.ts');
 const robotsSource = await readText('src/app/robots.ts');
 const sitemapSource = await readText('src/app/sitemap.ts');
@@ -90,10 +92,13 @@ const seoCheckSource = await readText('scripts/seo-check.mjs');
 const llmsSource = await readText('public/llms.txt');
 
 assertMatch(siteSource, /supportedLocales\s*=\s*\[['"]en['"]\s*,\s*['"]ar['"]\]/, 'supportedLocales must include en and ar in src/lib/seo/site.ts');
-assertMatch(siteSource, /supportedCountries\s*=\s*\[['"]om['"]\]/, 'supportedCountries must include om in src/lib/seo/site.ts');
+assertMatch(siteSource, /supportedCountries\s*=\s*publicMarketCountries/, 'SEO supportedCountries must come from publicMarketCountries.');
+assertMatch(marketSource, /publicMarketCountries\s*=\s*\['om'\]\s+as\s+const/, 'Only Oman must be public in public-market config.');
+assertMatch(marketSource, /seoIndexableMarketCountries\s*=\s*\['om'\]\s+as\s+const/, 'Only Oman must be SEO-indexable in public-market config.');
+assertMatch(marketSource, /sitemapMarketCountries\s*=\s*\['om'\]\s+as\s+const/, 'Only Oman must be included in sitemap market config.');
 
-if (!sitemapSource.includes("localizedRootPath('en')") || !sitemapSource.includes("localizedRootPath('ar')")) {
-  throw new Error('src/app/sitemap.ts must include /en/om and /ar/om via localizedRootPath helper usage.');
+if (!sitemapSource.includes('sitemapMarketCountries.flatMap') || !sitemapSource.includes('localizedRootPath(locale, country)')) {
+  throw new Error('src/app/sitemap.ts must build public URLs from sitemapMarketCountries and localizedRootPath(locale, country).');
 }
 
 for (const route of approvedDiscoveryRoutes) {
@@ -105,6 +110,13 @@ for (const route of approvedDiscoveryRoutes) {
 for (const route of approvedProviderRoutes) {
   if (!sitemapSource.includes(route)) {
     throw new Error(`src/app/sitemap.ts must include approved provider route: ${route}.`);
+  }
+}
+
+for (const blockedCountry of ['ae', 'qa', 'bh', 'kw', 'sa', 'iq', 'sy', 'jo', 'lb', 'ps', 'eg', 'ye', 'ma', 'dz', 'tn', 'ly', 'sd', 'mr', 'ir']) {
+  const blockedPattern = new RegExp(`/(en|ar)/${blockedCountry}(?:/|['\"\`])`, 'i');
+  if (blockedPattern.test(sitemapSource)) {
+    throw new Error(`src/app/sitemap.ts must not include non-launched country URLs: ${blockedCountry}.`);
   }
 }
 
@@ -189,4 +201,4 @@ if (forbiddenAiSymptomPositiveClaimPatterns.some((pattern) => pattern.test(llmsS
   throw new Error('public/llms.txt must not claim AI diagnosis or symptom checker availability.');
 }
 
-console.log('seo:check passed (robots, sitemap, locales/countries, llms, and static SEO constraints verified).');
+console.log('seo:check passed (robots, sitemap, market gate, llms, and static SEO constraints verified).');
