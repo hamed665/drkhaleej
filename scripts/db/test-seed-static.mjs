@@ -12,7 +12,13 @@ const packageJsonPath = path.join(repoRoot, 'package.json');
 const expectedSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0001_taxonomy_verticals_center_categories.sql',
+  '0002_geo_regions_c3_north_africa.sql',
 ];
+const geoSeedFiles = [
+  '0000_oman_geo_foundation.sql',
+  '0002_geo_regions_c3_north_africa.sql',
+];
+const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
 
 function fail(message) {
   console.error(`❌ ${message}`);
@@ -53,8 +59,8 @@ assert(
   `Expected only approved SQL seed files ${expectedRelativePaths.join(', ')}; found: ${allSqlUnderSeed.join(', ') || '(none)'}`,
 );
 
-const geoSeedContent = readFileSync(path.join(seedDir, expectedSeedFiles[0]), 'utf8');
-const taxonomySeedContent = readFileSync(path.join(seedDir, expectedSeedFiles[1]), 'utf8');
+const geoSeedContent = geoSeedFiles.map((fileName) => readFileSync(path.join(seedDir, fileName), 'utf8')).join('\n');
+const taxonomySeedContent = readFileSync(path.join(seedDir, taxonomySeedFile), 'utf8');
 const allSeedContent = `${geoSeedContent}\n${taxonomySeedContent}`;
 
 for (const forbidden of [
@@ -85,6 +91,12 @@ for (const required of [
   /'muscat-governorate'/i,
   /'muscat'/i,
   /'al-khuwair'/i,
+  /'casablanca-settat'/i,
+  /'algiers-province'/i,
+  /'tunis-governorate'/i,
+  /'tripoli-district'/i,
+  /'khartoum-state'/i,
+  /'nouakchott-nord-region'/i,
 ]) {
   assert(required.test(geoSeedContent), `Missing required approved geo seed pattern: ${required}`);
 }
