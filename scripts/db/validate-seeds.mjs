@@ -8,12 +8,14 @@ const expectedSeedFiles = [
   '0001_taxonomy_verticals_center_categories.sql',
   '0002_geo_regions_c3_north_africa.sql',
   '0003_geo_cities_d1a_oman.sql',
+  '0004_geo_cities_d1b_gulf.sql',
 ];
 const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
 const geoSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0002_geo_regions_c3_north_africa.sql',
   '0003_geo_cities_d1a_oman.sql',
+  '0004_geo_cities_d1b_gulf.sql',
 ];
 const expectedVerticalSlugs = [
   'medical',
@@ -143,6 +145,14 @@ for (const [pattern, message] of [
   [/'sohar'/i, 'GEO-FULL-D1A seed must include Sohar.'],
   [/'salalah'/i, 'GEO-FULL-D1A seed must include Salalah.'],
   [/'shalim-and-the-hallaniyat-islands'/i, 'GEO-FULL-D1A seed must include Shalim and the Hallaniyat Islands.'],
+  [/'abu-dhabi'/i, 'GEO-FULL-D1B seed must include Abu Dhabi.'],
+  [/'al-ain'/i, 'GEO-FULL-D1B seed must include Al Ain.'],
+  [/'dubai'/i, 'GEO-FULL-D1B seed must include Dubai.'],
+  [/'doha'/i, 'GEO-FULL-D1B seed must include Doha.'],
+  [/'lusail'/i, 'GEO-FULL-D1B seed must include Lusail.'],
+  [/'manama'/i, 'GEO-FULL-D1B seed must include Manama.'],
+  [/'kuwait-city'/i, 'GEO-FULL-D1B seed must include Kuwait City.'],
+  [/'salmiya'/i, 'GEO-FULL-D1B seed must include Salmiya.'],
 ]) {
   requirePattern(geoContent, pattern, message);
 }
