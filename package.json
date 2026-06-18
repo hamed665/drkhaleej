@@ -18,6 +18,7 @@
     "db:reset": "pnpm db:check-cli && supabase db reset",
     "test:db:rls": "pnpm db:validate:migrations && node scripts/db/test-rls-static-taxrlsa.mjs",
     "test:db:seed": "pnpm db:validate:seeds && node scripts/db/test-seed-static.mjs",
+    "seo:market-gate": "node scripts/seo/test-market-gate-static.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "test": "pnpm test:unit",
     "test:unit": "vitest run",
