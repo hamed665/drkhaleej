@@ -18,8 +18,10 @@ const taxC1Validator = path.join(repoRoot, 'scripts', 'db', 'validate-migrations
 const taxC1Migration = '0054_healthcare_verticals_center_categories.sql';
 const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const geoFullBCountryCodeMigration = '0056_country_code_regional_expansion.sql';
+const taxSpecialtyModelMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const geoFullBCountryCodeMigrationPath = path.join(migrationsDir, geoFullBCountryCodeMigration);
+const taxSpecialtyModelMigrationPath = path.join(migrationsDir, taxSpecialtyModelMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-${taxRlsMigration}.hidden`,
@@ -27,6 +29,10 @@ const hiddenTaxRlsMigrationPath = path.join(
 const hiddenGeoFullBCountryCodeMigrationPath = path.join(
   migrationsDir,
   `.geofullb-${geoFullBCountryCodeMigration}.hidden`,
+);
+const hiddenTaxSpecialtyModelMigrationPath = path.join(
+  migrationsDir,
+  `.taxspecialtymodela-${taxSpecialtyModelMigration}.hidden`,
 );
 
 const expectedMigrations = [
@@ -86,6 +92,7 @@ const expectedMigrations = [
   taxC1Migration,
   taxRlsMigration,
   geoFullBCountryCodeMigration,
+  taxSpecialtyModelMigration,
 ];
 
 function fail(message) {
@@ -123,7 +130,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0056 for GEO-FULL-B.');
+    fail('Migration inventory must be exactly 0001 through 0057 for TAX-SPECIALTY-MODEL-A.');
   }
 }
 
@@ -207,12 +214,61 @@ function validateGeoFullBCountryCodeMigration() {
   }
 }
 
+function validateTaxSpecialtyModelMigration() {
+  requireCondition(existsSync(taxSpecialtyModelMigrationPath), `${taxSpecialtyModelMigration} is missing.`);
+
+  const content = readFileSync(taxSpecialtyModelMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0057 must not seed rows or use INSERT INTO.'],
+    [/\bdrop\s+table\b/i, '0057 must not drop tables.'],
+    [/\bpayments?\b/i, '0057 must not include payment scope.'],
+    [/\binsurance\b/i, '0057 must not include insurance scope.'],
+    [/\blicense_authorities\b/i, '0057 must not include license authority scope.'],
+    [/\bmedia_assets\b/i, '0057 must not include media scope.'],
+    [/\bsponsored_campaigns\b/i, '0057 must not include ads scope.'],
+    [/\bai\b/i, '0057 must not include AI scope.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  const requiredPatterns = [
+    [/alter\s+table\s+public\.specialties/i, '0057 must alter public.specialties.'],
+    [/parent_specialty_id\s+uuid\s+null\s+references\s+public\.specialties\(id\)/i, '0057 must add parent_specialty_id.'],
+    [/specialty_level\s+text\s+not\s+null\s+default\s+'specialty'/i, '0057 must add specialty_level.'],
+    [/clinical_domain\s+text\s+null/i, '0057 must add clinical_domain.'],
+    [/age_focus\s+text\s+not\s+null\s+default\s+'all'/i, '0057 must add age_focus.'],
+    [/is_doctor_specialty\s+boolean\s+not\s+null\s+default\s+true/i, '0057 must add is_doctor_specialty.'],
+    [/is_primary_care\s+boolean\s+not\s+null\s+default\s+false/i, '0057 must add is_primary_care.'],
+    [/is_surgical\s+boolean\s+not\s+null\s+default\s+false/i, '0057 must add is_surgical.'],
+    [/public_directory_enabled\s+boolean\s+not\s+null\s+default\s+true/i, '0057 must add public_directory_enabled.'],
+    [/public_profile_enabled\s+boolean\s+not\s+null\s+default\s+true/i, '0057 must add public_profile_enabled.'],
+    [/specialties_specialty_level_check/i, '0057 must constrain specialty_level.'],
+    [/specialties_age_focus_check/i, '0057 must constrain age_focus.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.specialty_aliases/i, '0057 must create specialty_aliases.'],
+    [/specialty_aliases_locale_check/i, '0057 must constrain alias locale.'],
+    [/specialty_aliases_unique/i, '0057 must keep specialty aliases unique.'],
+    [/alter\s+table\s+public\.specialty_aliases\s+enable\s+row\s+level\s+security/i, '0057 must enable RLS on specialty_aliases.'],
+    [/create\s+policy\s+specialty_aliases_select_public_active\s+on\s+public\.specialty_aliases/i, '0057 must create public select policy for specialty_aliases.'],
+    [/for\s+select/i, '0057 alias policy must be SELECT-only.'],
+    [/to\s+anon\s*,\s*authenticated/i, '0057 alias policy must target anon and authenticated.'],
+    [/public_directory_enabled\s*=\s*true/i, '0057 alias policy must respect public_directory_enabled.'],
+    [/public_profile_enabled\s*=\s*true/i, '0057 alias policy must respect public_profile_enabled.'],
+  ];
+
+  for (const [pattern, message] of requiredPatterns) {
+    requirePattern(content, pattern, message);
+  }
+}
+
 function runTaxC1ValidatorWithoutLaterMigrations() {
   requireCondition(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   requireCondition(!existsSync(hiddenGeoFullBCountryCodeMigrationPath), 'Hidden GEO-FULL-B migration file already exists.');
+  requireCondition(!existsSync(hiddenTaxSpecialtyModelMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(geoFullBCountryCodeMigrationPath, hiddenGeoFullBCountryCodeMigrationPath);
+  renameSync(taxSpecialtyModelMigrationPath, hiddenTaxSpecialtyModelMigrationPath);
 
   try {
     execFileSync(process.execPath, [taxC1Validator], {
@@ -220,6 +276,10 @@ function runTaxC1ValidatorWithoutLaterMigrations() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenTaxSpecialtyModelMigrationPath)) {
+      renameSync(hiddenTaxSpecialtyModelMigrationPath, taxSpecialtyModelMigrationPath);
+    }
+
     if (existsSync(hiddenGeoFullBCountryCodeMigrationPath)) {
       renameSync(hiddenGeoFullBCountryCodeMigrationPath, geoFullBCountryCodeMigrationPath);
     }
@@ -233,6 +293,7 @@ function runTaxC1ValidatorWithoutLaterMigrations() {
 validateMigrationInventory();
 validateTaxRlsMigration();
 validateGeoFullBCountryCodeMigration();
+validateTaxSpecialtyModelMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
-console.log('GEO-FULL-B migration validation passed.');
+console.log('TAX-SPECIALTY-MODEL-A migration validation passed.');

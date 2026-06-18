@@ -15,10 +15,16 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyRlsStaticTest = path.join(repoRoot, 'scripts', 'db', 'test-rls-static.mjs');
 const taxRlsMigration = '0055_taxonomy_public_rls.sql';
+const specialtyTaxonomyMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
+const specialtyTaxonomyMigrationPath = path.join(migrationsDir, specialtyTaxonomyMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-static-${taxRlsMigration}.hidden`,
+);
+const hiddenSpecialtyTaxonomyMigrationPath = path.join(
+  migrationsDir,
+  `.taxspecialtymodela-static-${specialtyTaxonomyMigration}.hidden`,
 );
 
 function fail(message) {
@@ -77,10 +83,44 @@ function validateTaxonomyRlsMigration() {
   }
 }
 
+function validateSpecialtyAliasRlsMigration() {
+  assert(existsSync(specialtyTaxonomyMigrationPath), `${specialtyTaxonomyMigration} is missing.`);
+
+  const content = readFileSync(specialtyTaxonomyMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0057 must not contain INSERT INTO.'],
+    [/\bdrop\s+table\b/i, '0057 must not drop tables.'],
+    [/\bfor\s+insert\b/i, '0057 must not add INSERT policies.'],
+    [/\bfor\s+update\b/i, '0057 must not add UPDATE policies.'],
+    [/\bfor\s+delete\b/i, '0057 must not add DELETE policies.'],
+    [/\bto\s+service_role\b/i, '0057 must not grant to service_role.'],
+    [/\busing\s*\(\s*true\s*\)/i, '0057 must not use broad TRUE policy predicates.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  for (const [pattern, message] of [
+    [/create\s+table\s+if\s+not\s+exists\s+public\.specialty_aliases/i, '0057 must create specialty_aliases.'],
+    [/alter\s+table\s+public\.specialty_aliases\s+enable\s+row\s+level\s+security/i, '0057 must enable RLS on specialty_aliases.'],
+    [/create\s+policy\s+specialty_aliases_select_public_active[\s\S]*on\s+public\.specialty_aliases[\s\S]*for\s+select[\s\S]*to\s+anon\s*,\s*authenticated/i, 'specialty_aliases policy must be public SELECT only.'],
+    [/is_active\s*=\s*true[\s\S]*deleted_at\s+is\s+null/i, 'specialty_aliases policy must require active non-deleted aliases.'],
+    [/from\s+public\.specialties\s+specialty/i, 'specialty_aliases policy must check parent specialties.'],
+    [/specialty\.is_active\s*=\s*true/i, 'specialty_aliases policy must require active specialty.'],
+    [/specialty\.deleted_at\s+is\s+null/i, 'specialty_aliases policy must require non-deleted specialty.'],
+    [/specialty\.public_directory_enabled\s*=\s*true/i, 'specialty_aliases policy must respect specialty public_directory_enabled.'],
+    [/specialty\.public_profile_enabled\s*=\s*true/i, 'specialty_aliases policy must respect specialty public_profile_enabled.'],
+  ]) {
+    requirePattern(content, pattern, message);
+  }
+}
+
 function runLegacyStaticRlsTestWithoutTaxRls() {
   assert(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
+  assert(!existsSync(hiddenSpecialtyTaxonomyMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
+  renameSync(specialtyTaxonomyMigrationPath, hiddenSpecialtyTaxonomyMigrationPath);
 
   try {
     execFileSync(process.execPath, [legacyRlsStaticTest], {
@@ -88,6 +128,10 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenSpecialtyTaxonomyMigrationPath)) {
+      renameSync(hiddenSpecialtyTaxonomyMigrationPath, specialtyTaxonomyMigrationPath);
+    }
+
     if (existsSync(hiddenTaxRlsMigrationPath)) {
       renameSync(hiddenTaxRlsMigrationPath, taxRlsMigrationPath);
     }
@@ -95,6 +139,7 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
 }
 
 validateTaxonomyRlsMigration();
+validateSpecialtyAliasRlsMigration();
 runLegacyStaticRlsTestWithoutTaxRls();
 
-console.log('TAX-RLS-A static RLS validation passed.');
+console.log('TAX-SPECIALTY-MODEL-A static RLS validation passed.');
