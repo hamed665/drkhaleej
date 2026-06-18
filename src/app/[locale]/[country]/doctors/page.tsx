@@ -10,12 +10,19 @@ type Copy = {
   searchBadge: string;
   searchTitle: string;
   searchText: string;
+  queryLabel: string;
   placeholder: string;
+  searchIn: string;
+  country: string;
+  city: string;
+  area: string;
+  moreFilters: string;
+  specialty: string;
   searchButton: string;
-  quick: string;
-  trustTitle: string;
   trustItems: readonly string[];
   chips: readonly string[];
+  specialties: readonly string[];
+  areas: readonly string[];
 };
 
 const copy: Record<'en' | 'ar', Copy> = {
@@ -27,14 +34,21 @@ const copy: Record<'en' | 'ar', Copy> = {
     provider: 'List your center',
     whatsapp: 'WhatsApp',
     searchBadge: 'Doctor search',
-    searchTitle: 'Search by doctor, specialty or area',
-    searchText: 'Start with a doctor name, specialty, clinic or Muscat area. Public listings appear only after approval.',
-    placeholder: 'Doctor name, specialty, clinic or area…',
+    searchTitle: 'Search doctors, specialties or areas',
+    searchText: 'Use the same DrMuscat smart search style to start from a doctor name, specialty, clinic or Muscat area.',
+    queryLabel: 'What do you need?',
+    placeholder: 'Search doctor name, specialty, clinic or area...',
+    searchIn: 'Search in',
+    country: 'Country',
+    city: 'City',
+    area: 'Area',
+    moreFilters: 'More filters',
+    specialty: 'Specialty paths',
     searchButton: 'Search',
-    quick: 'Popular paths',
-    trustTitle: 'Discovery safety',
-    trustItems: ['Public discovery only', 'Not medical advice', 'Approved listings only'],
-    chips: ['Pediatrics', 'Dermatology', 'Dentistry', 'Gynecology', 'ENT', 'Orthopedics', 'General Practice', 'Cardiology']
+    trustItems: ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+    chips: ['Doctors', 'Clinics', 'Dental', 'Dermatology', 'Pediatrics', 'Women’s health', 'ENT', 'Orthopedics'],
+    specialties: ['General Practice', 'Cardiology', 'Ophthalmology', 'Physiotherapy'],
+    areas: ['Muscat', 'Al Khuwair', 'Qurum', 'Azaiba']
   },
   ar: {
     badge: 'الأطباء في عُمان',
@@ -44,14 +58,21 @@ const copy: Record<'en' | 'ar', Copy> = {
     provider: 'أدرج مركزك',
     whatsapp: 'واتساب',
     searchBadge: 'بحث الأطباء',
-    searchTitle: 'ابحث باسم الطبيب أو التخصص أو المنطقة',
-    searchText: 'ابدأ باسم طبيب أو تخصص أو عيادة أو منطقة في مسقط. تظهر القوائم العامة بعد الاعتماد فقط.',
-    placeholder: 'اسم الطبيب أو التخصص أو العيادة أو المنطقة…',
+    searchTitle: 'ابحث عن الأطباء أو التخصصات أو المناطق',
+    searchText: 'استخدم نفس أسلوب بحث DrMuscat الذكي للبدء باسم طبيب أو تخصص أو عيادة أو منطقة في مسقط.',
+    queryLabel: 'ماذا تحتاج؟',
+    placeholder: 'ابحث باسم الطبيب أو التخصص أو العيادة أو المنطقة...',
+    searchIn: 'ابحث في',
+    country: 'الدولة',
+    city: 'المدينة',
+    area: 'المنطقة',
+    moreFilters: 'المزيد من الفلاتر',
+    specialty: 'مسارات التخصص',
     searchButton: 'بحث',
-    quick: 'مسارات شائعة',
-    trustTitle: 'سلامة الاكتشاف',
-    trustItems: ['اكتشاف عام فقط', 'ليست نصيحة طبية', 'قوائم معتمدة فقط'],
-    chips: ['طب الأطفال', 'جلدية', 'أسنان', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'طب عام', 'قلب']
+    trustItems: ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'],
+    chips: ['الأطباء', 'العيادات', 'الأسنان', 'الجلدية', 'طب الأطفال', 'النساء والولادة', 'أنف وأذن وحنجرة', 'العظام'],
+    specialties: ['طب عام', 'قلب', 'عيون', 'علاج طبيعي'],
+    areas: ['مسقط', 'الخوير', 'القرم', 'العذيبة']
   }
 };
 
@@ -75,40 +96,102 @@ export default async function DoctorsPage({ params }: { params: Promise<Params> 
     <main className="dm2026-shell doctors-a" dir={dir} data-locale={lang} data-country={country}>
       <style>{styles}</style>
       <section className="doctors-a__section" aria-labelledby="doctors-a-title">
-        <div className="dm2026-container doctors-a__grid">
-          <div className="dm2026-glass doctors-a__copy-card">
-            <div className="doctors-a__copy-main">
+        <div className="dm2026-container doctors-a__stack">
+          <div className="dm2026-glass doctors-a__hero-strip">
+            <div>
               <span className="dm2026-badge">{t.badge}</span>
               <h1 id="doctors-a-title">{t.title}</h1>
               <p>{t.intro}</p>
-              <div className="doctors-a__actions">
-                <a className="dm2026-button dm2026-button-primary" href="#doctors-a-search">{t.primary}</a>
-                <a className="dm2026-button dm2026-button-secondary" href={`${root}/for-providers`}>{t.provider}</a>
-                <button className="dm2026-button dm2026-button-secondary doctors-a__whatsapp" type="button">{t.whatsapp}</button>
-              </div>
             </div>
-            <div className="dm2026-glass doctors-a__trust" aria-label={t.trustTitle}>
-              <strong>{t.trustTitle}</strong>
-              <ul>{t.trustItems.map((item) => <li key={item}>{item}</li>)}</ul>
+            <div className="doctors-a__hero-actions">
+              <a className="dm2026-button dm2026-button-primary" href="#doctors-a-search">{t.primary}</a>
+              <a className="dm2026-button dm2026-button-secondary" href={`${root}/for-providers`}>{t.provider}</a>
+              <button className="dm2026-button dm2026-button-secondary doctors-a__whatsapp" type="button">{t.whatsapp}</button>
             </div>
           </div>
 
-          <aside id="doctors-a-search" className="dm2026-search-surface doctors-a__search-card" aria-label={t.searchTitle}>
-            <header className="doctors-a__search-head">
-              <span className="dm2026-badge">{t.searchBadge}</span>
-              <h2>{t.searchTitle}</h2>
-              <p>{t.searchText}</p>
-            </header>
-            <form className="doctors-a__search-row">
-              <label className="sr-only" htmlFor="doctors-a-q">{t.placeholder}</label>
-              <input className="dm2026-input" id="doctors-a-q" name="q" placeholder={t.placeholder} type="search" />
-              <button className="dm2026-button dm2026-button-primary" type="button">{t.searchButton}</button>
+          <section id="doctors-a-search" className="dm2026-home-search dm2026-search doctors-a__search" aria-labelledby="doctors-a-search-title">
+            <form className="dm2026-search-surface dm2026-home-search__surface doctors-a__surface" action={`${root}/search`} method="get">
+              <div className="dm2026-home-search__main doctors-a__search-main">
+                <div className="dm2026-home-search__header">
+                  <span className="dm2026-badge">{t.searchBadge}</span>
+                  <div>
+                    <h2 id="doctors-a-search-title">{t.searchTitle}</h2>
+                    <p>{t.searchText}</p>
+                  </div>
+                </div>
+
+                <div className="dm2026-home-search__command">
+                  <label htmlFor="doctors-a-query">{t.queryLabel}</label>
+                  <div className="dm2026-home-search__command-input">
+                    <span aria-hidden="true">⌕</span>
+                    <input id="doctors-a-query" name="q" className="dm2026-input" type="search" placeholder={t.placeholder} autoComplete="off" />
+                    <button type="submit" className="dm2026-button dm2026-button-primary">{t.searchButton}</button>
+                  </div>
+                </div>
+
+                <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={t.searchIn}>
+                  <legend>{t.searchIn}</legend>
+                  <div>
+                    {t.chips.map((chip, index) => (
+                      <label key={chip} className="dm2026-home-search__chip">
+                        <input type="radio" name="contentType" value={chip} defaultChecked={index === 0} />
+                        <span>{chip}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <div className="dm2026-home-search__select-grid" aria-label={`${t.country}, ${t.city}, ${t.area}`}>
+                  <div className="dm2026-home-search__field">
+                    <label htmlFor="doctors-a-country">{t.country}</label>
+                    <select id="doctors-a-country" name="country" className="dm2026-select" defaultValue={lang === 'ar' ? 'عُمان' : 'Oman'}>
+                      <option>{lang === 'ar' ? 'عُمان' : 'Oman'}</option>
+                    </select>
+                  </div>
+                  <div className="dm2026-home-search__field">
+                    <label htmlFor="doctors-a-city">{t.city}</label>
+                    <select id="doctors-a-city" name="city" className="dm2026-select" defaultValue={lang === 'ar' ? 'مسقط' : 'Muscat'}>
+                      <option>{lang === 'ar' ? 'مسقط' : 'Muscat'}</option>
+                      <option>{lang === 'ar' ? 'السيب' : 'Seeb'}</option>
+                      <option>{lang === 'ar' ? 'بوشر' : 'Bawshar'}</option>
+                    </select>
+                  </div>
+                  <div className="dm2026-home-search__field">
+                    <label htmlFor="doctors-a-area">{t.area}</label>
+                    <select id="doctors-a-area" name="area" className="dm2026-select" defaultValue={t.areas[1]}>
+                      {t.areas.map((area) => <option key={area}>{area}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <details className="dm2026-home-search__more-filters">
+                  <summary>{t.moreFilters}</summary>
+                  <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={t.specialty}>
+                    <legend>{t.specialty}</legend>
+                    <div>
+                      {t.specialties.map((specialty) => (
+                        <label key={specialty} className="dm2026-home-search__chip">
+                          <input type="radio" name="specialty" value={specialty} />
+                          <span>{specialty}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                </details>
+
+                <div className="dm2026-home-search__actions">
+                  <button type="submit" className="dm2026-button dm2026-button-primary">{t.searchButton}</button>
+                  <a href={`${root}/for-providers`} className="dm2026-button dm2026-button-secondary">{t.provider}</a>
+                  <button type="button" className="dm2026-button dm2026-button-ghost">{t.whatsapp}</button>
+                </div>
+
+                <ul className="dm2026-home-search__trust-row" aria-label={t.trustTitle}>
+                  {t.trustItems.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
             </form>
-            <div className="doctors-a__quick">
-              <span className="dm2026-badge">{t.quick}</span>
-              <div>{t.chips.map((chip) => <button className="doctors-a__chip" key={chip} type="button">{chip}</button>)}</div>
-            </div>
-          </aside>
+          </section>
         </div>
       </section>
     </main>
@@ -117,29 +200,17 @@ export default async function DoctorsPage({ params }: { params: Promise<Params> 
 
 const styles = `
 .doctors-a { min-block-size: 100svh; }
-.doctors-a__section { min-block-size: calc(100svh - 5.6rem); display: grid; align-items: start; overflow: hidden; padding-block: clamp(1rem, 2.4vw, 1.55rem); }
-.doctors-a__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.1fr); gap: clamp(0.85rem, 2vw, 1.25rem); align-items: start; }
-.doctors-a__copy-card, .doctors-a__search-card { min-block-size: auto; }
-.doctors-a__copy-card { display: grid; gap: clamp(0.7rem, 1.2vw, 0.95rem); padding: clamp(1rem, 2vw, 1.35rem); }
-.doctors-a__copy-main { display: grid; gap: clamp(0.52rem, 1vw, 0.72rem); align-content: start; }
-.doctors-a__copy-card h1 { max-inline-size: 11ch; margin: 0; color: var(--dm-teal-950, #07302c); font-size: clamp(1.82rem, 3.15vw, 2.72rem); font-weight: 720; line-height: 1.05; letter-spacing: -0.038em; }
-.doctors-a__copy-card p { max-inline-size: 34rem; margin: 0; color: var(--dm-color-text-muted, #66736f); font-size: clamp(0.86rem, 1vw, 0.96rem); line-height: 1.62; }
-.doctors-a__actions { display: flex; flex-wrap: wrap; gap: 0.48rem; align-items: center; margin-block-start: 0.12rem; }
+.doctors-a__section { min-block-size: calc(100svh - 5.5rem); display: grid; align-items: start; overflow: hidden; padding-block: clamp(0.85rem, 2vw, 1.2rem) clamp(1rem, 2.4vw, 1.5rem); }
+.doctors-a__stack { display: grid; gap: clamp(0.8rem, 1.8vw, 1.15rem); }
+.doctors-a__hero-strip { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(0.7rem, 1.8vw, 1rem); align-items: end; padding: clamp(0.9rem, 1.9vw, 1.25rem); }
+.doctors-a__hero-strip h1 { max-inline-size: 14ch; margin: 0.42rem 0 0; color: var(--dm-teal-950, #07302c); font-size: clamp(1.85rem, 3.2vw, 2.75rem); font-weight: 720; line-height: 1.04; letter-spacing: -0.04em; }
+.doctors-a__hero-strip p { max-inline-size: 54rem; margin: 0.45rem 0 0; color: var(--dm-color-text-muted, #66736f); font-size: clamp(0.9rem, 1.05vw, 0.98rem); line-height: 1.62; }
+.doctors-a__hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: end; align-items: center; }
 .doctors-a__whatsapp { color: var(--dm-teal-950, #07302c); border-color: rgba(14, 110, 100, 0.22); background: rgba(220, 238, 235, 0.72); }
-.doctors-a__trust { display: grid; gap: 0.48rem; padding: 0.74rem 0.82rem; }
-.doctors-a__trust strong { color: var(--dm-teal-950, #07302c); font-size: 0.88rem; font-weight: 760; }
-.doctors-a__trust ul { display: flex; flex-wrap: wrap; gap: 0.34rem; margin: 0; padding: 0; list-style: none; }
-.doctors-a__trust li, .doctors-a__chip { border: 1px solid rgba(14, 110, 100, 0.14); border-radius: var(--dm-radius-pill, 999px); background: rgba(239, 246, 244, 0.86); color: var(--dm-color-brand-strong, #0b6f63); font-size: 0.78rem; font-weight: 680; padding: 0.36rem 0.58rem; }
-.doctors-a__search-card { display: grid; gap: clamp(0.72rem, 1.4vw, 1rem); align-content: start; padding: clamp(1rem, 2.1vw, 1.35rem); border-color: rgba(14, 110, 100, 0.16); background: radial-gradient(520px circle at 10% -20%, rgba(42, 161, 146, 0.13), transparent 48%), radial-gradient(420px circle at 95% 0%, rgba(201, 162, 75, 0.1), transparent 45%), rgba(255, 255, 255, 0.92); }
-.doctors-a__search-head { display: grid; gap: 0.36rem; max-inline-size: 100%; }
-.doctors-a__search-card h2 { max-inline-size: none; margin: 0; color: var(--dm-teal-950, #07302c); font-size: clamp(1.18rem, 2vw, 1.62rem); font-weight: 690; line-height: 1.16; letter-spacing: -0.018em; }
-.doctors-a__search-card p { max-inline-size: 46rem; margin: 0; color: var(--dm-color-text-muted, #66736f); font-size: 0.86rem; line-height: 1.55; }
-.doctors-a__search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: center; }
-.doctors-a__quick { display: grid; gap: 0.48rem; }
-.doctors-a__quick > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.42rem; }
-.doctors-a__chip { min-block-size: 2.1rem; display: inline-flex; align-items: center; justify-content: center; font: inherit; cursor: pointer; transition: transform 140ms ease, background-color 140ms ease, color 140ms ease, border-color 140ms ease; }
-.doctors-a__chip:hover { transform: translateY(-1px); border-color: rgba(14, 110, 100, 0.32); background: rgba(220, 238, 235, 0.96); }
-[dir='rtl'] .doctors-a__copy-card h1, [dir='rtl'] .doctors-a__search-card h2 { letter-spacing: 0; line-height: 1.16; }
-@media (max-width: 980px) { .doctors-a__section { min-block-size: auto; } .doctors-a__grid { grid-template-columns: 1fr; } .doctors-a__quick > div { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .doctors-a__search-row { grid-template-columns: 1fr; } .doctors-a__copy-card h1 { font-size: clamp(1.78rem, 8.6vw, 2.55rem); } .doctors-a__quick > div { grid-template-columns: 1fr 1fr; } }
+.doctors-a__search { display: block; }
+.doctors-a__surface { max-inline-size: none; margin: 0; }
+.doctors-a__search-main { display: grid; gap: clamp(0.46rem, 1vw, 0.68rem); }
+[dir='rtl'] .doctors-a__hero-strip h1, [dir='rtl'] .dm2026-home-search__header h2 { letter-spacing: 0; line-height: 1.16; }
+@media (max-width: 68rem) { .doctors-a__hero-strip { grid-template-columns: 1fr; align-items: start; } .doctors-a__hero-actions { justify-content: start; } }
+@media (max-width: 42rem) { .doctors-a__hero-actions { align-items: stretch; flex-direction: column; } .doctors-a__hero-strip h1 { font-size: clamp(1.78rem, 8.4vw, 2.55rem); } }
 `;
