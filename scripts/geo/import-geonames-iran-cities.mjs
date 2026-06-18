@@ -74,10 +74,6 @@ function sqlString(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
 }
 
-function sqlNullableNumber(value) {
-  return value === null ? 'null' : String(value);
-}
-
 function readManifest(manifestPath, countryCode, seedPhase) {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const requiredKeys = [
