@@ -6,9 +6,13 @@ const dir = 'supabase/seed';
 const expectedSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0001_taxonomy_verticals_center_categories.sql',
+  '0002_geo_regions_c3_north_africa.sql',
 ];
 const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
-const geoSeedFile = '0000_oman_geo_foundation.sql';
+const geoSeedFiles = [
+  '0000_oman_geo_foundation.sql',
+  '0002_geo_regions_c3_north_africa.sql',
+];
 const expectedVerticalSlugs = [
   'medical',
   'dental',
@@ -92,7 +96,7 @@ requireCondition(
   `Allowed seed SQL files are exactly: ${expectedSeedFiles.join(', ')}. Found: ${sqlFiles.join(', ') || '(none)'}`,
 );
 
-const geoContent = readSeed(geoSeedFile);
+const geoContent = geoSeedFiles.map(readSeed).join('\n');
 const taxonomyContent = readSeed(taxonomySeedFile);
 const allContent = `${geoContent}\n${taxonomyContent}`;
 
@@ -126,6 +130,12 @@ for (const [pattern, message] of [
   [/'muscat-governorate'/i, 'Geo seed must include Muscat Governorate.'],
   [/'muscat'/i, 'Geo seed must include Muscat.'],
   [/'al-khuwair'/i, 'Geo seed must include Al Khuwair.'],
+  [/'casablanca-settat'/i, 'GEO-FULL-C3 seed must include Casablanca-Settat.'],
+  [/'algiers-province'/i, 'GEO-FULL-C3 seed must include Algiers Province.'],
+  [/'tunis-governorate'/i, 'GEO-FULL-C3 seed must include Tunis Governorate.'],
+  [/'tripoli-district'/i, 'GEO-FULL-C3 seed must include Tripoli District.'],
+  [/'khartoum-state'/i, 'GEO-FULL-C3 seed must include Khartoum State.'],
+  [/'nouakchott-nord-region'/i, 'GEO-FULL-C3 seed must include Nouakchott-Nord.'],
 ]) {
   requirePattern(geoContent, pattern, message);
 }
