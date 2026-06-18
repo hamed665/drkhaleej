@@ -1,0 +1,7 @@
+source_id	name_en	name_ar	province_slug	feature_class	feature_code	is_capital	population	latitude	longitude
+112931	Tehran	طهران	tehran-province	P	PPLC	true	8693706	35.6892	51.3890
+128747	Karaj	كرج	alborz-province	P	PPLA	false	1592492	35.8327	50.9915
+418863	Isfahan	أصفهان	isfahan-province	P	PPLA	false	1961260	32.6525	51.6746
+115019	Shiraz	شيراز	fars-province	P	PPLA	false	1565572	29.6103	52.5311
+124665	Mashhad	مشهد	razavi-khorasan-province	P	PPLA	false	3001184	36.2605	59.6168
+113646	Tabriz	تبريز	east-azerbaijan-province	P	PPLA	false	1558693	38.0962	46.2738

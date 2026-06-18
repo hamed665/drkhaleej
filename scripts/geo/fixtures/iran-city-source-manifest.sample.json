@@ -1,0 +1,20 @@
+{
+  "source": "geonames",
+  "source_version": "sample-contract-2026-06-18",
+  "source_url": "geonames-export-dump-IR-zip",
+  "license": "CC-BY-4.0",
+  "attribution": "GeoNames",
+  "country_code": "ir",
+  "seed_phase": "GEO-FULL-D2B",
+  "review_status": "imported",
+  "allowed_feature_classes": ["P"],
+  "allowed_feature_codes": ["PPLC", "PPLA", "PPLA2", "PPL"],
+  "province_slugs": [
+    "tehran-province",
+    "alborz-province",
+    "isfahan-province",
+    "fars-province",
+    "razavi-khorasan-province",
+    "east-azerbaijan-province"
+  ]
+}

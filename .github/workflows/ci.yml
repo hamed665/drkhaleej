@@ -49,6 +49,9 @@ jobs:
       - name: Validate seeds
         run: pnpm db:validate:seeds
 
+      - name: Validate Iran geo import contract
+        run: pnpm geo:validate:iran-import
+
       - name: Static RLS tests
         run: pnpm test:db:rls
 
