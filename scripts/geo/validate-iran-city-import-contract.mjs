@@ -74,7 +74,7 @@ const sql = execFileSync(process.execPath, [
 for (const [pattern, message] of [
   [/insert\s+into\s+public\.geo_cities/i, 'Importer output must insert geo_cities.'],
   [/update\s+public\.geo_cities/i, 'Importer output must update geo_cities idempotently.'],
-  [/from\s+public\.geo_regions/i, 'Importer output must resolve geo_regions.'],
+  [/(from|join)\s+public\.geo_regions/i, 'Importer output must resolve geo_regions.'],
   [/code\s*=\s*'ir'::country_code/i, 'Importer output must target Iran country code.'],
   [/GEO-FULL-D2B/i, 'Importer output must include GEO-FULL-D2B metadata.'],
   [/source_version/i, 'Importer output must include source_version metadata.'],
