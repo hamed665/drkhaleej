@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 
 import type { SupportedCountry } from '@/lib/i18n/config';
 import type { PublicCatalogLocale, PublicCatalogQueryResult, PublicDoctorSummary } from '@/lib/catalog/public-types';
@@ -272,7 +272,7 @@ function StethoscopeMotionSvg({ dir }: { dir: 'ltr' | 'rtl' }) {
   const transform = dir === 'rtl' ? 'scale(-1 1) translate(-420 0)' : undefined;
 
   return (
-    <svg aria-hidden="true" className="h-full w-full" viewBox="0 0 420 320" role="img">
+    <svg aria-hidden="true" className="h-full w-full" viewBox="0 0 420 320">
       <defs>
         <linearGradient id="doctor-hero-metal" x1="0" x2="1" y1="0" y2="1">
           <stop offset="0" stopColor="#ffffff" />
@@ -366,7 +366,7 @@ function PremiumSection({
   eyebrow: string;
   title: string;
   body?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section className="mx-auto mt-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
