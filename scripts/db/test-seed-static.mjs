@@ -16,6 +16,7 @@ const expectedSeedFiles = [
   '0003_geo_cities_d1a_oman.sql',
   '0004_geo_cities_d1b_gulf.sql',
   '0005_geo_cities_d2a_saudi.sql',
+  '0006_specialties_seed_a_internal.sql',
 ];
 const geoSeedFiles = [
   '0000_oman_geo_foundation.sql',
@@ -25,6 +26,7 @@ const geoSeedFiles = [
   '0005_geo_cities_d2a_saudi.sql',
 ];
 const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
+const specialtySeedFile = '0006_specialties_seed_a_internal.sql';
 
 function fail(message) {
   console.error(`❌ ${message}`);
@@ -67,7 +69,8 @@ assert(
 
 const geoSeedContent = geoSeedFiles.map((fileName) => readFileSync(path.join(seedDir, fileName), 'utf8')).join('\n');
 const taxonomySeedContent = readFileSync(path.join(seedDir, taxonomySeedFile), 'utf8');
-const allSeedContent = `${geoSeedContent}\n${taxonomySeedContent}`;
+const specialtySeedContent = readFileSync(path.join(seedDir, specialtySeedFile), 'utf8');
+const allSeedContent = `${geoSeedContent}\n${taxonomySeedContent}\n${specialtySeedContent}`;
 
 for (const forbidden of [
   /insert\s+into\s+public\.centers\b/i,
@@ -149,6 +152,45 @@ for (const required of [
   /where\s+not\s+exists/i,
 ]) {
   assert(required.test(taxonomySeedContent), `Missing required approved taxonomy seed pattern: ${required}`);
+}
+
+for (const required of [
+  /with\s+specialty_seed\s*\(/i,
+  /insert\s+into\s+public\.specialties/i,
+  /update\s+public\.specialties/i,
+  /insert\s+into\s+public\.specialty_aliases/i,
+  /update\s+public\.specialty_aliases/i,
+  /TAX-SPECIALTY-SEED-A-INTERNAL/i,
+  /public_directory_enabled\s*=\s*false/i,
+  /public_profile_enabled\s*=\s*false/i,
+  /parent_links/i,
+  /where\s+not\s+exists/i,
+  /'general-practitioner'/i,
+  /'family-medicine'/i,
+  /'pediatrics'/i,
+  /'cardiology'/i,
+  /'dermatology'/i,
+  /'dentistry'/i,
+  /'neonatology'/i,
+  /'pediatric-cardiology'/i,
+  /'interventional-cardiology'/i,
+  /'reproductive-medicine'/i,
+  /'en'/i,
+  /'ar'/i,
+]) {
+  assert(required.test(specialtySeedContent), `Missing required approved specialty seed pattern: ${required}`);
+}
+
+for (const forbidden of [
+  /'fa'/i,
+  /[پچژگک‌یۀ]/,
+  /generateMetadata/i,
+  /generateStaticParams/i,
+  /sitemap/i,
+  /robots/i,
+  /src\/app/i,
+]) {
+  assert(!forbidden.test(specialtySeedContent), `Forbidden specialty seed scope found: ${forbidden}`);
 }
 
 for (const forbiddenSlug of [
