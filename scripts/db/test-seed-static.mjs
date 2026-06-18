@@ -13,10 +13,12 @@ const expectedSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0001_taxonomy_verticals_center_categories.sql',
   '0002_geo_regions_c3_north_africa.sql',
+  '0003_geo_cities_d1a_oman.sql',
 ];
 const geoSeedFiles = [
   '0000_oman_geo_foundation.sql',
   '0002_geo_regions_c3_north_africa.sql',
+  '0003_geo_cities_d1a_oman.sql',
 ];
 const taxonomySeedFile = '0001_taxonomy_verticals_center_categories.sql';
 
@@ -97,6 +99,11 @@ for (const required of [
   /'tripoli-district'/i,
   /'khartoum-state'/i,
   /'nouakchott-nord-region'/i,
+  /'jabal-akhdar'/i,
+  /'sinaw'/i,
+  /'sohar'/i,
+  /'salalah'/i,
+  /'shalim-and-the-hallaniyat-islands'/i,
 ]) {
   assert(required.test(geoSeedContent), `Missing required approved geo seed pattern: ${required}`);
 }
