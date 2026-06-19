@@ -26,10 +26,11 @@ export function SiteHeader() {
     { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
     { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops },
+    { href: publicDiscoveryRoute(locale, country, 'offers'), label: copy.offers },
     { href: publicDiscoveryRoute(locale, country, 'services'), label: copy.services },
     { href: articlesHref, label: copy.articles }
   ] as const;
-  const pendingNavItems = [copy.hospitals, copy.offers] as const;
+  const pendingNavItems = [copy.hospitals] as const;
 
   useEffect(() => {
     const closeMenu = (target: EventTarget | null) => {
