@@ -8319,3 +8319,77 @@
     white-space: nowrap;
   }
 }
+
+/* Public discovery search header polish: no category badge is rendered inside the card. */
+.dm2026-public-discovery-search__header {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+[dir='rtl'] .dm2026-public-discovery-search__header {
+  align-items: flex-end;
+  text-align: start;
+}
+
+/* Public discovery live suggestions: scoped to discovery cards so the approved search pill stays intact. */
+.dm2026-public-discovery-hero-shell,
+.dm2026-public-discovery-hero-content,
+.dm2026-public-discovery-hero__search,
+.dm2026-public-discovery-search,
+.dm2026-public-discovery-search .dm2026-home-search__surface,
+.dm2026-public-discovery-search .dm2026-home-search__main,
+.dm2026-public-discovery-command {
+  overflow: visible;
+}
+
+.dm2026-public-discovery-command {
+  position: relative;
+}
+
+.dm2026-public-discovery-command-input {
+  position: relative;
+  z-index: 2;
+}
+
+.dm2026-public-discovery-suggestions {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(100% + 0.5rem);
+  z-index: 40;
+  display: grid;
+  gap: 0.35rem;
+  max-block-size: min(18rem, 42vh);
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid rgba(14, 110, 100, 0.16);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 50px rgba(11, 40, 38, 0.14);
+  backdrop-filter: blur(16px);
+}
+
+.dm2026-public-discovery-suggestion {
+  width: 100%;
+  display: grid;
+  gap: 0.12rem;
+  text-align: start;
+  border: 0;
+  border-radius: 0.95rem;
+  background: transparent;
+  color: var(--dm-teal-950, #07302c);
+  padding: 0.72rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.dm2026-public-discovery-suggestion:hover,
+.dm2026-public-discovery-suggestion:focus-visible {
+  background: rgba(220, 238, 235, 0.85);
+  outline: none;
+}
+
+.dm2026-public-discovery-suggestion small {
+  color: var(--dm-color-text-muted, #66736f);
+  font-size: 0.78rem;
+}

@@ -45,7 +45,7 @@ export default async function PublicLabsPage({ params }: { params: Promise<Param
   const config = buildLabsDiscoveryConfig(safeLocale, safeCountry, dir);
   const result = await listPublicCenters({ country: safeCountry, centerType: 'laboratory' });
   const whatsAppNumber = normalizeWhatsAppNumber(process.env.NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER);
-  const whatsAppHref = buildWhatsAppUrl(whatsAppNumber, config.whatsAppMessage);
+  const whatsAppHref = buildWhatsAppUrl(whatsAppNumber, config.whatsAppMessage ?? '');
 
   return (
     <main className="home-foundation dm2026-home-page dm2026-doctors-page dm2026-public-discovery-page dm2026-public-discovery-page--labs" dir={dir} data-country={safeCountry} data-locale={safeLocale}>

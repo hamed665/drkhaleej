@@ -14,6 +14,8 @@ export function PublicDiscoveryHero2026({ config, whatsAppHref }: Props) {
   const activeSlide = config.visual.slides[activeIndex] ?? fallbackSlide;
   const goToPrevious = () => setActiveIndex((current) => (current === 0 ? config.visual.slides.length - 1 : current - 1));
   const goToNext = () => setActiveIndex((current) => (current + 1) % config.visual.slides.length);
+  const shouldRenderWhatsApp = config.showWhatsApp !== false && Boolean(config.whatsAppCta);
+  const whatsAppUnavailable = config.whatsAppUnavailable ?? config.whatsAppCta;
 
   return (
     <section className="dm2026-doctors-first-fold dm2026-container dm2026-public-discovery-first-fold" aria-labelledby={`dm2026-${config.categoryType}-title`}>
@@ -26,7 +28,7 @@ export function PublicDiscoveryHero2026({ config, whatsAppHref }: Props) {
           </div>
           <div className="dm2026-doctors-hero__actions dm2026-public-discovery-hero__actions" aria-label={config.badge}>
             <Link className="dm2026-button dm2026-button-secondary" href={`/${config.locale}/${config.country}/for-providers`}>{config.providerCta}</Link>
-            {whatsAppHref ? <a className="dm2026-button dm2026-button-ghost" href={whatsAppHref} target="_blank" rel="noopener noreferrer">{config.whatsAppCta}</a> : <span className="dm2026-button dm2026-button-ghost" aria-disabled="true" title={config.whatsAppUnavailable}>{config.whatsAppCta}</span>}
+            {shouldRenderWhatsApp ? (whatsAppHref ? <a className="dm2026-button dm2026-button-ghost" href={whatsAppHref} target="_blank" rel="noopener noreferrer">{config.whatsAppCta}</a> : <span className="dm2026-button dm2026-button-ghost" aria-disabled="true" title={whatsAppUnavailable}>{config.whatsAppCta}</span>) : null}
           </div>
           <div id={config.searchId} className="dm2026-doctors-hero__search dm2026-public-discovery-hero__search">
             <PublicDiscoverySearch2026 config={config} />
