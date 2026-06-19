@@ -24,11 +24,11 @@ export function SiteHeader() {
     { href: publicDiscoveryRoute(locale, country, 'centers'), label: copy.centers },
     { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
+    { href: publicDiscoveryRoute(locale, country, 'hospitals'), label: copy.hospitals },
     { href: publicDiscoveryRoute(locale, country, 'offers'), label: copy.offers },
     { href: publicDiscoveryRoute(locale, country, 'beauty'), label: copy.beauty },
     { href: publicDiscoveryRoute(locale, country, 'pet-clinics'), label: copy.petClinics }
   ] as const;
-  const pendingNavItems = [copy.hospitals] as const;
 
   useEffect(() => {
     const closeMenu = (target: EventTarget | null) => {
@@ -60,13 +60,6 @@ export function SiteHeader() {
             {linkedNavItems.map((item) => (
               <li key={item.href}>
                 <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
-            {pendingNavItems.map((item) => (
-              <li key={item}>
-                <span className="dm2026-site-header__pending" aria-disabled="true" title={copy.comingSoon}>
-                  {item}
-                </span>
               </li>
             ))}
           </ul>
@@ -135,13 +128,6 @@ export function SiteHeader() {
                 <Link href={item.href} data-dm2026-mobile-menu-close>
                   {item.label}
                 </Link>
-              </li>
-            ))}
-            {pendingNavItems.map((item) => (
-              <li key={item}>
-                <span aria-disabled="true" title={copy.comingSoon} data-dm2026-mobile-menu-close>
-                  {item}
-                </span>
               </li>
             ))}
             <li>
