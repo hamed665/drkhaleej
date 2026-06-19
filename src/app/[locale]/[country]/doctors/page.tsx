@@ -91,7 +91,7 @@ export default async function PublicDoctorsPage({ params }: { params: Promise<Pa
 
   return (
     <main className="home-foundation dm2026-home-page dm2026-doctors-page" dir={dir} data-country={safeCountry} data-locale={safeLocale}>
-      <section className="dm2026-doctors-first-fold dm-container" aria-labelledby="dm2026-doctors-title">
+      <section className="dm2026-doctors-first-fold dm2026-container" aria-labelledby="dm2026-doctors-title">
         <div className="dm2026-doctors-hero-shell dm2026-search-surface">
           <div className="dm2026-doctors-hero-content">
             <div className="dm2026-doctors-hero__copy">
@@ -117,7 +117,7 @@ export default async function PublicDoctorsPage({ params }: { params: Promise<Pa
         </div>
       </section>
 
-      <section id="doctor-results" className="dm-container dm2026-doctors-listings" aria-labelledby="doctor-results-title">
+      <section id="doctor-results" className="dm2026-container dm2026-doctors-listings" aria-labelledby="doctor-results-title">
         <div className="dm2026-doctors-results-header dm2026-card-soft">
           <h2 id="doctor-results-title">{copy.resultsHeading}</h2>
           <p>{copy.resultsSubtext}</p>

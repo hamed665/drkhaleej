@@ -8145,3 +8145,125 @@
     text-align: center;
   }
 }
+
+/* Doctors hero polish pass: alignment, spacing, and overflow safeguards. */
+.dm2026-doctors-first-fold,
+.dm2026-doctors-listings,
+.dm2026-doctors-hero-shell,
+.dm2026-doctors-hero-content,
+.dm2026-doctors-hero__search,
+.dm2026-doctors-search,
+.dm2026-doctors-carousel {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.dm2026-doctors-first-fold.dm2026-container,
+.dm2026-doctors-listings.dm2026-container {
+  inline-size: min(100% - clamp(1rem, 4vw, 2.5rem), var(--dm2026-container, 1180px));
+}
+
+.dm2026-doctors-hero-shell {
+  grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.dm2026-doctors-hero-shell .dm2026-doctors-hero__copy h1 {
+  font-size: clamp(1.95rem, 3.25vw, 2.9rem);
+  overflow-wrap: anywhere;
+}
+
+.dm2026-doctors-hero-shell .dm2026-doctors-hero__copy p {
+  font-size: clamp(0.98rem, 1.25vw, 1.08rem);
+  overflow-wrap: anywhere;
+}
+
+.dm2026-doctors-hero__actions {
+  align-items: center;
+}
+
+.dm2026-doctors-hero__actions .dm2026-button {
+  min-block-size: 2.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.dm2026-doctors-hero__search .dm2026-home-search__header {
+  align-items: start;
+  text-align: start;
+}
+
+.dm2026-doctors-hero__search .dm2026-home-search__header h2 {
+  margin: 0;
+  font-size: clamp(1.08rem, 1.55vw, 1.32rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.dm2026-doctors-hero__search .dm2026-home-search__header p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dm2026-doctors-search .dm2026-home-search__command-input {
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+.dm2026-doctors-search .dm2026-home-search__chip span {
+  max-inline-size: 100%;
+  white-space: nowrap;
+}
+
+.dm2026-doctors-search .dm2026-home-search__segment > div {
+  max-inline-size: 100%;
+  padding-block: 0 0.16rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__smart-panel {
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+.dm2026-doctors-carousel {
+  grid-template-rows: minmax(0, 1fr) auto;
+  block-size: 100%;
+}
+
+.dm2026-doctors-carousel__media {
+  block-size: 100%;
+  min-block-size: clamp(20rem, 36vw, 33rem);
+}
+
+@media (max-width: 1040px) {
+  .dm2026-doctors-hero-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .dm2026-doctors-carousel {
+    block-size: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .dm2026-doctors-first-fold.dm2026-container,
+  .dm2026-doctors-listings.dm2026-container {
+    inline-size: min(100% - 1rem, var(--dm2026-container, 1180px));
+  }
+
+  .dm2026-doctors-hero__actions .dm2026-button {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .dm2026-doctors-search .dm2026-home-search__chip span {
+    white-space: nowrap;
+  }
+
+  .dm2026-doctors-carousel__media {
+    min-block-size: 13.75rem;
+  }
+}
