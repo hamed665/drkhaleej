@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState, type FormEvent } from 'react';
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
@@ -30,7 +29,7 @@ type Suggestion = {
 const copyByLocale = {
   en: {
     badge: 'Doctor search',
-    title: 'Search doctors, specialties or areas',
+    title: 'Find a doctor by specialty, name or area',
     description: 'Start with a doctor name, specialty, clinic or Muscat area.',
     inputLabel: 'What do you need?',
     placeholder: 'Search doctor name, specialty, clinic or area…',
@@ -40,24 +39,19 @@ const copyByLocale = {
     country: 'Country',
     city: 'City',
     area: 'Area',
-    secondaryLegend: 'Additional doctor specialties',
-    listCta: 'List your center',
-    whatsappCta: 'WhatsApp',
-    whatsappUnavailable: 'WhatsApp activation pending',
     suggestionLabel: 'Doctor search suggestions',
     useSuggestion: 'Use suggestion',
     contentType: 'Doctors',
     trustAria: 'Doctor search guidance',
     trust: ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
     chips: ['Pediatrician', 'Dermatologist', 'Dentist', 'Gynecologist', 'ENT doctor', 'Orthopedist', 'Cardiologist', 'General Practitioner'],
-    secondaryChips: ['Family doctor', 'Internal medicine', 'Ophthalmologist', 'Psychiatrist'],
     countries: ['Oman'],
     cities: ['Muscat', 'Seeb', 'Bawshar', 'Muttrah'],
     areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi']
   },
   ar: {
     badge: 'بحث الأطباء',
-    title: 'ابحث عن الأطباء أو التخصصات أو المناطق',
+    title: 'ابحث عن طبيب حسب التخصص أو الاسم أو المنطقة',
     description: 'ابدأ باسم طبيب أو تخصص أو عيادة أو منطقة في مسقط.',
     inputLabel: 'ماذا تحتاج؟',
     placeholder: 'ابحث باسم الطبيب أو التخصص أو العيادة أو المنطقة…',
@@ -67,17 +61,12 @@ const copyByLocale = {
     country: 'الدولة',
     city: 'المدينة',
     area: 'المنطقة',
-    secondaryLegend: 'تخصصات أطباء إضافية',
-    listCta: 'أدرج مركزك',
-    whatsappCta: 'واتساب',
-    whatsappUnavailable: 'تفعيل واتساب قيد الإعداد',
     suggestionLabel: 'اقتراحات بحث الأطباء',
     useSuggestion: 'استخدم الاقتراح',
     contentType: 'الأطباء',
     trustAria: 'إرشادات بحث الأطباء',
     trust: ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'],
     chips: ['طبيب أطفال', 'جلدية', 'أسنان', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'قلب', 'طبيب عام'],
-    secondaryChips: ['طبيب أسرة', 'باطنية', 'عيون', 'طب نفسي'],
     countries: ['عُمان'],
     cities: ['مسقط', 'السيب', 'بوشر', 'مطرح'],
     areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي']
@@ -110,7 +99,6 @@ const normalizeSearch = (value: string) => normalizeArabic(value).trim().toLocal
 
 export function DoctorsSearch2026({ locale, country, dir, resultsId }: DoctorsSearch2026Props) {
   const copy = copyByLocale[locale];
-  const providerHref = `/${locale}/${country}/for-providers`;
   const [query, setQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>(copy.chips[0]);
   const [selectedCountry, setSelectedCountry] = useState<string>(copy.countries[0]);
@@ -251,47 +239,29 @@ export function DoctorsSearch2026({ locale, country, dir, resultsId }: DoctorsSe
             </div>
           </fieldset>
 
-          <div className="dm2026-home-search__select-grid" aria-label={`${copy.country}, ${copy.city}, ${copy.area}`}>
-            <div className="dm2026-home-search__field">
-              <label htmlFor="dm2026-doctors-country">{copy.country}</label>
-              <select id="dm2026-doctors-country" name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => setSelectedCountry(event.target.value)}>
-                {copy.countries.map((countryOption) => <option key={countryOption} value={countryOption}>{countryOption}</option>)}
-              </select>
-            </div>
-            <div className="dm2026-home-search__field">
-              <label htmlFor="dm2026-doctors-city">{copy.city}</label>
-              <select id="dm2026-doctors-city" name="city" className="dm2026-select" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>
-                {copy.cities.map((city) => <option key={city} value={city}>{city}</option>)}
-              </select>
-            </div>
-            <div className="dm2026-home-search__field">
-              <label htmlFor="dm2026-doctors-area">{copy.area}</label>
-              <select id="dm2026-doctors-area" name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>
-                {copy.areas.map((area) => <option key={area} value={area}>{area}</option>)}
-              </select>
-            </div>
-          </div>
-
           <details className="dm2026-home-search__more-filters">
             <summary>{copy.moreFilters}</summary>
-            <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.secondaryLegend}>
-              <legend>{copy.secondaryLegend}</legend>
-              <div>
-                {copy.secondaryChips.map((chip) => (
-                  <label key={chip} className="dm2026-home-search__chip">
-                    <input type="radio" name="specialty" value={chip} checked={chip === selectedSpecialty} onChange={() => setSelectedSpecialty(chip)} />
-                    <span>{chip}</span>
-                  </label>
-                ))}
+            <div className="dm2026-home-search__select-grid" aria-label={`${copy.country}, ${copy.city}, ${copy.area}`}>
+              <div className="dm2026-home-search__field">
+                <label htmlFor="dm2026-doctors-country">{copy.country}</label>
+                <select id="dm2026-doctors-country" name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => setSelectedCountry(event.target.value)}>
+                  {copy.countries.map((countryOption) => <option key={countryOption} value={countryOption}>{countryOption}</option>)}
+                </select>
               </div>
-            </fieldset>
+              <div className="dm2026-home-search__field">
+                <label htmlFor="dm2026-doctors-city">{copy.city}</label>
+                <select id="dm2026-doctors-city" name="city" className="dm2026-select" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>
+                  {copy.cities.map((city) => <option key={city} value={city}>{city}</option>)}
+                </select>
+              </div>
+              <div className="dm2026-home-search__field">
+                <label htmlFor="dm2026-doctors-area">{copy.area}</label>
+                <select id="dm2026-doctors-area" name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>
+                  {copy.areas.map((area) => <option key={area} value={area}>{area}</option>)}
+                </select>
+              </div>
+            </div>
           </details>
-
-          <div className="dm2026-home-search__actions">
-            <button type="submit" className="dm2026-button dm2026-button-primary">{copy.search}</button>
-            <Link className="dm2026-button dm2026-button-secondary" href={providerHref}>{copy.listCta}</Link>
-            <span className="dm2026-button dm2026-button-ghost" aria-disabled="true" title={copy.whatsappUnavailable}>{copy.whatsappCta}</span>
-          </div>
 
           <div className="dm2026-home-search__trust-row" aria-label={copy.trustAria}>
             {copy.trust.map((item) => <span key={item}>{item}</span>)}

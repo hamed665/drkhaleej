@@ -45,7 +45,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     whatsappMessage: 'Hello DrMuscat, I need help with doctor discovery in Oman.',
     whatsappUnavailable: 'WhatsApp activation pending',
     resultsHeading: 'Browse doctors',
-    resultsSubtext: 'Search results and public doctor listings appear here.'
+    resultsSubtext: 'Search results and public doctor listings appear here after approval.'
   },
   ar: {
     metadataTitle: 'الأطباء في عُمان | DrMuscat',
@@ -59,7 +59,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     whatsappMessage: 'مرحباً DrMuscat، أحتاج مساعدة في اكتشاف الأطباء في عُمان.',
     whatsappUnavailable: 'تفعيل واتساب قيد الإعداد',
     resultsHeading: 'تصفح الأطباء',
-    resultsSubtext: 'تظهر هنا نتائج البحث وقوائم الأطباء العامة.'
+    resultsSubtext: 'تظهر هنا نتائج البحث وقوائم الأطباء العامة بعد الاعتماد.'
   }
 };
 
