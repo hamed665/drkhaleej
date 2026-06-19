@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { sitemapMarketCountries } from '@/lib/market/public-market';
 import { localizedRootPath, siteConfig } from '@/lib/seo/site';
 
-const discoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/labs', '/services', '/search'] as const;
+const discoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/pet-clinics', '/labs', '/services', '/search'] as const;
 const providerRoutes = ['/for-providers'] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -261,6 +261,111 @@ export function buildCentersDiscoveryConfig(locale: SupportedLocale, country: Su
       next: isAr ? 'الصورة التالية' : 'Next image',
       slideLabel: isAr ? 'عرض الصورة' : 'Show image',
       slides: centersSlides[locale]
+    }
+  };
+}
+
+
+const petClinicsSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Pet clinic discovery visual for veterinary care in Oman', caption: 'Pet clinic discovery across services and areas' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Healthcare platform visual for pet clinic search in Oman', caption: 'Browse veterinary clinics and pet care services in Oman' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready pet clinic discovery visual', caption: 'Public discovery only, not veterinary advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف العيادات البيطرية في عُمان', caption: 'اكتشاف العيادات البيطرية حسب الخدمات والمناطق' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة رعاية لبحث العيادات البيطرية في عُمان', caption: 'تصفح العيادات البيطرية وخدمات رعاية الحيوانات في عُمان' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف عيادات بيطرية مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة بيطرية' }
+  ]
+} as const;
+
+export function buildPetClinicsDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'pet-clinics',
+    path: '/pet-clinics',
+    searchId: 'pet-clinic-search',
+    resultsId: 'pet-clinic-results',
+    showWhatsApp: false,
+    badge: isAr ? 'العيادات البيطرية في عُمان' : 'Pet clinics in Oman',
+    title: isAr ? 'ابحث عن عيادات بيطرية في عُمان.' : 'Find pet clinics in Oman.',
+    subtitle: isAr
+      ? 'تصفح العيادات البيطرية وخدمات رعاية الحيوانات وخيارات صحة الحيوانات في عُمان. اكتشاف عام فقط وليس نصيحة بيطرية.'
+      : 'Browse veterinary clinics, pet care services and animal health options across Oman. Public discovery only, not veterinary advice.',
+    primaryCta: isAr ? 'ابحث عن العيادات البيطرية' : 'Search pet clinics',
+    providerCta: isAr ? 'أدرج عيادتك البيطرية' : 'List your pet clinic',
+    search: {
+      badge: isAr ? 'بحث العيادات البيطرية' : 'Pet clinic search',
+      title: isAr ? 'ابحث عن العيادات البيطرية أو الخدمات أو المناطق' : 'Find pet clinics, services or areas',
+      description: isAr ? 'ابدأ بخدمة للحيوانات أو اسم عيادة أو احتياج رعاية أو منطقة في مسقط.' : 'Start with a pet service, clinic name, animal care need or Muscat area.',
+      inputLabel: isAr ? 'ما خدمة رعاية الحيوانات التي تحتاجها؟' : 'What pet care service do you need?',
+      placeholder: isAr ? 'ابحث عن عيادة بيطرية أو تطعيم أو عناية وتنظيف أو طوارئ أو منطقة…' : 'Search vet clinic, vaccination, grooming, emergency or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'خدمات العيادات البيطرية' : 'Pet clinic services',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'خدمات بيطرية إضافية' : 'More pet clinic services',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث العيادات البيطرية' : 'Pet clinic search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'العيادات البيطرية' : 'Pet clinics',
+      trustAria: isAr ? 'إرشادات بحث العيادات البيطرية' : 'Pet clinic search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة بيطرية'] : ['Public discovery only', 'Confirm details with provider', 'Not veterinary advice'],
+      mainChips: isAr ? ['عيادة بيطرية', 'تطعيم', 'عناية وتنظيف', 'طوارئ بيطرية', 'أسنان الحيوانات'] : ['Veterinary clinic', 'Vaccination', 'Grooming', 'Emergency vet', 'Pet dental care'],
+      moreChips: isAr ? ['جراحة', 'علاج الديدان', 'شريحة إلكترونية', 'وثائق سفر الحيوانات', 'رعاية القطط', 'رعاية الكلاب'] : ['Surgery', 'Deworming', 'Microchip', 'Pet travel documents', 'Cat care', 'Dog care'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط'] : ['Muscat'],
+      areaOptions: isAr ? ['الخوير'] : ['Al Khuwair'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'veterinary-clinic', label: 'عيادة بيطرية', helper: 'اقتراح بحث عيادات بيطرية', chip: 'عيادة بيطرية', keywords: ['عيادة بيطرية', 'بيطري'] },
+        { id: 'vaccination', label: 'تطعيم', helper: 'اقتراح خدمة بيطرية', chip: 'تطعيم', keywords: ['تطعيم', 'لقاح'] },
+        { id: 'grooming', label: 'عناية وتنظيف', helper: 'اقتراح خدمة حيوانات', chip: 'عناية وتنظيف', keywords: ['عناية', 'تنظيف'] },
+        { id: 'emergency-vet', label: 'طوارئ بيطرية', helper: 'اقتراح خدمة بيطرية', chip: 'طوارئ بيطرية', keywords: ['طوارئ', 'بيطري'] },
+        { id: 'pet-dental-care', label: 'أسنان الحيوانات', helper: 'اقتراح خدمة بيطرية', chip: 'أسنان الحيوانات', keywords: ['أسنان', 'اسنان'] },
+        { id: 'vet-muscat', label: 'طبيب بيطري في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط', 'طبيب بيطري مسقط'] },
+        { id: 'vet-khuwair', label: 'طبيب بيطري في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'بيطري الخوير'] },
+        { id: 'vet-qurum', label: 'طبيب بيطري في القرم', helper: 'بحث حسب المنطقة', keywords: ['القرم', 'بيطري القرم'] },
+        { id: 'cat-vaccination', label: 'تطعيم القطط', helper: 'اقتراح خدمة بيطرية', chip: 'تطعيم', keywords: ['قطط', 'تطعيم القطط'] },
+        { id: 'dog-vaccination', label: 'تطعيم الكلاب', helper: 'اقتراح خدمة بيطرية', chip: 'تطعيم', keywords: ['كلاب', 'تطعيم الكلاب'] },
+        { id: 'pet-travel-documents', label: 'وثائق سفر الحيوانات', helper: 'اقتراح خدمة بيطرية', chip: 'وثائق سفر الحيوانات', keywords: ['سفر', 'وثائق'] },
+        { id: 'pet-microchip', label: 'شريحة إلكترونية للحيوانات', helper: 'اقتراح خدمة بيطرية', chip: 'شريحة إلكترونية', keywords: ['شريحة', 'الكترونية'] },
+        { id: 'cat-grooming', label: 'عناية القطط', helper: 'اقتراح خدمة حيوانات', chip: 'رعاية القطط', keywords: ['قطط', 'عناية القطط'] },
+        { id: 'dog-grooming', label: 'عناية الكلاب', helper: 'اقتراح خدمة حيوانات', chip: 'رعاية الكلاب', keywords: ['كلاب', 'عناية الكلاب'] }
+      ] : [
+        { id: 'veterinary-clinic', label: 'Veterinary clinic', helper: 'Pet clinic search suggestion', chip: 'Veterinary clinic', keywords: ['veterinary', 'vet clinic'] },
+        { id: 'vaccination', label: 'Vaccination', helper: 'Pet service suggestion', chip: 'Vaccination', keywords: ['vaccination', 'vaccine'] },
+        { id: 'grooming', label: 'Grooming', helper: 'Pet service suggestion', chip: 'Grooming', keywords: ['grooming', 'pet grooming'] },
+        { id: 'emergency-vet', label: 'Emergency vet', helper: 'Pet clinic search suggestion', chip: 'Emergency vet', keywords: ['emergency', 'emergency vet'] },
+        { id: 'pet-dental-care', label: 'Pet dental care', helper: 'Pet service suggestion', chip: 'Pet dental care', keywords: ['dental', 'pet dental'] },
+        { id: 'vet-muscat', label: 'Vet in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat', 'vet muscat'] },
+        { id: 'vet-khuwair', label: 'Vet in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair vet'] },
+        { id: 'vet-qurum', label: 'Vet in Qurum', helper: 'Area search path', keywords: ['qurum', 'qurum vet'] },
+        { id: 'cat-vaccination', label: 'Cat vaccination', helper: 'Pet service suggestion', chip: 'Vaccination', keywords: ['cat', 'cat vaccination'] },
+        { id: 'dog-vaccination', label: 'Dog vaccination', helper: 'Pet service suggestion', chip: 'Vaccination', keywords: ['dog', 'dog vaccination'] },
+        { id: 'pet-travel-documents', label: 'Pet travel documents', helper: 'Pet service suggestion', chip: 'Pet travel documents', keywords: ['travel', 'documents'] },
+        { id: 'pet-microchip', label: 'Microchip for pets', helper: 'Pet service suggestion', chip: 'Microchip', keywords: ['microchip', 'chip'] },
+        { id: 'cat-grooming', label: 'Cat grooming', helper: 'Pet service suggestion', chip: 'Cat care', keywords: ['cat grooming', 'cat'] },
+        { id: 'dog-grooming', label: 'Dog grooming', helper: 'Pet service suggestion', chip: 'Dog care', keywords: ['dog grooming', 'dog'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح العيادات البيطرية' : 'Browse pet clinics',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم العيادات البيطرية العامة بعد الاعتماد.' : 'Search results and public pet clinic listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف العيادات البيطرية' : 'Pet clinic discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: petClinicsSlides[locale]
     }
   };
 }
