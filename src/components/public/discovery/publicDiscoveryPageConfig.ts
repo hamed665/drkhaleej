@@ -165,6 +165,107 @@ export function buildLabsDiscoveryConfig(locale: SupportedLocale, country: Suppo
 }
 
 
+const centersSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Clinic and medical center discovery visual for Oman', caption: 'Clinic discovery across services and areas' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Healthcare platform visual for clinic and center search in Oman', caption: 'Browse clinics, medical centers and care options in Oman' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready clinic and medical center discovery visual', caption: 'Public discovery only, not medical advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف العيادات والمراكز الطبية في عُمان', caption: 'اكتشاف العيادات حسب الخدمات والمناطق' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة رعاية صحية لبحث العيادات والمراكز في عُمان', caption: 'تصفح العيادات والمراكز الطبية وخيارات الرعاية في عُمان' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف عيادات ومراكز مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة طبية' }
+  ]
+} as const;
+
+export function buildCentersDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'centers',
+    path: '/centers',
+    searchId: 'center-search',
+    resultsId: 'center-results',
+    showWhatsApp: false,
+    badge: isAr ? 'العيادات والمراكز في عُمان' : 'Clinics and centers in Oman',
+    title: isAr ? 'ابحث عن عيادات ومراكز طبية في عُمان.' : 'Find clinics and medical centers in Oman.',
+    subtitle: isAr
+      ? 'تصفح العيادات والمراكز الطبية والخدمات وخيارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
+      : 'Browse clinics, medical centers, services and care options across Oman. Public discovery only, not medical advice.',
+    primaryCta: isAr ? 'ابحث عن العيادات' : 'Search clinics',
+    providerCta: isAr ? 'أدرج مركزك' : 'List your center',
+    search: {
+      badge: isAr ? 'بحث المراكز' : 'Center search',
+      title: isAr ? 'ابحث عن العيادات أو الخدمات أو المناطق' : 'Find clinics, services or areas',
+      description: isAr ? 'ابدأ بنوع عيادة أو خدمة أو اسم مركز أو منطقة في مسقط.' : 'Start with a clinic type, service, center name or Muscat area.',
+      inputLabel: isAr ? 'ما العيادة أو الخدمة التي تحتاجها؟' : 'What clinic or service do you need?',
+      placeholder: isAr ? 'ابحث عن عيادة أو مركز طبي أو خدمة أو منطقة…' : 'Search clinic, medical center, service or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'خدمات العيادات والمراكز' : 'Clinic and center services',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'خدمات عيادات ومراكز إضافية' : 'More clinic and center services',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث العيادات والمراكز' : 'Clinic and center search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'العيادات والمراكز' : 'Clinics and centers',
+      trustAria: isAr ? 'إرشادات بحث العيادات والمراكز' : 'Clinic and center search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+      mainChips: isAr ? ['عيادة أسنان', 'عيادة جلدية', 'عيادة عائلية', 'عيادة عيون', 'صحة المرأة'] : ['Dental clinic', 'Skin clinic', 'Family clinic', 'Eye clinic', 'Women’s health'],
+      moreChips: isAr ? ['عيادة أنف وأذن وحنجرة', 'عيادة أطفال', 'عيادة عظام', 'عيادة قلب', 'علاج طبيعي', 'مركز طبي'] : ['ENT clinic', 'Pediatric clinic', 'Orthopedic clinic', 'Cardiology clinic', 'Physiotherapy', 'Medical center'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط'] : ['Muscat'],
+      areaOptions: isAr ? ['الخوير'] : ['Al Khuwair'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'dental-clinic', label: 'عيادة أسنان', helper: 'اقتراح بحث عيادات', chip: 'عيادة أسنان', keywords: ['أسنان', 'عيادة أسنان'] },
+        { id: 'skin-clinic', label: 'عيادة جلدية', helper: 'اقتراح بحث عيادات', chip: 'عيادة جلدية', keywords: ['جلدية', 'جلد'] },
+        { id: 'family-clinic', label: 'عيادة عائلية', helper: 'اقتراح بحث عيادات', chip: 'عيادة عائلية', keywords: ['عائلة', 'عائلي'] },
+        { id: 'eye-clinic', label: 'عيادة عيون', helper: 'اقتراح بحث عيادات', chip: 'عيادة عيون', keywords: ['عيون', 'عين'] },
+        { id: 'womens-health-clinic', label: 'عيادة صحة المرأة', helper: 'اقتراح بحث عيادات', chip: 'صحة المرأة', keywords: ['المرأة', 'نساء', 'صحة المرأة'] },
+        { id: 'ent-clinic', label: 'عيادة أنف وأذن وحنجرة', helper: 'اقتراح بحث عيادات', chip: 'عيادة أنف وأذن وحنجرة', keywords: ['أنف', 'اذن', 'حنجرة'] },
+        { id: 'pediatric-clinic', label: 'عيادة أطفال', helper: 'اقتراح بحث عيادات', chip: 'عيادة أطفال', keywords: ['أطفال', 'طفل'] },
+        { id: 'orthopedic-clinic', label: 'عيادة عظام', helper: 'اقتراح بحث عيادات', chip: 'عيادة عظام', keywords: ['عظام'] },
+        { id: 'medical-center-muscat', label: 'مركز طبي في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', chip: 'مركز طبي', keywords: ['مسقط', 'مركز طبي مسقط'] },
+        { id: 'clinic-khuwair', label: 'عيادة في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'عيادة الخوير'] },
+        { id: 'clinic-qurum', label: 'عيادة في القرم', helper: 'بحث حسب المنطقة', keywords: ['القرم', 'عيادة القرم'] },
+        { id: 'physiotherapy-center', label: 'مركز علاج طبيعي', helper: 'اقتراح بحث عيادات', chip: 'علاج طبيعي', keywords: ['علاج طبيعي', 'طبيعي'] }
+      ] : [
+        { id: 'dental-clinic', label: 'Dental clinic', helper: 'Clinic search suggestion', chip: 'Dental clinic', keywords: ['dental', 'dentist'] },
+        { id: 'skin-clinic', label: 'Skin clinic', helper: 'Clinic search suggestion', chip: 'Skin clinic', keywords: ['skin', 'dermatology'] },
+        { id: 'family-clinic', label: 'Family clinic', helper: 'Clinic search suggestion', chip: 'Family clinic', keywords: ['family', 'general clinic'] },
+        { id: 'eye-clinic', label: 'Eye clinic', helper: 'Clinic search suggestion', chip: 'Eye clinic', keywords: ['eye', 'ophthalmology'] },
+        { id: 'womens-health-clinic', label: 'Women’s health clinic', helper: 'Clinic search suggestion', chip: 'Women’s health', keywords: ['women', 'women’s health', 'womens health'] },
+        { id: 'ent-clinic', label: 'ENT clinic', helper: 'Clinic search suggestion', chip: 'ENT clinic', keywords: ['ent', 'ear nose throat'] },
+        { id: 'pediatric-clinic', label: 'Pediatric clinic', helper: 'Clinic search suggestion', chip: 'Pediatric clinic', keywords: ['pediatric', 'children'] },
+        { id: 'orthopedic-clinic', label: 'Orthopedic clinic', helper: 'Clinic search suggestion', chip: 'Orthopedic clinic', keywords: ['orthopedic', 'bones'] },
+        { id: 'medical-center-muscat', label: 'Medical center in Muscat', helper: 'City search path', city: 'Muscat', chip: 'Medical center', keywords: ['muscat', 'medical center muscat'] },
+        { id: 'clinic-khuwair', label: 'Clinic in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair clinic'] },
+        { id: 'clinic-qurum', label: 'Clinic in Qurum', helper: 'Area search path', keywords: ['qurum', 'qurum clinic'] },
+        { id: 'physiotherapy-center', label: 'Physiotherapy center', helper: 'Clinic search suggestion', chip: 'Physiotherapy', keywords: ['physiotherapy', 'physical therapy'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح العيادات والمراكز' : 'Browse clinics and centers',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم العيادات والمراكز الطبية العامة بعد الاعتماد.' : 'Search results and public clinic or medical center listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف العيادات والمراكز' : 'Clinic and center discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: centersSlides[locale]
+    }
+  };
+}
+
+
 const pharmaciesSlides = {
   en: [
     { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Pharmacy discovery visual for public healthcare search', caption: 'Pharmacy discovery across services, care needs and areas' },

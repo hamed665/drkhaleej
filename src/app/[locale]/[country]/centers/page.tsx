@@ -1,37 +1,36 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { PublicDiscoveryHero2026 } from '@/components/public/discovery/PublicDiscoveryHero2026';
+import { PublicDiscoveryResultsShell2026 } from '@/components/public/discovery/PublicDiscoveryResultsShell2026';
+import { buildCentersDiscoveryConfig } from '@/components/public/discovery/publicDiscoveryPageConfig';
 import { PublicDirectoryListingContent } from '@/components/public/public-directory-listing-content';
-import { PublicPageShell } from '@/components/public/public-page-shell';
 import { listPublicCenters } from '@/lib/catalog/public-queries';
 import {
   isSupportedCountry,
   isSupportedLocale,
   localeDirection,
+  type SupportedCountry,
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
 type Params = { locale: string; country: string };
 
-type RouteCopy = { title: string; description: string; badge: string };
-
-const copyByLocale: Record<SupportedLocale, RouteCopy> = {
+const metadataCopyByLocale: Record<SupportedLocale, { title: string; description: string }> = {
   en: {
-    title: 'Medical Centers in Oman | DrMuscat',
-    description: 'Browse public medical center listings in Oman with bilingual-ready, server-rendered pages.',
-    badge: 'Public center listings'
+    title: 'Clinics and Medical Centers in Oman | DrMuscat',
+    description: 'Browse clinics, medical centers, services and care options in Oman. Public discovery only, not medical advice.'
   },
   ar: {
-    title: 'المراكز الطبية في عُمان | DrMuscat',
-    description: 'تصفح القوائم العامة للمراكز الطبية في عُمان ضمن صفحات خادمية ثنائية اللغة.',
-    badge: 'قوائم المراكز العامة'
+    title: 'العيادات والمراكز الطبية في عُمان | DrMuscat',
+    description: 'تصفح العيادات والمراكز الطبية والخدمات وخيارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
   }
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
-  const copy = copyByLocale[locale];
+  const copy = metadataCopyByLocale[locale];
   return buildLocalizedMetadata({ locale, country, pathname: '/centers', title: copy.title, description: copy.description });
 }
 
@@ -39,18 +38,18 @@ export default async function PublicCentersPage({ params }: { params: Promise<Pa
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
 
-  const copy = copyByLocale[locale];
-  const result = await listPublicCenters({ country });
-
-  const content = <PublicDirectoryListingContent locale={locale} variant="center" result={result} />;
+  const safeLocale = locale as SupportedLocale;
+  const safeCountry = country as SupportedCountry;
+  const dir = localeDirection(safeLocale);
+  const config = buildCentersDiscoveryConfig(safeLocale, safeCountry, dir);
+  const result = await listPublicCenters({ country: safeCountry });
 
   return (
-    <PublicPageShell
-      dir={localeDirection(locale)}
-      heroBadge={copy.badge}
-      heroTitle={copy.title}
-      heroDescription={copy.description}
-      content={content}
-    />
+    <main className="home-foundation dm2026-home-page dm2026-doctors-page dm2026-public-discovery-page dm2026-public-discovery-page--centers" dir={dir} data-country={safeCountry} data-locale={safeLocale}>
+      <PublicDiscoveryHero2026 config={config} whatsAppHref={null} />
+      <PublicDiscoveryResultsShell2026 config={config}>
+        <PublicDirectoryListingContent locale={safeLocale} variant="center" result={result} />
+      </PublicDiscoveryResultsShell2026>
+    </main>
   );
 }
