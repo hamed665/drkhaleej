@@ -12,7 +12,7 @@ const requiredFiles = [
   'public/llms.txt'
 ];
 
-const approvedDiscoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/pet-clinics', '/pet-shops', '/offers', '/labs', '/services', '/search'];
+const approvedDiscoveryRoutes = ['/doctors', '/centers', '/pharmacies', '/beauty', '/pet-clinics', '/pet-shops', '/offers', '/labs', '/services', '/search'];
 const approvedProviderRoutes = ['/for-providers'];
 
 async function ensureFileExists(relativePath) {

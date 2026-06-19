@@ -15,20 +15,18 @@ export function SiteHeader() {
   const copy = headerCopy[locale];
   const homeHref = homeRoute(locale, country);
   const providerHref = publicProviderRoute(locale, country);
-  const articlesHref = `/${locale}/${country}/articles`;
   const mobileMenuId = `dm2026-mobile-menu-${locale}`;
   const accountPopoverId = `dm2026-account-menu-${locale}`;
   const accountLabel = locale === 'ar' ? 'دخول' : 'Login';
   const linkedNavItems = [
-    { href: homeHref, label: copy.home },
     { href: publicDiscoveryRoute(locale, country, 'doctors'), label: copy.doctors },
     { href: publicDiscoveryRoute(locale, country, 'centers'), label: copy.centers },
     { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
-    { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops },
     { href: publicDiscoveryRoute(locale, country, 'offers'), label: copy.offers },
-    { href: publicDiscoveryRoute(locale, country, 'services'), label: copy.services },
-    { href: articlesHref, label: copy.articles }
+    { href: publicDiscoveryRoute(locale, country, 'beauty'), label: copy.beauty },
+    { href: publicDiscoveryRoute(locale, country, 'pet-clinics'), label: copy.petClinics },
+    { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops }
   ] as const;
   const pendingNavItems = [copy.hospitals] as const;
 

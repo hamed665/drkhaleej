@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -164,6 +164,111 @@ export function buildLabsDiscoveryConfig(locale: SupportedLocale, country: Suppo
   };
 }
 
+
+
+const beautySlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Beauty center and salon discovery visual for Oman', caption: 'Beauty discovery across salons, skincare, hair and wellness' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Premium public discovery visual for beauty services in Oman', caption: 'Browse beauty centers, salons and non-emergency wellness services' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready beauty discovery visual', caption: 'Public discovery only, not medical advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف مراكز التجميل والصالونات في عُمان', caption: 'اكتشاف التجميل حسب الصالونات والعناية بالبشرة والشعر والعافية' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة اكتشاف عامة لخدمات التجميل في عُمان', caption: 'تصفح مراكز التجميل والصالونات وخدمات العافية غير الطارئة' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف تجميل مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة طبية' }
+  ]
+} as const;
+
+export function buildBeautyDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'beauty',
+    path: '/beauty',
+    searchId: 'beauty-search',
+    resultsId: 'beauty-results',
+    showWhatsApp: false,
+    badge: isAr ? 'التجميل في عُمان' : 'Beauty in Oman',
+    title: isAr ? 'ابحث عن مراكز التجميل والصالونات في عُمان.' : 'Find beauty centers and salons in Oman.',
+    subtitle: isAr
+      ? 'تصفح مراكز التجميل والصالونات والعناية بالبشرة والشعر والأظافر وخدمات العافية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
+      : 'Browse beauty centers, salons, skincare, hair, nails and wellness services across Oman. Public discovery only, not medical advice.',
+    primaryCta: isAr ? 'بحث' : 'Search',
+    providerCta: isAr ? 'أدرج مركز التجميل' : 'List your beauty center',
+    search: {
+      badge: isAr ? 'بحث التجميل' : 'Beauty search',
+      title: isAr ? 'ابحث عن خدمات التجميل أو الصالونات أو المناطق' : 'Find beauty services, salons or areas',
+      description: isAr ? 'ابدأ بخدمة تجميل أو نوع صالون أو فئة علاج أو منطقة في مسقط.' : 'Start with a beauty service, salon type, treatment category or Muscat area.',
+      inputLabel: isAr ? 'ما خدمة التجميل التي تحتاجها؟' : 'What beauty service do you need?',
+      placeholder: isAr ? 'ابحث عن عناية بالبشرة أو شعر أو أظافر أو ليزر أو سبا أو منطقة…' : 'Search skincare, hair, nails, laser, spa or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'فئات التجميل' : 'Beauty categories',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'فئات تجميل إضافية' : 'More beauty categories',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث التجميل' : 'Beauty search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'التجميل' : 'Beauty',
+      trustAria: isAr ? 'إرشادات بحث التجميل' : 'Beauty search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+      mainChips: isAr ? ['العناية بالبشرة', 'صالون شعر', 'الأظافر', 'ليزر', 'سبا'] : ['Skincare', 'Hair salon', 'Nails', 'Laser', 'Spa'],
+      moreChips: isAr ? ['مكياج', 'فيشل', 'مساج', 'الحواجب', 'إزالة الشعر', 'عيادة تجميل'] : ['Makeup', 'Facial', 'Massage', 'Eyebrows', 'Hair removal', 'Beauty clinic'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط', 'السيب', 'بوشر', 'مطرح'] : ['Muscat', 'Seeb', 'Bawshar', 'Muttrah'],
+      areaOptions: isAr ? ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي'] : ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'beauty-skincare', label: 'العناية بالبشرة', helper: 'فئة تجميل', chip: 'العناية بالبشرة', keywords: ['بشرة', 'العناية بالبشرة'] },
+        { id: 'beauty-hair-salon', label: 'صالون شعر', helper: 'نوع صالون', chip: 'صالون شعر', keywords: ['شعر', 'صالون شعر'] },
+        { id: 'beauty-nails', label: 'الأظافر', helper: 'فئة تجميل', chip: 'الأظافر', keywords: ['اظافر', 'أظافر', 'الأظافر'] },
+        { id: 'beauty-laser', label: 'ليزر', helper: 'فئة علاج', chip: 'ليزر', keywords: ['ليزر'] },
+        { id: 'beauty-spa', label: 'سبا', helper: 'فئة عافية', chip: 'سبا', keywords: ['سبا'] },
+        { id: 'beauty-facial', label: 'فيشل', helper: 'فئة تجميل', chip: 'فيشل', keywords: ['فيشل'] },
+        { id: 'beauty-makeup', label: 'مكياج', helper: 'فئة تجميل', chip: 'مكياج', keywords: ['مكياج'] },
+        { id: 'beauty-massage', label: 'مساج', helper: 'فئة عافية', chip: 'مساج', keywords: ['مساج'] },
+        { id: 'beauty-muscat', label: 'مركز تجميل في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط', 'مركز تجميل مسقط'] },
+        { id: 'beauty-khuwair', label: 'مركز تجميل في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'مركز تجميل الخوير'] },
+        { id: 'beauty-qurum', label: 'مركز تجميل في القرم', helper: 'بحث حسب المنطقة', area: 'القرم', keywords: ['القرم', 'مركز تجميل القرم'] },
+        { id: 'beauty-hair-removal', label: 'إزالة الشعر', helper: 'فئة تجميل', chip: 'إزالة الشعر', keywords: ['إزالة الشعر', 'ازالة الشعر'] },
+        { id: 'beauty-eyebrows', label: 'الحواجب', helper: 'فئة تجميل', chip: 'الحواجب', keywords: ['حواجب', 'الحواجب'] },
+        { id: 'beauty-clinic', label: 'عيادة تجميل', helper: 'نوع مقدم خدمة', chip: 'عيادة تجميل', keywords: ['عيادة تجميل', 'تجميل'] }
+      ] : [
+        { id: 'beauty-skincare', label: 'Skincare', helper: 'Beauty category', chip: 'Skincare', keywords: ['skincare', 'skin care'] },
+        { id: 'beauty-hair-salon', label: 'Hair salon', helper: 'Salon type', chip: 'Hair salon', keywords: ['hair', 'hair salon'] },
+        { id: 'beauty-nails', label: 'Nails', helper: 'Beauty category', chip: 'Nails', keywords: ['nails', 'nail'] },
+        { id: 'beauty-laser', label: 'Laser', helper: 'Treatment category', chip: 'Laser', keywords: ['laser'] },
+        { id: 'beauty-spa', label: 'Spa', helper: 'Wellness category', chip: 'Spa', keywords: ['spa'] },
+        { id: 'beauty-facial', label: 'Facial', helper: 'Beauty category', chip: 'Facial', keywords: ['facial'] },
+        { id: 'beauty-makeup', label: 'Makeup', helper: 'Beauty category', chip: 'Makeup', keywords: ['makeup', 'make up'] },
+        { id: 'beauty-massage', label: 'Massage', helper: 'Wellness category', chip: 'Massage', keywords: ['massage'] },
+        { id: 'beauty-muscat', label: 'Beauty center in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat', 'beauty center muscat'] },
+        { id: 'beauty-khuwair', label: 'Beauty center in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair beauty'] },
+        { id: 'beauty-qurum', label: 'Beauty center in Qurum', helper: 'Area search path', area: 'Qurum', keywords: ['qurum', 'qurum beauty'] },
+        { id: 'beauty-hair-removal', label: 'Hair removal', helper: 'Beauty category', chip: 'Hair removal', keywords: ['hair removal'] },
+        { id: 'beauty-eyebrows', label: 'Eyebrows', helper: 'Beauty category', chip: 'Eyebrows', keywords: ['eyebrows', 'brows'] },
+        { id: 'beauty-clinic', label: 'Beauty clinic', helper: 'Provider type', chip: 'Beauty clinic', keywords: ['beauty clinic', 'aesthetic clinic'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح مراكز التجميل والصالونات' : 'Browse beauty centers and salons',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم مراكز التجميل العامة بعد الاعتماد.' : 'Search results and public beauty center listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف التجميل' : 'Beauty discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: beautySlides[locale]
+    }
+  };
+}
 
 const centersSlides = {
   en: [

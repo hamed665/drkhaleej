@@ -393,6 +393,7 @@ const checks = [
       "doctors",
       "centers",
       "pharmacies",
+      "beauty",
       "labs",
       "services",
       "search",
