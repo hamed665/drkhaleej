@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'pet-shops' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -370,6 +370,113 @@ export function buildPetClinicsDiscoveryConfig(locale: SupportedLocale, country:
   };
 }
 
+
+
+const petShopsSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Pet shop discovery visual for pet supplies in Oman', caption: 'Pet shop discovery across products and areas' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Public pet shop search visual for Oman', caption: 'Browse pet food, supplies and grooming products in Oman' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready pet shop discovery visual', caption: 'Public discovery only, not veterinary advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف متاجر الحيوانات في عُمان', caption: 'اكتشاف متاجر الحيوانات حسب المنتجات والمناطق' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة بحث عامة عن متاجر الحيوانات في عُمان', caption: 'تصفح طعام الحيوانات والمستلزمات ومنتجات العناية في عُمان' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف متاجر حيوانات مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة بيطرية' }
+  ]
+} as const;
+
+export function buildPetShopsDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'pet-shops',
+    path: '/pet-shops',
+    searchId: 'pet-shop-search',
+    resultsId: 'pet-shop-results',
+    showWhatsApp: false,
+    badge: isAr ? 'متاجر الحيوانات في عُمان' : 'Pet shops in Oman',
+    title: isAr ? 'ابحث عن متاجر الحيوانات في عُمان.' : 'Find pet shops in Oman.',
+    subtitle: isAr
+      ? 'تصفح طعام الحيوانات والمستلزمات ومنتجات العناية والاحتياجات الأساسية في عُمان. اكتشاف عام فقط وليس نصيحة بيطرية.'
+      : 'Browse pet food, supplies, grooming products and care essentials across Oman. Public discovery only, not veterinary advice.',
+    primaryCta: isAr ? 'ابحث عن متاجر الحيوانات' : 'Search pet shops',
+    providerCta: isAr ? 'أدرج متجر الحيوانات' : 'List your pet shop',
+    search: {
+      badge: isAr ? 'بحث متاجر الحيوانات' : 'Pet shop search',
+      title: isAr ? 'ابحث عن متاجر الحيوانات أو المنتجات أو المناطق' : 'Find pet shops, products or areas',
+      description: isAr ? 'ابدأ بطعام الحيوانات أو المستلزمات أو منتجات العناية أو اسم متجر أو منطقة في مسقط.' : 'Start with pet food, supplies, grooming products, shop name or Muscat area.',
+      inputLabel: isAr ? 'ما المنتج أو متجر الحيوانات الذي تحتاجه؟' : 'What pet product or shop do you need?',
+      placeholder: isAr ? 'ابحث عن طعام الحيوانات أو الألعاب أو العناية أو مستلزمات القطط أو منطقة…' : 'Search pet food, toys, grooming, cat supplies or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'فئات متاجر الحيوانات' : 'Pet shop categories',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'فئات إضافية لمتاجر الحيوانات' : 'More pet shop categories',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث متاجر الحيوانات' : 'Pet shop search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'متاجر الحيوانات' : 'Pet shops',
+      trustAria: isAr ? 'إرشادات بحث متاجر الحيوانات' : 'Pet shop search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع المتجر', 'ليست نصيحة بيطرية'] : ['Public discovery only', 'Confirm details with shop', 'Not veterinary advice'],
+      mainChips: isAr ? ['طعام الحيوانات', 'مستلزمات القطط', 'مستلزمات الكلاب', 'منتجات العناية', 'ألعاب'] : ['Pet food', 'Cat supplies', 'Dog supplies', 'Grooming products', 'Toys'],
+      moreChips: isAr ? ['رمل القطط', 'إكسسوارات الحيوانات', 'أقفاص وحقائب نقل', 'مستلزمات الأحواض', 'مستلزمات الطيور', 'توصيل'] : ['Litter', 'Pet accessories', 'Cages and carriers', 'Aquarium supplies', 'Bird supplies', 'Delivery'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط'] : ['Muscat'],
+      areaOptions: isAr ? ['الخوير'] : ['Al Khuwair'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'pet-food', label: 'طعام الحيوانات', helper: 'اقتراح بحث متاجر الحيوانات', chip: 'طعام الحيوانات', keywords: ['طعام الحيوانات', 'طعام'] },
+        { id: 'cat-food', label: 'طعام القطط', helper: 'اقتراح منتج', chip: 'طعام الحيوانات', keywords: ['طعام القطط', 'قطط'] },
+        { id: 'dog-food', label: 'طعام الكلاب', helper: 'اقتراح منتج', chip: 'طعام الحيوانات', keywords: ['طعام الكلاب', 'كلاب'] },
+        { id: 'cat-supplies', label: 'مستلزمات القطط', helper: 'اقتراح فئة', chip: 'مستلزمات القطط', keywords: ['مستلزمات القطط', 'قطط'] },
+        { id: 'dog-supplies', label: 'مستلزمات الكلاب', helper: 'اقتراح فئة', chip: 'مستلزمات الكلاب', keywords: ['مستلزمات الكلاب', 'كلاب'] },
+        { id: 'pet-shop-muscat', label: 'متجر حيوانات في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط', 'متجر حيوانات مسقط'] },
+        { id: 'pet-shop-khuwair', label: 'متجر حيوانات في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'متجر حيوانات الخوير'] },
+        { id: 'pet-shop-qurum', label: 'متجر حيوانات في القرم', helper: 'بحث حسب المنطقة', keywords: ['القرم', 'متجر حيوانات القرم'] },
+        { id: 'grooming-products', label: 'منتجات العناية', helper: 'اقتراح فئة', chip: 'منتجات العناية', keywords: ['عناية', 'منتجات العناية'] },
+        { id: 'pet-toys', label: 'ألعاب الحيوانات', helper: 'اقتراح فئة', chip: 'ألعاب', keywords: ['ألعاب', 'العاب'] },
+        { id: 'litter', label: 'رمل القطط', helper: 'اقتراح فئة', chip: 'رمل القطط', keywords: ['رمل القطط', 'رمل'] },
+        { id: 'aquarium-supplies', label: 'مستلزمات الأحواض', helper: 'اقتراح فئة', chip: 'مستلزمات الأحواض', keywords: ['أحواض', 'احواض'] },
+        { id: 'bird-supplies', label: 'مستلزمات الطيور', helper: 'اقتراح فئة', chip: 'مستلزمات الطيور', keywords: ['طيور'] },
+        { id: 'pet-accessories', label: 'إكسسوارات الحيوانات', helper: 'اقتراح فئة', chip: 'إكسسوارات الحيوانات', keywords: ['إكسسوارات', 'اكسسوارات'] },
+        { id: 'delivery', label: 'توصيل', helper: 'اقتراح خدمة', chip: 'توصيل', keywords: ['توصيل'] }
+      ] : [
+        { id: 'pet-food', label: 'Pet food', helper: 'Pet shop search suggestion', chip: 'Pet food', keywords: ['pet food', 'food'] },
+        { id: 'cat-food', label: 'Cat food', helper: 'Product suggestion', chip: 'Pet food', keywords: ['cat food', 'cat'] },
+        { id: 'dog-food', label: 'Dog food', helper: 'Product suggestion', chip: 'Pet food', keywords: ['dog food', 'dog'] },
+        { id: 'cat-supplies', label: 'Cat supplies', helper: 'Category suggestion', chip: 'Cat supplies', keywords: ['cat supplies', 'cat'] },
+        { id: 'dog-supplies', label: 'Dog supplies', helper: 'Category suggestion', chip: 'Dog supplies', keywords: ['dog supplies', 'dog'] },
+        { id: 'pet-shop-muscat', label: 'Pet shop in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat', 'pet shop muscat'] },
+        { id: 'pet-shop-khuwair', label: 'Pet shop in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair pet shop'] },
+        { id: 'pet-shop-qurum', label: 'Pet shop in Qurum', helper: 'Area search path', keywords: ['qurum', 'qurum pet shop'] },
+        { id: 'grooming-products', label: 'Grooming products', helper: 'Category suggestion', chip: 'Grooming products', keywords: ['grooming', 'grooming products'] },
+        { id: 'pet-toys', label: 'Pet toys', helper: 'Category suggestion', chip: 'Toys', keywords: ['toys', 'pet toys'] },
+        { id: 'litter', label: 'Litter', helper: 'Category suggestion', chip: 'Litter', keywords: ['litter', 'cat litter'] },
+        { id: 'aquarium-supplies', label: 'Aquarium supplies', helper: 'Category suggestion', chip: 'Aquarium supplies', keywords: ['aquarium'] },
+        { id: 'bird-supplies', label: 'Bird supplies', helper: 'Category suggestion', chip: 'Bird supplies', keywords: ['bird supplies', 'bird'] },
+        { id: 'pet-accessories', label: 'Pet accessories', helper: 'Category suggestion', chip: 'Pet accessories', keywords: ['accessories'] },
+        { id: 'delivery', label: 'Delivery', helper: 'Service suggestion', chip: 'Delivery', keywords: ['delivery'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح متاجر الحيوانات' : 'Browse pet shops',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم متاجر الحيوانات العامة بعد الاعتماد.' : 'Search results and public pet shop listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف متاجر الحيوانات' : 'Pet shop discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: petShopsSlides[locale]
+    }
+  };
+}
 
 const pharmaciesSlides = {
   en: [

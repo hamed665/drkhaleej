@@ -2,7 +2,7 @@ import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
 export const homeRoute = (locale: SupportedLocale, country: SupportedCountry) => `/${locale}/${country}`;
 
-export const publicDiscoverySlugs = ['doctors', 'centers', 'pharmacies', 'pet-clinics', 'labs', 'services', 'search'] as const;
+export const publicDiscoverySlugs = ['doctors', 'centers', 'pharmacies', 'pet-clinics', 'pet-shops', 'labs', 'services', 'search'] as const;
 export type PublicDiscoverySlug = (typeof publicDiscoverySlugs)[number];
 
 export const publicDiscoveryRoute = (
@@ -28,6 +28,6 @@ export const publicDoctorDetailRoute = (
 
 export const localeCountryRoutePattern = /^\/(en|ar)\/(om)(?:\/)?$/;
 export const localeCountryDiscoveryRoutePattern =
-  /^\/(en|ar)\/(om)\/(doctors|centers|pharmacies|pet-clinics|labs|services|search)(?:\/)?$/;
+  /^\/(en|ar)\/(om)\/(doctors|centers|pharmacies|pet-clinics|pet-shops|labs|services|search)(?:\/)?$/;
 export const publicProviderRoutePattern = /^\/(en|ar)\/(om)\/for-providers(?:\/)?$/;
 export const publicDoctorDetailRoutePattern = /^\/(en|ar)\/(om)\/doctor\/([^/]+)(?:\/)?$/;

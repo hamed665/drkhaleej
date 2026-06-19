@@ -25,6 +25,7 @@ export function SiteHeader() {
     { href: publicDiscoveryRoute(locale, country, 'centers'), label: copy.centers },
     { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
+    { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops },
     { href: publicDiscoveryRoute(locale, country, 'services'), label: copy.services },
     { href: articlesHref, label: copy.articles }
   ] as const;
