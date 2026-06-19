@@ -23,7 +23,6 @@ type RouteCopy = {
   badge: string;
   title: string;
   description: string;
-  searchCta: string;
   listCta: string;
   whatsappCta: string;
   whatsappMessage: string;
@@ -39,7 +38,6 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     badge: 'Doctors in Oman',
     title: 'Find doctors in Oman.',
     description: 'Browse doctors, specialties, clinics and care paths across Oman. Public discovery only, not medical advice.',
-    searchCta: 'Search doctors',
     listCta: 'List your center',
     whatsappCta: 'WhatsApp',
     whatsappMessage: 'Hello DrMuscat, I need help with doctor discovery in Oman.',
@@ -53,7 +51,6 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     badge: 'الأطباء في عُمان',
     title: 'ابحث عن أطباء في عُمان.',
     description: 'تصفح الأطباء والتخصصات والعيادات ومسارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.',
-    searchCta: 'ابحث عن الأطباء',
     listCta: 'أدرج مركزك',
     whatsappCta: 'واتساب',
     whatsappMessage: 'مرحباً DrMuscat، أحتاج مساعدة في اكتشاف الأطباء في عُمان.',
@@ -100,7 +97,6 @@ export default async function PublicDoctorsPage({ params }: { params: Promise<Pa
               <p>{copy.description}</p>
             </div>
             <div className="dm2026-doctors-hero__actions" aria-label={copy.badge}>
-              <a className="dm2026-button dm2026-button-primary" href="#doctor-search">{copy.searchCta}</a>
               <Link className="dm2026-button dm2026-button-secondary" href={`/${safeLocale}/${safeCountry}/for-providers`}>{copy.listCta}</Link>
               {whatsAppHref ? (
                 <a className="dm2026-button dm2026-button-ghost" href={whatsAppHref} target="_blank" rel="noopener noreferrer">{copy.whatsappCta}</a>

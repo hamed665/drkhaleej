@@ -44,7 +44,9 @@ const copyByLocale = {
     contentType: 'Doctors',
     trustAria: 'Doctor search guidance',
     trust: ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
-    chips: ['Pediatrician', 'Dermatologist', 'Dentist', 'Gynecologist', 'ENT doctor', 'Orthopedist', 'Cardiologist', 'General Practitioner'],
+    chips: ['Pediatrician', 'Dermatologist', 'Dentist', 'Gynecologist', 'ENT doctor'],
+    additionalSpecialties: ['Orthopedist', 'Cardiologist', 'General Practitioner', 'Ophthalmologist', 'Psychiatrist', 'Neurologist'],
+    moreSpecialties: 'More specialties',
     countries: ['Oman'],
     cities: ['Muscat', 'Seeb', 'Bawshar', 'Muttrah'],
     areas: ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi']
@@ -66,7 +68,9 @@ const copyByLocale = {
     contentType: 'الأطباء',
     trustAria: 'إرشادات بحث الأطباء',
     trust: ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'],
-    chips: ['طبيب أطفال', 'جلدية', 'أسنان', 'نساء وولادة', 'أنف وأذن وحنجرة', 'عظام', 'قلب', 'طبيب عام'],
+    chips: ['طبيب أطفال', 'جلدية', 'أسنان', 'نساء وولادة', 'أنف وأذن وحنجرة'],
+    additionalSpecialties: ['عظام', 'قلب', 'طبيب عام', 'عيون', 'نفسي', 'أعصاب'],
+    moreSpecialties: 'المزيد من التخصصات',
     countries: ['عُمان'],
     cities: ['مسقط', 'السيب', 'بوشر', 'مطرح'],
     areas: ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي']
@@ -144,7 +148,7 @@ export function DoctorsSearch2026({ locale, country, dir, resultsId }: DoctorsSe
     const city = locale === 'ar' ? suggestion.cityAr : suggestion.cityEn;
     const area = locale === 'ar' ? suggestion.areaAr : suggestion.areaEn;
 
-    if (specialty && (copy.chips as readonly string[]).includes(specialty)) setSelectedSpecialty(specialty);
+    if (specialty && [...copy.chips, ...copy.additionalSpecialties].includes(specialty as never)) setSelectedSpecialty(specialty);
     if (city && (copy.cities as readonly string[]).includes(city)) setSelectedCity(city);
     if (area && (copy.areas as readonly string[]).includes(area)) setSelectedArea(area);
 
@@ -241,6 +245,17 @@ export function DoctorsSearch2026({ locale, country, dir, resultsId }: DoctorsSe
 
           <details className="dm2026-home-search__more-filters">
             <summary>{copy.moreFilters}</summary>
+            <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.moreSpecialties}>
+              <legend>{copy.moreSpecialties}</legend>
+              <div>
+                {copy.additionalSpecialties.map((chip) => (
+                  <label key={chip} className="dm2026-home-search__chip">
+                    <input type="radio" name="specialty" value={chip} checked={chip === selectedSpecialty} onChange={() => setSelectedSpecialty(chip)} />
+                    <span>{chip}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <div className="dm2026-home-search__select-grid" aria-label={`${copy.country}, ${copy.city}, ${copy.area}`}>
               <div className="dm2026-home-search__field">
                 <label htmlFor="dm2026-doctors-country">{copy.country}</label>
