@@ -8320,27 +8320,14 @@
   }
 }
 
-/* Public discovery search badge polish: keep the category badge as an eyebrow, not a CTA. */
+/* Public discovery search header polish: no category badge is rendered inside the card. */
 .dm2026-public-discovery-search__header {
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 0.36rem;
-}
-
-.dm2026-public-discovery-search__eyebrow {
-  width: fit-content;
-  max-width: 100%;
-  align-self: flex-start;
-  pointer-events: none;
-  cursor: default;
-  white-space: normal;
+  gap: 0;
 }
 
 [dir='rtl'] .dm2026-public-discovery-search__header {
   align-items: flex-end;
   text-align: start;
-}
-
-[dir='rtl'] .dm2026-public-discovery-search__eyebrow {
-  align-self: flex-end;
 }
