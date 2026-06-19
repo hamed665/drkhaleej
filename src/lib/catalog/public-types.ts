@@ -20,7 +20,7 @@ export type PublicMediaImage = {
   sortOrder: number;
 };
 
-export type PublicCatalogSlug = 'doctors' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'labs' | 'services' | 'search';
+export type PublicCatalogSlug = 'doctors' | 'dental' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'labs' | 'services' | 'search';
 
 export type PublicCatalogEmptyReason =
   | 'no_rows'

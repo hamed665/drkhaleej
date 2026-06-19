@@ -20,13 +20,13 @@ export function SiteHeader() {
   const accountLabel = locale === 'ar' ? 'دخول' : 'Login';
   const linkedNavItems = [
     { href: publicDiscoveryRoute(locale, country, 'doctors'), label: copy.doctors },
+    { href: publicDiscoveryRoute(locale, country, 'dental'), label: copy.dental },
     { href: publicDiscoveryRoute(locale, country, 'centers'), label: copy.centers },
     { href: publicDiscoveryRoute(locale, country, 'labs'), label: copy.labs },
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
     { href: publicDiscoveryRoute(locale, country, 'offers'), label: copy.offers },
     { href: publicDiscoveryRoute(locale, country, 'beauty'), label: copy.beauty },
-    { href: publicDiscoveryRoute(locale, country, 'pet-clinics'), label: copy.petClinics },
-    { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops }
+    { href: publicDiscoveryRoute(locale, country, 'pet-clinics'), label: copy.petClinics }
   ] as const;
   const pendingNavItems = [copy.hospitals] as const;
 

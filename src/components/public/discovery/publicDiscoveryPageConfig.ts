@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'dental' | 'labs' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -166,6 +166,111 @@ export function buildLabsDiscoveryConfig(locale: SupportedLocale, country: Suppo
 
 
 
+
+const dentalSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Dental clinic discovery visual for Oman', caption: 'Dental discovery across clinics, orthodontics and oral care' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Premium public discovery visual for dental services in Oman', caption: 'Browse dental clinics and oral care services in Oman' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready dental discovery visual', caption: 'Public discovery only, not medical advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف عيادات الأسنان في عُمان', caption: 'اكتشاف الأسنان حسب العيادات والتقويم والعناية بالفم' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة اكتشاف عامة لخدمات الأسنان في عُمان', caption: 'تصفح عيادات الأسنان وخدمات العناية بالفم في عُمان' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف أسنان مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة طبية' }
+  ]
+} as const;
+
+export function buildDentalDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'dental',
+    path: '/dental',
+    searchId: 'dental-search',
+    resultsId: 'dental-results',
+    showWhatsApp: false,
+    badge: isAr ? 'رعاية الأسنان في عُمان' : 'Dental care in Oman',
+    title: isAr ? 'ابحث عن عيادات الأسنان في عُمان.' : 'Find dental clinics in Oman.',
+    subtitle: isAr
+      ? 'تصفح عيادات الأسنان وأطباء الأسنان والتقويم والزراعة والتبييض وخدمات العناية بالفم في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
+      : 'Browse dental clinics, dentists, orthodontics, implants, whitening and oral care services across Oman. Public discovery only, not medical advice.',
+    primaryCta: isAr ? 'بحث' : 'Search',
+    providerCta: isAr ? 'أدرج عيادة الأسنان' : 'List your dental clinic',
+    search: {
+      badge: isAr ? 'بحث الأسنان' : 'Dental search',
+      title: isAr ? 'ابحث عن خدمات الأسنان أو العيادات أو المناطق' : 'Find dental services, clinics or areas',
+      description: isAr ? 'ابدأ بخدمة أسنان أو اسم عيادة أو نوع علاج أو منطقة في مسقط.' : 'Start with a dental service, clinic name, treatment type or Muscat area.',
+      inputLabel: isAr ? 'ما خدمة الأسنان التي تحتاجها؟' : 'What dental service do you need?',
+      placeholder: isAr ? 'ابحث عن عيادة أسنان أو تقويم أو زراعة أو تبييض أو منطقة…' : 'Search dental clinic, braces, implants, whitening or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'فئات الأسنان' : 'Dental categories',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'فئات أسنان إضافية' : 'More dental categories',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث الأسنان' : 'Dental search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'الأسنان' : 'Dental',
+      trustAria: isAr ? 'إرشادات بحث الأسنان' : 'Dental search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+      mainChips: isAr ? ['عيادة أسنان', 'تقويم الأسنان', 'زراعة الأسنان', 'تبييض الأسنان', 'طوارئ الأسنان'] : ['Dental clinic', 'Braces', 'Implants', 'Whitening', 'Emergency dental'],
+      moreChips: isAr ? ['علاج العصب', 'طبيب أسنان أطفال', 'تجميل الأسنان', 'تنظيف الأسنان', 'خلع الأسنان', 'رعاية اللثة'] : ['Root canal', 'Pediatric dentist', 'Cosmetic dentistry', 'Cleaning', 'Tooth extraction', 'Gum care'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط', 'السيب', 'بوشر', 'مطرح'] : ['Muscat', 'Seeb', 'Bawshar', 'Muttrah'],
+      areaOptions: isAr ? ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي'] : ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'dental-clinic', label: 'عيادة أسنان', helper: 'فئة أسنان', chip: 'عيادة أسنان', keywords: ['عيادة أسنان', 'أسنان'] },
+        { id: 'dentist-muscat', label: 'طبيب أسنان في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط', 'طبيب أسنان مسقط'] },
+        { id: 'dentist-khuwair', label: 'طبيب أسنان في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'طبيب أسنان الخوير'] },
+        { id: 'dentist-qurum', label: 'طبيب أسنان في القرم', helper: 'بحث حسب المنطقة', area: 'القرم', keywords: ['القرم', 'طبيب أسنان القرم'] },
+        { id: 'braces', label: 'تقويم الأسنان', helper: 'فئة علاج أسنان', chip: 'تقويم الأسنان', keywords: ['تقويم', 'تقويم الأسنان'] },
+        { id: 'dental-implants', label: 'زراعة الأسنان', helper: 'فئة علاج أسنان', chip: 'زراعة الأسنان', keywords: ['زراعة', 'زراعة الأسنان'] },
+        { id: 'teeth-whitening', label: 'تبييض الأسنان', helper: 'فئة علاج أسنان', chip: 'تبييض الأسنان', keywords: ['تبييض', 'تبييض الأسنان'] },
+        { id: 'root-canal', label: 'علاج العصب', helper: 'فئة علاج أسنان', chip: 'علاج العصب', keywords: ['عصب', 'علاج العصب'] },
+        { id: 'pediatric-dentist', label: 'طبيب أسنان أطفال', helper: 'فئة أسنان', chip: 'طبيب أسنان أطفال', keywords: ['أطفال', 'طبيب أسنان أطفال'] },
+        { id: 'cosmetic-dentistry', label: 'تجميل الأسنان', helper: 'فئة أسنان', chip: 'تجميل الأسنان', keywords: ['تجميل الأسنان', 'تجميل'] },
+        { id: 'dental-cleaning', label: 'تنظيف الأسنان', helper: 'فئة علاج أسنان', chip: 'تنظيف الأسنان', keywords: ['تنظيف', 'تنظيف الأسنان'] },
+        { id: 'tooth-extraction', label: 'خلع الأسنان', helper: 'فئة علاج أسنان', chip: 'خلع الأسنان', keywords: ['خلع', 'خلع الأسنان'] },
+        { id: 'gum-care', label: 'رعاية اللثة', helper: 'فئة عناية بالفم', chip: 'رعاية اللثة', keywords: ['لثة', 'رعاية اللثة'] },
+        { id: 'emergency-dental', label: 'طوارئ الأسنان', helper: 'فئة أسنان', chip: 'طوارئ الأسنان', keywords: ['طوارئ', 'طوارئ الأسنان'] }
+      ] : [
+        { id: 'dental-clinic', label: 'Dental clinic', helper: 'Dental category', chip: 'Dental clinic', keywords: ['dental clinic', 'dentist'] },
+        { id: 'dentist-muscat', label: 'Dentist in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat', 'dentist muscat'] },
+        { id: 'dentist-khuwair', label: 'Dentist in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair dentist'] },
+        { id: 'dentist-qurum', label: 'Dentist in Qurum', helper: 'Area search path', area: 'Qurum', keywords: ['qurum', 'qurum dentist'] },
+        { id: 'braces', label: 'Braces', helper: 'Dental treatment category', chip: 'Braces', keywords: ['braces', 'orthodontics'] },
+        { id: 'dental-implants', label: 'Dental implants', helper: 'Dental treatment category', chip: 'Implants', keywords: ['implants', 'dental implants'] },
+        { id: 'teeth-whitening', label: 'Teeth whitening', helper: 'Dental treatment category', chip: 'Whitening', keywords: ['whitening', 'teeth whitening'] },
+        { id: 'root-canal', label: 'Root canal', helper: 'Dental treatment category', chip: 'Root canal', keywords: ['root canal'] },
+        { id: 'pediatric-dentist', label: 'Pediatric dentist', helper: 'Dental category', chip: 'Pediatric dentist', keywords: ['pediatric dentist', 'children dentist'] },
+        { id: 'cosmetic-dentistry', label: 'Cosmetic dentistry', helper: 'Dental category', chip: 'Cosmetic dentistry', keywords: ['cosmetic dentistry'] },
+        { id: 'dental-cleaning', label: 'Dental cleaning', helper: 'Dental treatment category', chip: 'Cleaning', keywords: ['cleaning', 'dental cleaning'] },
+        { id: 'tooth-extraction', label: 'Tooth extraction', helper: 'Dental treatment category', chip: 'Tooth extraction', keywords: ['tooth extraction', 'extraction'] },
+        { id: 'gum-care', label: 'Gum care', helper: 'Oral care category', chip: 'Gum care', keywords: ['gum care', 'gums'] },
+        { id: 'emergency-dental', label: 'Emergency dental', helper: 'Dental category', chip: 'Emergency dental', keywords: ['emergency dental', 'dental emergency'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح عيادات الأسنان' : 'Browse dental clinics',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم عيادات الأسنان العامة بعد الاعتماد.' : 'Search results and public dental clinic listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف الأسنان' : 'Dental discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: dentalSlides[locale]
+    }
+  };
+}
+
 const beautySlides = {
   en: [
     { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Beauty center and salon discovery visual for Oman', caption: 'Beauty discovery across salons, skincare, hair and wellness' },
@@ -216,8 +321,8 @@ export function buildBeautyDiscoveryConfig(locale: SupportedLocale, country: Sup
       contentType: isAr ? 'التجميل' : 'Beauty',
       trustAria: isAr ? 'إرشادات بحث التجميل' : 'Beauty search guidance',
       trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
-      mainChips: isAr ? ['العناية بالبشرة', 'صالون شعر', 'الأظافر', 'ليزر', 'سبا'] : ['Skincare', 'Hair salon', 'Nails', 'Laser', 'Spa'],
-      moreChips: isAr ? ['مكياج', 'فيشل', 'مساج', 'الحواجب', 'إزالة الشعر', 'عيادة تجميل'] : ['Makeup', 'Facial', 'Massage', 'Eyebrows', 'Hair removal', 'Beauty clinic'],
+      mainChips: isAr ? ['العناية بالبشرة', 'صالون شعر', 'الأظافر', 'ليزر', 'فيشل', 'عيادة تجميل', 'مساج', 'سبا'] : ['Skincare', 'Hair salon', 'Nails', 'Laser', 'Facial', 'Beauty clinic', 'Massage', 'Spa'],
+      moreChips: isAr ? ['مكياج', 'الحواجب', 'إزالة الشعر', 'واكس', 'الرموش', 'العناية بالجسم'] : ['Makeup', 'Eyebrows', 'Hair removal', 'Waxing', 'Lashes', 'Body care'],
       countryOptions: isAr ? ['عُمان'] : ['Oman'],
       cityOptions: isAr ? ['مسقط', 'السيب', 'بوشر', 'مطرح'] : ['Muscat', 'Seeb', 'Bawshar', 'Muttrah'],
       areaOptions: isAr ? ['الخوير', 'القرم', 'العذيبة', 'الغبرة', 'روي'] : ['Al Khuwair', 'Qurum', 'Azaiba', 'Al Ghubra', 'Ruwi'],

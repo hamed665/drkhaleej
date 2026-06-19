@@ -19,7 +19,8 @@ export function SiteFooter() {
     { href: publicDiscoveryRoute(locale, country, 'pharmacies'), label: copy.pharmacies },
     { href: publicDiscoveryRoute(locale, country, 'services'), label: copy.services },
     { href: `/${locale}/${country}/articles`, label: copy.articles },
-    { href: `/${locale}/${country}/about`, label: copy.about }
+    { href: `/${locale}/${country}/about`, label: copy.about },
+    { href: publicDiscoveryRoute(locale, country, 'pet-shops'), label: copy.petShops }
   ] as const;
   const disabledBrowseItems = [copy.hospitals, copy.offers] as const;
   const providerLinks = [{ href: publicProviderRoute(locale, country), label: copy.listYourCenter }] as const;

@@ -322,6 +322,7 @@ async function getPublicDoctorMedia(
 function createDiscoveryCategories(): PublicDiscoveryCategory[] {
   return [
     { slug: 'doctors', label: 'Doctors' },
+    { slug: 'dental', label: 'Dental' },
     { slug: 'centers', label: 'Centers' },
     { slug: 'pharmacies', label: 'Pharmacies' },
     { slug: 'beauty', label: 'Beauty' },

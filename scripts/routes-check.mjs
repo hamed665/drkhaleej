@@ -391,6 +391,7 @@ const checks = [
     name: "approved discovery skeleton routes exist",
     pass: [
       "doctors",
+      "dental",
       "centers",
       "pharmacies",
       "beauty",
