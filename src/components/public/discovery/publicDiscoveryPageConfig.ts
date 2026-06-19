@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'dental' | 'labs' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'dental' | 'labs' | 'centers' | 'pharmacies' | 'beauty' | 'pet-clinics' | 'pet-shops' | 'hospitals' | 'offers' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -688,6 +688,111 @@ export function buildPetShopsDiscoveryConfig(locale: SupportedLocale, country: S
   };
 }
 
+
+
+const hospitalSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Hospital discovery visual for Oman', caption: 'Hospital discovery across departments and areas' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Premium healthcare discovery visual for hospitals in Oman', caption: 'Browse hospitals, patient services and care options in Oman' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready hospital discovery visual', caption: 'Public discovery only, not medical advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف المستشفيات في عُمان', caption: 'اكتشاف المستشفيات حسب الأقسام والمناطق' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة اكتشاف رعاية صحية للمستشفيات في عُمان', caption: 'تصفح المستشفيات وخدمات المرضى وخيارات الرعاية في عُمان' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف مستشفيات مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة طبية' }
+  ]
+} as const;
+
+export function buildHospitalsDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'hospitals',
+    path: '/hospitals',
+    searchId: 'hospital-search',
+    resultsId: 'hospital-results',
+    showWhatsApp: false,
+    badge: isAr ? 'المستشفيات في عُمان' : 'Hospitals in Oman',
+    title: isAr ? 'ابحث عن مستشفيات في عُمان.' : 'Find hospitals in Oman.',
+    subtitle: isAr
+      ? 'تصفح المستشفيات والأقسام وخدمات المرضى وخيارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
+      : 'Browse hospitals, departments, patient services and care options across Oman. Public discovery only, not medical advice.',
+    primaryCta: isAr ? 'بحث' : 'Search',
+    providerCta: isAr ? 'إدارة ملف المستشفى' : 'Claim hospital profile',
+    search: {
+      badge: isAr ? 'بحث المستشفيات' : 'Hospital search',
+      title: isAr ? 'ابحث عن المستشفيات أو الأقسام أو المناطق' : 'Find hospitals, departments or areas',
+      description: isAr ? 'ابدأ باسم مستشفى أو قسم أو خدمة للمرضى أو منطقة في مسقط.' : 'Start with a hospital name, department, patient service or Muscat area.',
+      inputLabel: isAr ? 'ما خدمة المستشفى التي تحتاجها؟' : 'What hospital service do you need?',
+      placeholder: isAr ? 'ابحث عن مستشفى أو طوارئ أو ولادة أو جراحة أو منطقة…' : 'Search hospital, emergency, maternity, surgery or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'خدمات المستشفيات' : 'Hospital services',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'خدمات مستشفيات إضافية' : 'More hospital services',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث المستشفيات' : 'Hospital search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'المستشفيات' : 'Hospitals',
+      trustAria: isAr ? 'إرشادات بحث المستشفيات' : 'Hospital search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية', 'للحالات العاجلة، تواصل مع خدمات الطوارئ المحلية أو المستشفى مباشرة.'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice', 'For urgent care, contact local emergency services or the hospital directly.'],
+      mainChips: isAr ? ['الطوارئ', 'الولادة', 'الأطفال', 'الجراحة', 'القلب', 'مستشفى خاص'] : ['Emergency', 'Maternity', 'Pediatrics', 'Surgery', 'Cardiology', 'Private hospital'],
+      moreChips: isAr ? ['العناية المركزة', 'الأشعة', 'المختبر', 'الصيدلية', 'دعم التأمين', 'المرضى الدوليون'] : ['ICU', 'Radiology', 'Laboratory', 'Pharmacy', 'Insurance support', 'International patients'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط'] : ['Muscat'],
+      areaOptions: isAr ? ['الخوير', 'القرم'] : ['Al Khuwair', 'Qurum'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'hospital-muscat', label: 'مستشفى في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط', 'مستشفى مسقط'] },
+        { id: 'hospital-khuwair', label: 'مستشفى في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير', 'مستشفى الخوير'] },
+        { id: 'hospital-qurum', label: 'مستشفى في القرم', helper: 'بحث حسب المنطقة', area: 'القرم', keywords: ['القرم', 'مستشفى القرم'] },
+        { id: 'emergency', label: 'الطوارئ', helper: 'فلتر اكتشاف', chip: 'الطوارئ', keywords: ['طوارئ'] },
+        { id: 'maternity-hospital', label: 'مستشفى ولادة', helper: 'فلتر اكتشاف', chip: 'الولادة', keywords: ['ولادة', 'مستشفى ولادة'] },
+        { id: 'pediatric-hospital', label: 'مستشفى أطفال', helper: 'فلتر اكتشاف', chip: 'الأطفال', keywords: ['أطفال', 'مستشفى أطفال'] },
+        { id: 'surgery-department', label: 'قسم الجراحة', helper: 'فلتر اكتشاف', chip: 'الجراحة', keywords: ['جراحة', 'قسم الجراحة'] },
+        { id: 'cardiology-department', label: 'قسم القلب', helper: 'فلتر اكتشاف', chip: 'القلب', keywords: ['قلب', 'قسم القلب'] },
+        { id: 'private-hospital', label: 'مستشفى خاص', helper: 'فلتر اكتشاف', chip: 'مستشفى خاص', keywords: ['خاص', 'مستشفى خاص'] },
+        { id: 'icu', label: 'العناية المركزة', helper: 'فلتر اكتشاف', chip: 'العناية المركزة', keywords: ['العناية المركزة'] },
+        { id: 'radiology', label: 'الأشعة', helper: 'فلتر اكتشاف', chip: 'الأشعة', keywords: ['الأشعة'] },
+        { id: 'laboratory', label: 'المختبر', helper: 'فلتر اكتشاف', chip: 'المختبر', keywords: ['المختبر'] },
+        { id: 'hospital-pharmacy', label: 'صيدلية المستشفى', helper: 'فلتر اكتشاف', chip: 'الصيدلية', keywords: ['صيدلية المستشفى'] },
+        { id: 'international-patients', label: 'المرضى الدوليون', helper: 'فلتر اكتشاف', chip: 'المرضى الدوليون', keywords: ['المرضى الدوليون'] }
+      ] : [
+        { id: 'hospital-muscat', label: 'Hospital in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat', 'hospital muscat'] },
+        { id: 'hospital-khuwair', label: 'Hospital in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair', 'al khuwair hospital'] },
+        { id: 'hospital-qurum', label: 'Hospital in Qurum', helper: 'Area search path', area: 'Qurum', keywords: ['qurum', 'qurum hospital'] },
+        { id: 'emergency', label: 'Emergency', helper: 'Discovery filter', chip: 'Emergency', keywords: ['emergency'] },
+        { id: 'maternity-hospital', label: 'Maternity hospital', helper: 'Discovery filter', chip: 'Maternity', keywords: ['maternity', 'maternity hospital'] },
+        { id: 'pediatric-hospital', label: 'Pediatric hospital', helper: 'Discovery filter', chip: 'Pediatrics', keywords: ['pediatric', 'children hospital'] },
+        { id: 'surgery-department', label: 'Surgery department', helper: 'Discovery filter', chip: 'Surgery', keywords: ['surgery', 'surgery department'] },
+        { id: 'cardiology-department', label: 'Cardiology department', helper: 'Discovery filter', chip: 'Cardiology', keywords: ['cardiology', 'heart'] },
+        { id: 'private-hospital', label: 'Private hospital', helper: 'Discovery filter', chip: 'Private hospital', keywords: ['private', 'private hospital'] },
+        { id: 'icu', label: 'ICU', helper: 'Discovery filter', chip: 'ICU', keywords: ['icu', 'intensive care'] },
+        { id: 'radiology', label: 'Radiology', helper: 'Discovery filter', chip: 'Radiology', keywords: ['radiology', 'xray'] },
+        { id: 'laboratory', label: 'Laboratory', helper: 'Discovery filter', chip: 'Laboratory', keywords: ['laboratory', 'lab'] },
+        { id: 'hospital-pharmacy', label: 'Hospital pharmacy', helper: 'Discovery filter', chip: 'Pharmacy', keywords: ['hospital pharmacy'] },
+        { id: 'international-patients', label: 'International patients', helper: 'Discovery filter', chip: 'International patients', keywords: ['international patients'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح المستشفيات' : 'Browse hospitals',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث وقوائم المستشفيات العامة بعد الاعتماد.' : 'Search results and public hospital listings appear here after approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف المستشفيات' : 'Hospital discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: hospitalSlides[locale]
+    }
+  };
+}
 
 const offersSlides = {
   en: [

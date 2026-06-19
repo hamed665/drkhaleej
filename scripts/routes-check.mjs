@@ -396,6 +396,7 @@ const checks = [
       "pharmacies",
       "beauty",
       "labs",
+      "hospitals",
       "services",
       "search",
     ].every((slug) =>
@@ -511,10 +512,14 @@ const checks = [
   },
   {
     name: "branded hospital and clinic route directories do not exist",
-    pass: ["hospital", "hospitals", "clinic", "clinics"].every(
-      (slug) =>
-        !existsSync(resolve(projectRoot, `src/app/[locale]/[country]/${slug}`)),
-    ),
+    pass:
+      ["hospital", "clinic", "clinics"].every(
+        (slug) =>
+          !existsSync(resolve(projectRoot, `src/app/[locale]/[country]/${slug}`)),
+      ) &&
+      readdirSync(resolve(projectRoot, "src/app/[locale]/[country]/hospitals")).every(
+        (entry) => entry === "page.tsx",
+      ),
   },
   {
     name: "src/app/fa route does not exist",
