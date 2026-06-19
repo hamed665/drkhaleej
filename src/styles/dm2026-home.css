@@ -8267,3 +8267,55 @@
     min-block-size: 13.75rem;
   }
 }
+
+/* Reusable public discovery page system. Extends the approved PR #262 doctors visual formula. */
+.dm2026-public-discovery-page,
+.dm2026-public-discovery-first-fold,
+.dm2026-public-discovery-listings,
+.dm2026-public-discovery-hero-shell,
+.dm2026-public-discovery-hero-content,
+.dm2026-public-discovery-hero__search,
+.dm2026-public-discovery-search,
+.dm2026-public-discovery-visual {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.dm2026-public-discovery-page {
+  overflow-x: clip;
+}
+
+.dm2026-public-discovery-hero__actions {
+  flex-wrap: wrap;
+}
+
+.dm2026-public-discovery-hero__actions .dm2026-button {
+  min-block-size: 2.55rem;
+}
+
+.dm2026-public-discovery-search .dm2026-home-search__command-input,
+.dm2026-public-discovery-search .dm2026-home-search__smart-panel,
+.dm2026-public-discovery-search .dm2026-home-search__segment > div {
+  max-inline-size: 100%;
+}
+
+.dm2026-public-discovery-search .dm2026-home-search__chip span {
+  max-inline-size: 100%;
+  white-space: nowrap;
+}
+
+.dm2026-public-discovery-listings {
+  scroll-margin-block-start: 1rem;
+}
+
+@media (max-width: 720px) {
+  .dm2026-public-discovery-hero__actions .dm2026-button {
+    flex: 1 1 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .dm2026-public-discovery-search .dm2026-home-search__chip span {
+    white-space: nowrap;
+  }
+}
