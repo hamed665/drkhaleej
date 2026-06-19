@@ -7831,3 +7831,73 @@
     justify-content: flex-start;
   }
 }
+
+/* Doctors search alignment refinements: keep the command as a homepage-style single pill on desktop. */
+.dm2026-doctors-search .dm2026-home-search__command-input {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.35rem;
+  padding: 0.26rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__command-input .dm2026-input {
+  min-inline-size: 0;
+  inline-size: 100%;
+  font-size: clamp(0.95rem, 1.25vw, 1.05rem);
+}
+
+.dm2026-doctors-search .dm2026-home-search__command-input .dm2026-button {
+  inline-size: auto;
+  min-inline-size: 5.25rem;
+  padding-inline: clamp(0.85rem, 1.4vw, 1.15rem);
+  white-space: nowrap;
+}
+
+.dm2026-doctors-search .dm2026-home-search__segment > div {
+  padding-block-end: 0.08rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__select-grid {
+  grid-template-columns: minmax(8rem, 0.7fr) minmax(9rem, 1fr) minmax(9rem, 1fr);
+}
+
+.dm2026-doctors-search .dm2026-home-search__more-filters {
+  margin-block-start: -0.1rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__more-filters[open] {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__more-filters .dm2026-home-search__segment {
+  margin-block-start: 0.5rem;
+}
+
+.dm2026-doctors-search .dm2026-home-search__actions {
+  justify-content: flex-start;
+  margin-block-start: 0;
+}
+
+.dm2026-doctors-search .dm2026-home-search__actions .dm2026-button {
+  flex: 0 0 auto;
+}
+
+[dir='rtl'] .dm2026-doctors-search .dm2026-home-search__actions {
+  justify-content: flex-start;
+}
+
+@media (max-width: 720px) {
+  .dm2026-doctors-search .dm2026-home-search__command-input {
+    grid-template-columns: auto minmax(0, 1fr);
+    border-radius: var(--dm-radius-xl, 1.5rem);
+  }
+
+  .dm2026-doctors-search .dm2026-home-search__command-input .dm2026-button {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+  }
+
+  .dm2026-doctors-search .dm2026-home-search__select-grid {
+    grid-template-columns: 1fr;
+  }
+}
