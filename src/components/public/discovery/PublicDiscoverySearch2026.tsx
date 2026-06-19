@@ -88,8 +88,8 @@ export function PublicDiscoverySearch2026({ config }: Props) {
       <form className="dm2026-search-surface dm2026-home-search__surface" action={`/${locale}/${country}${path}#${resultsId}`} method="get" onSubmit={handleSubmit}>
         <input type="hidden" name="contentType" value={copy.contentType} />
         <div className="dm2026-home-search__main">
-          <div className="dm2026-home-search__header">
-            <span className="dm2026-badge">{copy.badge}</span>
+          <div className="dm2026-home-search__header dm2026-public-discovery-search__header">
+            <span className="dm2026-badge dm2026-public-discovery-search__eyebrow">{copy.badge}</span>
             <div>
               <h2 id={titleId}>{copy.title}</h2>
               <p>{copy.description}</p>
