@@ -233,7 +233,9 @@ export function buildPharmaciesDiscoveryConfig(locale: SupportedLocale, country:
         { id: 'skincare-pharmacy', label: 'العناية بالبشرة', helper: 'اقتراح بحث صيدليات', chip: 'العناية بالبشرة', keywords: ['بشرة', 'العناية بالبشرة'] },
         { id: 'vitamins', label: 'فيتامينات', helper: 'اقتراح بحث صيدليات', chip: 'فيتامينات', keywords: ['فيتامين', 'فيتامينات'] },
         { id: 'diabetes-care', label: 'رعاية السكري', helper: 'اقتراح بحث صيدليات', chip: 'رعاية السكري', keywords: ['سكري', 'رعاية السكري'] },
-        { id: 'medical-devices', label: 'أجهزة طبية', helper: 'اقتراح بحث صيدليات', chip: 'أجهزة طبية', keywords: ['أجهزة', 'أجهزة طبية'] }
+        { id: 'medical-devices', label: 'أجهزة طبية', helper: 'اقتراح بحث صيدليات', chip: 'أجهزة طبية', keywords: ['أجهزة', 'أجهزة طبية'] },
+        { id: 'first-aid', label: 'إسعافات أولية', helper: 'اقتراح بحث صيدليات', chip: 'إسعافات أولية', keywords: ['اسعافات', 'إسعافات أولية', 'اسعافات اوليه'] },
+        { id: 'mother-care', label: 'رعاية الأم', helper: 'اقتراح بحث صيدليات', chip: 'رعاية الأم', keywords: ['ام', 'الأم', 'رعاية الأم'] }
       ] : [
         { id: 'pharmacy-24-7', label: '24/7 pharmacy', helper: 'Pharmacy search suggestion', chip: '24/7 pharmacy', keywords: ['24/7', '24 hour', 'pharmacy'] },
         { id: 'prescription-medicine', label: 'Prescription medicine', helper: 'Pharmacy search suggestion', chip: 'Prescription medicine', keywords: ['prescription', 'medicine'] },
@@ -244,7 +246,9 @@ export function buildPharmaciesDiscoveryConfig(locale: SupportedLocale, country:
         { id: 'skincare-pharmacy', label: 'Skincare pharmacy', helper: 'Pharmacy search suggestion', chip: 'Skincare', keywords: ['skincare', 'skin care'] },
         { id: 'vitamins', label: 'Vitamins', helper: 'Pharmacy search suggestion', chip: 'Vitamins', keywords: ['vitamin', 'vitamins'] },
         { id: 'diabetes-care', label: 'Diabetes care', helper: 'Pharmacy search suggestion', chip: 'Diabetes care', keywords: ['diabetes', 'diabetes care'] },
-        { id: 'medical-devices', label: 'Medical devices', helper: 'Pharmacy search suggestion', chip: 'Medical devices', keywords: ['devices', 'medical devices'] }
+        { id: 'medical-devices', label: 'Medical devices', helper: 'Pharmacy search suggestion', chip: 'Medical devices', keywords: ['devices', 'medical devices'] },
+        { id: 'first-aid', label: 'First aid', helper: 'Pharmacy search suggestion', chip: 'First aid', keywords: ['first aid', 'aid'] },
+        { id: 'mother-care', label: 'Mother care', helper: 'Pharmacy search suggestion', chip: 'Mother care', keywords: ['mother care', 'mother'] }
       ])
     },
     results: {

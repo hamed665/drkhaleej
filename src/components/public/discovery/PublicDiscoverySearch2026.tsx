@@ -12,7 +12,7 @@ const normalizeArabic = (value: string) => value
   .replace(/ى/g, 'ي')
   .replace(/ـ/g, '');
 
-const normalizeSearch = (value: string) => normalizeArabic(value).trim().toLocaleLowerCase();
+const normalizeSearch = (value: string) => normalizeArabic(value).replace(/\s+/g, ' ').trim().toLocaleLowerCase();
 
 export function PublicDiscoverySearch2026({ config }: Props) {
   const { locale, country, dir, path, resultsId, categoryType } = config;
@@ -23,9 +23,6 @@ export function PublicDiscoverySearch2026({ config }: Props) {
   const [selectedCity, setSelectedCity] = useState(copy.defaultCity);
   const [selectedArea, setSelectedArea] = useState(copy.defaultArea);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const fallbackSuggestion: PublicDiscoverySuggestion = copy.suggestions[0] ?? { id: 'default', label: copy.mainChips[0] ?? copy.contentType, helper: copy.legend, keywords: [] };
-  const [activeSuggestion, setActiveSuggestion] = useState<PublicDiscoverySuggestion>(fallbackSuggestion);
-
   const visibleSuggestions = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);
     if (normalizedQuery.length < 1) return [];
@@ -57,7 +54,6 @@ export function PublicDiscoverySearch2026({ config }: Props) {
 
   const applySuggestion = (suggestion: PublicDiscoverySuggestion) => {
     setQuery(suggestion.label);
-    setActiveSuggestion(suggestion);
     if (suggestion.chip && [...copy.mainChips, ...copy.moreChips].includes(suggestion.chip)) setSelectedChip(suggestion.chip);
     if (suggestion.city && copy.cityOptions.includes(suggestion.city)) setSelectedCity(suggestion.city);
     if (suggestion.area && copy.areaOptions.includes(suggestion.area)) setSelectedArea(suggestion.area);
@@ -95,37 +91,42 @@ export function PublicDiscoverySearch2026({ config }: Props) {
             </div>
           </div>
 
-          <div className="dm2026-home-search__command">
+          <div className="dm2026-home-search__command dm2026-public-discovery-command">
             <label htmlFor={inputId}>{copy.inputLabel}</label>
-            <div className="dm2026-home-search__command-input" role="combobox" aria-expanded={showSuggestions && visibleSuggestions.length > 0} aria-controls={panelId}>
+            <div className="dm2026-home-search__command-input dm2026-public-discovery-command-input" role="combobox" aria-expanded={showSuggestions && visibleSuggestions.length > 0} aria-controls={panelId}>
               <span aria-hidden="true">⌕</span>
-              <input id={inputId} name="q" className="dm2026-input" type="search" value={query} onChange={(event) => { setQuery(event.target.value); setShowSuggestions(event.target.value.trim().length > 0); }} onFocus={() => setShowSuggestions(normalizeSearch(query).length > 0)} placeholder={copy.placeholder} autoComplete="off" />
+              <input
+                id={inputId}
+                name="q"
+                className="dm2026-input"
+                type="search"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setShowSuggestions(event.target.value.trim().length > 0);
+                }}
+                onFocus={() => {
+                  if (query.trim().length > 0) setShowSuggestions(true);
+                }}
+                onBlur={() => {
+                  window.setTimeout(() => setShowSuggestions(false), 140);
+                }}
+                placeholder={copy.placeholder}
+                autoComplete="off"
+              />
               <button type="submit" className="dm2026-button dm2026-button-primary">{copy.button}</button>
             </div>
-          </div>
-
-          {showSuggestions && visibleSuggestions.length > 0 ? (
-            <div id={panelId} className="dm2026-home-search__smart-panel dm2026-home-search__smart-panel--active" aria-live="polite">
-              <div className="dm2026-home-search__smart-list" role="listbox" aria-label={copy.suggestionLabel}>
+            {showSuggestions && visibleSuggestions.length > 0 ? (
+              <div id={panelId} className="dm2026-public-discovery-suggestions" role="listbox" aria-label={copy.suggestionLabel} aria-live="polite">
                 {visibleSuggestions.map((suggestion) => (
-                  <button key={suggestion.id} type="button" className="dm2026-home-search__smart-item" onClick={() => applySuggestion(suggestion)} onMouseEnter={() => setActiveSuggestion(suggestion)} onFocus={() => setActiveSuggestion(suggestion)} role="option" aria-selected={activeSuggestion?.id === suggestion.id}>
-                    <span aria-hidden="true" />
-                    <strong>{suggestion.label}</strong>
-                    <small>{suggestion.helper}</small>
+                  <button key={suggestion.id} type="button" role="option" aria-selected="false" className="dm2026-public-discovery-suggestion" onMouseDown={(event) => event.preventDefault()} onClick={() => applySuggestion(suggestion)}>
+                    <span>{suggestion.label}</span>
+                    {suggestion.helper ? <small>{suggestion.helper}</small> : null}
                   </button>
                 ))}
               </div>
-              {activeSuggestion ? (
-                <aside className="dm2026-home-search__preview" aria-label={activeSuggestion.label}>
-                  <span aria-hidden="true" />
-                  <small>{copy.badge}</small>
-                  <strong>{activeSuggestion.label}</strong>
-                  <p>{activeSuggestion.helper}</p>
-                  <button type="button" className="dm2026-home-search__preview-cta" onClick={() => applySuggestion(activeSuggestion)}>{copy.useSuggestion}</button>
-                </aside>
-              ) : null}
-            </div>
-          ) : null}
+            ) : null}
+          </div>
 
           <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={copy.legend}>
             <legend>{copy.legend}</legend>
