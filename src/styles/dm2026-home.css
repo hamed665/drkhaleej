@@ -8299,6 +8299,18 @@
   max-inline-size: 100%;
 }
 
+.dm2026-public-discovery-search .dm2026-home-search__segment > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  overflow: visible;
+  mask-image: none;
+}
+
+.dm2026-public-discovery-search .dm2026-home-search__segment > div > * {
+  flex: 0 0 auto;
+}
+
 .dm2026-public-discovery-search .dm2026-home-search__chip span {
   max-inline-size: 100%;
   white-space: nowrap;
