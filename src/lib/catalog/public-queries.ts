@@ -325,6 +325,7 @@ function createDiscoveryCategories(): PublicDiscoveryCategory[] {
     { slug: 'centers', label: 'Centers' },
     { slug: 'pharmacies', label: 'Pharmacies' },
     { slug: 'labs', label: 'Labs' },
+    { slug: 'offers', label: 'Offers' },
     { slug: 'services', label: 'Services' }
   ];
 }

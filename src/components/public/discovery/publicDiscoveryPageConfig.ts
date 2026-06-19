@@ -1,6 +1,6 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 
-export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'pet-shops' | 'services';
+export type PublicDiscoveryCategoryType = 'doctors' | 'labs' | 'centers' | 'pharmacies' | 'pet-clinics' | 'pet-shops' | 'offers' | 'services';
 
 export type PublicDiscoverySuggestion = {
   id: string;
@@ -474,6 +474,107 @@ export function buildPetShopsDiscoveryConfig(locale: SupportedLocale, country: S
       next: isAr ? 'الصورة التالية' : 'Next image',
       slideLabel: isAr ? 'عرض الصورة' : 'Show image',
       slides: petShopsSlides[locale]
+    }
+  };
+}
+
+
+const offersSlides = {
+  en: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'Offer discovery visual for healthcare and wellness services in Oman', caption: 'Offer discovery across services and areas' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'Public healthcare and wellness offer discovery visual for Oman', caption: 'Browse approved offers after provider approval' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'Mobile-ready offer discovery visual', caption: 'Public discovery only, not medical advice' }
+  ],
+  ar: [
+    { src: '/images/home/provider-cta-healthcare-platform-preview.jpg', alt: 'صورة اكتشاف عروض الصحة والعافية في عُمان', caption: 'اكتشاف العروض حسب الخدمات والمناطق' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview.webp', alt: 'واجهة اكتشاف عامة لعروض الصحة والعافية في عُمان', caption: 'تصفح العروض المعتمدة بعد موافقة المقدم' },
+    { src: '/images/home/provider-cta-healthcare-platform-preview-mobile.webp', alt: 'صورة اكتشاف عروض مناسبة للجوال', caption: 'اكتشاف عام فقط وليس نصيحة طبية' }
+  ]
+} as const;
+
+export function buildOffersDiscoveryConfig(locale: SupportedLocale, country: SupportedCountry, dir: 'ltr' | 'rtl'): PublicDiscoveryPageConfig {
+  const isAr = locale === 'ar';
+
+  return {
+    locale,
+    country,
+    dir,
+    categoryType: 'offers',
+    path: '/offers',
+    searchId: 'offer-search',
+    resultsId: 'offer-results',
+    showWhatsApp: false,
+    badge: isAr ? 'العروض في عُمان' : 'Offers in Oman',
+    title: isAr ? 'ابحث عن عروض الصحة والعافية في عُمان.' : 'Find healthcare and wellness offers in Oman.',
+    subtitle: isAr
+      ? 'تصفح العروض المعتمدة من العيادات ومراكز التجميل والصيدليات والمختبرات ومقدمي العافية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.'
+      : 'Browse approved offers from clinics, beauty centers, pharmacies, labs and wellness providers across Oman. Public discovery only, not medical advice.',
+    primaryCta: isAr ? 'بحث' : 'Search',
+    providerCta: isAr ? 'أدرج عرضك' : 'List your offer',
+    search: {
+      badge: isAr ? 'بحث العروض' : 'Offer search',
+      title: isAr ? 'ابحث عن العروض حسب الخدمة أو المقدم أو المنطقة' : 'Find offers by service, provider or area',
+      description: isAr ? 'ابدأ بخدمة أو نوع مقدم أو فئة علاج أو منطقة في مسقط.' : 'Start with a service, provider type, treatment category or Muscat area.',
+      inputLabel: isAr ? 'ما العرض الذي تبحث عنه؟' : 'What offer are you looking for?',
+      placeholder: isAr ? 'ابحث عن أسنان أو جلدية أو فحص مختبر أو صيدلية أو عافية أو منطقة…' : 'Search dental, skin, lab test, pharmacy, wellness or area…',
+      button: isAr ? 'بحث' : 'Search',
+      legend: isAr ? 'فئات العروض' : 'Offer categories',
+      moreFilters: isAr ? 'المزيد من الفلاتر' : 'More filters',
+      moreLegend: isAr ? 'فئات عروض إضافية' : 'More offer categories',
+      countryLabel: isAr ? 'الدولة' : 'Country',
+      cityLabel: isAr ? 'المدينة' : 'City',
+      areaLabel: isAr ? 'المنطقة' : 'Area',
+      suggestionLabel: isAr ? 'اقتراحات بحث العروض' : 'Offer search suggestions',
+      useSuggestion: isAr ? 'استخدم الاقتراح' : 'Use suggestion',
+      contentType: isAr ? 'العروض' : 'Offers',
+      trustAria: isAr ? 'إرشادات بحث العروض' : 'Offer search guidance',
+      trust: isAr ? ['اكتشاف عام فقط', 'أكد التفاصيل مع مقدم الخدمة', 'ليست نصيحة طبية'] : ['Public discovery only', 'Confirm details with provider', 'Not medical advice'],
+      mainChips: isAr ? ['عروض الأسنان', 'الجلدية والتجميل', 'فحوصات المختبر', 'عروض الصيدليات', 'العافية'] : ['Dental offers', 'Skin and beauty', 'Lab tests', 'Pharmacy offers', 'Wellness'],
+      moreChips: isAr ? ['عيادات', 'مراكز التجميل', 'رعاية الحيوانات', 'رعاية العيون', 'علاج طبيعي', 'رعاية العائلة'] : ['Clinics', 'Beauty centers', 'Pet care', 'Eye care', 'Physiotherapy', 'Family care'],
+      countryOptions: isAr ? ['عُمان'] : ['Oman'],
+      cityOptions: isAr ? ['مسقط'] : ['Muscat'],
+      areaOptions: isAr ? ['الخوير'] : ['Al Khuwair'],
+      defaultCountry: isAr ? 'عُمان' : 'Oman',
+      defaultCity: isAr ? 'مسقط' : 'Muscat',
+      defaultArea: isAr ? 'الخوير' : 'Al Khuwair',
+      suggestions: (isAr ? [
+        { id: 'dental-offers', label: 'عروض الأسنان', helper: 'اقتراح بحث عروض', chip: 'عروض الأسنان', keywords: ['عروض الأسنان', 'أسنان'] },
+        { id: 'skin-clinic-offers', label: 'عروض عيادات الجلدية', helper: 'اقتراح بحث عروض', chip: 'الجلدية والتجميل', keywords: ['جلدية', 'عروض عيادات الجلدية'] },
+        { id: 'beauty-center-offers', label: 'عروض مراكز التجميل', helper: 'اقتراح بحث عروض', chip: 'مراكز التجميل', keywords: ['تجميل', 'عروض مراكز التجميل'] },
+        { id: 'lab-test-offers', label: 'عروض فحوصات المختبر', helper: 'اقتراح بحث عروض', chip: 'فحوصات المختبر', keywords: ['مختبر', 'فحوصات'] },
+        { id: 'pharmacy-offers', label: 'عروض الصيدليات', helper: 'اقتراح بحث عروض', chip: 'عروض الصيدليات', keywords: ['صيدلية', 'صيدليات'] },
+        { id: 'wellness-offers', label: 'عروض العافية', helper: 'اقتراح بحث عروض', chip: 'العافية', keywords: ['عافية'] },
+        { id: 'physiotherapy-offers', label: 'عروض العلاج الطبيعي', helper: 'اقتراح بحث عروض', chip: 'علاج طبيعي', keywords: ['علاج طبيعي'] },
+        { id: 'eye-care-offers', label: 'عروض رعاية العيون', helper: 'اقتراح بحث عروض', chip: 'رعاية العيون', keywords: ['عيون'] },
+        { id: 'pet-care-offers', label: 'عروض رعاية الحيوانات', helper: 'اقتراح بحث عروض', chip: 'رعاية الحيوانات', keywords: ['حيوانات'] },
+        { id: 'offers-muscat', label: 'عروض في مسقط', helper: 'بحث حسب المدينة', city: 'مسقط', keywords: ['مسقط'] },
+        { id: 'offers-khuwair', label: 'عروض في الخوير', helper: 'بحث حسب المنطقة', area: 'الخوير', keywords: ['الخوير'] },
+        { id: 'offers-qurum', label: 'عروض في القرم', helper: 'بحث حسب المنطقة', area: 'القرم', keywords: ['القرم'] }
+      ] : [
+        { id: 'dental-offers', label: 'Dental offers', helper: 'Offer search suggestion', chip: 'Dental offers', keywords: ['dental', 'dental offers'] },
+        { id: 'skin-clinic-offers', label: 'Skin clinic offers', helper: 'Offer search suggestion', chip: 'Skin and beauty', keywords: ['skin', 'skin clinic'] },
+        { id: 'beauty-center-offers', label: 'Beauty center offers', helper: 'Offer search suggestion', chip: 'Beauty centers', keywords: ['beauty', 'beauty center'] },
+        { id: 'lab-test-offers', label: 'Lab test offers', helper: 'Offer search suggestion', chip: 'Lab tests', keywords: ['lab', 'lab test'] },
+        { id: 'pharmacy-offers', label: 'Pharmacy offers', helper: 'Offer search suggestion', chip: 'Pharmacy offers', keywords: ['pharmacy'] },
+        { id: 'wellness-offers', label: 'Wellness offers', helper: 'Offer search suggestion', chip: 'Wellness', keywords: ['wellness'] },
+        { id: 'physiotherapy-offers', label: 'Physiotherapy offers', helper: 'Offer search suggestion', chip: 'Physiotherapy', keywords: ['physiotherapy'] },
+        { id: 'eye-care-offers', label: 'Eye care offers', helper: 'Offer search suggestion', chip: 'Eye care', keywords: ['eye care'] },
+        { id: 'pet-care-offers', label: 'Pet care offers', helper: 'Offer search suggestion', chip: 'Pet care', keywords: ['pet care'] },
+        { id: 'offers-muscat', label: 'Offers in Muscat', helper: 'City search path', city: 'Muscat', keywords: ['muscat'] },
+        { id: 'offers-khuwair', label: 'Offers in Al Khuwair', helper: 'Area search path', area: 'Al Khuwair', keywords: ['khuwair'] },
+        { id: 'offers-qurum', label: 'Offers in Qurum', helper: 'Area search path', area: 'Qurum', keywords: ['qurum'] }
+      ])
+    },
+    results: {
+      title: isAr ? 'تصفح العروض المعتمدة' : 'Browse approved offers',
+      emptyText: isAr ? 'تظهر هنا نتائج البحث والعروض العامة المعتمدة بعد موافقة المقدم.' : 'Search results and approved public offers appear here after provider approval.'
+    },
+    visual: {
+      label: isAr ? 'معرض صور اكتشاف العروض' : 'Offer discovery image gallery',
+      previous: isAr ? 'الصورة السابقة' : 'Previous image',
+      next: isAr ? 'الصورة التالية' : 'Next image',
+      slideLabel: isAr ? 'عرض الصورة' : 'Show image',
+      slides: offersSlides[locale]
     }
   };
 }
