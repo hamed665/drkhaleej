@@ -22,6 +22,11 @@ import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
 type Params = { locale: string; country: string };
 
+const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
+  en: "Approved lab listings will appear here after review.",
+  ar: "ستظهر قوائم المختبرات المعتمدة هنا بعد المراجعة.",
+};
+
 const metadataCopyByLocale: Record<
   SupportedLocale,
   { title: string; description: string }
@@ -87,11 +92,16 @@ export default async function PublicLabsPage({
       data-locale={safeLocale}
     >
       <PublicDiscoveryHero2026 config={config} whatsAppHref={whatsAppHref} />
-      <PublicDiscoveryResultsShell2026 config={config}>
+      <PublicDiscoveryResultsShell2026
+        config={config}
+        isEmpty={result.ok && result.data.length === 0}
+        compactEmptyText={compactEmptyCopyByLocale[safeLocale]}
+      >
         <PublicDirectoryListingContent
           locale={safeLocale}
           variant="center"
           result={result}
+          emptyText={compactEmptyCopyByLocale[safeLocale]}
         />
       </PublicDiscoveryResultsShell2026>
       {config.faq ? (

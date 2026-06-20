@@ -21,6 +21,11 @@ import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
 type Params = { locale: string; country: string };
 
+const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
+  en: "Approved pet shop listings will appear here after review.",
+  ar: "ستظهر قوائم متاجر الحيوانات المعتمدة هنا بعد المراجعة.",
+};
+
 const metadataCopyByLocale: Record<
   SupportedLocale,
   { title: string; description: string }
@@ -82,11 +87,16 @@ export default async function PublicPetShopsPage({
       data-locale={safeLocale}
     >
       <PublicDiscoveryHero2026 config={config} whatsAppHref={null} />
-      <PublicDiscoveryResultsShell2026 config={config}>
+      <PublicDiscoveryResultsShell2026
+        config={config}
+        isEmpty={emptyPetShopResult.ok && emptyPetShopResult.data.length === 0}
+        compactEmptyText={compactEmptyCopyByLocale[safeLocale]}
+      >
         <PublicDirectoryListingContent
           locale={safeLocale}
           variant="center"
           result={emptyPetShopResult}
+          emptyText={compactEmptyCopyByLocale[safeLocale]}
         />
       </PublicDiscoveryResultsShell2026>
       {config.faq ? (

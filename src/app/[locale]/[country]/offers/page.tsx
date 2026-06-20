@@ -31,9 +31,9 @@ const metadataCopyByLocale: Record<
   },
 };
 
-const emptyStateCopyByLocale: Record<SupportedLocale, string> = {
-  en: "No approved offers are available yet.",
-  ar: "لا توجد عروض معتمدة متاحة حالياً.",
+const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
+  en: "Approved public offers will appear here after provider review.",
+  ar: "ستظهر العروض العامة المعتمدة هنا بعد مراجعة مقدم الخدمة.",
 };
 
 export async function generateMetadata({
@@ -74,14 +74,12 @@ export default async function PublicOffersPage({
       data-locale={safeLocale}
     >
       <PublicDiscoveryHero2026 config={config} whatsAppHref={null} />
-      <PublicDiscoveryResultsShell2026 config={config}>
-        <section
-          className="mt-10 rounded-2xl border border-slate-200/70 bg-white/70 p-6 text-sm leading-6 text-slate-600 shadow-sm"
-          role="status"
-          aria-live="polite"
-        >
-          <p>{emptyStateCopyByLocale[safeLocale]}</p>
-        </section>
+      <PublicDiscoveryResultsShell2026
+        config={config}
+        isEmpty
+        compactEmptyText={compactEmptyCopyByLocale[safeLocale]}
+      >
+        {null}
       </PublicDiscoveryResultsShell2026>
       {config.faq ? (
         <PublicDiscoveryFaq2026

@@ -34,9 +34,9 @@ const metadataCopyByLocale: Record<
   },
 };
 
-const emptyStateCopyByLocale: Record<SupportedLocale, string> = {
-  en: "No approved hospital listings are available yet.",
-  ar: "لا توجد قوائم مستشفيات معتمدة متاحة حالياً.",
+const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
+  en: "Approved hospital listings will appear here after review.",
+  ar: "ستظهر قوائم المستشفيات المعتمدة هنا بعد المراجعة.",
 };
 
 export async function generateMetadata({
@@ -81,22 +81,17 @@ export default async function PublicHospitalsPage({
       data-locale={safeLocale}
     >
       <PublicDiscoveryHero2026 config={config} whatsAppHref={null} />
-      <PublicDiscoveryResultsShell2026 config={config}>
-        {result.ok && result.data.length === 0 ? (
-          <section
-            className="mt-10 rounded-2xl border border-slate-200/70 bg-white/70 p-6 text-sm leading-6 text-slate-600 shadow-sm"
-            role="status"
-            aria-live="polite"
-          >
-            <p>{emptyStateCopyByLocale[safeLocale]}</p>
-          </section>
-        ) : (
-          <PublicDirectoryListingContent
-            locale={safeLocale}
-            variant="center"
-            result={result}
-          />
-        )}
+      <PublicDiscoveryResultsShell2026
+        config={config}
+        isEmpty={result.ok && result.data.length === 0}
+        compactEmptyText={compactEmptyCopyByLocale[safeLocale]}
+      >
+        <PublicDirectoryListingContent
+          locale={safeLocale}
+          variant="center"
+          result={result}
+          emptyText={compactEmptyCopyByLocale[safeLocale]}
+        />
       </PublicDiscoveryResultsShell2026>
       {config.faq ? (
         <PublicDiscoveryFaq2026

@@ -8320,6 +8320,44 @@
   scroll-margin-block-start: 1rem;
 }
 
+.dm2026-public-discovery-listings--compact-empty {
+  margin-block-start: clamp(1.25rem, 3vw, 2.25rem);
+  scroll-margin-block-start: 1rem;
+}
+
+.dm2026-public-discovery-empty-compact {
+  display: grid;
+  gap: 0.35rem;
+  margin-block: 0 clamp(0.75rem, 2vw, 1.25rem);
+  padding: clamp(0.85rem, 2vw, 1.1rem) clamp(1rem, 3vw, 1.35rem);
+  border-color: rgba(14, 110, 100, 0.14);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(243, 250, 248, 0.82));
+  box-shadow: 0 14px 34px rgba(7, 48, 44, 0.06);
+}
+
+.dm2026-public-discovery-empty-compact h2,
+.dm2026-public-discovery-empty-compact p {
+  margin: 0;
+}
+
+.dm2026-public-discovery-empty-compact h2 {
+  color: var(--dm-teal-950, #07302c);
+  font-size: clamp(0.98rem, 1.55vw, 1.12rem);
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.dm2026-public-discovery-empty-compact p {
+  color: var(--dm-color-text-muted, #66736f);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+[dir='rtl'] .dm2026-public-discovery-empty-compact h2 {
+  line-height: 1.65;
+}
+
 @media (max-width: 720px) {
   .dm2026-public-discovery-hero__actions .dm2026-button {
     flex: 1 1 100%;

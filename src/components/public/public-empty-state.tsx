@@ -2,16 +2,17 @@ import type { PublicCatalogLocale } from '@/lib/catalog/public-types';
 
 type PublicEmptyStateProps = {
   locale: PublicCatalogLocale;
+  text?: string | undefined;
 };
 
-export function PublicEmptyState({ locale }: PublicEmptyStateProps) {
+export function PublicEmptyState({ locale, text }: PublicEmptyStateProps) {
   return (
     <section
-      className="mt-10 rounded-2xl border border-slate-200/70 bg-white/70 p-6 text-sm leading-6 text-slate-600 shadow-sm"
+      className="dm2026-public-discovery-empty-compact dm2026-card-soft"
       role="status"
       aria-live="polite"
     >
-      <p>{locale === 'ar' ? 'لا توجد قوائم عامة متاحة بعد.' : 'No public listings are available yet.'}</p>
+      <h2>{text ?? (locale === 'ar' ? 'لا توجد قوائم عامة متاحة بعد.' : 'No public listings are available yet.')}</h2>
     </section>
   );
 }

@@ -14,16 +14,19 @@ type PublicDirectoryListingContentProps =
       locale: PublicCatalogLocale;
       variant: 'center';
       result: PublicCatalogQueryResult<PublicCenterSummary[]>;
+      emptyText?: string;
     }
   | {
       locale: PublicCatalogLocale;
       variant: 'doctor';
       result: PublicCatalogQueryResult<PublicDoctorSummary[]>;
+      emptyText?: string;
     }
   | {
       locale: PublicCatalogLocale;
       variant: 'service';
       result: PublicCatalogQueryResult<PublicServiceSummary[]>;
+      emptyText?: string;
     };
 
 export function PublicDirectoryListingContent(props: PublicDirectoryListingContentProps) {
@@ -32,7 +35,7 @@ export function PublicDirectoryListingContent(props: PublicDirectoryListingConte
   }
 
   if (props.result.data.length === 0) {
-    return <PublicEmptyState locale={props.locale} />;
+    return <PublicEmptyState locale={props.locale} text={props.emptyText} />;
   }
 
   if (props.variant === 'center') {

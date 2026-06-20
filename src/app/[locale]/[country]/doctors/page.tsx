@@ -35,6 +35,7 @@ type RouteCopy = {
   whatsappUnavailable: string;
   resultsHeading: string;
   resultsSubtext: string;
+  compactEmptyText: string;
 };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
@@ -54,6 +55,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     resultsHeading: "Browse doctors",
     resultsSubtext:
       "Search results and public doctor listings appear here after approval.",
+    compactEmptyText: "Approved doctor profiles will appear here after review.",
   },
   ar: {
     metadataTitle: "الأطباء في عُمان | DrMuscat",
@@ -70,6 +72,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     whatsappUnavailable: "تفعيل واتساب قيد الإعداد",
     resultsHeading: "تصفح الأطباء",
     resultsSubtext: "تظهر هنا نتائج البحث وقوائم الأطباء العامة بعد الاعتماد.",
+    compactEmptyText: "ستظهر ملفات الأطباء المعتمدة هنا بعد المراجعة.",
   },
 };
 
@@ -173,18 +176,35 @@ export default async function PublicDoctorsPage({
 
       <section
         id="doctor-results"
-        className="dm2026-container dm2026-doctors-listings"
+        className={
+          result.ok && result.data.length === 0
+            ? "dm2026-container dm2026-doctors-listings dm2026-public-discovery-listings--compact-empty"
+            : "dm2026-container dm2026-doctors-listings"
+        }
         aria-labelledby="doctor-results-title"
       >
-        <div className="dm2026-doctors-results-header dm2026-card-soft">
-          <h2 id="doctor-results-title">{copy.resultsHeading}</h2>
-          <p>{copy.resultsSubtext}</p>
-        </div>
-        <PublicDirectoryListingContent
-          locale={safeLocale}
-          variant="doctor"
-          result={result}
-        />
+        {result.ok && result.data.length === 0 ? (
+          <div
+            className="dm2026-public-discovery-empty-compact dm2026-card-soft"
+            role="status"
+            aria-live="polite"
+          >
+            <h2 id="doctor-results-title">{copy.compactEmptyText}</h2>
+          </div>
+        ) : (
+          <>
+            <div className="dm2026-doctors-results-header dm2026-card-soft">
+              <h2 id="doctor-results-title">{copy.resultsHeading}</h2>
+              <p>{copy.resultsSubtext}</p>
+            </div>
+            <PublicDirectoryListingContent
+              locale={safeLocale}
+              variant="doctor"
+              result={result}
+              emptyText={copy.compactEmptyText}
+            />
+          </>
+        )}
       </section>
       <PublicDiscoveryFaq2026
         faq={faq}
