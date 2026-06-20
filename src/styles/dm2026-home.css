@@ -8405,3 +8405,17 @@
   color: var(--dm-color-text-muted, #66736f);
   font-size: 0.78rem;
 }
+
+.dm2026-public-discovery-faq .dm2026-home-faq__headline-group h2,
+.dm2026-public-discovery-faq__headline-group h2 {
+  font-size: clamp(1.9rem, 3.2vw, 2.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+@media (max-width: 768px) {
+  .dm2026-public-discovery-faq .dm2026-home-faq__headline-group h2,
+  .dm2026-public-discovery-faq__headline-group h2 {
+    font-size: clamp(1.65rem, 7vw, 2.25rem);
+  }
+}
