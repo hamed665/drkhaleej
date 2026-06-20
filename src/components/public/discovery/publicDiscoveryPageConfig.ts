@@ -127,12 +127,17 @@ export function buildDiscoveryFaq(
             {
               question: "ماذا أجد في صفحة الأطباء؟",
               answer:
-                "يمكنك تصفح معلومات اكتشاف الأطباء العامة مثل التخصصات والملفات عند توفر قوائم معتمدة.",
+                "يمكنك تصفح معلومات اكتشاف الأطباء العامة مثل الملفات والتخصصات عند توفر قوائم معتمدة.",
             },
             {
-              question: "هل تعرض الصفحة جداول الأطباء؟",
+              question: "كيف يساعدني البحث في صفحة الأطباء؟",
               answer:
-                "قد تظهر تفاصيل الجداول عند اعتمادها، ويجب تأكيد الموعد والموقع مباشرة مع مقدم الخدمة.",
+                "يمكنك استخدام البحث لاستكشاف تخصص أو اسم مقدم خدمة أو منطقة كمسار اكتشاف عام.",
+            },
+            {
+              question: "ما التفاصيل التي يجب تأكيدها قبل الزيارة؟",
+              answer:
+                "أكد الجدول، الموقع، التخصص وتفاصيل الخدمة مباشرة مع مقدم الخدمة قبل الزيارة.",
             },
             {
               question: "هل يمكنني استخدام الصفحة كنصيحة طبية؟",
@@ -140,9 +145,9 @@ export function buildDiscoveryFaq(
                 "لا. DrMuscat مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية أو تشخيصاً أو توصيات علاجية.",
             },
             {
-              question: "هل يجب تأكيد التفاصيل قبل الزيارة؟",
+              question: "متى تظهر ملفات الأطباء للعامة؟",
               answer:
-                "نعم. أكد التخصص، الجدول، الموقع وتفاصيل الخدمة مباشرة مع مقدم الخدمة.",
+                "تظهر ملفات الأطباء للعامة عندما تكون معتمدة ومناسبة للنشر العام.",
             },
           ],
         }
@@ -152,12 +157,17 @@ export function buildDiscoveryFaq(
             {
               question: "What can I find on the Doctors page?",
               answer:
-                "You can browse public doctor discovery information such as specialties and profiles when approved listings are available.",
+                "You can browse public doctor discovery information such as profiles and specialties when approved listings are available.",
             },
             {
-              question: "Does the page show doctor schedules?",
+              question: "How does doctor search help?",
               answer:
-                "Schedule details may appear when approved, and you should confirm timing and location directly with the provider.",
+                "Search can help you explore a specialty, provider name or area as a public discovery path.",
+            },
+            {
+              question: "What should I confirm before visiting?",
+              answer:
+                "Confirm schedule, location, specialty and service details directly with the provider before visiting.",
             },
             {
               question: "Can I use this page for medical advice?",
@@ -165,9 +175,9 @@ export function buildDiscoveryFaq(
                 "No. DrMuscat is for public discovery only and does not provide medical advice, diagnosis, or treatment recommendations.",
             },
             {
-              question: "Should I confirm details before visiting?",
+              question: "When do doctor profiles appear publicly?",
               answer:
-                "Yes. Confirm specialty, schedule, location and service details directly with the provider.",
+                "Doctor profiles appear publicly when they are approved and suitable for public publishing.",
             },
           ],
         },
@@ -178,17 +188,27 @@ export function buildDiscoveryFaq(
             {
               question: "ماذا أجد في صفحة الأسنان؟",
               answer:
-                "يمكنك استكشاف عيادات الأسنان وخدمات العناية بالفم عند توفر قوائم عامة معتمدة.",
+                "يمكنك استكشاف عيادات الأسنان ومعلومات العناية بالفم عند توفر قوائم عامة معتمدة.",
             },
             {
-              question: "هل توصي DrMuscat بعلاج أسنان محدد؟",
+              question: "كيف يعمل بحث خدمات الأسنان؟",
               answer:
-                "لا. الصفحة للاكتشاف فقط ولا تقدم توصيات علاجية أو نصيحة طبية.",
+                "يساعدك البحث على استكشاف خدمات مثل التقويم أو التنظيف أو عيادات في مناطق محددة.",
             },
             {
-              question: "هل يجب تأكيد الخدمة قبل الحجز؟",
+              question: "ما الذي يجب تأكيده مع عيادة الأسنان؟",
               answer:
-                "نعم. أكد الخدمة والموقع والجدول مباشرة مع عيادة الأسنان.",
+                "أكد الخدمة، الموعد، الموقع وأي تفاصيل علاجية مباشرة مع عيادة الأسنان.",
+            },
+            {
+              question: "هل تقدم DrMuscat نصيحة طبية للأسنان؟",
+              answer:
+                "لا. الصفحة للاكتشاف العام فقط ولا تقدم نصيحة طبية أو توصيات علاجية.",
+            },
+            {
+              question: "متى تظهر قوائم عيادات الأسنان؟",
+              answer:
+                "تظهر القوائم العامة بعد المراجعة والاعتماد عندما تكون مناسبة للنشر.",
             },
           ],
         }
@@ -198,17 +218,27 @@ export function buildDiscoveryFaq(
             {
               question: "What can I find on the Dental page?",
               answer:
-                "You can explore dental clinics and oral care services when approved public listings are available.",
+                "You can explore dental clinics and oral care information when approved public listings are available.",
             },
             {
-              question: "Does DrMuscat recommend a dental treatment?",
+              question: "How does dental service search work?",
               answer:
-                "No. The page is for discovery only and does not provide treatment recommendations or medical advice.",
+                "Search helps you explore services such as braces, cleaning or clinics in specific areas.",
             },
             {
-              question: "Should I confirm the service before booking?",
+              question: "What should I confirm with a dental clinic?",
               answer:
-                "Yes. Confirm the service, location and schedule directly with the dental clinic.",
+                "Confirm the service, appointment time, location and treatment details directly with the dental clinic.",
+            },
+            {
+              question: "Does DrMuscat provide dental medical advice?",
+              answer:
+                "No. The page is for public discovery only and does not provide medical advice or treatment recommendations.",
+            },
+            {
+              question: "When do dental listings appear?",
+              answer:
+                "Public listings appear after review and approval when they are suitable for publishing.",
             },
           ],
         },
@@ -217,18 +247,28 @@ export function buildDiscoveryFaq(
           headline: "أسئلة حول اكتشاف المختبرات",
           items: [
             {
-              question: "ما الذي يمكنني البحث عنه في صفحة المختبرات؟",
+              question: "ماذا أجد في صفحة المختبرات؟",
               answer:
                 "يمكنك استكشاف المختبرات والفحوصات وخيارات سحب العينات عند توفر قوائم معتمدة.",
+            },
+            {
+              question: "كيف يساعد بحث المختبرات؟",
+              answer:
+                "يساعد البحث على استكشاف فحوصات أو خدمات مختبر أو مناطق كمسارات اكتشاف عامة.",
+            },
+            {
+              question: "ما الذي يجب تأكيده مع المختبر؟",
+              answer:
+                "أكد تعليمات التحضير، وقت النتيجة وخيارات سحب العينات مباشرة مع المختبر.",
             },
             {
               question: "هل تفسر DrMuscat نتائج الفحوصات؟",
               answer: "لا. لا تقدم DrMuscat تفسيراً للنتائج أو نصيحة طبية.",
             },
             {
-              question: "هل يجب تأكيد التحضير ووقت النتيجة؟",
+              question: "متى تظهر المختبرات في النتائج؟",
               answer:
-                "نعم. أكد تعليمات التحضير والمدة وخيارات سحب العينات مباشرة مع المختبر.",
+                "تظهر المختبرات للعامة بعد المراجعة والاعتماد عندما تكون مناسبة للنشر.",
             },
           ],
         }
@@ -236,9 +276,19 @@ export function buildDiscoveryFaq(
           headline: "Lab discovery questions",
           items: [
             {
-              question: "What can I search for on the Labs page?",
+              question: "What can I find on the Labs page?",
               answer:
                 "You can explore labs, test services and sample collection options when approved listings are available.",
+            },
+            {
+              question: "How does lab search help?",
+              answer:
+                "Search helps you explore tests, lab services or areas as public discovery paths.",
+            },
+            {
+              question: "What should I confirm with the lab?",
+              answer:
+                "Confirm preparation instructions, result timing and sample collection options directly with the lab.",
             },
             {
               question: "Does DrMuscat interpret lab results?",
@@ -246,9 +296,9 @@ export function buildDiscoveryFaq(
                 "No. DrMuscat does not interpret results or provide medical advice.",
             },
             {
-              question: "Should I confirm preparation and timing?",
+              question: "When do labs appear in results?",
               answer:
-                "Yes. Confirm preparation instructions, timing and sample collection options directly with the lab.",
+                "Labs appear publicly after review and approval when they are suitable for publishing.",
             },
           ],
         },
@@ -259,17 +309,27 @@ export function buildDiscoveryFaq(
             {
               question: "ماذا تعرض صفحة المراكز؟",
               answer:
-                "تعرض مسارات اكتشاف للعيادات والمراكز الطبية والخدمات عند توفر قوائم عامة معتمدة.",
+                "تعرض مسارات اكتشاف للعيادات والمراكز الطبية عند توفر قوائم عامة معتمدة.",
             },
             {
-              question: "متى تظهر المراكز في النتائج؟",
+              question: "كيف أستكشف الخدمات والمناطق؟",
               answer:
-                "تظهر القوائم العامة بعد المراجعة والاعتماد وفق حالة النشر.",
+                "يمكنك البحث حسب خدمة أو اسم مركز أو مدينة أو منطقة كاكتشاف عام.",
             },
             {
-              question: "هل يجب التواصل مع المركز؟",
+              question: "ما التفاصيل التي يجب تأكيدها؟",
               answer:
-                "نعم. أكد الخدمات، الأقسام، الموقع وساعات العمل مباشرة مع المركز.",
+                "أكد الخدمات، الأقسام، الموقع وساعات العمل مباشرة مع المركز.",
+            },
+            {
+              question: "هل تعد الصفحة نصيحة طبية؟",
+              answer:
+                "لا. DrMuscat مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية.",
+            },
+            {
+              question: "متى تظهر المراكز للعامة؟",
+              answer:
+                "تظهر قوائم المراكز بعد المراجعة والاعتماد وفق حالة النشر.",
             },
           ],
         }
@@ -279,17 +339,27 @@ export function buildDiscoveryFaq(
             {
               question: "What does the Centers page show?",
               answer:
-                "It provides discovery paths for clinics, medical centers and services when approved public listings are available.",
+                "It provides discovery paths for clinics and medical centers when approved public listings are available.",
             },
             {
-              question: "When do centers appear in results?",
+              question: "How can I explore services and areas?",
               answer:
-                "Public listings appear after review and approval according to their publishing status.",
+                "You can search by service, center name, city or area as a public discovery path.",
             },
             {
-              question: "Should I contact the center?",
+              question: "What details should I confirm?",
               answer:
-                "Yes. Confirm services, departments, location and opening hours directly with the center.",
+                "Confirm services, departments, location and opening hours directly with the center.",
+            },
+            {
+              question: "Is this page medical advice?",
+              answer:
+                "No. DrMuscat is for public discovery only and does not provide medical advice.",
+            },
+            {
+              question: "When do centers appear publicly?",
+              answer:
+                "Center listings appear after review and approval according to publishing status.",
             },
           ],
         },
@@ -303,13 +373,24 @@ export function buildDiscoveryFaq(
                 "يمكنك استكشاف الصيدليات ومناطقها ومعلوماتها العامة عند توفر قوائم معتمدة.",
             },
             {
-              question: "هل تؤكد DrMuscat توفر الأدوية؟",
-              answer: "لا. يجب تأكيد توفر أي دواء أو منتج مباشرة مع الصيدلية.",
+              question: "كيف يساعد بحث الصيدليات؟",
+              answer:
+                "يساعد البحث على استكشاف صيدليات أو مناطق أو خدمات عامة مرتبطة بالصيدلية.",
+            },
+            {
+              question: "هل تؤكد DrMuscat توفر الأدوية أو المنتجات؟",
+              answer:
+                "لا. أكد توفر أي دواء أو منتج أو خدمة مباشرة مع الصيدلية.",
             },
             {
               question: "هل تقدم الصفحة نصيحة دوائية؟",
               answer:
                 "لا. الصفحة للاكتشاف العام فقط ولا تقدم نصيحة حول الأدوية.",
+            },
+            {
+              question: "متى تظهر قوائم الصيدليات؟",
+              answer:
+                "تظهر الصيدليات للعامة بعد المراجعة والاعتماد عندما تكون مناسبة للنشر.",
             },
           ],
         }
@@ -322,14 +403,25 @@ export function buildDiscoveryFaq(
                 "You can explore pharmacies, areas and public profile information when approved listings are available.",
             },
             {
-              question: "Does DrMuscat confirm medicine availability?",
+              question: "How does pharmacy search help?",
               answer:
-                "No. Confirm any medicine or product availability directly with the pharmacy.",
+                "Search helps you explore pharmacies, areas or general pharmacy service paths.",
+            },
+            {
+              question:
+                "Does DrMuscat confirm medicine or product availability?",
+              answer:
+                "No. Confirm any medicine, product or service availability directly with the pharmacy.",
             },
             {
               question: "Does the page provide medicine advice?",
               answer:
                 "No. The page is for public discovery only and does not provide medicine advice.",
+            },
+            {
+              question: "When do pharmacy listings appear?",
+              answer:
+                "Pharmacies appear publicly after review and approval when they are suitable for publishing.",
             },
           ],
         },
@@ -343,13 +435,23 @@ export function buildDiscoveryFaq(
                 "يمكنك استكشاف مراكز التجميل والصالونات وخدمات العناية عند توفر قوائم معتمدة.",
             },
             {
-              question: "هل تعرض الصفحة أسعاراً مضمونة؟",
+              question: "كيف يساعد بحث خدمات التجميل؟",
               answer:
-                "لا. لا تضيف DrMuscat أسعاراً أو وعوداً؛ أكد التفاصيل مباشرة مع المركز.",
+                "يساعدك البحث على استكشاف خدمات مثل العناية بالبشرة أو الشعر أو السبا أو الليزر كمسارات عامة.",
+            },
+            {
+              question: "ما الذي يجب تأكيده قبل الزيارة؟",
+              answer:
+                "أكد الأسعار، المواعيد، الخدمات والموقع مباشرة مع مركز التجميل أو الصالون.",
             },
             {
               question: "هل تقدم DrMuscat نصيحة طبية للتجميل؟",
               answer: "لا. المحتوى للاكتشاف العام فقط وليس نصيحة طبية.",
+            },
+            {
+              question: "متى تظهر قوائم التجميل؟",
+              answer:
+                "تظهر قوائم مراكز التجميل والصالونات بعد المراجعة والاعتماد.",
             },
           ],
         }
@@ -362,14 +464,24 @@ export function buildDiscoveryFaq(
                 "You can explore beauty centers, salons and care services when approved listings are available.",
             },
             {
-              question: "Does the page show guaranteed prices?",
+              question: "How does beauty service search help?",
               answer:
-                "No. DrMuscat does not add prices or promises; confirm details directly with the center.",
+                "Search helps you explore skincare, hair, spa or laser services as public discovery paths.",
+            },
+            {
+              question: "What should I confirm before visiting?",
+              answer:
+                "Confirm prices, timing, services and location directly with the beauty center or salon.",
             },
             {
               question: "Does DrMuscat provide beauty medical advice?",
               answer:
                 "No. Content is for public discovery only and is not medical advice.",
+            },
+            {
+              question: "When do beauty listings appear?",
+              answer:
+                "Beauty center and salon listings appear after review and approval.",
             },
           ],
         },
@@ -380,7 +492,17 @@ export function buildDiscoveryFaq(
             {
               question: "ماذا أجد في صفحة العيادات البيطرية؟",
               answer:
-                "يمكنك استكشاف العيادات البيطرية ومسارات مثل التطعيم والعناية ووثائق السفر عند توفر قوائم معتمدة.",
+                "يمكنك استكشاف العيادات البيطرية عند توفر قوائم عامة معتمدة.",
+            },
+            {
+              question: "ما الخدمات التي يمكن استكشافها؟",
+              answer:
+                "يمكنك استكشاف مسارات مثل التطعيم والعناية ووثائق السفر كاكتشاف عام.",
+            },
+            {
+              question: "ما الذي يجب تأكيده مع العيادة؟",
+              answer:
+                "أكد الخدمات، المواعيد، المتطلبات والموقع مباشرة مع العيادة البيطرية.",
             },
             {
               question: "هل تقدم DrMuscat نصيحة بيطرية؟",
@@ -388,9 +510,9 @@ export function buildDiscoveryFaq(
                 "لا. الصفحة للاكتشاف العام فقط ولا تقدم تشخيصاً أو نصيحة بيطرية.",
             },
             {
-              question: "هل يجب تأكيد التفاصيل مع العيادة؟",
+              question: "متى تظهر العيادات البيطرية؟",
               answer:
-                "نعم. أكد الخدمات، المواعيد، المتطلبات والموقع مباشرة مع العيادة البيطرية.",
+                "تظهر القوائم العامة بعد المراجعة والاعتماد عندما تكون مناسبة للنشر.",
             },
           ],
         }
@@ -400,7 +522,17 @@ export function buildDiscoveryFaq(
             {
               question: "What can I find on the Pet Clinics page?",
               answer:
-                "You can explore veterinary clinics and paths such as vaccination, grooming and travel documents when approved listings are available.",
+                "You can explore veterinary clinics when approved public listings are available.",
+            },
+            {
+              question: "Which services can I explore?",
+              answer:
+                "You can explore paths such as vaccination, grooming and travel documents as public discovery.",
+            },
+            {
+              question: "What should I confirm with the clinic?",
+              answer:
+                "Confirm services, schedules, requirements and location directly with the veterinary clinic.",
             },
             {
               question: "Does DrMuscat provide veterinary advice?",
@@ -408,9 +540,9 @@ export function buildDiscoveryFaq(
                 "No. The page is for public discovery only and does not provide diagnosis or veterinary advice.",
             },
             {
-              question: "Should I confirm details with the clinic?",
+              question: "When do pet clinic listings appear?",
               answer:
-                "Yes. Confirm services, schedules, requirements and location directly with the veterinary clinic.",
+                "Public listings appear after review and approval when they are suitable for publishing.",
             },
           ],
         },
@@ -424,6 +556,11 @@ export function buildDiscoveryFaq(
                 "يمكنك استكشاف متاجر الحيوانات ومستلزمات الطعام والعناية والمنتجات عند توفر قوائم معتمدة.",
             },
             {
+              question: "كيف يساعد بحث المنتجات؟",
+              answer:
+                "يساعدك البحث على استكشاف الطعام والمستلزمات وفئات المنتجات كمسارات عامة.",
+            },
+            {
               question: "هل تؤكد DrMuscat توفر المنتجات؟",
               answer:
                 "لا. أكد توفر الطعام أو المستلزمات أو المنتجات مباشرة مع المتجر.",
@@ -432,6 +569,11 @@ export function buildDiscoveryFaq(
               question: "هل تقدم الصفحة نصيحة بيطرية؟",
               answer:
                 "لا. الصفحة للاكتشاف العام للمتاجر فقط وليست نصيحة بيطرية.",
+            },
+            {
+              question: "متى تظهر متاجر الحيوانات؟",
+              answer:
+                "تظهر قوائم المتاجر بعد المراجعة والاعتماد عندما تكون مناسبة للنشر.",
             },
           ],
         }
@@ -444,6 +586,11 @@ export function buildDiscoveryFaq(
                 "You can explore pet shops, food, care supplies and product categories when approved listings are available.",
             },
             {
+              question: "How does product search help?",
+              answer:
+                "Search helps you explore food, supplies and product categories as public discovery paths.",
+            },
+            {
               question: "Does DrMuscat confirm product availability?",
               answer:
                 "No. Confirm food, supplies or product availability directly with the shop.",
@@ -452,6 +599,11 @@ export function buildDiscoveryFaq(
               question: "Does the page provide veterinary advice?",
               answer:
                 "No. The page is for public shop discovery only and is not veterinary advice.",
+            },
+            {
+              question: "When do pet shop listings appear?",
+              answer:
+                "Shop listings appear after review and approval when they are suitable for publishing.",
             },
           ],
         },
@@ -462,17 +614,27 @@ export function buildDiscoveryFaq(
             {
               question: "ماذا تعرض صفحة المستشفيات؟",
               answer:
-                "يمكنك استكشاف المستشفيات والأقسام وخدمات المرضى عند توفر قوائم عامة معتمدة.",
+                "يمكنك استكشاف المستشفيات ومعلوماتها العامة عند توفر قوائم معتمدة.",
             },
             {
-              question: "هل يجب تأكيد الأقسام والخدمات؟",
+              question: "كيف أستكشف الأقسام وخدمات المرضى؟",
               answer:
-                "نعم. أكد الأقسام، الخدمات، الموقع وساعات العمل مباشرة مع المستشفى.",
+                "يساعد البحث على استكشاف الأقسام وخدمات المرضى والمناطق كمسارات عامة.",
+            },
+            {
+              question: "ما التفاصيل التي يجب تأكيدها مع المستشفى؟",
+              answer:
+                "أكد الأقسام، الخدمات، الموقع وساعات العمل مباشرة مع المستشفى.",
             },
             {
               question: "ماذا أفعل في الحالات العاجلة؟",
               answer:
-                "للحالات العاجلة، تواصل مع خدمات الطوارئ المحلية أو مع المستشفى مباشرة.",
+                "للحالات العاجلة، تواصل مع خدمات الطوارئ المحلية أو المستشفى مباشرة.",
+            },
+            {
+              question: "متى تظهر قوائم المستشفيات؟",
+              answer:
+                "تظهر قوائم المستشفيات بعد المراجعة والاعتماد عندما تكون مناسبة للنشر العام.",
             },
           ],
         }
@@ -482,17 +644,27 @@ export function buildDiscoveryFaq(
             {
               question: "What does the Hospitals page show?",
               answer:
-                "You can explore hospitals, departments and patient services when approved public listings are available.",
+                "You can explore hospitals and public information when approved listings are available.",
             },
             {
-              question: "Should I confirm departments and services?",
+              question: "How can I explore departments and patient services?",
               answer:
-                "Yes. Confirm departments, services, location and opening hours directly with the hospital.",
+                "Search helps you explore departments, patient services and areas as public discovery paths.",
+            },
+            {
+              question: "What details should I confirm with the hospital?",
+              answer:
+                "Confirm departments, services, location and opening hours directly with the hospital.",
             },
             {
               question: "What should I do for urgent care?",
               answer:
                 "For urgent care, contact local emergency services or the hospital directly.",
+            },
+            {
+              question: "When do hospital listings appear?",
+              answer:
+                "Hospital listings appear after review and approval when they are suitable for public publishing.",
             },
           ],
         },
@@ -506,13 +678,24 @@ export function buildDiscoveryFaq(
                 "تعرض مسارات اكتشاف للعروض العامة المعتمدة عند توفرها من مقدمي الخدمة.",
             },
             {
-              question: "هل تضيف DrMuscat خصومات وهمية؟",
-              answer: "لا. لا تضيف DrMuscat أسعاراً أو خصومات غير معتمدة.",
+              question: "هل تؤكد DrMuscat تفاصيل العروض؟",
+              answer:
+                "تظهر العروض عندما تكون معتمدة وعامة، لكن يجب تأكيد التفاصيل مباشرة مع مقدم الخدمة.",
             },
             {
-              question: "هل يجب تأكيد شروط العرض؟",
+              question: "هل يجب تأكيد تفاصيل العرض قبل الزيارة؟",
               answer:
                 "نعم. أكد السعر والشروط والتوفر ومدة العرض مباشرة مع مقدم الخدمة.",
+            },
+            {
+              question: "هل تعني العروض أن مقدم الخدمة أفضل طبياً؟",
+              answer:
+                "لا. العروض لا تمثل ترتيباً للجودة الطبية أو توصية علاجية.",
+            },
+            {
+              question: "كيف ينشر مقدمو الخدمة العروض على DrMuscat؟",
+              answer:
+                "يمكن أن تظهر العروض عندما يقدمها مقدم الخدمة وتصبح معتمدة ومناسبة للنشر العام.",
             },
           ],
         }
@@ -525,14 +708,24 @@ export function buildDiscoveryFaq(
                 "It provides discovery paths for approved public offers when they are available from providers.",
             },
             {
-              question: "Does DrMuscat add fake discounts?",
+              question: "Does DrMuscat confirm offer details?",
               answer:
-                "No. DrMuscat does not add unapproved prices or discounts.",
+                "Offers appear when approved and public, but details should still be confirmed directly with the provider.",
             },
             {
-              question: "Should I confirm offer terms?",
+              question: "Should I confirm offer details before visiting?",
               answer:
-                "Yes. Confirm price, terms, availability and offer period directly with the provider.",
+                "Yes. Confirm price, terms, availability and offer timing directly with the provider.",
+            },
+            {
+              question: "Do offers mean a provider is medically better?",
+              answer:
+                "No. Offers do not represent medical quality rankings or treatment recommendations.",
+            },
+            {
+              question: "How do providers publish offers on DrMuscat?",
+              answer:
+                "Offers can appear when submitted by a provider and approved as suitable for public publishing.",
             },
           ],
         },
@@ -546,13 +739,21 @@ export function buildDiscoveryFaq(
                 "يمكنك استكشاف مسارات خدمات الرعاية العامة عند توفر معلومات معتمدة.",
             },
             {
+              question: "كيف يساعد بحث الخدمات؟",
+              answer: "يساعد البحث على استكشاف خدمة أو منطقة كمسار اكتشاف عام.",
+            },
+            {
+              question: "ما الذي يجب تأكيده؟",
+              answer: "أكد الخدمة والمتطلبات والموقع مباشرة مع مقدم الخدمة.",
+            },
+            {
               question: "هل تقترح DrMuscat خدمة معينة؟",
               answer: "لا. DrMuscat لا تقدم توصيات علاجية أو نصيحة طبية.",
             },
             {
-              question: "هل يجب تأكيد التفاصيل؟",
+              question: "متى تظهر معلومات الخدمات؟",
               answer:
-                "نعم. أكد الخدمة والمتطلبات والموقع مباشرة مع مقدم الخدمة.",
+                "تظهر معلومات الخدمات العامة عندما تكون معتمدة ومناسبة للنشر.",
             },
           ],
         }
@@ -565,14 +766,24 @@ export function buildDiscoveryFaq(
                 "You can explore public healthcare service discovery paths when approved information is available.",
             },
             {
+              question: "How does service search help?",
+              answer:
+                "Search helps you explore a service or area as a public discovery path.",
+            },
+            {
+              question: "What should I confirm?",
+              answer:
+                "Confirm the service, requirements and location directly with the provider.",
+            },
+            {
               question: "Does DrMuscat recommend a specific service?",
               answer:
                 "No. DrMuscat does not provide treatment recommendations or medical advice.",
             },
             {
-              question: "Should I confirm details?",
+              question: "When does service information appear?",
               answer:
-                "Yes. Confirm the service, requirements and location directly with the provider.",
+                "Public service information appears when it is approved and suitable for publishing.",
             },
           ],
         },
