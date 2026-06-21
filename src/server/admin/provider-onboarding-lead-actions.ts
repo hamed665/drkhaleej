@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -124,7 +125,8 @@ export async function updateProviderOnboardingLeadStatusPriority(
   _previousState: ProviderOnboardingLeadMutationState,
   formData: FormData,
 ): Promise<ProviderOnboardingLeadMutationState> {
-  const platformAdmin = await requirePlatformAdmin();
+  const admin = await requireAdminPermission("provider_leads.update_status");
+  const platformAdmin = admin.profile;
 
   const leadId = readRequiredFormString(formData, "leadId");
   const status = readRequiredFormString(formData, "status");
@@ -206,6 +208,18 @@ export async function updateProviderOnboardingLeadStatusPriority(
         "Lead was updated, but the history event could not be recorded. Refresh and review the lead before continuing.",
     };
   }
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "provider_leads.update_status",
+    action: "provider_lead.status_priority_updated",
+    entityType: "provider_onboarding_lead",
+    entityId: leadId,
+    targetTable: "provider_onboarding_leads",
+    summary: "Provider onboarding lead status/priority updated.",
+    oldValues: { status: oldStatus, priority: oldPriority },
+    newValues: { status, priority },
+  });
 
   return {
     ok: true,

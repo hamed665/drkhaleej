@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -263,7 +264,8 @@ export async function upsertCenterSubscriptionAssignment(
   _previousState: CenterSubscriptionAssignmentState,
   formData: FormData,
 ): Promise<CenterSubscriptionAssignmentState> {
-  const platformAdmin = await requirePlatformAdmin();
+  const admin = await requireAdminPermission("subscriptions.assign");
+  const platformAdmin = admin.profile;
 
   const centerId = readFormString(formData, "centerId");
   const planTier = readFormString(formData, "planTier");
@@ -369,6 +371,8 @@ export async function upsertCenterSubscriptionAssignment(
 
     revalidatePath("/admin/center-subscriptions");
 
+    await writeAdminAuditEvent({ admin, permissionKey: "subscriptions.assign", action: "subscription.assigned", entityType: "center_subscription", entityId: insertedSubscription.id, targetTable: "center_subscriptions", summary: "Center subscription assignment created.", newValues: { center_id: centerId, plan_id: plan.id, status, billing_interval: plan.interval } });
+
     return {
       ok: true,
       message: "Center subscription assignment was created.",
@@ -388,6 +392,8 @@ export async function upsertCenterSubscriptionAssignment(
   }
 
   revalidatePath("/admin/center-subscriptions");
+
+  await writeAdminAuditEvent({ admin, permissionKey: "subscriptions.assign", action: "subscription.assigned", entityType: "center_subscription", entityId: updatedSubscription.id, targetTable: "center_subscriptions", summary: "Center subscription assignment updated.", newValues: { center_id: centerId, plan_id: plan.id, status, billing_interval: plan.interval } });
 
   return {
     ok: true,

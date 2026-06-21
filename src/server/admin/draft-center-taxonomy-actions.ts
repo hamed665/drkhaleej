@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -80,7 +81,7 @@ export async function saveDraftCenterPrimaryCategory(
   _previousState: DraftCenterTaxonomyState,
   formData: FormData,
 ): Promise<DraftCenterTaxonomyState> {
-  await requirePlatformAdmin();
+  const admin = await requireAdminPermission("draft_centers.taxonomy.update");
 
   const centerId = readFormString(formData, "centerId");
   const categoryId = readFormString(formData, "categoryId");
@@ -197,6 +198,17 @@ export async function saveDraftCenterPrimaryCategory(
   }
 
   revalidateCenterTaxonomy(centerId);
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "draft_centers.taxonomy.update",
+    action: "draft_center.taxonomy_updated",
+    entityType: "draft_center",
+    entityId: centerId,
+    targetTable: "center_category_assignments",
+    summary: "Draft center primary category updated.",
+    newValues: { category_id: categoryId },
+  });
 
   return {
     ok: true,

@@ -16,8 +16,10 @@ const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyRlsStaticTest = path.join(repoRoot, 'scripts', 'db', 'test-rls-static.mjs');
 const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const specialtyTaxonomyMigration = '0057_specialty_taxonomy_hierarchy.sql';
+const adminAuditEventsMigration = '0058_admin_audit_events.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const specialtyTaxonomyMigrationPath = path.join(migrationsDir, specialtyTaxonomyMigration);
+const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-static-${taxRlsMigration}.hidden`,
@@ -25,6 +27,10 @@ const hiddenTaxRlsMigrationPath = path.join(
 const hiddenSpecialtyTaxonomyMigrationPath = path.join(
   migrationsDir,
   `.taxspecialtymodela-static-${specialtyTaxonomyMigration}.hidden`,
+);
+const hiddenAdminAuditEventsMigrationPath = path.join(
+  migrationsDir,
+  `.admgova-static-${adminAuditEventsMigration}.hidden`,
 );
 
 function fail(message) {
@@ -115,12 +121,37 @@ function validateSpecialtyAliasRlsMigration() {
   }
 }
 
+function validateAdminAuditEventsRlsMigration() {
+  assert(existsSync(adminAuditEventsMigrationPath), `${adminAuditEventsMigration} is missing.`);
+  const content = readFileSync(adminAuditEventsMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0058 must not create RLS policies.'],
+    [/\bfor\s+select\b/i, '0058 must not add SELECT policies.'],
+    [/\bfor\s+insert\b/i, '0058 must not add INSERT policies.'],
+    [/\bfor\s+update\b/i, '0058 must not add UPDATE policies.'],
+    [/\bfor\s+delete\b/i, '0058 must not add DELETE policies.'],
+    [/\bto\s+anon\b/i, '0058 must not expose anon access.'],
+    [/\bto\s+authenticated\b/i, '0058 must not expose authenticated access.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  requirePattern(
+    content,
+    /alter\s+table\s+public\.admin_audit_events\s+enable\s+row\s+level\s+security/i,
+    '0058 must enable RLS on admin_audit_events.',
+  );
+}
+
 function runLegacyStaticRlsTestWithoutTaxRls() {
   assert(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   assert(!existsSync(hiddenSpecialtyTaxonomyMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
+  assert(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(specialtyTaxonomyMigrationPath, hiddenSpecialtyTaxonomyMigrationPath);
+  renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
   try {
     execFileSync(process.execPath, [legacyRlsStaticTest], {
@@ -128,6 +159,10 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminAuditEventsMigrationPath)) {
+      renameSync(hiddenAdminAuditEventsMigrationPath, adminAuditEventsMigrationPath);
+    }
+
     if (existsSync(hiddenSpecialtyTaxonomyMigrationPath)) {
       renameSync(hiddenSpecialtyTaxonomyMigrationPath, specialtyTaxonomyMigrationPath);
     }
@@ -140,6 +175,7 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
 
 validateTaxonomyRlsMigration();
 validateSpecialtyAliasRlsMigration();
+validateAdminAuditEventsRlsMigration();
 runLegacyStaticRlsTestWithoutTaxRls();
 
-console.log('TAX-SPECIALTY-MODEL-A static RLS validation passed.');
+console.log('ADM-GOV-A static RLS validation passed.');

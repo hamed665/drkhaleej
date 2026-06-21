@@ -19,9 +19,11 @@ const taxC1Migration = '0054_healthcare_verticals_center_categories.sql';
 const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const geoFullBCountryCodeMigration = '0056_country_code_regional_expansion.sql';
 const taxSpecialtyModelMigration = '0057_specialty_taxonomy_hierarchy.sql';
+const adminAuditEventsMigration = '0058_admin_audit_events.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const geoFullBCountryCodeMigrationPath = path.join(migrationsDir, geoFullBCountryCodeMigration);
 const taxSpecialtyModelMigrationPath = path.join(migrationsDir, taxSpecialtyModelMigration);
+const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-${taxRlsMigration}.hidden`,
@@ -33,6 +35,10 @@ const hiddenGeoFullBCountryCodeMigrationPath = path.join(
 const hiddenTaxSpecialtyModelMigrationPath = path.join(
   migrationsDir,
   `.taxspecialtymodela-${taxSpecialtyModelMigration}.hidden`,
+);
+const hiddenAdminAuditEventsMigrationPath = path.join(
+  migrationsDir,
+  `.admgova-${adminAuditEventsMigration}.hidden`,
 );
 
 const expectedMigrations = [
@@ -93,6 +99,7 @@ const expectedMigrations = [
   taxRlsMigration,
   geoFullBCountryCodeMigration,
   taxSpecialtyModelMigration,
+  adminAuditEventsMigration,
 ];
 
 function fail(message) {
@@ -130,7 +137,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0057 for TAX-SPECIALTY-MODEL-A.');
+    fail('Migration inventory must be exactly 0001 through 0058 for ADM-GOV-A.');
   }
 }
 
@@ -261,14 +268,47 @@ function validateTaxSpecialtyModelMigration() {
   }
 }
 
+function validateAdminAuditEventsMigration() {
+  requireCondition(existsSync(adminAuditEventsMigrationPath), `${adminAuditEventsMigration} is missing.`);
+
+  const content = readFileSync(adminAuditEventsMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0058 must not seed rows or use INSERT INTO.'],
+    [/\bdrop\s+table\b/i, '0058 must not drop tables.'],
+    [/\bcreate\s+policy\b/i, '0058 must not add public or authenticated RLS policies.'],
+    [/\bto\s+anon\b/i, '0058 must not grant anon access.'],
+    [/\bto\s+authenticated\b/i, '0058 must not grant authenticated access.'],
+    [/\bpayments?\b/i, '0058 must not include payment scope.'],
+    [/\bbookings?\b/i, '0058 must not include booking scope.'],
+    [/\bai\b/i, '0058 must not include AI scope.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  for (const [pattern, message] of [
+    [/create\s+table\s+if\s+not\s+exists\s+public\.admin_audit_events/i, '0058 must create admin_audit_events.'],
+    [/actor_profile_id\s+uuid\s+references\s+public\.profiles\(id\)/i, '0058 must reference profiles for actor_profile_id.'],
+    [/permission_key\s+text/i, '0058 must include permission_key.'],
+    [/old_values\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i, '0058 must include old_values JSONB default.'],
+    [/new_values\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i, '0058 must include new_values JSONB default.'],
+    [/alter\s+table\s+public\.admin_audit_events\s+enable\s+row\s+level\s+security/i, '0058 must enable RLS on admin_audit_events.'],
+    [/idx_admin_audit_events_created_at_desc/i, '0058 must index created_at desc.'],
+  ]) {
+    requirePattern(content, pattern, message);
+  }
+}
+
 function runTaxC1ValidatorWithoutLaterMigrations() {
   requireCondition(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   requireCondition(!existsSync(hiddenGeoFullBCountryCodeMigrationPath), 'Hidden GEO-FULL-B migration file already exists.');
   requireCondition(!existsSync(hiddenTaxSpecialtyModelMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
+  requireCondition(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(geoFullBCountryCodeMigrationPath, hiddenGeoFullBCountryCodeMigrationPath);
   renameSync(taxSpecialtyModelMigrationPath, hiddenTaxSpecialtyModelMigrationPath);
+  renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
   try {
     execFileSync(process.execPath, [taxC1Validator], {
@@ -276,6 +316,10 @@ function runTaxC1ValidatorWithoutLaterMigrations() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminAuditEventsMigrationPath)) {
+      renameSync(hiddenAdminAuditEventsMigrationPath, adminAuditEventsMigrationPath);
+    }
+
     if (existsSync(hiddenTaxSpecialtyModelMigrationPath)) {
       renameSync(hiddenTaxSpecialtyModelMigrationPath, taxSpecialtyModelMigrationPath);
     }
@@ -294,6 +338,7 @@ validateMigrationInventory();
 validateTaxRlsMigration();
 validateGeoFullBCountryCodeMigration();
 validateTaxSpecialtyModelMigration();
+validateAdminAuditEventsMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
-console.log('TAX-SPECIALTY-MODEL-A migration validation passed.');
+console.log('ADM-GOV-A migration validation passed.');

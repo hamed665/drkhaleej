@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 import type {
@@ -114,7 +115,8 @@ export async function createCommercialAddOnAssignment(
   _previousState: CommercialAddOnAssignmentState,
   formData: FormData,
 ): Promise<CommercialAddOnAssignmentState> {
-  const admin = await requirePlatformAdmin();
+  const adminContext = await requireAdminPermission("commercial_addons.assign");
+  const admin = adminContext.profile;
 
   const centerId = formString(formData, "centerId");
   const addOnTypeValue = formString(formData, "addOnType");
@@ -217,6 +219,8 @@ export async function createCommercialAddOnAssignment(
   }
 
   revalidatePath("/admin/commercial-addons");
+
+  await writeAdminAuditEvent({ admin: adminContext, permissionKey: "commercial_addons.assign", action: "commercial_addon.assigned", entityType: "commercial_addon", entityId: campaign.id, targetTable: "sponsored_campaigns", summary: "Commercial add-on assignment created as draft.", newValues: { center_id: centerId, add_on_type: addOnTypeValue, term: termValue } });
 
   return {
     ok: true,

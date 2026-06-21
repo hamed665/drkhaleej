@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -207,7 +208,7 @@ export async function initializeBaseSubscriptionPlanCatalog(
   _previousState: BaseSubscriptionPlanCatalogState,
   _formData: FormData,
 ): Promise<BaseSubscriptionPlanCatalogState> {
-  await requirePlatformAdmin();
+  const admin = await requireAdminPermission("subscription_plans.sync");
 
   const supabase = createSupabaseServiceRoleClient();
   const now = new Date().toISOString();
@@ -271,6 +272,8 @@ export async function initializeBaseSubscriptionPlanCatalog(
   }
 
   revalidatePath("/admin/center-subscriptions");
+
+  await writeAdminAuditEvent({ admin, permissionKey: "subscription_plans.sync", action: "subscription_plan_catalog.synced", entityType: "subscription_plan_catalog", targetTable: "subscription_plans", summary: "Base subscription plan catalog synced.", metadata: { plan_count: baseSubscriptionPlans.length } });
 
   return {
     ok: true,

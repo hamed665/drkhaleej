@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -144,7 +144,7 @@ function buildItems(
 }
 
 export async function listAdminCommercialAddOns(): Promise<AdminCommercialAddOnsResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("commercial_addons.read");
 
   const supabase = createSupabaseServiceRoleClient();
 

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -189,7 +189,7 @@ function mapCenterSubscription(
 }
 
 export async function listAdminCenterSubscriptions(): Promise<AdminCenterSubscriptionsListResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("subscriptions.read");
 
   const supabase = createSupabaseServiceRoleClient();
 

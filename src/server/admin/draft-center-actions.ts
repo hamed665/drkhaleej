@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -110,7 +111,7 @@ export async function updateDraftCenterDetails(
   _previousState: DraftCenterUpdateState,
   formData: FormData,
 ): Promise<DraftCenterUpdateState> {
-  await requirePlatformAdmin();
+  const admin = await requireAdminPermission("draft_centers.update");
 
   const centerId = readFormString(formData, "centerId");
   const nameEn = readOptionalText(formData, "nameEn", 160);
@@ -260,6 +261,17 @@ export async function updateDraftCenterDetails(
   revalidatePath("/admin/draft-centers");
   revalidatePath(`/admin/draft-centers/${centerId}`);
   revalidatePath("/admin/center-subscriptions");
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "draft_centers.update",
+    action: "draft_center.details_updated",
+    entityType: "draft_center",
+    entityId: centerId,
+    targetTable: "centers",
+    summary: "Draft center details updated.",
+    newValues: { fields: Object.keys(updatePayload) },
+  });
 
   return {
     ok: true,

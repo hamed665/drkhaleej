@@ -1,6 +1,7 @@
 import "server-only";
 
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -279,6 +280,7 @@ export async function listAdminProviderOnboardingLeads(
   filters: AdminProviderOnboardingLeadListFilters = {},
 ): Promise<AdminProviderOnboardingLeadListResult> {
   await requirePlatformAdmin();
+  await requireAdminPermission("provider_leads.read");
 
   const limit = normalizeLimit(filters.limit);
   const offset = normalizeOffset(filters.offset);
@@ -339,7 +341,7 @@ export async function listAdminProviderOnboardingLeads(
 export async function getAdminProviderOnboardingLeadById(
   id: string,
 ): Promise<AdminProviderOnboardingLeadDetailResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("provider_leads.read");
 
   if (!isUuid(id)) {
     return { ok: false, reason: "not_found" };
@@ -371,7 +373,7 @@ export async function getAdminProviderOnboardingLeadById(
 export async function listProviderOnboardingLeadEvents(
   leadId: string,
 ): Promise<AdminProviderOnboardingLeadEventsResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("provider_leads.read");
 
   if (!isUuid(leadId)) {
     return { ok: false, reason: "not_found", events: [] };

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 
 type QueryError = { message?: string };
@@ -133,7 +133,7 @@ function mapCategoryOptions(
 export async function getAdminDraftCenterTaxonomy(
   centerId: string,
 ): Promise<AdminDraftCenterTaxonomyResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("draft_centers.read");
 
   const supabase = adminTaxonomyClient();
 

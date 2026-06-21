@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -77,7 +78,7 @@ export async function markDraftCenterReadyForReview(
   _previousState: DraftCenterWorkflowState,
   formData: FormData,
 ): Promise<DraftCenterWorkflowState> {
-  await requirePlatformAdmin();
+  const admin = await requireAdminPermission("draft_centers.workflow.update");
 
   const centerId = readFormString(formData, "centerId");
   if (centerId === null || !isUuid(centerId)) {
@@ -120,6 +121,18 @@ export async function markDraftCenterReadyForReview(
 
   revalidateCenterWorkflow(centerId);
 
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "draft_centers.workflow.update",
+    action: "draft_center.workflow_updated",
+    entityType: "draft_center",
+    entityId: centerId,
+    targetTable: "centers",
+    summary: "Draft center marked ready for review.",
+    oldValues: { status: "draft" },
+    newValues: { status: "pending_review" },
+  });
+
   return {
     ok: true,
     message: "Draft center was marked ready for review. It is still not public or active.",
@@ -130,7 +143,7 @@ export async function returnCenterToDraft(
   _previousState: DraftCenterWorkflowState,
   formData: FormData,
 ): Promise<DraftCenterWorkflowState> {
-  await requirePlatformAdmin();
+  const admin = await requireAdminPermission("draft_centers.workflow.update");
 
   const centerId = readFormString(formData, "centerId");
   if (centerId === null || !isUuid(centerId)) {
@@ -158,6 +171,18 @@ export async function returnCenterToDraft(
   }
 
   revalidateCenterWorkflow(centerId);
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "draft_centers.workflow.update",
+    action: "draft_center.workflow_updated",
+    entityType: "draft_center",
+    entityId: centerId,
+    targetTable: "centers",
+    summary: "Draft center returned to draft.",
+    oldValues: { status: "pending_review" },
+    newValues: { status: "draft" },
+  });
 
   return {
     ok: true,

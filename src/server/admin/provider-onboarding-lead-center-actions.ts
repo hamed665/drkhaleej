@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
+import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -127,7 +128,8 @@ export async function createDraftCenterFromLead(
   _previousState: DraftCenterCreationState,
   formData: FormData,
 ): Promise<DraftCenterCreationState> {
-  const admin = await requirePlatformAdmin();
+  const adminContext = await requireAdminPermission("provider_leads.create_draft_center");
+  const admin = adminContext.profile;
   const leadId = formString(formData, "leadId");
 
   if (leadId === null || !isUuid(leadId)) return failure;
@@ -246,6 +248,17 @@ export async function createDraftCenterFromLead(
       message: "Draft center was created, but the lead history event could not be recorded. Refresh before continuing.",
     };
   }
+
+  await writeAdminAuditEvent({
+    admin: adminContext,
+    permissionKey: "provider_leads.create_draft_center",
+    action: "provider_lead.draft_center_created",
+    entityType: "provider_onboarding_lead",
+    entityId: leadId,
+    targetTable: "centers",
+    summary: "Draft center created from provider onboarding lead.",
+    newValues: { draft_center_id: centerId, lead_status: "converted" },
+  });
 
   return {
     ok: true,

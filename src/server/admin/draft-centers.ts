@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -167,7 +167,7 @@ function mapCenterDetail(row: CenterDetailRow): AdminDraftCenterDetail {
 }
 
 export async function listAdminDraftCenters(): Promise<AdminDraftCentersListResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("draft_centers.read");
 
   const supabase = createSupabaseServiceRoleClient();
   const { data, error } = await supabase
@@ -188,7 +188,7 @@ export async function listAdminDraftCenters(): Promise<AdminDraftCentersListResu
 export async function getAdminDraftCenterById(
   centerId: string,
 ): Promise<AdminDraftCenterDetailResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("draft_centers.read");
 
   if (!isUuid(centerId)) {
     return { ok: false, reason: "not_found" };

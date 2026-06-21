@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { Database } from "@/lib/supabase/types";
 
@@ -46,7 +46,7 @@ const subscriptionPlanSelectColumns =
   "id, name_en, slug, interval, price_amount, currency_code, status";
 
 export async function listAdminCenterSubscriptionAssignmentOptions(): Promise<AdminCenterSubscriptionAssignmentOptionsResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("subscriptions.read");
 
   const supabase = createSupabaseServiceRoleClient();
 

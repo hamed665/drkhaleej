@@ -169,27 +169,27 @@ export const adminModuleGroups: AdminModuleGroup[] = [
   {
     title: "Governance",
     description:
-      "Future platform oversight surfaces. Authentication and roles are unchanged in this PR.",
+      "Platform oversight surfaces. Authentication and login behavior remain unchanged.",
     modules: [
       {
         title: "Audit Log",
         description:
-          "Planned read-only audit log structure for actor, action, entity, change summary, and reason.",
-        status: "Planned",
+          "Read-only audit log for actor, permission, action, entity, summary, and reason.",
+        status: "Read-only",
         href: "/admin/audit-log",
       },
       {
         title: "Admin Settings",
         description:
-          "Planned settings inventory for feature flags, disclaimers, contact defaults, and launch flags.",
-        status: "Planned",
+          "Read-only settings and access overview foundation; no role mutation controls.",
+        status: "Read-only",
         href: "/admin/settings",
       },
       {
         title: "Roles / Access Overview",
         description:
-          "Future roles and permissions overview only; no auth or Supabase guard changes are included.",
-        status: "Planned",
+          "Read-only resolved role and grouped permission overview; assignment UI remains planned.",
+        status: "Read-only",
         href: "/admin/settings",
       },
     ],

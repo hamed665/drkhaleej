@@ -1,6 +1,6 @@
 import "server-only";
 
-import { requirePlatformAdmin } from "@/lib/permissions/admin";
+import { requireAdminPermission } from "@/server/admin/permissions";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { AdminCenterCategoryAssignment } from "@/server/admin/draft-center-taxonomy";
 import type { AdminDraftCenterDetail } from "@/server/admin/draft-centers";
@@ -200,7 +200,7 @@ export async function getAdminDraftCenterQuality(
   taxonomyAssignment: AdminCenterCategoryAssignment | null,
   taxonomyAvailable: boolean,
 ): Promise<DraftCenterQualityResult> {
-  await requirePlatformAdmin();
+  await requireAdminPermission("draft_centers.read");
 
   const supabase = qualityClient();
   const { data: locations, error: locationsError } = await supabase
