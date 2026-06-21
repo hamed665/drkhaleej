@@ -1,22 +1,36 @@
-import type { Metadata } from 'next';
-import { headers } from 'next/headers';
-import type { ReactNode } from 'react';
-import { AppShell } from '@/components/layout/app-shell';
-import { isSupportedLocale, localeDirection } from '@/lib/i18n/config';
-import { defaultMetadata } from '@/lib/seo/meta';
-import '@/styles/globals.css';
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import type { ReactNode } from "react";
+
+import { AppShell } from "@/components/layout/app-shell";
+import { isSupportedLocale, localeDirection } from "@/lib/i18n/config";
+import { defaultMetadata } from "@/lib/seo/meta";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = defaultMetadata;
 
+function isAdminRequestPath(path: string | null): boolean {
+  return path === "/admin" || path?.startsWith("/admin/") === true;
+}
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const localeHeader = (await headers()).get('x-drmuscat-locale');
-  const locale = localeHeader && isSupportedLocale(localeHeader) ? localeHeader : 'en';
+  const requestHeaders = await headers();
+  const localeHeader = requestHeaders.get("x-drmuscat-locale");
+  const locale =
+    localeHeader && isSupportedLocale(localeHeader) ? localeHeader : "en";
+  const requestPath =
+    requestHeaders.get("x-next-url") ??
+    requestHeaders.get("x-matched-path") ??
+    requestHeaders.get("next-url");
+  const body = isAdminRequestPath(requestPath) ? (
+    children
+  ) : (
+    <AppShell>{children}</AppShell>
+  );
 
   return (
     <html lang={locale} dir={localeDirection(locale)}>
-      <body>
-        <AppShell>{children}</AppShell>
-      </body>
+      <body>{body}</body>
     </html>
   );
 }
