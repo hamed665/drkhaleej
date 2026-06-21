@@ -34,6 +34,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_events: {
+        Row: {
+          action: string
+          actor_auth_user_id: string | null
+          actor_email: string | null
+          actor_profile_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+          new_values: Json
+          old_values: Json
+          permission_key: string | null
+          reason: string | null
+          request_source: string
+          summary: string
+          target_table: string | null
+        }
+        Insert: {
+          action: string
+          actor_auth_user_id?: string | null
+          actor_email?: string | null
+          actor_profile_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+          new_values?: Json
+          old_values?: Json
+          permission_key?: string | null
+          reason?: string | null
+          request_source?: string
+          summary: string
+          target_table?: string | null
+        }
+        Update: {
+          action?: string
+          actor_auth_user_id?: string | null
+          actor_email?: string | null
+          actor_profile_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+          new_values?: Json
+          old_values?: Json
+          permission_key?: string | null
+          reason?: string | null
+          request_source?: string
+          summary?: string
+          target_table?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_events_actor_profile_id_fkey"
+            columns: ["actor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointment_cancellations: {
         Row: {
           appointment_id: string
