@@ -3,64 +3,40 @@
 import { redirect } from "next/navigation";
 
 import { createSessionAwareSupabaseServerClient } from "@/lib/auth/server";
-import { buildAdminLoginRedirectUrl, getRequestOrigin } from "@/lib/auth/admin-login";
 
 export type AdminLoginActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
 
-export async function requestAdminLoginLink(
+export async function signInAdminWithPassword(
   _previousState: AdminLoginActionState,
   formData: FormData,
 ): Promise<AdminLoginActionState> {
   const email = formData.get("email");
+  const password = formData.get("password");
 
-  if (typeof email !== "string" || email.trim().length === 0) {
-    return {
-      status: "error",
-      message: "Enter the platform admin email address registered for DrMuscat.",
-    };
+  if (typeof email !== "string" || typeof password !== "string") {
+    return { status: "error", message: "Enter your admin email and password." };
   }
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-    return {
-      status: "error",
-      message: "Enter a valid platform admin email address.",
-    };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || password.length === 0) {
+    return { status: "error", message: "Enter a valid admin email and password." };
   }
 
   const supabase = await createSessionAwareSupabaseServerClient();
-  const origin = await getRequestOrigin();
-  const emailRedirectTo = buildAdminLoginRedirectUrl(origin);
-
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithPassword({
     email: normalizedEmail,
-    options: emailRedirectTo
-      ? {
-          emailRedirectTo,
-          shouldCreateUser: false,
-        }
-      : {
-          shouldCreateUser: false,
-        },
+    password,
   });
 
   if (error) {
-    return {
-      status: "error",
-      message:
-        "We could not send an admin sign-in link. Confirm the email is already registered for platform admin access.",
-    };
+    return { status: "error", message: "Admin sign in failed. Check the email and password." };
   }
 
-  return {
-    status: "success",
-    message:
-      "If this email is registered for platform admin access, a secure sign-in link has been sent.",
-  };
+  redirect("/admin/provider-leads");
 }
 
 export async function signOutAdmin() {
