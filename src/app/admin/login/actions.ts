@@ -3,45 +3,64 @@
 import { redirect } from "next/navigation";
 
 import { createSessionAwareSupabaseServerClient } from "@/lib/auth/server";
-import { isEmailAllowedForAdmin } from "@/lib/permissions/admin";
+import { buildAdminLoginRedirectUrl, getRequestOrigin } from "@/lib/auth/admin-login";
 
 export type AdminLoginActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
 
-export async function signInAdminWithPassword(
+export async function requestAdminLoginLink(
   _previousState: AdminLoginActionState,
   formData: FormData,
 ): Promise<AdminLoginActionState> {
   const email = formData.get("email");
-  const password = formData.get("password");
 
-  if (typeof email !== "string" || typeof password !== "string") {
-    return { status: "error", message: "Enter your admin email and password." };
+  if (typeof email !== "string" || email.trim().length === 0) {
+    return {
+      status: "error",
+      message: "Enter the platform admin email address registered for DrMuscat.",
+    };
   }
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || password.length === 0) {
-    return { status: "error", message: "Enter a valid admin email and password." };
-  }
-
-  if (!isEmailAllowedForAdmin(normalizedEmail)) {
-    return { status: "error", message: "Access denied for this admin account." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return {
+      status: "error",
+      message: "Enter a valid platform admin email address.",
+    };
   }
 
   const supabase = await createSessionAwareSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const origin = await getRequestOrigin();
+  const emailRedirectTo = buildAdminLoginRedirectUrl(origin);
+
+  const { error } = await supabase.auth.signInWithOtp({
     email: normalizedEmail,
-    password,
+    options: emailRedirectTo
+      ? {
+          emailRedirectTo,
+          shouldCreateUser: false,
+        }
+      : {
+          shouldCreateUser: false,
+        },
   });
 
   if (error) {
-    return { status: "error", message: "Admin sign in failed. Check the email and password." };
+    return {
+      status: "error",
+      message:
+        "We could not send an admin sign-in link. Confirm the email is already registered for platform admin access.",
+    };
   }
 
-  redirect("/admin/provider-leads");
+  return {
+    status: "success",
+    message:
+      "If this email is registered for platform admin access, a secure sign-in link has been sent.",
+  };
 }
 
 export async function signOutAdmin() {

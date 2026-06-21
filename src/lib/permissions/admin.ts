@@ -3,55 +3,48 @@ import "server-only";
 import { redirect } from "next/navigation";
 
 import { createSessionAwareSupabaseServerClient } from "@/lib/auth/server";
+import type { Database } from "@/lib/supabase/types";
 
-export type PlatformAdminProfile = {
-  id: string;
-  email: string;
-  display_name: string | null;
-  full_name: string | null;
-  is_platform_admin: true;
-};
+export type PlatformAdminProfile = Pick<
+  Database["public"]["Tables"]["profiles"]["Row"],
+  | "id"
+  | "auth_user_id"
+  | "email"
+  | "display_name"
+  | "full_name"
+  | "is_platform_admin"
+>;
 
-function getAdminEmailAllowlist(): Set<string> {
-  return new Set(
-    (process.env.ADMIN_EMAIL_ALLOWLIST ?? "")
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter((email) => email.length > 0),
-  );
-}
-
-export function isEmailAllowedForAdmin(email: string | null | undefined): boolean {
-  if (!email) return false;
-
-  const allowlist = getAdminEmailAllowlist();
-  if (allowlist.size === 0) return false;
-
-  return allowlist.has(email.trim().toLowerCase());
-}
-
-export async function getCurrentAllowedAdmin(): Promise<PlatformAdminProfile | null> {
+export async function getCurrentPlatformAdmin(): Promise<PlatformAdminProfile | null> {
   const supabase = await createSessionAwareSupabaseServerClient();
   const {
     data: { user },
-    error,
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (error || !user || !isEmailAllowedForAdmin(user.email)) {
+  if (userError || !user) {
     return null;
   }
 
-  return {
-    id: user.id,
-    email: user.email ?? "",
-    display_name: user.user_metadata?.display_name ?? null,
-    full_name: user.user_metadata?.full_name ?? null,
-    is_platform_admin: true,
-  };
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select(
+      "id, auth_user_id, email, display_name, full_name, is_platform_admin",
+    )
+    .eq("auth_user_id", user.id)
+    .eq("is_platform_admin", true)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    return null;
+  }
+
+  return profile;
 }
 
 export async function requirePlatformAdmin(): Promise<PlatformAdminProfile> {
-  const admin = await getCurrentAllowedAdmin();
+  const admin = await getCurrentPlatformAdmin();
 
   if (!admin) {
     redirect("/admin/login");

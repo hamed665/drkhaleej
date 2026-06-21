@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import { getCurrentAllowedAdmin } from "@/lib/permissions/admin";
+import { getCurrentPlatformAdmin } from "@/lib/permissions/admin";
 
 export const metadata: Metadata = {
   title: "DrMuscat Admin",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLoginPage() {
-  const admin = await getCurrentAllowedAdmin();
+  const admin = await getCurrentPlatformAdmin();
 
   if (admin) {
     redirect("/admin/provider-leads");
