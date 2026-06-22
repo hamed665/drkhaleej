@@ -32,6 +32,10 @@ export const activeAdminPermissions = [
   "subscription_plans.sync",
   "commercial_addons.read",
   "commercial_addons.assign",
+  "media.read",
+  "media.upload",
+  "media.update",
+  "media.archive",
 ] as const satisfies readonly AdminPermissionKey[];
 
 export type AdminRoleKey = "super_admin" | "operations_manager" | "content_editor" | "media_manager" | "commercial_manager" | "auditor";

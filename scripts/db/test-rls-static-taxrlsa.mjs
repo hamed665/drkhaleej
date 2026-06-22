@@ -17,9 +17,11 @@ const legacyRlsStaticTest = path.join(repoRoot, 'scripts', 'db', 'test-rls-stati
 const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const specialtyTaxonomyMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const adminAuditEventsMigration = '0058_admin_audit_events.sql';
+const adminMediaLibraryMigration = '0059_admin_media_library_foundation.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const specialtyTaxonomyMigrationPath = path.join(migrationsDir, specialtyTaxonomyMigration);
 const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
+const adminMediaLibraryMigrationPath = path.join(migrationsDir, adminMediaLibraryMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-static-${taxRlsMigration}.hidden`,
@@ -31,6 +33,10 @@ const hiddenSpecialtyTaxonomyMigrationPath = path.join(
 const hiddenAdminAuditEventsMigrationPath = path.join(
   migrationsDir,
   `.admgova-static-${adminAuditEventsMigration}.hidden`,
+);
+const hiddenAdminMediaLibraryMigrationPath = path.join(
+  migrationsDir,
+  `.admmediaa-static-${adminMediaLibraryMigration}.hidden`,
 );
 
 function fail(message) {
@@ -144,13 +150,32 @@ function validateAdminAuditEventsRlsMigration() {
   );
 }
 
+function validateAdminMediaLibraryRlsMigration() {
+  assert(existsSync(adminMediaLibraryMigrationPath), `${adminMediaLibraryMigration} is missing.`);
+  const content = readFileSync(adminMediaLibraryMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0059 must not create RLS policies.'],
+    [/\bfor\s+select\b/i, '0059 must not add SELECT policies.'],
+    [/\bfor\s+insert\b/i, '0059 must not add INSERT policies.'],
+    [/\bfor\s+update\b/i, '0059 must not add UPDATE policies.'],
+    [/\bfor\s+delete\b/i, '0059 must not add DELETE policies.'],
+    [/\bto\s+anon\b/i, '0059 must not expose anon access.'],
+    [/\bto\s+authenticated\b/i, '0059 must not expose authenticated access.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+}
+
 function runLegacyStaticRlsTestWithoutTaxRls() {
   assert(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   assert(!existsSync(hiddenSpecialtyTaxonomyMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
   assert(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
+  assert(!existsSync(hiddenAdminMediaLibraryMigrationPath), 'Hidden ADM-MEDIA-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(specialtyTaxonomyMigrationPath, hiddenSpecialtyTaxonomyMigrationPath);
+  renameSync(adminMediaLibraryMigrationPath, hiddenAdminMediaLibraryMigrationPath);
   renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
   try {
@@ -159,6 +184,10 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminMediaLibraryMigrationPath)) {
+      renameSync(hiddenAdminMediaLibraryMigrationPath, adminMediaLibraryMigrationPath);
+    }
+
     if (existsSync(hiddenAdminAuditEventsMigrationPath)) {
       renameSync(hiddenAdminAuditEventsMigrationPath, adminAuditEventsMigrationPath);
     }
@@ -176,6 +205,7 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
 validateTaxonomyRlsMigration();
 validateSpecialtyAliasRlsMigration();
 validateAdminAuditEventsRlsMigration();
+validateAdminMediaLibraryRlsMigration();
 runLegacyStaticRlsTestWithoutTaxRls();
 
-console.log('ADM-GOV-A static RLS validation passed.');
+console.log('ADM-MEDIA-A static RLS validation passed.');

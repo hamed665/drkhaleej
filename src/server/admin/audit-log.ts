@@ -13,7 +13,11 @@ export type AdminAuditAction =
   | "draft_center.workflow_updated"
   | "subscription.assigned"
   | "subscription_plan_catalog.synced"
-  | "commercial_addon.assigned";
+  | "commercial_addon.assigned"
+  | "media_asset.uploaded"
+  | "media_asset.metadata_updated"
+  | "media_asset.archived"
+  | "media_asset.restored";
 
 type JsonRecord = Record<string, Json>;
 type AdminAuditEventRow = Database["public"]["Tables"]["admin_audit_events"]["Row"];
