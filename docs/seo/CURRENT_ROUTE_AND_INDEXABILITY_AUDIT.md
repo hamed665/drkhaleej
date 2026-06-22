@@ -117,16 +117,16 @@ All public catalog helpers use `createSupabaseServerClient()` and therefore shou
 
 ## 6. Internal linking audit
 
-- Doctor listing cards link to doctor profile routes.
-- Center listing cards link to center profile routes.
-- Center detail pages include associated doctor summaries that can link to doctor profiles where IDs/slugs exist.
-- Doctor detail pages include practice center/location summaries that can link to center profiles where IDs/slugs exist.
+- Doctor listing cards currently render doctor summaries but do not link to doctor profile routes; they still show a “Profile coming soon” label.
+- Center listing cards currently render center summaries but do not link to center profile routes; they still show a “Profile coming soon” label.
+- Doctor detail pages link to practice center profiles where center slugs exist.
+- Center detail pages show associated doctor summaries, but those doctor summaries do not currently link to doctor profile routes.
 - Current services on detail pages are displayed as service summaries; service page route linking is not yet safe because service slug ambiguity remains unresolved.
 - Location names are displayed but should not link to area/city pages until geo uniqueness and local page QA are implemented.
 - Discovery pages link mostly to current route families and provider CTA surfaces; they do not have a graph-driven related entity engine.
 - Breadcrumb UI/JSON-LD is missing or not broad enough for future route depth.
 - Related blocks are manual/limited rather than generated from an entity relation graph.
-- Orphan risk is high for dynamic doctor and center profiles because sitemap omits them and relation completeness depends on listings/detail associations.
+- Orphan risk is high for dynamic doctor and center profiles because sitemap omits them, listing cards do not link to profile routes, and center detail doctor summaries do not link to doctor profiles.
 
 ## 7. Existing taxonomy and geo audit
 
@@ -178,7 +178,7 @@ All public catalog helpers use `createSupabaseServerClient()` and therefore shou
 
 | Risk | Severity | Recommended next prompt | Notes |
 | --- | --- | --- | --- |
-| Orphan profile pages | High | Prompt 20-23 | Dynamic profiles render but are absent from sitemap and graph-driven related blocks. |
+| Orphan profile pages | High | Prompt 20-23 | Dynamic profiles render, but the sitemap omits them, listing cards do not link to profile routes, and center detail doctor summaries do not link to doctor profiles. |
 | Static/non-dynamic sitemap | High | Prompt 23 | Current sitemap omits profiles/local pages and uses current date for all URLs. |
 | Premature indexing of thin local pages | High | Prompt 10-11, 25-27 | Scaffold routes correctly fail closed; future pages need thresholds. |
 | Duplicate doctor/entity records | High | Prompt 15 | No duplicate detection/import review foundation for bulk data. |
