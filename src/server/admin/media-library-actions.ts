@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
+import type { Database } from "@/lib/supabase/types";
 import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { requireAdminPermission } from "@/server/admin/permissions";
 import { isReviewStatus, isUsageKind, isUuid, isVisibilityStatus } from "@/server/admin/media-library";
@@ -11,6 +12,18 @@ export type AdminMediaActionState = { ok: boolean; message: string };
 
 const MAX_ALT_LENGTH = 180;
 const MAX_CAPTION_LENGTH = 300;
+
+type MediaAssetUpdate = Pick<
+  Database["public"]["Tables"]["media_assets"]["Update"],
+  | "alt_text_en"
+  | "alt_text_ar"
+  | "caption_en"
+  | "caption_ar"
+  | "admin_usage_kind"
+  | "admin_review_status"
+  | "admin_visibility_status"
+  | "updated_by_profile_id"
+>;
 
 export async function uploadAdminMediaAsset(): Promise<AdminMediaActionState> {
   await requireAdminPermission("media.upload");
@@ -33,6 +46,7 @@ export async function updateAdminMediaAssetMetadata(formData: FormData): Promise
   if (!isUsageKind(usageKind) || !isReviewStatus(reviewStatus) || !isVisibilityStatus(visibilityStatus)) {
     return;
   }
+
   if ([altTextEn, altTextAr, captionEn, captionAr].includes(false as never)) return;
 
   const supabase = createSupabaseServiceRoleClient();
@@ -42,10 +56,26 @@ export async function updateAdminMediaAssetMetadata(formData: FormData): Promise
     .eq("id", mediaId)
     .is("deleted_at", null)
     .maybeSingle();
+
   if (readError || !oldRow) return;
 
-  const next = { alt_text_en: altTextEn || null, alt_text_ar: altTextAr || null, caption_en: captionEn || null, caption_ar: captionAr || null, admin_usage_kind: usageKind, admin_review_status: reviewStatus, admin_visibility_status: visibilityStatus, updated_by_profile_id: admin.profile.id };
-  const { error } = await supabase.from("media_assets").update(next).eq("id", mediaId).is("deleted_at", null);
+  const next: MediaAssetUpdate = {
+    alt_text_en: altTextEn || null,
+    alt_text_ar: altTextAr || null,
+    caption_en: captionEn || null,
+    caption_ar: captionAr || null,
+    admin_usage_kind: usageKind,
+    admin_review_status: reviewStatus,
+    admin_visibility_status: visibilityStatus,
+    updated_by_profile_id: admin.profile.id,
+  };
+
+  const { error } = await supabase
+    .from("media_assets")
+    .update(next)
+    .eq("id", mediaId)
+    .is("deleted_at", null);
+
   if (error) return;
 
   const oldValues: Record<string, string | null> = {};
@@ -53,11 +83,24 @@ export async function updateAdminMediaAssetMetadata(formData: FormData): Promise
   for (const [key, newValue] of Object.entries(next)) {
     if (key === "updated_by_profile_id") continue;
     const oldValue = oldRow[key as keyof typeof oldRow] as string | null;
-    if (oldValue !== newValue) { oldValues[key] = oldValue; newValues[key] = newValue; }
+    if (oldValue !== newValue) {
+      oldValues[key] = oldValue;
+      newValues[key] = newValue;
+    }
   }
-  await writeAdminAuditEvent({ admin, permissionKey: "media.update", action: "media_asset.metadata_updated", entityType: "media_asset", entityId: mediaId, targetTable: "media_assets", summary: "Media asset metadata updated.", oldValues, newValues });
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "media.update",
+    action: "media_asset.metadata_updated",
+    entityType: "media_asset",
+    entityId: mediaId,
+    targetTable: "media_assets",
+    summary: "Media asset metadata updated.",
+    oldValues,
+    newValues,
+  });
   revalidateMedia(mediaId);
-  return;
 }
 
 export async function archiveAdminMediaAsset(formData: FormData): Promise<void> {
@@ -72,13 +115,40 @@ async function setArchiveState(formData: FormData, isArchived: boolean): Promise
   const admin = await requireAdminPermission("media.archive");
   const mediaId = String(formData.get("mediaId") ?? "");
   if (!isUuid(mediaId)) return;
+
   const supabase = createSupabaseServiceRoleClient();
-  const { error } = await supabase.from("media_assets").update({ is_archived: isArchived, updated_by_profile_id: admin.profile.id }).eq("id", mediaId).is("deleted_at", null);
+  const { error } = await supabase
+    .from("media_assets")
+    .update({ is_archived: isArchived, updated_by_profile_id: admin.profile.id })
+    .eq("id", mediaId)
+    .is("deleted_at", null);
+
   if (error) return;
-  await writeAdminAuditEvent({ admin, permissionKey: "media.archive", action: isArchived ? "media_asset.archived" : "media_asset.restored", entityType: "media_asset", entityId: mediaId, targetTable: "media_assets", summary: isArchived ? "Media asset archived." : "Media asset restored.", newValues: { is_archived: isArchived } });
+
+  await writeAdminAuditEvent({
+    admin,
+    permissionKey: "media.archive",
+    action: isArchived ? "media_asset.archived" : "media_asset.restored",
+    entityType: "media_asset",
+    entityId: mediaId,
+    targetTable: "media_assets",
+    summary: isArchived ? "Media asset archived." : "Media asset restored.",
+    newValues: { is_archived: isArchived },
+  });
   revalidateMedia(mediaId);
 }
 
-function clean(value: FormDataEntryValue | null): string { return typeof value === "string" ? value.trim() : ""; }
-function cleanNullable(value: FormDataEntryValue | null, maxLength: number): string | null | false { const next = clean(value); if (!next) return null; return next.length > maxLength ? false : next; }
-function revalidateMedia(mediaId: string): void { revalidatePath("/admin/media"); revalidatePath(`/admin/media/${mediaId}`); }
+function clean(value: FormDataEntryValue | null): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function cleanNullable(value: FormDataEntryValue | null, maxLength: number): string | null | false {
+  const next = clean(value);
+  if (!next) return null;
+  return next.length > maxLength ? false : next;
+}
+
+function revalidateMedia(mediaId: string): void {
+  revalidatePath("/admin/media");
+  revalidatePath(`/admin/media/${mediaId}`);
+}
