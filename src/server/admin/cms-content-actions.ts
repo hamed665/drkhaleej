@@ -112,7 +112,7 @@ function safeError(error: unknown): ActionState {
   };
 }
 
-function readRevisionPayload(formData: FormData): RevisionPayload {
+function buildRevisionPayload(formData: FormData): RevisionPayload {
   return {
     title_en: readText(formData, "titleEn", max.title),
     title_ar: readText(formData, "titleAr", max.title),
@@ -175,6 +175,20 @@ async function readRevision(supabase: SupabaseServiceClient, revisionId: string)
   return data;
 }
 
+async function readCurrentRevision(
+  supabase: SupabaseServiceClient,
+  entry: CmsEntryRow,
+): Promise<CmsRevisionRow | null> {
+  if (!entry.current_revision_id) return null;
+
+  const revision = await readRevision(supabase, entry.current_revision_id);
+  if (revision.entry_id !== entry.id) {
+    throw new Error("Current CMS revision does not belong to this entry.");
+  }
+
+  return revision;
+}
+
 function validateEntryTransition(current: CmsStatus, next: CmsStatus): void {
   if (!entryTransitions[current]?.includes(next)) {
     throw new Error("CMS entry status transition is not allowed.");
@@ -199,7 +213,7 @@ async function latestRevisionNumber(supabase: SupabaseServiceClient, entryId: st
   return data?.revision_number ?? 0;
 }
 
-async function auditCmsMutation(input: {
+async function writeCmsAuditEvent(input: {
   admin: CurrentAdminContext;
   permissionKey: AdminPermissionKey;
   action: AdminAuditAction;
@@ -243,7 +257,7 @@ export async function createAdminCmsContentEntry(
     }
 
     const supabase = createSupabaseServiceRoleClient();
-    const revisionPayload = readRevisionPayload(formData);
+    const revisionPayload = buildRevisionPayload(formData);
     const entryPayload: CmsEntryInsert = {
       created_by_profile_id: admin.profile.id,
       updated_by_profile_id: admin.profile.id,
@@ -289,7 +303,7 @@ export async function createAdminCmsContentEntry(
 
     newId = entry.id;
 
-    await auditCmsMutation({
+    await writeCmsAuditEvent({
       admin,
       permissionKey: "content.create",
       action: "cms_content.entry_created",
@@ -306,7 +320,7 @@ export async function createAdminCmsContentEntry(
       },
     });
 
-    await auditCmsMutation({
+    await writeCmsAuditEvent({
       admin,
       permissionKey: "content.create",
       action: "cms_content.revision_created",
@@ -342,7 +356,7 @@ export async function updateAdminCmsContentDraft(
       throw new Error("Only draft or rejected CMS entries can be edited.");
     }
 
-    const revisionPayload = readRevisionPayload(formData);
+    const revisionPayload = buildRevisionPayload(formData);
     const entryPatch: CmsEntryUpdate = {
       updated_by_profile_id: admin.profile.id,
       title_en: revisionPayload.title_en,
@@ -375,7 +389,7 @@ export async function updateAdminCmsContentDraft(
 
       if (revisionError) throw new Error("CMS revision could not be updated.");
 
-      await auditCmsMutation({
+      await writeCmsAuditEvent({
         admin,
         permissionKey: "content.update",
         action: "cms_content.revision_updated",
@@ -390,7 +404,7 @@ export async function updateAdminCmsContentDraft(
       });
     }
 
-    await auditCmsMutation({
+    await writeCmsAuditEvent({
       admin,
       permissionKey: "content.update",
       action: "cms_content.entry_updated",
@@ -425,7 +439,7 @@ export async function createAdminCmsContentRevision(entryId: string): Promise<vo
   const admin = await requireAdminPermission("content.update");
   const supabase = createSupabaseServiceRoleClient();
   const entry = await readEntry(supabase, entryId);
-  const source = entry.current_revision_id ? await readRevision(supabase, entry.current_revision_id) : null;
+  const source = await readCurrentRevision(supabase, entry);
   const revisionNumber = (await latestRevisionNumber(supabase, entry.id)) + 1;
 
   if (source && source.entry_id !== entry.id) {
@@ -466,7 +480,7 @@ export async function createAdminCmsContentRevision(entryId: string): Promise<vo
 
   if (entryError) throw new Error("CMS entry could not be updated.");
 
-  await auditCmsMutation({
+  await writeCmsAuditEvent({
     admin,
     permissionKey: "content.update",
     action: "cms_content.revision_created",
@@ -539,7 +553,7 @@ async function transitionRevision(input: {
 
   if (entryError) throw new Error("CMS entry workflow could not be updated.");
 
-  await auditCmsMutation({
+  await writeCmsAuditEvent({
     admin,
     permissionKey: input.permissionKey,
     action: input.action,
@@ -614,7 +628,7 @@ export async function archiveAdminCmsContentEntry(formData: FormData): Promise<v
 
   if (error) throw new Error("CMS entry could not be archived.");
 
-  await auditCmsMutation({
+  await writeCmsAuditEvent({
     admin,
     permissionKey: "content.archive",
     action: "cms_content.entry_archived",
@@ -657,7 +671,7 @@ export async function restoreAdminCmsContentEntry(formData: FormData): Promise<v
 
   if (error) throw new Error("CMS entry could not be restored.");
 
-  await auditCmsMutation({
+  await writeCmsAuditEvent({
     admin,
     permissionKey: "content.archive",
     action: "cms_content.entry_restored",
