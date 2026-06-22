@@ -82,7 +82,9 @@ BEGIN
 END
 $$;
 
-CREATE UNIQUE INDEX IF NOT EXISTS cms_content_entries_active_key_locale_country_idx ON public.cms_content_entries(content_key, locale, country) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS cms_content_entries_active_key_locale_country_idx
+  ON public.cms_content_entries(content_key, COALESCE(locale::text, 'global'), country)
+  WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS cms_content_entries_created_at_desc_idx ON public.cms_content_entries(created_at DESC);
 CREATE INDEX IF NOT EXISTS cms_content_entries_content_type_idx ON public.cms_content_entries(content_type);
 CREATE INDEX IF NOT EXISTS cms_content_entries_status_idx ON public.cms_content_entries(status);

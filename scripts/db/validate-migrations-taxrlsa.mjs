@@ -370,7 +370,7 @@ function validateAdminCmsMigration() {
     [/cms_content_entries_content_type_check/i, '0060 must constrain CMS content types.'],
     [/cms_content_entries_status_check/i, '0060 must constrain entry statuses.'],
     [/cms_content_revisions_status_check/i, '0060 must constrain revision statuses.'],
-    [/cms_content_entries_active_key_locale_country_idx/i, '0060 must enforce unique active CMS key/locale/country.'],
+    [/cms_content_entries_active_key_locale_country_idx[\s\S]*coalesce\(locale::text, 'global'\)[\s\S]*country[\s\S]*where\s+deleted_at\s+is\s+null/i, '0060 must enforce unique active CMS key/locale/country including null/global locale.'],
     [/cms_content_revisions_entry_revision_number_idx/i, '0060 must enforce unique revision numbers per entry.'],
     [/alter\s+table\s+public\.cms_content_entries\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_entries.'],
     [/alter\s+table\s+public\.cms_content_revisions\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_revisions.'],
