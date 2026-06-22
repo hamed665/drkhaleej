@@ -42,6 +42,7 @@ export default async function AdminMediaDetailPage({ params }: { params: Promise
             <Row label="Dimensions" value={item.width && item.height ? `${item.width}×${item.height}` : "—"} />
             <Row label="Created" value={formatDate(item.createdAt)} />
             <Row label="Updated" value={formatDate(item.updatedAt)} />
+            <Row label="Public media status" value={item.publicStatus} />
             <Row label="Archived" value={item.isArchived ? "Archived" : "Active"} />
           </dl>
           <form action={item.isArchived ? restoreAdminMediaAsset : archiveAdminMediaAsset} className="mt-5">
@@ -61,7 +62,7 @@ export default async function AdminMediaDetailPage({ params }: { params: Promise
             <Field name="captionEn" label="Caption EN" value={item.captionEn} maxLength={300} textarea />
             <Field name="captionAr" label="Caption AR" value={item.captionAr} maxLength={300} textarea />
             <Select name="usageKind" label="Usage kind" value={item.usageKind} options={mediaUsageKinds} />
-            <Select name="reviewStatus" label="Review status" value={item.reviewStatus} options={mediaReviewStatuses} />
+            <Select name="reviewStatus" label="Admin review status" value={item.reviewStatus} options={mediaReviewStatuses} />
             <Select name="visibilityStatus" label="Visibility status" value={item.visibilityStatus} options={mediaVisibilityStatuses} />
           </div>
           <button className="mt-5 rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white">

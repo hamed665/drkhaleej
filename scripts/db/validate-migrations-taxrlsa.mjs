@@ -330,9 +330,12 @@ function validateAdminMediaLibraryMigration() {
     [/add\s+column\s+if\s+not\s+exists\s+alt_text_en\s+text/i, '0059 must add admin-safe alt_text_en metadata.'],
     [/add\s+column\s+if\s+not\s+exists\s+caption_en\s+text/i, '0059 must add admin-safe caption_en metadata.'],
     [/admin_usage_kind\s+text\s+not\s+null\s+default\s+'general'/i, '0059 must add admin_usage_kind default general.'],
+    [/admin_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0059 must add admin-only review status default draft.'],
     [/admin_visibility_status\s+text\s+not\s+null\s+default\s+'private'/i, '0059 must keep admin visibility private by default.'],
     [/is_archived\s+boolean\s+not\s+null\s+default\s+false/i, '0059 must add soft archive state.'],
-    [/media_assets_admin_visibility_status_check/i, '0059 must constrain admin visibility values.'],
+    [/media_assets_admin_review_status_check/i, '0059 must constrain admin review values.'],
+    [/media_assets_admin_visibility_status_check[\s\S]*'private'[\s\S]*'public_candidate'[\s\S]*\)[\s\S]*;/i, '0059 must constrain admin visibility to private/public_candidate only.'],
+    [/(?<!')public(?!')/i, '0059 must not allow public admin visibility value.'],
   ]) {
     requirePattern(content, pattern, message);
   }

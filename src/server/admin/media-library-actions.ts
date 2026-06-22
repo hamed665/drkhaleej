@@ -35,17 +35,17 @@ export async function updateAdminMediaAssetMetadata(formData: FormData): Promise
   }
   if ([altTextEn, altTextAr, captionEn, captionAr].includes(false as never)) return;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = createSupabaseServiceRoleClient() as unknown as any;
+  const supabase = createSupabaseServiceRoleClient();
   const { data: oldRow, error: readError } = await supabase
     .from("media_assets")
-    .select("id, alt_text_en, alt_text_ar, caption_en, caption_ar, admin_usage_kind, status, admin_visibility_status")
+    .select("id, alt_text_en, alt_text_ar, caption_en, caption_ar, admin_usage_kind, admin_review_status, admin_visibility_status")
     .eq("id", mediaId)
+    .is("deleted_at", null)
     .maybeSingle();
   if (readError || !oldRow) return;
 
-  const next = { alt_text_en: altTextEn || null, alt_text_ar: altTextAr || null, caption_en: captionEn || null, caption_ar: captionAr || null, admin_usage_kind: usageKind, status: reviewStatus, admin_visibility_status: visibilityStatus, updated_by_profile_id: admin.profile.id };
-  const { error } = await supabase.from("media_assets").update(next).eq("id", mediaId);
+  const next = { alt_text_en: altTextEn || null, alt_text_ar: altTextAr || null, caption_en: captionEn || null, caption_ar: captionAr || null, admin_usage_kind: usageKind, admin_review_status: reviewStatus, admin_visibility_status: visibilityStatus, updated_by_profile_id: admin.profile.id };
+  const { error } = await supabase.from("media_assets").update(next).eq("id", mediaId).is("deleted_at", null);
   if (error) return;
 
   const oldValues: Record<string, string | null> = {};
@@ -72,9 +72,8 @@ async function setArchiveState(formData: FormData, isArchived: boolean): Promise
   const admin = await requireAdminPermission("media.archive");
   const mediaId = String(formData.get("mediaId") ?? "");
   if (!isUuid(mediaId)) return;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = createSupabaseServiceRoleClient() as unknown as any;
-  const { error } = await supabase.from("media_assets").update({ is_archived: isArchived, updated_by_profile_id: admin.profile.id }).eq("id", mediaId);
+  const supabase = createSupabaseServiceRoleClient();
+  const { error } = await supabase.from("media_assets").update({ is_archived: isArchived, updated_by_profile_id: admin.profile.id }).eq("id", mediaId).is("deleted_at", null);
   if (error) return;
   await writeAdminAuditEvent({ admin, permissionKey: "media.archive", action: isArchived ? "media_asset.archived" : "media_asset.restored", entityType: "media_asset", entityId: mediaId, targetTable: "media_assets", summary: isArchived ? "Media asset archived." : "Media asset restored.", newValues: { is_archived: isArchived } });
   revalidateMedia(mediaId);
