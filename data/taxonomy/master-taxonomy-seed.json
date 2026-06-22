@@ -11,8 +11,14 @@
         "descriptionEn": "Licensed medical aesthetic services.",
         "descriptionAr": "خدمات تجميل طبية مرخصة.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "audiology",
@@ -21,8 +27,14 @@
         "descriptionEn": "Hearing assessment and audiology services.",
         "descriptionAr": "خدمات تقييم السمع والسمعيات.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "beauty-nonmedical",
@@ -31,8 +43,14 @@
         "descriptionEn": "Non-medical beauty services outside core healthcare.",
         "descriptionAr": "خدمات تجميل غير طبية خارج الرعاية الصحية الأساسية.",
         "scope": "deferred",
+        "publicLaunchPhase": "deferred",
+        "topicalRisk": "low",
         "isCore": false,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "clinics",
@@ -41,8 +59,14 @@
         "descriptionEn": "Outpatient clinics and polyclinics.",
         "descriptionAr": "عيادات ومجمعات طبية للمرضى الخارجيين.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "dental",
@@ -51,8 +75,14 @@
         "descriptionEn": "Dental clinics, dentists, and oral healthcare.",
         "descriptionAr": "عيادات وأطباء الأسنان وخدمات صحة الفم.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": true,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "diagnostics",
@@ -61,8 +91,14 @@
         "descriptionEn": "Diagnostic tests and clinical assessment services.",
         "descriptionAr": "فحوصات تشخيصية وخدمات تقييم سريري.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "doctors",
@@ -71,8 +107,14 @@
         "descriptionEn": "Individual licensed doctors and clinicians.",
         "descriptionAr": "أطباء وممارسون صحيون مرخصون كأفراد.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "emergency-transport",
@@ -81,8 +123,14 @@
         "descriptionEn": "Ambulance and emergency medical transport.",
         "descriptionAr": "خدمات الإسعاف والنقل الطبي الطارئ.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "healthy-food",
@@ -90,19 +138,31 @@
         "labelAr": "الأكل الصحي",
         "descriptionEn": "Healthy food businesses outside core healthcare.",
         "descriptionAr": "أنشطة الأكل الصحي خارج الرعاية الصحية الأساسية.",
-        "scope": "deferred",
+        "scope": "excluded",
+        "publicLaunchPhase": "excluded",
+        "topicalRisk": "low",
         "isCore": false,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "healthy-meal-delivery",
         "labelEn": "Healthy Meal Delivery",
         "labelAr": "توصيل الوجبات الصحية",
-        "descriptionEn": "Healthy meal delivery, deferred from healthcare taxonomy.",
-        "descriptionAr": "توصيل وجبات صحية مؤجل خارج تصنيف الرعاية الصحية.",
-        "scope": "deferred",
+        "descriptionEn": "Healthy meal delivery, excluded from healthcare taxonomy.",
+        "descriptionAr": "توصيل وجبات صحية مستبعد خارج تصنيف الرعاية الصحية.",
+        "scope": "excluded",
+        "publicLaunchPhase": "excluded",
+        "topicalRisk": "low",
         "isCore": false,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "home-care",
@@ -111,8 +171,14 @@
         "descriptionEn": "Clinical care delivered at home.",
         "descriptionAr": "رعاية صحية سريرية تقدم في المنزل.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "hospitals",
@@ -121,8 +187,14 @@
         "descriptionEn": "General hospitals serving patients in Oman.",
         "descriptionAr": "مستشفيات عامة تقدم الرعاية للمرضى في عُمان.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "imaging",
@@ -131,8 +203,14 @@
         "descriptionEn": "Medical imaging and radiology services.",
         "descriptionAr": "خدمات التصوير الطبي والأشعة.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ivf-fertility",
@@ -141,8 +219,14 @@
         "descriptionEn": "Fertility, IVF, and reproductive medicine services.",
         "descriptionAr": "خدمات الخصوبة وأطفال الأنابيب وطب الإنجاب.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "laboratory",
@@ -151,8 +235,14 @@
         "descriptionEn": "Medical laboratories and sample testing services.",
         "descriptionAr": "مختبرات طبية وخدمات فحص العينات.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "medical",
@@ -161,8 +251,14 @@
         "descriptionEn": "Licensed human healthcare providers and services.",
         "descriptionAr": "مقدمو وخدمات الرعاية الصحية البشرية المرخصة.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "mental-health",
@@ -171,8 +267,14 @@
         "descriptionEn": "Mental health, psychiatry, and counseling care.",
         "descriptionAr": "رعاية الصحة النفسية والطب النفسي والاستشارات.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "nutrition-clinic",
@@ -181,8 +283,14 @@
         "descriptionEn": "Clinical nutrition and dietitian services.",
         "descriptionAr": "خدمات التغذية العلاجية وأخصائيي التغذية.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "optical",
@@ -191,8 +299,14 @@
         "descriptionEn": "Optical shops and vision support services.",
         "descriptionAr": "محلات بصريات وخدمات دعم النظر.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pediatrics",
@@ -201,8 +315,14 @@
         "descriptionEn": "Child and adolescent healthcare.",
         "descriptionAr": "الرعاية الصحية للأطفال واليافعين.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pet-clinics",
@@ -211,8 +331,14 @@
         "descriptionEn": "Clinics for pets and companion animals.",
         "descriptionAr": "عيادات للحيوانات الأليفة وحيوانات الرفقة.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pet-shops",
@@ -221,8 +347,14 @@
         "descriptionEn": "Standalone pet retail shops, not core healthcare.",
         "descriptionAr": "متاجر بيع مستلزمات الحيوانات الأليفة وليست رعاية صحية أساسية.",
         "scope": "deferred",
+        "publicLaunchPhase": "deferred",
+        "topicalRisk": "low",
         "isCore": false,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "pharmacy",
@@ -231,8 +363,14 @@
         "descriptionEn": "Licensed pharmacies and medicine access points.",
         "descriptionAr": "صيدليات مرخصة ونقاط توفير الأدوية.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "physiotherapy-rehabilitation",
@@ -241,8 +379,14 @@
         "descriptionEn": "Physiotherapy and rehabilitation services.",
         "descriptionAr": "خدمات العلاج الطبيعي وإعادة التأهيل.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "psychology-counseling",
@@ -251,8 +395,14 @@
         "descriptionEn": "Psychology and counseling services.",
         "descriptionAr": "خدمات علم النفس والاستشارات النفسية.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "restaurants",
@@ -261,8 +411,14 @@
         "descriptionEn": "Restaurants are excluded from core healthcare taxonomy.",
         "descriptionAr": "المطاعم مستبعدة من التصنيف الصحي الأساسي.",
         "scope": "excluded",
+        "publicLaunchPhase": "excluded",
+        "topicalRisk": "low",
         "isCore": false,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "specialty-hospitals",
@@ -271,8 +427,14 @@
         "descriptionEn": "Hospitals focused on specific medical disciplines.",
         "descriptionAr": "مستشفيات تركز على تخصصات طبية محددة.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "telemedicine",
@@ -281,8 +443,14 @@
         "descriptionEn": "Remote medical consultation services.",
         "descriptionAr": "خدمات الاستشارة الطبية عن بُعد.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "veterinary",
@@ -291,8 +459,14 @@
         "descriptionEn": "Veterinary care for animals.",
         "descriptionAr": "رعاية بيطرية للحيوانات.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": false,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "weight-management",
@@ -301,8 +475,14 @@
         "descriptionEn": "Clinical weight management and lifestyle support.",
         "descriptionAr": "إدارة الوزن سريرياً ودعم نمط الحياة الصحي.",
         "scope": "adjacent",
+        "publicLaunchPhase": "adjacent",
+        "topicalRisk": "medium",
         "isCore": false,
-        "isAdjacent": true
+        "isAdjacent": true,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "women-health",
@@ -311,8 +491,14 @@
         "descriptionEn": "Women’s health, obstetrics, and gynecology care.",
         "descriptionAr": "رعاية صحة المرأة والنساء والولادة.",
         "scope": "core",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
         "isCore": true,
-        "isAdjacent": false
+        "isAdjacent": false,
+        "isMedical": true,
+        "isDental": false,
+        "isMentalHealth": false,
+        "isCommercialLifestyle": false
       }
     ],
     "entityTypes": [
@@ -329,7 +515,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "counseling-center",
@@ -344,7 +535,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "dental-clinic",
@@ -359,7 +555,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "doctor-profile",
@@ -374,7 +575,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "fertility-clinic",
@@ -389,7 +595,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "high",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "hospital",
@@ -404,7 +615,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "high",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "imaging-center",
@@ -419,7 +635,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ivf-center",
@@ -434,7 +655,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "high",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "laboratory-center",
@@ -449,7 +675,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pet-clinic-shop-hybrid",
@@ -464,7 +695,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "recommended",
         "medicalRiskLevel": "low",
-        "isHumanHealthcare": false
+        "isHumanHealthcare": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": false,
+        "isDental": false,
+        "isCommercialLifestyle": true
       },
       {
         "slug": "physiotherapy-center",
@@ -479,7 +715,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "rehabilitation-center",
@@ -494,7 +735,12 @@
         "requiresLicense": "required",
         "requiresMedicalReview": "required_before_index",
         "medicalRiskLevel": "medium",
-        "isHumanHealthcare": true
+        "isHumanHealthcare": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       }
     ],
     "doctorLevels": [
@@ -504,7 +750,12 @@
         "labelAr": "استشاري",
         "descriptionEn": "Senior consultant doctor level.",
         "descriptionAr": "درجة طبيب استشاري بخبرة متقدمة.",
-        "rank": 1
+        "rank": 1,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "dentist",
@@ -512,7 +763,12 @@
         "labelAr": "طبيب أسنان",
         "descriptionEn": "Licensed dentist level.",
         "descriptionAr": "درجة طبيب أسنان مرخص.",
-        "rank": 4
+        "rank": 4,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "general-practitioner",
@@ -520,7 +776,12 @@
         "labelAr": "طبيب عام",
         "descriptionEn": "General practitioner doctor level.",
         "descriptionAr": "درجة طبيب عام يقدم الرعاية الأولية.",
-        "rank": 3
+        "rank": 3,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "specialist",
@@ -528,7 +789,12 @@
         "labelAr": "اختصاصي",
         "descriptionEn": "Specialist doctor level.",
         "descriptionAr": "درجة طبيب اختصاصي في مجال طبي محدد.",
-        "rank": 2
+        "rank": 2,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       }
     ],
     "specialties": [
@@ -544,7 +810,12 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "general-medicine",
@@ -560,7 +831,12 @@
           "clinic",
           "doctor-profile"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "infertility-ivf",
@@ -575,7 +851,12 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "obstetrics-gynecology",
@@ -590,7 +871,12 @@
           "clinic",
           "doctor-profile"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pathology-laboratory",
@@ -605,7 +891,12 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pediatric-dentistry",
@@ -620,7 +911,12 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "physiotherapy",
@@ -635,7 +931,12 @@
           "physiotherapy-center",
           "rehabilitation-center"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "psychology",
@@ -650,7 +951,12 @@
         "relatedEntityTypeSlugs": [
           "counseling-center"
         ],
-        "isMentalHealth": true
+        "isMentalHealth": true,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "radiology",
@@ -665,7 +971,12 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "reproductive-medicine",
@@ -680,7 +991,12 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "isMentalHealth": false
+        "isMentalHealth": false,
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       }
     ],
     "services": [
@@ -702,7 +1018,13 @@
           "clinic",
           "laboratory-center"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "antenatal-care",
@@ -721,7 +1043,13 @@
           "clinic",
           "doctor-profile"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "blood-test",
@@ -740,7 +1068,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "breast-screening",
@@ -761,7 +1095,13 @@
           "clinic",
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "cbc",
@@ -780,7 +1120,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "cbct",
@@ -801,7 +1147,13 @@
           "imaging-center",
           "dental-clinic"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ct-scan",
@@ -819,7 +1171,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "dental-checkup",
@@ -837,7 +1195,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "executive-health-checkup",
@@ -857,7 +1221,13 @@
           "clinic",
           "laboratory-center"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "fertility-consultation",
@@ -877,7 +1247,13 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "general-consultation",
@@ -896,7 +1272,13 @@
           "clinic",
           "doctor-profile"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "gum-treatment",
@@ -914,7 +1296,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "gynecology-consultation",
@@ -933,7 +1321,13 @@
           "clinic",
           "doctor-profile"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "hba1c",
@@ -952,7 +1346,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "home-sample-collection",
@@ -971,7 +1371,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "icsi",
@@ -991,7 +1397,13 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ivf",
@@ -1011,7 +1423,13 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "high",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "kidney-function-test",
@@ -1030,7 +1448,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "lipid-profile",
@@ -1049,7 +1473,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "liver-function-test",
@@ -1068,7 +1498,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "mammography",
@@ -1088,7 +1524,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "mri",
@@ -1106,7 +1548,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "open-mri",
@@ -1124,7 +1572,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "opg",
@@ -1145,7 +1599,13 @@
           "imaging-center",
           "dental-clinic"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ovulation-tracking",
@@ -1165,7 +1625,13 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pap-smear",
@@ -1185,7 +1651,13 @@
           "clinic",
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pediatric-dentistry",
@@ -1203,7 +1675,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "postnatal-care",
@@ -1222,7 +1700,13 @@
           "clinic",
           "doctor-profile"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "pregnancy-follow-up",
@@ -1241,7 +1725,13 @@
           "clinic",
           "doctor-profile"
         ],
-        "schemaHintSlug": "medical-service"
+        "schemaHintSlug": "medical-service",
+        "schemaHint": "medical-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "scaling-polishing",
@@ -1259,7 +1749,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "semen-analysis",
@@ -1279,7 +1775,13 @@
           "ivf-center",
           "fertility-clinic"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "teeth-whitening",
@@ -1297,7 +1799,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "thyroid-test",
@@ -1316,7 +1824,13 @@
         "relatedEntityTypeSlugs": [
           "laboratory-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "tooth-extraction",
@@ -1334,7 +1848,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "ultrasound",
@@ -1352,7 +1872,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "wisdom-tooth-extraction",
@@ -1370,7 +1896,13 @@
         "relatedEntityTypeSlugs": [
           "dental-clinic"
         ],
-        "schemaHintSlug": "dental-service"
+        "schemaHintSlug": "dental-service",
+        "schemaHint": "dental-service",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "x-ray",
@@ -1388,7 +1920,13 @@
         "relatedEntityTypeSlugs": [
           "imaging-center"
         ],
-        "schemaHintSlug": "diagnostic-test"
+        "schemaHintSlug": "diagnostic-test",
+        "schemaHint": "diagnostic-test",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       }
     ],
     "schemaHints": [
@@ -1398,7 +1936,12 @@
         "labelAr": "خدمة أسنان",
         "descriptionEn": "Schema hint for dental services.",
         "descriptionAr": "إشارة مخطط لخدمات الأسنان.",
-        "schemaType": "MedicalProcedure"
+        "schemaType": "MedicalProcedure",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": true,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "diagnostic-test",
@@ -1406,7 +1949,12 @@
         "labelAr": "فحص تشخيصي",
         "descriptionEn": "Schema hint for diagnostic tests.",
         "descriptionAr": "إشارة مخطط للفحوصات التشخيصية.",
-        "schemaType": "MedicalTest"
+        "schemaType": "MedicalTest",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       },
       {
         "slug": "medical-service",
@@ -1414,7 +1962,12 @@
         "labelAr": "خدمة طبية",
         "descriptionEn": "Schema hint for a healthcare service item.",
         "descriptionAr": "إشارة مخطط لخدمة رعاية صحية.",
-        "schemaType": "MedicalProcedure"
+        "schemaType": "MedicalProcedure",
+        "publicLaunchPhase": "core",
+        "topicalRisk": "medium",
+        "isMedical": true,
+        "isDental": false,
+        "isCommercialLifestyle": false
       }
     ]
   }

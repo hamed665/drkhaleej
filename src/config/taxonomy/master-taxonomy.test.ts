@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { taxonomyDoctorLevels, taxonomyEntityTypes, taxonomySchemaHints, taxonomyServices, taxonomySpecialties, taxonomyVerticals } from './index';
+import { adjacentTaxonomyVerticals, coreTaxonomyVerticals, deferredTaxonomyVerticals, excludedTaxonomyVerticals, getTaxonomyService, getTaxonomyVertical, taxonomyDoctorLevels, taxonomyEntityTypes, taxonomySchemaHints, taxonomyServices, taxonomySpecialties, taxonomyVerticals } from './index';
 
 const registries = {
   verticals: taxonomyVerticals,
@@ -41,6 +41,7 @@ describe('master taxonomy registry', () => {
       expect(item.relatedSpecialtySlugs.every((slug) => specialties.has(slug))).toBe(true);
       expect(item.relatedEntityTypeSlugs.every((slug) => entityTypes.has(slug))).toBe(true);
       expect(schemaHints.has(item.schemaHintSlug)).toBe(true);
+      expect(item.schemaHint).toBe(item.schemaHintSlug);
     }
   });
 
@@ -97,6 +98,8 @@ describe('master taxonomy registry', () => {
   it('keeps excluded and deferred verticals out of core healthcare', () => {
     const verticals = bySlug(taxonomyVerticals);
     for (const slug of ['healthy-food', 'healthy-meal-delivery', 'restaurants']) {
+      expect(verticals.get(slug)?.scope).toBe('excluded');
+      expect(verticals.get(slug)?.publicLaunchPhase).toBe('excluded');
       expect(verticals.get(slug)?.isCore).toBe(false);
       expect(verticals.get(slug)?.isAdjacent).toBe(false);
     }
@@ -105,6 +108,16 @@ describe('master taxonomy registry', () => {
     const hybrid = bySlug(taxonomyEntityTypes).get('pet-clinic-shop-hybrid');
     expect(hybrid?.primaryVerticalSlug).toBe('pet-clinics');
     expect(hybrid?.secondaryVerticalSlugs).toContain('pet-shops');
+  });
+
+
+  it('preserves pure lookup helpers and derived vertical exports', () => {
+    expect(coreTaxonomyVerticals.every((vertical) => vertical.scope === 'core')).toBe(true);
+    expect(adjacentTaxonomyVerticals.every((vertical) => vertical.scope === 'adjacent')).toBe(true);
+    expect(deferredTaxonomyVerticals.every((vertical) => vertical.scope === 'deferred')).toBe(true);
+    expect(excludedTaxonomyVerticals.every((vertical) => vertical.scope === 'excluded')).toBe(true);
+    expect(getTaxonomyVertical('women-health')?.labelAr).toBe('صحة المرأة');
+    expect(getTaxonomyService('blood-test')?.labelAr).toBe('تحليل دم');
   });
 
   it('exports deterministic seed-ready JSON with matching registry counts', () => {

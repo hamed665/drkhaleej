@@ -63,12 +63,13 @@ export function validateMasterTaxonomy(registries = loadMasterTaxonomy()) {
     for (const slug of service.relatedSpecialtySlugs) if (!specialtySlugs.has(slug)) errors.push(`services/${service.slug}: missing specialty ${slug}`);
     for (const slug of service.relatedEntityTypeSlugs) if (!entityTypeSlugs.has(slug)) errors.push(`services/${service.slug}: missing entity type ${slug}`);
     if (!schemaHintSlugs.has(service.schemaHintSlug)) errors.push(`services/${service.slug}: missing schema hint ${service.schemaHintSlug}`);
+    if (service.schemaHint !== service.schemaHintSlug) errors.push(`services/${service.slug}: schemaHint must mirror schemaHintSlug for seed compatibility`);
   }
 
   const verticalBySlug = new Map(registries.verticals.map((item) => [item.slug, item]));
   for (const slug of ['healthy-food', 'healthy-meal-delivery', 'restaurants']) {
     const vertical = verticalBySlug.get(slug);
-    if (vertical?.isCore || vertical?.isAdjacent || vertical?.scope === 'core' || vertical?.scope === 'adjacent') errors.push(`verticals/${slug}: must not be core or adjacent`);
+    if (vertical?.isCore || vertical?.isAdjacent || vertical?.scope !== 'excluded' || vertical?.publicLaunchPhase !== 'excluded') errors.push(`verticals/${slug}: must be excluded and must not be core or adjacent`);
   }
   for (const slug of ['beauty-nonmedical', 'pet-shops']) if (verticalBySlug.get(slug)?.isCore) errors.push(`verticals/${slug}: must not be core`);
   const hybrid = registries.entityTypes.find((item) => item.slug === 'pet-clinic-shop-hybrid');
