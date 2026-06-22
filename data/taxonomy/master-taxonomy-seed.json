@@ -1,0 +1,1421 @@
+{
+  "version": "v1",
+  "generatedFrom": "src/config/taxonomy",
+  "sortOrder": "slug-ascending",
+  "registries": {
+    "verticals": [
+      {
+        "slug": "aesthetic-medical",
+        "labelEn": "Aesthetic Medical",
+        "labelAr": "التجميل الطبي",
+        "descriptionEn": "Licensed medical aesthetic services.",
+        "descriptionAr": "خدمات تجميل طبية مرخصة.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "audiology",
+        "labelEn": "Audiology",
+        "labelAr": "السمعيات",
+        "descriptionEn": "Hearing assessment and audiology services.",
+        "descriptionAr": "خدمات تقييم السمع والسمعيات.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "beauty-nonmedical",
+        "labelEn": "Beauty Nonmedical",
+        "labelAr": "التجميل غير الطبي",
+        "descriptionEn": "Non-medical beauty services outside core healthcare.",
+        "descriptionAr": "خدمات تجميل غير طبية خارج الرعاية الصحية الأساسية.",
+        "scope": "deferred",
+        "isCore": false,
+        "isAdjacent": false
+      },
+      {
+        "slug": "clinics",
+        "labelEn": "Clinics",
+        "labelAr": "العيادات",
+        "descriptionEn": "Outpatient clinics and polyclinics.",
+        "descriptionAr": "عيادات ومجمعات طبية للمرضى الخارجيين.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "dental",
+        "labelEn": "Dental",
+        "labelAr": "طب الأسنان",
+        "descriptionEn": "Dental clinics, dentists, and oral healthcare.",
+        "descriptionAr": "عيادات وأطباء الأسنان وخدمات صحة الفم.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "diagnostics",
+        "labelEn": "Diagnostics",
+        "labelAr": "التشخيص",
+        "descriptionEn": "Diagnostic tests and clinical assessment services.",
+        "descriptionAr": "فحوصات تشخيصية وخدمات تقييم سريري.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "doctors",
+        "labelEn": "Doctors",
+        "labelAr": "الأطباء",
+        "descriptionEn": "Individual licensed doctors and clinicians.",
+        "descriptionAr": "أطباء وممارسون صحيون مرخصون كأفراد.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "emergency-transport",
+        "labelEn": "Emergency Transport",
+        "labelAr": "النقل الإسعافي",
+        "descriptionEn": "Ambulance and emergency medical transport.",
+        "descriptionAr": "خدمات الإسعاف والنقل الطبي الطارئ.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "healthy-food",
+        "labelEn": "Healthy Food",
+        "labelAr": "الأكل الصحي",
+        "descriptionEn": "Healthy food businesses outside core healthcare.",
+        "descriptionAr": "أنشطة الأكل الصحي خارج الرعاية الصحية الأساسية.",
+        "scope": "deferred",
+        "isCore": false,
+        "isAdjacent": false
+      },
+      {
+        "slug": "healthy-meal-delivery",
+        "labelEn": "Healthy Meal Delivery",
+        "labelAr": "توصيل الوجبات الصحية",
+        "descriptionEn": "Healthy meal delivery, deferred from healthcare taxonomy.",
+        "descriptionAr": "توصيل وجبات صحية مؤجل خارج تصنيف الرعاية الصحية.",
+        "scope": "deferred",
+        "isCore": false,
+        "isAdjacent": false
+      },
+      {
+        "slug": "home-care",
+        "labelEn": "Home Care",
+        "labelAr": "الرعاية المنزلية",
+        "descriptionEn": "Clinical care delivered at home.",
+        "descriptionAr": "رعاية صحية سريرية تقدم في المنزل.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "hospitals",
+        "labelEn": "Hospitals",
+        "labelAr": "المستشفيات",
+        "descriptionEn": "General hospitals serving patients in Oman.",
+        "descriptionAr": "مستشفيات عامة تقدم الرعاية للمرضى في عُمان.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "imaging",
+        "labelEn": "Imaging",
+        "labelAr": "التصوير الطبي",
+        "descriptionEn": "Medical imaging and radiology services.",
+        "descriptionAr": "خدمات التصوير الطبي والأشعة.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "ivf-fertility",
+        "labelEn": "IVF Fertility",
+        "labelAr": "أطفال الأنابيب والخصوبة",
+        "descriptionEn": "Fertility, IVF, and reproductive medicine services.",
+        "descriptionAr": "خدمات الخصوبة وأطفال الأنابيب وطب الإنجاب.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "laboratory",
+        "labelEn": "Laboratory",
+        "labelAr": "المختبرات",
+        "descriptionEn": "Medical laboratories and sample testing services.",
+        "descriptionAr": "مختبرات طبية وخدمات فحص العينات.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "medical",
+        "labelEn": "Medical",
+        "labelAr": "طبي",
+        "descriptionEn": "Licensed human healthcare providers and services.",
+        "descriptionAr": "مقدمو وخدمات الرعاية الصحية البشرية المرخصة.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "mental-health",
+        "labelEn": "Mental Health",
+        "labelAr": "الصحة النفسية",
+        "descriptionEn": "Mental health, psychiatry, and counseling care.",
+        "descriptionAr": "رعاية الصحة النفسية والطب النفسي والاستشارات.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "nutrition-clinic",
+        "labelEn": "Nutrition Clinic",
+        "labelAr": "عيادة التغذية",
+        "descriptionEn": "Clinical nutrition and dietitian services.",
+        "descriptionAr": "خدمات التغذية العلاجية وأخصائيي التغذية.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "optical",
+        "labelEn": "Optical",
+        "labelAr": "البصريات",
+        "descriptionEn": "Optical shops and vision support services.",
+        "descriptionAr": "محلات بصريات وخدمات دعم النظر.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "pediatrics",
+        "labelEn": "Pediatrics",
+        "labelAr": "طب الأطفال",
+        "descriptionEn": "Child and adolescent healthcare.",
+        "descriptionAr": "الرعاية الصحية للأطفال واليافعين.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "pet-clinics",
+        "labelEn": "Pet Clinics",
+        "labelAr": "عيادات الحيوانات الأليفة",
+        "descriptionEn": "Clinics for pets and companion animals.",
+        "descriptionAr": "عيادات للحيوانات الأليفة وحيوانات الرفقة.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "pet-shops",
+        "labelEn": "Pet Shops",
+        "labelAr": "متاجر الحيوانات الأليفة",
+        "descriptionEn": "Standalone pet retail shops, not core healthcare.",
+        "descriptionAr": "متاجر بيع مستلزمات الحيوانات الأليفة وليست رعاية صحية أساسية.",
+        "scope": "deferred",
+        "isCore": false,
+        "isAdjacent": false
+      },
+      {
+        "slug": "pharmacy",
+        "labelEn": "Pharmacy",
+        "labelAr": "الصيدليات",
+        "descriptionEn": "Licensed pharmacies and medicine access points.",
+        "descriptionAr": "صيدليات مرخصة ونقاط توفير الأدوية.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "physiotherapy-rehabilitation",
+        "labelEn": "Physiotherapy Rehabilitation",
+        "labelAr": "العلاج الطبيعي وإعادة التأهيل",
+        "descriptionEn": "Physiotherapy and rehabilitation services.",
+        "descriptionAr": "خدمات العلاج الطبيعي وإعادة التأهيل.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "psychology-counseling",
+        "labelEn": "Psychology Counseling",
+        "labelAr": "علم النفس والاستشارات",
+        "descriptionEn": "Psychology and counseling services.",
+        "descriptionAr": "خدمات علم النفس والاستشارات النفسية.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "restaurants",
+        "labelEn": "Restaurants",
+        "labelAr": "المطاعم",
+        "descriptionEn": "Restaurants are excluded from core healthcare taxonomy.",
+        "descriptionAr": "المطاعم مستبعدة من التصنيف الصحي الأساسي.",
+        "scope": "excluded",
+        "isCore": false,
+        "isAdjacent": false
+      },
+      {
+        "slug": "specialty-hospitals",
+        "labelEn": "Specialty Hospitals",
+        "labelAr": "مستشفيات تخصصية",
+        "descriptionEn": "Hospitals focused on specific medical disciplines.",
+        "descriptionAr": "مستشفيات تركز على تخصصات طبية محددة.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      },
+      {
+        "slug": "telemedicine",
+        "labelEn": "Telemedicine",
+        "labelAr": "الاستشارة الطبية عن بُعد",
+        "descriptionEn": "Remote medical consultation services.",
+        "descriptionAr": "خدمات الاستشارة الطبية عن بُعد.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "veterinary",
+        "labelEn": "Veterinary",
+        "labelAr": "الطب البيطري",
+        "descriptionEn": "Veterinary care for animals.",
+        "descriptionAr": "رعاية بيطرية للحيوانات.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "weight-management",
+        "labelEn": "Weight Management",
+        "labelAr": "إدارة الوزن",
+        "descriptionEn": "Clinical weight management and lifestyle support.",
+        "descriptionAr": "إدارة الوزن سريرياً ودعم نمط الحياة الصحي.",
+        "scope": "adjacent",
+        "isCore": false,
+        "isAdjacent": true
+      },
+      {
+        "slug": "women-health",
+        "labelEn": "Women Health",
+        "labelAr": "صحة المرأة",
+        "descriptionEn": "Women’s health, obstetrics, and gynecology care.",
+        "descriptionAr": "رعاية صحة المرأة والنساء والولادة.",
+        "scope": "core",
+        "isCore": true,
+        "isAdjacent": false
+      }
+    ],
+    "entityTypes": [
+      {
+        "slug": "clinic",
+        "labelEn": "Clinic",
+        "labelAr": "عيادة",
+        "descriptionEn": "Licensed outpatient clinic entity.",
+        "descriptionAr": "منشأة عيادة خارجية مرخصة.",
+        "primaryVerticalSlug": "clinics",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "counseling-center",
+        "labelEn": "Counseling Center",
+        "labelAr": "مركز استشارات نفسية",
+        "descriptionEn": "Psychology and counseling provider entity.",
+        "descriptionAr": "مركز يقدم خدمات نفسية واستشارات مرخصة.",
+        "primaryVerticalSlug": "psychology-counseling",
+        "secondaryVerticalSlugs": [
+          "mental-health"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "dental-clinic",
+        "labelEn": "Dental Clinic",
+        "labelAr": "عيادة أسنان",
+        "descriptionEn": "Licensed dental clinic entity.",
+        "descriptionAr": "منشأة عيادة أسنان مرخصة.",
+        "primaryVerticalSlug": "dental",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "doctor-profile",
+        "labelEn": "Doctor Profile",
+        "labelAr": "ملف طبيب",
+        "descriptionEn": "Individual licensed doctor profile.",
+        "descriptionAr": "ملف لطبيب فرد مرخص.",
+        "primaryVerticalSlug": "doctors",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "fertility-clinic",
+        "labelEn": "Fertility Clinic",
+        "labelAr": "عيادة خصوبة",
+        "descriptionEn": "Fertility clinic provider entity.",
+        "descriptionAr": "عيادة تقدم خدمات الخصوبة وطب الإنجاب.",
+        "primaryVerticalSlug": "ivf-fertility",
+        "secondaryVerticalSlugs": [
+          "women-health"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "high",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "hospital",
+        "labelEn": "Hospital",
+        "labelAr": "مستشفى",
+        "descriptionEn": "Licensed hospital provider entity.",
+        "descriptionAr": "منشأة مستشفى مرخصة لتقديم الرعاية الصحية.",
+        "primaryVerticalSlug": "hospitals",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "high",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "imaging-center",
+        "labelEn": "Imaging Center",
+        "labelAr": "مركز تصوير طبي",
+        "descriptionEn": "Medical imaging provider entity.",
+        "descriptionAr": "منشأة تقدم خدمات التصوير الطبي.",
+        "primaryVerticalSlug": "imaging",
+        "secondaryVerticalSlugs": [
+          "diagnostics"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "ivf-center",
+        "labelEn": "IVF Center",
+        "labelAr": "مركز أطفال الأنابيب",
+        "descriptionEn": "Fertility and IVF center entity.",
+        "descriptionAr": "مركز متخصص في الخصوبة وأطفال الأنابيب.",
+        "primaryVerticalSlug": "ivf-fertility",
+        "secondaryVerticalSlugs": [
+          "women-health"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "high",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "laboratory-center",
+        "labelEn": "Laboratory Center",
+        "labelAr": "مركز مختبرات",
+        "descriptionEn": "Medical laboratory provider entity.",
+        "descriptionAr": "منشأة مختبرات طبية مرخصة.",
+        "primaryVerticalSlug": "laboratory",
+        "secondaryVerticalSlugs": [
+          "diagnostics"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "pet-clinic-shop-hybrid",
+        "labelEn": "Pet Clinic Shop Hybrid",
+        "labelAr": "عيادة ومتجر حيوانات أليفة",
+        "descriptionEn": "Pet clinic with related pet retail activity.",
+        "descriptionAr": "عيادة حيوانات أليفة مع نشاط متجر مرتبط بها.",
+        "primaryVerticalSlug": "pet-clinics",
+        "secondaryVerticalSlugs": [
+          "pet-shops"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "recommended",
+        "medicalRiskLevel": "low",
+        "isHumanHealthcare": false
+      },
+      {
+        "slug": "physiotherapy-center",
+        "labelEn": "Physiotherapy Center",
+        "labelAr": "مركز علاج طبيعي",
+        "descriptionEn": "Physiotherapy provider entity.",
+        "descriptionAr": "مركز يقدم خدمات العلاج الطبيعي.",
+        "primaryVerticalSlug": "physiotherapy-rehabilitation",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      },
+      {
+        "slug": "rehabilitation-center",
+        "labelEn": "Rehabilitation Center",
+        "labelAr": "مركز إعادة تأهيل",
+        "descriptionEn": "Rehabilitation provider entity.",
+        "descriptionAr": "مركز يقدم خدمات إعادة التأهيل.",
+        "primaryVerticalSlug": "physiotherapy-rehabilitation",
+        "secondaryVerticalSlugs": [
+          "medical"
+        ],
+        "requiresLicense": "required",
+        "requiresMedicalReview": "required_before_index",
+        "medicalRiskLevel": "medium",
+        "isHumanHealthcare": true
+      }
+    ],
+    "doctorLevels": [
+      {
+        "slug": "consultant",
+        "labelEn": "Consultant",
+        "labelAr": "استشاري",
+        "descriptionEn": "Senior consultant doctor level.",
+        "descriptionAr": "درجة طبيب استشاري بخبرة متقدمة.",
+        "rank": 1
+      },
+      {
+        "slug": "dentist",
+        "labelEn": "Dentist",
+        "labelAr": "طبيب أسنان",
+        "descriptionEn": "Licensed dentist level.",
+        "descriptionAr": "درجة طبيب أسنان مرخص.",
+        "rank": 4
+      },
+      {
+        "slug": "general-practitioner",
+        "labelEn": "General Practitioner",
+        "labelAr": "طبيب عام",
+        "descriptionEn": "General practitioner doctor level.",
+        "descriptionAr": "درجة طبيب عام يقدم الرعاية الأولية.",
+        "rank": 3
+      },
+      {
+        "slug": "specialist",
+        "labelEn": "Specialist",
+        "labelAr": "اختصاصي",
+        "descriptionEn": "Specialist doctor level.",
+        "descriptionAr": "درجة طبيب اختصاصي في مجال طبي محدد.",
+        "rank": 2
+      }
+    ],
+    "specialties": [
+      {
+        "slug": "dentistry",
+        "labelEn": "Dentistry",
+        "labelAr": "طب الأسنان",
+        "descriptionEn": "Dental and oral healthcare specialty.",
+        "descriptionAr": "تخصص طب الأسنان وصحة الفم.",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "general-medicine",
+        "labelEn": "General Medicine",
+        "labelAr": "الطب العام",
+        "descriptionEn": "General medical care specialty.",
+        "descriptionAr": "تخصص الرعاية الطبية العامة.",
+        "verticalSlugs": [
+          "medical",
+          "clinics"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "infertility-ivf",
+        "labelEn": "Infertility IVF",
+        "labelAr": "العقم وأطفال الأنابيب",
+        "descriptionEn": "Infertility and IVF specialty.",
+        "descriptionAr": "تخصص علاج العقم وأطفال الأنابيب.",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "obstetrics-gynecology",
+        "labelEn": "Obstetrics Gynecology",
+        "labelAr": "النساء والولادة",
+        "descriptionEn": "Women’s health, pregnancy, and gynecology specialty.",
+        "descriptionAr": "تخصص صحة المرأة والحمل والنساء والولادة.",
+        "verticalSlugs": [
+          "women-health"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "pathology-laboratory",
+        "labelEn": "Pathology Laboratory",
+        "labelAr": "علم الأمراض والمختبرات",
+        "descriptionEn": "Laboratory medicine and pathology specialty.",
+        "descriptionAr": "تخصص طب المختبرات وعلم الأمراض.",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "pediatric-dentistry",
+        "labelEn": "Pediatric Dentistry",
+        "labelAr": "طب أسنان الأطفال",
+        "descriptionEn": "Dental care for children.",
+        "descriptionAr": "رعاية أسنان الأطفال.",
+        "verticalSlugs": [
+          "dental",
+          "pediatrics"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "physiotherapy",
+        "labelEn": "Physiotherapy",
+        "labelAr": "العلاج الطبيعي",
+        "descriptionEn": "Physiotherapy and rehabilitation specialty.",
+        "descriptionAr": "تخصص العلاج الطبيعي وإعادة التأهيل.",
+        "verticalSlugs": [
+          "physiotherapy-rehabilitation"
+        ],
+        "relatedEntityTypeSlugs": [
+          "physiotherapy-center",
+          "rehabilitation-center"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "psychology",
+        "labelEn": "Psychology",
+        "labelAr": "علم النفس",
+        "descriptionEn": "Psychology specialty for mental health support.",
+        "descriptionAr": "تخصص علم النفس لدعم الصحة النفسية.",
+        "verticalSlugs": [
+          "psychology-counseling",
+          "mental-health"
+        ],
+        "relatedEntityTypeSlugs": [
+          "counseling-center"
+        ],
+        "isMentalHealth": true
+      },
+      {
+        "slug": "radiology",
+        "labelEn": "Radiology",
+        "labelAr": "الأشعة",
+        "descriptionEn": "Radiology and medical imaging specialty.",
+        "descriptionAr": "تخصص الأشعة والتصوير الطبي.",
+        "verticalSlugs": [
+          "imaging",
+          "diagnostics"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "isMentalHealth": false
+      },
+      {
+        "slug": "reproductive-medicine",
+        "labelEn": "Reproductive Medicine",
+        "labelAr": "طب الإنجاب",
+        "descriptionEn": "Reproductive medicine and fertility specialty.",
+        "descriptionAr": "تخصص طب الإنجاب والخصوبة.",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "isMentalHealth": false
+      }
+    ],
+    "services": [
+      {
+        "slug": "annual-checkup",
+        "labelEn": "Annual Checkup",
+        "labelAr": "فحص سنوي",
+        "descriptionEn": "Routine annual health checkup.",
+        "descriptionAr": "فحص صحي سنوي روتيني.",
+        "family": "primary-care",
+        "verticalSlugs": [
+          "medical",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "general-medicine"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "antenatal-care",
+        "labelEn": "Antenatal Care",
+        "labelAr": "رعاية ما قبل الولادة",
+        "descriptionEn": "Care provided during pregnancy before birth.",
+        "descriptionAr": "رعاية صحية تقدم أثناء الحمل قبل الولادة.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "blood-test",
+        "labelEn": "Blood Test",
+        "labelAr": "تحليل دم",
+        "descriptionEn": "General blood test service.",
+        "descriptionAr": "خدمة تحليل الدم في المختبر.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "breast-screening",
+        "labelEn": "Breast Screening",
+        "labelAr": "فحص الثدي",
+        "descriptionEn": "Breast screening and assessment.",
+        "descriptionAr": "فحص وتقييم الثدي.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health",
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology",
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "cbc",
+        "labelEn": "CBC",
+        "labelAr": "CBC",
+        "descriptionEn": "Complete blood count test.",
+        "descriptionAr": "تحليل تعداد الدم الكامل CBC.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "cbct",
+        "labelEn": "CBCT",
+        "labelAr": "CBCT",
+        "descriptionEn": "Cone beam CT dental imaging.",
+        "descriptionAr": "تصوير CBCT للأسنان والفكين.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging",
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology",
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center",
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "ct-scan",
+        "labelEn": "CT Scan",
+        "labelAr": "CT Scan",
+        "descriptionEn": "CT scan imaging service.",
+        "descriptionAr": "خدمة تصوير مقطعي CT.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "dental-checkup",
+        "labelEn": "Dental Checkup",
+        "labelAr": "فحص الأسنان",
+        "descriptionEn": "Routine dental examination.",
+        "descriptionAr": "فحص روتيني لصحة الأسنان.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "executive-health-checkup",
+        "labelEn": "Executive Health Checkup",
+        "labelAr": "فحص صحي شامل",
+        "descriptionEn": "Comprehensive preventive health checkup.",
+        "descriptionAr": "فحص وقائي شامل لتقييم الصحة العامة.",
+        "family": "primary-care",
+        "verticalSlugs": [
+          "medical",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "general-medicine"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "fertility-consultation",
+        "labelEn": "Fertility Consultation",
+        "labelAr": "استشارة الخصوبة",
+        "descriptionEn": "Fertility assessment consultation.",
+        "descriptionAr": "استشارة لتقييم الخصوبة وخيارات العلاج.",
+        "family": "ivf-fertility",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedSpecialtySlugs": [
+          "reproductive-medicine",
+          "infertility-ivf"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "general-consultation",
+        "labelEn": "General Consultation",
+        "labelAr": "استشارة عامة",
+        "descriptionEn": "General clinical consultation.",
+        "descriptionAr": "استشارة طبية عامة لتقييم الحالة.",
+        "family": "primary-care",
+        "verticalSlugs": [
+          "medical"
+        ],
+        "relatedSpecialtySlugs": [
+          "general-medicine"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "gum-treatment",
+        "labelEn": "Gum Treatment",
+        "labelAr": "علاج اللثة",
+        "descriptionEn": "Gum disease assessment and treatment.",
+        "descriptionAr": "تقييم وعلاج مشكلات اللثة.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "gynecology-consultation",
+        "labelEn": "Gynecology Consultation",
+        "labelAr": "استشارة نساء",
+        "descriptionEn": "Gynecology consultation for women’s health.",
+        "descriptionAr": "استشارة نسائية لصحة المرأة.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "hba1c",
+        "labelEn": "HbA1c",
+        "labelAr": "HbA1c",
+        "descriptionEn": "HbA1c diabetes monitoring test.",
+        "descriptionAr": "تحليل HbA1c لمتابعة السكري.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "home-sample-collection",
+        "labelEn": "Home Sample Collection",
+        "labelAr": "سحب العينات من المنزل",
+        "descriptionEn": "Home collection of laboratory samples.",
+        "descriptionAr": "سحب عينات المختبر من المنزل.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "home-care"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "icsi",
+        "labelEn": "ICSI",
+        "labelAr": "ICSI",
+        "descriptionEn": "Intracytoplasmic sperm injection service.",
+        "descriptionAr": "خدمة الحقن المجهري ضمن علاج الخصوبة.",
+        "family": "ivf-fertility",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedSpecialtySlugs": [
+          "reproductive-medicine",
+          "infertility-ivf"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "ivf",
+        "labelEn": "IVF",
+        "labelAr": "أطفال الأنابيب",
+        "descriptionEn": "In vitro fertilization service.",
+        "descriptionAr": "خدمة أطفال الأنابيب ضمن علاج الخصوبة.",
+        "family": "ivf-fertility",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedSpecialtySlugs": [
+          "reproductive-medicine",
+          "infertility-ivf"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "kidney-function-test",
+        "labelEn": "Kidney Function Test",
+        "labelAr": "تحليل وظائف الكلى",
+        "descriptionEn": "Laboratory kidney function test.",
+        "descriptionAr": "تحليل مخبري لوظائف الكلى.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "lipid-profile",
+        "labelEn": "Lipid Profile",
+        "labelAr": "تحليل الدهون",
+        "descriptionEn": "Blood lipid profile test.",
+        "descriptionAr": "تحليل دهون الدم.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "liver-function-test",
+        "labelEn": "Liver Function Test",
+        "labelAr": "تحليل وظائف الكبد",
+        "descriptionEn": "Laboratory liver function test.",
+        "descriptionAr": "تحليل مخبري لوظائف الكبد.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "mammography",
+        "labelEn": "Mammography",
+        "labelAr": "تصوير الثدي",
+        "descriptionEn": "Mammography breast imaging.",
+        "descriptionAr": "تصوير الثدي بالأشعة للفحص والتقييم.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging",
+          "women-health"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology",
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "mri",
+        "labelEn": "MRI",
+        "labelAr": "MRI",
+        "descriptionEn": "MRI imaging service.",
+        "descriptionAr": "خدمة تصوير بالرنين المغناطيسي MRI.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "open-mri",
+        "labelEn": "Open MRI",
+        "labelAr": "MRI مفتوح",
+        "descriptionEn": "Open MRI imaging service.",
+        "descriptionAr": "خدمة تصوير MRI مفتوح للمرضى المناسبين.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "opg",
+        "labelEn": "OPG",
+        "labelAr": "OPG",
+        "descriptionEn": "Panoramic dental X-ray imaging.",
+        "descriptionAr": "تصوير بانورامي للأسنان والفكين.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging",
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology",
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center",
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "ovulation-tracking",
+        "labelEn": "Ovulation Tracking",
+        "labelAr": "متابعة التبويض",
+        "descriptionEn": "Ovulation monitoring for fertility care.",
+        "descriptionAr": "متابعة التبويض ضمن رعاية الخصوبة.",
+        "family": "ivf-fertility",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedSpecialtySlugs": [
+          "reproductive-medicine",
+          "infertility-ivf"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "pap-smear",
+        "labelEn": "Pap Smear",
+        "labelAr": "مسحة عنق الرحم",
+        "descriptionEn": "Cervical screening test.",
+        "descriptionAr": "فحص مسحة عنق الرحم للكشف المبكر.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "pediatric-dentistry",
+        "labelEn": "Pediatric Dentistry",
+        "labelAr": "طب أسنان الأطفال",
+        "descriptionEn": "Dental care for children.",
+        "descriptionAr": "رعاية أسنان الأطفال في عيادة الأسنان.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "postnatal-care",
+        "labelEn": "Postnatal Care",
+        "labelAr": "رعاية ما بعد الولادة",
+        "descriptionEn": "Care provided after birth for mother and baby.",
+        "descriptionAr": "رعاية صحية بعد الولادة للأم والطفل.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "pregnancy-follow-up",
+        "labelEn": "Pregnancy Follow Up",
+        "labelAr": "متابعة الحمل",
+        "descriptionEn": "Pregnancy follow-up visits and monitoring.",
+        "descriptionAr": "زيارات متابعة الحمل ومراقبته.",
+        "family": "women-health",
+        "verticalSlugs": [
+          "women-health"
+        ],
+        "relatedSpecialtySlugs": [
+          "obstetrics-gynecology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "clinic",
+          "doctor-profile"
+        ],
+        "schemaHintSlug": "medical-service"
+      },
+      {
+        "slug": "scaling-polishing",
+        "labelEn": "Scaling Polishing",
+        "labelAr": "إزالة الجير وتلميع الأسنان",
+        "descriptionEn": "Dental scaling and polishing.",
+        "descriptionAr": "إزالة جير الأسنان وتلميعها.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "semen-analysis",
+        "labelEn": "Semen Analysis",
+        "labelAr": "تحليل السائل المنوي",
+        "descriptionEn": "Laboratory semen analysis.",
+        "descriptionAr": "تحليل مخبري للسائل المنوي.",
+        "family": "ivf-fertility",
+        "verticalSlugs": [
+          "ivf-fertility"
+        ],
+        "relatedSpecialtySlugs": [
+          "reproductive-medicine",
+          "infertility-ivf"
+        ],
+        "relatedEntityTypeSlugs": [
+          "ivf-center",
+          "fertility-clinic"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "teeth-whitening",
+        "labelEn": "Teeth Whitening",
+        "labelAr": "تبييض الأسنان",
+        "descriptionEn": "Dental teeth whitening service.",
+        "descriptionAr": "خدمة تبييض الأسنان تحت إشراف مناسب.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "thyroid-test",
+        "labelEn": "Thyroid Test",
+        "labelAr": "تحليل الغدة الدرقية",
+        "descriptionEn": "Laboratory thyroid test.",
+        "descriptionAr": "تحليل مخبري للغدة الدرقية.",
+        "family": "laboratory",
+        "verticalSlugs": [
+          "laboratory",
+          "diagnostics"
+        ],
+        "relatedSpecialtySlugs": [
+          "pathology-laboratory"
+        ],
+        "relatedEntityTypeSlugs": [
+          "laboratory-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "tooth-extraction",
+        "labelEn": "Tooth Extraction",
+        "labelAr": "خلع السن",
+        "descriptionEn": "Dental tooth extraction procedure.",
+        "descriptionAr": "إجراء خلع السن عند الحاجة الطبية.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "ultrasound",
+        "labelEn": "Ultrasound",
+        "labelAr": "سونار",
+        "descriptionEn": "Ultrasound imaging service.",
+        "descriptionAr": "خدمة تصوير بالسونار.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      },
+      {
+        "slug": "wisdom-tooth-extraction",
+        "labelEn": "Wisdom Tooth Extraction",
+        "labelAr": "خلع ضرس العقل",
+        "descriptionEn": "Wisdom tooth extraction procedure.",
+        "descriptionAr": "إجراء خلع ضرس العقل عند الحاجة.",
+        "family": "dental-care",
+        "verticalSlugs": [
+          "dental"
+        ],
+        "relatedSpecialtySlugs": [
+          "dentistry"
+        ],
+        "relatedEntityTypeSlugs": [
+          "dental-clinic"
+        ],
+        "schemaHintSlug": "dental-service"
+      },
+      {
+        "slug": "x-ray",
+        "labelEn": "X Ray",
+        "labelAr": "أشعة سينية",
+        "descriptionEn": "X-ray imaging service.",
+        "descriptionAr": "خدمة تصوير بالأشعة السينية.",
+        "family": "imaging",
+        "verticalSlugs": [
+          "imaging"
+        ],
+        "relatedSpecialtySlugs": [
+          "radiology"
+        ],
+        "relatedEntityTypeSlugs": [
+          "imaging-center"
+        ],
+        "schemaHintSlug": "diagnostic-test"
+      }
+    ],
+    "schemaHints": [
+      {
+        "slug": "dental-service",
+        "labelEn": "Dental Service",
+        "labelAr": "خدمة أسنان",
+        "descriptionEn": "Schema hint for dental services.",
+        "descriptionAr": "إشارة مخطط لخدمات الأسنان.",
+        "schemaType": "MedicalProcedure"
+      },
+      {
+        "slug": "diagnostic-test",
+        "labelEn": "Diagnostic Test",
+        "labelAr": "فحص تشخيصي",
+        "descriptionEn": "Schema hint for diagnostic tests.",
+        "descriptionAr": "إشارة مخطط للفحوصات التشخيصية.",
+        "schemaType": "MedicalTest"
+      },
+      {
+        "slug": "medical-service",
+        "labelEn": "Medical Service",
+        "labelAr": "خدمة طبية",
+        "descriptionEn": "Schema hint for a healthcare service item.",
+        "descriptionAr": "إشارة مخطط لخدمة رعاية صحية.",
+        "schemaType": "MedicalProcedure"
+      }
+    ]
+  }
+}

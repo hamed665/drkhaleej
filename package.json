@@ -24,7 +24,9 @@
     "test:unit": "vitest run",
     "test:landing:public-gate": "node scripts/db/test-landing-public-gate-static.mjs",
     "test:landing:runtime:scaffold": "node scripts/db/test-landing-runtime-scaffold.mjs",
-    "test:landing:runtime": "node scripts/db/test-landing-runtime.mjs"
+    "test:landing:runtime": "node scripts/db/test-landing-runtime.mjs",
+    "taxonomy:validate": "node scripts/taxonomy/validate-master-taxonomy.mjs",
+    "taxonomy:export": "node scripts/taxonomy/export-master-taxonomy.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
