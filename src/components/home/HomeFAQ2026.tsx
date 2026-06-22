@@ -6,9 +6,10 @@ import type { SupportedLocale } from '@/lib/i18n/config';
 type HomeFAQ2026Props = {
   locale: SupportedLocale;
   dir: 'ltr' | 'rtl';
+  items?: readonly HomeFAQItem[];
 };
 
-type FAQItem = {
+export type HomeFAQItem = {
   question: string;
   answer: string;
 };
@@ -18,10 +19,10 @@ type HomeFAQCopy = {
   headline: string;
   subtitle: string;
   trustChips: readonly string[];
-  items: readonly FAQItem[];
+  items: readonly HomeFAQItem[];
 };
 
-const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
+export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
   en: {
     badge: 'FAQ',
     headline: 'Questions before you explore care',
@@ -119,8 +120,9 @@ const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
   }
 };
 
-export function HomeFAQ2026({ locale, dir }: HomeFAQ2026Props) {
+export function HomeFAQ2026({ locale, dir, items }: HomeFAQ2026Props) {
   const copy = homeFAQCopy[locale];
+  const renderedItems = items && items.length > 0 ? items : copy.items;
   const [openIndex, setOpenIndex] = useState(0);
   const titleId = `dm2026-home-faq-title-${locale}`;
   const subtitleId = `dm2026-home-faq-subtitle-${locale}`;
@@ -142,7 +144,7 @@ export function HomeFAQ2026({ locale, dir }: HomeFAQ2026Props) {
         </div>
 
         <div className="dm2026-home-faq__accordion" aria-label={copy.headline}>
-          {copy.items.map((item, index) => {
+          {renderedItems.map((item, index) => {
             const isOpen = openIndex === index;
             const panelId = `dm2026-home-faq-panel-${locale}-${index}`;
             const buttonId = `dm2026-home-faq-button-${locale}-${index}`;

@@ -11,7 +11,7 @@ export function FaqCmsForm({ item }: { item?: AdminFaqCmsItem }) {
   return <form action={action} className="space-y-4 rounded-2xl border bg-white p-5 text-sm">
     {item ? <input type="hidden" name="entryId" value={item.id} /> : null}
     {state.message ? <p className={state.ok ? "text-emerald-700" : "text-red-700"}>{state.message}</p> : null}
-    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-900">Admin-only FAQ CMS pilot. Public FAQ rendering is not connected to CMS yet.</div>
+    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-900">Admin-only FAQ CMS pilot. Public FAQ CMS rendering is feature-flagged and only approved active FAQ entries can be shown publicly.</div>
     <div className="grid gap-4 md:grid-cols-2">
       <label className="font-semibold">Content key<input name="contentKey" defaultValue={item?.contentKey ?? "faq."} disabled={Boolean(item)} required maxLength={160} className="mt-1 w-full rounded-lg border p-2 font-normal"/><span className="mt-1 block text-xs font-normal text-slate-500">Use a stable key such as faq.provider-onboarding. The faq. prefix is enforced.</span></label>
       <label className="font-semibold">Slug/key helper<input name="slug" defaultValue={item?.slug ?? ""} maxLength={160} className="mt-1 w-full rounded-lg border p-2 font-normal"/></label>

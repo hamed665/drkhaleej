@@ -1,6 +1,6 @@
 import { HomeDiscoveryCategories2026 } from '@/components/home/HomeDiscoveryCategories2026';
 import { HomeEntityClarity2026 } from '@/components/home/HomeEntityClarity2026';
-import { HomeFAQ2026 } from '@/components/home/HomeFAQ2026';
+import { HomeFAQ2026, type HomeFAQItem } from '@/components/home/HomeFAQ2026';
 import { HomeFeaturedBoard2026 } from '@/components/home/HomeFeaturedBoard2026';
 import { HomeProviderCTA2026 } from '@/components/home/HomeProviderCTA2026';
 import { HomeSpecialOffersShowcase2026 } from '@/components/home/HomeSpecialOffersShowcase2026';
@@ -9,6 +9,7 @@ import { HomeSupportContact2026 } from '@/components/home/HomeSupportContact2026
 import { HomeTrustSafety2026 } from '@/components/home/HomeTrustSafety2026';
 import { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 import { publicDiscoveryRoute, publicProviderRoute } from '@/lib/routes/public';
+import { listApprovedPublicFaqCmsItems } from '@/server/public/faq-cms';
 
 type HomePage2026HeaderHeroProps = {
   locale: SupportedLocale;
@@ -179,11 +180,21 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
   }
 };
 
-export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026HeaderHeroProps) {
+function localizeCmsFaqItems(items: Awaited<ReturnType<typeof listApprovedPublicFaqCmsItems>>, locale: SupportedLocale): HomeFAQItem[] {
+  return items
+    .map((item) => ({
+      question: locale === 'ar' ? item.questionAr ?? item.questionEn : item.questionEn ?? item.questionAr,
+      answer: locale === 'ar' ? item.answerAr ?? item.answerEn : item.answerEn ?? item.answerAr
+    }))
+    .filter((item): item is HomeFAQItem => Boolean(item.question && item.answer));
+}
+
+export async function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026HeaderHeroProps) {
   const copy = home2026Copy[locale];
   const searchHref = publicDiscoveryRoute(locale, country, 'search');
   const providerHref = publicProviderRoute(locale, country);
   const articlesHref = `/${locale}/${country}/articles`;
+  const cmsFaqItems = localizeCmsFaqItems(await listApprovedPublicFaqCmsItems(), locale);
 
   return (
     <section className="dm2026-home-top dm2026-shell" dir={dir} aria-label={copy.search.title}>
@@ -205,7 +216,7 @@ export function HomePage2026HeaderHero({ locale, country, dir }: HomePage2026Hea
       <HomeDiscoveryCategories2026 locale={locale} country={country} dir={dir} />
       <HomeSpecialOffersShowcase2026 locale={locale} country={country} dir={dir} />
       <HomeProviderCTA2026 locale={locale} dir={dir} />
-      <HomeFAQ2026 locale={locale} dir={dir} />
+      <HomeFAQ2026 locale={locale} dir={dir} items={cmsFaqItems} />
       <HomeTrustSafety2026 locale={locale} dir={dir} />
       <HomeSupportContact2026 locale={locale} dir={dir} />
     </section>
