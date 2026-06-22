@@ -2213,6 +2213,154 @@ export type Database = {
           },
         ]
       }
+      cms_content_entries: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          created_by_profile_id: string | null
+          updated_by_profile_id: string | null
+          content_key: string
+          content_type: string
+          locale: Database["public"]["Enums"]["app_locale"] | null
+          country: Database["public"]["Enums"]["country_code"]
+          title_en: string | null
+          title_ar: string | null
+          slug: string | null
+          status: string
+          current_revision_id: string | null
+          published_revision_id: string | null
+          metadata: Json
+          is_archived: boolean
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          created_by_profile_id?: string | null
+          updated_by_profile_id?: string | null
+          content_key: string
+          content_type: string
+          locale?: Database["public"]["Enums"]["app_locale"] | null
+          country?: Database["public"]["Enums"]["country_code"]
+          title_en?: string | null
+          title_ar?: string | null
+          slug?: string | null
+          status?: string
+          current_revision_id?: string | null
+          published_revision_id?: string | null
+          metadata?: Json
+          is_archived?: boolean
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          created_by_profile_id?: string | null
+          updated_by_profile_id?: string | null
+          content_key?: string
+          content_type?: string
+          locale?: Database["public"]["Enums"]["app_locale"] | null
+          country?: Database["public"]["Enums"]["country_code"]
+          title_en?: string | null
+          title_ar?: string | null
+          slug?: string | null
+          status?: string
+          current_revision_id?: string | null
+          published_revision_id?: string | null
+          metadata?: Json
+          is_archived?: boolean
+          deleted_at?: string | null
+        }
+        Relationships: [
+          { foreignKeyName: "cms_content_entries_created_by_profile_id_fkey"; columns: ["created_by_profile_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_entries_updated_by_profile_id_fkey"; columns: ["updated_by_profile_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_entries_current_revision_id_fkey"; columns: ["current_revision_id"]; isOneToOne: false; referencedRelation: "cms_content_revisions"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_entries_published_revision_id_fkey"; columns: ["published_revision_id"]; isOneToOne: false; referencedRelation: "cms_content_revisions"; referencedColumns: ["id"] },
+        ]
+      }
+      cms_content_revisions: {
+        Row: {
+          id: string
+          entry_id: string
+          created_at: string
+          created_by_profile_id: string | null
+          revision_number: number
+          status: string
+          title_en: string | null
+          title_ar: string | null
+          summary_en: string | null
+          summary_ar: string | null
+          body_en: Json
+          body_ar: Json
+          seo_title_en: string | null
+          seo_title_ar: string | null
+          seo_description_en: string | null
+          seo_description_ar: string | null
+          metadata: Json
+          review_note: string | null
+          approved_at: string | null
+          approved_by_profile_id: string | null
+          rejected_at: string | null
+          rejected_by_profile_id: string | null
+        }
+        Insert: {
+          id?: string
+          entry_id: string
+          created_at?: string
+          created_by_profile_id?: string | null
+          revision_number: number
+          status?: string
+          title_en?: string | null
+          title_ar?: string | null
+          summary_en?: string | null
+          summary_ar?: string | null
+          body_en?: Json
+          body_ar?: Json
+          seo_title_en?: string | null
+          seo_title_ar?: string | null
+          seo_description_en?: string | null
+          seo_description_ar?: string | null
+          metadata?: Json
+          review_note?: string | null
+          approved_at?: string | null
+          approved_by_profile_id?: string | null
+          rejected_at?: string | null
+          rejected_by_profile_id?: string | null
+        }
+        Update: {
+          id?: string
+          entry_id?: string
+          created_at?: string
+          created_by_profile_id?: string | null
+          revision_number?: number
+          status?: string
+          title_en?: string | null
+          title_ar?: string | null
+          summary_en?: string | null
+          summary_ar?: string | null
+          body_en?: Json
+          body_ar?: Json
+          seo_title_en?: string | null
+          seo_title_ar?: string | null
+          seo_description_en?: string | null
+          seo_description_ar?: string | null
+          metadata?: Json
+          review_note?: string | null
+          approved_at?: string | null
+          approved_by_profile_id?: string | null
+          rejected_at?: string | null
+          rejected_by_profile_id?: string | null
+        }
+        Relationships: [
+          { foreignKeyName: "cms_content_revisions_entry_id_fkey"; columns: ["entry_id"]; isOneToOne: false; referencedRelation: "cms_content_entries"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_revisions_created_by_profile_id_fkey"; columns: ["created_by_profile_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_revisions_approved_by_profile_id_fkey"; columns: ["approved_by_profile_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "cms_content_revisions_rejected_by_profile_id_fkey"; columns: ["rejected_by_profile_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+        ]
+      }
       landing_page_contents: {
         Row: {
           area_id: string | null

@@ -21,11 +21,13 @@ const geoFullBCountryCodeMigration = '0056_country_code_regional_expansion.sql';
 const taxSpecialtyModelMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const adminAuditEventsMigration = '0058_admin_audit_events.sql';
 const adminMediaLibraryMigration = '0059_admin_media_library_foundation.sql';
+const adminCmsMigration = '0060_admin_cms_core_revision_foundation.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const geoFullBCountryCodeMigrationPath = path.join(migrationsDir, geoFullBCountryCodeMigration);
 const taxSpecialtyModelMigrationPath = path.join(migrationsDir, taxSpecialtyModelMigration);
 const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
 const adminMediaLibraryMigrationPath = path.join(migrationsDir, adminMediaLibraryMigration);
+const adminCmsMigrationPath = path.join(migrationsDir, adminCmsMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-${taxRlsMigration}.hidden`,
@@ -45,6 +47,10 @@ const hiddenAdminAuditEventsMigrationPath = path.join(
 const hiddenAdminMediaLibraryMigrationPath = path.join(
   migrationsDir,
   `.admmediaa-${adminMediaLibraryMigration}.hidden`,
+);
+const hiddenAdminCmsMigrationPath = path.join(
+  migrationsDir,
+  `.admcmsa-${adminCmsMigration}.hidden`,
 );
 
 const expectedMigrations = [
@@ -107,6 +113,7 @@ const expectedMigrations = [
   taxSpecialtyModelMigration,
   adminAuditEventsMigration,
   adminMediaLibraryMigration,
+  adminCmsMigration,
 ];
 
 function fail(message) {
@@ -144,7 +151,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0059 for ADM-MEDIA-A.');
+    fail('Migration inventory must be exactly 0001 through 0060 for ADM-CMS-A.');
   }
 }
 
@@ -341,16 +348,47 @@ function validateAdminMediaLibraryMigration() {
   }
 }
 
+function validateAdminCmsMigration() {
+  requireCondition(existsSync(adminCmsMigrationPath), `${adminCmsMigration} is missing.`);
+  const content = readFileSync(adminCmsMigrationPath, 'utf8');
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0060 must not seed CMS rows.'],
+    [/\bdrop\s+table\b/i, '0060 must not drop tables.'],
+    [/\bcreate\s+policy\b/i, '0060 must not add public or authenticated CMS policies.'],
+    [/\bto\s+anon\b/i, '0060 must not grant anon access.'],
+    [/\bto\s+authenticated\b/i, '0060 must not grant authenticated access.'],
+    [/\bpayments?\b/i, '0060 must not include payment scope.'],
+    [/\bbookings?\b/i, '0060 must not include booking scope.'],
+    [/\bai\b/i, '0060 must not include AI scope.'],
+  ]) forbidPattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/ADM-CMS-A: admin CMS core and revision foundation/i, '0060 must include ADM-CMS-A comment prefix.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.cms_content_entries/i, '0060 must create cms_content_entries.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.cms_content_revisions/i, '0060 must create cms_content_revisions.'],
+    [/current_revision_id\s+uuid/i, '0060 must include current_revision_id.'],
+    [/published_revision_id\s+uuid/i, '0060 must include published_revision_id without activating publishing.'],
+    [/cms_content_entries_content_type_check/i, '0060 must constrain CMS content types.'],
+    [/cms_content_entries_status_check/i, '0060 must constrain entry statuses.'],
+    [/cms_content_revisions_status_check/i, '0060 must constrain revision statuses.'],
+    [/cms_content_entries_active_key_locale_country_idx/i, '0060 must enforce unique active CMS key/locale/country.'],
+    [/cms_content_revisions_entry_revision_number_idx/i, '0060 must enforce unique revision numbers per entry.'],
+    [/alter\s+table\s+public\.cms_content_entries\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_entries.'],
+    [/alter\s+table\s+public\.cms_content_revisions\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_revisions.'],
+  ]) requirePattern(content, pattern, message);
+}
+
 function runTaxC1ValidatorWithoutLaterMigrations() {
   requireCondition(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   requireCondition(!existsSync(hiddenGeoFullBCountryCodeMigrationPath), 'Hidden GEO-FULL-B migration file already exists.');
   requireCondition(!existsSync(hiddenTaxSpecialtyModelMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
   requireCondition(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
   requireCondition(!existsSync(hiddenAdminMediaLibraryMigrationPath), 'Hidden ADM-MEDIA-A migration file already exists.');
+  requireCondition(!existsSync(hiddenAdminCmsMigrationPath), 'Hidden ADM-CMS-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(geoFullBCountryCodeMigrationPath, hiddenGeoFullBCountryCodeMigrationPath);
   renameSync(taxSpecialtyModelMigrationPath, hiddenTaxSpecialtyModelMigrationPath);
+  renameSync(adminCmsMigrationPath, hiddenAdminCmsMigrationPath);
   renameSync(adminMediaLibraryMigrationPath, hiddenAdminMediaLibraryMigrationPath);
   renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
@@ -360,6 +398,10 @@ function runTaxC1ValidatorWithoutLaterMigrations() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminCmsMigrationPath)) {
+      renameSync(hiddenAdminCmsMigrationPath, adminCmsMigrationPath);
+    }
+
     if (existsSync(hiddenAdminMediaLibraryMigrationPath)) {
       renameSync(hiddenAdminMediaLibraryMigrationPath, adminMediaLibraryMigrationPath);
     }
@@ -388,6 +430,7 @@ validateGeoFullBCountryCodeMigration();
 validateTaxSpecialtyModelMigration();
 validateAdminAuditEventsMigration();
 validateAdminMediaLibraryMigration();
+validateAdminCmsMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
-console.log('ADM-MEDIA-A migration validation passed.');
+console.log('ADM-CMS-A migration validation passed.');

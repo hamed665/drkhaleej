@@ -17,7 +17,16 @@ export type AdminAuditAction =
   | "media_asset.uploaded"
   | "media_asset.metadata_updated"
   | "media_asset.archived"
-  | "media_asset.restored";
+  | "media_asset.restored"
+  | "cms_content.entry_created"
+  | "cms_content.entry_updated"
+  | "cms_content.revision_created"
+  | "cms_content.revision_updated"
+  | "cms_content.submitted_for_review"
+  | "cms_content.revision_approved"
+  | "cms_content.revision_rejected"
+  | "cms_content.entry_archived"
+  | "cms_content.entry_restored";
 
 type JsonRecord = Record<string, Json>;
 type AdminAuditEventRow = Database["public"]["Tables"]["admin_audit_events"]["Row"];

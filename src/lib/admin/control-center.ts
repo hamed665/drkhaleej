@@ -67,8 +67,8 @@ export const adminModuleGroups: AdminModuleGroup[] = [
       {
         title: "Site Content",
         description:
-          "Inventory current public content areas, sources, language coverage, and future editability.",
-        status: "Planned",
+          "Inventory current public content areas and access the internal CMS draft/revision foundation. No live public publishing.",
+        status: "Partial",
         href: "/admin/content",
       },
       {

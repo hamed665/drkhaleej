@@ -18,10 +18,12 @@ const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const specialtyTaxonomyMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const adminAuditEventsMigration = '0058_admin_audit_events.sql';
 const adminMediaLibraryMigration = '0059_admin_media_library_foundation.sql';
+const adminCmsMigration = '0060_admin_cms_core_revision_foundation.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const specialtyTaxonomyMigrationPath = path.join(migrationsDir, specialtyTaxonomyMigration);
 const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
 const adminMediaLibraryMigrationPath = path.join(migrationsDir, adminMediaLibraryMigration);
+const adminCmsMigrationPath = path.join(migrationsDir, adminCmsMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-static-${taxRlsMigration}.hidden`,
@@ -37,6 +39,10 @@ const hiddenAdminAuditEventsMigrationPath = path.join(
 const hiddenAdminMediaLibraryMigrationPath = path.join(
   migrationsDir,
   `.admmediaa-static-${adminMediaLibraryMigration}.hidden`,
+);
+const hiddenAdminCmsMigrationPath = path.join(
+  migrationsDir,
+  `.admcmsa-static-${adminCmsMigration}.hidden`,
 );
 
 function fail(message) {
@@ -167,14 +173,32 @@ function validateAdminMediaLibraryRlsMigration() {
   }
 }
 
+function validateAdminCmsRlsMigration() {
+  assert(existsSync(adminCmsMigrationPath), `${adminCmsMigration} is missing.`);
+  const content = readFileSync(adminCmsMigrationPath, 'utf8');
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0060 must not create RLS policies.'],
+    [/\bfor\s+select\b/i, '0060 must not add SELECT policies.'],
+    [/\bfor\s+insert\b/i, '0060 must not add INSERT policies.'],
+    [/\bfor\s+update\b/i, '0060 must not add UPDATE policies.'],
+    [/\bfor\s+delete\b/i, '0060 must not add DELETE policies.'],
+    [/\bto\s+anon\b/i, '0060 must not expose anon access.'],
+    [/\bto\s+authenticated\b/i, '0060 must not expose authenticated access.'],
+  ]) forbidPattern(content, pattern, message);
+  requirePattern(content, /alter\s+table\s+public\.cms_content_entries\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_entries.');
+  requirePattern(content, /alter\s+table\s+public\.cms_content_revisions\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_revisions.');
+}
+
 function runLegacyStaticRlsTestWithoutTaxRls() {
   assert(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   assert(!existsSync(hiddenSpecialtyTaxonomyMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
   assert(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
   assert(!existsSync(hiddenAdminMediaLibraryMigrationPath), 'Hidden ADM-MEDIA-A migration file already exists.');
+  assert(!existsSync(hiddenAdminCmsMigrationPath), 'Hidden ADM-CMS-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(specialtyTaxonomyMigrationPath, hiddenSpecialtyTaxonomyMigrationPath);
+  renameSync(adminCmsMigrationPath, hiddenAdminCmsMigrationPath);
   renameSync(adminMediaLibraryMigrationPath, hiddenAdminMediaLibraryMigrationPath);
   renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
@@ -184,6 +208,10 @@ function runLegacyStaticRlsTestWithoutTaxRls() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminCmsMigrationPath)) {
+      renameSync(hiddenAdminCmsMigrationPath, adminCmsMigrationPath);
+    }
+
     if (existsSync(hiddenAdminMediaLibraryMigrationPath)) {
       renameSync(hiddenAdminMediaLibraryMigrationPath, adminMediaLibraryMigrationPath);
     }
@@ -206,6 +234,7 @@ validateTaxonomyRlsMigration();
 validateSpecialtyAliasRlsMigration();
 validateAdminAuditEventsRlsMigration();
 validateAdminMediaLibraryRlsMigration();
+validateAdminCmsRlsMigration();
 runLegacyStaticRlsTestWithoutTaxRls();
 
-console.log('ADM-MEDIA-A static RLS validation passed.');
+console.log('ADM-CMS-A static RLS validation passed.');
