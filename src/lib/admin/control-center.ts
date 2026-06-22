@@ -104,13 +104,13 @@ export const adminModuleGroups: AdminModuleGroup[] = [
   {
     title: "Media",
     description:
-      "Future media governance for entity images and editorial assets. Upload remains disabled.",
+      "Protected media governance for private asset metadata, review state, and archive controls. Upload remains disabled until private storage is configured.",
     modules: [
       {
         title: "Media Library",
         description:
-          "Planned media asset catalog, usage assignment, review status, alt text, captions, and archive controls.",
-        status: "Planned",
+          "Protected media asset catalog with metadata review, assignment count, and archive controls. Upload remains disabled.",
+        status: "Active",
         href: "/admin/media",
       },
       {

@@ -20,10 +20,12 @@ const taxRlsMigration = '0055_taxonomy_public_rls.sql';
 const geoFullBCountryCodeMigration = '0056_country_code_regional_expansion.sql';
 const taxSpecialtyModelMigration = '0057_specialty_taxonomy_hierarchy.sql';
 const adminAuditEventsMigration = '0058_admin_audit_events.sql';
+const adminMediaLibraryMigration = '0059_admin_media_library_foundation.sql';
 const taxRlsMigrationPath = path.join(migrationsDir, taxRlsMigration);
 const geoFullBCountryCodeMigrationPath = path.join(migrationsDir, geoFullBCountryCodeMigration);
 const taxSpecialtyModelMigrationPath = path.join(migrationsDir, taxSpecialtyModelMigration);
 const adminAuditEventsMigrationPath = path.join(migrationsDir, adminAuditEventsMigration);
+const adminMediaLibraryMigrationPath = path.join(migrationsDir, adminMediaLibraryMigration);
 const hiddenTaxRlsMigrationPath = path.join(
   migrationsDir,
   `.taxrlsa-${taxRlsMigration}.hidden`,
@@ -39,6 +41,10 @@ const hiddenTaxSpecialtyModelMigrationPath = path.join(
 const hiddenAdminAuditEventsMigrationPath = path.join(
   migrationsDir,
   `.admgova-${adminAuditEventsMigration}.hidden`,
+);
+const hiddenAdminMediaLibraryMigrationPath = path.join(
+  migrationsDir,
+  `.admmediaa-${adminMediaLibraryMigration}.hidden`,
 );
 
 const expectedMigrations = [
@@ -100,6 +106,7 @@ const expectedMigrations = [
   geoFullBCountryCodeMigration,
   taxSpecialtyModelMigration,
   adminAuditEventsMigration,
+  adminMediaLibraryMigration,
 ];
 
 function fail(message) {
@@ -137,7 +144,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0058 for ADM-GOV-A.');
+    fail('Migration inventory must be exactly 0001 through 0059 for ADM-MEDIA-A.');
   }
 }
 
@@ -299,15 +306,52 @@ function validateAdminAuditEventsMigration() {
   }
 }
 
+function validateAdminMediaLibraryMigration() {
+  requireCondition(existsSync(adminMediaLibraryMigrationPath), `${adminMediaLibraryMigration} is missing.`);
+
+  const content = readFileSync(adminMediaLibraryMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0059 must not seed media rows.'],
+    [/\bdrop\s+table\b/i, '0059 must not drop tables.'],
+    [/\bcreate\s+policy\b/i, '0059 must not add public or authenticated media policies.'],
+    [/\bto\s+anon\b/i, '0059 must not grant anon access.'],
+    [/\bto\s+authenticated\b/i, '0059 must not grant authenticated access.'],
+    [/storage\.buckets/i, '0059 must not create a storage bucket.'],
+    [/\bpayments?\b/i, '0059 must not include payment scope.'],
+    [/\bbookings?\b/i, '0059 must not include booking scope.'],
+    [/\bai\b/i, '0059 must not include AI scope.'],
+  ]) {
+    forbidPattern(content, pattern, message);
+  }
+
+  for (const [pattern, message] of [
+    [/alter\s+table\s+public\.media_assets/i, '0059 must alter existing media_assets instead of creating a duplicate table.'],
+    [/add\s+column\s+if\s+not\s+exists\s+alt_text_en\s+text/i, '0059 must add admin-safe alt_text_en metadata.'],
+    [/add\s+column\s+if\s+not\s+exists\s+caption_en\s+text/i, '0059 must add admin-safe caption_en metadata.'],
+    [/admin_usage_kind\s+text\s+not\s+null\s+default\s+'general'/i, '0059 must add admin_usage_kind default general.'],
+    [/admin_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0059 must add admin-only review status default draft.'],
+    [/admin_visibility_status\s+text\s+not\s+null\s+default\s+'private'/i, '0059 must keep admin visibility private by default.'],
+    [/is_archived\s+boolean\s+not\s+null\s+default\s+false/i, '0059 must add soft archive state.'],
+    [/media_assets_admin_review_status_check/i, '0059 must constrain admin review values.'],
+    [/media_assets_admin_visibility_status_check[\s\S]*'private'[\s\S]*'public_candidate'[\s\S]*\)[\s\S]*;/i, '0059 must constrain admin visibility to private/public_candidate only.'],
+    [/(?<!')public(?!')/i, '0059 must not allow public admin visibility value.'],
+  ]) {
+    requirePattern(content, pattern, message);
+  }
+}
+
 function runTaxC1ValidatorWithoutLaterMigrations() {
   requireCondition(!existsSync(hiddenTaxRlsMigrationPath), 'Hidden TAX-RLS-A migration file already exists.');
   requireCondition(!existsSync(hiddenGeoFullBCountryCodeMigrationPath), 'Hidden GEO-FULL-B migration file already exists.');
   requireCondition(!existsSync(hiddenTaxSpecialtyModelMigrationPath), 'Hidden TAX-SPECIALTY-MODEL-A migration file already exists.');
   requireCondition(!existsSync(hiddenAdminAuditEventsMigrationPath), 'Hidden ADM-GOV-A migration file already exists.');
+  requireCondition(!existsSync(hiddenAdminMediaLibraryMigrationPath), 'Hidden ADM-MEDIA-A migration file already exists.');
 
   renameSync(taxRlsMigrationPath, hiddenTaxRlsMigrationPath);
   renameSync(geoFullBCountryCodeMigrationPath, hiddenGeoFullBCountryCodeMigrationPath);
   renameSync(taxSpecialtyModelMigrationPath, hiddenTaxSpecialtyModelMigrationPath);
+  renameSync(adminMediaLibraryMigrationPath, hiddenAdminMediaLibraryMigrationPath);
   renameSync(adminAuditEventsMigrationPath, hiddenAdminAuditEventsMigrationPath);
 
   try {
@@ -316,6 +360,10 @@ function runTaxC1ValidatorWithoutLaterMigrations() {
       stdio: 'inherit',
     });
   } finally {
+    if (existsSync(hiddenAdminMediaLibraryMigrationPath)) {
+      renameSync(hiddenAdminMediaLibraryMigrationPath, adminMediaLibraryMigrationPath);
+    }
+
     if (existsSync(hiddenAdminAuditEventsMigrationPath)) {
       renameSync(hiddenAdminAuditEventsMigrationPath, adminAuditEventsMigrationPath);
     }
@@ -339,6 +387,7 @@ validateTaxRlsMigration();
 validateGeoFullBCountryCodeMigration();
 validateTaxSpecialtyModelMigration();
 validateAdminAuditEventsMigration();
+validateAdminMediaLibraryMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
-console.log('ADM-GOV-A migration validation passed.');
+console.log('ADM-MEDIA-A migration validation passed.');

@@ -2440,7 +2440,14 @@ export type Database = {
       }
       media_assets: {
         Row: {
+          admin_review_status: string
+          admin_usage_kind: string
+          admin_visibility_status: string
+          alt_text_ar: string | null
+          alt_text_en: string | null
           blurhash: string | null
+          caption_ar: string | null
+          caption_en: string | null
           checksum_sha256: string | null
           created_at: string
           created_by_profile_id: string | null
@@ -2449,6 +2456,7 @@ export type Database = {
           file_size_bytes: number | null
           height: number | null
           id: string
+          is_archived: boolean
           metadata: Json
           mime_type: string | null
           original_filename: string | null
@@ -2458,10 +2466,18 @@ export type Database = {
           storage_bucket: string | null
           storage_path: string | null
           updated_at: string
+          updated_by_profile_id: string | null
           width: number | null
         }
         Insert: {
+          admin_review_status?: string
+          admin_usage_kind?: string
+          admin_visibility_status?: string
+          alt_text_ar?: string | null
+          alt_text_en?: string | null
           blurhash?: string | null
+          caption_ar?: string | null
+          caption_en?: string | null
           checksum_sha256?: string | null
           created_at?: string
           created_by_profile_id?: string | null
@@ -2470,6 +2486,7 @@ export type Database = {
           file_size_bytes?: number | null
           height?: number | null
           id?: string
+          is_archived?: boolean
           metadata?: Json
           mime_type?: string | null
           original_filename?: string | null
@@ -2479,10 +2496,18 @@ export type Database = {
           storage_bucket?: string | null
           storage_path?: string | null
           updated_at?: string
+          updated_by_profile_id?: string | null
           width?: number | null
         }
         Update: {
+          admin_review_status?: string
+          admin_usage_kind?: string
+          admin_visibility_status?: string
+          alt_text_ar?: string | null
+          alt_text_en?: string | null
           blurhash?: string | null
+          caption_ar?: string | null
+          caption_en?: string | null
           checksum_sha256?: string | null
           created_at?: string
           created_by_profile_id?: string | null
@@ -2491,6 +2516,7 @@ export type Database = {
           file_size_bytes?: number | null
           height?: number | null
           id?: string
+          is_archived?: boolean
           metadata?: Json
           mime_type?: string | null
           original_filename?: string | null
@@ -2500,6 +2526,7 @@ export type Database = {
           storage_bucket?: string | null
           storage_path?: string | null
           updated_at?: string
+          updated_by_profile_id?: string | null
           width?: number | null
         }
         Relationships: [
