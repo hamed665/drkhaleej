@@ -14,6 +14,7 @@
     "geo:validate:oman": "node scripts/validate-oman-geo.mjs",
     "geo:export:oman": "node scripts/export-oman-geo.mjs",
     "geo:routes:validate": "node scripts/validate-oman-geo-route-contract.mjs",
+    "geo:check:oman": "pnpm geo:validate:oman && pnpm geo:routes:validate",
     "db:check-cli": "node scripts/db/check-supabase-cli.mjs",
     "db:validate:migrations": "node scripts/db/validate-migrations-taxrlsa.mjs",
     "db:validate:seeds": "node scripts/db/validate-seeds.mjs",
