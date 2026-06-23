@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const geoPath = 'src/config/geo/oman.ts';
 const outputPath = 'data/seo/oman-geo-registry.json';
+const policyPath = 'docs/DRMUSCAT_GEO_EXPORT_GENERATED_POLICY_V1.md';
 
 function readFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -85,4 +86,6 @@ fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(exportData, null, 2)}\n`, 'utf8');
 
 console.log(`Exported Oman geo registry to ${outputPath}`);
+console.log('Generated geo export JSON is ignored by git and should not be committed.');
+console.log(`See ${policyPath} for the generated artifact policy.`);
 console.log(exportData.summary);
