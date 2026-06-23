@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const geoPath = 'src/config/geo/oman.ts';
 const contractPath = 'src/config/geo/route-contract.ts';
+const metadataHelperPath = 'src/lib/seo/geo-route-metadata.ts';
 
 const expectedRouteNames = [
   'oman-governorate',
@@ -50,12 +51,18 @@ function assert(condition, message) {
 
 const geoSource = readFile(geoPath);
 const contractSource = readFile(contractPath);
+const metadataHelperSource = readFile(metadataHelperPath);
 
-assert(contractSource.includes("status: 'runtime-scaffold'"), 'Route contract must be runtime-scaffold.');
-assert(contractSource.includes('runtimeRoutesEnabled: true'), 'Runtime routes must be enabled by this scaffold.');
-assert(contractSource.includes('metadataEnabled: false'), 'Metadata must remain disabled in this scaffold.');
-assert(contractSource.includes('sitemapEnabled: false'), 'Sitemap must remain disabled in this scaffold.');
-assert(contractSource.includes('jsonLdEnabled: false'), 'JSON-LD must remain disabled in this scaffold.');
+assert(contractSource.includes("status: 'metadata-noindex'"), 'Route contract must be metadata-noindex.');
+assert(contractSource.includes('runtimeRoutesEnabled: true'), 'Runtime routes must stay enabled.');
+assert(contractSource.includes('metadataEnabled: true'), 'Metadata must be enabled for this scaffold.');
+assert(contractSource.includes('noindexEnabled: true'), 'Noindex guardrail must be enabled.');
+assert(contractSource.includes('sitemapEnabled: false'), 'Sitemap must remain disabled.');
+assert(contractSource.includes('jsonLdEnabled: false'), 'JSON-LD must remain disabled.');
+
+assert(metadataHelperSource.includes('buildOmanGeoNoindexMetadata'), 'Missing noindex metadata helper.');
+assert(metadataHelperSource.includes('index: false'), 'Metadata helper must set index false.');
+assert(metadataHelperSource.includes('follow: true'), 'Metadata helper must keep follow true.');
 
 const routeNames = collectProp(contractSource, 'routeName');
 const duplicateRouteNames = routeNames.filter((routeName, index) => routeNames.indexOf(routeName) !== index);
@@ -71,7 +78,8 @@ for (const routeFile of expectedRouteFiles) {
 
   const routeSource = readFile(routeFile);
   assert(routeSource.includes('notFound'), `Route file must guard invalid params: ${routeFile}`);
-  assert(!routeSource.includes('generateMetadata'), `Route scaffold must not generate metadata yet: ${routeFile}`);
+  assert(routeSource.includes('generateMetadata'), `Route file must generate noindex metadata: ${routeFile}`);
+  assert(routeSource.includes('buildOmanGeoNoindexMetadata'), `Route file must use noindex metadata helper: ${routeFile}`);
   assert(!routeSource.includes('sitemap'), `Route scaffold must not generate sitemap behavior yet: ${routeFile}`);
   assert(!routeSource.includes('jsonLd'), `Route scaffold must not generate JSON-LD yet: ${routeFile}`);
 }
@@ -87,10 +95,11 @@ const summary = {
   routeTemplates: routeNames.length,
   routeFiles: expectedRouteFiles.length,
   runtimeRoutesEnabled: true,
-  metadataEnabled: false,
+  metadataEnabled: true,
+  noindexEnabled: true,
   sitemapEnabled: false,
   jsonLdEnabled: false,
 };
 
-console.log('Oman geo runtime route scaffold validated.');
+console.log('Oman geo noindex metadata guardrails validated.');
 console.log(summary);
