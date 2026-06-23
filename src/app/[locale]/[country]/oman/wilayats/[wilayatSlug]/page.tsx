@@ -1,14 +1,42 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { OmanGeoRuntimeScaffold } from '@/components/geo/oman-geo-runtime-scaffold';
 import { OMAN_GOVERNORATES, OMAN_WILAYATS } from '@/config/geo/oman';
 import { isSupportedCountry, isSupportedLocale } from '@/lib/i18n/config';
+import { buildOmanGeoNoindexMetadata } from '@/lib/seo/geo-route-metadata';
 
 type Params = {
   locale: string;
   country: string;
   wilayatSlug: string;
 };
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { locale, country, wilayatSlug } = await params;
+
+  if (!isSupportedLocale(locale) || !isSupportedCountry(country) || country !== 'om') {
+    return {};
+  }
+
+  const wilayat = OMAN_WILAYATS.find((item) => item.slug === wilayatSlug);
+
+  if (!wilayat) {
+    return {};
+  }
+
+  const governorate = OMAN_GOVERNORATES.find((item) => item.slug === wilayat.governorateSlug);
+  const parentLabel = governorate ? (locale === 'ar' ? governorate.labelAr : governorate.labelEn) : null;
+
+  return buildOmanGeoNoindexMetadata({
+    locale,
+    country,
+    entity: 'wilayat',
+    item: wilayat,
+    pathname: `/oman/wilayats/${wilayat.slug}`,
+    ...(parentLabel ? { parentLabel } : {}),
+  });
+}
 
 export default async function OmanWilayatPage({ params }: { params: Promise<Params> }) {
   const { locale, country, wilayatSlug } = await params;
