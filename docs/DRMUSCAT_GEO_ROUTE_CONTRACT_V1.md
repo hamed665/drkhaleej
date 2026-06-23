@@ -2,17 +2,17 @@
 
 ## Purpose
 
-Define and guard the first runtime route scaffold for Oman geo discovery.
+Define and guard the runtime route scaffold for Oman geo discovery.
 
-This contract now allows runtime route files for governorate, wilayat, and area discovery pages while still blocking SEO-heavy behavior such as sitemap entries, metadata generation, JSON-LD, provider queries, and database access.
+This contract now allows runtime route files and controlled metadata generation for governorate, wilayat, and area discovery pages while keeping all geo pages noindex until provider listings and SEO content are ready.
 
 ## Status
 
 ```text
-runtime-scaffold
+metadata-noindex
 ```
 
-Runtime route files are enabled. SEO runtime behavior is not enabled.
+Runtime route files are enabled. Metadata is enabled only with noindex guardrails.
 
 ## Canonical source
 
@@ -32,6 +32,12 @@ The shared runtime scaffold component lives in:
 
 ```text
 src/components/geo/oman-geo-runtime-scaffold.tsx
+```
+
+The metadata guardrail helper lives in:
+
+```text
+src/lib/seo/geo-route-metadata.ts
 ```
 
 ## Runtime route templates
@@ -67,6 +73,19 @@ locale: en | ar
 country: om
 ```
 
+## Metadata policy
+
+Geo route metadata is enabled with noindex guardrails:
+
+```text
+robots.index = false
+robots.follow = true
+googleBot.index = false
+googleBot.follow = true
+```
+
+This means the pages can render and expose safe titles/descriptions, but they are not treated as indexable SEO landing pages yet.
+
 ## Validation command
 
 ```bash
@@ -75,31 +94,29 @@ pnpm geo:routes:validate
 
 The validator checks that:
 
-- The contract is in `runtime-scaffold` status.
+- The contract is in `metadata-noindex` status.
 - Runtime route files exist.
-- Runtime routes are enabled only for the scaffold.
-- Metadata remains disabled.
+- Metadata exists on each route file.
+- The noindex metadata helper is used.
 - Sitemap remains disabled.
 - JSON-LD remains disabled.
 - The route files guard invalid params with `notFound()`.
-- The route files do not define `generateMetadata` yet.
 
 ## Implementation gates still pending
 
 Future SEO route work must be done in separate approved PRs and must include:
 
-- metadata behavior
-- hreflang behavior
-- canonical behavior
-- sitemap behavior
-- empty state behavior
-- noindex/index policy for thin pages
+- index/noindex promotion rules
 - provider listing behavior
+- empty state behavior
+- hreflang QA
+- canonical QA
+- sitemap behavior
+- JSON-LD behavior
 
 ## Explicit non-goals
 
 - No sitemap entries
-- No metadata generation
 - No JSON-LD generation
 - No provider queries
 - No database migrations
