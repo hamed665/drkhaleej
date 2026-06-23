@@ -11,6 +11,7 @@
     "routes:check": "node scripts/routes-check.mjs",
     "env:check": "node scripts/env-check.mjs",
     "geo:validate:iran-import": "node scripts/geo/validate-iran-city-import-contract.mjs",
+    "geo:validate:oman": "node scripts/validate-oman-geo.mjs",
     "db:check-cli": "node scripts/db/check-supabase-cli.mjs",
     "db:validate:migrations": "node scripts/db/validate-migrations-taxrlsa.mjs",
     "db:validate:seeds": "node scripts/db/validate-seeds.mjs",
