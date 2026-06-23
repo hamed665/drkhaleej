@@ -52,6 +52,9 @@ jobs:
       - name: Validate Iran geo import contract
         run: pnpm geo:validate:iran-import
 
+      - name: Validate Oman geo guardrails
+        run: pnpm geo:check:oman
+
       - name: Validate SEO market gate
         run: pnpm seo:market-gate
 
