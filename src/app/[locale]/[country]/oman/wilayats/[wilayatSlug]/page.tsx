@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { OmanGeoRuntimeScaffold } from '@/components/geo/oman-geo-runtime-scaffold';
 import { OMAN_GOVERNORATES, OMAN_WILAYATS } from '@/config/geo/oman';
+import { getOmanGeoEditorialContent } from '@/lib/geo/oman-editorial-content';
 import { isSupportedCountry, isSupportedLocale } from '@/lib/i18n/config';
 import { buildOmanGeoNoindexMetadata } from '@/lib/seo/geo-route-metadata';
 
@@ -53,6 +54,11 @@ export default async function OmanWilayatPage({ params }: { params: Promise<Para
 
   const governorate = OMAN_GOVERNORATES.find((item) => item.slug === wilayat.governorateSlug);
   const parentLabel = governorate ? (locale === 'ar' ? governorate.labelAr : governorate.labelEn) : null;
+  const editorialContent = getOmanGeoEditorialContent({
+    entity: 'wilayat',
+    slug: wilayat.slug,
+    locale,
+  });
 
   return (
     <OmanGeoRuntimeScaffold
@@ -60,6 +66,7 @@ export default async function OmanWilayatPage({ params }: { params: Promise<Para
       country={country}
       entity="wilayat"
       item={wilayat}
+      editorialContent={editorialContent}
       {...(parentLabel ? { parentLabel } : {})}
     />
   );
