@@ -21,6 +21,7 @@
     "seo:market-gate": "node scripts/seo/test-market-gate-static.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "taxonomy:validate": "node scripts/validate-taxonomy.mjs",
+    "taxonomy:export": "node scripts/export-taxonomy.mjs",
     "test": "pnpm test:unit",
     "test:unit": "vitest run",
     "test:landing:public-gate": "node scripts/db/test-landing-public-gate-static.mjs",
