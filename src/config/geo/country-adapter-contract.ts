@@ -9,7 +9,10 @@ export type DrMuscatCountryGeoLevelKey =
   | 'city'
   | 'district'
   | 'region'
-  | 'municipality';
+  | 'municipality'
+  | 'state'
+  | 'province'
+  | 'nation';
 
 export type DrMuscatCountryGeoLevel = {
   key: DrMuscatCountryGeoLevelKey;
@@ -66,10 +69,117 @@ const omanGeoLevels = [
   },
 ] as const satisfies readonly DrMuscatCountryGeoLevel[];
 
+const canadaDraftGeoLevels = [
+  {
+    key: 'province',
+    order: 1,
+    routeSegment: 'provinces',
+    routeParam: 'provinceSlug',
+    parentKey: null,
+    enabled: false,
+  },
+  {
+    key: 'city',
+    order: 2,
+    routeSegment: 'cities',
+    routeParam: 'citySlug',
+    parentKey: 'province',
+    enabled: false,
+  },
+  {
+    key: 'area',
+    order: 3,
+    routeSegment: 'areas',
+    routeParam: 'areaSlug',
+    parentKey: 'city',
+    enabled: false,
+  },
+] as const satisfies readonly DrMuscatCountryGeoLevel[];
+
+const unitedStatesDraftGeoLevels = [
+  {
+    key: 'state',
+    order: 1,
+    routeSegment: 'states',
+    routeParam: 'stateSlug',
+    parentKey: null,
+    enabled: false,
+  },
+  {
+    key: 'city',
+    order: 2,
+    routeSegment: 'cities',
+    routeParam: 'citySlug',
+    parentKey: 'state',
+    enabled: false,
+  },
+  {
+    key: 'area',
+    order: 3,
+    routeSegment: 'areas',
+    routeParam: 'areaSlug',
+    parentKey: 'city',
+    enabled: false,
+  },
+] as const satisfies readonly DrMuscatCountryGeoLevel[];
+
+const unitedKingdomDraftGeoLevels = [
+  {
+    key: 'nation',
+    order: 1,
+    routeSegment: 'nations',
+    routeParam: 'nationSlug',
+    parentKey: null,
+    enabled: false,
+  },
+  {
+    key: 'city',
+    order: 2,
+    routeSegment: 'cities',
+    routeParam: 'citySlug',
+    parentKey: 'nation',
+    enabled: false,
+  },
+  {
+    key: 'area',
+    order: 3,
+    routeSegment: 'areas',
+    routeParam: 'areaSlug',
+    parentKey: 'city',
+    enabled: false,
+  },
+] as const satisfies readonly DrMuscatCountryGeoLevel[];
+
+type DraftCountryAdapterOverride = {
+  countrySlug: string;
+  routeNamespace: string;
+  geoLevels: readonly DrMuscatCountryGeoLevel[];
+};
+
+const draftCountryAdapterOverrides: Partial<Record<InternalGeoCountryCode, DraftCountryAdapterOverride>> = {
+  ca: {
+    countrySlug: 'canada',
+    routeNamespace: 'canada',
+    geoLevels: canadaDraftGeoLevels,
+  },
+  us: {
+    countrySlug: 'united-states',
+    routeNamespace: 'united-states',
+    geoLevels: unitedStatesDraftGeoLevels,
+  },
+  gb: {
+    countrySlug: 'united-kingdom',
+    routeNamespace: 'uk',
+    geoLevels: unitedKingdomDraftGeoLevels,
+  },
+};
+
 function disabledDraftAdapter(countryCode: InternalGeoCountryCode): DrMuscatCountryAdapter {
+  const override = draftCountryAdapterOverrides[countryCode];
+
   return {
     countryCode,
-    countrySlug: countryCode,
+    countrySlug: override?.countrySlug ?? countryCode,
     status: 'disabled-draft',
     publicEnabled: false,
     seoIndexable: false,
@@ -77,8 +187,8 @@ function disabledDraftAdapter(countryCode: InternalGeoCountryCode): DrMuscatCoun
     llmSurfaceEnabled: false,
     supportedLocales: ['en', 'ar'],
     defaultLocale: 'en',
-    geoLevels: [],
-    routeNamespace: countryCode,
+    geoLevels: override?.geoLevels ?? [],
+    routeNamespace: override?.routeNamespace ?? countryCode,
     metadataPolicy: 'noindex-first',
     publicationPolicy: 'gated',
     schemaPolicy: 'disabled-until-approved',
