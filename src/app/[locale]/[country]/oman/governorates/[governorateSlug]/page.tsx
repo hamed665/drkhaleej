@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { OmanGeoRuntimeScaffold } from '@/components/geo/oman-geo-runtime-scaffold';
 import { OMAN_GOVERNORATES } from '@/config/geo/oman';
+import { getOmanGeoPublicationGates } from '@/lib/geo/oman-publication-gates';
 import { getOmanGeoReadiness } from '@/lib/geo/oman-readiness';
 import { isSupportedCountry, isSupportedLocale } from '@/lib/i18n/config';
 import { buildOmanGeoNoindexMetadata } from '@/lib/seo/geo-route-metadata';
@@ -53,6 +54,12 @@ export default async function OmanGovernoratePage({ params }: { params: Promise<
     slug: governorate.slug,
     locale,
   });
+  const publicationGates = getOmanGeoPublicationGates({
+    entity: 'governorate',
+    slug: governorate.slug,
+    locale,
+    readiness,
+  });
 
   return (
     <OmanGeoRuntimeScaffold
@@ -64,6 +71,7 @@ export default async function OmanGovernoratePage({ params }: { params: Promise<
       providerInventory={readiness.providerInventory}
       indexPromotionEligibility={readiness.indexPromotionEligibility}
       readiness={readiness}
+      publicationGates={publicationGates}
     />
   );
 }
