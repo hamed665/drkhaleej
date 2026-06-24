@@ -2,7 +2,7 @@ import "server-only";
 
 import { inflateRawSync } from "node:zlib";
 
-type ParsedCellValue = string | number | boolean | null;
+export type ParsedCellValue = string | number | boolean | null;
 
 export type ParsedImportSpreadsheetRow = {
   sheetName: string;
@@ -51,12 +51,13 @@ export function parseImportSpreadsheet(
 }
 
 function parseXlsxSpreadsheet(bytes: Uint8Array): ParsedImportSpreadsheet {
-  const entries = readZipEntries(Buffer.from(bytes));
+  const workbookBuffer = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const entries = readZipEntries(workbookBuffer);
   const fileMap = new Map<string, Buffer>();
 
   for (const entry of entries) {
     if (!entry.fileName.endsWith(".xml") && !entry.fileName.endsWith(".rels")) continue;
-    fileMap.set(entry.fileName, readZipEntry(Buffer.from(bytes), entry));
+    fileMap.set(entry.fileName, readZipEntry(workbookBuffer, entry));
   }
 
   const workbookXml = readTextFile(fileMap, "xl/workbook.xml");
@@ -114,6 +115,8 @@ function parseDelimitedSpreadsheet(
 
   for (let index = headerIndex + 1; index < table.length; index += 1) {
     const row = table[index];
+    if (row === undefined) continue;
+
     const values: Record<string, ParsedCellValue> = {};
 
     row.forEach((cell, cellIndex) => {
@@ -136,8 +139,8 @@ function parseDelimitedRows(text: string, delimiter: string): string[][] {
   let insideQuotes = false;
 
   for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-    const next = text[index + 1];
+    const char = text.charAt(index);
+    const next = text.charAt(index + 1);
 
     if (char === '"') {
       if (insideQuotes && next === '"') {
@@ -236,6 +239,8 @@ function parseWorksheetRows(
 
   for (let index = headerIndex + 1; index < rawRows.length; index += 1) {
     const rawRow = rawRows[index];
+    if (rawRow === undefined) continue;
+
     const values: Record<string, ParsedCellValue> = {};
 
     rawRow.cells.forEach((cell, cellIndex) => {
