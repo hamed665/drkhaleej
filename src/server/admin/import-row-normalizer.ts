@@ -1,9 +1,9 @@
 import "server-only";
 
 export type ImportJsonPrimitive = string | number | boolean | null;
-export type ImportJsonValue = ImportJsonPrimitive | ImportJsonValue[] | { [key: string]: ImportJsonValue };
-export type ImportJsonRecord = Record<string, ImportJsonValue>;
+export type ImportJsonValue = unknown;
 
+type ImportJsonRecord = Record<string, unknown>;
 type RawImportValues = Record<string, ImportJsonPrimitive>;
 
 export type NormalizedImportPayload = {
