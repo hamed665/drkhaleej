@@ -3,6 +3,7 @@ import fs from 'node:fs';
 const geoPath = 'src/config/geo/oman.ts';
 const contractPath = 'src/config/geo/route-contract.ts';
 const metadataHelperPath = 'src/lib/seo/geo-route-metadata.ts';
+const gatedMetadataHelperPath = 'src/lib/seo/oman-geo-gated-metadata.ts';
 const indexPromotionPolicyPath = 'src/config/geo/index-promotion-policy.ts';
 
 const expectedRouteNames = [
@@ -53,6 +54,7 @@ function assert(condition, message) {
 const geoSource = readFile(geoPath);
 const contractSource = readFile(contractPath);
 const metadataHelperSource = readFile(metadataHelperPath);
+const gatedMetadataHelperSource = readFile(gatedMetadataHelperPath);
 const indexPromotionPolicySource = readFile(indexPromotionPolicyPath);
 
 assert(contractSource.includes("status: 'metadata-noindex'"), 'Route contract must be metadata-noindex.');
@@ -65,6 +67,9 @@ assert(contractSource.includes('jsonLdEnabled: false'), 'JSON-LD must remain dis
 assert(metadataHelperSource.includes('buildOmanGeoNoindexMetadata'), 'Missing noindex metadata helper.');
 assert(metadataHelperSource.includes('index: false'), 'Metadata helper must set index false.');
 assert(metadataHelperSource.includes('follow: true'), 'Metadata helper must keep follow true.');
+assert(gatedMetadataHelperSource.includes('buildOmanGeoGatedMetadata'), 'Missing gated metadata helper.');
+assert(gatedMetadataHelperSource.includes('getOmanGeoPublicationGates'), 'Gated metadata helper must read publication gates.');
+assert(gatedMetadataHelperSource.includes('buildOmanGeoNoindexMetadata(input)'), 'Gated metadata helper must preserve noindex output.');
 
 assert(indexPromotionPolicySource.includes('OMAN_GEO_INDEX_PROMOTION_POLICY'), 'Missing Oman geo index promotion policy export.');
 assert(indexPromotionPolicySource.includes("defaultStatus: 'blocked-until-content-ready'"), 'Geo index promotion must stay blocked by default.');
@@ -90,9 +95,12 @@ for (const routeFile of expectedRouteFiles) {
   assert(contractSource.includes(`routeFile: '${routeFile}'`), `Missing route file in contract: ${routeFile}`);
 
   const routeSource = readFile(routeFile);
+  const usesNoindexMetadata = routeSource.includes('buildOmanGeoNoindexMetadata');
+  const usesGatedMetadata = routeSource.includes('buildOmanGeoGatedMetadata');
+
   assert(routeSource.includes('notFound'), `Route file must guard invalid params: ${routeFile}`);
   assert(routeSource.includes('generateMetadata'), `Route file must generate noindex metadata: ${routeFile}`);
-  assert(routeSource.includes('buildOmanGeoNoindexMetadata'), `Route file must use noindex metadata helper: ${routeFile}`);
+  assert(usesNoindexMetadata || usesGatedMetadata, `Route file must use noindex or gated metadata helper: ${routeFile}`);
   assert(!routeSource.includes('sitemap'), `Route scaffold must not generate sitemap behavior yet: ${routeFile}`);
   assert(!routeSource.includes('jsonLd'), `Route scaffold must not generate JSON-LD yet: ${routeFile}`);
 }
@@ -110,6 +118,7 @@ const summary = {
   runtimeRoutesEnabled: true,
   metadataEnabled: true,
   noindexEnabled: true,
+  gatedMetadataSupported: true,
   sitemapEnabled: false,
   jsonLdEnabled: false,
   indexPromotionDefault: 'blocked-until-content-ready',
