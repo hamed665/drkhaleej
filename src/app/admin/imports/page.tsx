@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ImportUploadForm } from "@/components/admin/import-upload-form";
 import { listAdminImportBatches } from "@/server/admin/imports";
 
 function formatDate(value: string): string {
@@ -40,7 +41,7 @@ export default async function AdminImportsPage() {
           Unified import staging
         </h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. This page is read-only in this phase: it does not upload files, publish public profiles, promote pages to the sitemap, or index imported records.
+          Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Uploads now parse approved spreadsheets only into staging rows; public profiles, sitemap promotion, and indexing are still blocked.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4">
@@ -58,11 +59,13 @@ export default async function AdminImportsPage() {
         </div>
       </section>
 
+      <ImportUploadForm />
+
       {result.items.length === 0 ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="text-xl font-bold text-slate-950">No import batches yet</h3>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Excel upload and parsing are intentionally deferred to the next phase. Once uploaded batches exist, validation counts, duplicate flags, and review readiness will appear here.
+            Upload an approved Doctor v3, Pharmacy v1, or Hospital v1 spreadsheet above. Parsed rows will appear here after they are stored in protected staging.
           </p>
         </section>
       ) : (
