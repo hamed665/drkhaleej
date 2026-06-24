@@ -15,6 +15,7 @@ const adminNavigationGroups = [
       { href: "/admin", label: "Control Center" },
       { href: "/admin/provider-onboarding-leads", label: "Provider Leads" },
       { href: "/admin/draft-centers", label: "Draft Centers" },
+      { href: "/admin/imports", label: "Imports" },
     ],
   },
   {

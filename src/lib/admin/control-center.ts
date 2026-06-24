@@ -23,7 +23,7 @@ export const adminModuleGroups: AdminModuleGroup[] = [
   {
     title: "Operations",
     description:
-      "Provider intake, draft profile preparation, and core supply operations.",
+      "Provider intake, draft profile preparation, imports, and core supply operations.",
     modules: [
       {
         title: "Provider Leads",
@@ -38,6 +38,13 @@ export const adminModuleGroups: AdminModuleGroup[] = [
           "Manage internal draft center records, taxonomy assignments, quality checks, and review workflow.",
         status: "Active",
         href: "/admin/draft-centers",
+      },
+      {
+        title: "Imports",
+        description:
+          "Read-only unified staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Upload, parsing, review actions, and public publishing remain deferred.",
+        status: "Partial",
+        href: "/admin/imports",
       },
       {
         title: "Centers / Clinics",
@@ -210,6 +217,13 @@ export const partialAdminModules: AdminModule[] = [
       "Taxonomy assignment exists for draft centers; broader taxonomy administration remains planned.",
     status: "Partial",
     href: "/admin/draft-centers",
+  },
+  {
+    title: "Import staging",
+    description:
+      "Unified import staging tables and read-only admin inspection are available; upload/parsing/publishing are deferred.",
+    status: "Partial",
+    href: "/admin/imports",
   },
   {
     title: "Lead history",

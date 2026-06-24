@@ -26,7 +26,12 @@ export type AdminAuditAction =
   | "cms_content.revision_approved"
   | "cms_content.revision_rejected"
   | "cms_content.entry_archived"
-  | "cms_content.entry_restored";
+  | "cms_content.entry_restored"
+  | "import_batch.created"
+  | "import_file.registered"
+  | "import_row.validation_recorded"
+  | "import_duplicate_candidate.created"
+  | "import_review.status_changed";
 
 type JsonRecord = Record<string, Json>;
 type AdminAuditEventRow = Database["public"]["Tables"]["admin_audit_events"]["Row"];
