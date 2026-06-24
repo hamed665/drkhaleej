@@ -79,17 +79,15 @@ export function getOmanGeoReadiness(input: OmanGeoReadinessInput): OmanGeoReadin
   const qaEvidenceReady = Boolean(qaEvidenceRuntimeState.hasQaEvidence && indexPromotionEligibility.qaEvidenceComplete);
   const indexPromotionEligibilityReady = Boolean(indexPromotionEligibility.eligibleForIndexPromotion);
   const readyForPromotionReview = false;
-
-  const blockedReasons = Array.from(
-    new Set([
-      ...(contract ? [] : ['missing-readiness-contract']),
-      ...(providerInventoryReady ? [] : ['provider-inventory-not-ready']),
-      ...(editorialContentReady ? [] : ['editorial-content-not-ready']),
-      ...(qaEvidenceReady ? [] : ['qa-evidence-not-ready']),
-      ...(indexPromotionEligibilityReady ? [] : ['index-promotion-eligibility-not-ready']),
-      ...indexPromotionEligibility.blockedReasons,
-    ]),
-  );
+  const readinessBlockers = new Set([
+    ...(contract ? [] : ['missing-readiness-contract']),
+    ...(providerInventoryReady ? [] : ['provider-inventory-not-ready']),
+    ...(editorialContentReady ? [] : ['editorial-content-not-ready']),
+    ...(qaEvidenceReady ? [] : ['qa-evidence-not-ready']),
+    ...(indexPromotionEligibilityReady ? [] : ['index-promotion-eligibility-not-ready']),
+    ...indexPromotionEligibility.blockedReasons,
+  ]);
+  const blockedReasons = [...readinessBlockers];
 
   return {
     entity: input.entity,
