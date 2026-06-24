@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { resolveAdminImportDuplicateCandidate } from "@/server/admin/import-duplicate-resolution";
 import { reviewAdminImportRow } from "@/server/admin/import-row-review";
+import { projectAdminImportBatchRows } from "@/server/admin/import-public-projection";
 import {
   detectAdminImportBatchDuplicates,
   getAdminImportBatchDetail,
@@ -74,6 +75,19 @@ async function reviewRowAction(formData: FormData) {
   }
 
   const result = await reviewAdminImportRow(rawRowId, reviewDecision);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
+async function projectRowsAction(formData: FormData) {
+  "use server";
+
+  const batchIdValue = formData.get("batchId");
+  if (typeof batchIdValue !== "string") return;
+
+  const result = await projectAdminImportBatchRows(batchIdValue);
   if (result.ok) {
     revalidatePath("/admin/imports");
     revalidatePath(`/admin/imports/${batchIdValue}`);
@@ -169,6 +183,7 @@ export default async function AdminImportBatchDetailPage({
   const { batch } = result;
   const canNormalize = result.rawRows.length > 0;
   const canDetectDuplicates = result.rawRows.length > 1;
+  const canProjectRows = result.rawRows.some((row) => row.row_status === "ready_for_publish");
 
   return (
     <div className="space-y-6">
@@ -184,7 +199,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, and row review update protected staging records only; public projection, publishing, sitemap promotion, and indexing remain deferred.
+              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, and public-safe projection update protected staging records only; public publishing, sitemap promotion, and indexing remain deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -225,7 +240,7 @@ export default async function AdminImportBatchDetailPage({
         </dl>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
+      <section className="grid gap-4 xl:grid-cols-3">
         <div className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-5 text-cyan-950 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-C</p>
           <h3 className="mt-2 text-xl font-bold text-slate-950">Normalize staged rows</h3>
@@ -258,6 +273,24 @@ export default async function AdminImportBatchDetailPage({
               className="rounded-2xl bg-violet-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
             >
               Detect duplicate candidates
+            </button>
+          </form>
+        </div>
+
+        <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-5 text-emerald-950 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-800">ADM-IMPORT-F</p>
+          <h3 className="mt-2 text-xl font-bold text-slate-950">Create public-safe projection</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Copies approved rows into protected entity candidates using only safe normalized fields. Raw payloads, internal metadata, public pages, sitemap promotion, and indexing stay out of scope.
+          </p>
+          <form action={projectRowsAction} className="mt-4">
+            <input type="hidden" name="batchId" value={batch.id} />
+            <button
+              type="submit"
+              disabled={!canProjectRows}
+              className="rounded-2xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              Create public-safe projection
             </button>
           </form>
         </div>
