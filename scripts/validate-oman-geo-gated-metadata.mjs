@@ -46,7 +46,8 @@ assert(helperSource.includes('publicationGates.jsonLdAllowed'), 'Gated metadata 
 assert(helperSource.includes('publicationGates.indexPromotionAllowed'), 'Gated metadata helper must inspect index gate.');
 assert(!helperSource.includes('robots: { index: true'), 'Gated metadata helper must not create indexable robots metadata.');
 assert(!helperSource.includes('alternates:'), 'Gated metadata helper must not add new alternates behavior.');
-assert(!helperSource.includes('jsonLd'), 'Gated metadata helper must not generate JSON-LD payloads.');
+assert(!helperSource.includes('application/ld+json'), 'Gated metadata helper must not generate JSON-LD payloads.');
+assert(!helperSource.includes('schema.org'), 'Gated metadata helper must not generate schema payloads.');
 assert(noindexHelperSource.includes('index: false'), 'Base geo metadata helper must keep noindex robots.');
 
 for (const route of routeFiles) {
