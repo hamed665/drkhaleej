@@ -5,6 +5,9 @@ export const internalGeoCountryCodes = [
   'bh',
   'kw',
   'sa',
+  'ca',
+  'us',
+  'gb',
   'iq',
   'sy',
   'jo',
@@ -74,6 +77,27 @@ export const marketLaunchConfig: Record<InternalGeoCountryCode, MarketLaunchConf
   },
   sa: {
     countryCode: 'sa',
+    publicEnabled: false,
+    seoIndexable: false,
+    sitemapEnabled: false,
+    providerOnboardingEnabled: false
+  },
+  ca: {
+    countryCode: 'ca',
+    publicEnabled: false,
+    seoIndexable: false,
+    sitemapEnabled: false,
+    providerOnboardingEnabled: false
+  },
+  us: {
+    countryCode: 'us',
+    publicEnabled: false,
+    seoIndexable: false,
+    sitemapEnabled: false,
+    providerOnboardingEnabled: false
+  },
+  gb: {
+    countryCode: 'gb',
     publicEnabled: false,
     seoIndexable: false,
     sitemapEnabled: false,
