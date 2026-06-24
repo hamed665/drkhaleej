@@ -1,4 +1,5 @@
 import type { OmanGeoEditorialContentEntry, OmanGeoEditorialContentLocale } from '@/config/geo/editorial-content-contract';
+import type { OmanGeoPromotionReviewEntityContract } from '@/config/geo/promotion-review-contract';
 import type { OmanGeoProviderInventoryEntityContract } from '@/config/geo/provider-inventory-contract';
 import type { OmanGeoQaEvidenceEntityContract } from '@/config/geo/qa-evidence-contract';
 import {
@@ -16,6 +17,7 @@ import {
   getOmanGeoIndexPromotionEligibility,
   type OmanGeoIndexPromotionEligibility,
 } from '@/lib/geo/oman-index-promotion-eligibility';
+import { getOmanGeoPromotionReviewContract } from '@/lib/geo/oman-promotion-review';
 import {
   getOmanGeoProviderInventoryContract,
   getOmanGeoProviderInventoryRuntimeState,
@@ -37,11 +39,14 @@ export type OmanGeoReadinessRuntimeState = {
   editorialContent: OmanGeoEditorialContentEntry | null;
   providerInventory: OmanGeoProviderInventoryEntityContract | null;
   qaEvidence: OmanGeoQaEvidenceEntityContract | null;
+  promotionReview: OmanGeoPromotionReviewEntityContract | null;
   indexPromotionEligibility: OmanGeoIndexPromotionEligibility;
   providerInventoryReady: boolean;
   editorialContentReady: boolean;
   qaEvidenceReady: boolean;
   indexPromotionEligibilityReady: boolean;
+  promotionReviewReady: boolean;
+  promotionReviewApproved: boolean;
   readyForPromotionReview: boolean;
   noindexRemovalAllowed: boolean;
   sitemapPromotionAllowed: boolean;
@@ -63,6 +68,7 @@ export function getOmanGeoReadiness(input: OmanGeoReadinessInput): OmanGeoReadin
   const editorialContent = getOmanGeoEditorialContent(input);
   const providerInventory = getOmanGeoProviderInventoryContract({ entity: input.entity });
   const qaEvidence = getOmanGeoQaEvidenceContract({ entity: input.entity });
+  const promotionReview = getOmanGeoPromotionReviewContract({ entity: input.entity });
   const indexPromotionEligibility = getOmanGeoIndexPromotionEligibility(input);
   const providerInventoryRuntimeState = getOmanGeoProviderInventoryRuntimeState();
   const editorialContentRuntimeState = getOmanGeoEditorialContentRuntimeState();
@@ -78,13 +84,18 @@ export function getOmanGeoReadiness(input: OmanGeoReadinessInput): OmanGeoReadin
   );
   const qaEvidenceReady = Boolean(qaEvidenceRuntimeState.hasQaEvidence && indexPromotionEligibility.qaEvidenceComplete);
   const indexPromotionEligibilityReady = Boolean(indexPromotionEligibility.eligibleForIndexPromotion);
+  const promotionReviewReady = Boolean(promotionReview?.readyForPromotionReview);
+  const promotionReviewApproved = Boolean(promotionReview?.decision === 'approved' && promotionReview.reviewedByHuman);
   const readyForPromotionReview = false;
   const readinessBlockers = new Set([
     ...(contract ? [] : ['missing-readiness-contract']),
+    ...(promotionReview ? [] : ['missing-promotion-review-contract']),
     ...(providerInventoryReady ? [] : ['provider-inventory-not-ready']),
     ...(editorialContentReady ? [] : ['editorial-content-not-ready']),
     ...(qaEvidenceReady ? [] : ['qa-evidence-not-ready']),
     ...(indexPromotionEligibilityReady ? [] : ['index-promotion-eligibility-not-ready']),
+    ...(promotionReviewReady ? [] : ['promotion-review-not-ready']),
+    ...(promotionReviewApproved ? [] : ['promotion-review-approval-missing']),
     ...indexPromotionEligibility.blockedReasons,
   ]);
   const blockedReasons = [...readinessBlockers];
@@ -98,11 +109,14 @@ export function getOmanGeoReadiness(input: OmanGeoReadinessInput): OmanGeoReadin
     editorialContent,
     providerInventory,
     qaEvidence,
+    promotionReview,
     indexPromotionEligibility,
     providerInventoryReady,
     editorialContentReady,
     qaEvidenceReady,
     indexPromotionEligibilityReady,
+    promotionReviewReady,
+    promotionReviewApproved,
     readyForPromotionReview,
     noindexRemovalAllowed: false,
     sitemapPromotionAllowed: false,
