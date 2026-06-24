@@ -69,6 +69,33 @@ const omanGeoLevels = [
   },
 ] as const satisfies readonly DrMuscatCountryGeoLevel[];
 
+const uaeDraftGeoLevels = [
+  {
+    key: 'emirate',
+    order: 1,
+    routeSegment: 'emirates',
+    routeParam: 'emirateSlug',
+    parentKey: null,
+    enabled: false,
+  },
+  {
+    key: 'city',
+    order: 2,
+    routeSegment: 'cities',
+    routeParam: 'citySlug',
+    parentKey: 'emirate',
+    enabled: false,
+  },
+  {
+    key: 'area',
+    order: 3,
+    routeSegment: 'areas',
+    routeParam: 'areaSlug',
+    parentKey: 'city',
+    enabled: false,
+  },
+] as const satisfies readonly DrMuscatCountryGeoLevel[];
+
 const canadaDraftGeoLevels = [
   {
     key: 'province',
@@ -157,6 +184,11 @@ type DraftCountryAdapterOverride = {
 };
 
 const draftCountryAdapterOverrides: Partial<Record<InternalGeoCountryCode, DraftCountryAdapterOverride>> = {
+  ae: {
+    countrySlug: 'united-arab-emirates',
+    routeNamespace: 'uae',
+    geoLevels: uaeDraftGeoLevels,
+  },
   ca: {
     countrySlug: 'canada',
     routeNamespace: 'canada',
