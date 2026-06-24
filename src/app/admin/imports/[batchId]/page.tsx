@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { resolveAdminImportDuplicateCandidate } from "@/server/admin/import-duplicate-resolution";
+import { reviewAdminImportRow } from "@/server/admin/import-row-review";
 import {
   detectAdminImportBatchDuplicates,
   getAdminImportBatchDetail,
@@ -61,6 +62,24 @@ async function resolveDuplicateAction(formData: FormData) {
   }
 }
 
+async function reviewRowAction(formData: FormData) {
+  "use server";
+
+  const rawRowId = formData.get("rawRowId");
+  const reviewDecision = formData.get("reviewDecision");
+  const batchIdValue = formData.get("batchId");
+
+  if (typeof rawRowId !== "string" || typeof reviewDecision !== "string" || typeof batchIdValue !== "string") {
+    return;
+  }
+
+  const result = await reviewAdminImportRow(rawRowId, reviewDecision);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en", {
     dateStyle: "medium",
@@ -92,6 +111,32 @@ function DuplicateResolutionButton({
       <input type="hidden" name="batchId" value={batchId} />
       <input type="hidden" name="duplicateCandidateId" value={duplicateCandidateId} />
       <input type="hidden" name="resolutionStatus" value={resolutionStatus} />
+      <button
+        type="submit"
+        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+      >
+        {label}
+      </button>
+    </form>
+  );
+}
+
+function RowReviewButton({
+  batchId,
+  rawRowId,
+  reviewDecision,
+  label,
+}: {
+  batchId: string;
+  rawRowId: string;
+  reviewDecision: string;
+  label: string;
+}) {
+  return (
+    <form action={reviewRowAction}>
+      <input type="hidden" name="batchId" value={batchId} />
+      <input type="hidden" name="rawRowId" value={rawRowId} />
+      <input type="hidden" name="reviewDecision" value={reviewDecision} />
       <button
         type="submit"
         className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
@@ -139,7 +184,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization, duplicate detection, and duplicate resolution update protected staging records only; public publishing, sitemap promotion, and indexing remain deferred.
+              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, and row review update protected staging records only; public projection, publishing, sitemap promotion, and indexing remain deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -160,7 +205,7 @@ export default async function AdminImportBatchDetailPage({
             <p className="mt-2 font-mono text-lg text-slate-950">{batch.duplicateSuspectedRows}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ready for review</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ready for projection</p>
             <p className="mt-2 font-mono text-lg text-slate-950">{batch.readyForReviewRows}</p>
           </div>
         </div>
@@ -252,30 +297,10 @@ export default async function AdminImportBatchDetailPage({
                     </div>
                     {candidate.resolution_status === "pending" ? (
                       <div className="flex flex-wrap gap-2">
-                        <DuplicateResolutionButton
-                          batchId={batch.id}
-                          duplicateCandidateId={candidate.id}
-                          resolutionStatus="same_entity"
-                          label="Same entity"
-                        />
-                        <DuplicateResolutionButton
-                          batchId={batch.id}
-                          duplicateCandidateId={candidate.id}
-                          resolutionStatus="different_entity"
-                          label="Different"
-                        />
-                        <DuplicateResolutionButton
-                          batchId={batch.id}
-                          duplicateCandidateId={candidate.id}
-                          resolutionStatus="needs_manual_review"
-                          label="Manual review"
-                        />
-                        <DuplicateResolutionButton
-                          batchId={batch.id}
-                          duplicateCandidateId={candidate.id}
-                          resolutionStatus="ignored"
-                          label="Ignore"
-                        />
+                        <DuplicateResolutionButton batchId={batch.id} duplicateCandidateId={candidate.id} resolutionStatus="same_entity" label="Same entity" />
+                        <DuplicateResolutionButton batchId={batch.id} duplicateCandidateId={candidate.id} resolutionStatus="different_entity" label="Different" />
+                        <DuplicateResolutionButton batchId={batch.id} duplicateCandidateId={candidate.id} resolutionStatus="needs_manual_review" label="Manual review" />
+                        <DuplicateResolutionButton batchId={batch.id} duplicateCandidateId={candidate.id} resolutionStatus="ignored" label="Ignore" />
                       </div>
                     ) : null}
                   </div>
@@ -287,7 +312,7 @@ export default async function AdminImportBatchDetailPage({
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-950">Raw row preview</h3>
+        <h3 className="text-lg font-bold text-slate-950">Import review queue</h3>
         {result.rawRows.length === 0 ? (
           <p className="mt-3 text-sm leading-6 text-slate-600">No parsed rows are available yet.</p>
         ) : (
@@ -300,16 +325,25 @@ export default async function AdminImportBatchDetailPage({
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Score</th>
                   <th className="px-4 py-3">Last checked</th>
+                  <th className="px-4 py-3">Review decision</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {result.rawRows.map((row) => (
-                  <tr key={row.id}>
+                  <tr key={row.id} className="align-top">
                     <td className="px-4 py-3 font-mono text-slate-700">{row.row_number}</td>
                     <td className="px-4 py-3 text-slate-700">{row.external_id ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-700">{formatLabel(row.row_status)}</td>
                     <td className="px-4 py-3 font-mono text-slate-700">{row.validation_score}</td>
                     <td className="px-4 py-3 text-slate-700">{row.last_checked_at ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <RowReviewButton batchId={batch.id} rawRowId={row.id} reviewDecision="approved_for_projection" label="Approve projection" />
+                        <RowReviewButton batchId={batch.id} rawRowId={row.id} reviewDecision="needs_more_data" label="Needs data" />
+                        <RowReviewButton batchId={batch.id} rawRowId={row.id} reviewDecision="hold" label="Hold" />
+                        <RowReviewButton batchId={batch.id} rawRowId={row.id} reviewDecision="rejected" label="Reject" />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
