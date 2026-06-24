@@ -1,6 +1,12 @@
 import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
+import {
+  detectStagedDuplicateCandidates,
+  duplicateMatchedRawRowIds,
+  normalizeExistingDuplicatePair,
+  type DuplicateDetectionRow,
+} from "@/server/admin/import-duplicate-detector";
 import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import {
   normalizeImportRawPayload,
@@ -44,6 +50,7 @@ type SingleQueryResult<T> = { data: T | null; error: unknown | null };
 type ImportUpdatePayload = Record<string, unknown>;
 
 type ImportQueryBuilder<T> = PromiseLike<QueryResult<T>> & {
+  insert(values: ImportUpdatePayload | ImportUpdatePayload[]): ImportQueryBuilder<T>;
   select(columns: string): ImportQueryBuilder<T>;
   eq(column: string, value: string | number | boolean): ImportQueryBuilder<T>;
   order(column: string, options?: { ascending?: boolean }): ImportQueryBuilder<T>;
@@ -91,6 +98,10 @@ type ImportRawRowForNormalization = ImportRawRow & {
   raw_payload: ImportJsonValue;
 };
 
+type ImportRawRowForDuplicateDetection = ImportRawRow & {
+  normalized_payload: ImportJsonValue;
+};
+
 type ImportValidationIssueRow = {
   id: string;
   raw_row_id: string | null;
@@ -111,6 +122,11 @@ type ImportDuplicateCandidateRow = {
   match_reason: string;
   resolution_status: string;
   created_at: string;
+};
+
+type ImportDuplicateCandidateExistingRow = {
+  raw_row_id: string;
+  metadata: ImportJsonValue;
 };
 
 type ImportMappingResultRow = {
@@ -179,9 +195,14 @@ export type AdminImportBatchNormalizeResult =
   | { ok: true; normalizedRows: number; readyForReviewRows: number }
   | { ok: false; reason: "not_found" | "unavailable" | "empty" };
 
+export type AdminImportBatchDuplicateDetectionResult =
+  | { ok: true; candidatesCreated: number; duplicateSuspectedRows: number }
+  | { ok: false; reason: "not_found" | "unavailable" | "empty" };
+
 const batchLimit = 50;
 const detailLimit = 100;
 const normalizationLimit = 500;
+const duplicateDetectionLimit = 500;
 const batchColumns =
   "id, batch_name, entity_type, source_type, source_name, file_name, file_hash, status, total_rows, valid_rows, invalid_rows, duplicate_suspected_rows, ready_for_review_rows, created_at, updated_at";
 
@@ -220,6 +241,17 @@ function nextNormalizedRowStatus(currentStatus: string, readyForReview: boolean)
 
   if (currentStatus === "validation_failed") return "validation_failed";
   return readyForReview ? "normalized" : "needs_review";
+}
+
+function toDuplicateDetectionRow(row: ImportRawRowForDuplicateDetection): DuplicateDetectionRow {
+  return {
+    id: row.id,
+    rowNumber: row.row_number,
+    entityType: row.entity_type,
+    rowStatus: row.row_status,
+    externalId: row.external_id,
+    normalizedPayload: row.normalized_payload,
+  };
 }
 
 export async function listAdminImportBatches(): Promise<AdminImportBatchListResult> {
@@ -452,4 +484,124 @@ export async function normalizeAdminImportBatchRows(
   });
 
   return { ok: true, normalizedRows, readyForReviewRows };
+}
+
+export async function detectAdminImportBatchDuplicates(
+  batchId: string,
+): Promise<AdminImportBatchDuplicateDetectionResult> {
+  const admin = await requireAdminPermission("imports.validate");
+
+  if (!isUuid(batchId)) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  const supabase = createImportAdminClient();
+  const batchResult = await supabase
+    .from<ImportBatchRow>("import_batches")
+    .select(batchColumns)
+    .eq("id", batchId)
+    .maybeSingle();
+
+  if (batchResult.error !== null) {
+    return { ok: false, reason: "unavailable" };
+  }
+
+  if (batchResult.data === null) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  const [rowsResult, existingResult] = await Promise.all([
+    supabase
+      .from<ImportRawRowForDuplicateDetection>("import_raw_rows")
+      .select(
+        "id, row_number, entity_type, external_id, row_status, validation_score, source_url, last_checked_at, normalized_payload, created_at, updated_at",
+      )
+      .eq("batch_id", batchId)
+      .order("row_number", { ascending: true })
+      .limit(duplicateDetectionLimit),
+    supabase
+      .from<ImportDuplicateCandidateExistingRow>("import_duplicate_candidates")
+      .select("raw_row_id, metadata")
+      .eq("batch_id", batchId)
+      .limit(duplicateDetectionLimit),
+  ]);
+
+  if (rowsResult.error !== null || rowsResult.data === null || existingResult.error !== null || existingResult.data === null) {
+    return { ok: false, reason: "unavailable" };
+  }
+
+  if (rowsResult.data.length === 0) {
+    return { ok: false, reason: "empty" };
+  }
+
+  const candidates = detectStagedDuplicateCandidates(
+    rowsResult.data.map(toDuplicateDetectionRow),
+    existingResult.data.map((candidate) => normalizeExistingDuplicatePair(candidate.raw_row_id, candidate.metadata)),
+  );
+  const duplicateRowIds = duplicateMatchedRawRowIds(candidates);
+
+  if (candidates.length > 0) {
+    const insertResult = await supabase.from("import_duplicate_candidates").insert(
+      candidates.map((candidate) => ({
+        batch_id: batchId,
+        raw_row_id: candidate.rawRowId,
+        matched_entity_type: candidate.matchedEntityType,
+        matched_entity_id: null,
+        match_score: candidate.matchScore,
+        match_reason: candidate.matchReason,
+        resolution_status: "pending",
+        metadata: {
+          detector_version: "v1",
+          matched_raw_row_id: candidate.matchedRawRowId,
+          matched_row_number: candidate.matchedRowNumber,
+          signals: candidate.signals,
+        },
+      })),
+    );
+
+    if (insertResult.error !== null) {
+      return { ok: false, reason: "unavailable" };
+    }
+  }
+
+  const batchUpdateResult = await supabase
+    .from("import_batches")
+    .update({
+      status: candidates.length > 0 ? "reviewing" : batchResult.data.status,
+      duplicate_suspected_rows: duplicateRowIds.length,
+      metadata: {
+        duplicate_detector_version: "v1",
+        duplicate_candidates_created: candidates.length,
+        duplicate_suspected_rows: duplicateRowIds.length,
+        max_rows_per_run: duplicateDetectionLimit,
+      },
+    })
+    .eq("id", batchId);
+
+  if (batchUpdateResult.error !== null) {
+    return { ok: false, reason: "unavailable" };
+  }
+
+  if (candidates.length > 0) {
+    await writeAdminAuditEvent({
+      admin,
+      permissionKey: "imports.validate",
+      action: "import_duplicate_candidate.created",
+      entityType: "import_batch",
+      entityId: batchId,
+      targetTable: "import_duplicate_candidates",
+      summary: "Duplicate candidates created for normalized import rows.",
+      metadata: {
+        candidatesCreated: candidates.length,
+        duplicateSuspectedRows: duplicateRowIds.length,
+        previousBatchStatus: batchResult.data.status,
+      },
+    });
+  }
+
+  return {
+    ok: true,
+    candidatesCreated: candidates.length,
+    duplicateSuspectedRows: duplicateRowIds.length,
+  };
 }

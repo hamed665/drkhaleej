@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
+  detectAdminImportBatchDuplicates,
   getAdminImportBatchDetail,
   normalizeAdminImportBatchRows,
 } from "@/server/admin/imports";
@@ -18,6 +19,19 @@ async function normalizeBatchAction(formData: FormData) {
   if (typeof batchIdValue !== "string") return;
 
   const result = await normalizeAdminImportBatchRows(batchIdValue);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
+async function detectDuplicatesAction(formData: FormData) {
+  "use server";
+
+  const batchIdValue = formData.get("batchId");
+  if (typeof batchIdValue !== "string") return;
+
+  const result = await detectAdminImportBatchDuplicates(batchIdValue);
   if (result.ok) {
     revalidatePath("/admin/imports");
     revalidatePath(`/admin/imports/${batchIdValue}`);
@@ -60,6 +74,7 @@ export default async function AdminImportBatchDetailPage({
 
   const { batch } = result;
   const canNormalize = result.rawRows.length > 0;
+  const canDetectDuplicates = result.rawRows.length > 1;
 
   return (
     <div className="space-y-6">
@@ -75,7 +90,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization updates protected staging rows only; review actions, duplicate resolution, public publishing, sitemap promotion, and indexing remain deferred.
+              Batch inspection and staging controls. Normalization and duplicate detection update protected staging records only; review actions, public publishing, sitemap promotion, and indexing remain deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -92,8 +107,8 @@ export default async function AdminImportBatchDetailPage({
             <p className="mt-2 font-mono text-lg text-slate-950">{batch.totalRows}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Invalid rows</p>
-            <p className="mt-2 font-mono text-lg text-slate-950">{batch.invalidRows}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Duplicate suspected</p>
+            <p className="mt-2 font-mono text-lg text-slate-950">{batch.duplicateSuspectedRows}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ready for review</p>
@@ -116,16 +131,14 @@ export default async function AdminImportBatchDetailPage({
         </dl>
       </section>
 
-      <section className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-5 text-cyan-950 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-C</p>
-            <h3 className="mt-2 text-xl font-bold text-slate-950">Normalize staged rows</h3>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Cleans names, source fields, Oman phone numbers, WhatsApp, Google Maps URLs, dates, geo text, specialty/service text, languages, and quality flags into normalized_payload. This does not publish or index any provider.
-            </p>
-          </div>
-          <form action={normalizeBatchAction}>
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-5 text-cyan-950 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-C</p>
+          <h3 className="mt-2 text-xl font-bold text-slate-950">Normalize staged rows</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Cleans names, source fields, Oman phone numbers, WhatsApp, Google Maps URLs, dates, geo text, specialty/service text, languages, and quality flags into normalized_payload. This does not publish or index any provider.
+          </p>
+          <form action={normalizeBatchAction} className="mt-4">
             <input type="hidden" name="batchId" value={batch.id} />
             <button
               type="submit"
@@ -133,6 +146,24 @@ export default async function AdminImportBatchDetailPage({
               className="rounded-2xl bg-cyan-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
             >
               Normalize staging rows
+            </button>
+          </form>
+        </div>
+
+        <div className="rounded-3xl border border-violet-100 bg-violet-50/70 p-5 text-violet-950 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-800">ADM-IMPORT-D</p>
+          <h3 className="mt-2 text-xl font-bold text-slate-950">Detect duplicate candidates</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Compares normalized rows by name, external ID, phone, WhatsApp, map URLs, source URLs, coordinates, area, and wilayat. This only creates pending duplicate candidates for admin review.
+          </p>
+          <form action={detectDuplicatesAction} className="mt-4">
+            <input type="hidden" name="batchId" value={batch.id} />
+            <button
+              type="submit"
+              disabled={!canDetectDuplicates}
+              className="rounded-2xl bg-violet-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              Detect duplicate candidates
             </button>
           </form>
         </div>
