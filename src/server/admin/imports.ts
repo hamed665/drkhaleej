@@ -4,7 +4,6 @@ import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import {
   normalizeImportRawPayload,
-  type ImportJsonRecord,
   type ImportJsonValue,
 } from "@/server/admin/import-row-normalizer";
 import { requireAdminPermission } from "@/server/admin/permissions";
@@ -42,18 +41,19 @@ type ImportTableName =
 
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
 type SingleQueryResult<T> = { data: T | null; error: unknown | null };
+type ImportUpdatePayload = Record<string, unknown>;
 
 type ImportQueryBuilder<T> = PromiseLike<QueryResult<T>> & {
   select(columns: string): ImportQueryBuilder<T>;
   eq(column: string, value: string | number | boolean): ImportQueryBuilder<T>;
   order(column: string, options?: { ascending?: boolean }): ImportQueryBuilder<T>;
   limit(count: number): ImportQueryBuilder<T>;
-  update(values: ImportJsonRecord): ImportQueryBuilder<T>;
+  update(values: ImportUpdatePayload): ImportQueryBuilder<T>;
   maybeSingle(): Promise<SingleQueryResult<T>>;
 };
 
 type ImportAdminClient = {
-  from<T extends object>(table: ImportTableName): ImportQueryBuilder<T>;
+  from<T extends object = Record<string, unknown>>(table: ImportTableName): ImportQueryBuilder<T>;
 };
 
 type ImportBatchRow = {
@@ -391,7 +391,7 @@ export async function normalizeAdminImportBatchRows(
     const updateResult = await supabase
       .from("import_raw_rows")
       .update({
-        normalized_payload: normalized.normalizedPayload as unknown as ImportJsonValue,
+        normalized_payload: normalized.normalizedPayload,
         row_status: rowStatus,
         validation_score: nextScore,
         external_id: normalized.normalizedPayload.identity.externalId ?? row.external_id,
