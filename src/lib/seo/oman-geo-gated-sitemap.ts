@@ -53,7 +53,7 @@ export function listOmanGeoGatedSitemapEntries(): readonly OmanGeoGatedSitemapEn
       locale: 'en',
     });
 
-    return gates.sitemapPromotionAllowed && gates.indexPromotionAllowed && !gates.noindexRemovalAllowed;
+    return gates.sitemapPromotionAllowed && gates.indexPromotionAllowed && gates.noindexRemovalAllowed;
   });
 }
 
