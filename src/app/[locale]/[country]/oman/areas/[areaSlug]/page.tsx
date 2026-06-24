@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { OmanGeoRuntimeScaffold } from '@/components/geo/oman-geo-runtime-scaffold';
 import { OMAN_AREAS, OMAN_GOVERNORATES, OMAN_WILAYATS } from '@/config/geo/oman';
+import { getOmanGeoPublicationGates } from '@/lib/geo/oman-publication-gates';
 import { getOmanGeoReadiness } from '@/lib/geo/oman-readiness';
 import { isSupportedCountry, isSupportedLocale } from '@/lib/i18n/config';
 import { buildOmanGeoNoindexMetadata } from '@/lib/seo/geo-route-metadata';
@@ -64,6 +65,12 @@ export default async function OmanAreaPage({ params }: { params: Promise<Params>
 
   const parentLabel = buildParentLabel(locale, area);
   const readiness = getOmanGeoReadiness({ entity: 'area', slug: area.slug, locale });
+  const publicationGates = getOmanGeoPublicationGates({
+    entity: 'area',
+    slug: area.slug,
+    locale,
+    readiness,
+  });
 
   return (
     <OmanGeoRuntimeScaffold
@@ -75,6 +82,7 @@ export default async function OmanAreaPage({ params }: { params: Promise<Params>
       providerInventory={readiness.providerInventory}
       indexPromotionEligibility={readiness.indexPromotionEligibility}
       readiness={readiness}
+      publicationGates={publicationGates}
       {...(parentLabel ? { parentLabel } : {})}
     />
   );
