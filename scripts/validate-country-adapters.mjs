@@ -4,6 +4,7 @@ const marketPath = 'src/lib/market/public-market.ts';
 const contractPath = 'src/config/geo/country-adapter-contract.ts';
 const accessorPath = 'src/lib/geo/country-adapters.ts';
 const docsPath = 'docs/DRMUSCAT_COUNTRY_ADAPTER_FOUNDATION_V1.md';
+const requiredDraftCountries = ['ae', 'qa', 'sa', 'kw', 'bh', 'ca', 'us', 'gb'];
 
 function readFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -23,7 +24,7 @@ const accessorSource = readFile(accessorPath);
 const docsSource = readFile(docsPath);
 
 const countryCodes = [...marketSource.matchAll(/'([a-z]{2})'/g)].map((match) => match[1]);
-const uniqueCountryCodes = [...new Set(countryCodes)].filter((code) => contractSource.includes(`countryCode: '${code}'`) || code === 'om');
+const uniqueCountryCodes = [...new Set(countryCodes)].filter((code) => contractSource.includes(`'${code}'`) || code === 'om');
 
 assert(contractSource.includes('DRMUSCAT_COUNTRY_ADAPTER_CONTRACT'), 'Missing country adapter contract export.');
 assert(contractSource.includes('DRMUSCAT_COUNTRY_ADAPTERS'), 'Missing country adapters export.');
@@ -41,9 +42,28 @@ assert(contractSource.includes("defaultMetadataPolicy: 'noindex-first'"), 'Missi
 assert(contractSource.includes("defaultPublicationPolicy: 'gated'"), 'Missing gated publication policy.');
 assert(contractSource.includes("defaultSchemaPolicy: 'disabled-until-approved'"), 'Missing disabled schema policy.');
 assert(contractSource.includes('disabledDraftAdapter(countryCode)'), 'Non-Oman countries must use disabled draft adapter.');
-assert(!contractSource.includes("countryCode: 'ae',\n      countrySlug: 'ae',\n      status: 'active'"), 'UAE must not be active.');
-assert(!contractSource.includes("countryCode: 'sa',\n      countrySlug: 'sa',\n      status: 'active'"), 'Saudi Arabia must not be active.');
-assert(!contractSource.includes("countryCode: 'qa',\n      countrySlug: 'qa',\n      status: 'active'"), 'Qatar must not be active.');
+
+for (const countryCode of requiredDraftCountries) {
+  assert(marketSource.includes(`'${countryCode}'`), `Missing draft market code: ${countryCode}.`);
+  assert(contractSource.includes(`${countryCode}:`) || contractSource.includes(`'${countryCode}'`), `Missing draft adapter coverage for ${countryCode}.`);
+}
+
+assert(contractSource.includes("countrySlug: 'canada'"), 'Missing Canada country slug.');
+assert(contractSource.includes("countrySlug: 'united-states'"), 'Missing United States country slug.');
+assert(contractSource.includes("countrySlug: 'united-kingdom'"), 'Missing United Kingdom country slug.');
+assert(contractSource.includes("routeNamespace: 'uk'"), 'United Kingdom route namespace should be uk.');
+assert(contractSource.includes("key: 'province'"), 'Missing Canada province level.');
+assert(contractSource.includes("key: 'state'"), 'Missing United States state level.');
+assert(contractSource.includes("key: 'nation'"), 'Missing United Kingdom nation level.');
+assert(contractSource.includes("parentKey: 'province'"), 'Missing Canada city parent key.');
+assert(contractSource.includes("parentKey: 'state'"), 'Missing United States city parent key.');
+assert(contractSource.includes("parentKey: 'nation'"), 'Missing United Kingdom city parent key.');
+assert(contractSource.includes('enabled: false'), 'Draft country geo levels must remain disabled.');
+
+for (const countryCode of ['ae', 'sa', 'qa', 'ca', 'us', 'gb']) {
+  assert(!contractSource.includes(`countryCode: '${countryCode}',\n      countrySlug: '${countryCode}',\n      status: 'active'`), `${countryCode} must not be active.`);
+}
+
 assert(!contractSource.includes('schemaPolicy: \'enabled\''), 'Schema must not be enabled.');
 assert(!contractSource.includes('llmSurfaceEnabled: true'), 'LLM surfaces must not be enabled by this foundation.');
 
@@ -60,12 +80,16 @@ assert(accessorSource.includes("schemaPolicy: 'disabled-until-approved'"), 'Runt
 
 assert(docsSource.includes('Country Adapter Foundation'), 'Docs must describe country adapter foundation.');
 assert(docsSource.includes('Only Oman is active'), 'Docs must state only Oman is active.');
+assert(docsSource.includes('Canada'), 'Docs must mention Canada draft coverage.');
+assert(docsSource.includes('United States'), 'Docs must mention United States draft coverage.');
+assert(docsSource.includes('United Kingdom'), 'Docs must mention United Kingdom draft coverage.');
 assert(docsSource.includes('Prompt 35'), 'Docs must identify next migration prompt.');
 
 console.log('Country adapter foundation validated.');
 console.log({
   countryCodes: uniqueCountryCodes.length,
   activeCountry: 'om',
+  draftCountries: requiredDraftCountries.length,
   metadataPolicy: 'noindex-first',
   publicationPolicy: 'gated',
   schemaPolicy: 'disabled-until-approved',
