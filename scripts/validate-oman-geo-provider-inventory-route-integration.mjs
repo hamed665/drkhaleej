@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 
 const accessorPath = 'src/lib/geo/oman-provider-inventory.ts';
+const readinessAccessorPath = 'src/lib/geo/oman-readiness.ts';
 const scaffoldPath = 'src/components/geo/oman-geo-runtime-scaffold.tsx';
 const routeFiles = [
   {
@@ -32,6 +33,7 @@ function assert(condition, message) {
 }
 
 const accessorSource = readFile(accessorPath);
+const readinessAccessorSource = readFile(readinessAccessorPath);
 const scaffoldSource = readFile(scaffoldPath);
 
 assert(accessorSource.includes('getOmanGeoProviderInventoryContract'), 'Missing provider inventory lookup helper.');
@@ -39,6 +41,10 @@ assert(accessorSource.includes('getOmanGeoProviderInventoryRuntimeState'), 'Miss
 assert(accessorSource.includes('hasRuntimeEvidence: false'), 'Provider inventory runtime state must not claim runtime evidence yet.');
 assert(accessorSource.includes('providerQueryAllowed: false'), 'Provider inventory runtime state must keep provider query disabled.');
 assert(accessorSource.includes('databaseAccessAllowed: false'), 'Provider inventory runtime state must keep database access disabled.');
+
+assert(readinessAccessorSource.includes('getOmanGeoProviderInventoryContract'), 'Readiness accessor must read provider inventory state.');
+assert(readinessAccessorSource.includes('providerInventoryReady'), 'Readiness accessor must expose provider inventory readiness.');
+assert(readinessAccessorSource.includes('provider-inventory-not-ready'), 'Readiness accessor must block on missing provider inventory readiness.');
 
 assert(scaffoldSource.includes('OmanGeoProviderInventoryEntityContract'), 'Runtime scaffold must accept typed provider inventory.');
 assert(scaffoldSource.includes('providerInventory?: OmanGeoProviderInventoryEntityContract | null'), 'Runtime scaffold must accept nullable provider inventory.');
@@ -51,11 +57,21 @@ assert(scaffoldSource.includes('providerEmpty'), 'Runtime scaffold must render s
 
 for (const route of routeFiles) {
   const source = readFile(route.path);
+  const usesDirectProviderInventory =
+    source.includes('getOmanGeoProviderInventoryContract') &&
+    source.includes('const providerInventory = getOmanGeoProviderInventoryContract({') &&
+    source.includes('providerInventory={providerInventory}');
+  const usesUnifiedReadiness =
+    source.includes('getOmanGeoReadiness') &&
+    source.includes('const readiness = getOmanGeoReadiness') &&
+    source.includes('providerInventory={readiness.providerInventory}') &&
+    source.includes('readiness={readiness}');
 
-  assert(source.includes('getOmanGeoProviderInventoryContract'), `Route must import provider inventory accessor: ${route.path}`);
-  assert(source.includes('const providerInventory = getOmanGeoProviderInventoryContract({'), `Route must call provider inventory accessor: ${route.path}`);
+  assert(
+    usesDirectProviderInventory || usesUnifiedReadiness,
+    `Route must wire provider inventory directly or through unified readiness: ${route.path}`,
+  );
   assert(source.includes(`entity: '${route.entity}'`), `Route must use correct provider inventory entity: ${route.path}`);
-  assert(source.includes('providerInventory={providerInventory}'), `Route must pass provider inventory into scaffold: ${route.path}`);
   assert(!source.includes('sitemap'), `Route integration must not add sitemap behavior: ${route.path}`);
   assert(!source.includes('jsonLd'), `Route integration must not add JSON-LD behavior: ${route.path}`);
 }
@@ -78,6 +94,7 @@ console.log('Oman geo provider inventory route integration validated.');
 console.log({
   routeFiles: routeFiles.length,
   providerInventoryRouteIntegration: true,
+  supportsUnifiedReadiness: true,
   providerQueryAllowed: false,
   databaseAccessAllowed: false,
 });
