@@ -5,6 +5,7 @@ import {
 } from '@/config/geo/index-promotion-policy';
 import type { OmanGeoEditorialContentLocale } from '@/config/geo/editorial-content-contract';
 import type { OmanGeoProviderInventoryEntityContract } from '@/config/geo/provider-inventory-contract';
+import type { OmanGeoQaEvidenceEntityContract } from '@/config/geo/qa-evidence-contract';
 import type { OmanGeoRouteEntity } from '@/config/geo/route-contract';
 import {
   getOmanGeoEditorialContent,
@@ -14,6 +15,10 @@ import {
   getOmanGeoProviderInventoryContract,
   getOmanGeoProviderInventoryRuntimeState,
 } from '@/lib/geo/oman-provider-inventory';
+import {
+  getOmanGeoQaEvidenceContract,
+  getOmanGeoQaEvidenceRuntimeState,
+} from '@/lib/geo/oman-qa-evidence';
 
 export type OmanGeoIndexPromotionEligibilityInput = {
   entity: OmanGeoRouteEntity;
@@ -32,8 +37,15 @@ export type OmanGeoIndexPromotionEligibility = {
   jsonLdAllowed: boolean;
   policy: OmanGeoIndexPromotionEntityPolicy | null;
   providerInventory: OmanGeoProviderInventoryEntityContract | null;
+  qaEvidence: OmanGeoQaEvidenceEntityContract | null;
   providerInventoryMeetsThreshold: boolean;
   editorialContentExists: boolean;
+  qaEvidenceComplete: boolean;
+  canonicalReviewComplete: boolean;
+  hreflangReviewComplete: boolean;
+  thinPageReviewComplete: boolean;
+  sitemapPolicyReviewComplete: boolean;
+  promotionPrApproved: boolean;
   blockedReasons: readonly string[];
 };
 
@@ -47,12 +59,28 @@ export function getOmanGeoIndexPromotionEligibility(
   const policy = getOmanGeoIndexPromotionPolicy(input.entity);
   const providerInventory = getOmanGeoProviderInventoryContract({ entity: input.entity });
   const providerInventoryRuntimeState = getOmanGeoProviderInventoryRuntimeState();
+  const qaEvidence = getOmanGeoQaEvidenceContract({ entity: input.entity });
+  const qaEvidenceRuntimeState = getOmanGeoQaEvidenceRuntimeState();
   const editorialContent = getOmanGeoEditorialContent(input);
   const editorialContentRuntimeState = getOmanGeoEditorialContentRuntimeState();
   const providerInventoryMeetsThreshold = Boolean(
     policy && providerInventory && providerInventory.publishedProviderCount >= policy.minimumPublishedProviders,
   );
   const editorialContentExists = Boolean(editorialContent);
+  const canonicalReviewComplete = Boolean(qaEvidence?.canonicalReviewComplete);
+  const hreflangReviewComplete = Boolean(qaEvidence?.hreflangReviewComplete);
+  const thinPageReviewComplete = Boolean(qaEvidence?.thinPageReviewComplete);
+  const sitemapPolicyReviewComplete = Boolean(qaEvidence?.sitemapPolicyReviewComplete);
+  const promotionPrApproved = Boolean(qaEvidence?.promotionPrApproved);
+  const qaEvidenceComplete = Boolean(
+    qaEvidence &&
+      qaEvidenceRuntimeState.hasQaEvidence &&
+      canonicalReviewComplete &&
+      hreflangReviewComplete &&
+      thinPageReviewComplete &&
+      sitemapPolicyReviewComplete &&
+      promotionPrApproved,
+  );
   const blockedReasons: string[] = [];
 
   if (!policy) {
@@ -79,6 +107,34 @@ export function getOmanGeoIndexPromotionEligibility(
     blockedReasons.push('localized-editorial-content-missing');
   }
 
+  if (!qaEvidence) {
+    blockedReasons.push('missing-qa-evidence-contract');
+  }
+
+  if (!qaEvidenceRuntimeState.hasQaEvidence) {
+    blockedReasons.push('qa-evidence-runtime-unavailable');
+  }
+
+  if (!canonicalReviewComplete) {
+    blockedReasons.push('canonical-review-incomplete');
+  }
+
+  if (!hreflangReviewComplete) {
+    blockedReasons.push('hreflang-review-incomplete');
+  }
+
+  if (!thinPageReviewComplete) {
+    blockedReasons.push('thin-page-review-incomplete');
+  }
+
+  if (!sitemapPolicyReviewComplete) {
+    blockedReasons.push('sitemap-policy-review-incomplete');
+  }
+
+  if (!promotionPrApproved) {
+    blockedReasons.push('promotion-pr-approval-missing');
+  }
+
   return {
     entity: input.entity,
     slug: input.slug,
@@ -90,8 +146,15 @@ export function getOmanGeoIndexPromotionEligibility(
     jsonLdAllowed: false,
     policy,
     providerInventory,
+    qaEvidence,
     providerInventoryMeetsThreshold,
     editorialContentExists,
+    qaEvidenceComplete,
+    canonicalReviewComplete,
+    hreflangReviewComplete,
+    thinPageReviewComplete,
+    sitemapPolicyReviewComplete,
+    promotionPrApproved,
     blockedReasons,
   };
 }
