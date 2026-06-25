@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { GuardedImportProfilePage } from '@/components/public/import-profile/GuardedImportProfilePage';
 import { PublicDoctorDetail } from '@/components/public/public-doctor-detail';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
@@ -12,6 +13,7 @@ import {
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
+import { getPublicImportDoctorProfile } from '@/server/public/import-doctor-profile-guard';
 
 type Params = { locale: string; country: string; doctorSlug: string };
 
@@ -60,6 +62,10 @@ function metadataDescription(locale: SupportedLocale, doctor: PublicDoctorDetail
   return `${normalizedBio.slice(0, 152).trim()}...`;
 }
 
+function importProfileDescription(name: string): string {
+  return `${name} on DrMuscat. Public healthcare discovery in Oman only; not medical advice, booking, or emergency care.`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country, doctorSlug } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
@@ -67,13 +73,24 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const copy = copyByLocale[locale];
   const result = await getPublicDoctorBySlug({ slug: doctorSlug, country });
 
-  if (!result.ok || !result.data) {
+  if (result.ok && result.data) {
     return buildLocalizedMetadata({
       locale,
       country,
       pathname: `/doctor/${doctorSlug}`,
-      title: copy.fallbackTitle,
-      description: copy.fallbackDescription
+      title: metadataTitle(doctorDisplayName(locale, result.data)),
+      description: metadataDescription(locale, result.data, copy.fallbackDescription)
+    });
+  }
+
+  const importResult = await getPublicImportDoctorProfile({ locale, country, doctorSlug });
+  if (importResult.ok) {
+    return buildLocalizedMetadata({
+      locale,
+      country,
+      pathname: `/doctor/${doctorSlug}`,
+      title: metadataTitle(importResult.profile.name),
+      description: importProfileDescription(importResult.profile.name)
     });
   }
 
@@ -81,8 +98,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     locale,
     country,
     pathname: `/doctor/${doctorSlug}`,
-    title: metadataTitle(doctorDisplayName(locale, result.data)),
-    description: metadataDescription(locale, result.data, copy.fallbackDescription)
+    title: copy.fallbackTitle,
+    description: copy.fallbackDescription
   });
 }
 
@@ -92,6 +109,26 @@ export default async function PublicDoctorDetailPage({ params }: { params: Promi
 
   const copy = copyByLocale[locale];
   const result = await getPublicDoctorBySlug({ slug: doctorSlug, country });
+
+  if (result.ok && result.data) {
+    const doctorName = doctorDisplayName(locale, result.data);
+    const description = metadataDescription(locale, result.data, copy.fallbackDescription);
+
+    return (
+      <PublicPageShell
+        dir={localeDirection(locale)}
+        heroBadge={copy.badge}
+        heroTitle={doctorName}
+        heroDescription={description}
+        content={<PublicDoctorDetail locale={locale} doctor={result.data} />}
+      />
+    );
+  }
+
+  const importResult = await getPublicImportDoctorProfile({ locale, country, doctorSlug });
+  if (importResult.ok) {
+    return <GuardedImportProfilePage profile={importResult.profile} locale={locale} />;
+  }
 
   if (!result.ok) {
     return (
@@ -105,18 +142,5 @@ export default async function PublicDoctorDetailPage({ params }: { params: Promi
     );
   }
 
-  if (!result.data) notFound();
-
-  const doctorName = doctorDisplayName(locale, result.data);
-  const description = metadataDescription(locale, result.data, copy.fallbackDescription);
-
-  return (
-    <PublicPageShell
-      dir={localeDirection(locale)}
-      heroBadge={copy.badge}
-      heroTitle={doctorName}
-      heroDescription={description}
-      content={<PublicDoctorDetail locale={locale} doctor={result.data} />}
-    />
-  );
+  notFound();
 }
