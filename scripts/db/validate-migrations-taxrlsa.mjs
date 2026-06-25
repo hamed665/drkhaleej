@@ -27,6 +27,7 @@ const laterMigrationNames = {
   importStaging: '0061_import_staging_foundation.sql',
   doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
   facilityDepartment: '0063_facility_department_foundation.sql',
+  importRelationCandidates: '0064_import_relation_candidates.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -109,6 +110,7 @@ const expectedMigrations = [
   laterMigrationNames.importStaging,
   laterMigrationNames.doctorPracticeHardening,
   laterMigrationNames.facilityDepartment,
+  laterMigrationNames.importRelationCandidates,
 ];
 
 function fail(message) {
@@ -146,7 +148,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0063 for ADM-IMPORT-A.');
+    fail('Migration inventory must be exactly 0001 through 0064 for ADM-IMPORT-A.');
   }
 }
 
@@ -322,6 +324,31 @@ function validateFacilityDepartmentMigration() {
   ]) requirePattern(content, pattern, message);
 }
 
+function validateImportRelationCandidatesMigration() {
+  const content = readMigration('importRelationCandidates');
+  validateAdminOnlyMigration(content, '0064');
+  for (const [pattern, message] of [
+    [/ADM-REL-A: import relation candidates foundation/i, '0064 must include ADM-REL-A comment prefix.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_relation_candidates/i, '0064 must create import_relation_candidates.'],
+    [/batch_id\s+uuid\s+not\s+null\s+references\s+public\.import_batches\(id\)\s+on\s+delete\s+cascade/i, '0064 must reference import_batches.'],
+    [/raw_row_id\s+uuid\s+null\s+references\s+public\.import_raw_rows\(id\)\s+on\s+delete\s+cascade/i, '0064 must optionally reference import_raw_rows.'],
+    [/source_entity_candidate_id\s+uuid\s+null\s+references\s+public\.import_entity_candidates\(id\)\s+on\s+delete\s+set\s+null/i, '0064 must reference import_entity_candidates.'],
+    [/relation_type\s+text\s+not\s+null/i, '0064 must include relation_type.'],
+    [/source_entity_type\s+text\s+not\s+null/i, '0064 must include source_entity_type.'],
+    [/target_entity_type\s+text\s+not\s+null/i, '0064 must include target_entity_type.'],
+    [/candidate_payload\s+jsonb\s+not\s+null\s+default\s+'\{\}'::jsonb/i, '0064 must include candidate_payload object.'],
+    [/match_score\s+numeric\(5,2\)\s+not\s+null\s+default\s+0/i, '0064 must include match_score numeric.'],
+    [/match_reason\s+text\s+not\s+null/i, '0064 must include match_reason.'],
+    [/resolution_status\s+text\s+not\s+null\s+default\s+'pending'/i, '0064 must default pending resolution.'],
+    [/doctor_practices_at_facility[\s\S]*doctor_member_of_department[\s\S]*facility_has_department[\s\S]*department_service[\s\S]*service_available_in_area/i, '0064 must include required relation families and entity types.'],
+    [/resolution_status\s+in\s+\('pending','approved','rejected','needs_manual_review','ignored'\)/i, '0064 must constrain resolution_status.'],
+    [/resolution_status\s+=\s+'pending'[\s\S]*resolved_at\s+is\s+null[\s\S]*resolved_by_profile_id\s+is\s+null/i, '0064 pending relation candidates must be unresolved.'],
+    [/alter\s+table\s+public\.import_relation_candidates\s+enable\s+row\s+level\s+security/i, '0064 must enable RLS on import_relation_candidates.'],
+    [/create\s+index\s+if\s+not\s+exists\s+idx_import_relation_candidates_batch_id/i, '0064 must index batch_id.'],
+    [/create\s+index\s+if\s+not\s+exists\s+idx_import_relation_candidates_resolution_status/i, '0064 must index resolution_status.'],
+  ]) requirePattern(content, pattern, message);
+}
+
 function validateAdminOnlyMigration(content, label) {
   for (const [pattern, message] of [
     [/\binsert\s+into\b/i, `${label} must not seed rows.`],
@@ -375,6 +402,7 @@ validateAdminCmsMigration();
 validateImportStagingMigration();
 validateDoctorPracticeHardeningMigration();
 validateFacilityDepartmentMigration();
+validateImportRelationCandidatesMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A migration validation passed.');
