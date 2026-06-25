@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import { writeAdminAuditEvent } from "@/server/admin/audit-log";
