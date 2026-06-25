@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { resolveAdminImportDuplicateCandidate } from "@/server/admin/import-duplicate-resolution";
+import { applyApprovedImportRelationCandidates } from "@/server/admin/import-relation-apply";
 import { generateAdminImportRelationCandidates } from "@/server/admin/import-relation-candidates";
 import { listAdminImportRelationCandidates } from "@/server/admin/import-relation-candidates-list";
 import { resolveAdminImportRelationCandidate } from "@/server/admin/import-relation-resolution";
@@ -132,6 +133,19 @@ async function generateRelationsAction(formData: FormData) {
   }
 }
 
+async function applyApprovedRelationsAction(formData: FormData) {
+  "use server";
+
+  const batchIdValue = formData.get("batchId");
+  if (typeof batchIdValue !== "string") return;
+
+  const result = await applyApprovedImportRelationCandidates(batchIdValue);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en", {
     dateStyle: "medium",
@@ -250,6 +264,9 @@ export default async function AdminImportBatchDetailPage({
   const canProjectRows = result.rawRows.some((row) => row.row_status === "ready_for_publish");
   const canGenerateRelations = batch.status === "ready_for_publish" || batch.status === "reviewing";
   const relationCandidatesResult = await listAdminImportRelationCandidates(batchId);
+  const canApplyApprovedRelations = relationCandidatesResult.ok
+    ? relationCandidatesResult.items.some((candidate) => candidate.resolution_status === "approved")
+    : false;
 
   return (
     <div className="space-y-6">
@@ -265,7 +282,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, and relation candidate generation update protected staging records only; public publishing, sitemap promotion, and indexing remain deferred.
+              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, relation candidate generation, and approved relation applying update protected staging records only; public publishing, sitemap promotion, and indexing remain deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -306,7 +323,7 @@ export default async function AdminImportBatchDetailPage({
         </dl>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-4">
+      <section className="grid gap-4 xl:grid-cols-5">
         <div className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-5 text-cyan-950 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-C</p>
           <h3 className="mt-2 text-xl font-bold text-slate-950">Normalize staged rows</h3>
@@ -375,6 +392,24 @@ export default async function AdminImportBatchDetailPage({
               className="rounded-2xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
             >
               Generate relation candidates
+            </button>
+          </form>
+        </div>
+
+        <div className="rounded-3xl border border-rose-100 bg-rose-50/70 p-5 text-rose-950 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-800">ADM-REL-B</p>
+          <h3 className="mt-2 text-xl font-bold text-slate-950">Apply approved relations</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Applies approved, ID-backed relation candidates into protected relation tables with inactive, non-public defaults. This still does not publish, index, create schema, or render public links.
+          </p>
+          <form action={applyApprovedRelationsAction} className="mt-4">
+            <input type="hidden" name="batchId" value={batch.id} />
+            <button
+              type="submit"
+              disabled={!canApplyApprovedRelations}
+              className="rounded-2xl bg-rose-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-800 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              Apply approved relations
             </button>
           </form>
         </div>
