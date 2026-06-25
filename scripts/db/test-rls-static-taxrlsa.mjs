@@ -23,6 +23,7 @@ const migrations = {
   adminCms: '0060_admin_cms_core_revision_foundation.sql',
   importStaging: '0061_import_staging_foundation.sql',
   doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
+  facilityDepartment: '0063_facility_department_foundation.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -167,6 +168,25 @@ function validateDoctorPracticeHardeningRlsMigration() {
   requirePattern(content, /public_relation_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0062 must keep public relation visibility false by default.');
 }
 
+function validateFacilityDepartmentRlsMigration() {
+  const content = readMigration('facilityDepartment');
+  validateNoAdminPolicies(content, '0063');
+  for (const tableName of [
+    'facility_departments',
+    'doctor_department_assignments',
+    'department_services',
+  ]) {
+    requirePattern(
+      content,
+      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
+      `0063 must enable RLS on ${tableName}.`,
+    );
+  }
+  requirePattern(content, /public_department_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department visibility false by default.');
+  requirePattern(content, /public_assignment_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep assignment visibility false by default.');
+  requirePattern(content, /public_service_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department service visibility false by default.');
+}
+
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
@@ -197,6 +217,7 @@ validateAdminMediaLibraryRlsMigration();
 validateAdminCmsRlsMigration();
 validateImportStagingRlsMigration();
 validateDoctorPracticeHardeningRlsMigration();
+validateFacilityDepartmentRlsMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');

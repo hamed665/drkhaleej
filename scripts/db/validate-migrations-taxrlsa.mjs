@@ -26,6 +26,7 @@ const laterMigrationNames = {
   adminCms: '0060_admin_cms_core_revision_foundation.sql',
   importStaging: '0061_import_staging_foundation.sql',
   doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
+  facilityDepartment: '0063_facility_department_foundation.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -107,6 +108,7 @@ const expectedMigrations = [
   laterMigrationNames.adminCms,
   laterMigrationNames.importStaging,
   laterMigrationNames.doctorPracticeHardening,
+  laterMigrationNames.facilityDepartment,
 ];
 
 function fail(message) {
@@ -144,7 +146,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0062 for ADM-IMPORT-A.');
+    fail('Migration inventory must be exactly 0001 through 0063 for ADM-IMPORT-A.');
   }
 }
 
@@ -288,6 +290,38 @@ function validateDoctorPracticeHardeningMigration() {
   ]) requirePattern(content, pattern, message);
 }
 
+function validateFacilityDepartmentMigration() {
+  const content = readMigration('facilityDepartment');
+  validateAdminOnlyMigration(content, '0063');
+  for (const [pattern, message] of [
+    [/REL-DEPT-A: facility department foundation/i, '0063 must include REL-DEPT-A comment prefix.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.facility_departments/i, '0063 must create facility_departments.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.doctor_department_assignments/i, '0063 must create doctor_department_assignments.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.department_services/i, '0063 must create department_services.'],
+    [/center_id\s+uuid\s+not\s+null\s+references\s+public\.centers\(id\)/i, '0063 departments must reference centers.'],
+    [/center_location_id\s+uuid\s+null\s+references\s+public\.center_locations\(id\)/i, '0063 departments must optionally reference center_locations.'],
+    [/facility_department_id\s+uuid\s+not\s+null\s+references\s+public\.facility_departments\(id\)/i, '0063 child tables must reference facility_departments.'],
+    [/doctor_id\s+uuid\s+not\s+null\s+references\s+public\.doctors\(id\)/i, '0063 assignments must reference doctors.'],
+    [/doctor_practice_location_id\s+uuid\s+null\s+references\s+public\.doctor_practice_locations\(id\)/i, '0063 assignments must optionally reference practice locations.'],
+    [/department_kind\s+text\s+not\s+null\s+default\s+'clinical'/i, '0063 must add department_kind default clinical.'],
+    [/department_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0063 must add department review status.'],
+    [/public_department_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must default public department visibility false.'],
+    [/assignment_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0063 must add assignment review status.'],
+    [/public_assignment_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must default public assignment visibility false.'],
+    [/service_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0063 must add service review status.'],
+    [/public_service_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must default public service visibility false.'],
+    [/source_url\s+text\s+null/i, '0063 must add source_url fields.'],
+    [/last_checked_at\s+timestamptz\s+null/i, '0063 must add last_checked_at fields.'],
+    [/confidence_score\s+numeric\(5,2\)\s+null/i, '0063 must add confidence_score fields.'],
+    [/public_department_visible\s+=\s+false[\s\S]*department_review_status\s+=\s+'approved'[\s\S]*last_checked_at\s+is\s+not\s+null/i, '0063 must gate department public visibility.'],
+    [/public_assignment_visible\s+=\s+false[\s\S]*assignment_review_status\s+=\s+'approved'[\s\S]*last_checked_at\s+is\s+not\s+null/i, '0063 must gate assignment public visibility.'],
+    [/public_service_visible\s+=\s+false[\s\S]*service_review_status\s+=\s+'approved'[\s\S]*last_checked_at\s+is\s+not\s+null/i, '0063 must gate service public visibility.'],
+    [/alter\s+table\s+public\.facility_departments\s+enable\s+row\s+level\s+security/i, '0063 must enable RLS on facility_departments.'],
+    [/alter\s+table\s+public\.doctor_department_assignments\s+enable\s+row\s+level\s+security/i, '0063 must enable RLS on doctor_department_assignments.'],
+    [/alter\s+table\s+public\.department_services\s+enable\s+row\s+level\s+security/i, '0063 must enable RLS on department_services.'],
+  ]) requirePattern(content, pattern, message);
+}
+
 function validateAdminOnlyMigration(content, label) {
   for (const [pattern, message] of [
     [/\binsert\s+into\b/i, `${label} must not seed rows.`],
@@ -340,6 +374,7 @@ validateAdminMediaLibraryMigration();
 validateAdminCmsMigration();
 validateImportStagingMigration();
 validateDoctorPracticeHardeningMigration();
+validateFacilityDepartmentMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A migration validation passed.');
