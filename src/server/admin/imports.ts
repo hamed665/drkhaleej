@@ -37,15 +37,6 @@ export type AdminImportBatchStatus =
   | "failed"
   | "archived";
 
-type ImportTableName =
-  | "import_batches"
-  | "import_raw_rows"
-  | "import_validation_issues"
-  | "import_duplicate_candidates"
-  | "import_mapping_results"
-  | "import_publish_queue"
-  | "import_relation_candidates";
-
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
 type SingleQueryResult<T> = { data: T | null; error: unknown | null };
 type ImportUpdatePayload = Record<string, unknown>;
@@ -61,7 +52,7 @@ type ImportQueryBuilder<T> = PromiseLike<QueryResult<T>> & {
 };
 
 type ImportAdminClient = {
-  from<T extends object = Record<string, unknown>>(table: ImportTableName): ImportQueryBuilder<T>;
+  from<T extends object = Record<string, unknown>>(table: string): ImportQueryBuilder<T>;
 };
 
 type ImportBatchRow = {
