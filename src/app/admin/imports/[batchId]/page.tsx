@@ -10,6 +10,7 @@ import { generateAdminImportRelationCandidates } from "@/server/admin/import-rel
 import { listAdminImportRelationCandidates } from "@/server/admin/import-relation-candidates-list";
 import { resolveAdminImportRelationCandidate } from "@/server/admin/import-relation-resolution";
 import { reviewAdminImportRow } from "@/server/admin/import-row-review";
+import { listAdminImportSitemapEligibleCandidates } from "@/server/admin/import-sitemap-eligibility";
 import { projectAdminImportBatchRows } from "@/server/admin/import-public-projection";
 import {
   detectAdminImportBatchDuplicates,
@@ -296,6 +297,10 @@ export default async function AdminImportBatchDetailPage({
   );
   const canGenerateRelations = batch.status === "ready_for_publish" || batch.status === "reviewing" || batch.status === "completed";
   const relationCandidatesResult = await listAdminImportRelationCandidates(batchId);
+  const sitemapEligibilityResult = await listAdminImportSitemapEligibleCandidates(batchId);
+  const sitemapEligibilityItems = sitemapEligibilityResult.ok ? sitemapEligibilityResult.items : [];
+  const sitemapIndexCandidateCount = sitemapEligibilityItems.filter((item) => item.robotsPolicy === "index_candidate").length;
+  const sitemapBlockedCount = sitemapEligibilityItems.length - sitemapIndexCandidateCount;
   const canApplyApprovedRelations = relationCandidatesResult.ok
     ? relationCandidatesResult.items.some((candidate) => candidate.resolution_status === "approved")
     : false;
@@ -314,7 +319,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, noindex publish queueing, index eligibility promotion, relation candidate generation, and approved relation applying update protected records only; sitemap inclusion remains deferred.
+              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, noindex publish queueing, index eligibility promotion, sitemap eligibility preview, relation candidate generation, and approved relation applying update protected records only; sitemap inclusion remains deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -565,6 +570,72 @@ export default async function AdminImportBatchDetailPage({
                       <RelationResolutionButton batchId={batch.id} relationCandidateId={candidate.id} resolutionStatus="ignored" label="Ignore" />
                     </div>
                   ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">ADM-SITEMAP-A</p>
+            <h3 className="mt-2 text-lg font-bold text-slate-950">Sitemap eligibility preview</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Preview of protected import rows that are eligible candidates for future sitemap handling. This does not create a public sitemap, does not set sitemap inclusion, and does not expose raw import data.
+            </p>
+          </div>
+          <div className="grid gap-2 text-xs text-slate-600 sm:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <p className="font-semibold text-slate-950">{sitemapEligibilityItems.length}</p>
+              <p>Total candidates</p>
+            </div>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+              <p className="font-semibold text-emerald-950">{sitemapIndexCandidateCount}</p>
+              <p>Index candidates</p>
+            </div>
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2">
+              <p className="font-semibold text-amber-950">{sitemapBlockedCount}</p>
+              <p>Blocked</p>
+            </div>
+          </div>
+        </div>
+        {!sitemapEligibilityResult.ok ? (
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Sitemap eligibility candidates could not be loaded right now.
+          </p>
+        ) : sitemapEligibilityItems.length === 0 ? (
+          <p className="mt-3 text-sm leading-6 text-slate-600">No sitemap eligibility candidates recorded yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {sitemapEligibilityItems.map((item) => (
+              <li key={item.publishQueueId} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-950">
+                      {formatLabel(item.entityType)} · {formatLabel(item.robotsPolicy)}
+                    </p>
+                    <p className="mt-1 break-all text-slate-700">
+                      Canonical candidate: {item.canonicalPath ?? "Blocked until canonical path resolves"}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Quality {item.qualityScore} · Last modified {formatDate(item.lastModified)} · Sitemap included: No
+                    </p>
+                  </div>
+                  {item.reasons.length === 0 ? (
+                    <span className="w-fit rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-900">
+                      Ready candidate
+                    </span>
+                  ) : (
+                    <div className="flex max-w-xl flex-wrap gap-2">
+                      {item.reasons.map((reason) => (
+                        <span key={reason} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
+                          {formatLabel(reason)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </li>
             ))}
