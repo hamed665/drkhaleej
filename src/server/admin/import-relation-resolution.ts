@@ -5,6 +5,21 @@ import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { requireAdminPermission } from "@/server/admin/permissions";
 
 type RelationResolutionStatus = "approved" | "rejected" | "needs_manual_review" | "ignored";
+type QueryResult<T> = { data: T[] | null; error: unknown | null };
+type SingleQueryResult<T> = { data: T | null; error: unknown | null };
+type MutationPayload = Record<string, unknown>;
+
+type RelationResolutionQueryBuilder<T> = PromiseLike<QueryResult<T>> & {
+  select(columns: string): RelationResolutionQueryBuilder<T>;
+  eq(column: string, value: string | number | boolean): RelationResolutionQueryBuilder<T>;
+  limit(count: number): RelationResolutionQueryBuilder<T>;
+  update(values: MutationPayload): RelationResolutionQueryBuilder<T>;
+  maybeSingle(): Promise<SingleQueryResult<T>>;
+};
+
+type RelationResolutionClient = {
+  from<T extends object = Record<string, unknown>>(table: string): RelationResolutionQueryBuilder<T>;
+};
 
 type RelationCandidateForResolution = {
   id: string;
@@ -22,8 +37,12 @@ type RelationCandidateCounterRow = {
   resolution_status: string;
 };
 
+function createRelationResolutionClient(): RelationResolutionClient {
+  return createSupabaseServiceRoleClient() as unknown as RelationResolutionClient;
+}
+
 function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
 function isRelationResolutionStatus(value: string): value is RelationResolutionStatus {
@@ -53,9 +72,9 @@ export async function resolveAdminImportRelationCandidate(
   }
 
   const nextResolutionStatus: RelationResolutionStatus = resolutionStatus;
-  const supabase = createSupabaseServiceRoleClient() as any;
+  const supabase = createRelationResolutionClient();
   const candidateResult = await supabase
-    .from("import_relation_candidates")
+    .from<RelationCandidateForResolution>("import_relation_candidates")
     .select("id, batch_id, raw_row_id, relation_type, source_entity_type, target_entity_type, match_score, resolution_status, metadata")
     .eq("id", relationCandidateId)
     .maybeSingle();
@@ -68,10 +87,9 @@ export async function resolveAdminImportRelationCandidate(
     return { ok: false as const, reason: "not_found" as const };
   }
 
-  const candidate = candidateResult.data as RelationCandidateForResolution;
   const now = new Date().toISOString();
-  const oldStatus = candidate.resolution_status;
-  const oldMetadata = isRecord(candidate.metadata) ? candidate.metadata : {};
+  const oldStatus = candidateResult.data.resolution_status;
+  const oldMetadata = isRecord(candidateResult.data.metadata) ? candidateResult.data.metadata : {};
 
   const updateResult = await supabase
     .from("import_relation_candidates")
@@ -94,16 +112,16 @@ export async function resolveAdminImportRelationCandidate(
   }
 
   const relationCandidatesResult = await supabase
-    .from("import_relation_candidates")
+    .from<RelationCandidateCounterRow>("import_relation_candidates")
     .select("resolution_status")
-    .eq("batch_id", candidate.batch_id)
+    .eq("batch_id", candidateResult.data.batch_id)
     .limit(5000);
 
   if (relationCandidatesResult.error !== null || relationCandidatesResult.data === null) {
     return { ok: false as const, reason: "unavailable" as const };
   }
 
-  const statusCounts = countStatuses(relationCandidatesResult.data as RelationCandidateCounterRow[]);
+  const statusCounts = countStatuses(relationCandidatesResult.data);
   const pendingCount = statusCounts.pending ?? 0;
   const approvedCount = statusCounts.approved ?? 0;
   const rejectedCount = statusCounts.rejected ?? 0;
@@ -124,7 +142,7 @@ export async function resolveAdminImportRelationCandidate(
         relation_candidates_ignored: ignoredCount,
       },
     })
-    .eq("id", candidate.batch_id);
+    .eq("id", candidateResult.data.batch_id);
 
   if (batchUpdateResult.error !== null) {
     return { ok: false as const, reason: "unavailable" as const };
@@ -141,12 +159,12 @@ export async function resolveAdminImportRelationCandidate(
     oldValues: { resolutionStatus: oldStatus },
     newValues: { resolutionStatus: nextResolutionStatus },
     metadata: {
-      batchId: candidate.batch_id,
-      rawRowId: candidate.raw_row_id,
-      relationType: candidate.relation_type,
-      sourceEntityType: candidate.source_entity_type,
-      targetEntityType: candidate.target_entity_type,
-      matchScore: candidate.match_score,
+      batchId: candidateResult.data.batch_id,
+      rawRowId: candidateResult.data.raw_row_id,
+      relationType: candidateResult.data.relation_type,
+      sourceEntityType: candidateResult.data.source_entity_type,
+      targetEntityType: candidateResult.data.target_entity_type,
+      matchScore: candidateResult.data.match_score,
       pendingCount,
       approvedCount,
       rejectedCount,
@@ -157,7 +175,7 @@ export async function resolveAdminImportRelationCandidate(
 
   return {
     ok: true as const,
-    batchId: candidate.batch_id,
+    batchId: candidateResult.data.batch_id,
     resolutionStatus: nextResolutionStatus,
   };
 }
