@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
-import { requireAdminPermission } from "@/server/admin/permissions";
+import { requireAdminPermission, type CurrentAdminContext } from "@/server/admin/permissions";
 
 type JsonRecord = Record<string, unknown>;
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
@@ -44,8 +44,14 @@ type InsertedRelation = {
   id: string;
 };
 
+type AppliedRelationAuditItem = {
+  candidateId: string;
+  targetTable: "doctor_practice_locations" | "doctor_department_assignments";
+  targetId: string;
+};
+
 export type ApplyApprovedImportRelationCandidatesResult =
-  | { ok: true; batchId: string; read: number; applied: number; skipped: number; unsupported: number }
+  | { ok: true; batchId: string; read: number; applied: number; skipped: number; unsupported: number; auditWritten: boolean }
   | { ok: false; reason: "not_found" | "unavailable" | "empty" };
 
 const applyLimit = 100;
@@ -137,6 +143,55 @@ async function markCandidateApplied(
     .eq("id", candidate.id);
 
   return updateResult.error === null;
+}
+
+async function writeRelationApplyAuditEvent({
+  supabase,
+  admin,
+  batchId,
+  read,
+  applied,
+  skipped,
+  unsupported,
+  appliedItems,
+}: {
+  supabase: ImportRelationApplyClient;
+  admin: CurrentAdminContext;
+  batchId: string;
+  read: number;
+  applied: number;
+  skipped: number;
+  unsupported: number;
+  appliedItems: AppliedRelationAuditItem[];
+}): Promise<boolean> {
+  const insertResult = await supabase
+    .from("admin_audit_events")
+    .insert({
+      actor_profile_id: admin.profile.id,
+      actor_auth_user_id: admin.profile.auth_user_id,
+      actor_email: admin.profile.email,
+      permission_key: "imports.review",
+      action: "import_relation.apply_approved",
+      entity_type: "import_batch",
+      entity_id: batchId,
+      target_table: "import_relation_candidates",
+      summary: "Applied approved import relation candidates",
+      old_values: {},
+      new_values: {
+        read,
+        applied,
+        skipped,
+        unsupported,
+      },
+      metadata: {
+        applied_relation_version: appliedRelationVersion,
+        apply_limit: applyLimit,
+        applied_items: appliedItems.slice(0, 100),
+      },
+      request_source: "admin",
+    });
+
+  return insertResult.error === null;
 }
 
 async function existingRelationId(
@@ -334,6 +389,7 @@ export async function applyApprovedImportRelationCandidates(
   let applied = 0;
   let skipped = 0;
   let unsupported = 0;
+  const appliedItems: AppliedRelationAuditItem[] = [];
 
   for (const candidate of candidates) {
     const now = new Date().toISOString();
@@ -387,11 +443,24 @@ export async function applyApprovedImportRelationCandidates(
       return { ok: false, reason: "unavailable" };
     }
 
+    appliedItems.push({
+      candidateId: candidate.id,
+      targetTable: appliedTargetTable,
+      targetId: applyResult.appliedId,
+    });
     applied += 1;
   }
 
-  // Existing admin audit action types do not include import relation apply events.
-  // Audit should be added in a follow-up PR with an approved action type/migration if required.
+  const auditWritten = await writeRelationApplyAuditEvent({
+    supabase,
+    admin,
+    batchId,
+    read: candidates.length,
+    applied,
+    skipped,
+    unsupported,
+    appliedItems,
+  });
 
   return {
     ok: true,
@@ -400,5 +469,6 @@ export async function applyApprovedImportRelationCandidates(
     applied,
     skipped,
     unsupported,
+    auditWritten,
   };
 }
