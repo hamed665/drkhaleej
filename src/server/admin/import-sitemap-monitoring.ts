@@ -65,7 +65,7 @@ function readString(value: JsonRecord, key: string): string | null {
 }
 
 function isSafePublicCanonicalPath(pathname: string): boolean {
-  return /^\/(en|ar)\/om\/(doctors|hospitals|clinics|pharmacies|labs)\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+  return /^\/(en|ar)\/om\/(doctor|hospitals|clinics|pharmacies|labs)\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
 }
 
 function isSafeIncludedRow(row: ImportSitemapQueueRow): boolean {
