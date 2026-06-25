@@ -24,6 +24,7 @@ const migrations = {
   importStaging: '0061_import_staging_foundation.sql',
   doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
   facilityDepartment: '0063_facility_department_foundation.sql',
+  importRelationCandidates: '0064_import_relation_candidates.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -187,6 +188,13 @@ function validateFacilityDepartmentRlsMigration() {
   requirePattern(content, /public_service_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department service visibility false by default.');
 }
 
+function validateImportRelationCandidatesRlsMigration() {
+  const content = readMigration('importRelationCandidates');
+  validateNoAdminPolicies(content, '0064');
+  requirePattern(content, /create\s+table\s+if\s+not\s+exists\s+public\.import_relation_candidates/i, '0064 must create import_relation_candidates.');
+  requirePattern(content, /alter\s+table\s+public\.import_relation_candidates\s+enable\s+row\s+level\s+security/i, '0064 must enable RLS on import_relation_candidates.');
+}
+
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
@@ -218,6 +226,7 @@ validateAdminCmsRlsMigration();
 validateImportStagingRlsMigration();
 validateDoctorPracticeHardeningRlsMigration();
 validateFacilityDepartmentRlsMigration();
+validateImportRelationCandidatesRlsMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');
