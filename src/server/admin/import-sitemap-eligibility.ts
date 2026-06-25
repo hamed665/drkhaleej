@@ -43,7 +43,7 @@ type ApprovedEntityCandidate = {
 
 type JsonRecord = Record<string, unknown>;
 
-type CanonicalRouteFamily = "doctors" | "hospitals" | "clinics" | "pharmacies" | "labs";
+type CanonicalRouteFamily = "doctor" | "hospitals" | "clinics" | "pharmacies" | "labs";
 
 export type AdminImportSitemapEligibilityCandidate = {
   publishQueueId: string;
@@ -73,7 +73,7 @@ function createImportSitemapEligibilityClient(): ImportSitemapEligibilityClient 
 }
 
 function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -96,7 +96,7 @@ function readString(value: JsonRecord, key: string): string | null {
 function canonicalRouteFamily(entityType: string): CanonicalRouteFamily | null {
   switch (entityType) {
     case "doctor":
-      return "doctors";
+      return "doctor";
     case "hospital":
       return "hospitals";
     case "pharmacy":
