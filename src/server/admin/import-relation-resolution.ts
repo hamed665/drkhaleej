@@ -4,7 +4,8 @@ import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { requireAdminPermission } from "@/server/admin/permissions";
 
-type RelationResolutionStatus = "approved" | "rejected" | "needs_manual_review" | "ignored";
+export type RelationResolutionStatus = "approved" | "rejected" | "needs_manual_review" | "ignored";
+
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
 type SingleQueryResult<T> = { data: T | null; error: unknown | null };
 type MutationPayload = Record<string, unknown>;
@@ -37,6 +38,10 @@ type RelationCandidateCounterRow = {
   resolution_status: string;
 };
 
+export type ResolveImportRelationResult =
+  | { ok: true; batchId: string; resolutionStatus: RelationResolutionStatus }
+  | { ok: false; reason: "invalid" | "not_found" | "unavailable" };
+
 function createRelationResolutionClient(): RelationResolutionClient {
   return createSupabaseServiceRoleClient() as unknown as RelationResolutionClient;
 }
@@ -64,11 +69,11 @@ function countStatuses(rows: RelationCandidateCounterRow[]): Record<string, numb
 export async function resolveAdminImportRelationCandidate(
   relationCandidateId: string,
   resolutionStatus: string,
-) {
+): Promise<ResolveImportRelationResult> {
   const admin = await requireAdminPermission("imports.review");
 
   if (!isUuid(relationCandidateId) || !isRelationResolutionStatus(resolutionStatus)) {
-    return { ok: false as const, reason: "invalid" as const };
+    return { ok: false, reason: "invalid" };
   }
 
   const nextResolutionStatus: RelationResolutionStatus = resolutionStatus;
@@ -80,11 +85,11 @@ export async function resolveAdminImportRelationCandidate(
     .maybeSingle();
 
   if (candidateResult.error !== null) {
-    return { ok: false as const, reason: "unavailable" as const };
+    return { ok: false, reason: "unavailable" };
   }
 
   if (candidateResult.data === null) {
-    return { ok: false as const, reason: "not_found" as const };
+    return { ok: false, reason: "not_found" };
   }
 
   const now = new Date().toISOString();
@@ -108,7 +113,7 @@ export async function resolveAdminImportRelationCandidate(
     .eq("id", relationCandidateId);
 
   if (updateResult.error !== null) {
-    return { ok: false as const, reason: "unavailable" as const };
+    return { ok: false, reason: "unavailable" };
   }
 
   const relationCandidatesResult = await supabase
@@ -118,7 +123,7 @@ export async function resolveAdminImportRelationCandidate(
     .limit(5000);
 
   if (relationCandidatesResult.error !== null || relationCandidatesResult.data === null) {
-    return { ok: false as const, reason: "unavailable" as const };
+    return { ok: false, reason: "unavailable" };
   }
 
   const statusCounts = countStatuses(relationCandidatesResult.data);
@@ -145,7 +150,7 @@ export async function resolveAdminImportRelationCandidate(
     .eq("id", candidateResult.data.batch_id);
 
   if (batchUpdateResult.error !== null) {
-    return { ok: false as const, reason: "unavailable" as const };
+    return { ok: false, reason: "unavailable" };
   }
 
   await writeAdminAuditEvent({
@@ -174,7 +179,7 @@ export async function resolveAdminImportRelationCandidate(
   });
 
   return {
-    ok: true as const,
+    ok: true,
     batchId: candidateResult.data.batch_id,
     resolutionStatus: nextResolutionStatus,
   };
