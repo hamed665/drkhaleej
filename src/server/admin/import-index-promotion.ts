@@ -135,11 +135,11 @@ function hasLocationSignal(candidatePayload: unknown): boolean {
 
 function hasCareSignal(candidatePayload: unknown): boolean {
   const taxonomy = readRecord(candidatePayload, "taxonomy");
-  return Boolean(
-    readString(taxonomy, "primarySpecialty") ??
-      readString(taxonomy, "subspecialty") ??
-      readStringArray(taxonomy, "services").length > 0 ??
-      readStringArray(taxonomy, "departments").length > 0,
+  return (
+    readString(taxonomy, "primarySpecialty") !== null ||
+    readString(taxonomy, "subspecialty") !== null ||
+    readStringArray(taxonomy, "services").length > 0 ||
+    readStringArray(taxonomy, "departments").length > 0
   );
 }
 
