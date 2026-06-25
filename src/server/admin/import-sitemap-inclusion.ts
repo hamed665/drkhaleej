@@ -70,8 +70,8 @@ function uniqueReasons(reasons: string[]): string[] {
   return [...new Set(reasons.filter((reason) => reason.trim().length > 0))];
 }
 
-function isRoutedEntityType(value: string): value is RoutedEntityType {
-  return routedEntityTypes.some((entityType) => entityType === value);
+function routedEntityType(value: string): RoutedEntityType | null {
+  return routedEntityTypes.some((entityType) => entityType === value) ? (value as RoutedEntityType) : null;
 }
 
 function isRoutedPublicPath(entityType: RoutedEntityType, path: string): boolean {
@@ -150,12 +150,12 @@ export async function includeSitemapEligibleImportCandidates(
     }
 
     const reasons = [...item.reasons];
-    const isRoutedEntity = isRoutedEntityType(item.entityType);
+    const safeEntityType = routedEntityType(item.entityType);
     if (item.robotsPolicy !== "index_candidate") reasons.push("robots_policy_not_index_candidate");
     if (item.sitemapIncluded !== false) reasons.push("already_marked_as_sitemap_included");
     if (item.canonicalPath === null || item.canonicalUrlCandidate === null) reasons.push("missing_canonical_url_candidate");
-    if (!isRoutedEntity) reasons.push("public_profile_route_not_enabled_for_entity_type");
-    if (isRoutedEntity && item.canonicalPath !== null && !isRoutedPublicPath(item.entityType, item.canonicalPath)) {
+    if (safeEntityType === null) reasons.push("public_profile_route_not_enabled_for_entity_type");
+    if (safeEntityType !== null && item.canonicalPath !== null && !isRoutedPublicPath(safeEntityType, item.canonicalPath)) {
       reasons.push("canonical_route_not_enabled_for_public_sitemap");
     }
 
