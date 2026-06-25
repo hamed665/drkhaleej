@@ -38,7 +38,7 @@ type RelationCandidateCounterRow = {
   resolution_status: string;
 };
 
-export type ResolveImportRelationResult =
+type ResolveImportRelationResult =
   | { ok: true; batchId: string; resolutionStatus: RelationResolutionStatus }
   | { ok: false; reason: "invalid" | "not_found" | "unavailable" };
 
