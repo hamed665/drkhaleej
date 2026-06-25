@@ -42,8 +42,8 @@ const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
   ar: "ستظهر قوائم المستشفيات المعتمدة هنا بعد المراجعة.",
 };
 
-function readProfileSlug(searchParams: SearchParams | undefined): string | null {
-  const value = searchParams?.profileSlug;
+function readProfileSlug(searchParams: SearchParams): string | null {
+  const value = searchParams.profileSlug;
   if (typeof value !== "string") return null;
   const trimmed = value.trim().toLowerCase();
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(trimmed) ? trimmed : null;
@@ -58,13 +58,12 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<Params>;
-  searchParams?: Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
 
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const profileSlug = readProfileSlug(resolvedSearchParams);
+  const profileSlug = readProfileSlug(await searchParams);
   if (profileSlug !== null) {
     const profileResult = await getPublicImportHospitalProfile({
       locale,
@@ -98,15 +97,14 @@ export default async function PublicHospitalsPage({
   searchParams,
 }: {
   params: Promise<Params>;
-  searchParams?: Promise<SearchParams>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
 
   const safeLocale = locale as SupportedLocale;
   const safeCountry = country as SupportedCountry;
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const profileSlug = readProfileSlug(resolvedSearchParams);
+  const profileSlug = readProfileSlug(await searchParams);
 
   if (profileSlug !== null) {
     const profileResult = await getPublicImportHospitalProfile({
