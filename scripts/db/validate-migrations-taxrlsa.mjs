@@ -25,6 +25,7 @@ const laterMigrationNames = {
   adminMedia: '0059_admin_media_library_foundation.sql',
   adminCms: '0060_admin_cms_core_revision_foundation.sql',
   importStaging: '0061_import_staging_foundation.sql',
+  doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -105,6 +106,7 @@ const expectedMigrations = [
   laterMigrationNames.adminMedia,
   laterMigrationNames.adminCms,
   laterMigrationNames.importStaging,
+  laterMigrationNames.doctorPracticeHardening,
 ];
 
 function fail(message) {
@@ -142,7 +144,7 @@ function validateMigrationInventory() {
     if (missing.length > 0) console.error(`Missing required files: ${missing.join(', ')}`);
     if (unexpected.length > 0) console.error(`Unexpected SQL migration files: ${unexpected.join(', ')}`);
 
-    fail('Migration inventory must be exactly 0001 through 0061 for ADM-IMPORT-A.');
+    fail('Migration inventory must be exactly 0001 through 0062 for ADM-IMPORT-A.');
   }
 }
 
@@ -257,6 +259,35 @@ function validateImportStagingMigration() {
   ]) requirePattern(content, pattern, message);
 }
 
+function validateDoctorPracticeHardeningMigration() {
+  const content = readMigration('doctorPracticeHardening');
+  validateAdminOnlyMigration(content, '0062');
+  for (const [pattern, message] of [
+    [/REL-DOCTOR-A: doctor multi-practice relation hardening/i, '0062 must include REL-DOCTOR-A comment prefix.'],
+    [/alter\s+table\s+public\.doctor_practice_locations/i, '0062 must alter doctor_practice_locations.'],
+    [/practice_type\s+text\s+not\s+null\s+default\s+'unknown'/i, '0062 must add practice_type default unknown.'],
+    [/relation_review_status\s+text\s+not\s+null\s+default\s+'draft'/i, '0062 must add relation_review_status default draft.'],
+    [/public_relation_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0062 must add public_relation_visible default false.'],
+    [/source_url\s+text\s+null/i, '0062 must add source_url.'],
+    [/source_name\s+text\s+null/i, '0062 must add source_name.'],
+    [/source_type\s+text\s+null/i, '0062 must add source_type.'],
+    [/last_checked_at\s+timestamptz\s+null/i, '0062 must add last_checked_at.'],
+    [/confidence_score\s+numeric\(5,2\)\s+null/i, '0062 must add confidence_score numeric(5,2).'],
+    [/reviewed_by_profile_id\s+uuid\s+null\s+references\s+public\.profiles\(id\)/i, '0062 must add reviewed_by_profile_id.'],
+    [/reviewed_at\s+timestamptz\s+null/i, '0062 must add reviewed_at.'],
+    [/doctor_practice_locations_practice_type_check/i, '0062 must constrain practice_type.'],
+    [/hospital_staff[\s\S]*clinic_staff[\s\S]*private_practice[\s\S]*visiting_consultant[\s\S]*department_member[\s\S]*unknown/i, '0062 must include approved practice types.'],
+    [/doctor_practice_locations_relation_review_status_check/i, '0062 must constrain relation_review_status.'],
+    [/draft[\s\S]*pending_review[\s\S]*approved[\s\S]*rejected[\s\S]*hold[\s\S]*archived/i, '0062 must include relation review statuses.'],
+    [/doctor_practice_locations_public_visible_gate_check/i, '0062 must gate public relation visibility.'],
+    [/last_checked_at\s+is\s+not\s+null/i, '0062 public gate must require last_checked_at.'],
+    [/source_url\s+is\s+not\s+null\s+or\s+source_name\s+is\s+not\s+null/i, '0062 public gate must require source.'],
+    [/create\s+index\s+if\s+not\s+exists\s+doctor_practice_locations_practice_type_idx/i, '0062 must index practice_type.'],
+    [/create\s+index\s+if\s+not\s+exists\s+doctor_practice_locations_relation_review_status_idx/i, '0062 must index relation_review_status.'],
+    [/create\s+index\s+if\s+not\s+exists\s+doctor_practice_locations_public_relation_visible_idx/i, '0062 must index public_relation_visible.'],
+  ]) requirePattern(content, pattern, message);
+}
+
 function validateAdminOnlyMigration(content, label) {
   for (const [pattern, message] of [
     [/\binsert\s+into\b/i, `${label} must not seed rows.`],
@@ -308,6 +339,7 @@ validateAdminAuditEventsMigration();
 validateAdminMediaLibraryMigration();
 validateAdminCmsMigration();
 validateImportStagingMigration();
+validateDoctorPracticeHardeningMigration();
 runTaxC1ValidatorWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A migration validation passed.');

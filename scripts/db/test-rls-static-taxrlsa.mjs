@@ -22,6 +22,7 @@ const migrations = {
   adminMedia: '0059_admin_media_library_foundation.sql',
   adminCms: '0060_admin_cms_core_revision_foundation.sql',
   importStaging: '0061_import_staging_foundation.sql',
+  doctorPracticeHardening: '0062_doctor_multi_practice_relation_hardening.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -159,6 +160,13 @@ function validateImportStagingRlsMigration() {
   }
 }
 
+function validateDoctorPracticeHardeningRlsMigration() {
+  const content = readMigration('doctorPracticeHardening');
+  validateNoAdminPolicies(content, '0062');
+  requirePattern(content, /alter\s+table\s+public\.doctor_practice_locations/i, '0062 must alter doctor_practice_locations.');
+  requirePattern(content, /public_relation_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0062 must keep public relation visibility false by default.');
+}
+
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
@@ -188,6 +196,7 @@ validateAdminAuditEventsRlsMigration();
 validateAdminMediaLibraryRlsMigration();
 validateAdminCmsRlsMigration();
 validateImportStagingRlsMigration();
+validateDoctorPracticeHardeningRlsMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');
