@@ -11,6 +11,7 @@ import { listAdminImportRelationCandidates } from "@/server/admin/import-relatio
 import { resolveAdminImportRelationCandidate } from "@/server/admin/import-relation-resolution";
 import { reviewAdminImportRow } from "@/server/admin/import-row-review";
 import { listAdminImportSitemapEligibleCandidates } from "@/server/admin/import-sitemap-eligibility";
+import { includeSitemapEligibleImportCandidates } from "@/server/admin/import-sitemap-inclusion";
 import { projectAdminImportBatchRows } from "@/server/admin/import-public-projection";
 import {
   detectAdminImportBatchDuplicates,
@@ -143,6 +144,19 @@ async function promoteIndexEligibleAction(formData: FormData) {
   if (typeof batchIdValue !== "string") return;
 
   const result = await promoteNoindexImportQueueToIndexEligible(batchIdValue);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
+async function includeSitemapAction(formData: FormData) {
+  "use server";
+
+  const batchIdValue = formData.get("batchId");
+  if (typeof batchIdValue !== "string") return;
+
+  const result = await includeSitemapEligibleImportCandidates(batchIdValue);
   if (result.ok) {
     revalidatePath("/admin/imports");
     revalidatePath(`/admin/imports/${batchIdValue}`);
@@ -295,6 +309,9 @@ export default async function AdminImportBatchDetailPage({
   const canPromoteIndexEligible = result.publishQueue.some(
     (row) => row.publish_status === "published_noindex" && row.index_policy === "noindex" && row.sitemap_policy === "excluded",
   );
+  const canIncludeSitemap = result.publishQueue.some(
+    (row) => row.publish_status === "index_eligible" && row.index_policy === "index_eligible" && row.sitemap_policy === "eligible",
+  );
   const canGenerateRelations = batch.status === "ready_for_publish" || batch.status === "reviewing" || batch.status === "completed";
   const relationCandidatesResult = await listAdminImportRelationCandidates(batchId);
   const sitemapEligibilityResult = await listAdminImportSitemapEligibleCandidates(batchId);
@@ -319,7 +336,7 @@ export default async function AdminImportBatchDetailPage({
           <div>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-slate-950">{batch.batchName}</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, noindex publish queueing, index eligibility promotion, sitemap eligibility preview, relation candidate generation, and approved relation applying update protected records only; sitemap inclusion remains deferred.
+              Batch inspection and staging controls. Normalization, duplicate detection, duplicate resolution, row review, public-safe projection, noindex publish queueing, index eligibility promotion, sitemap eligibility preview, sitemap inclusion gating, relation candidate generation, and approved relation applying update protected records only; public sitemap output remains deferred.
             </p>
           </div>
           <span className="w-fit rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -447,6 +464,24 @@ export default async function AdminImportBatchDetailPage({
               className="rounded-2xl bg-indigo-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
             >
               Promote index eligible
+            </button>
+          </form>
+        </div>
+
+        <div className="rounded-3xl border border-fuchsia-100 bg-fuchsia-50/70 p-5 text-fuchsia-950 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fuchsia-800">ADM-SITEMAP-B</p>
+          <h3 className="mt-2 text-xl font-bold text-slate-950">Include sitemap queue</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Runs the sitemap inclusion gate for eligible queue rows. This marks protected queue rows as included, but still does not create a public sitemap route.
+          </p>
+          <form action={includeSitemapAction} className="mt-4">
+            <input type="hidden" name="batchId" value={batch.id} />
+            <button
+              type="submit"
+              disabled={!canIncludeSitemap}
+              className="rounded-2xl bg-fuchsia-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-fuchsia-800 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              Include sitemap queue
             </button>
           </form>
         </div>
