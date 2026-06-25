@@ -126,6 +126,12 @@ export async function resolveAdminImportRelationCandidate(
   }
 
   const statusCounts = countStatuses(relationCandidatesResult.data);
+  const pendingCount = statusCounts.pending ?? 0;
+  const approvedCount = statusCounts.approved ?? 0;
+  const rejectedCount = statusCounts.rejected ?? 0;
+  const manualReviewCount = statusCounts.needs_manual_review ?? 0;
+  const ignoredCount = statusCounts.ignored ?? 0;
+
   const batchUpdateResult = await supabase
     .from("import_batches")
     .update({
@@ -133,7 +139,11 @@ export async function resolveAdminImportRelationCandidate(
         relation_resolution_version: "v1",
         last_relation_resolution_status: resolutionStatus,
         last_relation_candidate_id: relationCandidateId,
-        relation_resolution_status_counts: statusCounts,
+        relation_candidates_pending: pendingCount,
+        relation_candidates_approved: approvedCount,
+        relation_candidates_rejected: rejectedCount,
+        relation_candidates_needs_manual_review: manualReviewCount,
+        relation_candidates_ignored: ignoredCount,
       },
     })
     .eq("id", candidateResult.data.batch_id);
@@ -159,7 +169,11 @@ export async function resolveAdminImportRelationCandidate(
       sourceEntityType: candidateResult.data.source_entity_type,
       targetEntityType: candidateResult.data.target_entity_type,
       matchScore: candidateResult.data.match_score,
-      statusCounts,
+      pendingCount,
+      approvedCount,
+      rejectedCount,
+      manualReviewCount,
+      ignoredCount,
     },
   });
 
