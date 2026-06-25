@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ImportUploadForm } from "@/components/admin/import-upload-form";
+import { getAdminImportSitemapRuntimeQa } from "@/server/admin/import-sitemap-monitoring";
 import { listAdminImportBatches } from "@/server/admin/imports";
 
 function formatDate(value: string): string {
@@ -19,7 +20,10 @@ function formatLabel(value: string): string {
 }
 
 export default async function AdminImportsPage() {
-  const result = await listAdminImportBatches();
+  const [result, sitemapQa] = await Promise.all([
+    listAdminImportBatches(),
+    getAdminImportSitemapRuntimeQa(),
+  ]);
 
   if (!result.ok) {
     return (
@@ -41,7 +45,7 @@ export default async function AdminImportsPage() {
           Unified import staging
         </h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Uploads now parse approved spreadsheets only into staging rows; public profiles, sitemap promotion, and indexing are still blocked.
+          Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Uploads parse approved spreadsheets into staging rows; public sitemap entries are now gated by reviewed queue state.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4">
@@ -54,9 +58,84 @@ export default async function AdminImportsPage() {
           </div>
           <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">Public state</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">No public publishing</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">Gated sitemap only</p>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-fuchsia-100 bg-fuchsia-50/70 p-6 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fuchsia-800">ADM-SITEMAP-C</p>
+            <h3 className="mt-2 text-xl font-bold text-slate-950">Sitemap runtime QA</h3>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
+              Runtime snapshot for import sitemap queue health. This monitor does not change public sitemap output; it only surfaces unsafe included rows, duplicate canonical paths, pending eligible rows, and noindex rows still excluded from sitemap.
+            </p>
+          </div>
+          {sitemapQa.ok ? (
+            <span className="w-fit rounded-full border border-fuchsia-200 bg-white/80 px-3 py-1 text-xs font-bold text-fuchsia-900">
+              {sitemapQa.warnings.length === 0 ? "Clean" : `${sitemapQa.warnings.length} warnings`}
+            </span>
+          ) : (
+            <span className="w-fit rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">
+              Unavailable
+            </span>
+          )}
+        </div>
+
+        {sitemapQa.ok ? (
+          <>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Safe included</p>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{sitemapQa.safeIncludedRows}</p>
+              </div>
+              <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Unsafe included</p>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{sitemapQa.unsafeIncludedRows}</p>
+              </div>
+              <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Eligible pending</p>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{sitemapQa.eligibleRows}</p>
+              </div>
+              <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Noindex excluded</p>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{sitemapQa.noindexRows}</p>
+              </div>
+              <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-700">Duplicate canonicals</p>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{sitemapQa.duplicateCanonicalRows}</p>
+              </div>
+            </div>
+            <dl className="mt-4 grid gap-3 text-sm text-slate-700 md:grid-cols-3">
+              <div>
+                <dt className="font-semibold text-slate-950">Rows read</dt>
+                <dd>{sitemapQa.rowsRead} / {sitemapQa.limit}{sitemapQa.truncated ? " (limit reached)" : ""}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-950">Missing canonical</dt>
+                <dd>{sitemapQa.missingCanonicalRows}</dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-950">Latest included</dt>
+                <dd>{sitemapQa.latestIncludedAt ? formatDate(sitemapQa.latestIncludedAt) : "None"}</dd>
+              </div>
+            </dl>
+            {sitemapQa.warnings.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {sitemapQa.warnings.map((warning) => (
+                  <span key={warning} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
+                    {formatLabel(warning)}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <p className="mt-4 text-sm leading-6 text-slate-700">
+            Sitemap runtime QA could not be loaded right now. Public sitemap output is not changed by this card.
+          </p>
+        )}
       </section>
 
       <ImportUploadForm />
