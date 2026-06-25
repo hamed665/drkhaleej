@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 
 import { resolveAdminImportDuplicateCandidate } from "@/server/admin/import-duplicate-resolution";
 import { generateAdminImportRelationCandidates } from "@/server/admin/import-relation-candidates";
+import { listAdminImportRelationCandidates } from "@/server/admin/import-relation-candidates-list";
+import { resolveAdminImportRelationCandidate } from "@/server/admin/import-relation-resolution";
 import { reviewAdminImportRow } from "@/server/admin/import-row-review";
 import { projectAdminImportBatchRows } from "@/server/admin/import-public-projection";
 import {
@@ -58,6 +60,28 @@ async function resolveDuplicateAction(formData: FormData) {
   }
 
   const result = await resolveAdminImportDuplicateCandidate(duplicateCandidateId, resolutionStatus);
+  if (result.ok) {
+    revalidatePath("/admin/imports");
+    revalidatePath(`/admin/imports/${batchIdValue}`);
+  }
+}
+
+async function resolveRelationAction(formData: FormData) {
+  "use server";
+
+  const batchIdValue = formData.get("batchId");
+  const relationCandidateId = formData.get("relationCandidateId");
+  const resolutionStatus = formData.get("resolutionStatus");
+
+  if (
+    typeof batchIdValue !== "string" ||
+    typeof relationCandidateId !== "string" ||
+    typeof resolutionStatus !== "string"
+  ) {
+    return;
+  }
+
+  const result = await resolveAdminImportRelationCandidate(relationCandidateId, resolutionStatus);
   if (result.ok) {
     revalidatePath("/admin/imports");
     revalidatePath(`/admin/imports/${batchIdValue}`);
@@ -149,6 +173,32 @@ function DuplicateResolutionButton({
   );
 }
 
+function RelationResolutionButton({
+  batchId,
+  relationCandidateId,
+  resolutionStatus,
+  label,
+}: {
+  batchId: string;
+  relationCandidateId: string;
+  resolutionStatus: string;
+  label: string;
+}) {
+  return (
+    <form action={resolveRelationAction}>
+      <input type="hidden" name="batchId" value={batchId} />
+      <input type="hidden" name="relationCandidateId" value={relationCandidateId} />
+      <input type="hidden" name="resolutionStatus" value={resolutionStatus} />
+      <button
+        type="submit"
+        className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+      >
+        {label}
+      </button>
+    </form>
+  );
+}
+
 function RowReviewButton({
   batchId,
   rawRowId,
@@ -199,6 +249,7 @@ export default async function AdminImportBatchDetailPage({
   const canDetectDuplicates = result.rawRows.length > 1;
   const canProjectRows = result.rawRows.some((row) => row.row_status === "ready_for_publish");
   const canGenerateRelations = batch.status === "ready_for_publish" || batch.status === "reviewing";
+  const relationCandidatesResult = await listAdminImportRelationCandidates(batchId);
 
   return (
     <div className="space-y-6">
@@ -375,6 +426,47 @@ export default async function AdminImportBatchDetailPage({
             </ul>
           )}
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-950">Relation candidates</h3>
+        {!relationCandidatesResult.ok ? (
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Relation candidates could not be loaded right now.
+          </p>
+        ) : relationCandidatesResult.items.length === 0 ? (
+          <p className="mt-3 text-sm leading-6 text-slate-600">No relation candidates recorded yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {relationCandidatesResult.items.map((candidate) => (
+              <li key={candidate.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-950">
+                      {candidate.match_score}% · {formatLabel(candidate.resolution_status)}
+                    </p>
+                    <p className="mt-1 text-slate-700">{formatLabel(candidate.relation_type)}</p>
+                    <p className="mt-1 text-slate-700">{candidate.match_reason}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {formatLabel(candidate.source_entity_type)} → {formatLabel(candidate.target_entity_type)}
+                    </p>
+                    {candidate.target_entity_id ? (
+                      <p className="mt-1 text-xs text-slate-500">Target ID: {candidate.target_entity_id}</p>
+                    ) : null}
+                  </div>
+                  {candidate.resolution_status === "pending" ? (
+                    <div className="flex flex-wrap gap-2">
+                      <RelationResolutionButton batchId={batch.id} relationCandidateId={candidate.id} resolutionStatus="approved" label="Approve" />
+                      <RelationResolutionButton batchId={batch.id} relationCandidateId={candidate.id} resolutionStatus="rejected" label="Reject" />
+                      <RelationResolutionButton batchId={batch.id} relationCandidateId={candidate.id} resolutionStatus="needs_manual_review" label="Manual review" />
+                      <RelationResolutionButton batchId={batch.id} relationCandidateId={candidate.id} resolutionStatus="ignored" label="Ignore" />
+                    </div>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
