@@ -17,7 +17,7 @@ type EntityClarityCopy = {
 
 const entityClarityCopy: Record<SupportedLocale, EntityClarityCopy> = {
   en: {
-    heading: 'What DrMuscat helps you explore',
+    heading: 'What DrKhaleej helps you explore',
     cards: [
       {
         title: 'Public discovery',
@@ -29,12 +29,12 @@ const entityClarityCopy: Record<SupportedLocale, EntityClarityCopy> = {
       },
       {
         title: 'Safe boundaries',
-        body: 'DrMuscat is not medical advice. Always confirm details directly with providers.'
+        body: 'DrKhaleej is not medical advice. Always confirm details directly with providers.'
       }
     ]
   },
   ar: {
-    heading: 'ما الذي يساعدك DrMuscat على استكشافه',
+    heading: 'ما الذي يساعدك DrKhaleej على استكشافه',
     cards: [
       {
         title: 'اكتشاف عام',
@@ -46,7 +46,7 @@ const entityClarityCopy: Record<SupportedLocale, EntityClarityCopy> = {
       },
       {
         title: 'حدود آمنة',
-        body: 'DrMuscat ليس نصيحة طبية. يرجى دائماً تأكيد التفاصيل مباشرة مع مقدمي الخدمة.'
+        body: 'DrKhaleej ليس نصيحة طبية. يرجى دائماً تأكيد التفاصيل مباشرة مع مقدمي الخدمة.'
       }
     ]
   }
@@ -58,7 +58,7 @@ export function HomeEntityClarity2026({ locale, dir }: HomeEntityClarity2026Prop
   return (
     <section className="dm2026-home-entity" dir={dir} aria-labelledby="dm2026-home-entity-title">
       <div className="dm2026-home-entity__header">
-        <span className="dm2026-home-entity__eyebrow">DrMuscat</span>
+        <span className="dm2026-home-entity__eyebrow">DrKhaleej</span>
         <h2 id="dm2026-home-entity-title">{copy.heading}</h2>
       </div>
       <div className="dm2026-home-entity__grid" role="list">
