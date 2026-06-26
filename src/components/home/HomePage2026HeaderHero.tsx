@@ -1,3 +1,4 @@
+import { CommercialSlot2026 } from '@/components/commercial/CommercialSlot2026';
 import { HomeDiscoveryCategories2026 } from '@/components/home/HomeDiscoveryCategories2026';
 import { HomeEntityClarity2026 } from '@/components/home/HomeEntityClarity2026';
 import { HomeFAQ2026, type HomeFAQItem } from '@/components/home/HomeFAQ2026';
@@ -213,6 +214,7 @@ export async function HomePage2026HeaderHero({ locale, country, dir }: HomePage2
 
       <HomeEntityClarity2026 locale={locale} dir={dir} />
       <HomeFeaturedBoard2026 locale={locale} country={country} dir={dir} />
+      <CommercialSlot2026 locale={locale} dir={dir} placement="home_mid" />
       <HomeDiscoveryCategories2026 locale={locale} country={country} dir={dir} />
       <HomeSpecialOffersShowcase2026 locale={locale} country={country} dir={dir} />
       <HomeProviderCTA2026 locale={locale} dir={dir} />
