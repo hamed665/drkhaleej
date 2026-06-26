@@ -1,4 +1,5 @@
 import type { PublicDiscoveryFaq } from "@/components/public/discovery/publicDiscoveryPageConfig";
+import { normalizePublicBrandCopy } from "@/lib/brand/public-brand-copy";
 
 export function buildFaqJsonLd(faq: PublicDiscoveryFaq) {
   return {
@@ -6,10 +7,10 @@ export function buildFaqJsonLd(faq: PublicDiscoveryFaq) {
     "@type": "FAQPage",
     mainEntity: faq.items.map((item) => ({
       "@type": "Question",
-      name: item.question,
+      name: normalizePublicBrandCopy(item.question),
       acceptedAnswer: {
         "@type": "Answer",
-        text: item.answer,
+        text: normalizePublicBrandCopy(item.answer),
       },
     })),
   } as const;

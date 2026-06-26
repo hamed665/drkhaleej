@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import type { PublicDiscoveryPageConfig, PublicDiscoverySuggestion } from './publicDiscoveryPageConfig';
 
 type Props = { config: PublicDiscoveryPageConfig };
@@ -17,6 +18,7 @@ const normalizeSearch = (value: string) => normalizeArabic(value).replace(/\s+/g
 export function PublicDiscoverySearch2026({ config }: Props) {
   const { locale, country, dir, path, resultsId, categoryType } = config;
   const copy = config.search;
+  const brandCopy = normalizePublicBrandCopy;
   const [query, setQuery] = useState('');
   const [selectedChip, setSelectedChip] = useState(copy.mainChips[0] ?? '');
   const [selectedCountry, setSelectedCountry] = useState(copy.defaultCountry);
@@ -86,13 +88,13 @@ export function PublicDiscoverySearch2026({ config }: Props) {
         <div className="dm2026-home-search__main">
           <div className="dm2026-home-search__header dm2026-public-discovery-search__header">
             <div>
-              <h2 id={titleId}>{copy.title}</h2>
-              <p>{copy.description}</p>
+              <h2 id={titleId}>{brandCopy(copy.title)}</h2>
+              <p>{brandCopy(copy.description)}</p>
             </div>
           </div>
 
           <div className="dm2026-home-search__command dm2026-public-discovery-command">
-            <label htmlFor={inputId}>{copy.inputLabel}</label>
+            <label htmlFor={inputId}>{brandCopy(copy.inputLabel)}</label>
             <div className="dm2026-home-search__command-input dm2026-public-discovery-command-input" role="combobox" aria-expanded={showSuggestions && visibleSuggestions.length > 0} aria-controls={panelId}>
               <span aria-hidden="true">⌕</span>
               <input
@@ -111,42 +113,42 @@ export function PublicDiscoverySearch2026({ config }: Props) {
                 onBlur={() => {
                   window.setTimeout(() => setShowSuggestions(false), 140);
                 }}
-                placeholder={copy.placeholder}
+                placeholder={brandCopy(copy.placeholder)}
                 autoComplete="off"
               />
-              <button type="submit" className="dm2026-button dm2026-button-primary">{copy.button}</button>
+              <button type="submit" className="dm2026-button dm2026-button-primary">{brandCopy(copy.button)}</button>
             </div>
             {showSuggestions && visibleSuggestions.length > 0 ? (
-              <div id={panelId} className="dm2026-public-discovery-suggestions" role="listbox" aria-label={copy.suggestionLabel} aria-live="polite">
+              <div id={panelId} className="dm2026-public-discovery-suggestions" role="listbox" aria-label={brandCopy(copy.suggestionLabel)} aria-live="polite">
                 {visibleSuggestions.map((suggestion) => (
                   <button key={suggestion.id} type="button" role="option" aria-selected="false" className="dm2026-public-discovery-suggestion" onMouseDown={(event) => event.preventDefault()} onClick={() => applySuggestion(suggestion)}>
-                    <span>{suggestion.label}</span>
-                    {suggestion.helper ? <small>{suggestion.helper}</small> : null}
+                    <span>{brandCopy(suggestion.label)}</span>
+                    {suggestion.helper ? <small>{brandCopy(suggestion.helper)}</small> : null}
                   </button>
                 ))}
               </div>
             ) : null}
           </div>
 
-          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={copy.legend}>
-            <legend>{copy.legend}</legend>
-            <div>{copy.mainChips.map((chip) => <label key={chip} className="dm2026-home-search__chip"><input type="radio" name="service" value={chip} checked={chip === selectedChip} onChange={() => setSelectedChip(chip)} /><span>{chip}</span></label>)}</div>
+          <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--primary" aria-label={brandCopy(copy.legend)}>
+            <legend>{brandCopy(copy.legend)}</legend>
+            <div>{copy.mainChips.map((chip) => <label key={chip} className="dm2026-home-search__chip"><input type="radio" name="service" value={chip} checked={chip === selectedChip} onChange={() => setSelectedChip(chip)} /><span>{brandCopy(chip)}</span></label>)}</div>
           </fieldset>
 
           <details className="dm2026-home-search__more-filters">
-            <summary>{copy.moreFilters}</summary>
-            <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={copy.moreLegend}>
-              <legend>{copy.moreLegend}</legend>
-              <div>{copy.moreChips.map((chip) => <label key={chip} className="dm2026-home-search__chip"><input type="radio" name="service" value={chip} checked={chip === selectedChip} onChange={() => setSelectedChip(chip)} /><span>{chip}</span></label>)}</div>
+            <summary>{brandCopy(copy.moreFilters)}</summary>
+            <fieldset className="dm2026-home-search__segment dm2026-home-search__segment--secondary" aria-label={brandCopy(copy.moreLegend)}>
+              <legend>{brandCopy(copy.moreLegend)}</legend>
+              <div>{copy.moreChips.map((chip) => <label key={chip} className="dm2026-home-search__chip"><input type="radio" name="service" value={chip} checked={chip === selectedChip} onChange={() => setSelectedChip(chip)} /><span>{brandCopy(chip)}</span></label>)}</div>
             </fieldset>
-            <div className="dm2026-home-search__select-grid" aria-label={`${copy.countryLabel}, ${copy.cityLabel}, ${copy.areaLabel}`}>
-              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-country`}>{copy.countryLabel}</label><select id={`dm2026-${categoryType}-country`} name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => setSelectedCountry(event.target.value)}>{copy.countryOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></div>
-              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-city`}>{copy.cityLabel}</label><select id={`dm2026-${categoryType}-city`} name="city" className="dm2026-select" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>{copy.cityOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></div>
-              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-area`}>{copy.areaLabel}</label><select id={`dm2026-${categoryType}-area`} name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>{copy.areaOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></div>
+            <div className="dm2026-home-search__select-grid" aria-label={`${brandCopy(copy.countryLabel)}, ${brandCopy(copy.cityLabel)}, ${brandCopy(copy.areaLabel)}`}>
+              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-country`}>{brandCopy(copy.countryLabel)}</label><select id={`dm2026-${categoryType}-country`} name="country" className="dm2026-select" value={selectedCountry} onChange={(event) => setSelectedCountry(event.target.value)}>{copy.countryOptions.map((option) => <option key={option} value={option}>{brandCopy(option)}</option>)}</select></div>
+              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-city`}>{brandCopy(copy.cityLabel)}</label><select id={`dm2026-${categoryType}-city`} name="city" className="dm2026-select" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value)}>{copy.cityOptions.map((option) => <option key={option} value={option}>{brandCopy(option)}</option>)}</select></div>
+              <div className="dm2026-home-search__field"><label htmlFor={`dm2026-${categoryType}-area`}>{brandCopy(copy.areaLabel)}</label><select id={`dm2026-${categoryType}-area`} name="area" className="dm2026-select" value={selectedArea} onChange={(event) => setSelectedArea(event.target.value)}>{copy.areaOptions.map((option) => <option key={option} value={option}>{brandCopy(option)}</option>)}</select></div>
             </div>
           </details>
 
-          <div className="dm2026-home-search__trust-row" aria-label={copy.trustAria}>{copy.trust.map((item) => <span key={item}>{item}</span>)}</div>
+          <div className="dm2026-home-search__trust-row" aria-label={brandCopy(copy.trustAria)}>{copy.trust.map((item) => <span key={item}>{brandCopy(item)}</span>)}</div>
         </div>
       </form>
     </section>
