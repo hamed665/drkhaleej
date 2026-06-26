@@ -11,8 +11,15 @@ export type LocaleCountry = {
   country: SiteCountry;
 };
 
-const PRODUCTION_FALLBACK_URL = 'https://drmuscat.com';
+const PRODUCTION_FALLBACK_URL = 'https://drkhaleej.com';
 const LOCAL_FALLBACK_URL = 'http://localhost:3000';
+
+export const siteBrand = {
+  siteName: 'DrKhaleej',
+  previousSiteName: 'DrMuscat',
+  canonicalDomain: 'drkhaleej.com',
+  productionUrl: PRODUCTION_FALLBACK_URL
+} as const;
 
 function normalizeBaseUrl(url: URL): URL {
   return new URL(url.origin);
@@ -43,14 +50,16 @@ function getBaseUrl(): URL {
 }
 
 export const siteConfig = {
-  siteName: 'DrMuscat',
+  siteName: siteBrand.siteName,
+  previousSiteName: siteBrand.previousSiteName,
+  canonicalDomain: siteBrand.canonicalDomain,
   defaultLocale: 'en' as SiteLocale,
   locales: supportedLocales,
   defaultCountry: 'om' as SiteCountry,
   countries: supportedCountries,
-  defaultTitle: 'DrMuscat | Healthcare discovery in Oman',
+  defaultTitle: 'DrKhaleej | Healthcare discovery in Oman',
   defaultDescription:
-    'Discover trusted healthcare providers in Oman with a fast, bilingual-ready experience.',
+    'Discover doctors, hospitals, pharmacies, clinics, labs and healthcare services in Oman.',
   baseUrl: getBaseUrl()
 } as const;
 
