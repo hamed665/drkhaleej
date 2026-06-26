@@ -40,7 +40,7 @@ type RouteCopy = {
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
-    metadataTitle: "Doctors in Oman | DrMuscat",
+    metadataTitle: "Doctors in Oman | DrKhaleej",
     metadataDescription:
       "Browse doctors, specialties, clinics and care paths in Oman. Public discovery only, not medical advice.",
     badge: "Doctors in Oman",
@@ -50,7 +50,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     listCta: "List your center",
     whatsappCta: "WhatsApp",
     whatsappMessage:
-      "Hello DrMuscat, I need help with doctor discovery in Oman.",
+      "Hello DrKhaleej, I need help with doctor discovery in Oman.",
     whatsappUnavailable: "WhatsApp activation pending",
     resultsHeading: "Browse doctors",
     resultsSubtext:
@@ -58,7 +58,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     compactEmptyText: "Approved doctor profiles will appear here after review.",
   },
   ar: {
-    metadataTitle: "الأطباء في عُمان | DrMuscat",
+    metadataTitle: "الأطباء في عُمان | DrKhaleej",
     metadataDescription:
       "تصفح الأطباء والتخصصات والعيادات ومسارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
     badge: "الأطباء في عُمان",
@@ -68,7 +68,7 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     listCta: "أدرج مركزك",
     whatsappCta: "واتساب",
     whatsappMessage:
-      "مرحباً DrMuscat، أحتاج مساعدة في اكتشاف الأطباء في عُمان.",
+      "مرحباً DrKhaleej، أحتاج مساعدة في اكتشاف الأطباء في عُمان.",
     whatsappUnavailable: "تفعيل واتساب قيد الإعداد",
     resultsHeading: "تصفح الأطباء",
     resultsSubtext: "تظهر هنا نتائج البحث وقوائم الأطباء العامة بعد الاعتماد.",
