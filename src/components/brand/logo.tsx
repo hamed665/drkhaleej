@@ -29,8 +29,7 @@ export function Logo({ variant = 'full', className, imageAlt, ...props }: LogoPr
         overflow: 'visible',
         flexShrink: 0,
         background: 'transparent',
-        direction: 'ltr',
-        unicodeBidi: 'isolate'
+        direction: 'ltr'
       }}
       {...props}
     >
@@ -49,7 +48,6 @@ function FullLogoLockup() {
       viewBox="0 0 720 180"
       aria-hidden="true"
       focusable="false"
-      dir="ltr"
       style={{ display: 'block', inlineSize: '180px', blockSize: '45px', background: 'transparent', direction: 'ltr' }}
     >
       <defs>
@@ -90,7 +88,7 @@ function FullLogoLockup() {
         fontSize="92"
         fontWeight="700"
         letterSpacing="-4"
-        style={{ direction: 'ltr', unicodeBidi: 'isolate' }}
+        style={{ direction: 'ltr' }}
       >
         Dr
       </text>
@@ -102,7 +100,7 @@ function FullLogoLockup() {
         fontSize="92"
         fontWeight="700"
         letterSpacing="-4"
-        style={{ direction: 'ltr', unicodeBidi: 'isolate' }}
+        style={{ direction: 'ltr' }}
       >
         Khaleej
       </text>
@@ -119,7 +117,6 @@ function CompactLogoMark() {
       viewBox="0 0 180 180"
       aria-hidden="true"
       focusable="false"
-      dir="ltr"
       style={{ display: 'block', inlineSize: '44px', blockSize: '44px', background: 'transparent', direction: 'ltr' }}
     >
       <defs>
