@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { PublicProfileEntityType } from '@/lib/profiles/public-profile-guards';
+import type { InternalLinkDefinition } from '@/lib/seo/internal-linking';
 
 type PublicAreaTemplateLocale = 'en' | 'ar';
 
@@ -38,6 +39,7 @@ export type PublicAreaPageTemplate2026Props = {
   description?: string | null;
   directoryLinks?: readonly PublicAreaDirectoryLink[];
   providerGroups?: readonly PublicAreaProviderGroup[];
+  internalLinks?: readonly InternalLinkDefinition[];
   children?: ReactNode;
   footer?: ReactNode;
 };
@@ -56,6 +58,7 @@ const areaCopy: Record<
     draftHidden: string;
     providers: string;
     provider: string;
+    relatedLinks: string;
   }
 > = {
   en: {
@@ -69,7 +72,8 @@ const areaCopy: Record<
     safetyBody: 'Area pages do not imply MOH verification, diagnosis, booking availability, insurance acceptance or medical advice.',
     draftHidden: 'Draft, unreviewed or blocked profiles stay hidden from public area pages.',
     providers: 'providers',
-    provider: 'provider'
+    provider: 'provider',
+    relatedLinks: 'Related links'
   },
   ar: {
     eyebrow: 'دليل الرعاية الصحية في المنطقة',
@@ -82,7 +86,8 @@ const areaCopy: Record<
     safetyBody: 'صفحات المناطق لا تعني تحققاً من وزارة الصحة أو تشخيصاً أو توفر حجز أو قبول تأمين أو نصيحة طبية.',
     draftHidden: 'الملفات المسودة أو غير المراجعة أو المحظورة تبقى مخفية من صفحات المناطق العامة.',
     providers: 'مقدمو خدمة',
-    provider: 'مقدم خدمة'
+    provider: 'مقدم خدمة',
+    relatedLinks: 'روابط ذات صلة'
   }
 };
 
@@ -147,6 +152,31 @@ function AreaProviderCard({ provider, copy }: { provider: PublicAreaFeaturedProv
   );
 }
 
+function AreaInternalLinks({
+  links,
+  copy
+}: {
+  links: readonly InternalLinkDefinition[];
+  copy: (typeof areaCopy)[PublicAreaTemplateLocale];
+}) {
+  if (links.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav className="dm2026-area-template__internal-links" aria-label={copy.relatedLinks}>
+      <strong>{copy.relatedLinks}</strong>
+      <ul>
+        {links.map((link) => (
+          <li key={link.key} data-intent={link.intent} data-priority={link.priority}>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 export function PublicAreaPageTemplate2026({
   locale,
   dir,
@@ -156,6 +186,7 @@ export function PublicAreaPageTemplate2026({
   description = null,
   directoryLinks = [],
   providerGroups = [],
+  internalLinks = [],
   children,
   footer
 }: PublicAreaPageTemplate2026Props) {
@@ -188,6 +219,8 @@ export function PublicAreaPageTemplate2026({
           </div>
         </section>
       ) : null}
+
+      <AreaInternalLinks links={internalLinks} copy={copy} />
 
       {children}
 
