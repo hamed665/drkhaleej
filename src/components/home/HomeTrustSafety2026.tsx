@@ -15,13 +15,13 @@ const trustSafetyCopy: Record<SupportedLocale, TrustSafetyCopy> = {
   en: {
     heading: 'Built for safe public discovery',
     body:
-      'DrMuscat helps people explore public provider information in Oman. It is not medical advice. Sponsored visibility and Special Offers do not mean medical quality ranking. Always confirm details directly with the provider.',
+      'DrKhaleej helps people explore public provider information in Oman. It is not medical advice. Sponsored visibility and Special Offers do not mean medical quality ranking. Always confirm details directly with the provider.',
     pills: ['Public discovery only', 'Not medical advice', 'Confirm with provider', 'Sponsored clearly marked', 'Offers after review']
   },
   ar: {
     heading: 'مصمم لاكتشاف عام آمن',
     body:
-      'يساعد DrMuscat المستخدمين على استكشاف معلومات عامة عن مقدمي الخدمة في عُمان. لا يُعد ذلك نصيحة طبية. الظهور المدعوم والعروض الخاصة لا تعني ترتيباً لجودة طبية. يرجى دائماً تأكيد التفاصيل مباشرة مع مقدم الخدمة.',
+      'يساعد DrKhaleej المستخدمين على استكشاف معلومات عامة عن مقدمي الخدمة في عُمان. لا يُعد ذلك نصيحة طبية. الظهور المدعوم والعروض الخاصة لا تعني ترتيباً لجودة طبية. يرجى دائماً تأكيد التفاصيل مباشرة مع مقدم الخدمة.',
     pills: ['اكتشاف عام فقط', 'ليست نصيحة طبية', 'أكّد مع مقدم الخدمة', 'الظهور المدعوم موضح', 'العروض بعد المراجعة']
   }
 };
