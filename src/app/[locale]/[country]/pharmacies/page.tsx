@@ -28,12 +28,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Pharmacies in Oman | DrMuscat",
+    title: "Pharmacies in Oman | DrKhaleej",
     description:
       "Browse pharmacies, medicine access, health products and care essentials in Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "الصيدليات في عُمان | DrMuscat",
+    title: "الصيدليات في عُمان | DrKhaleej",
     description:
       "تصفح الصيدليات وخدمات الوصول للأدوية والمنتجات الصحية واحتياجات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },
