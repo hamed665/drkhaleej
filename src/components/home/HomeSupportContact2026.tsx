@@ -143,38 +143,35 @@ export function HomeSupportContact2026({ locale, dir }: HomeSupportContact2026Pr
   const whatsAppState = userHref ? 'active' : 'disabled';
 
   return (
-    <>
-      <section className="dm2026-home-support dm2026-container" dir={dir} aria-labelledby={titleId} data-whatsapp-state={whatsAppState}>
-        <div className="dm2026-home-support__shell">
-          <div className="dm2026-home-support__intro">
-            <span className="dm2026-home-support__eyebrow">{copy.eyebrow}</span>
-            <div className="dm2026-home-support__headline-group">
-              <h2 id={titleId}>{copy.headline}</h2>
-              <p>{copy.subtitle}</p>
-            </div>
-          </div>
-
-          <div className="dm2026-home-support__cards" aria-label={copy.headline}>
-            {[copy.user, copy.provider].map((card) => {
-              const href = card === copy.user ? userHref : providerHref;
-
-              return (
-                <article className="dm2026-home-support__card" key={card.title}>
-                  <div className="dm2026-home-support__card-mark" aria-hidden="true">
-                    <span />
-                  </div>
-                  <div className="dm2026-home-support__card-copy">
-                    <h3>{card.title}</h3>
-                    <p>{card.body}</p>
-                  </div>
-                  <SupportAction href={href} copy={card} unavailable={copy.unavailable} />
-                </article>
-              );
-            })}
+    <section className="dm2026-home-support dm2026-container" dir={dir} aria-labelledby={titleId} data-whatsapp-state={whatsAppState}>
+      <div className="dm2026-home-support__shell">
+        <div className="dm2026-home-support__intro">
+          <span className="dm2026-home-support__eyebrow">{copy.eyebrow}</span>
+          <div className="dm2026-home-support__headline-group">
+            <h2 id={titleId}>{copy.headline}</h2>
+            <p>{copy.subtitle}</p>
           </div>
         </div>
-      </section>
-      <HomeWhatsAppFloat2026 locale={locale} dir={dir} />
-    </>
+
+        <div className="dm2026-home-support__cards" aria-label={copy.headline}>
+          {[copy.user, copy.provider].map((card) => {
+            const href = card === copy.user ? userHref : providerHref;
+
+            return (
+              <article className="dm2026-home-support__card" key={card.title}>
+                <div className="dm2026-home-support__card-mark" aria-hidden="true">
+                  <span />
+                </div>
+                <div className="dm2026-home-support__card-copy">
+                  <h3>{card.title}</h3>
+                  <p>{card.body}</p>
+                </div>
+                <SupportAction href={href} copy={card} unavailable={copy.unavailable} />
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
