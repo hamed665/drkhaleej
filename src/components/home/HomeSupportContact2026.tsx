@@ -1,5 +1,5 @@
 import type { SupportedLocale } from '@/lib/i18n/config';
-import { buildWhatsAppUrl, normalizeWhatsAppNumber } from '@/lib/contact/whatsapp';
+import { buildWhatsAppUrl, getPublicWhatsAppNumber } from '@/lib/contact/whatsapp';
 
 type HomeSupportContact2026Props = {
   locale: SupportedLocale;
@@ -103,7 +103,7 @@ function SupportAction({ href, copy, unavailable }: { href: string | null; copy:
 
 export function HomeWhatsAppFloat2026({ locale, dir }: HomeSupportContact2026Props) {
   const copy = supportContactCopy[locale];
-  const whatsAppNumber = normalizeWhatsAppNumber(process.env.NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER);
+  const whatsAppNumber = getPublicWhatsAppNumber();
   const userHref = buildWhatsAppUrl(whatsAppNumber, copy.user.message);
   const whatsAppState = userHref ? 'active' : 'disabled';
 
@@ -137,7 +137,7 @@ export function HomeWhatsAppFloat2026({ locale, dir }: HomeSupportContact2026Pro
 export function HomeSupportContact2026({ locale, dir }: HomeSupportContact2026Props) {
   const copy = supportContactCopy[locale];
   const titleId = `dm2026-home-support-title-${locale}`;
-  const whatsAppNumber = normalizeWhatsAppNumber(process.env.NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER);
+  const whatsAppNumber = getPublicWhatsAppNumber();
   const userHref = buildWhatsAppUrl(whatsAppNumber, copy.user.message);
   const providerHref = buildWhatsAppUrl(whatsAppNumber, copy.provider.message);
   const whatsAppState = userHref ? 'active' : 'disabled';
