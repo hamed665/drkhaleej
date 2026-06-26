@@ -6,10 +6,7 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildLabsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
 import { listPublicCenters } from "@/lib/catalog/public-queries";
-import {
-  buildWhatsAppUrl,
-  normalizeWhatsAppNumber,
-} from "@/lib/contact/whatsapp";
+import { buildWhatsAppUrl, getPublicWhatsAppNumber } from "@/lib/contact/whatsapp";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -32,12 +29,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Labs in Oman | DrMuscat",
+    title: "Labs in Oman | DrKhaleej",
     description:
       "Browse medical labs, test services and sample collection options across Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "المختبرات في عُمان | DrMuscat",
+    title: "المختبرات في عُمان | DrKhaleej",
     description:
       "تصفح المختبرات الطبية وخدمات الفحوصات وخيارات سحب العينات في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },
@@ -76,9 +73,7 @@ export default async function PublicLabsPage({
     country: safeCountry,
     centerType: "laboratory",
   });
-  const whatsAppNumber = normalizeWhatsAppNumber(
-    process.env.NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER,
-  );
+  const whatsAppNumber = getPublicWhatsAppNumber();
   const whatsAppHref = buildWhatsAppUrl(
     whatsAppNumber,
     config.whatsAppMessage ?? "",
