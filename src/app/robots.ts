@@ -7,7 +7,10 @@ const robotsBlockedPaths = [
   '/admin/',
   '/dashboard/',
   '/import/',
-  '/preview/'
+  '/preview/',
+  '/demo/',
+  '/en/om/demo/',
+  '/ar/om/demo/'
 ] as const;
 
 export default function robots(): MetadataRoute.Robots {
