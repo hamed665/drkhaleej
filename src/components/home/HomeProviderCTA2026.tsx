@@ -28,7 +28,7 @@ const providerCTACopy: Record<SupportedLocale, ProviderCTACopy> = {
     badge: 'For healthcare providers in Oman',
     headline: 'Grow your healthcare presence in Oman',
     subtitle:
-      'Create a reviewed DrMuscat profile with photos, services, special offers and direct contact actions.',
+      'Create a reviewed DrKhaleej profile with photos, services, special offers and direct contact actions.',
     supportingLine: 'A premium public profile built for discovery, trust and direct enquiries.',
     featurePills: [
       'Premium profile',
@@ -53,7 +53,7 @@ const providerCTACopy: Record<SupportedLocale, ProviderCTACopy> = {
     badge: 'لمقدمي الرعاية الصحية في عُمان',
     headline: 'عزّز حضور مركزك الصحي في عُمان',
     subtitle:
-      'أنشئ ملفاً عاماً معتمداً على DrMuscat مع الصور والخدمات والعروض الخاصة ووسائل التواصل المباشر.',
+      'أنشئ ملفاً عاماً معتمداً على DrKhaleej مع الصور والخدمات والعروض الخاصة ووسائل التواصل المباشر.',
     supportingLine: 'ملف عام مميز يساعد على الاكتشاف والثقة والتواصل المباشر.',
     featurePills: [
       'ملف مميز',
