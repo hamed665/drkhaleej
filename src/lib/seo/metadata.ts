@@ -37,6 +37,8 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
 
   return {
     metadataBase: siteConfig.baseUrl,
+    applicationName: siteConfig.siteName,
+    manifest: '/manifest.webmanifest',
     title,
     description,
     alternates: {
