@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicAreaPageTemplate2026 } from '@/components/geo/PublicAreaPageTemplate2026';
 import { PublicDirectoryTemplate2026 } from '@/components/directory/PublicDirectoryTemplate2026';
@@ -10,17 +9,14 @@ import {
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { createPublicTemplateDemoBundle } from '@/lib/demo/public-template-demo-data';
+import { createNoindexMetadata } from '@/lib/seo/noindex';
 
 type Params = { locale: string; country: string };
 
-export const metadata: Metadata = {
+export const metadata = createNoindexMetadata({
   title: 'Public template preview | DrKhaleej',
-  description: 'Noindex preview route for checking public profile, directory and area templates with safe demo data.',
-  robots: {
-    index: false,
-    follow: false
-  }
-};
+  description: 'Noindex preview route for checking public profile, directory and area templates with safe demo data.'
+});
 
 export default async function PublicTemplatePreviewPage({ params }: { params: Promise<Params> }) {
   const { locale, country } = await params;
