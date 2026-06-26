@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
+
 export type BillingPeriodId = 'three' | 'six' | 'twelve';
 
 export type ProviderPricingPlan = {
@@ -99,20 +101,21 @@ export function ProviderPricingPlans({ copy }: ProviderPricingPlansProps) {
     [copy.periods, selectedPeriod]
   );
   const isArabic = copy.selectorLabel.includes('اختر');
+  const brandCopy = normalizePublicBrandCopy;
 
   return (
     <section className="dm2026-section provider-onboarding-section provider-onboarding-pricing" aria-labelledby="provider-pricing-title">
       <div className="dm2026-container">
         <div className="provider-onboarding-pricing__topline">
           <header className="dm2026-section-header provider-onboarding-section__header provider-onboarding-pricing__header">
-            <span className="dm2026-badge">{copy.badge}</span>
-            <h2 id="provider-pricing-title">{copy.title}</h2>
-            <p>{copy.subtitle}</p>
+            <span className="dm2026-badge">{brandCopy(copy.badge)}</span>
+            <h2 id="provider-pricing-title">{brandCopy(copy.title)}</h2>
+            <p>{brandCopy(copy.subtitle)}</p>
           </header>
 
-          <div className="provider-onboarding-pricing__selector" aria-label={copy.selectorLabel}>
-            <span>{copy.selectorLabel}</span>
-            <div className="provider-onboarding-pricing__segments" role="radiogroup" aria-label={copy.selectorLabel}>
+          <div className="provider-onboarding-pricing__selector" aria-label={brandCopy(copy.selectorLabel)}>
+            <span>{brandCopy(copy.selectorLabel)}</span>
+            <div className="provider-onboarding-pricing__segments" role="radiogroup" aria-label={brandCopy(copy.selectorLabel)}>
               {copy.periods.map((period) => (
                 <button
                   aria-checked={period.id === selectedPeriod}
@@ -123,7 +126,7 @@ export function ProviderPricingPlans({ copy }: ProviderPricingPlansProps) {
                   role="radio"
                   type="button"
                 >
-                  {period.label}
+                  {brandCopy(period.label)}
                 </button>
               ))}
             </div>
@@ -138,21 +141,21 @@ export function ProviderPricingPlans({ copy }: ProviderPricingPlansProps) {
               <article className="dm2026-card-glass provider-onboarding-plan" data-plan={plan.id} data-recommended={plan.recommendedLabel ? 'true' : 'false'} key={plan.id}>
                 <div className="provider-onboarding-plan__head">
                   {plan.recommendedLabel ? (
-                    <span className="provider-onboarding-plan__recommended">{plan.recommendedLabel}</span>
+                    <span className="provider-onboarding-plan__recommended">{brandCopy(plan.recommendedLabel)}</span>
                   ) : (
-                    <span className="provider-onboarding-plan__badge">{plan.badge}</span>
+                    <span className="provider-onboarding-plan__badge">{brandCopy(plan.badge)}</span>
                   )}
                 </div>
 
                 <div className="provider-onboarding-plan__name-row">
-                  <h3>{plan.name}</h3>
-                  {plan.supportLabel ? <span>{plan.supportLabel}</span> : null}
+                  <h3>{brandCopy(plan.name)}</h3>
+                  {plan.supportLabel ? <span>{brandCopy(plan.supportLabel)}</span> : null}
                 </div>
 
-                <p className="provider-onboarding-plan__description">{plan.description}</p>
+                <p className="provider-onboarding-plan__description">{brandCopy(plan.description)}</p>
 
                 <div className="provider-onboarding-plan__price-block">
-                  <div className="provider-onboarding-plan__price" aria-label={`${plan.name} ${selectedPeriodLabel}`}>
+                  <div className="provider-onboarding-plan__price" aria-label={`${brandCopy(plan.name)} ${brandCopy(selectedPeriodLabel)}`}>
                     <strong>{selectedPricing.price}</strong>
                   </div>
                   {selectedPricing.priceHelper ? <p className="provider-onboarding-plan__price-helper">{selectedPricing.priceHelper}</p> : null}
@@ -163,28 +166,28 @@ export function ProviderPricingPlans({ copy }: ProviderPricingPlansProps) {
                 </div>
 
                 <div className="provider-onboarding-plan__best-for">
-                  <span>{plan.bestForLabel}</span>
-                  <p>{plan.bestFor}</p>
+                  <span>{brandCopy(plan.bestForLabel)}</span>
+                  <p>{brandCopy(plan.bestFor)}</p>
                 </div>
 
-                <ul className="provider-onboarding-plan__features" aria-label={plan.name}>
+                <ul className="provider-onboarding-plan__features" aria-label={brandCopy(plan.name)}>
                   {plan.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
+                    <li key={feature}>{brandCopy(feature)}</li>
                   ))}
                 </ul>
 
                 <div className="provider-onboarding-plan__footer">
                   <a className="dm2026-button dm2026-button-secondary provider-onboarding-plan__button" href="#provider-onboarding-form">
-                    {plan.cta}
+                    {brandCopy(plan.cta)}
                   </a>
-                  <p>{plan.note}</p>
+                  <p>{brandCopy(plan.note)}</p>
                 </div>
               </article>
             );
           })}
         </div>
 
-        <p className="dm2026-card-soft provider-onboarding-pricing-note">{copy.disclaimer}</p>
+        <p className="dm2026-card-soft provider-onboarding-pricing-note">{brandCopy(copy.disclaimer)}</p>
       </div>
     </section>
   );
