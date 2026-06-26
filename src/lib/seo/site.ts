@@ -11,13 +11,13 @@ export type LocaleCountry = {
   country: SiteCountry;
 };
 
-const PRODUCTION_FALLBACK_URL = 'https://drkhaleej.com';
+const PRODUCTION_FALLBACK_URL = 'https://www.drkhaleej.com';
 const LOCAL_FALLBACK_URL = 'http://localhost:3000';
 
 export const siteBrand = {
   siteName: 'DrKhaleej',
   previousSiteName: 'DrMuscat',
-  canonicalDomain: 'drkhaleej.com',
+  canonicalDomain: 'www.drkhaleej.com',
   productionUrl: PRODUCTION_FALLBACK_URL
 } as const;
 

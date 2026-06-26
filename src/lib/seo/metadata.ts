@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { languageAlternates, localizedPathname, siteConfig, type SiteCountry, type SiteLocale } from './site';
+import { localizedPathname, siteConfig, type SiteCountry, type SiteLocale } from './site';
 
 type BuildLocalizedMetadataInput = {
   locale?: SiteLocale;
@@ -13,6 +13,14 @@ function toAbsoluteUrl(pathname: string): string {
   return new URL(pathname, siteConfig.baseUrl).toString();
 }
 
+function regionalLanguageCode(locale: SiteLocale, country: SiteCountry): string {
+  return `${locale}-${country.toUpperCase()}`;
+}
+
+function openGraphLocale(locale: SiteLocale, country: SiteCountry): string {
+  return `${locale}_${country.toUpperCase()}`;
+}
+
 export function buildCanonicalUrl(pathname: string, locale: SiteLocale, country: SiteCountry): string {
   return toAbsoluteUrl(localizedPathname(pathname, locale, country));
 }
@@ -24,6 +32,8 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
   const title = input.title ?? siteConfig.defaultTitle;
   const description = input.description ?? siteConfig.defaultDescription;
   const canonical = buildCanonicalUrl(pathname, locale, country);
+  const englishAlternate = toAbsoluteUrl(localizedPathname(pathname, 'en', country));
+  const arabicAlternate = toAbsoluteUrl(localizedPathname(pathname, 'ar', country));
 
   return {
     metadataBase: siteConfig.baseUrl,
@@ -32,14 +42,16 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
     alternates: {
       canonical,
       languages: {
-        en: toAbsoluteUrl(localizedPathname(pathname, 'en', country)),
-        ar: toAbsoluteUrl(localizedPathname(pathname, 'ar', country)),
-        'x-default': toAbsoluteUrl(languageAlternates.en)
+        [regionalLanguageCode('en', country)]: englishAlternate,
+        [regionalLanguageCode('ar', country)]: arabicAlternate,
+        en: englishAlternate,
+        ar: arabicAlternate,
+        'x-default': englishAlternate
       }
     },
     openGraph: {
       type: 'website',
-      locale,
+      locale: openGraphLocale(locale, country),
       siteName: siteConfig.siteName,
       title,
       description,
@@ -52,7 +64,7 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
     },
     icons: {
       icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-      other: [{ rel: 'mask-icon', url: '/brand/drmuscat-app-icon.svg', color: '#0e7469' }]
+      other: [{ rel: 'mask-icon', url: '/favicon.svg', color: '#0e7469' }]
     }
   };
 }
