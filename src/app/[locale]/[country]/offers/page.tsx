@@ -20,12 +20,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Healthcare and Wellness Offers in Oman | DrMuscat",
+    title: "Healthcare and Wellness Offers in Oman | DrKhaleej",
     description:
       "Browse approved healthcare, beauty, pharmacy, lab and wellness offers in Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "عروض الصحة والعافية في عُمان | DrMuscat",
+    title: "عروض الصحة والعافية في عُمان | DrKhaleej",
     description:
       "تصفح عروض الصحة والتجميل والصيدليات والمختبرات والعافية المعتمدة في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },

@@ -16,12 +16,12 @@ type RouteCopy = { title: string; description: string; badge: string };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
-    title: 'Healthcare Services in Oman | DrMuscat',
+    title: 'Healthcare Services in Oman | DrKhaleej',
     description: 'Browse public healthcare service listings in Oman with bilingual-ready, server-rendered pages.',
     badge: 'Public service listings'
   },
   ar: {
-    title: 'الخدمات الصحية في عُمان | DrMuscat',
+    title: 'الخدمات الصحية في عُمان | DrKhaleej',
     description: 'تصفح القوائم العامة للخدمات الصحية في عُمان ضمن صفحات خادمية ثنائية اللغة.',
     badge: 'قوائم الخدمات العامة'
   }
