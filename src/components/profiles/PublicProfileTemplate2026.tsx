@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { PublicProfileEntityType, PublicProfilePublicationDecision } from '@/lib/profiles/public-profile-guards';
+import type { InternalLinkDefinition } from '@/lib/seo/internal-linking';
 
 type PublicProfileTemplateLocale = 'en' | 'ar';
 
@@ -27,6 +28,7 @@ export type PublicProfileTemplate2026Props = {
   contact?: PublicProfileTemplateContact;
   location?: PublicProfileTemplateLocation;
   publicationDecision: PublicProfilePublicationDecision;
+  internalLinks?: readonly InternalLinkDefinition[];
   children?: ReactNode;
 };
 
@@ -46,6 +48,7 @@ const profileCopy: Record<
     call: string;
     website: string;
     whatsapp: string;
+    relatedLinks: string;
   }
 > = {
   en: {
@@ -61,7 +64,8 @@ const profileCopy: Record<
     publicationReady: 'This profile passed the public publication guard.',
     call: 'Call',
     website: 'Website',
-    whatsapp: 'WhatsApp'
+    whatsapp: 'WhatsApp',
+    relatedLinks: 'Related links'
   },
   ar: {
     profileStatus: 'حالة الملف',
@@ -76,7 +80,8 @@ const profileCopy: Record<
     publicationReady: 'هذا الملف اجتاز بوابة النشر العامة.',
     call: 'اتصال',
     website: 'الموقع',
-    whatsapp: 'واتساب'
+    whatsapp: 'واتساب',
+    relatedLinks: 'روابط ذات صلة'
   }
 };
 
@@ -94,6 +99,31 @@ function locationText(location: PublicProfileTemplateLocation | undefined): stri
   return parts.length > 0 ? parts.join(', ') : null;
 }
 
+function ProfileInternalLinks({
+  links,
+  copy
+}: {
+  links: readonly InternalLinkDefinition[];
+  copy: (typeof profileCopy)[PublicProfileTemplateLocale];
+}) {
+  if (links.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav className="dm2026-public-profile__internal-links" aria-label={copy.relatedLinks}>
+      <strong>{copy.relatedLinks}</strong>
+      <ul>
+        {links.map((link) => (
+          <li key={link.key} data-intent={link.intent} data-priority={link.priority}>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 export function PublicProfileTemplate2026({
   locale,
   dir,
@@ -105,6 +135,7 @@ export function PublicProfileTemplate2026({
   contact,
   location,
   publicationDecision,
+  internalLinks = [],
   children
 }: PublicProfileTemplate2026Props) {
   const copy = profileCopy[locale];
@@ -132,6 +163,8 @@ export function PublicProfileTemplate2026({
         <strong>{copy.safetyNote}</strong>
         <p>{copy.notMedicalAdvice}</p>
       </section>
+
+      <ProfileInternalLinks links={internalLinks} copy={copy} />
 
       <div className="dm2026-public-profile__grid">
         <section className="dm2026-public-profile__panel" aria-label={copy.contact}>
