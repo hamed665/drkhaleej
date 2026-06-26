@@ -14,10 +14,7 @@ import {
   type SupportedCountry,
   type SupportedLocale,
 } from "@/lib/i18n/config";
-import {
-  buildWhatsAppUrl,
-  normalizeWhatsAppNumber,
-} from "@/lib/contact/whatsapp";
+import { buildWhatsAppUrl, getPublicWhatsAppNumber } from "@/lib/contact/whatsapp";
 import { buildLocalizedMetadata } from "@/lib/seo/metadata";
 import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
@@ -107,9 +104,7 @@ export default async function PublicDoctorsPage({
   const dir = localeDirection(safeLocale);
   const copy = copyByLocale[safeLocale];
   const result = await listPublicDoctors({ country: safeCountry });
-  const whatsAppNumber = normalizeWhatsAppNumber(
-    process.env.NEXT_PUBLIC_DRMUSCAT_WHATSAPP_NUMBER,
-  );
+  const whatsAppNumber = getPublicWhatsAppNumber();
   const whatsAppHref = buildWhatsAppUrl(whatsAppNumber, copy.whatsappMessage);
   const faq = buildDiscoveryFaq("doctors", safeLocale === "ar");
 
