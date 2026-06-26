@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const marketRootPaths = sitemapMarketCountries.flatMap((country) =>
     siteConfig.locales.map((locale) => localizedRootPath(locale, country)),
   );
-  const marketRootPathSet = new Set(marketRootPaths);
+  const marketRootPathSet = new Set<string>(marketRootPaths);
 
   const staticEntries: MetadataRoute.Sitemap = listSitemapEligibleSeoPageDefinitions().map((page) => ({
     url: new URL(page.pathname, siteConfig.baseUrl).toString(),
