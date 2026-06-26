@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import { localizedPathname, siteConfig, type SiteCountry, type SiteLocale } from './site';
 
 type BuildLocalizedMetadataInput = {
@@ -29,8 +30,8 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
   const locale = input.locale ?? siteConfig.defaultLocale;
   const country = input.country ?? siteConfig.defaultCountry;
   const pathname = input.pathname ?? '/';
-  const title = input.title ?? siteConfig.defaultTitle;
-  const description = input.description ?? siteConfig.defaultDescription;
+  const title = normalizePublicBrandCopy(input.title ?? siteConfig.defaultTitle);
+  const description = normalizePublicBrandCopy(input.description ?? siteConfig.defaultDescription);
   const canonical = buildCanonicalUrl(pathname, locale, country);
   const englishAlternate = toAbsoluteUrl(localizedPathname(pathname, 'en', country));
   const arabicAlternate = toAbsoluteUrl(localizedPathname(pathname, 'ar', country));
