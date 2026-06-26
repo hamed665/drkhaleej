@@ -23,12 +23,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Hospitals in Oman | DrMuscat",
+    title: "Hospitals in Oman | DrKhaleej",
     description:
       "Browse hospitals, departments, patient services and care options in Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "المستشفيات في عُمان | DrMuscat",
+    title: "المستشفيات في عُمان | DrKhaleej",
     description:
       "تصفح المستشفيات والأقسام وخدمات المرضى وخيارات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },
