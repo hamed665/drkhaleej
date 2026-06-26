@@ -2,6 +2,7 @@ import type { PublicAreaPageTemplate2026Props } from '@/components/geo/PublicAre
 import type { PublicDirectoryTemplate2026Props } from '@/components/directory/PublicDirectoryTemplate2026';
 import type { PublicProfileTemplate2026Props } from '@/components/profiles/PublicProfileTemplate2026';
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
+import { createPublicDirectoryResultCards, type PublicDirectoryProviderInput } from '@/lib/directory/public-directory-results';
 import { evaluatePublicProfilePublication } from '@/lib/profiles/public-profile-guards';
 import { publicDiscoveryRoute, publicDoctorDetailRoute } from '@/lib/routes/public';
 import {
@@ -72,6 +73,27 @@ function copyFor(locale: SupportedLocale): DemoLocaleCopy {
   return demoCopy[locale];
 }
 
+function createDemoDirectoryProviderInputs(copy: DemoLocaleCopy, profileHref: string): readonly PublicDirectoryProviderInput[] {
+  return [
+    {
+      id: demoDoctorSlug,
+      entityType: 'doctor',
+      isActive: true,
+      reviewStatus: 'approved',
+      readinessStatus: 'ready',
+      slug: demoDoctorSlug,
+      displayName: copy.doctorName,
+      hasUnsafeMedicalClaims: false,
+      href: profileHref,
+      categoryLabel: copy.doctorCategory,
+      summary: copy.directoryDescription,
+      area: copy.areaName,
+      city: copy.parentLabel,
+      badges: copy.badges
+    }
+  ];
+}
+
 export function createDemoPublicProfileTemplateProps(
   locale: SupportedLocale,
   country: SupportedCountry
@@ -129,6 +151,7 @@ export function createDemoPublicDirectoryTemplateProps(
 ): PublicDirectoryTemplate2026Props {
   const copy = copyFor(locale);
   const profileHref = publicDoctorDetailRoute(locale, country, demoDoctorSlug);
+  const results = createPublicDirectoryResultCards(createDemoDirectoryProviderInputs(copy, profileHref));
 
   return {
     locale,
@@ -137,7 +160,7 @@ export function createDemoPublicDirectoryTemplateProps(
     eyebrow: locale === 'ar' ? 'دليل تجريبي' : 'Demo directory',
     title: copy.directoryTitle,
     description: copy.directoryDescription,
-    totalResults: 1,
+    totalResults: results.length,
     filters: [
       {
         key: 'area',
@@ -153,20 +176,7 @@ export function createDemoPublicDirectoryTemplateProps(
         href: publicDiscoveryRoute(locale, country, 'doctors')
       }
     ],
-    results: [
-      {
-        id: demoDoctorSlug,
-        href: profileHref,
-        entityType: 'doctor',
-        displayName: copy.doctorName,
-        categoryLabel: copy.doctorCategory,
-        summary: copy.directoryDescription,
-        area: copy.areaName,
-        city: copy.parentLabel,
-        badges: copy.badges,
-        isPublic: true
-      }
-    ],
+    results,
     internalLinks: selectPrimaryInternalLinks(
       createDirectoryInternalLinks({ locale, country, currentSlug: 'doctors' }),
       6
