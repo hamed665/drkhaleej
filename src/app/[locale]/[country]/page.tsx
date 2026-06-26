@@ -21,18 +21,18 @@ type HomeMetadataCopy = {
 
 const homeMetadataByLocale: Record<SupportedLocale, HomeMetadataCopy> = {
   en: {
-    metadataTitle: 'DrMuscat | Healthcare Discovery in Oman',
+    metadataTitle: 'DrKhaleej | Healthcare Discovery in Oman',
     metadataDescription:
       'Explore doctors, clinics, labs, pharmacies, beauty centers, pet clinics, wellness providers and offers in Oman. Public discovery only, not medical advice.',
-    openGraphTitle: 'DrMuscat | Healthcare Discovery in Oman',
+    openGraphTitle: 'DrKhaleej | Healthcare Discovery in Oman',
     openGraphDescription:
       'Explore healthcare, beauty, wellness and pet care providers across Oman. Public discovery only, not medical advice.'
   },
   ar: {
-    metadataTitle: 'DrMuscat | اكتشاف الرعاية الصحية في عُمان',
+    metadataTitle: 'DrKhaleej | اكتشاف الرعاية الصحية في عُمان',
     metadataDescription:
       'استكشف الأطباء والعيادات والمختبرات والصيدليات ومراكز التجميل والعيادات البيطرية ومقدمي خدمات الرفاهية والعروض في عُمان. اكتشاف عام فقط، وليس نصيحة طبية.',
-    openGraphTitle: 'DrMuscat | اكتشاف الرعاية الصحية في عُمان',
+    openGraphTitle: 'DrKhaleej | اكتشاف الرعاية الصحية في عُمان',
     openGraphDescription:
       'استكشف مقدمي الرعاية الصحية والتجميل والرفاهية ورعاية الحيوانات الأليفة في عُمان. اكتشاف عام فقط، وليس نصيحة طبية.'
   }

@@ -37,7 +37,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     eyebrow: 'Oman-first public discovery',
     title: 'Discover doctors, clinics, labs, pharmacies and care services in Oman.',
     subtitle:
-      'A premium bilingual DrMuscat experience for Muscat and Oman discovery. Start broad, compare public options, then confirm details directly with providers.',
+      'A premium bilingual DrKhaleej experience for Muscat and Oman discovery. Start broad, compare public options, then confirm details directly with providers.',
     primaryCta: 'Search healthcare options',
     secondaryCta: 'For providers',
     heroNote: 'Public discovery information only. Confirm details directly with the provider. Not medical advice.',
@@ -46,7 +46,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     visualTitle: 'Premium Oman discovery shell',
     visualItems: ['English + Arabic', 'Search-first command center', 'Provider visibility ready'],
     search: {
-      eyebrow: 'Search DrMuscat',
+      eyebrow: 'Search DrKhaleej',
       title: 'Search doctors, clinics, services, offers and guides from one command center.',
       description: 'Use premium filters to explore public discovery by provider type, specialty, city and area.',
       careNeedLabel: 'Care need, specialty or service',
@@ -110,7 +110,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     eyebrow: 'اكتشاف عام يبدأ من عُمان',
     title: 'اكتشف خيارات الرعاية الصحية في عُمان',
     subtitle:
-      'تجربة DrMuscat مميزة بثنائية اللغة لاكتشاف الرعاية في مسقط وعُمان. ابدأ من البحث ثم أكّد التفاصيل مباشرة مع مقدّمي الخدمة.',
+      'تجربة DrKhaleej مميزة بثنائية اللغة لاكتشاف الرعاية في مسقط وعُمان. ابدأ من البحث ثم أكّد التفاصيل مباشرة مع مقدّمي الخدمة.',
     primaryCta: 'ابحث عن خيارات الرعاية',
     secondaryCta: 'للمقدّمين',
     heroNote: 'معلومات اكتشاف عامة فقط. يرجى تأكيد التفاصيل مباشرة مع مقدّم الخدمة. ليست نصيحة طبية.',
@@ -119,7 +119,7 @@ const home2026Copy: Record<SupportedLocale, HeaderHeroCopy> = {
     visualTitle: 'واجهة اكتشاف مميزة لعُمان',
     visualItems: ['العربية + الإنجليزية', 'مركز بحث متقدم', 'جاهزية لظهور المقدّمين'],
     search: {
-      eyebrow: 'ابحث في DrMuscat',
+      eyebrow: 'ابحث في DrKhaleej',
       title: 'ابحث عن الأطباء والعيادات والخدمات والعروض والأدلة من مركز واحد.',
       description: 'استخدم المرشحات لاستكشاف الخيارات العامة حسب نوع المقدم والتخصص والمدينة والمنطقة.',
       careNeedLabel: 'احتياج الرعاية أو التخصص أو الخدمة',
