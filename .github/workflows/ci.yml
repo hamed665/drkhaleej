@@ -1,4 +1,4 @@
-name: DrMuscat CI
+name: DrKhaleej CI
 
 on:
   pull_request:
