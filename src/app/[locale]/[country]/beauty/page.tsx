@@ -20,12 +20,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Beauty Centers and Salons in Oman | DrMuscat",
+    title: "Beauty Centers and Salons in Oman | DrKhaleej",
     description:
       "Browse beauty centers, salons, skincare, hair, nails and wellness services in Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "مراكز التجميل والصالونات في عُمان | DrMuscat",
+    title: "مراكز التجميل والصالونات في عُمان | DrKhaleej",
     description:
       "تصفح مراكز التجميل والصالونات والعناية بالبشرة والشعر والأظافر وخدمات العافية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },

@@ -20,12 +20,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Dental Clinics in Oman | DrMuscat",
+    title: "Dental Clinics in Oman | DrKhaleej",
     description:
       "Browse dental clinics, dentists, orthodontics, implants, whitening and oral care services in Oman. Public discovery only, not medical advice.",
   },
   ar: {
-    title: "عيادات الأسنان في عُمان | DrMuscat",
+    title: "عيادات الأسنان في عُمان | DrKhaleej",
     description:
       "تصفح عيادات الأسنان وأطباء الأسنان والتقويم والزراعة والتبييض وخدمات العناية بالفم في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },
