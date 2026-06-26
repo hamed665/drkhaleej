@@ -26,18 +26,18 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
   en: {
     badge: 'FAQ',
     headline: 'Questions before you explore care',
-    subtitle: 'Clear answers about DrMuscat, provider information, offers, and safe public discovery in Oman.',
+    subtitle: 'Clear answers about DrKhaleej, provider information, offers, and safe public discovery in Oman.',
     trustChips: ['Oman public discovery', 'Arabic + English', 'Medical-safe guidance'],
     items: [
       {
-        question: 'What is DrMuscat?',
+        question: 'What is DrKhaleej?',
         answer:
-          'DrMuscat is a public healthcare discovery platform for Oman. It helps people explore doctors, clinics, hospitals, labs, pharmacies, beauty centers, pet clinics, wellness providers, services, and special offer previews.'
+          'DrKhaleej is a public healthcare discovery platform for Oman. It helps people explore doctors, clinics, hospitals, labs, pharmacies, beauty centers, pet clinics, wellness providers, services, and special offer previews.'
       },
       {
-        question: 'Does DrMuscat provide medical advice?',
+        question: 'Does DrKhaleej provide medical advice?',
         answer:
-          'No. DrMuscat is for public discovery only and does not provide medical advice, diagnosis, or treatment recommendations. Always confirm medical decisions with a qualified healthcare professional.'
+          'No. DrKhaleej is for public discovery only and does not provide medical advice, diagnosis, or treatment recommendations. Always confirm medical decisions with a qualified healthcare professional.'
       },
       {
         question: 'Are provider details reviewed before publishing?',
@@ -50,9 +50,9 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
           'No. Special Offers are promotional previews and do not represent medical quality rankings. Sponsored visibility and offers should be understood separately from medical quality.'
       },
       {
-        question: 'Can I contact providers directly from DrMuscat?',
+        question: 'Can I contact providers directly from DrKhaleej?',
         answer:
-          'DrMuscat is designed to support direct actions such as WhatsApp, call, directions, and profile viewing when provider details are approved and available.'
+          'DrKhaleej is designed to support direct actions such as WhatsApp, call, directions, and profile viewing when provider details are approved and available.'
       },
       {
         question: 'Can clinics and healthcare providers list their center?',
@@ -60,8 +60,8 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
           'Yes. Providers can prepare a reviewed public profile with photos, services, special offers, and direct contact actions. Full onboarding and plan details will be handled in a dedicated provider flow.'
       },
       {
-        question: 'Does DrMuscat support Arabic and English?',
-        answer: 'Yes. DrMuscat is built for Arabic and English discovery in Oman, with RTL-aware design for Arabic users.'
+        question: 'Does DrKhaleej support Arabic and English?',
+        answer: 'Yes. DrKhaleej is built for Arabic and English discovery in Oman, with RTL-aware design for Arabic users.'
       },
       {
         question: 'Should I confirm details before visiting a provider?',
@@ -73,18 +73,18 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
   ar: {
     badge: 'الأسئلة الشائعة',
     headline: 'أسئلة قبل استكشاف الرعاية',
-    subtitle: 'إجابات واضحة حول DrMuscat ومعلومات مقدمي الخدمة والعروض والاكتشاف العام الآمن في عُمان.',
+    subtitle: 'إجابات واضحة حول DrKhaleej ومعلومات مقدمي الخدمة والعروض والاكتشاف العام الآمن في عُمان.',
     trustChips: ['اكتشاف عام في عُمان', 'العربية + الإنجليزية', 'محتوى آمن طبياً'],
     items: [
       {
-        question: 'ما هو DrMuscat؟',
+        question: 'ما هو DrKhaleej؟',
         answer:
-          'DrMuscat هو منصة اكتشاف عامة للرعاية الصحية في عُمان. يساعد المستخدمين على استكشاف الأطباء والعيادات والمستشفيات والمختبرات والصيدليات ومراكز التجميل والعيادات البيطرية ومقدمي خدمات الرفاهية والخدمات ومعاينات العروض الخاصة.'
+          'DrKhaleej هو منصة اكتشاف عامة للرعاية الصحية في عُمان. يساعد المستخدمين على استكشاف الأطباء والعيادات والمستشفيات والمختبرات والصيدليات ومراكز التجميل والعيادات البيطرية ومقدمي خدمات الرفاهية والخدمات ومعاينات العروض الخاصة.'
       },
       {
-        question: 'هل يقدم DrMuscat نصائح طبية؟',
+        question: 'هل يقدم DrKhaleej نصائح طبية؟',
         answer:
-          'لا. DrMuscat مخصص للاكتشاف العام فقط، ولا يقدم نصائح طبية أو تشخيصاً أو توصيات علاجية. يجب دائماً تأكيد القرارات الطبية مع مختص رعاية صحية مؤهل.'
+          'لا. DrKhaleej مخصص للاكتشاف العام فقط، ولا يقدم نصائح طبية أو تشخيصاً أو توصيات علاجية. يجب دائماً تأكيد القرارات الطبية مع مختص رعاية صحية مؤهل.'
       },
       {
         question: 'هل تتم مراجعة تفاصيل مقدمي الخدمة قبل النشر؟',
@@ -97,9 +97,9 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
           'لا. العروض الخاصة هي معاينات ترويجية ولا تمثل ترتيباً لجودة طبية. يجب فهم الظهور المدعوم والعروض بشكل منفصل عن جودة الخدمة الطبية.'
       },
       {
-        question: 'هل يمكنني التواصل مباشرة مع مقدمي الخدمة عبر DrMuscat؟',
+        question: 'هل يمكنني التواصل مباشرة مع مقدمي الخدمة عبر DrKhaleej؟',
         answer:
-          'تم تصميم DrMuscat لدعم إجراءات التواصل المباشر مثل واتساب والاتصال والاتجاهات وعرض الملف عندما تكون تفاصيل مقدم الخدمة معتمدة ومتاحة.'
+          'تم تصميم DrKhaleej لدعم إجراءات التواصل المباشر مثل واتساب والاتصال والاتجاهات وعرض الملف عندما تكون تفاصيل مقدم الخدمة معتمدة ومتاحة.'
       },
       {
         question: 'هل يمكن للعيادات ومقدمي الرعاية الصحية إدراج مراكزهم؟',
@@ -107,9 +107,9 @@ export const homeFAQCopy: Record<SupportedLocale, HomeFAQCopy> = {
           'نعم. يمكن لمقدمي الخدمة تجهيز ملف عام بعد المراجعة، مع الصور والخدمات والعروض الخاصة وإجراءات التواصل المباشر. سيتم التعامل مع تفاصيل الانضمام والخطط في مسار مخصص لمقدمي الخدمة.'
       },
       {
-        question: 'هل يدعم DrMuscat العربية والإنجليزية؟',
+        question: 'هل يدعم DrKhaleej العربية والإنجليزية؟',
         answer:
-          'نعم. تم بناء DrMuscat لدعم الاكتشاف بالعربية والإنجليزية في عُمان، مع تصميم مناسب لاتجاه الكتابة من اليمين إلى اليسار للمستخدمين العرب.'
+          'نعم. تم بناء DrKhaleej لدعم الاكتشاف بالعربية والإنجليزية في عُمان، مع تصميم مناسب لاتجاه الكتابة من اليمين إلى اليسار للمستخدمين العرب.'
       },
       {
         question: 'هل يجب تأكيد التفاصيل قبل زيارة مقدم الخدمة؟',
