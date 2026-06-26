@@ -21,6 +21,12 @@
 17. Search analytics.
 18. First controlled index batch.
 
+## Quality gates
+
+A public page can be indexed only after it has a canonical URL, matching language alternate where possible, visible useful content, internal links, source or freshness evidence where relevant, and no duplicate route conflict.
+
+A public listing or profile page must not be added to sitemap only because a keyword exists.
+
 ## Non-goals for first launch
 
 Full dashboards, online payment automation, advanced marketplace flows, full review system, and country expansion are not blockers for first public indexing.
