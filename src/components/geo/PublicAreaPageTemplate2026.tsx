@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import type { PublicProfileEntityType } from '@/lib/profiles/public-profile-guards';
 import type { InternalLinkDefinition } from '@/lib/seo/internal-linking';
 
@@ -132,7 +133,7 @@ function AreaDirectoryCard({
 
   return (
     <a className="dm2026-area-template__directory-card" href={link.href} data-entity-type={link.entityType}>
-      <span>{link.label}</span>
+      <span>{normalizePublicBrandCopy(link.label)}</span>
       {resolvedCount ? <small>{resolvedCount}</small> : null}
       <strong>{copy.openDirectory}</strong>
     </a>
@@ -140,13 +141,14 @@ function AreaDirectoryCard({
 }
 
 function AreaProviderCard({ provider, copy }: { provider: PublicAreaFeaturedProvider; copy: (typeof areaCopy)[PublicAreaTemplateLocale] }) {
-  const heading = <h3>{provider.displayName}</h3>;
+  const brandCopy = normalizePublicBrandCopy;
+  const heading = <h3>{brandCopy(provider.displayName)}</h3>;
 
   return (
     <article className="dm2026-area-template__provider-card" data-entity-type={provider.entityType}>
-      <span>{provider.categoryLabel ?? provider.entityType}</span>
+      <span>{brandCopy(provider.categoryLabel ?? provider.entityType)}</span>
       {hasText(provider.href) ? <a href={provider.href}>{heading}</a> : heading}
-      {hasText(provider.summary) ? <p>{provider.summary}</p> : null}
+      {hasText(provider.summary) ? <p>{brandCopy(provider.summary)}</p> : null}
       {hasText(provider.href) ? <a href={provider.href}>{copy.openProfile}</a> : null}
     </article>
   );
@@ -169,7 +171,7 @@ function AreaInternalLinks({
       <ul>
         {links.map((link) => (
           <li key={link.key} data-intent={link.intent} data-priority={link.priority}>
-            <a href={link.href}>{link.label}</a>
+            <a href={link.href}>{normalizePublicBrandCopy(link.label)}</a>
           </li>
         ))}
       </ul>
@@ -191,16 +193,18 @@ export function PublicAreaPageTemplate2026({
   footer
 }: PublicAreaPageTemplate2026Props) {
   const copy = areaCopy[locale];
-  const locationParts = [parentLabel, countryLabel].filter(hasText);
+  const brandCopy = normalizePublicBrandCopy;
+  const locationParts = [parentLabel, countryLabel].filter(hasText).map(brandCopy);
   const locationLabel = locationParts.length > 0 ? locationParts.join(' · ') : null;
+  const safeAreaName = brandCopy(areaName);
 
   return (
-    <main className="dm2026-area-template" dir={dir} data-area-name={areaName}>
+    <main className="dm2026-area-template" dir={dir} data-area-name={safeAreaName}>
       <header className="dm2026-area-template__hero">
         <span className="dm2026-area-template__eyebrow">{copy.eyebrow}</span>
-        <h1>{areaName}</h1>
+        <h1>{safeAreaName}</h1>
         {locationLabel ? <p>{locationLabel}</p> : null}
-        {hasText(description) ? <p>{description}</p> : null}
+        {hasText(description) ? <p>{brandCopy(description)}</p> : null}
       </header>
 
       <section className="dm2026-area-template__safety" aria-label={copy.safetyNote}>
@@ -233,8 +237,8 @@ export function PublicAreaPageTemplate2026({
             return (
               <section key={group.key} className="dm2026-area-template__provider-group" data-entity-type={group.entityType}>
                 <header>
-                  <h3>{group.title}</h3>
-                  {hasText(group.description) ? <p>{group.description}</p> : null}
+                  <h3>{brandCopy(group.title)}</h3>
+                  {hasText(group.description) ? <p>{brandCopy(group.description)}</p> : null}
                 </header>
                 {providers.length > 0 ? (
                   <div>

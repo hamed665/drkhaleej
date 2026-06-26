@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import type { PublicProfileEntityType } from '@/lib/profiles/public-profile-guards';
 import type { InternalLinkDefinition } from '@/lib/seo/internal-linking';
 
@@ -113,22 +114,23 @@ function DirectoryResultCard({ result, copy }: { result: PublicDirectoryResultCa
   const badges = filteredTextList(result.badges);
   const resolvedPlace = placeLabel(result);
   const cardState = result.isPublic === false ? 'review-gated' : 'public';
-  const title = <h2>{result.displayName}</h2>;
+  const brandCopy = normalizePublicBrandCopy;
+  const title = <h2>{brandCopy(result.displayName)}</h2>;
 
   return (
     <article className="dm2026-directory-card" data-entity-type={result.entityType} data-card-state={cardState}>
       <div className="dm2026-directory-card__body">
         <div className="dm2026-directory-card__heading">
-          <span>{result.categoryLabel ?? result.entityType}</span>
+          <span>{brandCopy(result.categoryLabel ?? result.entityType)}</span>
           {result.isSponsored ? <strong>{copy.sponsored}</strong> : null}
         </div>
         {hasText(result.href) ? <a href={result.href}>{title}</a> : title}
-        {hasText(result.summary) ? <p>{result.summary}</p> : null}
-        {resolvedPlace ? <p className="dm2026-directory-card__place">{resolvedPlace}</p> : null}
+        {hasText(result.summary) ? <p>{brandCopy(result.summary)}</p> : null}
+        {resolvedPlace ? <p className="dm2026-directory-card__place">{brandCopy(resolvedPlace)}</p> : null}
         {badges.length > 0 ? (
           <ul className="dm2026-directory-card__badges" aria-label="Profile badges">
             {badges.map((badge) => (
-              <li key={badge}>{badge}</li>
+              <li key={badge}>{brandCopy(badge)}</li>
             ))}
           </ul>
         ) : null}
@@ -155,7 +157,7 @@ function DirectoryInternalLinks({
       <ul>
         {links.map((link) => (
           <li key={link.key} data-intent={link.intent} data-priority={link.priority}>
-            <a href={link.href}>{link.label}</a>
+            <a href={link.href}>{normalizePublicBrandCopy(link.label)}</a>
           </li>
         ))}
       </ul>
@@ -181,14 +183,15 @@ export function PublicDirectoryTemplate2026({
   const copy = directoryCopy[locale];
   const countLabel = resultCountLabel(locale, totalResults);
   const visibleResults = results.filter((result) => result.isPublic !== false);
+  const brandCopy = normalizePublicBrandCopy;
 
   return (
     <main className="dm2026-directory" dir={dir} data-directory-entity-type={entityType}>
       <header className="dm2026-directory__hero">
         <div className="dm2026-directory__intro">
-          {hasText(eyebrow) ? <span className="dm2026-directory__eyebrow">{eyebrow}</span> : null}
-          <h1>{title}</h1>
-          {hasText(description) ? <p>{description}</p> : null}
+          {hasText(eyebrow) ? <span className="dm2026-directory__eyebrow">{brandCopy(eyebrow)}</span> : null}
+          <h1>{brandCopy(title)}</h1>
+          {hasText(description) ? <p>{brandCopy(description)}</p> : null}
         </div>
         {countLabel ? <p className="dm2026-directory__count">{countLabel}</p> : null}
       </header>
@@ -208,7 +211,7 @@ export function PublicDirectoryTemplate2026({
 
               return (
                 <li key={key} data-active={filter.active === true ? 'true' : 'false'}>
-                  {hasText(filter.href) ? <a href={filter.href}>{filter.label}</a> : <span>{filter.label}</span>}
+                  {hasText(filter.href) ? <a href={filter.href}>{brandCopy(filter.label)}</a> : <span>{brandCopy(filter.label)}</span>}
                 </li>
               );
             })}
@@ -221,7 +224,7 @@ export function PublicDirectoryTemplate2026({
       {children}
 
       {visibleResults.length > 0 ? (
-        <section className="dm2026-directory__results" aria-label={title}>
+        <section className="dm2026-directory__results" aria-label={brandCopy(title)}>
           {visibleResults.map((result) => (
             <DirectoryResultCard key={result.id} result={result} copy={copy} />
           ))}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import type { PublicProfileEntityType, PublicProfilePublicationDecision } from '@/lib/profiles/public-profile-guards';
 import type { InternalLinkDefinition } from '@/lib/seo/internal-linking';
 
@@ -116,7 +117,7 @@ function ProfileInternalLinks({
       <ul>
         {links.map((link) => (
           <li key={link.key} data-intent={link.intent} data-priority={link.priority}>
-            <a href={link.href}>{link.label}</a>
+            <a href={link.href}>{normalizePublicBrandCopy(link.label)}</a>
           </li>
         ))}
       </ul>
@@ -144,14 +145,15 @@ export function PublicProfileTemplate2026({
   const statusLabel = publicationDecision.isPublic ? copy.publicProfile : copy.draftProfile;
   const statusBody = publicationDecision.isPublic ? copy.publicationReady : copy.publicationBlocked;
   const profileState = publicationDecision.isPublic ? 'public' : 'blocked';
+  const brandCopy = normalizePublicBrandCopy;
 
   return (
     <article className="dm2026-public-profile" dir={dir} data-profile-state={profileState} data-entity-type={entityType}>
       <header className="dm2026-public-profile__hero">
         <div className="dm2026-public-profile__identity">
-          <span className="dm2026-public-profile__eyebrow">{categoryLabel ?? entityType}</span>
-          <h1>{displayName}</h1>
-          {hasText(description) ? <p>{description}</p> : null}
+          <span className="dm2026-public-profile__eyebrow">{brandCopy(categoryLabel ?? entityType)}</span>
+          <h1>{brandCopy(displayName)}</h1>
+          {hasText(description) ? <p>{brandCopy(description)}</p> : null}
         </div>
         <aside className="dm2026-public-profile__status" aria-label={copy.profileStatus}>
           <strong>{statusLabel}</strong>
@@ -187,7 +189,7 @@ export function PublicProfileTemplate2026({
         {resolvedLocation ? (
           <section className="dm2026-public-profile__panel" aria-label={copy.location}>
             <h2>{copy.location}</h2>
-            <p>{resolvedLocation}</p>
+            <p>{brandCopy(resolvedLocation)}</p>
           </section>
         ) : null}
 
@@ -196,7 +198,7 @@ export function PublicProfileTemplate2026({
             <h2>{copy.services}</h2>
             <ul>
               {serviceItems.map((service) => (
-                <li key={service}>{service}</li>
+                <li key={service}>{brandCopy(service)}</li>
               ))}
             </ul>
           </section>
@@ -207,7 +209,7 @@ export function PublicProfileTemplate2026({
             <h2>{copy.profileStatus}</h2>
             <ul>
               {publicationDecision.blockers.map((blocker) => (
-                <li key={blocker.key}>{blocker.message}</li>
+                <li key={blocker.key}>{brandCopy(blocker.message)}</li>
               ))}
             </ul>
           </section>
