@@ -31,12 +31,12 @@ const metadataCopyByLocale: Record<
   { title: string; description: string }
 > = {
   en: {
-    title: "Pet Clinics in Oman | DrMuscat",
+    title: "Pet Clinics in Oman | DrKhaleej",
     description:
       "Browse veterinary clinics, pet care services and animal health options in Oman. Public discovery only, not veterinary advice.",
   },
   ar: {
-    title: "العيادات البيطرية في عُمان | DrMuscat",
+    title: "العيادات البيطرية في عُمان | DrKhaleej",
     description:
       "تصفح العيادات البيطرية وخدمات رعاية الحيوانات وخيارات صحة الحيوانات في عُمان. اكتشاف عام فقط وليس نصيحة بيطرية.",
   },
