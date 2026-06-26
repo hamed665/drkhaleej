@@ -1,0 +1,171 @@
+.dm2026-public-profile,
+.dm2026-directory,
+.dm2026-area-template {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: var(--dm-space-12) 0 var(--dm-space-16);
+  color: var(--dm-text);
+}
+
+.dm2026-public-profile__hero,
+.dm2026-directory__hero,
+.dm2026-area-template__hero {
+  display: grid;
+  gap: var(--dm-space-6);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid var(--dm-border);
+  border-radius: var(--dm-radius-2xl);
+  background: linear-gradient(135deg, var(--dm-surface), var(--dm-teal-50));
+  box-shadow: var(--dm-shadow-sm);
+}
+
+.dm2026-public-profile__hero h1,
+.dm2026-directory__hero h1,
+.dm2026-area-template__hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--dm-ink-900);
+}
+
+.dm2026-public-profile__hero p,
+.dm2026-directory__hero p,
+.dm2026-area-template__hero p {
+  margin: 0;
+  max-width: 760px;
+  color: var(--dm-text-soft);
+  line-height: 1.75;
+}
+
+.dm2026-public-profile__eyebrow,
+.dm2026-directory__eyebrow,
+.dm2026-area-template__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: var(--dm-radius-pill);
+  padding: 0.375rem 0.75rem;
+  background: var(--dm-teal-100);
+  color: var(--dm-teal-800);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dm2026-public-profile__safety,
+.dm2026-directory__safety,
+.dm2026-area-template__safety,
+.dm2026-public-profile__internal-links,
+.dm2026-directory__internal-links,
+.dm2026-area-template__internal-links,
+.dm2026-directory__filters,
+.dm2026-area-template__directories,
+.dm2026-area-template__provider-groups {
+  margin-top: var(--dm-space-6);
+  border: 1px solid var(--dm-border);
+  border-radius: var(--dm-radius-xl);
+  background: var(--dm-surface);
+  padding: var(--dm-space-6);
+  box-shadow: var(--dm-shadow-xs);
+}
+
+.dm2026-public-profile__internal-links ul,
+.dm2026-directory__internal-links ul,
+.dm2026-area-template__internal-links ul,
+.dm2026-directory__filters ul,
+.dm2026-directory-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dm-space-3);
+  margin: var(--dm-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dm2026-public-profile__internal-links a,
+.dm2026-directory__internal-links a,
+.dm2026-area-template__internal-links a,
+.dm2026-directory__filters a,
+.dm2026-directory__filters span,
+.dm2026-public-profile__actions a,
+.dm2026-directory-card__cta,
+.dm2026-area-template__directory-card,
+.dm2026-area-template__provider-card a {
+  color: var(--dm-teal-800);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.dm2026-public-profile__grid,
+.dm2026-directory__results,
+.dm2026-area-template__directories > div,
+.dm2026-area-template__provider-group > div {
+  display: grid;
+  gap: var(--dm-space-4);
+  margin-top: var(--dm-space-6);
+}
+
+.dm2026-public-profile__grid,
+.dm2026-directory__results {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.dm2026-area-template__directories > div,
+.dm2026-area-template__provider-group > div {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.dm2026-public-profile__panel,
+.dm2026-directory-card,
+.dm2026-area-template__directory-card,
+.dm2026-area-template__provider-card,
+.dm2026-directory__empty {
+  border: 1px solid var(--dm-border);
+  border-radius: var(--dm-radius-xl);
+  background: var(--dm-surface);
+  padding: var(--dm-space-5);
+  box-shadow: var(--dm-shadow-xs);
+}
+
+.dm2026-public-profile__panel--wide {
+  grid-column: 1 / -1;
+}
+
+.dm2026-public-profile__panel h2,
+.dm2026-directory-card h2,
+.dm2026-area-template__provider-card h3,
+.dm2026-area-template__provider-group h3,
+.dm2026-area-template__directories h2,
+.dm2026-area-template__provider-groups h2 {
+  margin: 0;
+  color: var(--dm-ink-900);
+}
+
+.dm2026-public-profile__panel p,
+.dm2026-directory-card p,
+.dm2026-area-template__provider-card p,
+.dm2026-area-template__provider-group p,
+.dm2026-directory__empty p {
+  margin: var(--dm-space-3) 0 0;
+  color: var(--dm-text-soft);
+  line-height: 1.7;
+}
+
+.dm2026-public-profile__status,
+.dm2026-directory-card__heading strong,
+.dm2026-directory-card__badges li {
+  border-radius: var(--dm-radius-pill);
+  background: var(--dm-teal-50);
+  color: var(--dm-teal-800);
+  padding: 0.375rem 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .dm2026-public-profile__hero,
+  .dm2026-directory__hero,
+  .dm2026-area-template__hero {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+}
