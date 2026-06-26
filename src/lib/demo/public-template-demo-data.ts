@@ -3,6 +3,7 @@ import type { PublicDirectoryTemplate2026Props } from '@/components/directory/Pu
 import type { PublicProfileTemplate2026Props } from '@/components/profiles/PublicProfileTemplate2026';
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
 import { createPublicDirectoryResultCards, type PublicDirectoryProviderInput } from '@/lib/directory/public-directory-results';
+import { createPublicAreaProviderGroupCards, type PublicAreaProviderGroupInput } from '@/lib/geo/public-area-providers';
 import { evaluatePublicProfilePublication } from '@/lib/profiles/public-profile-guards';
 import { publicDiscoveryRoute, publicDoctorDetailRoute } from '@/lib/routes/public';
 import {
@@ -90,6 +91,32 @@ function createDemoDirectoryProviderInputs(copy: DemoLocaleCopy, profileHref: st
       area: copy.areaName,
       city: copy.parentLabel,
       badges: copy.badges
+    }
+  ];
+}
+
+function createDemoAreaProviderGroupInputs(copy: DemoLocaleCopy, profileHref: string): readonly PublicAreaProviderGroupInput[] {
+  return [
+    {
+      key: 'demo-doctors',
+      title: copy.doctorGroupTitle,
+      entityType: 'doctor',
+      description: copy.doctorGroupDescription,
+      providers: [
+        {
+          id: demoDoctorSlug,
+          entityType: 'doctor',
+          isActive: true,
+          reviewStatus: 'approved',
+          readinessStatus: 'ready',
+          slug: demoDoctorSlug,
+          displayName: copy.doctorName,
+          hasUnsafeMedicalClaims: false,
+          href: profileHref,
+          categoryLabel: copy.doctorCategory,
+          summary: copy.areaDescription
+        }
+      ]
     }
   ];
 }
@@ -191,6 +218,8 @@ export function createDemoPublicAreaTemplateProps(
   const copy = copyFor(locale);
   const doctorsHref = publicDiscoveryRoute(locale, country, 'doctors');
   const profileHref = publicDoctorDetailRoute(locale, country, demoDoctorSlug);
+  const providerGroups = createPublicAreaProviderGroupCards(createDemoAreaProviderGroupInputs(copy, profileHref));
+  const doctorCount = providerGroups[0]?.providers.length ?? 0;
 
   return {
     locale,
@@ -205,7 +234,7 @@ export function createDemoPublicAreaTemplateProps(
         href: `${doctorsHref}?area=${demoAreaSlug}`,
         label: copy.doctorsLink,
         entityType: 'doctor',
-        count: 1
+        count: doctorCount
       },
       {
         key: 'pharmacies',
@@ -220,25 +249,7 @@ export function createDemoPublicAreaTemplateProps(
         entityType: 'hospital'
       }
     ],
-    providerGroups: [
-      {
-        key: 'demo-doctors',
-        title: copy.doctorGroupTitle,
-        entityType: 'doctor',
-        description: copy.doctorGroupDescription,
-        providers: [
-          {
-            id: demoDoctorSlug,
-            href: profileHref,
-            displayName: copy.doctorName,
-            entityType: 'doctor',
-            categoryLabel: copy.doctorCategory,
-            summary: copy.areaDescription,
-            isPublic: true
-          }
-        ]
-      }
-    ],
+    providerGroups,
     internalLinks: selectPrimaryInternalLinks(
       createGeoInternalLinks({
         locale,
