@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { normalizePublicBrandCopy } from "@/lib/brand/public-brand-copy";
 import type { PublicDiscoveryFaq } from "./publicDiscoveryPageConfig";
 
 type Props = {
@@ -15,6 +16,7 @@ export function PublicDiscoveryFaq2026({ faq, locale, dir, idPrefix }: Props) {
   const safePrefix = `${idPrefix}-${locale}`;
   const titleId = `dm2026-public-discovery-faq-title-${safePrefix}`;
   const subtitleId = `dm2026-public-discovery-faq-subtitle-${safePrefix}`;
+  const brandCopy = normalizePublicBrandCopy;
 
   return (
     <section
@@ -26,25 +28,25 @@ export function PublicDiscoveryFaq2026({ faq, locale, dir, idPrefix }: Props) {
       <div className="dm2026-home-faq__shell dm2026-public-discovery-faq__shell">
         <div className="dm2026-home-faq__intro dm2026-public-discovery-faq__intro">
           <span className="dm2026-badge dm2026-home-faq__badge dm2026-public-discovery-faq__badge">
-            {faq.badge}
+            {brandCopy(faq.badge)}
           </span>
           <div className="dm2026-home-faq__headline-group dm2026-public-discovery-faq__headline-group">
-            <h2 id={titleId}>{faq.headline}</h2>
-            <p id={subtitleId}>{faq.subtitle}</p>
+            <h2 id={titleId}>{brandCopy(faq.headline)}</h2>
+            <p id={subtitleId}>{brandCopy(faq.subtitle)}</p>
           </div>
           <ul
             className="dm2026-home-faq__trust-chips dm2026-public-discovery-faq__trust-chips"
-            aria-label={faq.badge}
+            aria-label={brandCopy(faq.badge)}
           >
             {faq.trustChips.map((chip) => (
-              <li key={chip}>{chip}</li>
+              <li key={chip}>{brandCopy(chip)}</li>
             ))}
           </ul>
         </div>
 
         <div
           className="dm2026-home-faq__accordion dm2026-public-discovery-faq__accordion"
-          aria-label={faq.headline}
+          aria-label={brandCopy(faq.headline)}
         >
           {faq.items.map((item, index) => {
             const isOpen = openIndex === index;
@@ -66,7 +68,7 @@ export function PublicDiscoveryFaq2026({ faq, locale, dir, idPrefix }: Props) {
                     aria-controls={panelId}
                     onClick={() => setOpenIndex(isOpen ? -1 : index)}
                   >
-                    <span>{item.question}</span>
+                    <span>{brandCopy(item.question)}</span>
                     <span
                       className="dm2026-home-faq__icon dm2026-public-discovery-faq__icon"
                       aria-hidden="true"
@@ -80,7 +82,7 @@ export function PublicDiscoveryFaq2026({ faq, locale, dir, idPrefix }: Props) {
                   aria-labelledby={buttonId}
                   hidden={!isOpen}
                 >
-                  <p>{item.answer}</p>
+                  <p>{brandCopy(item.answer)}</p>
                 </div>
               </article>
             );
