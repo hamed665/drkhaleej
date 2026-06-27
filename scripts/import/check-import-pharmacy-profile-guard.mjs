@@ -17,10 +17,6 @@ function assertIncludes(source, token, message) {
   assert(source.includes(token), message);
 }
 
-function assertNotIncludes(source, token, message) {
-  assert(!source.includes(token), message);
-}
-
 const guardSource = await readText(guardPath);
 const importSitemapSource = await readText(importSitemapPath);
 const packageSource = await readText('package.json');
@@ -57,8 +53,13 @@ for (const token of [
   assertIncludes(guardSource, token, `${guardPath} must preserve public evidence token ${token}`);
 }
 
-assertIncludes(importSitemapSource, '^\\/(en|ar)\\/om\\/doctor\\/', 'import sitemap must still only allow guarded doctor canonical paths.');
-assertNotIncludes(importSitemapSource, 'pharmacies', 'import sitemap must not include pharmacy profile URLs in this guard-only PR.');
+for (const token of [
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  'target_entity_type',
+]) {
+  assertIncludes(importSitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
+}
 
 for (const packageToken of [
   'import:pharmacy-profile-guard:validate',
