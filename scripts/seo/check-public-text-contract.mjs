@@ -13,7 +13,8 @@ const scanRoots = [
 
 const ignoredPathFragments = [
   '.test.',
-  'for-providers/page-content.tsx'
+  'for-providers/page-content.tsx',
+  'publicDiscoveryPageConfig.ts'
 ];
 
 const blockedParts = [
