@@ -50,7 +50,7 @@ function metadataTitle(name: string): string {
 }
 
 function profileDescription(name: string): string {
-  return `${name} on DrKhaleej. Public pharmacy discovery in Oman only; not medical advice, booking, insurance confirmation, or emergency care.`;
+  return `${name} on DrKhaleej. Public pharmacy discovery in Oman only; not medical advice or emergency care.`;
 }
 
 function displayName(locale: SupportedLocale, name: string, nameAr: string | null): string {
