@@ -114,6 +114,7 @@ export function normalizeImportRawPayload(
   const nameEn = firstText(cleanedValues, [
     "full_name_en",
     "display_name_en",
+    "official_name_en",
     "doctor_name_en",
     "pharmacy_name_en",
     "hospital_name_en",
@@ -122,6 +123,7 @@ export function normalizeImportRawPayload(
   const nameAr = firstText(cleanedValues, [
     "full_name_ar",
     "display_name_ar",
+    "official_name_ar",
     "doctor_name_ar",
     "pharmacy_name_ar",
     "hospital_name_ar",
@@ -133,13 +135,25 @@ export function normalizeImportRawPayload(
     "pharmacy_external_id",
     "hospital_external_id",
     "facility_external_id",
+    "entity_external_id",
     "external_id",
     "doctor_id",
     "pharmacy_id",
     "hospital_id",
   ]) ?? normalizeFreeText(fallbackExternalId);
+  const explicitSlugCandidate = firstText(cleanedValues, [
+    "doctor_slug",
+    "facility_slug",
+    "hospital_slug",
+    "pharmacy_slug",
+    "page_slug",
+    "target_url_slug",
+    "slug",
+  ]);
   const phoneE164 = normalizeOmanPhone(firstText(cleanedValues, [
     "phone_e164",
+    "primary_phone_e164",
+    "emergency_phone_e164",
     "phone_display",
     "primary_phone",
     "phone",
@@ -154,6 +168,12 @@ export function normalizeImportRawPayload(
   const latitude = normalizeCoordinate(firstText(cleanedValues, ["latitude", "lat", "direction_latitude"]), -90, 90);
   const longitude = normalizeCoordinate(firstText(cleanedValues, ["longitude", "lng", "lon", "direction_longitude"]), -180, 180);
   const googleMapsUrl = normalizeUrl(firstText(cleanedValues, ["google_maps_url", "maps_url", "map_url"]));
+  const explicitDirectionUrl = normalizeUrl(firstText(cleanedValues, [
+    "generated_direction_url",
+    "generated_directions_url",
+    "direction_url",
+    "directions_url",
+  ]));
   const sourceUrl = normalizeUrl(firstText(cleanedValues, [
     "source_url",
     "license_source_url",
@@ -161,21 +181,40 @@ export function normalizeImportRawPayload(
   ]) ?? fallbackSourceUrl);
   const lastCheckedAt = normalizeDate(firstText(cleanedValues, [
     "last_checked_at",
+    "source_last_checked_at",
+    "source_date",
     "last_checked",
     "last_verified_at",
   ]) ?? fallbackLastCheckedAt);
-  const services = normalizeList(firstText(cleanedValues, ["services", "service_names", "services_csv", "doctor_services"]));
-  const departments = normalizeList(firstText(cleanedValues, ["departments", "department_names", "units"]));
+  const services = normalizeList(firstText(cleanedValues, [
+    "services",
+    "service_names",
+    "services_csv",
+    "doctor_services",
+    "service_name_en",
+    "service_slug",
+    "related_service_slug",
+    "service_code",
+  ]));
+  const departments = normalizeList(firstText(cleanedValues, [
+    "departments",
+    "department_names",
+    "department_name_en",
+    "department_slug",
+    "units",
+  ]));
   const languages = normalizeLanguages(firstText(cleanedValues, [
     "languages_spoken",
+    "languages_spoken_csv",
     "consultation_languages",
     "languages_csv",
     "staff_languages",
+    "language_code",
     "languages",
   ]));
   const sourceName = firstText(cleanedValues, ["source_name", "data_source", "license_source", "accreditation_source"]);
-  const directionUrl = buildDirectionUrl(latitude, longitude, googleMapsUrl);
-  const slugCandidate = slugify(primaryName);
+  const directionUrl = buildDirectionUrl(latitude, longitude, explicitDirectionUrl ?? googleMapsUrl);
+  const slugCandidate = slugify(explicitSlugCandidate ?? primaryName);
   const flags: string[] = [];
 
   if (primaryName === null) flags.push("missing_name");
@@ -217,7 +256,7 @@ export function normalizeImportRawPayload(
     contact: {
       phoneE164,
       whatsappE164,
-      email: normalizeEmail(firstText(cleanedValues, ["email", "email_address", "contact_email"])),
+      email: normalizeEmail(firstText(cleanedValues, ["email", "email_address", "contact_email", "email_public"])),
       websiteUrl: normalizeUrl(firstText(cleanedValues, ["website_url", "website", "url"])),
       googleMapsUrl,
       directionUrl,
@@ -390,11 +429,11 @@ function normalizeLanguages(value: string | null): string[] {
     .slice(0, 12);
 }
 
-function buildDirectionUrl(latitude: number | null, longitude: number | null, googleMapsUrl: string | null): string | null {
+function buildDirectionUrl(latitude: number | null, longitude: number | null, fallbackUrl: string | null): string | null {
   if (latitude !== null && longitude !== null) {
     return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
   }
-  return googleMapsUrl;
+  return fallbackUrl;
 }
 
 function slugify(value: string | null): string | null {
