@@ -17,10 +17,12 @@ export type PublicImportProfile = {
   languages: string[];
   phoneE164: string | null;
   whatsappE164: string | null;
+  email: string | null;
   websiteUrl: string | null;
   googleMapsUrl: string | null;
   directionUrl: string | null;
   sourceName: string | null;
+  sourceUrl: string | null;
   lastCheckedAt: string | null;
   qualityScore: number;
 };
@@ -121,6 +123,31 @@ function candidateId(metadata: unknown): string | null {
   return isRecord(metadata) ? stringValue(metadata, "import_entity_candidate_id") : null;
 }
 
+function hasSourceEvidence(sourceName: string | null, sourceUrl: string | null, lastCheckedAt: string | null): boolean {
+  return (sourceName !== null || sourceUrl !== null) && lastCheckedAt !== null;
+}
+
+function hasContactOrMap(input: {
+  phoneE164: string | null;
+  whatsappE164: string | null;
+  email: string | null;
+  websiteUrl: string | null;
+  googleMapsUrl: string | null;
+  directionUrl: string | null;
+}): boolean {
+  return Object.values(input).some((value) => value !== null);
+}
+
+function hasLocalGeo(geo: JsonRecord): boolean {
+  return (
+    stringValue(geo, "area") !== null ||
+    stringValue(geo, "wilayat") !== null ||
+    stringValue(geo, "governorate") !== null ||
+    numberValue(geo, "latitude") !== null ||
+    numberValue(geo, "longitude") !== null
+  );
+}
+
 function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): PublicImportProfile | null {
   if (candidate.entity_type !== "doctor") return null;
   if (candidate.candidate_status !== "approved") return null;
@@ -134,7 +161,20 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
   const source = record(payload, "source");
   const quality = record(payload, "quality");
   const name = stringValue(identity, "primaryName") ?? stringValue(identity, "nameEn");
+  const phoneE164 = stringValue(contact, "phoneE164");
+  const whatsappE164 = stringValue(contact, "whatsappE164");
+  const email = stringValue(contact, "email");
+  const websiteUrl = stringValue(contact, "websiteUrl");
+  const googleMapsUrl = stringValue(contact, "googleMapsUrl");
+  const directionUrl = stringValue(contact, "directionUrl");
+  const sourceName = stringValue(source, "sourceName");
+  const sourceUrl = stringValue(source, "sourceUrl");
+  const lastCheckedAt = stringValue(source, "lastCheckedAt");
+
   if (name === null) return null;
+  if (!hasLocalGeo(geo)) return null;
+  if (!hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)) return null;
+  if (!hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })) return null;
 
   return {
     family: "doctors",
@@ -149,13 +189,15 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     services: stringArray(taxonomy, "services"),
     departments: stringArray(taxonomy, "departments"),
     languages: stringArray(payload, "languages"),
-    phoneE164: stringValue(contact, "phoneE164"),
-    whatsappE164: stringValue(contact, "whatsappE164"),
-    websiteUrl: stringValue(contact, "websiteUrl"),
-    googleMapsUrl: stringValue(contact, "googleMapsUrl"),
-    directionUrl: stringValue(contact, "directionUrl"),
-    sourceName: stringValue(source, "sourceName"),
-    lastCheckedAt: stringValue(source, "lastCheckedAt"),
+    phoneE164,
+    whatsappE164,
+    email,
+    websiteUrl,
+    googleMapsUrl,
+    directionUrl,
+    sourceName,
+    sourceUrl,
+    lastCheckedAt,
     qualityScore: Math.max(0, Math.min(100, numberValue(quality, "score") ?? queue.quality_score)),
   };
 }
