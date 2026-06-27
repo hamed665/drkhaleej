@@ -9,6 +9,15 @@ export type SeoPageFamily =
 export type SeoPageIndexPolicy = 'index' | 'noindex_until_ready';
 export type SeoPageReadiness = 'ready' | 'needs_content' | 'blocked';
 
+export type SeoPageLaunchGateReason =
+  | 'market-root'
+  | 'trust-directory'
+  | 'provider-onboarding'
+  | 'search-utility-noindex'
+  | 'money-page-needs-real-data'
+  | 'offers-engine-not-public'
+  | 'legacy-non-core-needs-reapproval';
+
 export type PublicSeoPageDefinition = {
   readonly id: string;
   readonly pathname: string;
@@ -18,28 +27,162 @@ export type PublicSeoPageDefinition = {
   readonly sitemapEligible: boolean;
   readonly priority: number;
   readonly changeFrequency: 'daily' | 'weekly' | 'monthly';
+  readonly launchGateReason: SeoPageLaunchGateReason;
 };
 
-const publicDirectoryPages = [
-  '/doctors',
-  '/dental',
-  '/centers',
-  '/labs',
-  '/pharmacies',
-  '/hospitals',
-  '/offers',
-  '/beauty',
-  '/pet-clinics',
-  '/pet-shops',
-  '/services',
-  '/search',
-] as const;
+type StaticPublicPageDefinition = {
+  readonly pathname: string;
+  readonly family: Exclude<SeoPageFamily, 'country_root'>;
+  readonly indexPolicy: SeoPageIndexPolicy;
+  readonly readiness: SeoPageReadiness;
+  readonly sitemapEligible: boolean;
+  readonly priority: number;
+  readonly changeFrequency: 'daily' | 'weekly' | 'monthly';
+  readonly launchGateReason: SeoPageLaunchGateReason;
+};
 
-const publicProviderPages = ['/for-providers'] as const;
+const publicStaticPages = [
+  {
+    pathname: '/doctors',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.8,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/dental',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'needs_content',
+    sitemapEligible: false,
+    priority: 0.6,
+    changeFrequency: 'weekly',
+    launchGateReason: 'money-page-needs-real-data',
+  },
+  {
+    pathname: '/centers',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.8,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/labs',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.8,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/pharmacies',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.85,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/hospitals',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.85,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/offers',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'blocked',
+    sitemapEligible: false,
+    priority: 0.4,
+    changeFrequency: 'weekly',
+    launchGateReason: 'offers-engine-not-public',
+  },
+  {
+    pathname: '/beauty',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'needs_content',
+    sitemapEligible: false,
+    priority: 0.5,
+    changeFrequency: 'weekly',
+    launchGateReason: 'money-page-needs-real-data',
+  },
+  {
+    pathname: '/pet-clinics',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'blocked',
+    sitemapEligible: false,
+    priority: 0.3,
+    changeFrequency: 'monthly',
+    launchGateReason: 'legacy-non-core-needs-reapproval',
+  },
+  {
+    pathname: '/pet-shops',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'blocked',
+    sitemapEligible: false,
+    priority: 0.3,
+    changeFrequency: 'monthly',
+    launchGateReason: 'legacy-non-core-needs-reapproval',
+  },
+  {
+    pathname: '/services',
+    family: 'directory',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.75,
+    changeFrequency: 'weekly',
+    launchGateReason: 'trust-directory',
+  },
+  {
+    pathname: '/search',
+    family: 'directory',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'needs_content',
+    sitemapEligible: false,
+    priority: 0.4,
+    changeFrequency: 'monthly',
+    launchGateReason: 'search-utility-noindex',
+  },
+  {
+    pathname: '/for-providers',
+    family: 'provider_onboarding',
+    indexPolicy: 'index',
+    readiness: 'ready',
+    sitemapEligible: true,
+    priority: 0.7,
+    changeFrequency: 'weekly',
+    launchGateReason: 'provider-onboarding',
+  },
+] as const satisfies readonly StaticPublicPageDefinition[];
 
 function pageId(locale: SiteLocale, country: SiteCountry, pathname: string): string {
   const normalizedPath = pathname === '/' ? 'root' : pathname.replace(/^\//, '').replace(/\//g, '_');
   return `${locale}_${country}_${normalizedPath}`;
+}
+
+function normalizeStaticPathname(pathname: string): string {
+  const withLeadingSlash = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  const trimmed = withLeadingSlash.replace(/\/+$/g, '');
+  return trimmed.length === 0 ? '/' : trimmed;
 }
 
 function countryRootPage(locale: SiteLocale, country: SiteCountry): PublicSeoPageDefinition {
@@ -54,24 +197,25 @@ function countryRootPage(locale: SiteLocale, country: SiteCountry): PublicSeoPag
     sitemapEligible: true,
     priority: 1,
     changeFrequency: 'weekly',
+    launchGateReason: 'market-root',
   };
 }
 
 function localizedStaticPage(
   locale: SiteLocale,
   country: SiteCountry,
-  pathname: string,
-  family: Exclude<SeoPageFamily, 'country_root'>,
+  definition: StaticPublicPageDefinition,
 ): PublicSeoPageDefinition {
   return {
-    id: pageId(locale, country, pathname),
-    pathname: localizedPathname(pathname, locale, country),
-    family,
-    indexPolicy: 'index',
-    readiness: 'ready',
-    sitemapEligible: true,
-    priority: 0.8,
-    changeFrequency: 'weekly',
+    id: pageId(locale, country, definition.pathname),
+    pathname: localizedPathname(definition.pathname, locale, country),
+    family: definition.family,
+    indexPolicy: definition.indexPolicy,
+    readiness: definition.readiness,
+    sitemapEligible: definition.sitemapEligible,
+    priority: definition.priority,
+    changeFrequency: definition.changeFrequency,
+    launchGateReason: definition.launchGateReason,
   };
 }
 
@@ -79,14 +223,24 @@ export function listPublicSeoPageDefinitions(): PublicSeoPageDefinition[] {
   return sitemapMarketCountries.flatMap((country) =>
     siteConfig.locales.flatMap((locale) => [
       countryRootPage(locale, country),
-      ...publicDirectoryPages.map((pathname) =>
-        localizedStaticPage(locale, country, pathname, 'directory'),
-      ),
-      ...publicProviderPages.map((pathname) =>
-        localizedStaticPage(locale, country, pathname, 'provider_onboarding'),
-      ),
+      ...publicStaticPages.map((definition) => localizedStaticPage(locale, country, definition)),
     ]),
   );
+}
+
+export function getPublicSeoPageDefinition(input: {
+  pathname: string;
+  locale?: SiteLocale;
+  country?: SiteCountry;
+}): PublicSeoPageDefinition | null {
+  const locale = input.locale ?? siteConfig.defaultLocale;
+  const country = input.country ?? siteConfig.defaultCountry;
+  const staticPathname = normalizeStaticPathname(input.pathname);
+  const targetPathname = staticPathname === '/'
+    ? localizedRootPath(locale, country)
+    : localizedPathname(staticPathname, locale, country);
+
+  return listPublicSeoPageDefinitions().find((page) => page.pathname === targetPathname) ?? null;
 }
 
 export function isSitemapReadySeoPageDefinition(page: PublicSeoPageDefinition): boolean {

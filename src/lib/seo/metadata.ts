@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import { normalizePublicBrandMetadata } from '@/lib/brand/public-brand-metadata';
+import {
+  getPublicSeoPageDefinition,
+  isSitemapReadySeoPageDefinition
+} from '@/lib/seo/page-registry';
 import { localizedPathname, siteConfig, type SiteCountry, type SiteLocale } from './site';
 
 type BuildLocalizedMetadataInput = {
@@ -8,6 +12,11 @@ type BuildLocalizedMetadataInput = {
   pathname?: string;
   title?: string;
   description?: string;
+};
+
+const noindexFollowRobots: NonNullable<Metadata['robots']> = {
+  index: false,
+  follow: true
 };
 
 function toAbsoluteUrl(pathname: string): string {
@@ -20,6 +29,13 @@ function regionalLanguageCode(locale: SiteLocale, country: SiteCountry): string 
 
 function openGraphLocale(locale: SiteLocale, country: SiteCountry): string {
   return `${locale}_${country.toUpperCase()}`;
+}
+
+function robotsForStaticSeoPage(pathname: string, locale: SiteLocale, country: SiteCountry): Metadata['robots'] | undefined {
+  const page = getPublicSeoPageDefinition({ pathname, locale, country });
+  if (page === null || isSitemapReadySeoPageDefinition(page)) return undefined;
+
+  return noindexFollowRobots;
 }
 
 export function buildCanonicalUrl(pathname: string, locale: SiteLocale, country: SiteCountry): string {
@@ -35,6 +51,7 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
   const canonical = buildCanonicalUrl(pathname, locale, country);
   const englishAlternate = toAbsoluteUrl(localizedPathname(pathname, 'en', country));
   const arabicAlternate = toAbsoluteUrl(localizedPathname(pathname, 'ar', country));
+  const robots = robotsForStaticSeoPage(pathname, locale, country);
 
   return normalizePublicBrandMetadata({
     metadataBase: siteConfig.baseUrl,
@@ -42,6 +59,7 @@ export function buildLocalizedMetadata(input: BuildLocalizedMetadataInput = {}):
     manifest: '/manifest.webmanifest',
     title,
     description,
+    robots,
     alternates: {
       canonical,
       languages: {
