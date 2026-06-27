@@ -136,7 +136,7 @@ for (const route of approvedProviderRoutes) {
 }
 
 for (const blockedCountry of ['ae', 'qa', 'bh', 'kw', 'sa', 'iq', 'sy', 'jo', 'lb', 'ps', 'eg', 'ye', 'ma', 'dz', 'tn', 'ly', 'sd', 'mr', 'ir']) {
-  const blockedPattern = new RegExp(`/(en|ar)/${blockedCountry}\b`, 'i');
+  const blockedPattern = new RegExp('/(en|ar)/' + blockedCountry + '\\b', 'i');
   if (blockedPattern.test(sitemapSource)) {
     throw new Error(`src/app/sitemap.ts must not include non-launched country URLs: ${blockedCountry}.`);
   }
