@@ -46,7 +46,7 @@
   "templates": [
     {
       "id": "complete_profile",
-      "fileName": "DrMuscat_Complete_Profile_Import_Template_v3.xlsx",
+      "fileName": "uploaded-complete-profile-import-template-v3.xlsx",
       "headerRow": 1,
       "launchCriticalSheets": [
         "Doctors",
@@ -116,7 +116,7 @@
     },
     {
       "id": "hospital",
-      "fileName": "DrMuscat_Hospital_Import_Template_v1.xlsx",
+      "fileName": "uploaded-hospital-import-template-v1.xlsx",
       "headerRow": 4,
       "launchCriticalSheets": [
         "Hospital_Master",
@@ -205,7 +205,7 @@
     },
     {
       "id": "pharmacy",
-      "fileName": "DrMuscat_Pharmacy_Import_Template_v1.xlsx",
+      "fileName": "uploaded-pharmacy-import-template-v1.xlsx",
       "headerRow": 1,
       "launchCriticalSheets": [
         "Pharmacy_Master",
