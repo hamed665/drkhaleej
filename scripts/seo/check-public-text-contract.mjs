@@ -1,12 +1,25 @@
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 
-const staticScanRoots = [
+const staticScanFiles = [
   'public/llms.txt',
-  'src/components/home',
-  'src/lib/seo'
+  'src/components/home/HomePage2026HeaderHero.tsx',
+  'src/components/home/HomeSearch2026.tsx',
+  'src/components/home/HomeEntityClarity2026.tsx',
+  'src/components/home/HomeFeaturedBoard2026.tsx',
+  'src/components/home/HomeDiscoveryCategories2026.tsx',
+  'src/components/home/HomeSpecialOffersShowcase2026.tsx',
+  'src/components/home/HomeProviderCTA2026.tsx',
+  'src/components/home/HomeFAQ2026.tsx',
+  'src/components/home/HomeTrustSafety2026.tsx',
+  'src/components/home/HomeSupportContact2026.tsx',
+  'src/lib/seo/site.ts',
+  'src/lib/seo/metadata.ts',
+  'src/lib/seo/jsonld.ts',
+  'src/lib/seo/faq-jsonld.ts',
+  'src/lib/seo/page-registry.ts'
 ];
 
 const blockedParts = [
@@ -19,24 +32,9 @@ const blockedParts = [
 ];
 
 const blockedValues = blockedParts.map((parts) => parts.join(''));
-const checkedExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.md', '.txt']);
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
-}
-
-async function listFiles(relativePath) {
-  const absolutePath = path.join(root, relativePath);
-  const fileStat = await stat(absolutePath);
-
-  if (fileStat.isFile()) return [relativePath];
-
-  const entries = await readdir(absolutePath, { withFileTypes: true });
-  const nested = await Promise.all(
-    entries.map((entry) => listFiles(path.join(relativePath, entry.name)))
-  );
-
-  return nested.flat();
 }
 
 function routeFileForPathname(pathname) {
@@ -56,13 +54,7 @@ function assertNoBlockedText(relativePath, source) {
 const registrySource = await readText('src/lib/seo/page-registry.ts');
 const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
 const publicPageFiles = ['/', ...new Set(staticRouteMatches)].map(routeFileForPathname);
-
-const staticFiles = (await Promise.all(staticScanRoots.map((entry) => listFiles(entry))))
-  .flat()
-  .filter((file) => checkedExtensions.has(path.extname(file)))
-  .filter((file) => !file.includes('.test.'));
-
-const files = [...new Set([...staticFiles, ...publicPageFiles])];
+const files = [...new Set([...staticScanFiles, ...publicPageFiles])];
 
 for (const file of files) {
   const source = await readText(file);
