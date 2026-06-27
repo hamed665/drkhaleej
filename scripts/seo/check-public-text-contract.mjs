@@ -3,16 +3,10 @@ import path from 'node:path';
 
 const root = process.cwd();
 
-const scanRoots = [
+const staticScanRoots = [
   'public/llms.txt',
-  'src/app/[locale]/[country]',
   'src/components/home',
   'src/lib/seo'
-];
-
-const ignoredPathFragments = [
-  '.test.',
-  'for-providers/page-content.tsx'
 ];
 
 const blockedParts = [
@@ -27,8 +21,8 @@ const blockedParts = [
 const blockedValues = blockedParts.map((parts) => parts.join(''));
 const checkedExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.md', '.txt']);
 
-function shouldIgnore(relativePath) {
-  return ignoredPathFragments.some((fragment) => relativePath.includes(fragment));
+async function readText(relativePath) {
+  return readFile(path.join(root, relativePath), 'utf8');
 }
 
 async function listFiles(relativePath) {
@@ -45,6 +39,12 @@ async function listFiles(relativePath) {
   return nested.flat();
 }
 
+function routeFileForPathname(pathname) {
+  return pathname === '/'
+    ? 'src/app/[locale]/[country]/page.tsx'
+    : `src/app/[locale]/[country]${pathname}/page.tsx`;
+}
+
 function assertNoBlockedText(relativePath, source) {
   for (const value of blockedValues) {
     if (source.includes(value)) {
@@ -53,13 +53,19 @@ function assertNoBlockedText(relativePath, source) {
   }
 }
 
-const files = (await Promise.all(scanRoots.map((entry) => listFiles(entry))))
+const registrySource = await readText('src/lib/seo/page-registry.ts');
+const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
+const publicPageFiles = ['/', ...new Set(staticRouteMatches)].map(routeFileForPathname);
+
+const staticFiles = (await Promise.all(staticScanRoots.map((entry) => listFiles(entry))))
   .flat()
   .filter((file) => checkedExtensions.has(path.extname(file)))
-  .filter((file) => !shouldIgnore(file));
+  .filter((file) => !file.includes('.test.'));
+
+const files = [...new Set([...staticFiles, ...publicPageFiles])];
 
 for (const file of files) {
-  const source = await readFile(path.join(root, file), 'utf8');
+  const source = await readText(file);
   assertNoBlockedText(file, source);
 }
 
