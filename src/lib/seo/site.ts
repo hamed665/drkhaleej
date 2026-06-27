@@ -16,7 +16,6 @@ const LOCAL_FALLBACK_URL = 'http://localhost:3000';
 
 export const siteBrand = {
   siteName: 'DrKhaleej',
-  previousSiteName: 'DrMuscat',
   canonicalDomain: 'www.drkhaleej.com',
   productionUrl: PRODUCTION_FALLBACK_URL
 } as const;
@@ -51,7 +50,6 @@ function getBaseUrl(): URL {
 
 export const siteConfig = {
   siteName: siteBrand.siteName,
-  previousSiteName: siteBrand.previousSiteName,
   canonicalDomain: siteBrand.canonicalDomain,
   defaultLocale: 'en' as SiteLocale,
   locales: supportedLocales,
