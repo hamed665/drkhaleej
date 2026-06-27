@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This contract maps the uploaded DrMuscat-era import templates to the DrKhaleej fast-launch import staging model before any pharmacy or hospital profile route is allowed into the sitemap.
+This contract maps the uploaded legacy import templates to the DrKhaleej fast-launch import staging model before any pharmacy or hospital profile route is allowed into the sitemap.
 
 It is a launch-readiness contract, not a data import. No real provider rows are published by this document. No route, sitemap entry, structured data block, ad slot, offer, review, booking, payment, or provider dashboard capability is approved here. The point is to stop the usual spreadsheet-to-production circus before the clowns find the database.
 
@@ -10,9 +10,9 @@ It is a launch-readiness contract, not a data import. No real provider rows are 
 
 | Template | Launch use | Header row rule |
 | --- | --- | --- |
-| `DrMuscat_Complete_Profile_Import_Template_v3.xlsx` | Doctor/facility/profile relationship reference template | headers on row 1 |
-| `DrMuscat_Hospital_Import_Template_v1.xlsx` | Hospital profile and hospital relation template | each data sheet uses title/instructions on rows 1-3, headers on row 4 |
-| `DrMuscat_Pharmacy_Import_Template_v1.xlsx` | Pharmacy profile and pharmacy relation template | headers on row 1 |
+| `uploaded-complete-profile-import-template-v3.xlsx` | Doctor/facility/profile relationship reference template | headers on row 1 |
+| `uploaded-hospital-import-template-v1.xlsx` | Hospital profile and hospital relation template | each data sheet uses title/instructions on rows 1-3, headers on row 4 |
+| `uploaded-pharmacy-import-template-v1.xlsx` | Pharmacy profile and pharmacy relation template | headers on row 1 |
 
 ## Import model targets
 
