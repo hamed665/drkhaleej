@@ -4,6 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const locales = ['en', 'ar'];
 const country = 'om';
+const configBuilderPattern = /\bbuild[A-Za-z0-9]+DiscoveryConfig\s*\(/;
+const protectedConfigPattern = /\bcleanConfigBrand\s*\(\s*build[A-Za-z0-9]+DiscoveryConfig\s*\(/;
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -31,6 +33,14 @@ function localizedPath(locale, pathname) {
   return pathname === '/' ? `/${locale}/${country}` : `/${locale}/${country}${pathname}`;
 }
 
+function assertProtectedConfig(file, source) {
+  if (!configBuilderPattern.test(source)) return;
+  assertIncludes(source, 'cleanConfigBrand', `${file} must import the config brand cleaner.`);
+  if (!protectedConfigPattern.test(source)) {
+    throw new Error(`${file} must wrap discovery config builder output with cleanConfigBrand(...).`);
+  }
+}
+
 const llmsSource = await readText('public/llms.txt');
 const registrySource = await readText('src/lib/seo/page-registry.ts');
 const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
@@ -50,6 +60,7 @@ for (const pathname of publicPathnames) {
   const source = await readText(file);
   assertIncludes(source, 'generateMetadata', `${file} must expose metadata generation.`);
   assertIncludes(source, 'export default', `${file} must expose a page component.`);
+  assertProtectedConfig(file, source);
 }
 
 console.log('route contract check passed.');
