@@ -31,7 +31,20 @@ export type PublicImportSitemapEntry = {
   lastModified: Date;
 };
 
-const publicImportSitemapLimit = 1000;
+type InternalImportSitemapEntry = PublicImportSitemapEntry & {
+  entityType: SupportedImportSitemapEntityType;
+};
+
+const publicImportSitemapFamilyCaps = {
+  doctor: 3000,
+  pharmacy: 1500,
+  hospital: 500,
+} as const satisfies Record<SupportedImportSitemapEntityType, number>;
+
+const publicImportSitemapLimit = Object.values(publicImportSitemapFamilyCaps).reduce(
+  (total, cap) => total + cap,
+  0,
+);
 
 function createImportSitemapClient(): ImportSitemapClient {
   return createSupabaseServiceRoleClient() as unknown as ImportSitemapClient;
@@ -51,6 +64,14 @@ function readString(value: JsonRecord, key: string): string | null {
 function supportedEntityType(value: string): SupportedImportSitemapEntityType | null {
   if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;
   return null;
+}
+
+function emptyFamilyCounters(): Record<SupportedImportSitemapEntityType, number> {
+  return {
+    doctor: 0,
+    pharmacy: 0,
+    hospital: 0,
+  };
 }
 
 function isSafePublicCanonicalPathForEntity(
@@ -79,7 +100,7 @@ function hasReviewedImportEvidence(metadata: JsonRecord): boolean {
   return readString(metadata, "import_entity_candidate_id") !== null;
 }
 
-function rowToSitemapEntry(row: IncludedImportSitemapRow): PublicImportSitemapEntry | null {
+function rowToSitemapEntry(row: IncludedImportSitemapRow): InternalImportSitemapEntry | null {
   const entityType = supportedEntityType(row.target_entity_type);
   if (entityType === null) return null;
   if (!isRecord(row.metadata)) return null;
@@ -89,9 +110,32 @@ function rowToSitemapEntry(row: IncludedImportSitemapRow): PublicImportSitemapEn
   if (canonicalPath === null || !isSafePublicCanonicalPathForEntity(entityType, canonicalPath)) return null;
 
   return {
+    entityType,
     pathname: canonicalPath,
     lastModified: parseLastModified(row.updated_at),
   };
+}
+
+function toPublicSitemapEntry(entry: InternalImportSitemapEntry): PublicImportSitemapEntry {
+  return {
+    pathname: entry.pathname,
+    lastModified: entry.lastModified,
+  };
+}
+
+function applyFamilyCaps(entries: readonly InternalImportSitemapEntry[]): readonly PublicImportSitemapEntry[] {
+  const familyCounts = emptyFamilyCounters();
+  const uniqueEntries = new Map<string, InternalImportSitemapEntry>();
+
+  for (const entry of entries) {
+    if (uniqueEntries.has(entry.pathname)) continue;
+    if (familyCounts[entry.entityType] >= publicImportSitemapFamilyCaps[entry.entityType]) continue;
+
+    uniqueEntries.set(entry.pathname, entry);
+    familyCounts[entry.entityType] += 1;
+  }
+
+  return [...uniqueEntries.values()].map(toPublicSitemapEntry);
 }
 
 export async function listPublicImportSitemapEntries(): Promise<readonly PublicImportSitemapEntry[]> {
@@ -112,16 +156,9 @@ export async function listPublicImportSitemapEntries(): Promise<readonly PublicI
 
     const entries = result.data
       .map(rowToSitemapEntry)
-      .filter((entry): entry is PublicImportSitemapEntry => entry !== null);
+      .filter((entry): entry is InternalImportSitemapEntry => entry !== null);
 
-    const uniqueEntries = new Map<string, PublicImportSitemapEntry>();
-    for (const entry of entries) {
-      if (!uniqueEntries.has(entry.pathname)) {
-        uniqueEntries.set(entry.pathname, entry);
-      }
-    }
-
-    return [...uniqueEntries.values()];
+    return applyFamilyCaps(entries);
   } catch {
     return [];
   }
