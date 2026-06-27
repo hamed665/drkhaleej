@@ -15,7 +15,7 @@ type ImportSitemapClient = {
   from<T extends object = Record<string, unknown>>(table: string): ImportSitemapQueryBuilder<T>;
 };
 
-type SupportedImportSitemapEntityType = "doctor" | "pharmacy";
+type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";
 
 type IncludedImportSitemapRow = {
   id: string;
@@ -49,7 +49,7 @@ function readString(value: JsonRecord, key: string): string | null {
 }
 
 function supportedEntityType(value: string): SupportedImportSitemapEntityType | null {
-  if (value === "doctor" || value === "pharmacy") return value;
+  if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;
   return null;
 }
 
@@ -62,6 +62,8 @@ function isSafePublicCanonicalPathForEntity(
       return /^\/(en|ar)\/om\/doctor\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
     case "pharmacy":
       return /^\/(en|ar)\/om\/pharmacies\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+    case "hospital":
+      return /^\/(en|ar)\/om\/hospitals\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
   }
 }
 
