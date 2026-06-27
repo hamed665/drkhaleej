@@ -1,8 +1,35 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import type { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import type { PublicImportHospitalProfile } from "@/server/public/import-hospital-profile-guard";
 import { isSupportedCountry, isSupportedLocale, localeDirection, type SupportedLocale } from "@/lib/i18n/config";
 import { siteConfig } from "@/lib/seo/site";
+
+type PublicImportHospitalProfile = {
+  family: "hospitals";
+  canonicalPath: string;
+  entityType: "hospital";
+  name: string;
+  nameAr: string | null;
+  area: string | null;
+  wilayat: string | null;
+  governorate: string | null;
+  services: string[];
+  departments: string[];
+  languages: string[];
+  phoneE164: string | null;
+  whatsappE164: string | null;
+  email: string | null;
+  websiteUrl: string | null;
+  googleMapsUrl: string | null;
+  directionUrl: string | null;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  lastCheckedAt: string | null;
+  qualityScore: number;
+};
+
+type HospitalProfileApiPayload =
+  | { ok: true; profile: PublicImportHospitalProfile }
+  | { ok: false };
 
 type HospitalPageProps = {
   locale: SupportedLocale;
@@ -45,6 +72,43 @@ function singleParam(value: MaybeParam): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value : null;
 }
 
+function headerValue(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+}
+
+function requestBaseUrl(context: GetServerSidePropsContext): string | null {
+  const host = headerValue(context.req.headers["x-forwarded-host"]) ?? headerValue(context.req.headers.host);
+  if (host === null) return null;
+
+  const proto = headerValue(context.req.headers["x-forwarded-proto"]) ?? "https";
+  return `${proto.split(",")[0]}://${host.split(",")[0]}`;
+}
+
+function hospitalProfileEndpointUrl(context: GetServerSidePropsContext, locale: string, country: string, hospitalSlug: string): string | null {
+  const baseUrl = requestBaseUrl(context);
+  if (baseUrl === null) return null;
+  return new URL(`/api/_drk/hospital-profile/${locale}/${country}/${hospitalSlug}`, baseUrl).toString();
+}
+
+async function loadHospitalProfile(
+  context: GetServerSidePropsContext,
+  locale: string,
+  country: string,
+  hospitalSlug: string,
+): Promise<PublicImportHospitalProfile | null> {
+  const endpointUrl = hospitalProfileEndpointUrl(context, locale, country, hospitalSlug);
+  if (endpointUrl === null) return null;
+
+  const response = await fetch(endpointUrl, {
+    headers: { accept: "application/json" },
+  });
+  if (!response.ok) return null;
+
+  const payload = (await response.json()) as HospitalProfileApiPayload;
+  return payload.ok ? payload.profile : null;
+}
+
 function metadataTitle(name: string): string {
   return `${name} | DrKhaleej`;
 }
@@ -74,10 +138,8 @@ export const getServerSideProps: GetServerSideProps<HospitalPageProps> = async (
     return { notFound: true };
   }
 
-  const { getPublicImportHospitalProfile } = await import("@/server/public/import-hospital-profile-guard");
-  const result = await getPublicImportHospitalProfile({ locale, country, hospitalSlug });
-
-  if (!result.ok) {
+  const profile = await loadHospitalProfile(context, locale, country, hospitalSlug);
+  if (profile === null) {
     return { notFound: true };
   }
 
@@ -86,7 +148,7 @@ export const getServerSideProps: GetServerSideProps<HospitalPageProps> = async (
       locale,
       country,
       hospitalSlug,
-      profile: result.profile,
+      profile,
     },
   };
 };
