@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "template-import-contract-v1",
+  "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1",
+  "normalizerPath": "src/server/admin/import-row-normalizer.ts",
+  "coveredNormalizerAliases": [
+    "doctor_external_id",
+    "pharmacy_external_id",
+    "hospital_external_id",
+    "facility_external_id",
+    "full_name_en",
+    "display_name_en",
+    "hospital_name_en",
+    "phone_e164",
+    "whatsapp_e164",
+    "generated_whatsapp_url",
+    "google_maps_url",
+    "latitude",
+    "longitude",
+    "source_name",
+    "source_url",
+    "last_checked_at",
+    "last_verified_at",
+    "languages_csv"
+  ],
+  "requiredAliasGaps": [
+    "official_name_en",
+    "official_name_ar",
+    "primary_phone_e164",
+    "email_public",
+    "generated_direction_url",
+    "generated_directions_url",
+    "source_last_checked_at",
+    "source_date",
+    "languages_spoken_csv",
+    "service_name_en",
+    "department_name_en",
+    "hospital_slug",
+    "pharmacy_slug"
+  ],
+  "statusValues": [
+    "normalizer_alias_covered",
+    "needs_alias",
+    "derived_or_gate_only",
+    "support_only"
+  ],
+  "templates": [
+    {
+      "id": "complete_profile",
+      "fileName": "DrMuscat_Complete_Profile_Import_Template_v3.xlsx",
+      "headerRow": 1,
+      "launchCriticalSheets": [
+        "Doctors",
+        "Facilities",
+        "Locations",
+        "Doctor_Practice",
+        "Services_Specialties",
+        "Licenses_Verification",
+        "Contacts_Directions",
+        "SEO_Profile_Content",
+        "Publish_QA"
+      ],
+      "supportOnlySheets": [
+        "README",
+        "Lookups",
+        "Monitoring_Rules",
+        "Quality_Dashboard",
+        "Field_Dictionary"
+      ],
+      "mappings": [
+        {
+          "target": "identity.externalId",
+          "sheets": ["Doctors", "Facilities", "Services_Specialties", "Publish_QA"],
+          "headers": ["doctor_external_id", "facility_external_id", "entity_external_id"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "identity.name",
+          "sheets": ["Doctors", "Facilities"],
+          "headers": ["full_name_en", "full_name_ar", "display_name_en", "display_name_ar", "name_en", "name_ar"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "identity.slug",
+          "sheets": ["Doctors", "Facilities", "SEO_Profile_Content"],
+          "headers": ["doctor_slug", "facility_slug", "page_slug"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "contact.signal",
+          "sheets": ["Contacts_Directions"],
+          "headers": ["phone_e164", "phone_display", "whatsapp_e164", "generated_whatsapp_url", "google_maps_url", "direction_latitude", "direction_longitude"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "contact.directionUrl",
+          "sheets": ["Contacts_Directions"],
+          "headers": ["generated_direction_url"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "source.lastCheckedAt",
+          "sheets": ["Doctors", "Facilities"],
+          "headers": ["source_last_checked_at"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "publishQa.gate",
+          "sheets": ["Publish_QA"],
+          "headers": ["publish_status", "index_status", "sitemap_eligible", "duplicate_status", "seo_ready"],
+          "status": "derived_or_gate_only"
+        }
+      ]
+    },
+    {
+      "id": "hospital",
+      "fileName": "DrMuscat_Hospital_Import_Template_v1.xlsx",
+      "headerRow": 4,
+      "launchCriticalSheets": [
+        "Hospital_Master",
+        "Hospital_Locations",
+        "Contacts_Directions",
+        "Departments_Units",
+        "Hospital_Services",
+        "Doctors_Practice",
+        "Emergency_ICU",
+        "Licenses_Accreditation",
+        "SEO_Profile_Content",
+        "Publish_QA"
+      ],
+      "supportOnlySheets": [
+        "Instructions",
+        "Lookups",
+        "Dashboard",
+        "Import_Batches",
+        "Monitoring_Rules",
+        "Media_Photos",
+        "Reviews_Ratings",
+        "Comments_QA",
+        "Offers_Placement"
+      ],
+      "mappings": [
+        {
+          "target": "identity.externalId",
+          "sheets": ["Hospital_Master", "Hospital_Locations", "Contacts_Directions", "Publish_QA"],
+          "headers": ["hospital_external_id", "external_id"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "identity.name",
+          "sheets": ["Hospital_Master"],
+          "headers": ["hospital_name_en", "hospital_name_ar"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "identity.slug",
+          "sheets": ["Hospital_Master", "SEO_Profile_Content"],
+          "headers": ["hospital_slug", "slug"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "contact.signal",
+          "sheets": ["Contacts_Directions", "Emergency_ICU"],
+          "headers": ["phone_e164", "phone_display", "whatsapp_e164", "emergency_phone_e164", "google_maps_url"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "contact.directionUrl",
+          "sheets": ["Hospital_Locations", "Contacts_Directions"],
+          "headers": ["generated_direction_url"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "taxonomy.departments",
+          "sheets": ["Departments_Units"],
+          "headers": ["department_slug", "department_name_en"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "taxonomy.services",
+          "sheets": ["Hospital_Services"],
+          "headers": ["service_slug", "service_name_en"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "source.lastCheckedAt",
+          "sheets": ["Hospital_Master"],
+          "headers": ["source_date", "last_checked_at"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "publishQa.gate",
+          "sheets": ["Publish_QA", "SEO_Profile_Content"],
+          "headers": ["publish_status", "index_eligibility_status", "sitemap_status", "sitemap_eligible", "public_visible", "review_status"],
+          "status": "derived_or_gate_only"
+        }
+      ]
+    },
+    {
+      "id": "pharmacy",
+      "fileName": "DrMuscat_Pharmacy_Import_Template_v1.xlsx",
+      "headerRow": 1,
+      "launchCriticalSheets": [
+        "Pharmacy_Master",
+        "Pharmacy_Locations",
+        "Contacts_Directions",
+        "Opening_Hours",
+        "Pharmacy_Services",
+        "Licenses_Verification",
+        "Staff_Languages",
+        "SEO_Profile_Content",
+        "Publish_QA"
+      ],
+      "supportOnlySheets": [
+        "README",
+        "Lookups",
+        "Dashboard",
+        "Import_Batches",
+        "Monitoring_Rules",
+        "Media_Photos",
+        "Reviews_Ratings",
+        "Comments_QA",
+        "Offers_Placement"
+      ],
+      "mappings": [
+        {
+          "target": "identity.externalId",
+          "sheets": ["Pharmacy_Master", "Pharmacy_Locations", "Contacts_Directions", "Publish_QA"],
+          "headers": ["pharmacy_external_id"],
+          "status": "normalizer_alias_covered"
+        },
+        {
+          "target": "identity.name",
+          "sheets": ["Pharmacy_Master"],
+          "headers": ["official_name_en", "official_name_ar", "display_name_en", "display_name_ar"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "identity.slug",
+          "sheets": ["Pharmacy_Master", "SEO_Profile_Content"],
+          "headers": ["pharmacy_slug", "target_url_slug"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "contact.signal",
+          "sheets": ["Contacts_Directions"],
+          "headers": ["primary_phone_e164", "phone_display", "whatsapp_e164", "email_public"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "contact.directionUrl",
+          "sheets": ["Pharmacy_Locations"],
+          "headers": ["google_maps_url", "generated_directions_url", "latitude", "longitude"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "taxonomy.services",
+          "sheets": ["Pharmacy_Services"],
+          "headers": ["service_code", "service_name_en", "related_service_slug"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "languages",
+          "sheets": ["Pharmacy_Master", "Staff_Languages"],
+          "headers": ["languages_spoken_csv", "language_code"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "source.lastCheckedAt",
+          "sheets": ["Pharmacy_Master"],
+          "headers": ["source_date", "last_checked_at"],
+          "status": "needs_alias",
+          "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
+        },
+        {
+          "target": "publishQa.gate",
+          "sheets": ["Publish_QA", "SEO_Profile_Content"],
+          "headers": ["manual_publish_status", "index_eligibility_status", "sitemap_eligible", "public_visible", "review_status"],
+          "status": "derived_or_gate_only"
+        }
+      ]
+    }
+  ]
+}
