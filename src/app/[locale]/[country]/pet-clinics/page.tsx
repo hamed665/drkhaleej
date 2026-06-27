@@ -4,6 +4,7 @@ import { PublicDiscoveryHero2026 } from "@/components/public/discovery/PublicDis
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/PublicDiscoveryResultsShell2026";
 import { buildPetClinicsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
+import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
 import type {
   PublicCatalogQueryResult,
@@ -77,7 +78,7 @@ export default async function PublicPetClinicsPage({
   const safeLocale = locale as SupportedLocale;
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
-  const config = buildPetClinicsDiscoveryConfig(safeLocale, safeCountry, dir);
+  const config = cleanConfigBrand(buildPetClinicsDiscoveryConfig(safeLocale, safeCountry, dir));
 
   return (
     <main

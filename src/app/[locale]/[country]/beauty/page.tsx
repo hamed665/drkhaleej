@@ -4,6 +4,7 @@ import { PublicDiscoveryHero2026 } from "@/components/public/discovery/PublicDis
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/PublicDiscoveryResultsShell2026";
 import { buildBeautyDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
+import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import type { SupportedCountry, SupportedLocale } from "@/lib/i18n/config";
 import {
   isSupportedCountry,
@@ -64,7 +65,7 @@ export default async function PublicBeautyPage({
   const safeLocale = locale as SupportedLocale;
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
-  const config = buildBeautyDiscoveryConfig(safeLocale, safeCountry, dir);
+  const config = cleanConfigBrand(buildBeautyDiscoveryConfig(safeLocale, safeCountry, dir));
 
   return (
     <main
