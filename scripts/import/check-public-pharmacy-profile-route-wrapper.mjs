@@ -63,8 +63,14 @@ for (const forbiddenToken of [
   assertNotIncludes(routeSource, forbiddenToken, `${routePath} must not include ${forbiddenToken}.`);
 }
 
-assertIncludes(sitemapSource, '^\\/(en|ar)\\/om\\/doctor\\/', 'import sitemap must still only allow guarded doctor canonical paths.');
-assertNotIncludes(sitemapSource, 'pharmacies', 'import sitemap must not include pharmacy profile URLs in this route-wrapper PR.');
+for (const token of [
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  'hasReviewedImportEvidence',
+  'import_entity_candidate_id',
+]) {
+  assertIncludes(sitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
+}
 
 for (const packageToken of [
   'import:pharmacy-profile-route:validate',
