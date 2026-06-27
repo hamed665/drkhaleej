@@ -25,14 +25,8 @@ const packageSource = await readText('package.json');
 
 for (const token of [
   'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";',
-  'target_entity_type: string;',
-  'supportedEntityType(row.target_entity_type)',
-  'isSafePublicCanonicalPathForEntity',
-  'case "doctor":',
-  'case "pharmacy":',
+  'if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;',
   'case "hospital":',
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
   '^\\/(en|ar)\\/om\\/hospitals\\/',
   'hasReviewedImportEvidence',
   'metadata.sitemap_included !== true',
@@ -48,7 +42,7 @@ for (const token of [
 }
 
 for (const forbiddenToken of [
-  '/pharmacy/',
+  '/hospital/',
   'rating',
   'booking',
   'insurance',
@@ -59,11 +53,11 @@ for (const forbiddenToken of [
 }
 
 for (const packageToken of [
-  'import:pharmacy-sitemap:validate',
-  'scripts/import/check-import-pharmacy-sitemap-promotion.mjs',
-  'pnpm import:pharmacy-sitemap:validate',
+  'import:hospital-sitemap:validate',
+  'scripts/import/check-import-hospital-sitemap-promotion.mjs',
+  'pnpm import:hospital-sitemap:validate',
 ]) {
   assertIncludes(packageSource, packageToken, `package.json must include ${packageToken}.`);
 }
 
-console.log('import pharmacy sitemap promotion check passed.');
+console.log('import hospital sitemap promotion check passed.');

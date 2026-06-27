@@ -17,10 +17,6 @@ function assertIncludes(source, token, message) {
   assert(source.includes(token), message);
 }
 
-function assertNotIncludes(source, token, message) {
-  assert(!source.includes(token), message);
-}
-
 const guardSource = await readText(guardPath);
 const importSitemapSource = await readText(importSitemapPath);
 const packageSource = await readText('package.json');
@@ -60,12 +56,11 @@ for (const token of [
 for (const token of [
   '^\\/(en|ar)\\/om\\/doctor\\/',
   '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
   'target_entity_type',
 ]) {
-  assertIncludes(importSitemapSource, token, `import sitemap must preserve existing reviewed sitemap token ${token}`);
+  assertIncludes(importSitemapSource, token, `import sitemap must preserve reviewed sitemap token ${token}`);
 }
-
-assertNotIncludes(importSitemapSource, '^\\/(en|ar)\\/om\\/hospitals\\/', 'import sitemap must not include hospital profile URLs in this guard-only PR.');
 
 for (const packageToken of [
   'import:hospital-profile-guard:validate',

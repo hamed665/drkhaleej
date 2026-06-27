@@ -93,7 +93,14 @@ for (const token of [
   assertIncludes(apiRouteSource, token, `${apiRoutePath} must include ${token}`);
 }
 
-assertNotIncludes(sitemapSource, '^\\/(en|ar)\\/om\\/hospitals\\/', 'import sitemap must not include hospital profile URLs in this route-wrapper PR.');
+for (const token of [
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'hasReviewedImportEvidence',
+]) {
+  assertIncludes(sitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
+}
 
 for (const packageToken of [
   'import:hospital-profile-route:validate',
