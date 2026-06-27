@@ -123,6 +123,17 @@ function toPublicSitemapEntry(entry: InternalImportSitemapEntry): PublicImportSi
   };
 }
 
+function dedupePublicEntries(entries: readonly PublicImportSitemapEntry[]): readonly PublicImportSitemapEntry[] {
+  const uniqueEntries = new Map<string, PublicImportSitemapEntry>();
+  for (const entry of entries) {
+    if (!uniqueEntries.has(entry.pathname)) {
+      uniqueEntries.set(entry.pathname, entry);
+    }
+  }
+
+  return [...uniqueEntries.values()];
+}
+
 function applyFamilyCaps(entries: readonly InternalImportSitemapEntry[]): readonly PublicImportSitemapEntry[] {
   const familyCounts = emptyFamilyCounters();
   const uniqueEntries = new Map<string, InternalImportSitemapEntry>();
@@ -135,7 +146,7 @@ function applyFamilyCaps(entries: readonly InternalImportSitemapEntry[]): readon
     familyCounts[entry.entityType] += 1;
   }
 
-  return [...uniqueEntries.values()].map(toPublicSitemapEntry);
+  return dedupePublicEntries([...uniqueEntries.values()].map(toPublicSitemapEntry));
 }
 
 export async function listPublicImportSitemapEntries(): Promise<readonly PublicImportSitemapEntry[]> {
