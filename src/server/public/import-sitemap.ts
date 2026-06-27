@@ -15,8 +15,11 @@ type ImportSitemapClient = {
   from<T extends object = Record<string, unknown>>(table: string): ImportSitemapQueryBuilder<T>;
 };
 
+type SupportedImportSitemapEntityType = "doctor" | "pharmacy";
+
 type IncludedImportSitemapRow = {
   id: string;
+  target_entity_type: string;
   updated_at: string;
   metadata: unknown;
 };
@@ -45,8 +48,21 @@ function readString(value: JsonRecord, key: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function isSafePublicCanonicalPath(pathname: string): boolean {
-  return /^\/(en|ar)\/om\/doctor\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+function supportedEntityType(value: string): SupportedImportSitemapEntityType | null {
+  if (value === "doctor" || value === "pharmacy") return value;
+  return null;
+}
+
+function isSafePublicCanonicalPathForEntity(
+  entityType: SupportedImportSitemapEntityType,
+  pathname: string,
+): boolean {
+  switch (entityType) {
+    case "doctor":
+      return /^\/(en|ar)\/om\/doctor\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+    case "pharmacy":
+      return /^\/(en|ar)\/om\/pharmacies\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+  }
 }
 
 function parseLastModified(value: string): Date {
@@ -54,14 +70,21 @@ function parseLastModified(value: string): Date {
   return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
 }
 
-function rowToSitemapEntry(row: IncludedImportSitemapRow): PublicImportSitemapEntry | null {
-  if (!isRecord(row.metadata)) return null;
+function hasReviewedImportEvidence(metadata: JsonRecord): boolean {
+  if (metadata.sitemap_included !== true) return false;
+  if (readString(metadata, "robots_policy") !== "index") return false;
+  if (readString(metadata, "canonical_path") === null) return false;
+  return readString(metadata, "import_entity_candidate_id") !== null;
+}
 
-  if (row.metadata.sitemap_included !== true) return null;
-  if (readString(row.metadata, "robots_policy") !== "index") return null;
+function rowToSitemapEntry(row: IncludedImportSitemapRow): PublicImportSitemapEntry | null {
+  const entityType = supportedEntityType(row.target_entity_type);
+  if (entityType === null) return null;
+  if (!isRecord(row.metadata)) return null;
+  if (!hasReviewedImportEvidence(row.metadata)) return null;
 
   const canonicalPath = readString(row.metadata, "canonical_path");
-  if (canonicalPath === null || !isSafePublicCanonicalPath(canonicalPath)) return null;
+  if (canonicalPath === null || !isSafePublicCanonicalPathForEntity(entityType, canonicalPath)) return null;
 
   return {
     pathname: canonicalPath,
@@ -74,7 +97,7 @@ export async function listPublicImportSitemapEntries(): Promise<readonly PublicI
     const supabase = createImportSitemapClient();
     const result = await supabase
       .from<IncludedImportSitemapRow>("import_publish_queue")
-      .select("id, updated_at, metadata")
+      .select("id, target_entity_type, updated_at, metadata")
       .eq("publish_status", "index_eligible")
       .eq("index_policy", "index")
       .eq("sitemap_policy", "included")
