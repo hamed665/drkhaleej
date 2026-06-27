@@ -47,7 +47,7 @@
     "seo:geo:sitemap-exclusion": "node scripts/seo/check-geo-sitemap-exclusion.mjs",
     "seo:canonical-geo-contract:validate": "node scripts/seo/validate-canonical-url-geo-contract.mjs",
     "seo:entity-relation-gap:validate": "node scripts/seo/validate-entity-relation-gap-review.mjs",
-    "seo:check": "node scripts/seo-check.mjs && node scripts/seo/check-public-route-contract.mjs && pnpm seo:geo:sitemap-exclusion && pnpm seo:canonical-geo-contract:validate && pnpm seo:entity-relation-gap:validate",
+    "seo:check": "node scripts/seo-check.mjs && node scripts/seo/check-public-route-contract.mjs && node scripts/seo/check-public-text-contract.mjs && pnpm seo:geo:sitemap-exclusion && pnpm seo:canonical-geo-contract:validate && pnpm seo:entity-relation-gap:validate",
     "taxonomy:validate": "node scripts/validate-taxonomy.mjs",
     "taxonomy:export": "node scripts/export-taxonomy.mjs",
     "test": "pnpm test:unit",
