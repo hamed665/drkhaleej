@@ -4,6 +4,7 @@ import { PublicDiscoveryHero2026 } from "@/components/public/discovery/PublicDis
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/PublicDiscoveryResultsShell2026";
 import { buildLabsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
+import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
 import { listPublicCenters } from "@/lib/catalog/public-queries";
 import { buildWhatsAppUrl, getPublicWhatsAppNumber } from "@/lib/contact/whatsapp";
@@ -68,7 +69,7 @@ export default async function PublicLabsPage({
   const safeLocale = locale as SupportedLocale;
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
-  const config = buildLabsDiscoveryConfig(safeLocale, safeCountry, dir);
+  const config = cleanConfigBrand(buildLabsDiscoveryConfig(safeLocale, safeCountry, dir));
   const result = await listPublicCenters({
     country: safeCountry,
     centerType: "laboratory",
