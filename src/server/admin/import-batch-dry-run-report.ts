@@ -89,6 +89,17 @@ export type ImportBatchDryRunReport = {
   notes: readonly string[];
 };
 
+export type BuildImportBatchDryRunReportInput = {
+  rehearsalId: string;
+  generatedAt: string;
+  commitSha?: string | null;
+  checks: readonly ImportBatchDryRunCheck[];
+  sitemap: ImportBatchDryRunSitemapSummary;
+  byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  caps?: ImportBatchDryRunCaps;
+  notes?: readonly string[];
+};
+
 export const importBatchDryRunSchemaVersion: ImportBatchDryRunReportSchemaVersion =
   "drkhaleej.import.batchDryRun.v1";
 
@@ -106,6 +117,8 @@ export const importBatchDryRunRequiredChecks: readonly ImportBatchDryRunCheckKey
   "representative_profile_smoke_passed",
   "blocked_route_classes_absent",
 ];
+
+const importBatchDryRunFamilies: readonly ImportBatchDryRunFamily[] = ["doctor", "pharmacy", "hospital"];
 
 export function emptyImportBatchDryRunFamilySummary(): ImportBatchDryRunFamilySummary {
   return {
@@ -145,6 +158,62 @@ export function createEmptyImportBatchDryRunReport(input: {
       pharmacy: emptyImportBatchDryRunFamilySummary(),
       hospital: emptyImportBatchDryRunFamilySummary(),
     },
+    notes: input.notes ?? [],
+  };
+}
+
+function hasAllRequiredChecks(checks: readonly ImportBatchDryRunCheck[]): boolean {
+  return importBatchDryRunRequiredChecks.every((key) => checks.some((check) => check.key === key && check.passed));
+}
+
+function familyWithinCaps(
+  byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>,
+  caps: ImportBatchDryRunCaps,
+): boolean {
+  return importBatchDryRunFamilies.every((family) => {
+    const summary = byFamily[family];
+    return summary.selectedCount <= caps[family] && summary.sitemapUrlCount <= caps[family];
+  });
+}
+
+function familyHasNoBlockers(byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>): boolean {
+  return importBatchDryRunFamilies.every((family) => {
+    const summary = byFamily[family];
+    return summary.blockedCount === 0 && summary.blockers.length === 0 && summary.samples.every((sample) => sample.passed);
+  });
+}
+
+export function decideImportBatchDryRunReport(input: {
+  checks: readonly ImportBatchDryRunCheck[];
+  sitemap: ImportBatchDryRunSitemapSummary;
+  byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  caps?: ImportBatchDryRunCaps;
+}): ImportBatchDryRunDecision {
+  const caps = input.caps ?? firstImportBatchDryRunCaps;
+  if (!hasAllRequiredChecks(input.checks)) return "no_go";
+  if (input.sitemap.unexpectedUrlCount > 0 || input.sitemap.unexpectedUrls.length > 0) return "no_go";
+  if (!familyWithinCaps(input.byFamily, caps)) return "no_go";
+  if (!familyHasNoBlockers(input.byFamily)) return "no_go";
+  return "go";
+}
+
+export function buildImportBatchDryRunReport(input: BuildImportBatchDryRunReportInput): ImportBatchDryRunReport {
+  const caps = input.caps ?? firstImportBatchDryRunCaps;
+  return {
+    schemaVersion: importBatchDryRunSchemaVersion,
+    rehearsalId: input.rehearsalId,
+    generatedAt: input.generatedAt,
+    commitSha: input.commitSha ?? null,
+    decision: decideImportBatchDryRunReport({
+      checks: input.checks,
+      sitemap: input.sitemap,
+      byFamily: input.byFamily,
+      caps,
+    }),
+    caps,
+    checks: input.checks,
+    sitemap: input.sitemap,
+    byFamily: input.byFamily,
     notes: input.notes ?? [],
   };
 }
