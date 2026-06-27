@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { normalizePublicBrandCopy } from '@/lib/brand/public-brand-copy';
 import type { PublicDiscoveryPageConfig } from './publicDiscoveryPageConfig';
 
 type Props = {
@@ -22,6 +23,7 @@ export function PublicDiscoveryResultsShell2026({
 }: Props) {
   const shouldShowCompactEmpty = isEmpty && Boolean(compactEmptyText);
   const compactText = hasActiveQuery && compactEmptySearchText ? compactEmptySearchText : compactEmptyText;
+  const brandCopy = normalizePublicBrandCopy;
 
   return (
     <section
@@ -39,14 +41,14 @@ export function PublicDiscoveryResultsShell2026({
           role="status"
           aria-live="polite"
         >
-          <h2 id={`${config.resultsId}-title`}>{compactText}</h2>
-          {hasActiveQuery && compactEmptySearchHint ? <p>{compactEmptySearchHint}</p> : null}
+          <h2 id={`${config.resultsId}-title`}>{brandCopy(compactText ?? '')}</h2>
+          {hasActiveQuery && compactEmptySearchHint ? <p>{brandCopy(compactEmptySearchHint)}</p> : null}
         </div>
       ) : (
         <>
           <div className="dm2026-doctors-results-header dm2026-public-discovery-results-header dm2026-card-soft">
-            <h2 id={`${config.resultsId}-title`}>{config.results.title}</h2>
-            <p>{config.results.emptyText}</p>
+            <h2 id={`${config.resultsId}-title`}>{brandCopy(config.results.title)}</h2>
+            <p>{brandCopy(config.results.emptyText)}</p>
           </div>
           {children}
         </>
