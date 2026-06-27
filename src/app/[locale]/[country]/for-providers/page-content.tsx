@@ -127,28 +127,28 @@ const addonGroupAccentClasses = [
 
 const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
   en: {
-    metadataTitle: 'List your healthcare business in Oman | DrMuscat',
+    metadataTitle: 'List your healthcare business in Oman | DrKhaleej',
     metadataDescription:
-      'Request DrMuscat provider onboarding review for clinics, doctors, pharmacies, labs, hospitals, beauty, wellness and pet care providers in Oman. Public discovery only, not medical advice.',
+      'Request DrKhaleej provider onboarding review for clinics, doctors, pharmacies, labs, hospitals, beauty, wellness and pet care providers in Oman. Public discovery only, not medical advice.',
     hero: {
       badge: 'For providers in Oman',
-      title: 'Prepare your public DrMuscat discovery profile for review.',
+      title: 'Prepare your public DrKhaleej discovery profile for review.',
       description:
-        'A provider-focused DrMuscat onboarding page for clinics, doctors, labs, pharmacies, hospitals, dental, wellness, and pet-care businesses that want their public information reviewed for future bilingual discovery surfaces.',
+        'A provider-focused DrKhaleej onboarding page for clinics, doctors, labs, pharmacies, hospitals, dental, wellness, and pet-care businesses that want their public information reviewed for future bilingual discovery surfaces.',
       primaryCta: 'Request onboarding review',
       secondaryCta: 'Public discovery only',
       trustNote: 'No booking, payment, dashboard access, ranking promise, or immediate publishing is included in this request.',
       pills: ['English + Arabic ready', 'Contact details reviewed', 'Oman-first discovery'],
       visualLabel: 'Provider readiness',
       visualTitle: 'Review-ready public information',
-      visualDescription: 'Share core details so the DrMuscat team can review the public-facing information before any discovery preparation.',
+      visualDescription: 'Share core details so the DrKhaleej team can review the public-facing information before any discovery preparation.',
       visualItems: ['Provider category', 'City and area', 'Public contact options'],
       visualActions: ['Call', 'WhatsApp', 'Directions']
     },
     categories: {
       badge: 'Who can join',
       title: 'Built for care providers people search for in Oman.',
-      subtitle: 'This section mirrors the homepage discovery-card rhythm so provider categories feel native to DrMuscat.',
+      subtitle: 'This section mirrors the homepage discovery-card rhythm so provider categories feel native to DrKhaleej.',
       cta: 'Review scope',
       items: [
         { id: 'clinics', title: 'Clinics', description: 'Medical clinics preparing public discovery details.', size: 'large' },
@@ -164,7 +164,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     benefits: {
       badge: 'Discovery benefits',
       title: 'A reviewed visibility foundation, not a demand promise.',
-      subtitle: 'DrMuscat prepares public provider information so users can understand services, locations, and contact options, then confirm details directly with providers.',
+      subtitle: 'DrKhaleej prepares public provider information so users can understand services, locations, and contact options, then confirm details directly with providers.',
       items: [
         { title: 'Public discovery profile', description: 'Core provider information can be shaped into a public profile after review.' },
         { title: 'Bilingual presence', description: 'English and Arabic wording can be prepared when accurate information is available.' },
@@ -180,8 +180,8 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       subtitle: 'The process stays intentionally simple and review-led.',
       steps: [
         { title: 'Submit onboarding request', description: 'Share business, location, contact, and category information through the existing safe form.' },
-        { title: 'DrMuscat reviews public information', description: 'The team checks whether the submitted information is complete enough for discovery preparation.' },
-        { title: 'Approved details can be prepared', description: 'Reviewed public details can then be prepared for future DrMuscat discovery pages.' }
+        { title: 'DrKhaleej reviews public information', description: 'The team checks whether the submitted information is complete enough for discovery preparation.' },
+        { title: 'Approved details can be prepared', description: 'Reviewed public details can then be prepared for future DrKhaleej discovery pages.' }
       ]
     },
     reviewed: {
@@ -351,7 +351,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     formIntro: {
       badge: 'Provider request form',
       title: 'Send your onboarding review request.',
-      subtitle: 'Use this safe form to share your public provider details with the DrMuscat team for review and preparation.',
+      subtitle: 'Use this safe form to share your public provider details with the DrKhaleej team for review and preparation.',
       bullets: ['Public information review', 'English + Arabic readiness', 'Safe contact detail collection'],
       microNote: 'This form does not activate billing, booking, or instant public publication.'
     },
@@ -361,19 +361,19 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       subtitle: 'Clear answers about onboarding, review, language support, launch package concepts and safe public discovery.',
       trustChips: ['Public discovery only', 'Review before publishing', 'English + Arabic ready'],
       items: [
-        { question: 'Is DrMuscat a booking platform?', answer: 'No. This page is for public discovery onboarding review only. It does not add appointment booking, scheduling or patient management workflows.' },
+        { question: 'Is DrKhaleej a booking platform?', answer: 'No. This page is for public discovery onboarding review only. It does not add appointment booking, scheduling or patient management workflows.' },
         { question: 'Will my center be published immediately?', answer: 'No. Submitted information may require review and confirmation before any public discovery preparation or publishing.' },
         { question: 'Does this request give my business a verified badge?', answer: 'No. Submitting this form does not grant a verified badge, paid placement or automatic approval.' },
-        { question: 'What information does DrMuscat review first?', answer: 'The first review focuses on provider name, category, city, area, public contacts, website, address, directions readiness, service categories and bilingual wording where available.' },
-        { question: 'Can my profile appear in English and Arabic?', answer: 'DrMuscat is built for English and Arabic discovery in Oman. Bilingual wording can be prepared when accurate information is available.' },
+        { question: 'What information does DrKhaleej review first?', answer: 'The first review focuses on provider name, category, city, area, public contacts, website, address, directions readiness, service categories and bilingual wording where available.' },
+        { question: 'Can my profile appear in English and Arabic?', answer: 'DrKhaleej is built for English and Arabic discovery in Oman. Bilingual wording can be prepared when accurate information is available.' },
         { question: 'Can I add offers or packages later?', answer: 'Offer or package requests may be discussed later, but they must be provider-approved, reviewed and clearly presented. They are not activated by this page.' },
         { question: 'Can prices or insurance details be listed?', answer: 'Prices or insurance details may require direct provider confirmation and review. Users must confirm prices and insurance directly with the provider.' },
-        { question: 'Will being on DrMuscat guarantee Google ranking or new patients?', answer: 'No. DrMuscat does not guarantee search ranking, traffic, calls, WhatsApp messages or new patients.' },
+        { question: 'Will being on DrKhaleej guarantee Google ranking or new patients?', answer: 'No. DrKhaleej does not guarantee search ranking, traffic, calls, WhatsApp messages or new patients.' },
         { question: 'Can doctors and branches be added later?', answer: 'Doctors and branches can be requested later for review when accurate public information is available.' },
         { question: 'Can I upgrade plans later?', answer: 'Plan upgrades may be discussed later as review-based launch concepts. This page does not include payment or activation workflows.' },
         { question: 'Can I request advertising separately?', answer: 'Advertising or sponsored visibility can be requested separately in future conversations and must be reviewed and clearly presented where applicable.' },
-        { question: 'What happens if my submitted information is incomplete?', answer: 'DrMuscat may need additional details before public discovery preparation can continue.' },
-        { question: 'Does DrMuscat provide medical advice?', answer: 'No. DrMuscat is public discovery and visibility only. It does not provide medical advice, diagnosis or treatment recommendations.' }
+        { question: 'What happens if my submitted information is incomplete?', answer: 'DrKhaleej may need additional details before public discovery preparation can continue.' },
+        { question: 'Does DrKhaleej provide medical advice?', answer: 'No. DrKhaleej is public discovery and visibility only. It does not provide medical advice, diagnosis or treatment recommendations.' }
       ]
     },
     finalCta: {
@@ -385,11 +385,11 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     disclaimer: {
       title: 'Important discovery disclaimer',
       body:
-        'DrMuscat is public discovery and visibility only. It is not medical advice. Publishing is not immediate. Provider details may require review. Users must confirm services, prices, offers, insurance, availability, and medical details directly with providers.'
+        'DrKhaleej is public discovery and visibility only. It is not medical advice. Publishing is not immediate. Provider details may require review. Users must confirm services, prices, offers, insurance, availability, and medical details directly with providers.'
     },
     form: {
       title: 'Request provider onboarding',
-      description: 'Complete the fields below so the DrMuscat team can review your public provider information.',
+      description: 'Complete the fields below so the DrKhaleej team can review your public provider information.',
       requiredNote: 'Required fields are checked by browser validation before submission.',
       labels: {
         centerName: 'Center or business name',
@@ -402,7 +402,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         areaText: 'Area (optional)',
         preferredLanguage: 'Preferred language',
         message: 'Message (optional)',
-        consent: 'I agree that DrMuscat may contact me about provider onboarding and review of public information.',
+        consent: 'I agree that DrKhaleej may contact me about provider onboarding and review of public information.',
         honeypot: 'Website'
       },
       placeholders: {
@@ -439,28 +439,28 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     }
   },
   ar: {
-    metadataTitle: 'إدراج مقدم رعاية صحية في عُمان | DrMuscat',
+    metadataTitle: 'إدراج مقدم رعاية صحية في عُمان | DrKhaleej',
     metadataDescription:
-      'اطلب مراجعة انضمام مقدم خدمة إلى DrMuscat للعيادات والأطباء والصيدليات والمختبرات والمستشفيات ومقدمي التجميل والرفاهية ورعاية الحيوانات الأليفة في عُمان. اكتشاف عام فقط وليس نصيحة طبية.',
+      'اطلب مراجعة انضمام مقدم خدمة إلى DrKhaleej للعيادات والأطباء والصيدليات والمختبرات والمستشفيات ومقدمي التجميل والرفاهية ورعاية الحيوانات الأليفة في عُمان. اكتشاف عام فقط وليس نصيحة طبية.',
     hero: {
       badge: 'لمقدّمي الخدمة في عُمان',
-      title: 'جهّز ملفك العام على DrMuscat للمراجعة.',
+      title: 'جهّز ملفك العام على DrKhaleej للمراجعة.',
       description:
-        'هذه صفحة انضمام مخصّصة لمقدّمي الخدمة على DrMuscat، مثل العيادات والأطباء والمختبرات والصيدليات والمستشفيات وطبّ الأسنان ومراكز الرفاهية وعيادات الحيوانات الأليفة، ممّن يرغبون في مراجعة معلوماتهم العامة تمهيدًا لظهورها مستقبلًا ضمن صفحات اكتشاف ثنائية اللغة.',
+        'هذه صفحة انضمام مخصّصة لمقدّمي الخدمة على DrKhaleej، مثل العيادات والأطباء والمختبرات والصيدليات والمستشفيات وطبّ الأسنان ومراكز الرفاهية وعيادات الحيوانات الأليفة، ممّن يرغبون في مراجعة معلوماتهم العامة تمهيدًا لظهورها مستقبلًا ضمن صفحات اكتشاف ثنائية اللغة.',
       primaryCta: 'اطلب مراجعة الانضمام',
       secondaryCta: 'اكتشاف عام فقط',
       trustNote: 'هذا الطلب لا يشمل الحجز أو الدفع أو لوحة تحكّم أو وعودًا بالترتيب أو النشر الفوري.',
       pills: ['جاهز بالعربية والإنجليزية', 'مراجعة معلومات التواصل', 'اكتشاف يركّز على عُمان'],
       visualLabel: 'جاهزية مقدم الخدمة',
       visualTitle: 'معلومات عامة جاهزة للمراجعة',
-      visualDescription: 'شارك التفاصيل الأساسية حتى يتمكن فريق DrMuscat من مراجعة المعلومات العامة قبل أي إعداد لظهورك في صفحات الاكتشاف.',
+      visualDescription: 'شارك التفاصيل الأساسية حتى يتمكن فريق DrKhaleej من مراجعة المعلومات العامة قبل أي إعداد لظهورك في صفحات الاكتشاف.',
       visualItems: ['فئة مقدم الخدمة', 'المدينة والمنطقة', 'وسائل التواصل العامة'],
       visualActions: ['اتصال', 'واتساب', 'الاتجاهات']
     },
     categories: {
       badge: 'من يمكنه الانضمام',
       title: 'مصمم لمقدّمي الرعاية الذين يبحث عنهم الناس في عُمان.',
-      subtitle: 'يعكس هذا القسم إيقاع بطاقات الاكتشاف في الصفحة الرئيسية حتى تبدو فئات مقدّمي الخدمة جزءًا طبيعيًا من تجربة DrMuscat.',
+      subtitle: 'يعكس هذا القسم إيقاع بطاقات الاكتشاف في الصفحة الرئيسية حتى تبدو فئات مقدّمي الخدمة جزءًا طبيعيًا من تجربة DrKhaleej.',
       cta: 'نطاق المراجعة',
       items: [
         { id: 'clinics', title: 'العيادات', description: 'تفاصيل عامة للعيادات الطبية الجاهزة للاكتشاف.', size: 'large' },
@@ -476,7 +476,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     benefits: {
       badge: 'مزايا الظهور',
       title: 'أساس ظهور خاضع للمراجعة، وليس وعدًا بالطلب.',
-      subtitle: 'يُعِدّ DrMuscat معلومات مقدّمي الخدمة العامة حتى يتمكّن المستخدمون من فهم الخدمات والمواقع ووسائل التواصل، ثم تأكيد التفاصيل مباشرةً مع مقدّم الخدمة.',
+      subtitle: 'يُعِدّ DrKhaleej معلومات مقدّمي الخدمة العامة حتى يتمكّن المستخدمون من فهم الخدمات والمواقع ووسائل التواصل، ثم تأكيد التفاصيل مباشرةً مع مقدّم الخدمة.',
       items: [
         { title: 'ملف عام للاكتشاف', description: 'يمكن تنظيم المعلومات الأساسية لمقدّم الخدمة ضمن ملف عام بعد المراجعة.' },
         { title: 'حضور ثنائي اللغة', description: 'يمكن إعداد الصياغة بالإنجليزية والعربية عندما تكون المعلومات دقيقة ومتاحة.' },
@@ -492,8 +492,8 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       subtitle: 'تم تصميم هذه العملية لتبقى بسيطة وتعتمد على المراجعة أولاً.',
       steps: [
         { title: 'إرسال طلب الانضمام', description: 'شارك معلومات النشاط والموقع ووسائل التواصل والتصنيف عبر النموذج الحالي الآمن.' },
-        { title: 'يراجع DrMuscat المعلومات العامة', description: 'يتحقق الفريق مما إذا كانت المعلومات المرسلة مكتملة بما يكفي لإعداد الظهور في صفحات الاكتشاف.' },
-        { title: 'يمكن إعداد التفاصيل المعتمدة', description: 'يمكن بعد ذلك إعداد التفاصيل العامة التي تمت مراجعتها لصفحات الاكتشاف المستقبلية في DrMuscat.' }
+        { title: 'يراجع DrKhaleej المعلومات العامة', description: 'يتحقق الفريق مما إذا كانت المعلومات المرسلة مكتملة بما يكفي لإعداد الظهور في صفحات الاكتشاف.' },
+        { title: 'يمكن إعداد التفاصيل المعتمدة', description: 'يمكن بعد ذلك إعداد التفاصيل العامة التي تمت مراجعتها لصفحات الاكتشاف المستقبلية في DrKhaleej.' }
       ]
     },
     reviewed: {
@@ -663,7 +663,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     formIntro: {
       badge: 'نموذج طلب مقدم الخدمة',
       title: 'أرسل طلب مراجعة الانضمام.',
-      subtitle: 'استخدم هذا النموذج الآمن لإرسال بيانات مقدم الخدمة العامة إلى فريق DrMuscat لمراجعتها وتجهيزها.',
+      subtitle: 'استخدم هذا النموذج الآمن لإرسال بيانات مقدم الخدمة العامة إلى فريق DrKhaleej لمراجعتها وتجهيزها.',
       bullets: ['مراجعة المعلومات العامة', 'جاهزية العربية والإنجليزية', 'جمع بيانات التواصل بشكل آمن'],
       microNote: 'لا يؤدي هذا النموذج إلى تفعيل الدفع أو الحجز أو النشر الفوري.'
     },
@@ -673,19 +673,19 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
       subtitle: 'إجابات واضحة حول الانضمام والمراجعة ودعم اللغتين وتصورات باقات الإطلاق والاكتشاف العام الآمن.',
       trustChips: ['اكتشاف عام فقط', 'مراجعة قبل النشر', 'جاهز للعربية والإنجليزية'],
       items: [
-        { question: 'هل DrMuscat منصة حجز؟', answer: 'لا. هذه الصفحة مخصصة لمراجعة الانضمام للاكتشاف العام فقط، ولا تضيف حجز مواعيد أو جدولة أو إدارة مرضى.' },
+        { question: 'هل DrKhaleej منصة حجز؟', answer: 'لا. هذه الصفحة مخصصة لمراجعة الانضمام للاكتشاف العام فقط، ولا تضيف حجز مواعيد أو جدولة أو إدارة مرضى.' },
         { question: 'هل سيتم نشر مركزي فوراً؟', answer: 'لا. قد تحتاج المعلومات المرسلة إلى مراجعة وتأكيد قبل أي تجهيز أو نشر للاكتشاف العام.' },
         { question: 'هل يمنح هذا الطلب نشاطي شارة موثقة؟', answer: 'لا. إرسال هذا النموذج لا يمنح شارة موثقة أو موضعاً مدفوعاً أو موافقة تلقائية.' },
-        { question: 'ما المعلومات التي تراجعها DrMuscat أولاً؟', answer: 'تركز المراجعة الأولى على الاسم والفئة والمدينة والمنطقة ووسائل التواصل العامة والموقع الإلكتروني والعنوان وجاهزية الاتجاهات وفئات الخدمات والصياغة ثنائية اللغة عند توفرها.' },
-        { question: 'هل يمكن أن يظهر ملفي بالعربية والإنجليزية؟', answer: 'DrMuscat مصمم لاكتشاف عربي وإنجليزي في عُمان. يمكن تجهيز الصياغة ثنائية اللغة عندما تتوفر معلومات دقيقة.' },
+        { question: 'ما المعلومات التي تراجعها DrKhaleej أولاً؟', answer: 'تركز المراجعة الأولى على الاسم والفئة والمدينة والمنطقة ووسائل التواصل العامة والموقع الإلكتروني والعنوان وجاهزية الاتجاهات وفئات الخدمات والصياغة ثنائية اللغة عند توفرها.' },
+        { question: 'هل يمكن أن يظهر ملفي بالعربية والإنجليزية؟', answer: 'DrKhaleej مصمم لاكتشاف عربي وإنجليزي في عُمان. يمكن تجهيز الصياغة ثنائية اللغة عندما تتوفر معلومات دقيقة.' },
         { question: 'هل يمكنني إضافة عروض أو باقات لاحقاً؟', answer: 'يمكن مناقشة طلبات العروض أو الباقات لاحقاً، لكنها يجب أن تكون بموافقة مقدم الخدمة وتخضع للمراجعة وتعرض بوضوح. لا يتم تفعيلها من هذه الصفحة.' },
         { question: 'هل يمكن إدراج الأسعار أو تفاصيل التأمين؟', answer: 'قد تتطلب الأسعار أو تفاصيل التأمين تأكيداً مباشراً من مقدم الخدمة ومراجعة. يجب على المستخدمين تأكيد الأسعار والتأمين مباشرة مع مقدم الخدمة.' },
-        { question: 'هل يضمن الظهور في DrMuscat ترتيباً في Google أو مرضى جدداً؟', answer: 'لا. لا تضمن DrMuscat ترتيب البحث أو الزيارات أو الاتصالات أو رسائل واتساب أو مرضى جدداً.' },
+        { question: 'هل يضمن الظهور في DrKhaleej ترتيباً في Google أو مرضى جدداً؟', answer: 'لا. لا تضمن DrKhaleej ترتيب البحث أو الزيارات أو الاتصالات أو رسائل واتساب أو مرضى جدداً.' },
         { question: 'هل يمكن إضافة أطباء وفروع لاحقاً؟', answer: 'يمكن طلب إضافة الأطباء والفروع لاحقاً للمراجعة عندما تتوفر معلومات عامة دقيقة.' },
         { question: 'هل يمكنني ترقية الخطط لاحقاً؟', answer: 'يمكن مناقشة ترقيات الخطط لاحقاً كتصورات إطلاق قائمة على المراجعة. هذه الصفحة لا تتضمن الدفع أو التفعيل.' },
         { question: 'هل يمكنني طلب الإعلان بشكل منفصل؟', answer: 'يمكن طلب الإعلان أو الظهور المدعوم بشكل منفصل في محادثات مستقبلية، ويجب أن يخضع للمراجعة وأن يعرض بوضوح عند الحاجة.' },
-        { question: 'ماذا يحدث إذا كانت معلوماتي غير مكتملة؟', answer: 'قد تحتاج DrMuscat إلى تفاصيل إضافية قبل متابعة تجهيز الاكتشاف العام.' },
-        { question: 'هل تقدم DrMuscat نصائح طبية؟', answer: 'لا. DrMuscat مخصصة للاكتشاف والظهور العام فقط، ولا تقدم نصائح طبية أو تشخيصاً أو توصيات علاجية.' }
+        { question: 'ماذا يحدث إذا كانت معلوماتي غير مكتملة؟', answer: 'قد تحتاج DrKhaleej إلى تفاصيل إضافية قبل متابعة تجهيز الاكتشاف العام.' },
+        { question: 'هل تقدم DrKhaleej نصائح طبية؟', answer: 'لا. DrKhaleej مخصصة للاكتشاف والظهور العام فقط، ولا تقدم نصائح طبية أو تشخيصاً أو توصيات علاجية.' }
       ]
     },
     finalCta: {
@@ -697,11 +697,11 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
     disclaimer: {
       title: 'تنبيه مهم حول الاكتشاف',
       body:
-        'DrMuscat مخصصة للاكتشاف والظهور العام فقط. ليست نصيحة طبية. النشر ليس فورياً. قد تتطلب تفاصيل مقدمي الخدمة مراجعة. يجب على المستخدمين تأكيد الخدمات والأسعار والعروض والتأمين والتوفر والتفاصيل الطبية مباشرة مع مقدمي الخدمة.'
+        'DrKhaleej مخصصة للاكتشاف والظهور العام فقط. ليست نصيحة طبية. النشر ليس فورياً. قد تتطلب تفاصيل مقدمي الخدمة مراجعة. يجب على المستخدمين تأكيد الخدمات والأسعار والعروض والتأمين والتوفر والتفاصيل الطبية مباشرة مع مقدمي الخدمة.'
     },
     form: {
       title: 'طلب انضمام مقدم الخدمة',
-      description: 'أكمل الحقول التالية حتى يتمكن فريق DrMuscat من مراجعة معلومات مقدم الخدمة العامة.',
+      description: 'أكمل الحقول التالية حتى يتمكن فريق DrKhaleej من مراجعة معلومات مقدم الخدمة العامة.',
       requiredNote: 'يتم التحقق من الحقول المطلوبة من خلال المتصفح قبل الإرسال.',
       labels: {
         centerName: 'اسم المركز أو النشاط',
@@ -714,7 +714,7 @@ const copyByLocale: Record<SupportedLocale, ProviderPageCopy> = {
         areaText: 'المنطقة (اختياري)',
         preferredLanguage: 'اللغة المفضلة',
         message: 'رسالة (اختياري)',
-        consent: 'أوافق على أن يقوم DrMuscat بالتواصل معي بشأن طلب انضمام مقدم الخدمة ومراجعة المعلومات العامة.',
+        consent: 'أوافق على أن يقوم DrKhaleej بالتواصل معي بشأن طلب انضمام مقدم الخدمة ومراجعة المعلومات العامة.',
         honeypot: 'الموقع الإلكتروني'
       },
       placeholders: {

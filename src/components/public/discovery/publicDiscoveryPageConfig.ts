@@ -142,7 +142,7 @@ export function buildDiscoveryFaq(
             {
               question: "هل يمكنني استخدام الصفحة كنصيحة طبية؟",
               answer:
-                "لا. DrMuscat مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية أو تشخيصاً أو توصيات علاجية.",
+                "لا. DrKhaleej مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية أو تشخيصاً أو توصيات علاجية.",
             },
             {
               question: "متى تظهر ملفات الأطباء للعامة؟",
@@ -172,7 +172,7 @@ export function buildDiscoveryFaq(
             {
               question: "Can I use this page for medical advice?",
               answer:
-                "No. DrMuscat is for public discovery only and does not provide medical advice, diagnosis, or treatment recommendations.",
+                "No. DrKhaleej is for public discovery only and does not provide medical advice, diagnosis, or treatment recommendations.",
             },
             {
               question: "When do doctor profiles appear publicly?",
@@ -201,7 +201,7 @@ export function buildDiscoveryFaq(
                 "أكد الخدمة، الموعد، الموقع وأي تفاصيل علاجية مباشرة مع عيادة الأسنان.",
             },
             {
-              question: "هل تقدم DrMuscat نصيحة طبية للأسنان؟",
+              question: "هل تقدم DrKhaleej نصيحة طبية للأسنان؟",
               answer:
                 "لا. الصفحة للاكتشاف العام فقط ولا تقدم نصيحة طبية أو توصيات علاجية.",
             },
@@ -231,7 +231,7 @@ export function buildDiscoveryFaq(
                 "Confirm the service, appointment time, location and treatment details directly with the dental clinic.",
             },
             {
-              question: "Does DrMuscat provide dental medical advice?",
+              question: "Does DrKhaleej provide dental medical advice?",
               answer:
                 "No. The page is for public discovery only and does not provide medical advice or treatment recommendations.",
             },
@@ -262,8 +262,8 @@ export function buildDiscoveryFaq(
                 "أكد تعليمات التحضير، وقت النتيجة وخيارات سحب العينات مباشرة مع المختبر.",
             },
             {
-              question: "هل تفسر DrMuscat نتائج الفحوصات؟",
-              answer: "لا. لا تقدم DrMuscat تفسيراً للنتائج أو نصيحة طبية.",
+              question: "هل تفسر DrKhaleej نتائج الفحوصات؟",
+              answer: "لا. لا تقدم DrKhaleej تفسيراً للنتائج أو نصيحة طبية.",
             },
             {
               question: "متى تظهر المختبرات في النتائج؟",
@@ -291,9 +291,9 @@ export function buildDiscoveryFaq(
                 "Confirm preparation instructions, result timing and sample collection options directly with the lab.",
             },
             {
-              question: "Does DrMuscat interpret lab results?",
+              question: "Does DrKhaleej interpret lab results?",
               answer:
-                "No. DrMuscat does not interpret results or provide medical advice.",
+                "No. DrKhaleej does not interpret results or provide medical advice.",
             },
             {
               question: "When do labs appear in results?",
@@ -324,7 +324,7 @@ export function buildDiscoveryFaq(
             {
               question: "هل تعد الصفحة نصيحة طبية؟",
               answer:
-                "لا. DrMuscat مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية.",
+                "لا. DrKhaleej مخصص للاكتشاف العام فقط ولا يقدم نصيحة طبية.",
             },
             {
               question: "متى تظهر المراكز للعامة؟",
@@ -354,7 +354,7 @@ export function buildDiscoveryFaq(
             {
               question: "Is this page medical advice?",
               answer:
-                "No. DrMuscat is for public discovery only and does not provide medical advice.",
+                "No. DrKhaleej is for public discovery only and does not provide medical advice.",
             },
             {
               question: "When do centers appear publicly?",
@@ -378,7 +378,7 @@ export function buildDiscoveryFaq(
                 "يساعد البحث على استكشاف صيدليات أو مناطق أو خدمات عامة مرتبطة بالصيدلية.",
             },
             {
-              question: "هل تؤكد DrMuscat توفر الأدوية أو المنتجات؟",
+              question: "هل تؤكد DrKhaleej توفر الأدوية أو المنتجات؟",
               answer:
                 "لا. أكد توفر أي دواء أو منتج أو خدمة مباشرة مع الصيدلية.",
             },
@@ -409,7 +409,7 @@ export function buildDiscoveryFaq(
             },
             {
               question:
-                "Does DrMuscat confirm medicine or product availability?",
+                "Does DrKhaleej confirm medicine or product availability?",
               answer:
                 "No. Confirm any medicine, product or service availability directly with the pharmacy.",
             },
@@ -445,7 +445,7 @@ export function buildDiscoveryFaq(
                 "أكد الأسعار، المواعيد، الخدمات والموقع مباشرة مع مركز التجميل أو الصالون.",
             },
             {
-              question: "هل تقدم DrMuscat نصيحة طبية للتجميل؟",
+              question: "هل تقدم DrKhaleej نصيحة طبية للتجميل؟",
               answer: "لا. المحتوى للاكتشاف العام فقط وليس نصيحة طبية.",
             },
             {
@@ -474,7 +474,7 @@ export function buildDiscoveryFaq(
                 "Confirm prices, timing, services and location directly with the beauty center or salon.",
             },
             {
-              question: "Does DrMuscat provide beauty medical advice?",
+              question: "Does DrKhaleej provide beauty medical advice?",
               answer:
                 "No. Content is for public discovery only and is not medical advice.",
             },
@@ -505,7 +505,7 @@ export function buildDiscoveryFaq(
                 "أكد الخدمات، المواعيد، المتطلبات والموقع مباشرة مع العيادة البيطرية.",
             },
             {
-              question: "هل تقدم DrMuscat نصيحة بيطرية؟",
+              question: "هل تقدم DrKhaleej نصيحة بيطرية؟",
               answer:
                 "لا. الصفحة للاكتشاف العام فقط ولا تقدم تشخيصاً أو نصيحة بيطرية.",
             },
@@ -535,7 +535,7 @@ export function buildDiscoveryFaq(
                 "Confirm services, schedules, requirements and location directly with the veterinary clinic.",
             },
             {
-              question: "Does DrMuscat provide veterinary advice?",
+              question: "Does DrKhaleej provide veterinary advice?",
               answer:
                 "No. The page is for public discovery only and does not provide diagnosis or veterinary advice.",
             },
@@ -561,7 +561,7 @@ export function buildDiscoveryFaq(
                 "يساعدك البحث على استكشاف الطعام والمستلزمات وفئات المنتجات كمسارات عامة.",
             },
             {
-              question: "هل تؤكد DrMuscat توفر المنتجات؟",
+              question: "هل تؤكد DrKhaleej توفر المنتجات؟",
               answer:
                 "لا. أكد توفر الطعام أو المستلزمات أو المنتجات مباشرة مع المتجر.",
             },
@@ -591,7 +591,7 @@ export function buildDiscoveryFaq(
                 "Search helps you explore food, supplies and product categories as public discovery paths.",
             },
             {
-              question: "Does DrMuscat confirm product availability?",
+              question: "Does DrKhaleej confirm product availability?",
               answer:
                 "No. Confirm food, supplies or product availability directly with the shop.",
             },
@@ -670,7 +670,7 @@ export function buildDiscoveryFaq(
         },
     offers: isAr
       ? {
-          headline: "أسئلة شائعة عن العروض على DrMuscat",
+          headline: "أسئلة شائعة عن العروض على DrKhaleej",
           items: [
             {
               question: "ماذا تعرض صفحة العروض؟",
@@ -678,7 +678,7 @@ export function buildDiscoveryFaq(
                 "تعرض مسارات اكتشاف للعروض العامة المعتمدة عند توفرها من مقدمي الخدمة.",
             },
             {
-              question: "هل تؤكد DrMuscat تفاصيل العروض؟",
+              question: "هل تؤكد DrKhaleej تفاصيل العروض؟",
               answer:
                 "تظهر العروض عندما تكون معتمدة وعامة، لكن يجب تأكيد التفاصيل مباشرة مع مقدم الخدمة.",
             },
@@ -693,14 +693,14 @@ export function buildDiscoveryFaq(
                 "لا. العروض لا تمثل ترتيباً للجودة الطبية أو توصية علاجية.",
             },
             {
-              question: "كيف ينشر مقدمو الخدمة العروض على DrMuscat؟",
+              question: "كيف ينشر مقدمو الخدمة العروض على DrKhaleej؟",
               answer:
                 "يمكن أن تظهر العروض عندما يقدمها مقدم الخدمة وتصبح معتمدة ومناسبة للنشر العام.",
             },
           ],
         }
       : {
-          headline: "Questions about offers on DrMuscat",
+          headline: "Questions about offers on DrKhaleej",
           items: [
             {
               question: "What does the Offers page show?",
@@ -708,7 +708,7 @@ export function buildDiscoveryFaq(
                 "It provides discovery paths for approved public offers when they are available from providers.",
             },
             {
-              question: "Does DrMuscat confirm offer details?",
+              question: "Does DrKhaleej confirm offer details?",
               answer:
                 "Offers appear when approved and public, but details should still be confirmed directly with the provider.",
             },
@@ -723,7 +723,7 @@ export function buildDiscoveryFaq(
                 "No. Offers do not represent medical quality rankings or treatment recommendations.",
             },
             {
-              question: "How do providers publish offers on DrMuscat?",
+              question: "How do providers publish offers on DrKhaleej?",
               answer:
                 "Offers can appear when submitted by a provider and approved as suitable for public publishing.",
             },
@@ -731,7 +731,7 @@ export function buildDiscoveryFaq(
         },
     services: isAr
       ? {
-          headline: "أسئلة شائعة عن الخدمات على DrMuscat",
+          headline: "أسئلة شائعة عن الخدمات على DrKhaleej",
           items: [
             {
               question: "ماذا أجد في صفحة الخدمات؟",
@@ -747,8 +747,8 @@ export function buildDiscoveryFaq(
               answer: "أكد الخدمة والمتطلبات والموقع مباشرة مع مقدم الخدمة.",
             },
             {
-              question: "هل تقترح DrMuscat خدمة معينة؟",
-              answer: "لا. DrMuscat لا تقدم توصيات علاجية أو نصيحة طبية.",
+              question: "هل تقترح DrKhaleej خدمة معينة؟",
+              answer: "لا. DrKhaleej لا تقدم توصيات علاجية أو نصيحة طبية.",
             },
             {
               question: "متى تظهر معلومات الخدمات؟",
@@ -758,7 +758,7 @@ export function buildDiscoveryFaq(
           ],
         }
       : {
-          headline: "Questions about services on DrMuscat",
+          headline: "Questions about services on DrKhaleej",
           items: [
             {
               question: "What can I find on the Services page?",
@@ -776,9 +776,9 @@ export function buildDiscoveryFaq(
                 "Confirm the service, requirements and location directly with the provider.",
             },
             {
-              question: "Does DrMuscat recommend a specific service?",
+              question: "Does DrKhaleej recommend a specific service?",
               answer:
-                "No. DrMuscat does not provide treatment recommendations or medical advice.",
+                "No. DrKhaleej does not provide treatment recommendations or medical advice.",
             },
             {
               question: "When does service information appear?",
@@ -878,8 +878,8 @@ export function buildLabsDiscoveryConfig(
     providerCta: isAr ? "أدرج مختبرك" : "List your lab",
     whatsAppCta: isAr ? "واتساب" : "WhatsApp",
     whatsAppMessage: isAr
-      ? "مرحباً DrMuscat، أحتاج مساعدة في اكتشاف المختبرات في عُمان."
-      : "Hello DrMuscat, I need help with lab discovery in Oman.",
+      ? "مرحباً DrKhaleej، أحتاج مساعدة في اكتشاف المختبرات في عُمان."
+      : "Hello DrKhaleej, I need help with lab discovery in Oman.",
     whatsAppUnavailable: isAr
       ? "تفعيل واتساب قيد الإعداد"
       : "WhatsApp activation pending",
