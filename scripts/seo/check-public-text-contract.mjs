@@ -7,14 +7,12 @@ const scanRoots = [
   'public/llms.txt',
   'src/app/[locale]/[country]',
   'src/components/home',
-  'src/components/public',
   'src/lib/seo'
 ];
 
 const ignoredPathFragments = [
   '.test.',
-  'for-providers/page-content.tsx',
-  'publicDiscoveryPageConfig.ts'
+  'for-providers/page-content.tsx'
 ];
 
 const blockedParts = [
