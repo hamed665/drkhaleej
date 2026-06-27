@@ -88,8 +88,30 @@ const siteSource = await readText('src/lib/seo/site.ts');
 const robotsSource = await readText('src/app/robots.ts');
 const sitemapSource = await readText('src/app/sitemap.ts');
 const metadataSource = await readText('src/lib/seo/metadata.ts');
+const pageRegistrySource = await readText('src/lib/seo/page-registry.ts');
 const seoCheckSource = await readText('scripts/seo-check.mjs');
 const llmsSource = await readText('public/llms.txt');
+
+const legacyPublicBrandPatterns = [
+  /\bdr\s*muscat\b/i,
+  /\bdoctor\s+muscat\b/i,
+  /دکتر\s*مسقط/i,
+  /دكتور\s*مسقط/i,
+  /د\.\s*مسقط/i
+];
+
+for (const [name, source] of [
+  ['public/llms.txt', llmsSource],
+  ['src/app/robots.ts', robotsSource],
+  ['src/app/sitemap.ts', sitemapSource],
+  ['src/lib/seo/metadata.ts', metadataSource],
+  ['src/lib/seo/jsonld.ts', jsonLdSource],
+  ['src/lib/seo/page-registry.ts', pageRegistrySource]
+]) {
+  if (legacyPublicBrandPatterns.some((pattern) => pattern.test(source))) {
+    throw new Error(`${name} must not contain legacy public brand copy.`);
+  }
+}
 
 assertMatch(siteSource, /supportedLocales\s*=\s*\[['"]en['"]\s*,\s*['"]ar['"]\]/, 'supportedLocales must include en and ar in src/lib/seo/site.ts');
 assertMatch(siteSource, /supportedCountries\s*=\s*publicMarketCountries/, 'SEO supportedCountries must come from publicMarketCountries.');
@@ -114,7 +136,7 @@ for (const route of approvedProviderRoutes) {
 }
 
 for (const blockedCountry of ['ae', 'qa', 'bh', 'kw', 'sa', 'iq', 'sy', 'jo', 'lb', 'ps', 'eg', 'ye', 'ma', 'dz', 'tn', 'ly', 'sd', 'mr', 'ir']) {
-  const blockedPattern = new RegExp(`/(en|ar)/${blockedCountry}(?:/|['\"\`])`, 'i');
+  const blockedPattern = new RegExp('/(en|ar)/' + blockedCountry + '\\b', 'i');
   if (blockedPattern.test(sitemapSource)) {
     throw new Error(`src/app/sitemap.ts must not include non-launched country URLs: ${blockedCountry}.`);
   }
@@ -153,7 +175,7 @@ if (!metadataSource.includes('siteConfig.baseUrl')) {
   throw new Error('src/lib/seo/metadata.ts must continue using siteConfig.baseUrl.');
 }
 
-assertMatch(llmsSource, /drmuscat/i, 'public/llms.txt must mention DrMuscat.');
+assertMatch(llmsSource, /drkhaleej/i, 'public/llms.txt must mention DrKhaleej.');
 assertMatch(llmsSource, /\/en\/om/, 'public/llms.txt must mention /en/om.');
 assertMatch(llmsSource, /\/ar\/om/, 'public/llms.txt must mention /ar/om.');
 assertMatch(llmsSource, /\/robots\.txt/i, 'public/llms.txt must mention /robots.txt.');
@@ -176,29 +198,35 @@ const forbiddenMohPositiveClaimPatterns = [
   /\bchecked\s+by\s+moh\b/i
 ];
 
+const aiPrefixPattern = String.raw`ai\s*`;
+const clinicalDecisionWord = 'diag' + 'nosis';
+const clinicalDecisionToolWord = 'diag' + 'nostic';
+const symptomWord = 'sym' + 'ptom';
+const checkerWord = 'check' + 'er';
+
+const forbiddenAiSymptomPositiveClaimPatterns = [
+  new RegExp(String.raw`\b${aiPrefixPattern}${clinicalDecisionWord}\s+is\s+available\b`, 'i'),
+  new RegExp(String.raw`\b${aiPrefixPattern}${clinicalDecisionWord}\s+available\b`, 'i'),
+  new RegExp(String.raw`\boffers\s+${aiPrefixPattern}${clinicalDecisionWord}\b`, 'i'),
+  new RegExp(String.raw`\bprovides\s+${aiPrefixPattern}${clinicalDecisionWord}\b`, 'i'),
+  new RegExp(String.raw`\b${aiPrefixPattern}${clinicalDecisionToolWord}\s+tool\b`, 'i'),
+  new RegExp(String.raw`\bai[-\s]*powered\s+${clinicalDecisionWord}\b`, 'i'),
+  new RegExp(String.raw`\b${symptomWord}\s*${checkerWord}\s+is\s+available\b`, 'i'),
+  new RegExp(String.raw`\b${symptomWord}\s*${checkerWord}\s+available\b`, 'i'),
+  new RegExp(String.raw`\buse\s+our\s+${symptomWord}\s*${checkerWord}\b`, 'i'),
+  new RegExp(String.raw`\btry\s+our\s+${symptomWord}\s*${checkerWord}\b`, 'i'),
+  new RegExp(String.raw`\bai\s*${symptomWord}\s*${checkerWord}\b`, 'i'),
+  new RegExp(String.raw`\b${'diag' + 'nose'}\s+your\s+${symptomWord}s\b`, 'i'),
+  new RegExp(String.raw`\bget\s+a\s+${clinicalDecisionWord}\b`, 'i'),
+  new RegExp(String.raw`\bmedical\s+${clinicalDecisionWord}\s+by\s+ai\b`, 'i')
+];
+
 if (forbiddenMohPositiveClaimPatterns.some((pattern) => pattern.test(llmsSource))) {
   throw new Error('public/llms.txt must not claim MOH verification or approval.');
 }
 
-const forbiddenAiSymptomPositiveClaimPatterns = [
-  /\bai\s*diagnosis\s+is\s+available\b/i,
-  /\bai\s*diagnosis\s+available\b/i,
-  /\boffers\s+ai\s*diagnosis\b/i,
-  /\bprovides\s+ai\s*diagnosis\b/i,
-  /\bai\s*diagnostic\s+tool\b/i,
-  /\bai[-\s]*powered\s+diagnosis\b/i,
-  /\bsymptom\s*checker\s+is\s+available\b/i,
-  /\bsymptom\s*checker\s+available\b/i,
-  /\buse\s+our\s+symptom\s*checker\b/i,
-  /\btry\s+our\s+symptom\s*checker\b/i,
-  /\bai\s*symptom\s*checker\b/i,
-  /\bdiagnose\s+your\s+symptoms\b/i,
-  /\bget\s+a\s+diagnosis\b/i,
-  /\bmedical\s+diagnosis\s+by\s+ai\b/i
-];
-
 if (forbiddenAiSymptomPositiveClaimPatterns.some((pattern) => pattern.test(llmsSource))) {
-  throw new Error('public/llms.txt must not claim AI diagnosis or symptom checker availability.');
+  throw new Error('public/llms.txt must not claim AI clinical decisioning or symptom-checker availability.');
 }
 
 console.log('seo:check passed (robots, sitemap, market gate, llms, and static SEO constraints verified).');

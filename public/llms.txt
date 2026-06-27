@@ -2,8 +2,6 @@
 
 DrKhaleej is an SEO-first healthcare discovery and provider visibility platform for Oman.
 
-DrKhaleej is the current public brand. DrMuscat is a previous project name and may still appear in legacy repository or infrastructure references.
-
 Current public routes in this phase:
 - /en/om
 - /ar/om
