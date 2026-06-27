@@ -272,7 +272,7 @@
           "nextPr": "SEO-IMPORT-B import-header-alias-coverage-v1"
         },
         {
-          "target": "languages",
+          "target": "languages.spoken",
           "sheets": ["Pharmacy_Master", "Staff_Languages"],
           "headers": ["languages_spoken_csv", "language_code"],
           "status": "needs_alias",
