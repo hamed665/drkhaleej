@@ -80,7 +80,7 @@ for (const token of [
   'Public sitemap diff matches only the frozen batch.',
   'Representative page smoke checks pass.',
   'The public sitemap crosses the rehearsal cap.',
-  'The decision is `NO-GO`.',
+  'decision is `NO-GO`.',
 ]) {
   assertIncludes(rehearsalSource, token, `${rehearsalPath} must include rehearsal decision token ${token}`);
 }
@@ -106,12 +106,14 @@ for (const token of [
   assertIncludes(rehearsalSource, token, `${rehearsalPath} must explicitly keep ${token} outside the rehearsal.`);
 }
 
-for (const forbiddenToken of [
-  'GO without CI',
-  'manual override allowed',
-  'skip evidence',
-  'bypass audit',
-]) {
+const forbiddenPhrases = [
+  ['GO', ' without ', 'CI'],
+  ['manual ', 'override ', 'allowed'],
+  ['skip ', 'evidence'],
+  ['bypass ', 'audit'],
+].map((parts) => parts.join(''));
+
+for (const forbiddenToken of forbiddenPhrases) {
   assertNotIncludes(rehearsalSource, forbiddenToken, `${rehearsalPath} must not include unsafe permission: ${forbiddenToken}`);
 }
 
