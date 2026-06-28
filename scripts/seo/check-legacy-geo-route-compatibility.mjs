@@ -41,7 +41,14 @@ assertIncludes(files.routeContract, routeContract, 'noindexEnabled: true');
 assertIncludes(files.routeContract, routeContract, 'sitemapEnabled: false');
 assertIncludes(files.routeContract, routeContract, 'jsonLdEnabled: false');
 assertIncludes(files.routeContract, routeContract, 'No geo page is indexable yet.');
+assertIncludes(files.routeContract, routeContract, 'compatibilityOnly: true');
+assertIncludes(files.routeContract, routeContract, 'indexableCanonical: false');
+assertIncludes(files.routeContract, routeContract, "canonicalReplacementFamily: '/[locale]/[country]/locations/...'");
+assertIncludes(files.routeContract, routeContract, "canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]'");
+assertIncludes(files.routeContract, routeContract, "canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]'");
+assertIncludes(files.routeContract, routeContract, "canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]'");
 assertIncludes(files.routeContract, routeContract, '/[locale]/[country]/oman/areas/[areaSlug]');
+assertIncludes(files.routeContract, routeContract, 'Legacy Oman geo routes are compatibility-only and must not become indexable canonical pages.');
 
 assertIncludes(files.contractDoc, contractDoc, '/{locale}/{country}/locations/{governorateSlug}/{wilayatSlug}/{areaSlug}');
 assertIncludes(files.contractDoc, contractDoc, '`/areas/{areaSlug}` is not allowed as an indexable canonical route because area slugs are not globally unique.');
