@@ -74,7 +74,9 @@ requireTokens(closeoutDocPath, closeoutDoc, [
 requireTokens(closeoutDocPath, closeoutDoc, [
   'Manual gate runtime stays disabled.',
   'Manual gate integration guard is wired into `seo:check`.',
+  'Route readiness final gate is wired into `seo:check`.',
   'Route readiness final gate explicitly checks the manual gate contract, disabled runtime accessor, runtime tests, and integration guard.',
+  'keep manual gate runtime disabled until explicit promotion review',
   'final gate manual-chain coverage review when manual gate, route, sitemap, JSON-LD, or index behavior changes',
 ]);
 
