@@ -12,6 +12,7 @@ const allowedReferenceFiles = new Set([
   'scripts/seo/check-location-candidate-promotion-checklist-contract.mjs',
   'scripts/seo/check-location-candidate-promotion-checklist-runtime-accessor.mjs',
   'scripts/seo/check-location-candidate-promotion-checklist-integration.mjs',
+  'scripts/seo/check-location-candidate-evidence-snapshot-integration.mjs',
 ]);
 
 const forbiddenUsageTokens = [
