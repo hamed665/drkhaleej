@@ -8,10 +8,12 @@ const scannedExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'
 const allowedReferenceFiles = new Set([
   'src/lib/geo/oman-location-candidate-evidence-snapshots.ts',
   'src/lib/geo/oman-location-candidate-evidence-snapshots.test.ts',
+  'src/lib/geo/oman-location-candidate-promotion-checklists.ts',
   'src/config/geo/location-candidate-evidence-snapshot-contract.ts',
   'scripts/seo/check-location-candidate-evidence-snapshot-contract.mjs',
   'scripts/seo/check-location-candidate-evidence-snapshot-runtime-accessor.mjs',
   'scripts/seo/check-location-candidate-evidence-snapshot-integration.mjs',
+  'scripts/seo/check-location-candidate-promotion-checklist-runtime-accessor.mjs',
 ]);
 
 const forbiddenUsageTokens = [
