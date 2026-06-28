@@ -11,6 +11,7 @@ const scannedFiles = [
   'src/lib/seo/faq-jsonld.ts',
   'src/lib/seo/page-registry.ts',
   'src/lib/brand/public-brand-copy.ts',
+  'src/lib/brand/public-brand-copy.test.ts',
   'src/lib/brand/public-brand-metadata.ts',
   'src/app/[locale]/[country]/page.tsx',
   'src/app/[locale]/[country]/doctors/page.tsx',
