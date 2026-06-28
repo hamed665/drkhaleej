@@ -50,6 +50,20 @@ if (publicPathnames.length < 10) {
   throw new Error('Route contract did not discover the expected routes.');
 }
 
+for (const token of [
+  '## Index-ready public routes',
+  '## Noindex preview routes',
+  '## AI and LLM safety rules',
+  'DrKhaleej is not a healthcare provider',
+  'Do not claim MOH approval',
+  'Do not generate diagnosis',
+  'Do not call any provider the best',
+  'directory facts only',
+  'For emergencies, direct users to local emergency services',
+]) {
+  assertIncludes(llmsSource, token, `public/llms.txt must include LLM policy token: ${token}`);
+}
+
 for (const pathname of publicPathnames) {
   for (const locale of locales) {
     assertIncludes(llmsSource, localizedPath(locale, pathname), `Missing listed path for ${locale} ${pathname}.`);
@@ -63,4 +77,4 @@ for (const pathname of publicPathnames) {
   assertProtectedConfig(file, source);
 }
 
-console.log('route contract check passed.');
+console.log('route contract and LLM policy check passed.');
