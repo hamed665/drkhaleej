@@ -82,6 +82,9 @@ The following pieces are present and fail-closed:
 - source model runtime tests
 - source model integration guard
 - manual gate contract
+- disabled manual gate runtime accessor
+- manual gate runtime tests
+- manual gate integration guard
 
 ## Required promotion sequence
 
@@ -124,9 +127,12 @@ Key guard files include:
 - `scripts/seo/check-location-candidate-source-model-contract.mjs`
 - `scripts/seo/check-location-candidate-source-model-runtime-accessor.mjs`
 - `scripts/seo/check-location-candidate-source-model-integration.mjs`
+- `scripts/seo/check-location-candidate-manual-gate-integration.mjs`
 - `src/config/geo/location-candidate-manual-gate-contract.ts`
+- `src/lib/geo/oman-location-candidate-manual-gate.ts`
+- `src/lib/geo/oman-location-candidate-manual-gate.test.ts`
 
-All guard scripts above are wired through `seo:check`. The manual gate contract is contract-only and currently protected by the main CI TypeScript pass.
+All guard scripts above are wired through `seo:check`. The manual gate contract and runtime accessor remain fail-closed and are covered by unit tests plus the integration guard.
 
 ## Non-goals for the current phase
 

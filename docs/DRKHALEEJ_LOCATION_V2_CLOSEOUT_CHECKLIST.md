@@ -17,7 +17,8 @@ The Location V2 guardrail phase is complete when all of the following remain tru
 - Data-readiness integration guard is wired into `seo:check`.
 - Source model runtime stays disabled.
 - Source model integration guard is wired into `seo:check`.
-- Manual gate contract remains contract-only.
+- Manual gate runtime stays disabled.
+- Manual gate integration guard is wired into `seo:check`.
 - Route readiness final gate is wired into `seo:check`.
 - Location V2 status documentation is wired into `seo:check`.
 
