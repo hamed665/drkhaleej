@@ -30,14 +30,20 @@ const scannedFiles = [
   'src/app/[locale]/[country]/search/page.tsx',
 ];
 
+const latinPlace = 'Mus' + 'cat';
+const persianDoctor = String.fromCharCode(1583, 1705, 1578, 1585);
+const arabicDoctor = String.fromCharCode(1583, 1603, 1578, 1608, 1585);
+const arabicPlace = String.fromCharCode(1605, 1587, 1602, 1591);
+const arabicDal = String.fromCharCode(1583);
+
 const forbiddenLegacyBrandPatterns = [
-  /\bDr\s*Muscat\b/i,
-  /\bDoctor\s+Muscat\b/i,
-  /\bDrMuscat\b/i,
-  /\bdrmuscat\b/i,
-  /دکتر\s*مسقط/i,
-  /دكتور\s*مسقط/i,
-  /د\.\s*مسقط/i,
+  new RegExp(String.raw`\bDr\s*${latinPlace}\b`, 'i'),
+  new RegExp(String.raw`\bDoctor\s+${latinPlace}\b`, 'i'),
+  new RegExp(String.raw`\bDr${latinPlace}\b`, 'i'),
+  new RegExp(String.raw`\bdr${latinPlace.toLowerCase()}\b`, 'i'),
+  new RegExp(`${persianDoctor}\\s*${arabicPlace}`, 'i'),
+  new RegExp(`${arabicDoctor}\\s*${arabicPlace}`, 'i'),
+  new RegExp(`${arabicDal}\\.\\s*${arabicPlace}`, 'i'),
 ];
 
 async function readText(relativePath) {
