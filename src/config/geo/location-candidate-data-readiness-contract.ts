@@ -1,0 +1,97 @@
+import type { OmanLocationCandidateDimension } from '@/config/geo/location-threshold-policy';
+import type { OmanGeoRouteEntity } from '@/config/geo/route-contract';
+
+export type OmanLocationCandidateDataReadinessStatus = 'contract-only' | 'ready-for-audit' | 'active';
+
+export type OmanLocationCandidateDataReadinessSourceType =
+  | 'provider-count-source'
+  | 'verified-provider-source'
+  | 'evidence-count-source'
+  | 'source-reference-model'
+  | 'human-review-model';
+
+export type OmanLocationCandidateDataReadinessRequirement = {
+  sourceType: OmanLocationCandidateDataReadinessSourceType;
+  required: true;
+  currentlyAvailable: false;
+  runtimeAccessAllowed: false;
+};
+
+export type OmanLocationCandidateDataReadinessPolicy = {
+  entity: OmanGeoRouteEntity;
+  dimension: OmanLocationCandidateDimension;
+  requirements: readonly OmanLocationCandidateDataReadinessRequirement[];
+  dataImportAllowed: false;
+  runtimeGenerationAllowed: false;
+  routeCreationAllowed: false;
+  indexPromotionAllowed: false;
+};
+
+export const OMAN_LOCATION_CANDIDATE_DATA_READINESS_CONTRACT_VERSION = 'v1' as const;
+
+export const OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS: readonly OmanLocationCandidateDataReadinessRequirement[] = [
+  {
+    sourceType: 'provider-count-source',
+    required: true,
+    currentlyAvailable: false,
+    runtimeAccessAllowed: false,
+  },
+  {
+    sourceType: 'verified-provider-source',
+    required: true,
+    currentlyAvailable: false,
+    runtimeAccessAllowed: false,
+  },
+  {
+    sourceType: 'evidence-count-source',
+    required: true,
+    currentlyAvailable: false,
+    runtimeAccessAllowed: false,
+  },
+  {
+    sourceType: 'source-reference-model',
+    required: true,
+    currentlyAvailable: false,
+    runtimeAccessAllowed: false,
+  },
+  {
+    sourceType: 'human-review-model',
+    required: true,
+    currentlyAvailable: false,
+    runtimeAccessAllowed: false,
+  },
+] as const;
+
+export const OMAN_LOCATION_CANDIDATE_DATA_READINESS_POLICIES: readonly OmanLocationCandidateDataReadinessPolicy[] = [
+  { entity: 'governorate', dimension: 'category', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'governorate', dimension: 'service', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'governorate', dimension: 'specialty', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'wilayat', dimension: 'category', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'wilayat', dimension: 'service', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'wilayat', dimension: 'specialty', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'area', dimension: 'category', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'area', dimension: 'service', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+  { entity: 'area', dimension: 'specialty', requirements: OMAN_LOCATION_CANDIDATE_DATA_READINESS_REQUIREMENTS, dataImportAllowed: false, runtimeGenerationAllowed: false, routeCreationAllowed: false, indexPromotionAllowed: false },
+] as const;
+
+export const OMAN_LOCATION_CANDIDATE_DATA_READINESS_CONTRACT = {
+  version: OMAN_LOCATION_CANDIDATE_DATA_READINESS_CONTRACT_VERSION,
+  status: 'contract-only' as OmanLocationCandidateDataReadinessStatus,
+  policies: OMAN_LOCATION_CANDIDATE_DATA_READINESS_POLICIES,
+  dataImportAllowedByDefault: false,
+  runtimeGenerationAllowedByDefault: false,
+  databaseAccessAllowed: false,
+  routeCreationAllowed: false,
+  sitemapAllowed: false,
+  jsonLdAllowed: false,
+  indexPromotionAllowed: false,
+  internalSeoLinksAllowed: false,
+  nonGoals: [
+    'No provider or evidence data is imported by this contract.',
+    'No database access is enabled by this contract.',
+    'No route is added by this contract.',
+    'No sitemap entry is allowed by this contract.',
+    'No JSON-LD is generated by this contract.',
+    'No index promotion is allowed by this contract.',
+  ],
+} as const;
