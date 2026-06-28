@@ -106,14 +106,31 @@ requireTokens(files.indexPromotionPolicy, indexPromotionPolicy, [
 
 requireTokens(files.providerInventoryContract, providerInventoryContract, [
   'minimumPublishedProviders',
+  'publishedProviderCount: 0',
+  'verifiedProviderCount: 0',
+  'requiresPublishedProviderProfiles: true',
+  'requiresHumanReview: true',
+  'providerQueryAllowed: false',
+  'databaseAccessAllowed: false',
   'indexPromotionAllowed: false',
-  'runtimeEvidenceRequired: true',
+  'sitemapPromotionAllowed: false',
+  'promotionRequiresRuntimeEvidence: true',
 ]);
 
 requireTokens(files.evidenceRegistryContract, evidenceRegistryContract, [
   'minimumApprovedEvidenceEntries',
-  'approvedEvidenceEntries',
-  'sourceRefsRequired: true',
+  'approvedEvidenceEntries: 0',
+  'registryEnabled: false',
+  'requiredEvidenceKinds',
+  "'provider-inventory'",
+  "'editorial-content'",
+  "'qa-evidence'",
+  "'promotion-review'",
+  'promotionAllowed: false',
+  'noindexRemovalAllowed: false',
+  'sitemapPromotionAllowed: false',
+  'jsonLdAllowed: false',
+  'indexPromotionAllowed: false',
 ]);
 
 requireTokens(files.readiness, readiness, [
