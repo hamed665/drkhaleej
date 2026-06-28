@@ -1,36 +1,23 @@
-# DrMuscat Canonical URL and Geo Contract v1
+# DrKhaleej Canonical URL and Geo Contract v2
 
 Status: canonical product and engineering contract.
-Last updated: 2026-06-25.
+Last updated: 2026-06-28.
 Scope: documentation and validation only.
 Build mode: phased, fail-closed, Oman-first.
 
 ## 1. Purpose
 
-This contract locks the public URL, canonical, geo hierarchy, slug, alias, redirect, and indexability rules before public noindex publishing, entity relation graph runtime, internal linking runtime, dynamic sitemap, schema mapping, and local SEO page generation.
+This contract locks the public canonical URL, geo hierarchy, slug policy, alias and redirect policy, indexability contract, internal linking implications, breadcrumb contract, sitemap contract, robots and LLM contract, ad and UI slot compatibility, and implementation dependency order before location pages are promoted.
 
-The goal is to prevent route cannibalization, orphan pages, duplicate local pages, thin programmatic combinations, and future redirect debt.
+The goal is to prevent route cannibalization, orphan local pages, duplicate local pages, thin programmatic combinations, ambiguous area slugs, and future redirect debt.
 
 ## 2. Non-goals
 
-This phase does not add or change:
-
-- public routes
-- dynamic route rendering
-- sitemap output
-- robots output
-- `llms.txt`
-- metadata runtime
-- JSON-LD runtime
-- database migrations
-- import behavior
-- public publishing
-- index promotion
-- ad rendering
+This phase does not add or change public routes, dynamic route rendering, sitemap output, robots output, `llms.txt`, metadata runtime, JSON-LD runtime, database migrations, import behavior, public publishing, index promotion, or ad rendering.
 
 ## 3. Canonical locale and country base
 
-DrMuscat public canonical routes must use:
+DrKhaleej public canonical routes must use:
 
 ```text
 /{locale}/{country}/...
@@ -64,7 +51,7 @@ Implementation notes:
 
 - `governorate` and `wilayat` are required hierarchy levels for canonical local URLs once local pages are enabled.
 - `area` and `neighborhood` must not be treated as globally unique.
-- City-like labels such as Muscat, Salalah, Sohar, Seeb, and Barka may be governorate, wilayat, settlement, or area-like user labels depending on context.
+- City-like labels such as Muscat, Salalah, Sohar, Seeb, Barka, and Al Khoud may be governorate, wilayat, settlement, or area-like user labels depending on context.
 - A display label can be user-friendly, but canonical storage must preserve hierarchy and type.
 - Ambiguous geo slugs must not render indexable pages until a canonical parent path resolves the ambiguity.
 
@@ -99,24 +86,26 @@ Canonical routes:
 Rules:
 
 - Facility type determines canonical family.
-- Legacy `/center/{centerSlug}` routes may continue only as compatibility routes until migration/redirect policy is implemented.
+- Legacy `/center/{centerSlug}` routes may continue only as compatibility routes until migration or redirect policy is implemented.
 - Facility profiles can contain multiple locations, departments, doctors, services, media, contact actions, trust/source blocks, ads/offers, and related blocks.
 
-### 5.3 Geo pages
+### 5.3 Location pages
 
 Canonical routes:
 
 ```text
 /{locale}/{country}/locations/{governorateSlug}
 /{locale}/{country}/locations/{governorateSlug}/{wilayatSlug}
-/{locale}/{country}/areas/{governorateSlug}/{wilayatSlug}/{areaSlug}
+/{locale}/{country}/locations/{governorateSlug}/{wilayatSlug}/{areaSlug}
 ```
 
 Rules:
 
+- `/locations/{areaSlug}` is not allowed as an indexable canonical route because area slugs are not globally unique.
 - `/areas/{areaSlug}` is not allowed as an indexable canonical route because area slugs are not globally unique.
+- `/areas/{governorateSlug}/{wilayatSlug}/{areaSlug}` is not a DrKhaleej canonical route family.
 - Short local aliases can redirect to canonical geo routes only after alias mapping is reviewed.
-- Geo pages must remain noindex or not found until geo coverage and page readiness gates pass.
+- Location pages must remain noindex or not found until geo coverage and page readiness gates pass.
 
 ### 5.4 Specialty pages
 
@@ -124,13 +113,13 @@ Canonical routes:
 
 ```text
 /{locale}/{country}/specialties/{specialtySlug}
-/{locale}/{country}/specialties/{specialtySlug}/{governorateSlug}/{wilayatSlug}/{areaSlug}
+/{locale}/{country}/locations/{governorateSlug}/{wilayatSlug}/{areaSlug}/specialties/{specialtySlug}
 ```
 
 Rules:
 
 - Specialty pages require canonical specialty taxonomy.
-- Specialty + area pages require exact relationship coverage, local relevance, unique intro content, internal links, and no private data leakage.
+- Specialty + location pages require exact relationship coverage, local relevance, unique intro content, internal links, and no private data leakage.
 - Ambiguous specialty aliases must redirect to canonical specialty slugs before index eligibility.
 
 ### 5.5 Service pages
@@ -139,14 +128,14 @@ Canonical routes:
 
 ```text
 /{locale}/{country}/services/{serviceSlug}
-/{locale}/{country}/services/{serviceSlug}/{governorateSlug}/{wilayatSlug}/{areaSlug}
+/{locale}/{country}/locations/{governorateSlug}/{wilayatSlug}/{areaSlug}/services/{serviceSlug}
 ```
 
 Rules:
 
 - Service pages require canonical service taxonomy.
 - Service slugs must be unique in the public route namespace or resolved through a canonical route map.
-- Service + area pages require provider coverage, local relevance, unique visible intro, and review gates.
+- Service + location pages require provider coverage, local relevance, unique visible intro, and review gates.
 
 ### 5.6 Articles and guides
 
@@ -178,15 +167,7 @@ Rules:
 
 ## 6. Slug policy
 
-All canonical slugs must be:
-
-```text
-lowercase
-kebab-case
-ASCII route-safe
-stable after publish
-unique inside their canonical namespace
-```
+All canonical slugs must be lowercase, kebab-case, ASCII route-safe, stable after publish, and unique inside their canonical namespace.
 
 Slug sources:
 
@@ -204,14 +185,7 @@ Forbidden slug behavior:
 
 ## 7. Alias and redirect policy
 
-Aliases can exist for:
-
-- alternate English spellings
-- Arabic names
-- common local names
-- legacy route families
-- imported external IDs
-- provider-submitted names
+Aliases can exist for alternate English spellings, Arabic names, common local names, legacy route families, imported external IDs, and provider-submitted names.
 
 Alias output options:
 
@@ -246,7 +220,7 @@ A page cannot be `index_eligible` until all of these pass:
 - no private/admin/raw payload fields are rendered
 - page has enough visible content for its page family
 
-Search/filter result pages, sensitive assessment result pages, admin pages, private previews, and unresolved aliases must stay noindex or not found.
+Search/filter result pages, sensitive assessment result pages, admin pages, private previews, unresolved aliases, and unresolved location paths must stay noindex or not found.
 
 ## 9. Internal linking implications
 
@@ -316,6 +290,7 @@ Sitemap must not include:
 - duplicate-unresolved profiles
 - low-quality local combinations
 - sensitive assessment result pages
+- parentless area URLs
 
 Large public inventory must use sitemap sharding and, if needed, sitemap indexes.
 
@@ -359,23 +334,22 @@ Rules:
 After this contract, the safe implementation order is:
 
 ```text
-1. Entity relation model gap review
-2. Doctor multi-practice relation hardening
-3. Relation candidate generator
-4. Admin relation review
-5. Nearby/proximity engine
-6. Internal link candidate generator
-7. Page registry and readiness v2
+1. Parent-aware location path helper
+2. Legacy geo route noindex/compatibility policy
+3. Location route scaffolds under `/locations/...`, noindex-first
+4. Location breadcrumb contract
+5. Location page registry and readiness v2
+6. Location internal link candidate generator
+7. Location × category candidate generator
 8. Public noindex publisher
 9. Profile V2 pages
-10. Breadcrumb and related blocks runtime
-11. Dynamic sitemap
-12. Schema mapping
+10. Dynamic sitemap
+11. Schema mapping
 ```
 
 ## 15. Validation expectations
 
-A static validator should ensure this contract keeps the following required concepts present:
+A static validator must ensure this contract keeps the following required concepts present:
 
 ```text
 canonical URL
@@ -389,4 +363,5 @@ sitemap contract
 robots and LLM contract
 ad and UI slot compatibility
 implementation dependency order
+parent-aware location paths
 ```
