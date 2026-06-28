@@ -16,6 +16,10 @@ const files = {
   snapshotRuntime: join(['src/lib/geo/oman-location-candidate-evidence', '-snapshots.ts']),
   promotionContract: join(['src/config/geo/location-candidate-promotion', '-checklist-contract.ts']),
   promotionRuntime: join(['src/lib/geo/oman-location-candidate-promotion', '-checklists.ts']),
+  manualGateContract: join(['src/config/geo/location-candidate-manual', '-gate-contract.ts']),
+  manualGateRuntime: join(['src/lib/geo/oman-location-candidate-manual', '-gate.ts']),
+  manualGateTest: join(['src/lib/geo/oman-location-candidate-manual', '-gate.test.ts']),
+  manualGateIntegration: join(['scripts/seo/check-location-candidate-manual', '-gate-integration.mjs']),
 };
 
 const forbiddenCandidateRouteFiles = [
@@ -70,10 +74,15 @@ const snapshotContract = read(files.snapshotContract);
 const snapshotRuntime = read(files.snapshotRuntime);
 const promotionContract = read(files.promotionContract);
 const promotionRuntime = read(files.promotionRuntime);
+const manualGateContract = read(files.manualGateContract);
+const manualGateRuntime = read(files.manualGateRuntime);
+const manualGateTest = read(files.manualGateTest);
+const manualGateIntegration = read(files.manualGateIntegration);
 
 requireTokens(files.packageJson, packageJson, [
   'seo:location-candidate-route-readiness-final:validate',
   'check-location-candidate-route-readiness-final-gate.mjs',
+  'seo:location-candidate-manual-gate-integration:validate',
 ]);
 
 requireTokens(files.routeContract, routeContract, [
@@ -157,6 +166,45 @@ requireTokens(files.promotionRuntime, promotionRuntime, [
   'canSitemap: false',
   'canEmitJsonLd: false',
   'canUseInternalSeoLinks: false',
+]);
+
+requireTokens(files.manualGateContract, manualGateContract, [
+  "status: 'contract-only'",
+  'runtimeAllowed: false',
+  'databaseAccessAllowed: false',
+  'routeCreationAllowed: false',
+  'sitemapAllowed: false',
+  'jsonLdAllowed: false',
+  'indexPromotionAllowed: false',
+]);
+
+requireTokens(files.manualGateRuntime, manualGateRuntime, [
+  "status: 'disabled'",
+  'runtimeAllowed: false',
+  'databaseAccessAllowed: false',
+  'routeCreationAllowed: false',
+  'sitemapAllowed: false',
+  'jsonLdAllowed: false',
+  'indexPromotionAllowed: false',
+  'candidate-manual-gate-contract-only',
+  'candidate-manual-gate-runtime-disabled',
+]);
+
+requireTokens(files.manualGateTest, manualGateTest, [
+  'toHaveLength(9)',
+  "status).toBe('disabled')",
+  'runtimeAllowed).toBe(false)',
+  'databaseAccessAllowed).toBe(false)',
+  'routeCreationAllowed).toBe(false)',
+  'sitemapAllowed).toBe(false)',
+  'jsonLdAllowed).toBe(false)',
+  'indexPromotionAllowed).toBe(false)',
+]);
+
+requireTokens(files.manualGateIntegration, manualGateIntegration, [
+  'Candidate manual gate runtime must not be integrated into routes, sitemap, registry, UI, database, or public surfaces yet.',
+  'seo:location-candidate-manual-gate-integration:validate',
+  'check-location-candidate-manual-gate-integration.mjs',
 ]);
 
 console.log('Location candidate route readiness final gate passed.');
