@@ -80,14 +80,17 @@ requireTokens(files.routeContract, routeContract, [
   'location-governorate',
   'location-wilayat',
   'location-area',
-  'noindex',
-  'jsonLd: false',
-  'sitemap: false',
+  'noindexEnabled: true',
+  'jsonLdEnabled: false',
+  'sitemapEnabled: false',
+  'indexableCanonical: false',
 ]);
 
 requireTokens(files.indexPolicy, indexPolicy, [
   'blocked-until-content-ready',
-  'noindex',
+  'noindexRequiredByDefault: true',
+  'sitemapAllowedByDefault: false',
+  'jsonLdAllowedByDefault: false',
 ]);
 
 requireTokens(files.readiness, readiness, [
