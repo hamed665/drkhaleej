@@ -73,6 +73,10 @@ The following pieces are present and fail-closed:
 - promotion checklist integration guard
 - route readiness final gate
 - final gate smoke test
+- data-readiness source contract
+- disabled data-readiness runtime accessor
+- data-readiness runtime tests
+- data-readiness integration guard
 
 ## Required promotion sequence
 
@@ -109,6 +113,9 @@ Key guard files include:
 - `scripts/seo/check-location-candidate-promotion-checklist-runtime-accessor.mjs`
 - `scripts/seo/check-location-candidate-promotion-checklist-integration.mjs`
 - `scripts/seo/check-location-candidate-route-readiness-final-gate.mjs`
+- `scripts/seo/check-location-candidate-data-readiness-contract.mjs`
+- `scripts/seo/check-location-candidate-data-readiness-runtime-accessor.mjs`
+- `scripts/seo/check-location-candidate-data-readiness-integration.mjs`
 
 All of these are wired through `seo:check`.
 
@@ -125,6 +132,8 @@ The current phase does not add:
 - review workflow activation
 - runtime snapshot generation
 - runtime promotion activation
+- real data import
+- runtime data-readiness generation
 
 ## Promotion rule
 
