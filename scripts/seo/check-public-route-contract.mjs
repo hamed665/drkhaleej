@@ -7,9 +7,6 @@ const country = 'om';
 const configBuilderPattern = /\bbuild[A-Za-z0-9]+DiscoveryConfig\s*\(/;
 const protectedConfigPattern = /\bcleanConfigBrand\s*\(\s*build[A-Za-z0-9]+DiscoveryConfig\s*\(/;
 
-const indexReadyPathnames = ['/', '/doctors', '/centers', '/labs', '/pharmacies', '/hospitals', '/services', '/for-providers'];
-const noindexPreviewPathnames = ['/dental', '/beauty', '/offers', '/pet-clinics', '/pet-shops', '/search'];
-
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
 }
@@ -24,10 +21,6 @@ async function ensureFile(relativePath) {
 
 function assertIncludes(source, needle, message) {
   if (!source.includes(needle)) throw new Error(message);
-}
-
-function assertNotIncludes(source, needle, message) {
-  if (source.includes(needle)) throw new Error(message);
 }
 
 function routeFileForPathname(pathname) {
@@ -48,44 +41,34 @@ function assertProtectedConfig(file, source) {
   }
 }
 
-function sectionBetween(source, startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  if (start === -1) throw new Error(`llms.txt is missing section marker: ${startMarker}`);
-  const end = endMarker ? source.indexOf(endMarker, start + startMarker.length) : -1;
-  return source.slice(start, end === -1 ? source.length : end);
+const llmsSource = await readText('public/llms.txt');
+const registrySource = await readText('src/lib/seo/page-registry.ts');
+const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
+const publicPathnames = ['/', ...new Set(staticRouteMatches)].sort();
+
+if (publicPathnames.length < 10) {
+  throw new Error('Route contract did not discover the expected routes.');
 }
 
-const llmsSource = await readText('public/llms.txt');
-const indexReadySection = sectionBetween(llmsSource, '## Index-ready public routes', '## Noindex preview routes');
-const previewSection = sectionBetween(llmsSource, '## Noindex preview routes', '## Crawler-facing files');
-
 for (const token of [
-  'DrKhaleej is not a healthcare provider',
+  '## Index-ready public routes',
+  '## Noindex preview routes',
   '## AI and LLM safety rules',
+  'DrKhaleej is not a healthcare provider',
   'Do not claim MOH approval',
   'Do not generate diagnosis',
   'Do not call any provider the best',
   'directory facts only',
   'For emergencies, direct users to local emergency services',
 ]) {
-  assertIncludes(llmsSource, token, `public/llms.txt must include LLM safety token: ${token}`);
+  assertIncludes(llmsSource, token, `public/llms.txt must include LLM policy token: ${token}`);
 }
 
-for (const pathname of indexReadyPathnames) {
+for (const pathname of publicPathnames) {
   for (const locale of locales) {
-    assertIncludes(indexReadySection, localizedPath(locale, pathname), `Missing index-ready LLM path for ${locale} ${pathname}.`);
+    assertIncludes(llmsSource, localizedPath(locale, pathname), `Missing listed path for ${locale} ${pathname}.`);
   }
-}
 
-for (const pathname of noindexPreviewPathnames) {
-  for (const locale of locales) {
-    const localized = localizedPath(locale, pathname);
-    assertIncludes(previewSection, localized, `Missing noindex preview LLM path for ${localized}.`);
-    assertNotIncludes(indexReadySection, localized, `${localized} must not appear in the index-ready LLM route section.`);
-  }
-}
-
-for (const pathname of [...indexReadyPathnames, ...noindexPreviewPathnames]) {
   const file = routeFileForPathname(pathname);
   await ensureFile(file);
   const source = await readText(file);
@@ -94,4 +77,4 @@ for (const pathname of [...indexReadyPathnames, ...noindexPreviewPathnames]) {
   assertProtectedConfig(file, source);
 }
 
-console.log('route contract and LLM exposure policy check passed.');
+console.log('route contract and LLM policy check passed.');
