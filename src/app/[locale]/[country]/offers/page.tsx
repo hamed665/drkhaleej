@@ -12,7 +12,6 @@ import {
   localeDirection,
 } from "@/lib/i18n/config";
 import { buildLocalizedMetadata } from "@/lib/seo/metadata";
-import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
 type Params = { locale: string; country: string };
 
@@ -88,16 +87,6 @@ export default async function PublicOffersPage({
           locale={safeLocale}
           dir={dir}
           idPrefix={config.categoryType}
-        />
-      ) : null}
-      {config.faq ? (
-        <script
-          id={`dm2026-public-discovery-faq-jsonld-${config.categoryType}-${safeLocale}`}
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(buildFaqJsonLd(config.faq)),
-          }}
         />
       ) : null}
     </main>
