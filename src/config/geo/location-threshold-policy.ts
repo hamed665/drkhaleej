@@ -1,0 +1,166 @@
+import type { OmanGeoRouteEntity } from '@/config/geo/route-contract';
+
+export type OmanLocationCandidateDimension = 'category' | 'service' | 'specialty';
+
+export type OmanLocationThresholdStatus = 'contract-only' | 'ready-for-review' | 'active';
+
+export type OmanLocationThresholdPolicy = {
+  entity: OmanGeoRouteEntity;
+  dimension: OmanLocationCandidateDimension;
+  minimumPublishedProviders: number;
+  minimumVerifiedProviders: number;
+  minimumApprovedEvidenceEntries: number;
+  minimumEditorialWords: number;
+  noindexRequired: boolean;
+  sitemapAllowed: boolean;
+  jsonLdAllowed: boolean;
+  internalSeoLinksAllowed: boolean;
+  candidatePromotionAllowed: boolean;
+};
+
+export const OMAN_LOCATION_THRESHOLD_POLICY_VERSION = 'v1' as const;
+
+export const OMAN_LOCATION_THRESHOLD_POLICIES: readonly OmanLocationThresholdPolicy[] = [
+  {
+    entity: 'governorate',
+    dimension: 'category',
+    minimumPublishedProviders: 8,
+    minimumVerifiedProviders: 4,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 120,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'governorate',
+    dimension: 'service',
+    minimumPublishedProviders: 6,
+    minimumVerifiedProviders: 3,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 120,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'governorate',
+    dimension: 'specialty',
+    minimumPublishedProviders: 6,
+    minimumVerifiedProviders: 3,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 120,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'wilayat',
+    dimension: 'category',
+    minimumPublishedProviders: 6,
+    minimumVerifiedProviders: 3,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 90,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'wilayat',
+    dimension: 'service',
+    minimumPublishedProviders: 5,
+    minimumVerifiedProviders: 2,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 90,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'wilayat',
+    dimension: 'specialty',
+    minimumPublishedProviders: 5,
+    minimumVerifiedProviders: 2,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 90,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'area',
+    dimension: 'category',
+    minimumPublishedProviders: 3,
+    minimumVerifiedProviders: 2,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 70,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'area',
+    dimension: 'service',
+    minimumPublishedProviders: 3,
+    minimumVerifiedProviders: 2,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 70,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+  {
+    entity: 'area',
+    dimension: 'specialty',
+    minimumPublishedProviders: 3,
+    minimumVerifiedProviders: 2,
+    minimumApprovedEvidenceEntries: 4,
+    minimumEditorialWords: 70,
+    noindexRequired: true,
+    sitemapAllowed: false,
+    jsonLdAllowed: false,
+    internalSeoLinksAllowed: false,
+    candidatePromotionAllowed: false,
+  },
+] as const;
+
+export const OMAN_LOCATION_THRESHOLD_POLICY = {
+  version: OMAN_LOCATION_THRESHOLD_POLICY_VERSION,
+  status: 'contract-only' as OmanLocationThresholdStatus,
+  policies: OMAN_LOCATION_THRESHOLD_POLICIES,
+  defaultNoindexRequired: true,
+  defaultSitemapAllowed: false,
+  defaultJsonLdAllowed: false,
+  defaultInternalSeoLinksAllowed: false,
+  defaultCandidatePromotionAllowed: false,
+  promotionRequiresParentHierarchy: true,
+  promotionRequiresProviderThreshold: true,
+  promotionRequiresApprovedEvidence: true,
+  promotionRequiresReadinessGates: true,
+  promotionRequiresHumanReview: true,
+  promotionRequiresApprovedPr: true,
+  nonGoals: [
+    'No location-category candidate engine is added by this contract.',
+    'No composite location route is added by this contract.',
+    'No sitemap inclusion is allowed by this contract.',
+    'No JSON-LD is generated by this contract.',
+    'No internal SEO links are enabled by this contract.',
+    'No public index promotion is allowed by this contract.',
+  ],
+} as const;
