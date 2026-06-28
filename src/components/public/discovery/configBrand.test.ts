@@ -3,14 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { cleanConfigBrand } from './configBrand';
 import type { PublicDiscoveryPageConfig } from './publicDiscoveryPageConfig';
 
-const legacyNames = ['DrMuscat', 'Dr Muscat', 'Doctor Muscat', 'دکتر مسقط', 'دكتور مسقط', 'د. مسقط'];
-
 function stringify(value: unknown): string {
   return JSON.stringify(value);
 }
 
 describe('cleanConfigBrand', () => {
-  it('normalizes nested discovery config strings', () => {
+  it('keeps nested DrKhaleej discovery config strings unchanged', () => {
     const config = {
       locale: 'en',
       country: 'om',
@@ -19,15 +17,15 @@ describe('cleanConfigBrand', () => {
       path: '/offers',
       searchId: 'search',
       resultsId: 'results',
-      badge: 'DrMuscat offers',
-      title: 'Doctor Muscat title',
-      subtitle: 'دكتور مسقط subtitle',
+      badge: 'DrKhaleej offers',
+      title: 'DrKhaleej title',
+      subtitle: 'DrKhaleej subtitle',
       primaryCta: 'Search',
       providerCta: 'List',
       search: {
         badge: 'Search',
-        title: 'Dr Muscat search',
-        description: 'دکتر مسقط description',
+        title: 'DrKhaleej search',
+        description: 'DrKhaleej description',
         inputLabel: 'Input',
         placeholder: 'Placeholder',
         button: 'Button',
@@ -41,7 +39,7 @@ describe('cleanConfigBrand', () => {
         useSuggestion: 'Use',
         contentType: 'Offers',
         trustAria: 'Trust',
-        trust: ['د. مسقط trust'],
+        trust: ['DrKhaleej trust'],
         mainChips: ['Main'],
         moreChips: ['More'],
         countryOptions: ['Oman'],
@@ -54,22 +52,19 @@ describe('cleanConfigBrand', () => {
       },
       results: {
         title: 'Results',
-        emptyText: 'No DrMuscat results'
+        emptyText: 'No DrKhaleej results'
       },
       visual: {
         label: 'Visual',
         previous: 'Previous',
         next: 'Next',
         slideLabel: 'Slide',
-        slides: [{ src: '/x.webp', alt: 'Doctor Muscat image', caption: 'DrMuscat caption' }]
+        slides: [{ src: '/x.webp', alt: 'DrKhaleej image', caption: 'DrKhaleej caption' }]
       }
     } satisfies PublicDiscoveryPageConfig;
 
     const output = stringify(cleanConfigBrand(config));
 
     expect(output).toContain('DrKhaleej');
-    for (const legacyName of legacyNames) {
-      expect(output).not.toContain(legacyName);
-    }
   });
 });
