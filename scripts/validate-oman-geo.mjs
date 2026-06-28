@@ -5,6 +5,11 @@ const validScopes = new Set(['core', 'adjacent', 'deferred', 'excluded']);
 const validLaunchPhases = new Set(['1', '2', '3', 'deferred', 'excluded']);
 const placeholderPattern = /TODO|placeholder|taxonomy|area name/i;
 
+const expectedAuthorityCounts = {
+  governorates: 11,
+  wilayats: 63,
+};
+
 const errors = [];
 const warnings = [];
 
@@ -113,6 +118,12 @@ function checkUnique(registryName, items) {
   }
 }
 
+function checkExpectedCount(registryName, actual, expected) {
+  if (actual !== expected) {
+    errors.push(`${registryName} registry count must be ${expected}; found ${actual}`);
+  }
+}
+
 const source = readFile(geoPath);
 const governorates = parseRegistry(source, 'OMAN_GOVERNORATES', 'governorates');
 const wilayats = parseRegistry(source, 'OMAN_WILAYATS', 'wilayats');
@@ -121,6 +132,9 @@ const areas = parseRegistry(source, 'OMAN_AREAS', 'areas');
 for (const registry of [governorates, wilayats, areas]) {
   for (const item of registry) checkCommon(item);
 }
+
+checkExpectedCount('governorates', governorates.length, expectedAuthorityCounts.governorates);
+checkExpectedCount('wilayats', wilayats.length, expectedAuthorityCounts.wilayats);
 
 checkUnique('governorates', governorates);
 checkUnique('wilayats', wilayats);
