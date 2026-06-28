@@ -77,6 +77,10 @@ The following pieces are present and fail-closed:
 - disabled data-readiness runtime accessor
 - data-readiness runtime tests
 - data-readiness integration guard
+- source model contract
+- disabled source model runtime accessor
+- source model runtime tests
+- source model integration guard
 
 ## Required promotion sequence
 
@@ -116,6 +120,9 @@ Key guard files include:
 - `scripts/seo/check-location-candidate-data-readiness-contract.mjs`
 - `scripts/seo/check-location-candidate-data-readiness-runtime-accessor.mjs`
 - `scripts/seo/check-location-candidate-data-readiness-integration.mjs`
+- `scripts/seo/check-location-candidate-source-model-contract.mjs`
+- `scripts/seo/check-location-candidate-source-model-runtime-accessor.mjs`
+- `scripts/seo/check-location-candidate-source-model-integration.mjs`
 
 All of these are wired through `seo:check`.
 
@@ -134,6 +141,8 @@ The current phase does not add:
 - runtime promotion activation
 - real data import
 - runtime data-readiness generation
+- runtime source model collection
+- source model import pipeline
 
 ## Promotion rule
 
