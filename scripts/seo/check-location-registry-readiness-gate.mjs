@@ -88,7 +88,8 @@ for (const entity of ['governorate', 'wilayat', 'area']) {
 }
 
 requireTokens(files.readiness, readiness, [
-  'readyForPromotionReview: false',
+  'const readyForPromotionReview = false;',
+  'readyForPromotionReview,',
   'noindexRemovalAllowed: false',
   'sitemapPromotionAllowed: false',
   'jsonLdAllowed: false',
