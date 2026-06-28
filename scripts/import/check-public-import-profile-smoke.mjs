@@ -18,6 +18,9 @@ const profileContracts = [
       'GuardedImportProfilePage',
       'pathname: `/doctor/${doctorSlug}`',
       'notFound()',
+      'buildNoindexFallbackMetadata',
+      'robots: { index: false, follow: true }',
+      "fallbackTitle: 'Doctor Profile | DrKhaleej'",
     ],
   },
   {

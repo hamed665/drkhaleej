@@ -10,6 +10,7 @@ import {
   isSupportedCountry,
   isSupportedLocale,
   localeDirection,
+  type SupportedCountry,
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
@@ -26,13 +27,13 @@ type RouteCopy = {
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
     badge: 'Public doctor profile',
-    fallbackTitle: 'Doctor Profile | DrMuscat',
-    fallbackDescription: 'View public doctor profile information in Oman on DrMuscat.'
+    fallbackTitle: 'Doctor Profile | DrKhaleej',
+    fallbackDescription: 'View public doctor profile information in Oman on DrKhaleej.'
   },
   ar: {
     badge: 'ملف طبيب عام',
-    fallbackTitle: 'ملف طبيب | DrMuscat',
-    fallbackDescription: 'اطلع على معلومات عامة عن ملفات الأطباء في عُمان عبر DrMuscat.'
+    fallbackTitle: 'ملف طبيب | DrKhaleej',
+    fallbackDescription: 'اطلع على معلومات عامة عن ملفات الأطباء في عُمان عبر DrKhaleej.'
   }
 };
 
@@ -50,7 +51,7 @@ function doctorDisplayName(locale: SupportedLocale, doctor: PublicDoctorDetailDa
 }
 
 function metadataTitle(name: string): string {
-  return `${name} | DrMuscat`;
+  return `${name} | DrKhaleej`;
 }
 
 function metadataDescription(locale: SupportedLocale, doctor: PublicDoctorDetailData, fallback: string): string {
@@ -63,7 +64,26 @@ function metadataDescription(locale: SupportedLocale, doctor: PublicDoctorDetail
 }
 
 function importProfileDescription(name: string): string {
-  return `${name} on DrMuscat. Public healthcare discovery in Oman only; not medical advice, booking, or emergency care.`;
+  return `${name} on DrKhaleej. Public healthcare discovery in Oman only; not medical advice, booking, or emergency care.`;
+}
+
+function buildNoindexFallbackMetadata(input: {
+  locale: SupportedLocale;
+  country: SupportedCountry;
+  doctorSlug: string;
+  title: string;
+  description: string;
+}): Metadata {
+  return {
+    ...buildLocalizedMetadata({
+      locale: input.locale,
+      country: input.country,
+      pathname: `/doctor/${input.doctorSlug}`,
+      title: input.title,
+      description: input.description
+    }),
+    robots: { index: false, follow: true }
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -94,10 +114,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  return buildLocalizedMetadata({
+  return buildNoindexFallbackMetadata({
     locale,
     country,
-    pathname: `/doctor/${doctorSlug}`,
+    doctorSlug,
     title: copy.fallbackTitle,
     description: copy.fallbackDescription
   });
