@@ -10,12 +10,24 @@ const expectedRouteNames = [
   'oman-governorate',
   'oman-wilayat',
   'oman-area',
+  'location-governorate',
+  'location-wilayat',
+  'location-area',
 ];
 
 const expectedRouteFiles = [
   'src/app/[locale]/[country]/oman/governorates/[governorateSlug]/page.tsx',
   'src/app/[locale]/[country]/oman/wilayats/[wilayatSlug]/page.tsx',
   'src/app/[locale]/[country]/oman/areas/[areaSlug]/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]/page.tsx',
+];
+
+const expectedLocationPathHelpers = [
+  'buildOmanGovernorateLocationPath',
+  'buildOmanWilayatLocationPath',
+  'buildOmanAreaLocationPath',
 ];
 
 function readFile(filePath) {
@@ -63,10 +75,12 @@ assert(contractSource.includes('metadataEnabled: true'), 'Metadata must be enabl
 assert(contractSource.includes('noindexEnabled: true'), 'Noindex guardrail must be enabled.');
 assert(contractSource.includes('sitemapEnabled: false'), 'Sitemap must remain disabled.');
 assert(contractSource.includes('jsonLdEnabled: false'), 'JSON-LD must remain disabled.');
+assert(contractSource.includes('Location route scaffolds are noindex-first'), 'Location scaffold noindex-first non-goal must be documented.');
 
 assert(metadataHelperSource.includes('buildOmanGeoNoindexMetadata'), 'Missing noindex metadata helper.');
 assert(metadataHelperSource.includes('index: false'), 'Metadata helper must set index false.');
 assert(metadataHelperSource.includes('follow: true'), 'Metadata helper must keep follow true.');
+assert(metadataHelperSource.includes('DrKhaleej'), 'Geo metadata helper must use DrKhaleej branding.');
 assert(gatedMetadataHelperSource.includes('buildOmanGeoGatedMetadata'), 'Missing gated metadata helper.');
 assert(gatedMetadataHelperSource.includes('getOmanGeoPublicationGates'), 'Gated metadata helper must read publication gates.');
 assert(gatedMetadataHelperSource.includes('buildOmanGeoNoindexMetadata(input)'), 'Gated metadata helper must preserve noindex output.');
@@ -103,11 +117,19 @@ for (const routeFile of expectedRouteFiles) {
   assert(usesNoindexMetadata || usesGatedMetadata, `Route file must use noindex or gated metadata helper: ${routeFile}`);
   assert(!routeSource.includes('sitemap'), `Route scaffold must not generate sitemap behavior yet: ${routeFile}`);
   assert(!routeSource.includes('jsonLd'), `Route scaffold must not generate JSON-LD yet: ${routeFile}`);
+  assert(!routeSource.includes('application/ld+json'), `Route scaffold must not emit JSON-LD script yet: ${routeFile}`);
 }
 
-assert(contractSource.includes('/[locale]/[country]/oman/governorates/[governorateSlug]'), 'Missing governorate path template.');
-assert(contractSource.includes('/[locale]/[country]/oman/wilayats/[wilayatSlug]'), 'Missing wilayat path template.');
-assert(contractSource.includes('/[locale]/[country]/oman/areas/[areaSlug]'), 'Missing area path template.');
+for (const helperName of expectedLocationPathHelpers) {
+  assert(contractSource.includes(helperName) || expectedRouteFiles.some((routeFile) => readFile(routeFile).includes(helperName)), `Missing location path helper usage: ${helperName}`);
+}
+
+assert(contractSource.includes('/[locale]/[country]/oman/governorates/[governorateSlug]'), 'Missing legacy governorate path template.');
+assert(contractSource.includes('/[locale]/[country]/oman/wilayats/[wilayatSlug]'), 'Missing legacy wilayat path template.');
+assert(contractSource.includes('/[locale]/[country]/oman/areas/[areaSlug]'), 'Missing legacy area path template.');
+assert(contractSource.includes('/[locale]/[country]/locations/[governorateSlug]'), 'Missing location governorate path template.');
+assert(contractSource.includes('/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]'), 'Missing location wilayat path template.');
+assert(contractSource.includes('/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]'), 'Missing location area path template.');
 
 const summary = {
   governorates: countRegistryItems(geoSource, 'OMAN_GOVERNORATES'),

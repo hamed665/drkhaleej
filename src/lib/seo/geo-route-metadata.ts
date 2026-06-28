@@ -52,10 +52,10 @@ function labelForLocale(item: OmanGeoMetadataItem, locale: SupportedLocale): str
 
 function buildTitle(locale: SupportedLocale, entity: OmanGeoMetadataEntity, label: string): string {
   if (locale === 'ar') {
-    return `${label} | DrMuscat عُمان`;
+    return `${label} | DrKhaleej عُمان`;
   }
 
-  return `${label} ${entityLabelByLocale.en[entity]} | DrMuscat Oman`;
+  return `${label} ${entityLabelByLocale.en[entity]} | DrKhaleej Oman`;
 }
 
 function buildDescription(locale: SupportedLocale, entity: OmanGeoMetadataEntity, label: string, parentLabel?: string): string {

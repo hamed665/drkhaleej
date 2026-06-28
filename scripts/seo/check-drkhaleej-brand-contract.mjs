@@ -7,6 +7,8 @@ const scannedFiles = [
   'public/llms.txt',
   'src/lib/seo/site.ts',
   'src/lib/seo/metadata.ts',
+  'src/lib/seo/geo-route-metadata.ts',
+  'src/lib/seo/oman-geo-gated-metadata.ts',
   'src/lib/seo/jsonld.ts',
   'src/lib/seo/faq-jsonld.ts',
   'src/lib/seo/page-registry.ts',
@@ -29,6 +31,9 @@ const scannedFiles = [
   'src/app/[locale]/[country]/pet-clinics/page.tsx',
   'src/app/[locale]/[country]/pet-shops/page.tsx',
   'src/app/[locale]/[country]/search/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/page.tsx',
+  'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]/page.tsx',
 ];
 
 const latinPlace = 'Mus' + 'cat';

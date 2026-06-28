@@ -24,7 +24,7 @@ export type OmanGeoRouteTemplate = {
   canonicalReplacementPathTemplate: string;
 };
 
-export const OMAN_GEO_ROUTE_CONTRACT_VERSION = 'v4' as const;
+export const OMAN_GEO_ROUTE_CONTRACT_VERSION = 'v5' as const;
 
 export const OMAN_GEO_ROUTE_TEMPLATES: readonly OmanGeoRouteTemplate[] = [
   {
@@ -78,6 +78,57 @@ export const OMAN_GEO_ROUTE_TEMPLATES: readonly OmanGeoRouteTemplate[] = [
     indexableCanonical: false,
     canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]',
   },
+  {
+    routeName: 'location-governorate',
+    entity: 'governorate',
+    pathTemplate: '/[locale]/[country]/locations/[governorateSlug]',
+    routeFile: 'src/app/[locale]/[country]/locations/[governorateSlug]/page.tsx',
+    locales: ['en', 'ar'],
+    country: 'om',
+    runtimeEnabled: true,
+    metadataEnabled: true,
+    noindexEnabled: true,
+    sitemapEnabled: false,
+    jsonLdEnabled: false,
+    hasHreflangPeer: true,
+    compatibilityOnly: false,
+    indexableCanonical: false,
+    canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]',
+  },
+  {
+    routeName: 'location-wilayat',
+    entity: 'wilayat',
+    pathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]',
+    routeFile: 'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/page.tsx',
+    locales: ['en', 'ar'],
+    country: 'om',
+    runtimeEnabled: true,
+    metadataEnabled: true,
+    noindexEnabled: true,
+    sitemapEnabled: false,
+    jsonLdEnabled: false,
+    hasHreflangPeer: true,
+    compatibilityOnly: false,
+    indexableCanonical: false,
+    canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]',
+  },
+  {
+    routeName: 'location-area',
+    entity: 'area',
+    pathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]',
+    routeFile: 'src/app/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]/page.tsx',
+    locales: ['en', 'ar'],
+    country: 'om',
+    runtimeEnabled: true,
+    metadataEnabled: true,
+    noindexEnabled: true,
+    sitemapEnabled: false,
+    jsonLdEnabled: false,
+    hasHreflangPeer: true,
+    compatibilityOnly: false,
+    indexableCanonical: false,
+    canonicalReplacementPathTemplate: '/[locale]/[country]/locations/[governorateSlug]/[wilayatSlug]/[areaSlug]',
+  },
 ] as const;
 
 export const OMAN_GEO_ROUTE_CONTRACT = {
@@ -98,5 +149,6 @@ export const OMAN_GEO_ROUTE_CONTRACT = {
     'No database access is added by this scaffold.',
     'No geo page is indexable yet.',
     'Legacy Oman geo routes are compatibility-only and must not become indexable canonical pages.',
+    'Location route scaffolds are noindex-first and must not become indexable until page readiness gates pass.',
   ],
 } as const;
