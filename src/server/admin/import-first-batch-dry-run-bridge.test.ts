@@ -5,6 +5,7 @@ import { buildFirstBatchDryRunReport } from "./import-first-batch-dry-run-bridge
 import {
   firstBatchCaps,
   importFirstBatchSchemaVersion,
+  type ImportFirstBatchRow,
   type ImportFirstBatchSelection,
 } from "./import-first-batch-selection";
 
@@ -14,31 +15,31 @@ const allPassedChecks = importBatchDryRunRequiredChecks.map((key) => ({
   notes: null,
 }));
 
+const validRow: ImportFirstBatchRow = {
+  family: "doctor",
+  queueId: "queue-doctor-1",
+  candidateId: "candidate-doctor-1",
+  canonicalPath: "/en/om/doctor/amina-salim",
+  locale: "en",
+  slug: "amina-salim",
+  displayName: "Amina Salim",
+  area: "Muscat",
+  governorate: "Muscat",
+  sourceName: "clinic website",
+  sourceUrl: "https://example.com/amina-salim",
+  lastCheckedAt: "2026-06-28",
+  contactOrMapSignal: "map",
+  qaOwner: "import qa",
+  qaStatus: "selected",
+  qaNotes: null,
+};
+
 const validSelection: ImportFirstBatchSelection = {
   schemaVersion: importFirstBatchSchemaVersion,
   selectionId: "first-batch-test",
   generatedAt: "2026-06-28T00:00:00.000Z",
   caps: firstBatchCaps,
-  rows: [
-    {
-      family: "doctor",
-      queueId: "queue-doctor-1",
-      candidateId: "candidate-doctor-1",
-      canonicalPath: "/en/om/doctor/amina-salim",
-      locale: "en",
-      slug: "amina-salim",
-      displayName: "Amina Salim",
-      area: "Muscat",
-      governorate: "Muscat",
-      sourceName: "clinic website",
-      sourceUrl: "https://example.com/amina-salim",
-      lastCheckedAt: "2026-06-28",
-      contactOrMapSignal: "map",
-      qaOwner: "import qa",
-      qaStatus: "selected",
-      qaNotes: null,
-    },
-  ],
+  rows: [validRow],
 };
 
 describe("buildFirstBatchDryRunReport", () => {
@@ -61,7 +62,7 @@ describe("buildFirstBatchDryRunReport", () => {
         ...validSelection,
         rows: [
           {
-            ...validSelection.rows[0],
+            ...validRow,
             sourceName: "",
           },
         ],
