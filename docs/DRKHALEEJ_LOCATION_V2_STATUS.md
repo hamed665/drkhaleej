@@ -85,6 +85,9 @@ The following pieces are present and fail-closed:
 - disabled manual gate runtime accessor
 - manual gate runtime tests
 - manual gate integration guard
+- final gate manual chain coverage
+
+The route readiness final gate now directly checks the manual gate chain in addition to the standalone manual gate integration guard. It reads the manual gate contract, disabled runtime accessor, runtime tests, and integration guard, then asserts the `contract-only`, `disabled`, and public-surface blocking tokens that keep the manual gate fail-closed.
 
 ## Required promotion sequence
 
@@ -133,6 +136,13 @@ Key guard files include:
 - `src/lib/geo/oman-location-candidate-manual-gate.test.ts`
 
 All guard scripts above are wired through `seo:check`. The manual gate contract and runtime accessor remain fail-closed and are covered by unit tests plus the integration guard.
+
+The final gate also protects the manual gate chain directly:
+
+- `manualGateContract` must remain `contract-only` and forbid runtime, database, route creation, sitemap, JSON-LD, and index promotion behavior.
+- `manualGateRuntime` must remain `disabled` and expose the disabled/manual-gate reason tokens.
+- `manualGateTest` must keep the disabled policy coverage for all nine manual gate policy entries.
+- `manualGateIntegration` must keep the manual gate out of routes, sitemap, registry, UI, database, and public surfaces.
 
 ## Non-goals for the current phase
 
