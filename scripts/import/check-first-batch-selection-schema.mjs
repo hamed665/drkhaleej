@@ -22,6 +22,7 @@ for (const token of [
   'drkhaleej.import.firstBatchSelection.v1',
   'ImportFirstBatchRow',
   'ImportFirstBatchSelection',
+  'ImportFirstBatchValidation',
   'firstBatchCaps',
   'doctor: 50,',
   'pharmacy: 25,',
@@ -29,6 +30,10 @@ for (const token of [
   'emptyFirstBatchCounts',
   'countSelectedFirstBatchRows',
   'isFirstBatchWithinCaps',
+  'validateFirstBatchSelection',
+  'safeCanonicalPatterns',
+  'canonical_path_unsafe',
+  'family_cap_exceeded',
 ]) {
   mustContain(selectionSource, token, 'first batch selection schema');
 }
