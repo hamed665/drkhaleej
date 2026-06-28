@@ -45,6 +45,22 @@ requireTokens(statusDocPath, statusDoc, [
   'Any PR that changes a candidate from blocked to reviewable or indexable must include:',
 ]);
 
+requireTokens(statusDocPath, statusDoc, [
+  'manual gate contract',
+  'disabled manual gate runtime accessor',
+  'manual gate runtime tests',
+  'manual gate integration guard',
+  'final gate manual chain coverage',
+  'The route readiness final gate now directly checks the manual gate chain',
+  'manualGateContract',
+  'manualGateRuntime',
+  'manualGateTest',
+  'manualGateIntegration',
+  'contract-only',
+  'disabled',
+  'public-surface blocking tokens',
+]);
+
 requireTokens(closeoutDocPath, closeoutDoc, [
   'DrKhaleej Location V2 Closeout Checklist',
   'Phase status',
@@ -53,6 +69,13 @@ requireTokens(closeoutDocPath, closeoutDoc, [
   'Required before any candidate route PR',
   'Safe next phase',
   'No candidate page becomes reviewable or indexable',
+]);
+
+requireTokens(closeoutDocPath, closeoutDoc, [
+  'Manual gate runtime stays disabled.',
+  'Manual gate integration guard is wired into `seo:check`.',
+  'Route readiness final gate explicitly checks the manual gate contract, disabled runtime accessor, runtime tests, and integration guard.',
+  'final gate manual-chain coverage review when manual gate, route, sitemap, JSON-LD, or index behavior changes',
 ]);
 
 requireTokens(packagePath, packageJson, [
