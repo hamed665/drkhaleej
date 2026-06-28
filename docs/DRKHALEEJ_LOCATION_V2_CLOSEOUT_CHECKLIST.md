@@ -20,6 +20,7 @@ The Location V2 guardrail phase is complete when all of the following remain tru
 - Manual gate runtime stays disabled.
 - Manual gate integration guard is wired into `seo:check`.
 - Route readiness final gate is wired into `seo:check`.
+- Route readiness final gate explicitly checks the manual gate contract, disabled runtime accessor, runtime tests, and integration guard.
 - Location V2 status documentation is wired into `seo:check`.
 
 ## Do not touch yet
@@ -64,6 +65,7 @@ A candidate route PR must include:
 - human review notes
 - a promotion checklist update
 - final gate update
+- final gate manual-chain coverage review when manual gate, route, sitemap, JSON-LD, or index behavior changes
 - tests proving only the intended candidate family changes state
 - tests proving all other candidate families remain blocked
 
