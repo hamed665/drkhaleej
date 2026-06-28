@@ -13,6 +13,8 @@ The Location V2 guardrail phase is complete when all of the following remain tru
 - Candidate runtime stays blocked.
 - Evidence snapshot runtime stays disabled.
 - Promotion checklist runtime stays blocked.
+- Data-readiness runtime stays disabled.
+- Data-readiness integration guard is wired into `seo:check`.
 - Route readiness final gate is wired into `seo:check`.
 - Location V2 status documentation is wired into `seo:check`.
 
@@ -27,8 +29,10 @@ Do not add or enable these in the current phase:
 - database access for candidate generation
 - runtime evidence snapshot generation
 - runtime promotion activation
+- runtime data-readiness generation
 - review workflow activation
 - index promotion
+- real data import
 
 ## Required before data/import work
 
@@ -65,6 +69,7 @@ The safe next phase is data-readiness work only:
 - define reviewer workflow shape
 - define snapshot storage shape without runtime generation
 - keep all public route/index behavior unchanged
+- keep data-readiness runtime disabled until explicit promotion review
 
 ## Final rule
 
