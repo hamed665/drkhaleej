@@ -31,7 +31,7 @@ const requiredContractTokens = [
   'public_primary_phone_visible',
   'public_whatsapp_phone_visible',
   'public_email_visible',
-  'public_secondary_phone_visible remains out of scope',
+  '`public_secondary_phone_visible` remains out of scope',
   'Non-contact workflows may reset contact visibility flags to `false` for safety',
   'must not set any contact visibility flag to `true`',
   'must not set `contact_review_status` to `approved`',
