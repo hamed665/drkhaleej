@@ -1,5 +1,12 @@
+"use client";
+
+import { useActionState } from "react";
+
 import { DraftCenterLocationEditForm } from "@/components/admin/draft-center-location-edit-form";
-import { setPrimaryDraftCenterLocationCandidate } from "@/server/admin/draft-center-location-actions";
+import {
+  setPrimaryDraftCenterLocationCandidate,
+  type DraftCenterLocationPrimaryState,
+} from "@/server/admin/draft-center-location-actions";
 import type { AdminDraftCenterLocation } from "@/server/admin/draft-center-locations";
 
 type DraftCenterLocationPanelProps = {
@@ -7,7 +14,7 @@ type DraftCenterLocationPanelProps = {
   locations: AdminDraftCenterLocation[];
 };
 
-const primaryInitialState = {
+const primaryInitialState: DraftCenterLocationPrimaryState = {
   ok: false,
   message: null,
 };
@@ -38,25 +45,32 @@ function LocationPrimaryForm({
   centerId: string;
   location: AdminDraftCenterLocation;
 }) {
+  const [state, formAction, isPending] = useActionState(
+    setPrimaryDraftCenterLocationCandidate,
+    primaryInitialState,
+  );
+
   if (location.isActive) return null;
 
   return (
-    <form
-      action={setPrimaryDraftCenterLocationCandidate.bind(null, primaryInitialState)}
-      className="flex flex-col gap-2 sm:items-end"
-    >
+    <form action={formAction} className="flex flex-col gap-2 sm:items-end">
       <input type="hidden" name="centerId" value={centerId} />
       <input type="hidden" name="locationId" value={location.id} />
       <button
         type="submit"
-        disabled={location.isPrimary}
+        disabled={isPending || location.isPrimary}
         className="inline-flex justify-center rounded-2xl border border-cyan-100 bg-white px-4 py-2 text-xs font-bold text-cyan-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
       >
-        {location.isPrimary ? "Selected candidate" : "Select candidate"}
+        {location.isPrimary ? "Selected candidate" : isPending ? "Saving…" : "Select candidate"}
       </button>
       <span className="max-w-xs text-right text-[11px] font-semibold leading-4 text-slate-500">
         Selection stays private and inactive.
       </span>
+      {state.message !== null ? (
+        <p className={`max-w-xs text-right text-xs font-bold ${state.ok ? "text-emerald-700" : "text-rose-700"}`} role="status">
+          {state.message}
+        </p>
+      ) : null}
     </form>
   );
 }
