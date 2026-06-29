@@ -71,7 +71,7 @@ export default async function AdminDraftCenterEditPage({
       {locationOptions.ok ? (
         <DraftCenterLocationCreateForm centerId={centerId} options={locationOptions.options} />
       ) : null}
-      {locations.ok ? <DraftCenterLocationPanel locations={locations.locations} /> : null}
+      {locations.ok ? <DraftCenterLocationPanel centerId={centerId} locations={locations.locations} /> : null}
       {quality.ok ? (
         <DraftCenterQualityPanel report={quality.report} />
       ) : (
