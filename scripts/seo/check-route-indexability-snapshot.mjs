@@ -43,6 +43,8 @@ const snapshotSource = await readText(snapshotPath);
 const packageSource = await readText('package.json');
 const sitemapSource = await readText('src/app/sitemap.ts');
 const metadataSource = await readText('src/lib/seo/metadata.ts');
+const cpRuntimeSource = await readText('src/lib/geo/oman-location-candidate-cp-plan.ts');
+const cpRuntimeTestSource = await readText('src/lib/geo/cp.test.ts');
 
 for (const token of [
   '# DrKhaleej Route Indexability Snapshot V1',
@@ -118,6 +120,20 @@ for (const token of ['oman-location-candidate-cp-plan', 'location-candidate-prov
   assertExcludes(registrySource, token, `page registry must not reference ${token}.`);
   assertExcludes(sitemapSource, token, `sitemap must not reference ${token}.`);
   assertExcludes(metadataSource, token, `metadata must not reference ${token}.`);
+}
+
+for (const token of [
+  "status: 'disabled'",
+  'dataImportAllowed: false',
+  'runtimeCollectionAllowed: false',
+  'databaseAccessAllowed: false',
+  'routeCreationAllowed: false',
+  'sitemapAllowed: false',
+  'jsonLdAllowed: false',
+  'indexPromotionAllowed: false',
+]) {
+  assertIncludes(cpRuntimeSource, token, `cp runtime must include disabled token: ${token}`);
+  assertIncludes(cpRuntimeTestSource, token.replace(': false', ').toBe(false)').replace("status: 'disabled'", "status).toBe('disabled')"), `cp runtime test must cover ${token}.`);
 }
 
 assertIncludes(packageSource, 'seo:route-snapshot:validate', 'package.json must expose route snapshot validation.');
