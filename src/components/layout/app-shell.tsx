@@ -11,7 +11,7 @@ type AppShellProps = {
 
 const skipLinkCopy: Record<SupportedLocale, string> = {
   en: 'Skip to main content',
-  ar: 'انتقل إلى المحتوى الرئيسي'
+  ar: '\u0627\u0646\u062a\u0642\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0631\u0626\u064a\u0633\u064a'
 };
 
 export async function AppShell({ children }: AppShellProps) {
@@ -25,9 +25,9 @@ export async function AppShell({ children }: AppShellProps) {
         {skipLinkCopy[safeLocale]}
       </a>
       <SiteHeader />
-      <main id="main-content" className="app-shell__main">
+      <div id="main-content" className="app-shell__main">
         {children}
-      </main>
+      </div>
       <SiteFooter />
       <HomeWhatsAppFloat2026 locale={safeLocale} dir={dir} />
     </div>
