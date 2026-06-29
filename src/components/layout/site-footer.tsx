@@ -21,10 +21,6 @@ export function SiteFooter() {
       label: copy.doctors,
     },
     {
-      href: publicDiscoveryRoute(locale, country, "dental"),
-      label: copy.dental,
-    },
-    {
       href: publicDiscoveryRoute(locale, country, "centers"),
       label: copy.centers,
     },
@@ -38,27 +34,9 @@ export function SiteFooter() {
       label: copy.hospitals,
     },
     {
-      href: publicDiscoveryRoute(locale, country, "offers"),
-      label: copy.offers,
-    },
-    {
-      href: publicDiscoveryRoute(locale, country, "beauty"),
-      label: copy.beauty,
-    },
-    {
-      href: publicDiscoveryRoute(locale, country, "pet-clinics"),
-      label: copy.petClinics,
-    },
-    {
-      href: publicDiscoveryRoute(locale, country, "pet-shops"),
-      label: copy.petShops,
-    },
-    {
       href: publicDiscoveryRoute(locale, country, "services"),
       label: copy.services,
     },
-    { href: `/${locale}/${country}/articles`, label: copy.articles },
-    { href: `/${locale}/${country}/about`, label: copy.about },
   ] as const;
   const providerLinks = [
     { href: publicProviderRoute(locale, country), label: copy.listYourCenter },
