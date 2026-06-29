@@ -29,6 +29,14 @@ type PublicContactSource = PublicContactActionLabels & {
   publicWhatsappPhoneVisible?: boolean | null;
 };
 
+export type PublicContactVisibilityInput = {
+  contactReviewStatus?: string | null | undefined;
+  isVisible?: boolean | null | undefined;
+  locationActive?: boolean | null | undefined;
+  providerPublicEligible?: boolean | null | undefined;
+  value?: string | null | undefined;
+};
+
 const DEFAULT_CALL_LABEL_EN = 'Call center';
 const DEFAULT_CALL_LABEL_AR = 'الاتصال بالمركز';
 const DEFAULT_WHATSAPP_LABEL_EN = 'WhatsApp center';
@@ -73,8 +81,21 @@ function resolvePublicContactLabels(labels: PublicContactActionLabels = {}): Res
   };
 }
 
+function hasPublicContactValue(value: string | null | undefined): boolean {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 export function isApprovedPublicContact(contactReviewStatus: string | null | undefined): boolean {
   return contactReviewStatus === 'approved';
+}
+
+export function isPublicContactVisible(input: PublicContactVisibilityInput): boolean {
+  if (input.providerPublicEligible === false) return false;
+  if (input.locationActive === false) return false;
+  if (input.isVisible !== true) return false;
+  if (!hasPublicContactValue(input.value)) return false;
+
+  return isApprovedPublicContact(input.contactReviewStatus);
 }
 
 export function normalizePublicTelHref(value: string | null | undefined): string | null {
@@ -114,7 +135,7 @@ export function buildPublicCallAction(
   contactReviewStatus: string | null | undefined,
   labels?: PublicContactActionLabels
 ): PublicContactAction | null {
-  if (!isVisible || !isApprovedPublicContact(contactReviewStatus)) return null;
+  if (!isPublicContactVisible({ contactReviewStatus, isVisible, value })) return null;
 
   const href = normalizePublicTelHref(value);
   if (!href) return null;
@@ -129,7 +150,7 @@ export function buildPublicWhatsAppAction(
   country: PublicContactCountry | null | undefined,
   labels?: PublicContactActionLabels
 ): PublicContactAction | null {
-  if (!isVisible || !isApprovedPublicContact(contactReviewStatus)) return null;
+  if (!isPublicContactVisible({ contactReviewStatus, isVisible, value })) return null;
 
   const digits = normalizePublicWhatsAppDigits(value, country);
   if (!digits) return null;
