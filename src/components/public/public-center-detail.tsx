@@ -21,6 +21,7 @@ type CenterDetailCopy = {
   locationTitle: string;
   locationDescription: string;
   contactTitle: string;
+  contactUnavailable: string;
   galleryTitle: string;
   verificationTitle: string;
   verificationVerified: string;
@@ -47,6 +48,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     locationTitle: 'Location overview',
     locationDescription: 'Only public branch labels and general area, city, and country information are shown in this phase.',
     contactTitle: 'Contact this center',
+    contactUnavailable: 'Contact details should be confirmed with the provider.',
     galleryTitle: 'Gallery',
     verificationTitle: 'Profile verification',
     verificationVerified: 'This public profile is marked as verified in DrMuscat records. This is not a license or MOH approval claim.',
@@ -72,6 +74,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     locationTitle: 'نظرة عامة على الموقع',
     locationDescription: 'تظهر في هذه المرحلة أسماء الفروع العامة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
     contactTitle: 'التواصل مع المركز',
+    contactUnavailable: 'ينبغي تأكيد تفاصيل التواصل مع مقدم الخدمة.',
     galleryTitle: 'المعرض',
     verificationTitle: 'توثيق الملف',
     verificationVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrMuscat. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
@@ -108,6 +111,7 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
     preferredText(locale, center.shortDescriptionEn, center.shortDescriptionAr) ??
     preferredText(locale, center.descriptionEn, center.descriptionAr);
   const locationText = formatPublicLocationSummary(locale, center.location);
+  const showSafeContactFallback = center.contactActions.length === 0 && center.locations.length > 0;
 
   return (
     <div className="mt-10 space-y-5">
@@ -166,6 +170,12 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
               variant="center"
             />
           </div>
+        </PublicCenterDetailSection>
+      ) : null}
+
+      {showSafeContactFallback ? (
+        <PublicCenterDetailSection title={copy.contactTitle}>
+          <p className="text-sm leading-6 text-slate-600">{copy.contactUnavailable}</p>
         </PublicCenterDetailSection>
       ) : null}
 
