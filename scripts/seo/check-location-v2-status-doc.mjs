@@ -8,6 +8,7 @@ const providerStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_PROVIDER_SOURCE_PLAN_S
 const providerAddendumDocPath = 'docs/DRKHALEEJ_LOCATION_V2_PROVIDER_PLAN_ADDENDUM.md';
 const guardChainAddendumDocPath = 'docs/DRKHALEEJ_LOCATION_V2_GUARD_CHAIN_PROVIDER_PLAN_ADDENDUM.md';
 const verifiedCountStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_VERIFIED_COUNT_STATUS.md';
+const referenceStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_REFERENCE_STATUS.md';
 const packagePath = 'package.json';
 
 function read(relativePath) {
@@ -38,6 +39,7 @@ requireDocument(providerStatusDocPath, 'Location V2 provider status document');
 requireDocument(providerAddendumDocPath, 'Location V2 provider addendum document');
 requireDocument(guardChainAddendumDocPath, 'Location V2 guard chain addendum document');
 requireDocument(verifiedCountStatusDocPath, 'Location V2 verified count status document');
+requireDocument(referenceStatusDocPath, 'Location V2 reference status document');
 
 const statusDoc = read(statusDocPath);
 const closeoutDoc = read(closeoutDocPath);
@@ -45,6 +47,7 @@ const providerStatusDoc = read(providerStatusDocPath);
 const providerAddendumDoc = read(providerAddendumDocPath);
 const guardChainAddendumDoc = read(guardChainAddendumDocPath);
 const verifiedCountStatusDoc = read(verifiedCountStatusDocPath);
+const referenceStatusDoc = read(referenceStatusDocPath);
 const packageJson = read(packagePath);
 
 requireTokens(statusDocPath, statusDoc, [
@@ -120,6 +123,12 @@ requireTokens(guardChainAddendumDocPath, guardChainAddendumDoc, [
 
 requireTokens(verifiedCountStatusDocPath, verifiedCountStatusDoc, [
   'DrKhaleej Location V2 Verified Count Status',
+  'Guard chain',
+  'Boundary',
+]);
+
+requireTokens(referenceStatusDocPath, referenceStatusDoc, [
+  'DrKhaleej Location V2 Reference Status',
   'Guard chain',
   'Boundary',
 ]);
