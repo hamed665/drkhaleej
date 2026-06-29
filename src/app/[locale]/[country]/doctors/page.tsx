@@ -6,7 +6,7 @@ import { DoctorsSearch2026 } from "@/components/public/doctors/DoctorsSearch2026
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { buildDiscoveryFaq } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
-import { listPublicDoctors } from "@/lib/catalog/public-queries";
+import { listPublicDoctors } from "@/lib/catalog/public-eligible-queries";
 import {
   isSupportedCountry,
   isSupportedLocale,
