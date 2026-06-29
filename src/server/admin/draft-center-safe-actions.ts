@@ -8,6 +8,8 @@ import {
   type DraftCenterUpdateState,
 } from "@/server/admin/draft-center-actions";
 
+export type { DraftCenterUpdateState } from "@/server/admin/draft-center-actions";
+
 type VerificationStatus = Database["public"]["Enums"]["verification_status"];
 
 function failure(message: string): DraftCenterUpdateState {
