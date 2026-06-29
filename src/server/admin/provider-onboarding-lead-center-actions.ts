@@ -175,8 +175,19 @@ export async function createDraftCenterFromLead(
       .select("id")
       .maybeSingle();
 
-    if (insertError !== null || insertedCenter === null) return failure;
-    centerId = insertedCenter.id;
+    if (insertError !== null || insertedCenter === null) {
+      const { data: recoveredCenter, error: recoveredCenterError } = await supabase
+        .from("centers")
+        .select("id")
+        .eq("slug", slug)
+        .is("deleted_at", null)
+        .maybeSingle();
+
+      if (recoveredCenterError !== null || recoveredCenter === null) return failure;
+      centerId = recoveredCenter.id;
+    } else {
+      centerId = insertedCenter.id;
+    }
   }
 
   const now = new Date().toISOString();
