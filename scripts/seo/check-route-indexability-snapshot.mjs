@@ -12,6 +12,10 @@ function assertIncludes(source, needle, message) {
   if (!source.includes(needle)) throw new Error(message);
 }
 
+function assertExcludes(source, needle, message) {
+  if (source.includes(needle)) throw new Error(message);
+}
+
 function routeBlock(source, route) {
   const escaped = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const match = source.match(new RegExp(String.raw`\{[\s\S]*?pathname:\s*['"]${escaped}['"][\s\S]*?\}`, 'm'));
@@ -108,6 +112,12 @@ for (const token of [
   'required evidence exists',
 ]) {
   assertIncludes(snapshotSource, token, `${snapshotPath} must include import sitemap allowlist token: ${token}`);
+}
+
+for (const token of ['oman-location-candidate-cp-plan', 'location-candidate-provider-source-plan-contract']) {
+  assertExcludes(registrySource, token, `page registry must not reference ${token}.`);
+  assertExcludes(sitemapSource, token, `sitemap must not reference ${token}.`);
+  assertExcludes(metadataSource, token, `metadata must not reference ${token}.`);
 }
 
 assertIncludes(packageSource, 'seo:route-snapshot:validate', 'package.json must expose route snapshot validation.');
