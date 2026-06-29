@@ -19,8 +19,16 @@ function assertIncludes(source, token, message) {
   if (!source.includes(token)) throw new Error(message);
 }
 
+function assertIncludesOneOf(source, tokens, message) {
+  if (!tokens.some((token) => source.includes(token))) throw new Error(message);
+}
+
 function assertNotIncludes(source, token, message) {
   if (source.includes(token)) throw new Error(message);
+}
+
+function routeCallTokens(route) {
+  return [`publicDiscoveryRoute(locale, country, '${route}')`, `publicDiscoveryRoute(locale, country, "${route}")`];
 }
 
 for (const file of [
@@ -95,15 +103,16 @@ for (const route of ['/dental', '/beauty', '/offers', '/pet-clinics', '/pet-shop
 }
 
 for (const route of ['doctors', 'centers', 'labs', 'pharmacies', 'hospitals', 'services']) {
-  const token = `publicDiscoveryRoute(locale, country, '${route}')`;
-  assertIncludes(header, token, `header must include ${route}`);
-  assertIncludes(footer, token, `footer must include ${route}`);
+  const tokens = routeCallTokens(route);
+  assertIncludesOneOf(header, tokens, `header must include ${route}`);
+  assertIncludesOneOf(footer, tokens, `footer must include ${route}`);
 }
 
 for (const route of ['dental', 'beauty', 'offers', 'pet-clinics', 'pet-shops', 'search']) {
-  const token = `publicDiscoveryRoute(locale, country, '${route}')`;
-  assertNotIncludes(header, token, `header must not include preview route ${route}`);
-  assertNotIncludes(footer, token, `footer must not include preview route ${route}`);
+  for (const token of routeCallTokens(route)) {
+    assertNotIncludes(header, token, `header must not include preview route ${route}`);
+    assertNotIncludes(footer, token, `footer must not include preview route ${route}`);
+  }
 }
 
 for (const token of ['/${locale}/${country}/articles', '/${locale}/${country}/about']) {
