@@ -98,9 +98,9 @@ for (const token of [
 }
 
 for (const token of [
-  '^\/(en|ar)\/om\/doctor\/',
-  '^\/(en|ar)\/om\/pharmacies\/',
-  '^\/(en|ar)\/om\/hospitals\/',
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
   'hasReviewedImportEvidence',
 ]) {
   assertIncludes(sitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
