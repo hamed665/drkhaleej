@@ -20,6 +20,7 @@ const requiredWrapperTokens = [
   'export async function getPublicCenterBySlug',
   'export async function listPublicDoctors',
   'export async function getPublicDoctorBySlug',
+  'export async function searchPublicCatalog',
   '.eq("is_active", true)',
   '.eq("status", "active")',
   '.is("deleted_at", null)',
