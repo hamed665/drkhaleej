@@ -4,7 +4,7 @@ import { GuardedImportProfilePage } from '@/components/public/import-profile/Gua
 import { PublicDoctorDetail } from '@/components/public/public-doctor-detail';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
-import { getPublicDoctorBySlug } from '@/lib/catalog/public-queries';
+import { getPublicDoctorBySlug } from '@/lib/catalog/public-eligible-queries';
 import type { PublicDoctorDetail as PublicDoctorDetailData } from '@/lib/catalog/public-types';
 import {
   isSupportedCountry,
