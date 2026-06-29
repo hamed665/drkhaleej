@@ -20,5 +20,8 @@ it('keeps shell stable', () => {
     expect(state.jsonLdAllowed).toBe(false);
     expect(state.indexPromotionAllowed).toBe(false);
     expect(state.internalSeoLinksAllowed).toBe(false);
+    expect(state.blockedReasons).toContain('candidate-verified-count-contract-only');
+    expect(state.blockedReasons).toContain('candidate-verified-count-runtime-disabled');
+    expect(state.blockedReasons).toContain('candidate-verified-count-import-disabled');
   }
 });
