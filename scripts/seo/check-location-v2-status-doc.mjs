@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 const projectRoot = process.cwd();
 const statusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_STATUS.md';
 const closeoutDocPath = 'docs/DRKHALEEJ_LOCATION_V2_CLOSEOUT_CHECKLIST.md';
+const providerStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_PROVIDER_SOURCE_PLAN_STATUS.md';
 const packagePath = 'package.json';
 
 function read(relativePath) {
@@ -30,9 +31,11 @@ function requireTokens(label, source, tokens) {
 
 requireDocument(statusDocPath, 'Location V2 status document');
 requireDocument(closeoutDocPath, 'Location V2 closeout checklist');
+requireDocument(providerStatusDocPath, 'Location V2 provider status document');
 
 const statusDoc = read(statusDocPath);
 const closeoutDoc = read(closeoutDocPath);
+const providerStatusDoc = read(providerStatusDocPath);
 const packageJson = read(packagePath);
 
 requireTokens(statusDocPath, statusDoc, [
@@ -78,6 +81,15 @@ requireTokens(closeoutDocPath, closeoutDoc, [
   'Route readiness final gate explicitly checks the manual gate contract, disabled runtime accessor, runtime tests, and integration guard.',
   'keep manual gate runtime disabled until explicit promotion review',
   'final gate manual-chain coverage review when manual gate, route, sitemap, JSON-LD, or index behavior changes',
+]);
+
+requireTokens(providerStatusDocPath, providerStatusDoc, [
+  'DrKhaleej Location V2 Provider Source Plan Status',
+  'contract-only and fail-closed',
+  'provider source plan contract',
+  'disabled runtime accessor',
+  'runtime test coverage',
+  'route snapshot guard coverage',
 ]);
 
 requireTokens(packagePath, packageJson, [
