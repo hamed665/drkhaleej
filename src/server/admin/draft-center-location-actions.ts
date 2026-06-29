@@ -22,6 +22,11 @@ type DraftCenterLocationEditState = {
   message: string | null;
 };
 
+type DraftCenterLocationPrimaryState = {
+  ok: boolean;
+  message: string | null;
+};
+
 const draftStatuses = ["draft", "pending_review"] as const satisfies readonly DraftCenterStatus[];
 
 const failure: DraftCenterLocationCreateState = {
@@ -32,6 +37,11 @@ const failure: DraftCenterLocationCreateState = {
 const editFailure: DraftCenterLocationEditState = {
   ok: false,
   message: "Location candidate could not be updated.",
+};
+
+const primaryFailure: DraftCenterLocationPrimaryState = {
+  ok: false,
+  message: "Primary location candidate could not be updated.",
 };
 
 function formString(formData: FormData, key: string): string | null {
@@ -289,4 +299,85 @@ export async function updateDraftCenterLocationCandidate(
   };
 }
 
-export type { DraftCenterLocationCreateState, DraftCenterLocationEditState };
+export async function setPrimaryDraftCenterLocationCandidate(
+  _previousState: DraftCenterLocationPrimaryState,
+  formData: FormData,
+): Promise<DraftCenterLocationPrimaryState> {
+  const adminContext = await requireAdminPermission("draft_centers.update");
+  const centerId = formString(formData, "centerId");
+  const locationId = formString(formData, "locationId");
+
+  if (centerId === null || !isUuid(centerId)) return primaryFailure;
+  if (locationId === null || !isUuid(locationId)) return primaryFailure;
+
+  const supabase = createSupabaseServiceRoleClient();
+  const { data: center, error: centerError } = await supabase
+    .from("centers")
+    .select("id,status")
+    .eq("id", centerId)
+    .in("status", [...draftStatuses])
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (centerError !== null || center === null) return primaryFailure;
+
+  const { data: location, error: locationError } = await supabase
+    .from("center_locations")
+    .select("id")
+    .eq("id", locationId)
+    .eq("center_id", centerId)
+    .eq("is_active", false)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (locationError !== null || location === null) return primaryFailure;
+
+  const { error: resetError } = await supabase
+    .from("center_locations")
+    .update({ is_primary: false, updated_at: new Date().toISOString() })
+    .eq("center_id", centerId)
+    .eq("is_active", false)
+    .is("deleted_at", null);
+
+  if (resetError !== null) return primaryFailure;
+
+  const { error: primaryError } = await supabase
+    .from("center_locations")
+    .update({ is_primary: true, updated_at: new Date().toISOString() })
+    .eq("id", locationId)
+    .eq("center_id", centerId)
+    .eq("is_active", false)
+    .is("deleted_at", null);
+
+  if (primaryError !== null) return primaryFailure;
+
+  await writeAdminAuditEvent({
+    admin: adminContext,
+    permissionKey: "draft_centers.update",
+    action: "draft_center.details_updated",
+    entityType: "center",
+    entityId: centerId,
+    targetTable: "center_locations",
+    summary: "Draft center primary location candidate updated.",
+    newValues: {
+      location_id: locationId,
+      is_active: false,
+      is_primary: true,
+      public_primary_phone_visible: false,
+      public_whatsapp_phone_visible: false,
+    },
+  });
+
+  revalidatePath(`/admin/draft-centers/${centerId}`);
+
+  return {
+    ok: true,
+    message: "Primary location candidate was updated privately.",
+  };
+}
+
+export type {
+  DraftCenterLocationCreateState,
+  DraftCenterLocationEditState,
+  DraftCenterLocationPrimaryState,
+};
