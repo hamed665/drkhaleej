@@ -54,6 +54,20 @@ export function DraftCenterContactReviewPanel({ centerId, locations }: DraftCent
                   </span>
                 </div>
               </div>
+              <dl className="mt-3 grid gap-2 md:grid-cols-3">
+                <div className="rounded-xl bg-slate-50 px-3 py-2 ring-1 ring-slate-200">
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Primary field</dt>
+                  <dd className="mt-1 font-bold text-slate-800">{yesNo(location.publicPrimaryPhoneVisible)}</dd>
+                </div>
+                <div className="rounded-xl bg-slate-50 px-3 py-2 ring-1 ring-slate-200">
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Messaging field</dt>
+                  <dd className="mt-1 font-bold text-slate-800">{yesNo(location.publicWhatsappPhoneVisible)}</dd>
+                </div>
+                <div className="rounded-xl bg-slate-50 px-3 py-2 ring-1 ring-slate-200">
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Mail field</dt>
+                  <dd className="mt-1 font-bold text-slate-800">{yesNo(location.publicEmailVisible)}</dd>
+                </div>
+              </dl>
               <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">
                 Prepared flags are stored for admin review only. Public profile display still depends on provider publication readiness.
               </p>
