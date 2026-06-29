@@ -43,6 +43,8 @@ These routes may exist for user navigation or product preview, but they are not 
 - /ar/om/pet-shops
 - /en/om/search
 - /ar/om/search
+- /en/om/source-policy
+- /ar/om/source-policy
 
 ## Crawler-facing files
 
