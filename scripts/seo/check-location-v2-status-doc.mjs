@@ -7,6 +7,7 @@ const closeoutDocPath = 'docs/DRKHALEEJ_LOCATION_V2_CLOSEOUT_CHECKLIST.md';
 const providerStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_PROVIDER_SOURCE_PLAN_STATUS.md';
 const providerAddendumDocPath = 'docs/DRKHALEEJ_LOCATION_V2_PROVIDER_PLAN_ADDENDUM.md';
 const guardChainAddendumDocPath = 'docs/DRKHALEEJ_LOCATION_V2_GUARD_CHAIN_PROVIDER_PLAN_ADDENDUM.md';
+const verifiedCountStatusDocPath = 'docs/DRKHALEEJ_LOCATION_V2_VERIFIED_COUNT_STATUS.md';
 const packagePath = 'package.json';
 
 function read(relativePath) {
@@ -36,12 +37,14 @@ requireDocument(closeoutDocPath, 'Location V2 closeout checklist');
 requireDocument(providerStatusDocPath, 'Location V2 provider status document');
 requireDocument(providerAddendumDocPath, 'Location V2 provider addendum document');
 requireDocument(guardChainAddendumDocPath, 'Location V2 guard chain addendum document');
+requireDocument(verifiedCountStatusDocPath, 'Location V2 verified count status document');
 
 const statusDoc = read(statusDocPath);
 const closeoutDoc = read(closeoutDocPath);
 const providerStatusDoc = read(providerStatusDocPath);
 const providerAddendumDoc = read(providerAddendumDocPath);
 const guardChainAddendumDoc = read(guardChainAddendumDocPath);
+const verifiedCountStatusDoc = read(verifiedCountStatusDocPath);
 const packageJson = read(packagePath);
 
 requireTokens(statusDocPath, statusDoc, [
@@ -113,6 +116,12 @@ requireTokens(guardChainAddendumDocPath, guardChainAddendumDoc, [
   'provider planning step',
   'source model -> provider plan -> manual gate',
   'planning-only',
+]);
+
+requireTokens(verifiedCountStatusDocPath, verifiedCountStatusDoc, [
+  'DrKhaleej Location V2 Verified Count Status',
+  'Guard chain',
+  'Boundary',
 ]);
 
 requireTokens(packagePath, packageJson, [
