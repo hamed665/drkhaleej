@@ -19,7 +19,6 @@ type RouteCopy = {
   servicesTitle: string;
   contactTitle: string;
   sourceLabel: string;
-  qualityLabel: string;
 };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
@@ -31,17 +30,15 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     servicesTitle: "Pharmacy services",
     contactTitle: "Contact and directions",
     sourceLabel: "Source",
-    qualityLabel: "Quality score",
   },
   ar: {
-    badge: "ملف صيدلية عام",
-    fallbackTitle: "ملف صيدلية | DrKhaleej",
-    fallbackDescription: "اطلع على معلومات عامة مراجعة عن الصيدليات في عُمان عبر DrKhaleej.",
-    overviewTitle: "نظرة عامة على الملف",
-    servicesTitle: "خدمات الصيدلية",
-    contactTitle: "التواصل والاتجاهات",
-    sourceLabel: "المصدر",
-    qualityLabel: "درجة الجودة",
+    badge: "\u0645\u0644\u0641 \u0635\u064a\u062f\u0644\u064a\u0629 \u0639\u0627\u0645",
+    fallbackTitle: "\u0645\u0644\u0641 \u0635\u064a\u062f\u0644\u064a\u0629 | DrKhaleej",
+    fallbackDescription: "\u0627\u0637\u0644\u0639 \u0639\u0644\u0649 \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0639\u0627\u0645\u0629 \u0645\u0631\u0627\u062c\u0639\u0629 \u0639\u0646 \u0627\u0644\u0635\u064a\u062f\u0644\u064a\u0627\u062a \u0641\u064a \u0639\u064f\u0645\u0627\u0646 \u0639\u0628\u0631 DrKhaleej.",
+    overviewTitle: "\u0646\u0638\u0631\u0629 \u0639\u0627\u0645\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u0644\u0641",
+    servicesTitle: "\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0635\u064a\u062f\u0644\u064a\u0629",
+    contactTitle: "\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0648\u0627\u0644\u0627\u062a\u062c\u0627\u0647\u0627\u062a",
+    sourceLabel: "\u0627\u0644\u0645\u0635\u062f\u0631",
   },
 };
 
@@ -131,10 +128,6 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
               <dt className="font-semibold text-slate-950">Last checked</dt>
               <dd>{profile.lastCheckedAt}</dd>
             </div>
-            <div>
-              <dt className="font-semibold text-slate-950">Canonical path</dt>
-              <dd>{profile.canonicalPath}</dd>
-            </div>
           </dl>
         </div>
 
@@ -188,7 +181,7 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
         </div>
 
         <p className="mt-4 text-xs leading-5 text-slate-500">
-          {copy.sourceLabel}: {profile.sourceName ?? profile.sourceUrl}. {copy.qualityLabel}: {profile.qualityScore}.
+          {copy.sourceLabel}: {profile.sourceName ?? profile.sourceUrl}. Confirm details directly with the provider.
         </p>
       </section>
     </main>
