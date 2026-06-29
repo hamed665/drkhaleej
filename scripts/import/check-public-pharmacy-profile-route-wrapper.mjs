@@ -68,8 +68,8 @@ for (const forbiddenToken of [
 }
 
 for (const token of [
-  '^\/(en|ar)\/om\/doctor\/',
-  '^\/(en|ar)\/om\/pharmacies\/',
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
   'hasReviewedImportEvidence',
   'import_entity_candidate_id',
 ]) {
