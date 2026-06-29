@@ -107,7 +107,7 @@ export function GuardedImportProfilePage({ profile, locale }: GuardedImportProfi
         </div>
 
         <p className="mt-4 text-xs leading-5 text-slate-500">
-          Source: {profile.sourceName ?? "reviewed import source"}. Quality score: {profile.qualityScore}.
+          Source: {profile.sourceName ?? "reviewed import source"}. Confirm details directly with the provider.
         </p>
       </section>
     </main>
