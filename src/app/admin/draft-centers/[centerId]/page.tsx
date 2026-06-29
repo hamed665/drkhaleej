@@ -78,7 +78,7 @@ export default async function AdminDraftCenterEditPage({
       {locations.ok ? <DraftCenterLocationPanel centerId={centerId} locations={locations.locations} /> : null}
       {locations.ok ? <DraftCenterContactReviewPanel centerId={centerId} locations={locations.locations} /> : null}
       {readiness.ok ? (
-        <DraftCenterPublicationReadinessPanel readiness={readiness.readiness} />
+        <DraftCenterPublicationReadinessPanel centerId={centerId} readiness={readiness.readiness} />
       ) : (
         <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
           <h3 className="text-lg font-bold">Publication readiness unavailable</h3>
