@@ -35,7 +35,7 @@ export const adminModuleGroups: AdminModuleGroup[] = [
       {
         title: "Draft Centers",
         description:
-          "Manage internal draft center records, taxonomy assignments, quality checks, and review workflow.",
+          "Create protected manual draft centers, manage internal draft records, taxonomy assignments, quality checks, and review workflow.",
         status: "Active",
         href: "/admin/draft-centers",
       },
@@ -205,6 +205,13 @@ export const adminModuleGroups: AdminModuleGroup[] = [
 
 export const partialAdminModules: AdminModule[] = [
   {
+    title: "Manual draft center creation",
+    description:
+      "Admins can create protected center drafts manually. Created records remain draft, inactive, unverified, contact-hidden, not claimable, and excluded from public publishing flows.",
+    status: "Active",
+    href: "/admin/draft-centers/new",
+  },
+  {
     title: "Draft center quality gate",
     description:
       "Read-only quality signals are available inside draft center detail screens.",
@@ -216,6 +223,13 @@ export const partialAdminModules: AdminModule[] = [
     description:
       "Taxonomy assignment exists for draft centers; broader taxonomy administration remains planned.",
     status: "Partial",
+    href: "/admin/draft-centers",
+  },
+  {
+    title: "Public center eligibility guard",
+    description:
+      "SEO validation now checks that public center-family routes use the explicit eligibility wrapper instead of raw catalog queries.",
+    status: "Active",
     href: "/admin/draft-centers",
   },
   {
