@@ -30,11 +30,11 @@ type PublicContactSource = PublicContactActionLabels & {
 };
 
 export type PublicContactVisibilityInput = {
-  contactReviewStatus?: string | null;
-  isVisible?: boolean | null;
-  locationActive?: boolean | null;
-  providerPublicEligible?: boolean | null;
-  value?: string | null;
+  contactReviewStatus?: string | null | undefined;
+  isVisible?: boolean | null | undefined;
+  locationActive?: boolean | null | undefined;
+  providerPublicEligible?: boolean | null | undefined;
+  value?: string | null | undefined;
 };
 
 const DEFAULT_CALL_LABEL_EN = 'Call center';
