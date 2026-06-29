@@ -76,8 +76,16 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
               handled in guarded admin forms.
             </p>
           </div>
-          <div className="rounded-2xl border border-cyan-100 bg-cyan-50/80 px-4 py-3 text-sm font-medium text-cyan-900">
-            Fixed page size: {result.limit} centers
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:justify-end">
+            <Link
+              href="/admin/draft-centers/new"
+              className="inline-flex justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+            >
+              Create draft center
+            </Link>
+            <div className="rounded-2xl border border-cyan-100 bg-cyan-50/80 px-4 py-3 text-sm font-medium text-cyan-900">
+              Fixed page size: {result.limit} centers
+            </div>
           </div>
         </div>
       </header>
@@ -85,8 +93,9 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
       <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
         <p className="text-sm leading-6 text-slate-700">
           This list reads existing <strong>centers</strong> rows where status is
-          draft or pending review. Public activation remains a separate future
-          phase.
+          draft or pending review. Manual creations, provider-lead conversions,
+          and future import conversions all stay private until a separate public
+          activation workflow allows them.
         </p>
       </section>
 
@@ -104,10 +113,16 @@ export function DraftCentersList({ result }: DraftCentersListProps) {
             No draft or pending-review centers found
           </h3>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Draft centers created from provider onboarding leads, or manually
-            created later, will appear here before any public activation workflow
-            is added.
+            Draft centers created manually, from provider onboarding leads, or
+            from future reviewed imports will appear here before any public
+            activation workflow is added.
           </p>
+          <Link
+            href="/admin/draft-centers/new"
+            className="mt-4 inline-flex justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+          >
+            Create first draft center
+          </Link>
         </section>
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
