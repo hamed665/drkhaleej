@@ -15,6 +15,11 @@ const centerRouteFiles = [
   'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
 ];
 
+const doctorRouteFiles = [
+  'src/app/[locale]/[country]/doctors/page.tsx',
+  'src/app/[locale]/[country]/doctor/[doctorSlug]/page.tsx',
+];
+
 const requiredWrapperTokens = [
   'export async function listPublicCenters',
   'export async function getPublicCenterBySlug',
@@ -47,7 +52,7 @@ function assertNotIncludes(content, token, label) {
   }
 }
 
-for (const routeFile of centerRouteFiles) {
+for (const routeFile of [...centerRouteFiles, ...doctorRouteFiles]) {
   const content = readFile(routeFile);
   assertIncludes(content, eligibleImport, routeFile);
   assertNotIncludes(content, rawImport, routeFile);
