@@ -4,8 +4,10 @@ import { useActionState } from "react";
 
 import { DraftCenterLocationEditForm } from "@/components/admin/draft-center-location-edit-form";
 import {
+  markDraftCenterLocationReadyForReview,
   setPrimaryDraftCenterLocationCandidate,
   type DraftCenterLocationPrimaryState,
+  type DraftCenterLocationReviewState,
 } from "@/server/admin/draft-center-location-actions";
 import type { AdminDraftCenterLocation } from "@/server/admin/draft-center-locations";
 
@@ -15,6 +17,11 @@ type DraftCenterLocationPanelProps = {
 };
 
 const primaryInitialState: DraftCenterLocationPrimaryState = {
+  ok: false,
+  message: null,
+};
+
+const reviewInitialState: DraftCenterLocationReviewState = {
   ok: false,
   message: null,
 };
@@ -75,6 +82,51 @@ function LocationPrimaryForm({
   );
 }
 
+function LocationReviewForm({
+  centerId,
+  location,
+}: {
+  centerId: string;
+  location: AdminDraftCenterLocation;
+}) {
+  const [state, formAction, isPending] = useActionState(
+    markDraftCenterLocationReadyForReview,
+    reviewInitialState,
+  );
+
+  if (location.isActive) return null;
+
+  return (
+    <form
+      action={formAction}
+      className="rounded-[1.35rem] border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-cyan-50/50 p-3 shadow-sm"
+    >
+      <input type="hidden" name="centerId" value={centerId} />
+      <input type="hidden" name="locationId" value={location.id} />
+      <div className="flex flex-col gap-3 sm:items-end">
+        <span className="inline-flex rounded-full border border-amber-200 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-900 shadow-sm">
+          Quality gate step
+        </span>
+        <p className="max-w-xs text-right text-xs font-semibold leading-5 text-slate-600">
+          Marks this candidate internally active for admin quality checks only. Public contact visibility stays locked.
+        </p>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex justify-center rounded-2xl bg-slate-950 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        >
+          {isPending ? "Saving…" : "Mark ready for quality review"}
+        </button>
+        {state.message !== null ? (
+          <p className={`max-w-xs text-right text-xs font-bold ${state.ok ? "text-emerald-700" : "text-rose-700"}`} role="status">
+            {state.message}
+          </p>
+        ) : null}
+      </div>
+    </form>
+  );
+}
+
 function LocationCard({
   centerId,
   location,
@@ -104,13 +156,14 @@ function LocationCard({
         <div className="flex flex-col gap-3 sm:items-end">
           <div className="flex flex-wrap gap-2 sm:justify-end">
             <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">
-              Active: {yesNo(location.isActive)}
+              Internal active: {yesNo(location.isActive)}
             </span>
             <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">
               Selected: {yesNo(location.isPrimary)}
             </span>
           </div>
           <LocationPrimaryForm centerId={centerId} location={location} />
+          <LocationReviewForm centerId={centerId} location={location} />
         </div>
       </div>
 
@@ -136,7 +189,7 @@ function LocationCard({
       </dl>
 
       <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-950">
-        Candidate edits and selection stay private. Activation, public visibility, and promotion require a separate review workflow.
+        Candidate edits, selection, and quality readiness stay private. Public visibility and promotion require a separate workflow.
       </p>
 
       <DraftCenterLocationEditForm centerId={centerId} location={location} />
@@ -156,18 +209,18 @@ export function DraftCenterLocationPanel({ centerId, locations }: DraftCenterLoc
             Draft center locations
           </h3>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Private location candidates attached to this draft center. This panel does not activate, publish, verify, expose contact details, or promote records publicly.
+            Private location candidates attached to this draft center. This panel does not publish, verify, expose contact details, or promote records publicly.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
           <p className="font-bold">{locations.length} location candidate{locations.length === 1 ? "" : "s"}</p>
-          <p className="mt-1 text-xs font-semibold text-slate-500">Public activation remains blocked</p>
+          <p className="mt-1 text-xs font-semibold text-slate-500">Public visibility remains blocked</p>
         </div>
       </div>
 
       {locations.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-          No center location candidates are attached yet. The quality gate will remain blocked until an active location candidate exists.
+          No center location candidates are attached yet. The quality gate will remain blocked until an internally active location candidate exists.
         </div>
       ) : (
         <ul className="mt-5 grid gap-4">
