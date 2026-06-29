@@ -4,12 +4,14 @@ import { DraftCenterContactReviewPanel } from "@/components/admin/draft-center-c
 import { DraftCenterEditForm } from "@/components/admin/draft-center-edit-form";
 import { DraftCenterLocationCreateForm } from "@/components/admin/draft-center-location-create-form";
 import { DraftCenterLocationPanel } from "@/components/admin/draft-center-location-panel";
+import { DraftCenterPublicationReadinessPanel } from "@/components/admin/draft-center-publication-readiness-panel";
 import { DraftCenterQualityPanel } from "@/components/admin/draft-center-quality-panel";
 import { DraftCenterTaxonomyPanel } from "@/components/admin/draft-center-taxonomy-panel";
 import { DraftCenterWorkflowPanel } from "@/components/admin/draft-center-workflow-panel";
 import { getAdminDraftCenterById } from "@/server/admin/draft-centers";
 import { getDraftLocationOptions } from "@/server/admin/draft-center-location-options";
 import { listAdminDraftCenterLocations } from "@/server/admin/draft-center-locations";
+import { getDraftCenterPublicationReadiness } from "@/server/admin/draft-center-publication-readiness";
 import { getAdminDraftCenterQuality } from "@/server/admin/draft-center-quality";
 import { getAdminDraftCenterTaxonomy } from "@/server/admin/draft-center-taxonomy";
 
@@ -44,6 +46,7 @@ export default async function AdminDraftCenterEditPage({
   const taxonomy = await getAdminDraftCenterTaxonomy(centerId);
   const locationOptions = await getDraftLocationOptions();
   const locations = await listAdminDraftCenterLocations(centerId);
+  const readiness = await getDraftCenterPublicationReadiness(centerId);
   const quality = await getAdminDraftCenterQuality(
     centerId,
     result.center,
@@ -74,6 +77,16 @@ export default async function AdminDraftCenterEditPage({
       ) : null}
       {locations.ok ? <DraftCenterLocationPanel centerId={centerId} locations={locations.locations} /> : null}
       {locations.ok ? <DraftCenterContactReviewPanel centerId={centerId} locations={locations.locations} /> : null}
+      {readiness.ok ? (
+        <DraftCenterPublicationReadinessPanel readiness={readiness.readiness} />
+      ) : (
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+          <h3 className="text-lg font-bold">Publication readiness unavailable</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6">
+            Publication readiness evidence could not be loaded right now. This does not change any public state.
+          </p>
+        </section>
+      )}
       {quality.ok ? (
         <DraftCenterQualityPanel report={quality.report} />
       ) : (
