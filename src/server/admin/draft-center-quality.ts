@@ -85,7 +85,7 @@ function descriptionAvailable(center: AdminDraftCenterDetail): boolean {
   );
 }
 
-function activeLocationCount(locations: CenterLocationQualityRow[]): number {
+function internallyActiveLocationCount(locations: CenterLocationQualityRow[]): number {
   return locations.filter((location) => location.is_active).length;
 }
 
@@ -95,7 +95,7 @@ function buildChecks(
   taxonomyAvailable: boolean,
   locations: CenterLocationQualityRow[],
 ): DraftCenterQualityCheck[] {
-  const locationsCount = activeLocationCount(locations);
+  const internallyActiveLocationsCount = internallyActiveLocationCount(locations);
 
   return [
     check(
@@ -126,19 +126,19 @@ function buildChecks(
     ),
     check(
       "contact",
-      "Public contact candidate",
+      "Private contact candidate",
       contactAvailable(center) ? "pass" : "fail",
       contactAvailable(center)
-        ? "At least one contact candidate exists. Visibility still requires later review."
+        ? "At least one internal contact candidate exists. Public contact visibility still requires a later workflow."
         : "At least one phone, WhatsApp number, or email is needed before public review.",
     ),
     check(
       "location",
-      "Location candidate",
-      locationsCount > 0 ? "pass" : "fail",
-      locationsCount > 0
-        ? `${locationsCount} active location candidate${locationsCount === 1 ? "" : "s"} found.`
-        : "No active center location candidate found yet.",
+      "Internal location readiness",
+      internallyActiveLocationsCount > 0 ? "pass" : "fail",
+      internallyActiveLocationsCount > 0
+        ? `${internallyActiveLocationsCount} internally active location candidate${internallyActiveLocationsCount === 1 ? "" : "s"} found for admin quality checks only.`
+        : "No internally active location candidate is ready for the admin quality gate yet.",
     ),
     check(
       "description",
@@ -169,7 +169,7 @@ function buildChecks(
       "Public flags remain locked",
       !center.isActive && !center.isClaimable ? "pass" : "fail",
       !center.isActive && !center.isClaimable
-        ? "Center remains not active and not claimable."
+        ? "Center remains not active and not claimable. Internal quality readiness is not public activation."
         : "Unexpected public flags are enabled. Public activation is not allowed in this phase.",
     ),
   ];
@@ -187,8 +187,8 @@ function buildReport(checks: DraftCenterQualityCheck[]): DraftCenterQualityRepor
     publicActivationBlocked: true,
     readinessLabel:
       blockers === 0
-        ? "Ready for the next admin review step, but still not public"
-        : "Not ready for public workflow",
+        ? "Ready for the next internal admin review step, still not public"
+        : "Not ready for internal review workflow",
     total: checks.length,
     warnings,
   };
