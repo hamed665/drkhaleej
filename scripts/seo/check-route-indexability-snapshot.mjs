@@ -47,6 +47,8 @@ const cpRuntimeSource = await readText('src/lib/geo/oman-location-candidate-cp-p
 const cpRuntimeTestSource = await readText('src/lib/geo/cp.test.ts');
 const verifiedCountRuntimeSource = await readText('src/lib/geo/oman-location-candidate-verified-count.ts');
 const verifiedCountRuntimeTestSource = await readText('src/lib/geo/vcount.test.ts');
+const evidenceReferenceRuntimeSource = await readText('src/lib/geo/evidence-reference-runtime.ts');
+const evidenceReferenceRuntimeTestSource = await readText('src/lib/geo/er.test.ts');
 
 for (const token of [
   '# DrKhaleej Route Indexability Snapshot V1',
@@ -123,6 +125,8 @@ for (const token of [
   'location-candidate-provider-source-plan-contract',
   'oman-location-candidate-verified-count',
   'location-candidate-verified-count-method-contract',
+  'evidence-reference-runtime',
+  'location-candidate-evidence-source-reference-contract',
 ]) {
   assertExcludes(registrySource, token, `page registry must not reference ${token}.`);
   assertExcludes(sitemapSource, token, `sitemap must not reference ${token}.`);
@@ -164,6 +168,36 @@ for (const token of [
       .replace("status: 'disabled'", "status).toBe('disabled')"),
     `verified count runtime test must cover ${token}.`,
   );
+}
+
+for (const token of [
+  "status: 'disabled'",
+  'sourceReferences: []',
+  'runtimeCollectionAllowed: false',
+  'databaseAccessAllowed: false',
+  'importAllowed: false',
+  'routeCreationAllowed: false',
+  'sitemapAllowed: false',
+  'jsonLdAllowed: false',
+  'indexPromotionAllowed: false',
+  'internalSeoLinksAllowed: false',
+]) {
+  assertIncludes(evidenceReferenceRuntimeSource, token, `evidence reference runtime must include disabled token: ${token}`);
+}
+
+for (const token of [
+  "status).toBe('disabled')",
+  'sourceReferences).toHaveLength(0)',
+  'runtimeCollectionAllowed).toBe(false)',
+  'databaseAccessAllowed).toBe(false)',
+  'importAllowed).toBe(false)',
+  'routeCreationAllowed).toBe(false)',
+  'sitemapAllowed).toBe(false)',
+  'jsonLdAllowed).toBe(false)',
+  'indexPromotionAllowed).toBe(false)',
+  'internalSeoLinksAllowed).toBe(false)',
+]) {
+  assertIncludes(evidenceReferenceRuntimeTestSource, token, `evidence reference runtime test must cover ${token}.`);
 }
 
 assertIncludes(packageSource, 'seo:route-snapshot:validate', 'package.json must expose route snapshot validation.');
