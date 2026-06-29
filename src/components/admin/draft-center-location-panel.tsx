@@ -1,6 +1,8 @@
+import { DraftCenterLocationEditForm } from "@/components/admin/draft-center-location-edit-form";
 import type { AdminDraftCenterLocation } from "@/server/admin/draft-center-locations";
 
 type DraftCenterLocationPanelProps = {
+  centerId: string;
   locations: AdminDraftCenterLocation[];
 };
 
@@ -23,12 +25,26 @@ function formatDateTime(value: string): string {
   }).format(date);
 }
 
-function LocationCard({ location }: { location: AdminDraftCenterLocation }) {
+function LocationCard({
+  centerId,
+  location,
+}: {
+  centerId: string;
+  location: AdminDraftCenterLocation;
+}) {
   return (
-    <li className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-800">
+    <li className="rounded-[1.75rem] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-cyan-50/40 p-4 text-sm text-slate-800 shadow-sm ring-1 ring-white/80">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h4 className="font-bold text-slate-950">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex rounded-full border border-cyan-100 bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-cyan-800 shadow-sm">
+              Location candidate
+            </span>
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">
+              Contact review: {location.contactReviewStatus}
+            </span>
+          </div>
+          <h4 className="mt-3 text-base font-bold text-slate-950">
             {displayText(location.nameEn ?? location.nameAr)}
           </h4>
           <p className="mt-1 leading-6 text-slate-600">
@@ -55,23 +71,27 @@ function LocationCard({ location }: { location: AdminDraftCenterLocation }) {
           <dd className="mt-1 break-all font-semibold">{displayText(location.areaId)}</dd>
         </div>
         <div>
-          <dt className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Contact review</dt>
-          <dd className="mt-1 font-semibold">{location.contactReviewStatus}</dd>
-        </div>
-        <div>
           <dt className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Updated</dt>
           <dd className="mt-1 font-semibold">{formatDateTime(location.updatedAt)}</dd>
         </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Visibility</dt>
+          <dd className="mt-1 font-semibold">
+            Phone {yesNo(location.publicPrimaryPhoneVisible)} · WhatsApp {yesNo(location.publicWhatsappPhoneVisible)}
+          </dd>
+        </div>
       </dl>
 
-      <p className="mt-4 text-xs font-semibold text-slate-500">
-        Phone visible: {yesNo(location.publicPrimaryPhoneVisible)} · WhatsApp visible: {yesNo(location.publicWhatsappPhoneVisible)} · This panel is read-only.
+      <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-950">
+        Candidate edits stay private. Activation, public visibility, and promotion require a separate review workflow.
       </p>
+
+      <DraftCenterLocationEditForm centerId={centerId} location={location} />
     </li>
   );
 }
 
-export function DraftCenterLocationPanel({ locations }: DraftCenterLocationPanelProps) {
+export function DraftCenterLocationPanel({ centerId, locations }: DraftCenterLocationPanelProps) {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -83,7 +103,7 @@ export function DraftCenterLocationPanel({ locations }: DraftCenterLocationPanel
             Draft center locations
           </h3>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-            Read-only location candidates attached to this draft center. This panel does not activate, publish, verify, expose contact details, or create location records.
+            Private location candidates attached to this draft center. This panel does not activate, publish, verify, expose contact details, or promote records publicly.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
@@ -97,9 +117,9 @@ export function DraftCenterLocationPanel({ locations }: DraftCenterLocationPanel
           No center location candidates are attached yet. The quality gate will remain blocked until an active location candidate exists.
         </div>
       ) : (
-        <ul className="mt-5 grid gap-3">
+        <ul className="mt-5 grid gap-4">
           {locations.map((location) => (
-            <LocationCard key={location.id} location={location} />
+            <LocationCard centerId={centerId} key={location.id} location={location} />
           ))}
         </ul>
       )}
