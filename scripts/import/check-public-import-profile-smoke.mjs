@@ -54,9 +54,9 @@ const profileContracts = [
       'hospitalProfileEndpointUrl',
       '/api/_drk/hospital-profile/${locale}/${country}/${hospitalSlug}',
       'notFound: true',
-      'profile.canonicalPath',
       'hrefLang="en-OM"',
       'hrefLang="ar-OM"',
+      'Confirm details directly with the provider',
     ],
     apiRouteTokens: [
       'export async function GET',
@@ -146,6 +146,12 @@ async function assertRoute(contract) {
   }
 
   assertNotIncludes(source, 'listPublicImportSitemapEntries', `${contract.routePath} must not call sitemap listing from a profile page.`);
+
+  if (contract.entity === 'hospital') {
+    for (const token of ['profile.canonicalPath', 'profile.qualityScore', 'Quality score']) {
+      assertNotIncludes(source, token, `${contract.routePath} must not expose public QA field token: ${token}`);
+    }
+  }
 
   if (contract.apiRoutePath) {
     await assertFile(contract.apiRoutePath);

@@ -60,9 +60,9 @@ for (const token of [
   'href={canonical}',
   'hrefLang="en-OM"',
   'hrefLang="ar-OM"',
-  'profile.canonicalPath',
   'profile.lastCheckedAt',
   'profile.sourceName ?? profile.sourceUrl',
+  'Confirm details directly with the provider',
 ]) {
   assertIncludes(routeSource, token, `${routePath} must include ${token}`);
 }
@@ -77,6 +77,10 @@ for (const forbiddenToken of [
   'claim',
   'provider-dashboard',
   'listPublicImportSitemapEntries',
+  '<dt className="font-semibold text-slate-950">Canonical path</dt>',
+  'profile.canonicalPath',
+  'profile.qualityScore',
+  'Quality score',
 ]) {
   assertNotIncludes(routeSource, forbiddenToken, `${routePath} must not include ${forbiddenToken}.`);
 }

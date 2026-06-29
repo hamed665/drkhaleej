@@ -46,7 +46,6 @@ type RouteCopy = {
   servicesTitle: string;
   contactTitle: string;
   sourceLabel: string;
-  qualityLabel: string;
 };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
@@ -56,15 +55,13 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     servicesTitle: "Hospital services",
     contactTitle: "Contact and directions",
     sourceLabel: "Source",
-    qualityLabel: "Quality score",
   },
   ar: {
-    badge: "ملف مستشفى عام",
-    overviewTitle: "نظرة عامة على الملف",
-    servicesTitle: "خدمات المستشفى",
-    contactTitle: "التواصل والاتجاهات",
-    sourceLabel: "المصدر",
-    qualityLabel: "درجة الجودة",
+    badge: "\u0645\u0644\u0641 \u0645\u0633\u062a\u0634\u0641\u0649 \u0639\u0627\u0645",
+    overviewTitle: "\u0646\u0638\u0631\u0629 \u0639\u0627\u0645\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u0644\u0641",
+    servicesTitle: "\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0633\u062a\u0634\u0641\u0649",
+    contactTitle: "\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0648\u0627\u0644\u0627\u062a\u062c\u0627\u0647\u0627\u062a",
+    sourceLabel: "\u0627\u0644\u0645\u0635\u062f\u0631",
   },
 };
 
@@ -114,7 +111,7 @@ function metadataTitle(name: string): string {
 }
 
 function profileDescription(name: string): string {
-  return `${name} on DrKhaleej. Public hospital discovery in Oman only; not medical advice or emergency care.`;
+  return `${name} on DrKhaleej. Public directory information in Oman. Confirm details directly with the provider.`;
 }
 
 function displayName(locale: SupportedLocale, name: string, nameAr: string | null): string {
@@ -215,10 +212,6 @@ export default function PublicImportedHospitalProfilePage({
                 <dt className="font-semibold text-slate-950">Last checked</dt>
                 <dd>{profile.lastCheckedAt}</dd>
               </div>
-              <div>
-                <dt className="font-semibold text-slate-950">Canonical path</dt>
-                <dd>{profile.canonicalPath}</dd>
-              </div>
             </dl>
           </div>
 
@@ -272,7 +265,7 @@ export default function PublicImportedHospitalProfilePage({
           </div>
 
           <p className="mt-4 text-xs leading-5 text-slate-500">
-            {copy.sourceLabel}: {profile.sourceName ?? profile.sourceUrl}. {copy.qualityLabel}: {profile.qualityScore}.
+            {copy.sourceLabel}: {profile.sourceName ?? profile.sourceUrl}. Confirm details directly with the provider.
           </p>
         </section>
       </main>
