@@ -9,9 +9,15 @@ import { writeAdminAuditEvent } from "@/server/admin/audit-log";
 import { requireAdminPermission } from "@/server/admin/permissions";
 
 type CenterLocationInsert = Database["public"]["Tables"]["center_locations"]["Insert"];
+type CenterLocationUpdate = Database["public"]["Tables"]["center_locations"]["Update"];
 type DraftCenterStatus = Database["public"]["Enums"]["provider_status"];
 
 type DraftCenterLocationCreateState = {
+  ok: boolean;
+  message: string | null;
+};
+
+type DraftCenterLocationEditState = {
   ok: boolean;
   message: string | null;
 };
@@ -21,6 +27,11 @@ const draftStatuses = ["draft", "pending_review"] as const satisfies readonly Dr
 const failure: DraftCenterLocationCreateState = {
   ok: false,
   message: "Location candidate could not be created.",
+};
+
+const editFailure: DraftCenterLocationEditState = {
+  ok: false,
+  message: "Location candidate could not be updated.",
 };
 
 function formString(formData: FormData, key: string): string | null {
@@ -48,6 +59,16 @@ function safeSlugPart(value: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "location";
+}
+
+function hasEditableLocationText(formData: FormData): boolean {
+  return (
+    formString(formData, "nameEn") !== null ||
+    formString(formData, "nameAr") !== null ||
+    formString(formData, "addressLine1En") !== null ||
+    formString(formData, "addressLine1Ar") !== null ||
+    formString(formData, "mapUrl") !== null
+  );
 }
 
 function locationPayload(input: {
@@ -97,6 +118,26 @@ function locationPayload(input: {
   };
 }
 
+function locationUpdatePayload(formData: FormData): CenterLocationUpdate {
+  return {
+    address_line1_ar: limitedString(formString(formData, "addressLine1Ar"), 240),
+    address_line1_en: limitedString(formString(formData, "addressLine1En"), 240),
+    contact_review_status: "pending",
+    contact_reviewed_at: null,
+    is_active: false,
+    map_url: limitedString(formString(formData, "mapUrl"), 500),
+    name_ar: limitedString(formString(formData, "nameAr"), 160),
+    name_en: limitedString(formString(formData, "nameEn"), 160),
+    primary_phone: limitedString(formString(formData, "primaryPhone"), 64),
+    public_email_visible: false,
+    public_primary_phone_visible: false,
+    public_secondary_phone_visible: false,
+    public_whatsapp_phone_visible: false,
+    updated_at: new Date().toISOString(),
+    whatsapp_phone: limitedString(formString(formData, "whatsappPhone"), 64),
+  };
+}
+
 export async function createDraftCenterLocationCandidate(
   _previousState: DraftCenterLocationCreateState,
   formData: FormData,
@@ -114,14 +155,7 @@ export async function createDraftCenterLocationCandidate(
   if (cityId === null || !isUuid(cityId)) return failure;
   if (areaId !== null && !isUuid(areaId)) return failure;
 
-  const hasLocationText =
-    formString(formData, "nameEn") !== null ||
-    formString(formData, "nameAr") !== null ||
-    formString(formData, "addressLine1En") !== null ||
-    formString(formData, "addressLine1Ar") !== null ||
-    formString(formData, "mapUrl") !== null;
-
-  if (!hasLocationText) {
+  if (!hasEditableLocationText(formData)) {
     return {
       ok: false,
       message: "Add a name, address, or map URL before saving this location candidate.",
@@ -181,4 +215,78 @@ export async function createDraftCenterLocationCandidate(
   };
 }
 
-export type { DraftCenterLocationCreateState };
+export async function updateDraftCenterLocationCandidate(
+  _previousState: DraftCenterLocationEditState,
+  formData: FormData,
+): Promise<DraftCenterLocationEditState> {
+  const adminContext = await requireAdminPermission("draft_centers.update");
+  const centerId = formString(formData, "centerId");
+  const locationId = formString(formData, "locationId");
+
+  if (centerId === null || !isUuid(centerId)) return editFailure;
+  if (locationId === null || !isUuid(locationId)) return editFailure;
+
+  if (!hasEditableLocationText(formData)) {
+    return {
+      ok: false,
+      message: "Keep at least one location name, address, or map URL before saving.",
+    };
+  }
+
+  const supabase = createSupabaseServiceRoleClient();
+  const { data: center, error: centerError } = await supabase
+    .from("centers")
+    .select("id,status")
+    .eq("id", centerId)
+    .in("status", [...draftStatuses])
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (centerError !== null || center === null) return editFailure;
+
+  const { data: location, error: locationError } = await supabase
+    .from("center_locations")
+    .select("id")
+    .eq("id", locationId)
+    .eq("center_id", centerId)
+    .eq("is_active", false)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (locationError !== null || location === null) return editFailure;
+
+  const { error: updateError } = await supabase
+    .from("center_locations")
+    .update(locationUpdatePayload(formData))
+    .eq("id", locationId)
+    .eq("center_id", centerId)
+    .eq("is_active", false)
+    .is("deleted_at", null);
+
+  if (updateError !== null) return editFailure;
+
+  await writeAdminAuditEvent({
+    admin: adminContext,
+    permissionKey: "draft_centers.update",
+    action: "draft_center.details_updated",
+    entityType: "center",
+    entityId: centerId,
+    targetTable: "center_locations",
+    summary: "Draft center location candidate updated.",
+    newValues: {
+      location_id: locationId,
+      is_active: false,
+      public_primary_phone_visible: false,
+      public_whatsapp_phone_visible: false,
+    },
+  });
+
+  revalidatePath(`/admin/draft-centers/${centerId}`);
+
+  return {
+    ok: true,
+    message: "Location candidate was updated privately.",
+  };
+}
+
+export type { DraftCenterLocationCreateState, DraftCenterLocationEditState };
