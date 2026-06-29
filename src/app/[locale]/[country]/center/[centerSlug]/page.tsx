@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { PublicCenterDetail } from '@/components/public/public-center-detail';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
-import { getPublicCenterBySlug } from '@/lib/catalog/public-queries';
+import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
 import {
   isSupportedCountry,
   isSupportedLocale,

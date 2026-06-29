@@ -6,7 +6,7 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildHospitalsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
-import { listPublicCenters } from "@/lib/catalog/public-queries";
+import { listPublicCenters } from "@/lib/catalog/public-eligible-queries";
 import {
   isSupportedCountry,
   isSupportedLocale,
