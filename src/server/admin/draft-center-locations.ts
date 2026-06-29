@@ -22,9 +22,11 @@ type LocationListRow = Pick<
   | "map_url"
   | "primary_phone"
   | "whatsapp_phone"
+  | "email"
   | "contact_review_status"
   | "public_primary_phone_visible"
   | "public_whatsapp_phone_visible"
+  | "public_email_visible"
   | "sort_order"
   | "updated_at"
 >;
@@ -44,9 +46,11 @@ export type AdminDraftCenterLocation = {
   mapUrl: string | null;
   primaryPhone: string | null;
   whatsappPhone: string | null;
+  email: string | null;
   contactReviewStatus: string;
   publicPrimaryPhoneVisible: boolean;
   publicWhatsappPhoneVisible: boolean;
+  publicEmailVisible: boolean;
   sortOrder: number;
   updatedAt: string;
 };
@@ -71,9 +75,11 @@ function mapLocation(row: LocationListRow): AdminDraftCenterLocation {
     mapUrl: row.map_url,
     primaryPhone: row.primary_phone,
     whatsappPhone: row.whatsapp_phone,
+    email: row.email,
     contactReviewStatus: row.contact_review_status,
     publicPrimaryPhoneVisible: row.public_primary_phone_visible,
     publicWhatsappPhoneVisible: row.public_whatsapp_phone_visible,
+    publicEmailVisible: row.public_email_visible,
     sortOrder: row.sort_order,
     updatedAt: row.updated_at,
   };
@@ -88,7 +94,7 @@ export async function listAdminDraftCenterLocations(
   const { data, error } = await supabase
     .from("center_locations")
     .select(
-      "id,name_en,name_ar,address_line1_en,address_line1_ar,area_id,city_id,country_id,region_id,is_active,is_primary,map_url,primary_phone,whatsapp_phone,contact_review_status,public_primary_phone_visible,public_whatsapp_phone_visible,sort_order,updated_at",
+      "id,name_en,name_ar,address_line1_en,address_line1_ar,area_id,city_id,country_id,region_id,is_active,is_primary,map_url,primary_phone,whatsapp_phone,email,contact_review_status,public_primary_phone_visible,public_whatsapp_phone_visible,public_email_visible,sort_order,updated_at",
     )
     .eq("center_id", centerId)
     .is("deleted_at", null)
