@@ -77,9 +77,25 @@ type PublicGeoAreaSummaryRow = Pick<
   | "country_id"
 >;
 
+type CenterDetailRelationEligibility = {
+  doctorIds: Set<string>;
+  error: boolean;
+  locationIds: Set<string>;
+  serviceIds: Set<string>;
+};
+
+type DoctorDetailRelationEligibility = {
+  centerIds: Set<string>;
+  error: boolean;
+  locationIds: Set<string>;
+  practiceLocationIds: Set<string>;
+  serviceIds: Set<string>;
+};
+
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const MAX_SEARCH_QUERY_LENGTH = 64;
+const DETAIL_RELATION_LIMIT = 100;
 
 const safeVerificationStatuses = [
   "unverified",
@@ -125,6 +141,10 @@ function createErrorResult<T>(fallbackData: T): PublicCatalogQueryResult<T> {
     emptyReason: "query_error",
     error,
   };
+}
+
+function uniqueStrings(values: Array<string | null | undefined>): string[] {
+  return Array.from(new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0)));
 }
 
 function mapCenterSummary(row: PublicCenterSummaryRow): PublicCenterSummary {
@@ -175,6 +195,227 @@ function mapGeoAreaSummary(row: PublicGeoAreaSummaryRow): PublicGeoAreaSummary {
     nameAr: row.name_ar,
     cityId: row.city_id,
     countryId: row.country_id,
+  };
+}
+
+async function getEligibleDoctorIdSet(doctorIds: string[]): Promise<{ ids: Set<string>; error: boolean }> {
+  if (doctorIds.length === 0) return { ids: new Set(), error: false };
+
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("doctors")
+    .select("id")
+    .in("id", doctorIds)
+    .eq("is_active", true)
+    .eq("status", "active")
+    .in("verification_status", verificationStatusFilterValues())
+    .is("deleted_at", null)
+    .limit(DETAIL_RELATION_LIMIT);
+
+  if (error) return { ids: new Set(), error: true };
+  return { ids: new Set((data ?? []).map((row) => row.id)), error: false };
+}
+
+async function getEligibleCenterIdSet(centerIds: string[]): Promise<{ ids: Set<string>; error: boolean }> {
+  if (centerIds.length === 0) return { ids: new Set(), error: false };
+
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("centers")
+    .select("id")
+    .in("id", centerIds)
+    .eq("is_active", true)
+    .eq("status", "active")
+    .in("verification_status", verificationStatusFilterValues())
+    .is("deleted_at", null)
+    .limit(DETAIL_RELATION_LIMIT);
+
+  if (error) return { ids: new Set(), error: true };
+  return { ids: new Set((data ?? []).map((row) => row.id)), error: false };
+}
+
+async function getActiveServiceIdSet(serviceIds: string[]): Promise<{ ids: Set<string>; error: boolean }> {
+  if (serviceIds.length === 0) return { ids: new Set(), error: false };
+
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("services")
+    .select("id")
+    .in("id", serviceIds)
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .limit(DETAIL_RELATION_LIMIT);
+
+  if (error) return { ids: new Set(), error: true };
+  return { ids: new Set((data ?? []).map((row) => row.id)), error: false };
+}
+
+async function getCenterDetailRelationEligibility(centerId: string): Promise<CenterDetailRelationEligibility> {
+  const supabase = createSupabaseServerClient();
+  const [locationsResult, servicesResult, practiceLocationsResult] = await Promise.all([
+    supabase
+      .from("center_locations")
+      .select("id")
+      .eq("center_id", centerId)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT),
+    supabase
+      .from("center_services")
+      .select("id,service_id")
+      .eq("center_id", centerId)
+      .eq("is_available", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT),
+    supabase
+      .from("doctor_practice_locations")
+      .select("doctor_id")
+      .eq("center_id", centerId)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT),
+  ]);
+
+  if (locationsResult.error || servicesResult.error || practiceLocationsResult.error) {
+    return { doctorIds: new Set(), error: true, locationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const referencedServiceIds = uniqueStrings((servicesResult.data ?? []).map((row) => row.service_id));
+  const activeServiceIds = await getActiveServiceIdSet(referencedServiceIds);
+  if (activeServiceIds.error) {
+    return { doctorIds: new Set(), error: true, locationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const eligibleDoctorIds = await getEligibleDoctorIdSet(uniqueStrings((practiceLocationsResult.data ?? []).map((row) => row.doctor_id)));
+  if (eligibleDoctorIds.error) {
+    return { doctorIds: new Set(), error: true, locationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const serviceIds = new Set(
+    (servicesResult.data ?? [])
+      .filter((row) => row.service_id === null || activeServiceIds.ids.has(row.service_id))
+      .map((row) => row.id),
+  );
+
+  return {
+    doctorIds: eligibleDoctorIds.ids,
+    error: false,
+    locationIds: new Set((locationsResult.data ?? []).map((row) => row.id)),
+    serviceIds,
+  };
+}
+
+async function getDoctorDetailRelationEligibility(doctorId: string): Promise<DoctorDetailRelationEligibility> {
+  const supabase = createSupabaseServerClient();
+  const [servicesResult, practiceLocationsResult] = await Promise.all([
+    supabase
+      .from("doctor_services")
+      .select("id,service_id")
+      .eq("doctor_id", doctorId)
+      .eq("is_available", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT),
+    supabase
+      .from("doctor_practice_locations")
+      .select("id,center_id,center_location_id")
+      .eq("doctor_id", doctorId)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT),
+  ]);
+
+  if (servicesResult.error || practiceLocationsResult.error) {
+    return { centerIds: new Set(), error: true, locationIds: new Set(), practiceLocationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const referencedServiceIds = uniqueStrings((servicesResult.data ?? []).map((row) => row.service_id));
+  const activeServiceIds = await getActiveServiceIdSet(referencedServiceIds);
+  if (activeServiceIds.error) {
+    return { centerIds: new Set(), error: true, locationIds: new Set(), practiceLocationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const centerIds = uniqueStrings((practiceLocationsResult.data ?? []).map((row) => row.center_id));
+  const eligibleCenterIds = await getEligibleCenterIdSet(centerIds);
+  if (eligibleCenterIds.error) {
+    return { centerIds: new Set(), error: true, locationIds: new Set(), practiceLocationIds: new Set(), serviceIds: new Set() };
+  }
+
+  const eligiblePracticeRows = (practiceLocationsResult.data ?? []).filter((row) => eligibleCenterIds.ids.has(row.center_id));
+  const eligibleLocationCenterIds = uniqueStrings(eligiblePracticeRows.map((row) => row.center_id));
+
+  let locationIds = new Set<string>();
+  if (eligibleLocationCenterIds.length > 0) {
+    const { data: locationRows, error: locationError } = await supabase
+      .from("center_locations")
+      .select("id")
+      .in("center_id", eligibleLocationCenterIds)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .limit(DETAIL_RELATION_LIMIT);
+
+    if (locationError) {
+      return { centerIds: new Set(), error: true, locationIds: new Set(), practiceLocationIds: new Set(), serviceIds: new Set() };
+    }
+
+    locationIds = new Set((locationRows ?? []).map((row) => row.id));
+  }
+
+  const serviceIds = new Set(
+    (servicesResult.data ?? [])
+      .filter((row) => row.service_id === null || activeServiceIds.ids.has(row.service_id))
+      .map((row) => row.id),
+  );
+
+  return {
+    centerIds: eligibleCenterIds.ids,
+    error: false,
+    locationIds,
+    practiceLocationIds: new Set(eligiblePracticeRows.map((row) => row.id)),
+    serviceIds,
+  };
+}
+
+function filterCenterDetailRelations(
+  detail: PublicCenterDetail,
+  relationEligibility: CenterDetailRelationEligibility,
+): PublicCenterDetail {
+  const locations = detail.locations.filter((location) => relationEligibility.locationIds.has(location.id));
+  const location = detail.location && relationEligibility.locationIds.has(detail.location.id)
+    ? detail.location
+    : locations[0] ?? null;
+
+  return {
+    ...detail,
+    doctors: detail.doctors.filter((doctor) => relationEligibility.doctorIds.has(doctor.id)),
+    location,
+    locations,
+    services: detail.services.filter((service) => relationEligibility.serviceIds.has(service.id)),
+  };
+}
+
+function filterDoctorDetailRelations(
+  detail: PublicDoctorDetail,
+  relationEligibility: DoctorDetailRelationEligibility,
+): PublicDoctorDetail {
+  return {
+    ...detail,
+    practiceLocations: detail.practiceLocations.flatMap((practiceLocation) => {
+      if (!relationEligibility.practiceLocationIds.has(practiceLocation.id)) return [];
+      if (!relationEligibility.centerIds.has(practiceLocation.center.id)) return [];
+
+      const location = practiceLocation.location && relationEligibility.locationIds.has(practiceLocation.location.id)
+        ? practiceLocation.location
+        : null;
+
+      return [
+        {
+          ...practiceLocation,
+          contactActions: practiceLocation.location !== null && location === null ? [] : practiceLocation.contactActions,
+          location,
+        },
+      ];
+    }),
+    services: detail.services.filter((service) => relationEligibility.serviceIds.has(service.id)),
   };
 }
 
@@ -263,7 +504,13 @@ export async function getPublicCenterBySlug(
   if (eligibility.error) return createErrorResult(null);
   if (!eligibility.eligible) return createSuccessResult(null, "no_rows");
 
-  return getUngatedPublicCenterBySlug(options);
+  const detailResult = await getUngatedPublicCenterBySlug(options);
+  if (!detailResult.ok || !detailResult.data) return detailResult;
+
+  const relationEligibility = await getCenterDetailRelationEligibility(detailResult.data.id);
+  if (relationEligibility.error) return createErrorResult(null);
+
+  return createSuccessResult(filterCenterDetailRelations(detailResult.data, relationEligibility));
 }
 
 export async function listPublicDoctors(
@@ -300,7 +547,13 @@ export async function getPublicDoctorBySlug(
   if (eligibility.error) return createErrorResult(null);
   if (!eligibility.eligible) return createSuccessResult(null, "no_rows");
 
-  return getUngatedPublicDoctorBySlug(options);
+  const detailResult = await getUngatedPublicDoctorBySlug(options);
+  if (!detailResult.ok || !detailResult.data) return detailResult;
+
+  const relationEligibility = await getDoctorDetailRelationEligibility(detailResult.data.id);
+  if (relationEligibility.error) return createErrorResult(null);
+
+  return createSuccessResult(filterDoctorDetailRelations(detailResult.data, relationEligibility));
 }
 
 export async function searchPublicCatalog(
