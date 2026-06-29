@@ -4,7 +4,8 @@ import { localizedPathname, localizedRootPath, siteConfig, type SiteCountry, typ
 export type SeoPageFamily =
   | 'country_root'
   | 'directory'
-  | 'provider_onboarding';
+  | 'provider_onboarding'
+  | 'policy';
 
 export type SeoPageIndexPolicy = 'index' | 'noindex_until_ready';
 export type SeoPageReadiness = 'ready' | 'needs_content' | 'blocked';
@@ -13,6 +14,7 @@ export type SeoPageLaunchGateReason =
   | 'market-root'
   | 'trust-directory'
   | 'provider-onboarding'
+  | 'policy-noindex'
   | 'search-utility-noindex'
   | 'money-page-needs-real-data'
   | 'offers-engine-not-public'
@@ -171,6 +173,16 @@ const publicStaticPages = [
     priority: 0.7,
     changeFrequency: 'weekly',
     launchGateReason: 'provider-onboarding',
+  },
+  {
+    pathname: '/source-policy',
+    family: 'policy',
+    indexPolicy: 'noindex_until_ready',
+    readiness: 'needs_content',
+    sitemapEligible: false,
+    priority: 0.25,
+    changeFrequency: 'monthly',
+    launchGateReason: 'policy-noindex',
   },
 ] as const satisfies readonly StaticPublicPageDefinition[];
 

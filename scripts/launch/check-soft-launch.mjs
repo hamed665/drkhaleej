@@ -85,7 +85,7 @@ for (const token of ['/api/', '/admin/', '/dashboard/', '/import/', '/preview/',
   assertIncludes(robots, token, `robots must keep internal disallow token ${token}`);
 }
 
-for (const token of ['/en/om/dental', '/ar/om/dental', '/en/om/beauty', '/ar/om/beauty', '/en/om/offers', '/ar/om/offers', '/en/om/search', '/ar/om/search']) {
+for (const token of ['/en/om/dental', '/ar/om/dental', '/en/om/beauty', '/ar/om/beauty', '/en/om/offers', '/ar/om/offers', '/en/om/search', '/ar/om/search', '/en/om/source-policy', '/ar/om/source-policy']) {
   assertNotIncludes(robots, token, `robots must not block preview route token ${token}`);
 }
 
@@ -93,7 +93,7 @@ for (const route of ['/doctors', '/centers', '/labs', '/pharmacies', '/hospitals
   assertIncludes(registry, `pathname: '${route}'`, `route registry must include ${route}`);
 }
 
-for (const route of ['/dental', '/beauty', '/offers', '/pet-clinics', '/pet-shops', '/search']) {
+for (const route of ['/dental', '/beauty', '/offers', '/pet-clinics', '/pet-shops', '/search', '/source-policy']) {
   const routeToken = `pathname: '${route}'`;
   const index = registry.indexOf(routeToken);
   if (index < 0) throw new Error(`route registry must include preview route ${route}`);
@@ -115,9 +115,12 @@ for (const route of ['dental', 'beauty', 'offers', 'pet-clinics', 'pet-shops', '
   }
 }
 
-for (const token of ['/${locale}/${country}/articles', '/${locale}/${country}/about']) {
+for (const token of ['/${locale}/${country}/articles', '/${locale}/${country}/about', '/${locale}/${country}/source-policy']) {
   assertNotIncludes(footer, token, `footer must not include unlaunched static route token ${token}`);
 }
+
+assertIncludes(llms, '- /en/om/source-policy', 'llms.txt must include English source policy noindex route.');
+assertIncludes(llms, '- /ar/om/source-policy', 'llms.txt must include Arabic source policy noindex route.');
 
 assertNotIncludes(shell, '<main id="main-content"', 'app shell must not create nested main content landmark.');
 assertIncludes(shell, '<div id="main-content"', 'app shell must preserve skip-link target.');
