@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 
 import { DraftCenterEditForm } from "@/components/admin/draft-center-edit-form";
+import { DraftCenterLocationCreateForm } from "@/components/admin/draft-center-location-create-form";
 import { DraftCenterLocationPanel } from "@/components/admin/draft-center-location-panel";
 import { DraftCenterQualityPanel } from "@/components/admin/draft-center-quality-panel";
 import { DraftCenterTaxonomyPanel } from "@/components/admin/draft-center-taxonomy-panel";
 import { DraftCenterWorkflowPanel } from "@/components/admin/draft-center-workflow-panel";
 import { getAdminDraftCenterById } from "@/server/admin/draft-centers";
+import { getDraftLocationOptions } from "@/server/admin/draft-center-location-options";
 import { listAdminDraftCenterLocations } from "@/server/admin/draft-center-locations";
 import { getAdminDraftCenterQuality } from "@/server/admin/draft-center-quality";
 import { getAdminDraftCenterTaxonomy } from "@/server/admin/draft-center-taxonomy";
@@ -39,6 +41,7 @@ export default async function AdminDraftCenterEditPage({
   }
 
   const taxonomy = await getAdminDraftCenterTaxonomy(centerId);
+  const locationOptions = await getDraftLocationOptions();
   const locations = await listAdminDraftCenterLocations(centerId);
   const quality = await getAdminDraftCenterQuality(
     centerId,
@@ -65,6 +68,9 @@ export default async function AdminDraftCenterEditPage({
           </p>
         </section>
       )}
+      {locationOptions.ok ? (
+        <DraftCenterLocationCreateForm centerId={centerId} options={locationOptions.options} />
+      ) : null}
       {locations.ok ? <DraftCenterLocationPanel locations={locations.locations} /> : null}
       {quality.ok ? (
         <DraftCenterQualityPanel report={quality.report} />
