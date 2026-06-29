@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import {
-  updateDraftCenterDetails,
+  updateDraftCenterDetailsPreservingVerification,
   type DraftCenterUpdateState,
-} from "@/server/admin/draft-center-actions";
+} from "@/server/admin/draft-center-safe-actions";
 import type { AdminDraftCenterDetail } from "@/server/admin/draft-centers";
 
 type DraftCenterEditFormProps = {
@@ -60,7 +60,7 @@ function textareaClassName() {
 
 export function DraftCenterEditForm({ center }: DraftCenterEditFormProps) {
   const [state, formAction, isPending] = useActionState(
-    updateDraftCenterDetails,
+    updateDraftCenterDetailsPreservingVerification,
     initialState,
   );
 
