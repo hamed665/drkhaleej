@@ -6,7 +6,12 @@ import { DoctorsSearch2026 } from "@/components/public/doctors/DoctorsSearch2026
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { buildDiscoveryFaq } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
-import { listPublicDoctors } from "@/lib/catalog/public-eligible-queries";
+import { listPublicDoctors, searchPublicCatalog } from "@/lib/catalog/public-eligible-queries";
+import type {
+  PublicCatalogQueryResult,
+  PublicCatalogSearchResult,
+  PublicDoctorSummary,
+} from "@/lib/catalog/public-types";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -19,6 +24,7 @@ import { buildLocalizedMetadata } from "@/lib/seo/metadata";
 import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
 type Params = { locale: string; country: string };
+type SearchParams = Record<string, string | string[] | undefined>;
 
 type RouteCopy = {
   metadataTitle: string;
@@ -31,8 +37,11 @@ type RouteCopy = {
   whatsappMessage: string;
   whatsappUnavailable: string;
   resultsHeading: string;
+  searchResultsHeading: string;
   resultsSubtext: string;
+  searchResultsSubtext: string;
   compactEmptyText: string;
+  searchEmptyText: string;
 };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
@@ -50,9 +59,13 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
       "Hello DrKhaleej, I need help with doctor discovery in Oman.",
     whatsappUnavailable: "WhatsApp activation pending",
     resultsHeading: "Browse doctors",
+    searchResultsHeading: "Doctor search results",
     resultsSubtext:
       "Search results and public doctor listings appear here after approval.",
+    searchResultsSubtext:
+      "Showing public eligible doctor results only. Query URLs remain canonical to the base doctors page.",
     compactEmptyText: "Approved doctor profiles will appear here after review.",
+    searchEmptyText: "No public eligible doctor results matched this search yet.",
   },
   ar: {
     metadataTitle: "الأطباء في عُمان | DrKhaleej",
@@ -68,10 +81,30 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
       "مرحباً DrKhaleej، أحتاج مساعدة في اكتشاف الأطباء في عُمان.",
     whatsappUnavailable: "تفعيل واتساب قيد الإعداد",
     resultsHeading: "تصفح الأطباء",
+    searchResultsHeading: "نتائج البحث عن الأطباء",
     resultsSubtext: "تظهر هنا نتائج البحث وقوائم الأطباء العامة بعد الاعتماد.",
+    searchResultsSubtext:
+      "تظهر فقط نتائج الأطباء العامة المؤهلة. تبقى روابط البحث مرتبطة بالصفحة الأساسية للأطباء.",
     compactEmptyText: "ستظهر ملفات الأطباء المعتمدة هنا بعد المراجعة.",
+    searchEmptyText: "لا توجد نتائج أطباء عامة مؤهلة لهذا البحث حتى الآن.",
   },
 };
+
+function firstSearchParamValue(value: string | string[] | undefined): string {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  return rawValue ? rawValue.trim().slice(0, 80) : "";
+}
+
+function doctorResultFromSearch(
+  result: PublicCatalogQueryResult<PublicCatalogSearchResult>,
+): PublicCatalogQueryResult<PublicDoctorSummary[]> {
+  return {
+    ok: result.ok,
+    data: result.ok ? result.data.doctors : [],
+    emptyReason: result.emptyReason,
+    error: result.error,
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -93,8 +126,10 @@ export async function generateMetadata({
 
 export default async function PublicDoctorsPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
@@ -103,10 +138,17 @@ export default async function PublicDoctorsPage({
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
   const copy = copyByLocale[safeLocale];
-  const result = await listPublicDoctors({ country: safeCountry });
+  const query = firstSearchParamValue((await searchParams).q);
+  const isDirectorySearch = query.length >= 2;
+  const result = isDirectorySearch
+    ? doctorResultFromSearch(await searchPublicCatalog(query, { limit: 24 }))
+    : await listPublicDoctors({ country: safeCountry });
   const whatsAppNumber = getPublicWhatsAppNumber();
   const whatsAppHref = buildWhatsAppUrl(whatsAppNumber, copy.whatsappMessage);
   const faq = buildDiscoveryFaq("doctors", safeLocale === "ar");
+  const resultsHeading = isDirectorySearch ? copy.searchResultsHeading : copy.resultsHeading;
+  const resultsSubtext = isDirectorySearch ? copy.searchResultsSubtext : copy.resultsSubtext;
+  const emptyText = isDirectorySearch ? copy.searchEmptyText : copy.compactEmptyText;
 
   return (
     <main
@@ -184,19 +226,19 @@ export default async function PublicDoctorsPage({
             role="status"
             aria-live="polite"
           >
-            <h2 id="doctor-results-title">{copy.compactEmptyText}</h2>
+            <h2 id="doctor-results-title">{emptyText}</h2>
           </div>
         ) : (
           <>
             <div className="dm2026-doctors-results-header dm2026-card-soft">
-              <h2 id="doctor-results-title">{copy.resultsHeading}</h2>
-              <p>{copy.resultsSubtext}</p>
+              <h2 id="doctor-results-title">{resultsHeading}</h2>
+              <p>{resultsSubtext}</p>
             </div>
             <PublicDirectoryListingContent
               locale={safeLocale}
               variant="doctor"
               result={result}
-              emptyText={copy.compactEmptyText}
+              emptyText={emptyText}
             />
           </>
         )}
