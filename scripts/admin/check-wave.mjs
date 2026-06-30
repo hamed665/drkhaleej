@@ -36,8 +36,8 @@ for (const file of [
 
 const pkg = readFile('package.json');
 for (const token of [
-  '"admin:wave:validate": "node scripts/admin/check-wave.mjs"',
-  'pnpm admin:wave:validate',
+  '"admin:w:validate": "node scripts/admin/check-wave.mjs"',
+  'pnpm admin:w:validate',
 ]) {
   mustHave(pkg, token, 'package.json');
 }
