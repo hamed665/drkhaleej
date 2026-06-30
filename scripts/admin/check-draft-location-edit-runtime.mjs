@@ -58,8 +58,7 @@ const panelContent = readFile(panelPath);
 
 for (const token of [
   'DraftCenterLocationEditForm',
-  'Candidate edits stay private.',
-  'Activation, public visibility, and promotion require a separate review workflow.',
+  'Candidate edits, selection, and quality readiness stay private. Public visibility and promotion require a separate workflow.',
 ]) {
   assertIncludes(panelContent, token, panelPath);
 }
