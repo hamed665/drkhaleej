@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     locale: safeLocale,
     country: country as SupportedCountry,
     pathname: '/articles',
-    title: safeLocale === 'ar' ? 'مقالات DrMuscat | أدلة صحية في عُمان' : 'DrMuscat Articles | Health Guides in Oman',
+    title: safeLocale === 'ar' ? 'مقالات DrKhaleej | أدلة صحية في عُمان' : 'DrKhaleej Articles | Health Guides in Oman',
     description: copy.heroIntro
   });
 }
