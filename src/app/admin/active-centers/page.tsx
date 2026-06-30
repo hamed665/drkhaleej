@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { listAdminActiveCenters } from "@/server/admin/active-centers";
+import { listAdminActiveCenters, type AdminActiveCenterListItem } from "@/server/admin/active-centers";
 
 function formatNeutralLabel(value: string): string {
   return value
@@ -13,6 +13,10 @@ function formatDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toISOString().slice(0, 10);
+}
+
+function isReadyForPublicStateReview(center: AdminActiveCenterListItem): boolean {
+  return center.status === "active" && center.isActive && center.publicPathEn.length > 0 && center.publicPathAr.length > 0;
 }
 
 export default async function AdminActiveCentersPage() {
@@ -46,6 +50,17 @@ export default async function AdminActiveCentersPage() {
         </p>
       </section>
 
+      <section className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-5 text-emerald-950">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">PUBLIC_STATE_READINESS_VIEW</p>
+        <h3 className="mt-2 text-lg font-bold">Future public-state readiness</h3>
+        <p className="mt-2 max-w-3xl text-sm leading-6">
+          This panel is read-only evidence for a future guarded public-state workflow. No public-state controls are available here, and contact visibility, billing, claim, sponsored placement, and commercial controls remain outside this view.
+        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-6">
+          Future changes must preserve audit evidence, revalidate English and Arabic public paths, and revalidate sitemap output through a separate server-side action.
+        </p>
+      </section>
+
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -71,40 +86,53 @@ export default async function AdminActiveCentersPage() {
                   <th className="px-4 py-3">Center</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Public flags</th>
+                  <th className="px-4 py-3">State readiness</th>
                   <th className="px-4 py-3">Verification</th>
                   <th className="px-4 py-3">Public routes</th>
                   <th className="px-4 py-3">Updated</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
-                {result.items.map((center) => (
-                  <tr key={center.id} className="align-top">
-                    <td className="px-4 py-4">
-                      <p className="font-bold text-slate-950">{center.nameEn}</p>
-                      {center.nameAr ? <p className="mt-1 text-xs font-semibold text-slate-500">{center.nameAr}</p> : null}
-                      <p className="mt-2 break-all text-xs text-slate-500">{center.id}</p>
-                      <p className="mt-1 text-xs font-semibold text-slate-600">/{center.slug}</p>
-                      <p className="mt-1 text-xs text-slate-500">{formatNeutralLabel(center.centerType)}</p>
-                    </td>
-                    <td className="px-4 py-4 font-semibold text-slate-700">{center.status}</td>
-                    <td className="px-4 py-4 text-slate-700">
-                      <p>Active: {center.isActive ? "yes" : "no"}</p>
-                      <p className="mt-1">Claimable: {center.isClaimable ? "yes" : "no"}</p>
-                    </td>
-                    <td className="px-4 py-4 font-semibold text-slate-700">{center.verificationStatus}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col gap-2">
-                        <Link href={center.publicPathEn} className="font-semibold text-cyan-700 hover:text-cyan-900">
-                          English public profile
-                        </Link>
-                        <Link href={center.publicPathAr} className="font-semibold text-cyan-700 hover:text-cyan-900">
-                          Arabic public profile
-                        </Link>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-slate-600">{formatDate(center.updatedAt)}</td>
-                  </tr>
-                ))}
+                {result.items.map((center) => {
+                  const readyForPublicStateReview = isReadyForPublicStateReview(center);
+
+                  return (
+                    <tr key={center.id} className="align-top">
+                      <td className="px-4 py-4">
+                        <p className="font-bold text-slate-950">{center.nameEn}</p>
+                        {center.nameAr ? <p className="mt-1 text-xs font-semibold text-slate-500">{center.nameAr}</p> : null}
+                        <p className="mt-2 break-all text-xs text-slate-500">{center.id}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-600">/{center.slug}</p>
+                        <p className="mt-1 text-xs text-slate-500">{formatNeutralLabel(center.centerType)}</p>
+                      </td>
+                      <td className="px-4 py-4 font-semibold text-slate-700">{center.status}</td>
+                      <td className="px-4 py-4 text-slate-700">
+                        <p>Active: {center.isActive ? "yes" : "no"}</p>
+                        <p className="mt-1">Claimable: {center.isClaimable ? "yes" : "no"}</p>
+                      </td>
+                      <td className="px-4 py-4 text-slate-700">
+                        <p className="font-semibold text-slate-900">
+                          {readyForPublicStateReview ? "Ready for future state review" : "Blocked from state review"}
+                        </p>
+                        <p className="mt-1 max-w-xs text-xs leading-5 text-slate-500">
+                          Audit evidence, bilingual public path revalidation, and sitemap revalidation are required before any future server-side mutation.
+                        </p>
+                      </td>
+                      <td className="px-4 py-4 font-semibold text-slate-700">{center.verificationStatus}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col gap-2">
+                          <Link href={center.publicPathEn} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                            English public profile
+                          </Link>
+                          <Link href={center.publicPathAr} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                            Arabic public profile
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-slate-600">{formatDate(center.updatedAt)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
