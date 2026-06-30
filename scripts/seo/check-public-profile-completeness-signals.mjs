@@ -98,8 +98,8 @@ for (const token of [
   assertIncludes(doc, token, docPath);
 }
 
-const sitemapBoundaryPath = 'scripts/seo/check-public-profile-sitemap-boundary.mjs';
-const sitemapBoundary = readFile(sitemapBoundaryPath);
-assertIncludes(sitemapBoundary, "import './check-public-profile-completeness-signals.mjs';", sitemapBoundaryPath);
+const eligibilityGuardPath = 'scripts/seo/check-public-profile-index-eligibility-contract.mjs';
+const eligibilityGuard = readFile(eligibilityGuardPath);
+assertIncludes(eligibilityGuard, "import './check-public-profile-completeness-signals.mjs';", eligibilityGuardPath);
 
 console.log('Public profile completeness signals guard passed.');
