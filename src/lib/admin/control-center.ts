@@ -47,10 +47,11 @@ export const adminModuleGroups: AdminModuleGroup[] = [
         href: "/admin/imports",
       },
       {
-        title: "Centers / Clinics",
+        title: "Active Centers",
         description:
-          "Future full center management after activation, ownership, and publishing rules are approved.",
-        status: "Planned",
+          "Read-only operational view for centers that have left the draft workflow. No active-provider edit controls are available here.",
+        status: "Read-only",
+        href: "/admin/active-centers",
       },
       {
         title: "Doctors",
