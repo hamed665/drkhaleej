@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { isPublicImportProfileIndexEligible } from "@/lib/catalog/public-import-profile-index-eligibility";
 import {
   buildPublicImportProfileMetaDescription,
   buildPublicImportProfileSummary,
@@ -12,6 +13,7 @@ import {
   type SupportedLocale,
 } from "@/lib/i18n/config";
 import { buildLocalizedMetadata } from "@/lib/seo/metadata";
+import { buildProfileNoindexMetadata } from "@/lib/seo/profile-metadata-index-gate";
 import { getPublicImportPharmacyProfile } from "@/server/public/import-pharmacy-profile-guard";
 
 type Params = { locale: string; country: string; pharmacySlug: string };
@@ -80,13 +82,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const name = displayName(locale, result.profile.name, result.profile.nameAr);
   const profileSummary = buildPublicImportProfileSummary(locale, result.profile satisfies PublicImportProfileSummaryInput);
-  return buildLocalizedMetadata({
+  const metadata = buildLocalizedMetadata({
     locale,
     country,
     pathname: `/pharmacies/${pharmacySlug}`,
     title: metadataTitle(name),
     description: buildPublicImportProfileMetaDescription(profileSummary),
   });
+  const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile);
+
+  return importIndexEligibility.eligible ? metadata : buildProfileNoindexMetadata(metadata);
 }
 
 export default async function PublicImportedPharmacyProfilePage({ params }: { params: Promise<Params> }) {
