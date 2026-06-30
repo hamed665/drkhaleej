@@ -23,6 +23,10 @@ function assertIncludes(source, needle, message) {
   if (!source.includes(needle)) throw new Error(message);
 }
 
+function assertExcludes(source, needle, message) {
+  if (source.includes(needle)) throw new Error(message);
+}
+
 function routeFileForPathname(pathname) {
   return pathname === '/'
     ? 'src/app/[locale]/[country]/page.tsx'
@@ -44,6 +48,8 @@ function assertProtectedConfig(file, source) {
 const llmsSource = await readText('public/llms.txt');
 const registrySource = await readText('src/lib/seo/page-registry.ts');
 const urlRegistryV2Source = await readText('src/lib/seo/url-registry-v2.ts');
+const searchModeContractSource = await readText('docs/seo/search-mode-contract.md');
+const searchPageSource = await readText('src/app/[locale]/[country]/search/page.tsx');
 const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
 const publicPathnames = ['/', ...new Set(staticRouteMatches)].sort();
 
@@ -61,6 +67,45 @@ for (const token of [
   'private_exclusion',
 ]) {
   assertIncludes(urlRegistryV2Source, token, `src/lib/seo/url-registry-v2.ts must include URL registry token: ${token}`);
+}
+
+for (const token of [
+  'Search mode contract',
+  'noindex, follow',
+  'Search URLs and filtered query URLs must not enter the sitemap.',
+  'searchPublicCatalog',
+  'mobile-first layout',
+  'touch-friendly cards and filters',
+  'Indexable SEO landing pages must be created through GEO, service, and specialty gates',
+]) {
+  assertIncludes(searchModeContractSource, token, `docs/seo/search-mode-contract.md must include search mode token: ${token}`);
+}
+
+for (const token of [
+  "pathname: '/search'",
+  "indexPolicy: 'noindex_until_ready'",
+  'sitemapEligible: false',
+  "launchGateReason: 'search-utility-noindex'",
+]) {
+  assertIncludes(registrySource, token, `page registry must keep search noindex/excluded token: ${token}`);
+}
+
+for (const token of [
+  "id: 'search'",
+  "pattern: '/:locale/:country/search'",
+  "indexPolicy: 'noindex'",
+  "sitemapPolicy: 'exclude'",
+  "gate: 'search_noindex'",
+]) {
+  assertIncludes(urlRegistryV2Source, token, `URL registry v2 must keep search noindex/exclude token: ${token}`);
+}
+
+for (const token of ['generateMetadata', "pathname: '/search'", 'SearchParams', 'submittedFilters', 'dm-public-search']) {
+  assertIncludes(searchPageSource, token, `search page must keep safe utility token: ${token}`);
+}
+
+for (const token of ['listPublicImportSitemapEntries', 'sitemapEligible: true', 'sitemapPolicy: \'include\'']) {
+  assertExcludes(searchPageSource, token, `search page must not include sitemap/index expansion token: ${token}`);
 }
 
 for (const token of [
