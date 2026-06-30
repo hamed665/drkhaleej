@@ -22,7 +22,7 @@ function formatNeutralLabel(value: string): string {
     .join(' ');
 }
 
-const centerTypeLabelByValue: Partial<Record<CenterType, Record<PublicCatalogLocale, string>>> = {
+const centerTypeLabelByValue: Record<string, Record<PublicCatalogLocale, string>> = {
   clinic: { en: 'clinic', ar: 'عيادة' },
   hospital: { en: 'hospital', ar: 'مستشفى' },
   pharmacy: { en: 'pharmacy', ar: 'صيدلية' },
@@ -32,7 +32,7 @@ const centerTypeLabelByValue: Partial<Record<CenterType, Record<PublicCatalogLoc
   beauty_center: { en: 'aesthetic center', ar: 'مركز تجميل' },
 };
 
-const doctorTitleLabelByValue: Partial<Record<DoctorTitle, Record<PublicCatalogLocale, string>>> = {
+const doctorTitleLabelByValue: Record<string, Record<PublicCatalogLocale, string>> = {
   dr: { en: 'doctor', ar: 'طبيب' },
   doctor: { en: 'doctor', ar: 'طبيب' },
   dentist: { en: 'dentist', ar: 'طبيب أسنان' },
