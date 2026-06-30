@@ -1,5 +1,5 @@
 import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
-import type { PublicCenterDetail, PublicCatalogLocale } from '@/lib/catalog/public-types';
+import type { PublicCatalogLocale, PublicCenterDetail as PublicCenterDetailData } from '@/lib/catalog/public-types';
 
 import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
@@ -9,7 +9,7 @@ import { PublicLicenseInfoCard } from './public-license-info-card';
 
 type PublicCenterDetailProps = {
   locale: PublicCatalogLocale;
-  center: PublicCenterDetail;
+  center: PublicCenterDetailData;
 };
 
 type CenterDetailCopy = {
@@ -51,7 +51,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     contactUnavailable: 'Contact details should be confirmed with the provider.',
     galleryTitle: 'Gallery',
     verificationTitle: 'Profile verification',
-    verificationVerified: 'This public profile is marked as verified in DrMuscat records. This is not a license or MOH approval claim.',
+    verificationVerified: 'This public profile is marked as verified in DrKhaleej records. This is not a license or MOH approval claim.',
     verificationPlaceholder: 'License and verification details will be added after the provider verification foundation is complete.',
     futureTitle: 'Future profile sections',
     futureDescription: 'These areas are reserved for later approved phases and are not active yet.',
@@ -77,7 +77,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     contactUnavailable: 'ينبغي تأكيد تفاصيل التواصل مع مقدم الخدمة.',
     galleryTitle: 'المعرض',
     verificationTitle: 'توثيق الملف',
-    verificationVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrMuscat. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
+    verificationVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrKhaleej. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
     verificationPlaceholder: 'ستضاف تفاصيل الترخيص والتوثيق بعد اكتمال أساس توثيق مقدمي الخدمة.',
     futureTitle: 'أقسام الملف المستقبلية',
     futureDescription: 'هذه المساحات محجوزة لمراحل لاحقة معتمدة وليست مفعلة حالياً.',
