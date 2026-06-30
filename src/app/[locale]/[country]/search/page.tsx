@@ -1,286 +1,241 @@
-import type { CSSProperties } from 'react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { searchPublicCatalog } from '@/lib/catalog/public-eligible-queries';
+import type { PublicCatalogLocale, PublicCenterSummary, PublicDoctorSummary, PublicGeoAreaSummary, PublicServiceSummary } from '@/lib/catalog/public-types';
 import {
   isSupportedCountry,
   isSupportedLocale,
   localeDirection,
+  type SupportedCountry,
   type SupportedLocale
 } from '@/lib/i18n/config';
+import { publicCenterDetailRoute, publicDoctorDetailRoute } from '@/lib/routes/public';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
 type Params = { locale: string; country: string };
 type SearchParams = Record<string, string | string[] | undefined>;
-type FilterKey = 'q' | 'providerType' | 'specialty' | 'city' | 'area' | 'contentType';
-
-type RouteCopy = {
+type SearchCopy = {
   title: string;
   description: string;
   badge: string;
-  submittedHeading: string;
-  noFiltersHeading: string;
-  emptyLabel: string;
-  preparationHeading: string;
-  preparationBody: string;
-  preparationItems: readonly string[];
-  labels: Record<FilterKey, string>;
-  emptyValue: string;
+  searchTermLabel: string;
+  emptyTitle: string;
+  emptyBody: string;
+  errorTitle: string;
+  errorBody: string;
+  doctorsTitle: string;
+  centersTitle: string;
+  servicesTitle: string;
+  areasTitle: string;
+  noResults: string;
+  profileCta: string;
+  previewOnly: string;
 };
 
-const filterKeys: readonly FilterKey[] = ['q', 'contentType', 'providerType', 'specialty', 'city', 'area'];
+const explicitSearchRobots: Metadata['robots'] = { index: false, follow: true };
 
-const styles = {
-  main: {
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #f8fbfb 0%, #edf7f6 100%)',
-    color: '#102a2a',
-    padding: 'clamp(2rem, 5vw, 5rem) clamp(1rem, 4vw, 4rem)'
-  },
-  section: {
-    width: 'min(100%, 72rem)',
-    marginInline: 'auto'
-  },
-  hero: {
-    display: 'grid',
-    gap: '1rem',
-    paddingBlock: 'clamp(1rem, 3vw, 3rem)'
-  },
-  badge: {
-    width: 'fit-content',
-    border: '1px solid rgba(16, 42, 42, 0.12)',
-    borderRadius: '999px',
-    background: 'rgba(255, 255, 255, 0.78)',
-    color: '#10756e',
-    fontSize: '0.8rem',
-    fontWeight: 800,
-    letterSpacing: '0.04em',
-    padding: '0.45rem 0.75rem',
-    textTransform: 'uppercase'
-  },
-  rtlBadge: {
-    letterSpacing: 0
-  },
-  h1: {
-    maxWidth: '52rem',
-    fontSize: 'clamp(2.25rem, 6vw, 5rem)',
-    lineHeight: 0.98,
-    letterSpacing: '-0.06em',
-    margin: 0
-  },
-  rtlH1: {
-    letterSpacing: 0,
-    lineHeight: 1.12
-  },
-  h2: {
-    margin: 0,
-    fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-    lineHeight: 1.1
-  },
-  p: {
-    color: '#466566',
-    fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-    lineHeight: 1.75,
-    margin: 0
-  },
-  panel: {
-    width: 'min(100%, 72rem)',
-    marginInline: 'auto',
-    border: '1px solid rgba(16, 42, 42, 0.1)',
-    borderRadius: '2rem',
-    background: 'rgba(255, 255, 255, 0.88)',
-    boxShadow: '0 1.5rem 4rem rgba(15, 67, 65, 0.08)',
-    marginBlockStart: '1.25rem',
-    padding: 'clamp(1.25rem, 4vw, 2.5rem)',
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
-    gap: 'clamp(1rem, 3vw, 2rem)',
-    alignItems: 'start'
-  },
-  stack: {
-    display: 'grid',
-    gap: '0.85rem'
-  },
-  filters: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 14rem), 1fr))',
-    gap: '0.75rem',
-    margin: 0
-  },
-  filterCard: {
-    border: '1px solid rgba(16, 42, 42, 0.1)',
-    borderRadius: '1.1rem',
-    background: '#f8fbfb',
-    padding: '0.9rem'
-  },
-  dt: {
-    color: '#6d8585',
-    fontSize: '0.78rem',
-    fontWeight: 800,
-    textTransform: 'uppercase'
-  },
-  dd: {
-    margin: '0.25rem 0 0',
-    color: '#102a2a',
-    fontSize: '1rem',
-    fontWeight: 800,
-    overflowWrap: 'anywhere'
-  },
-  ul: {
-    display: 'grid',
-    gap: '0.6rem',
-    margin: 0,
-    paddingInlineStart: '1.2rem'
-  },
-  li: {
-    color: '#466566',
-    fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-    lineHeight: 1.75
-  }
-} satisfies Record<string, CSSProperties>;
-
-const copyByLocale: Record<SupportedLocale, RouteCopy> = {
+const copyByLocale: Record<SupportedLocale, SearchCopy> = {
   en: {
     title: 'Search Healthcare in Oman',
-    description: 'Search requests are now routed safely while DrKhaleej expands public discovery with reviewed provider information.',
+    description: 'Search reviewed public doctors, clinics, services and areas in Oman. Public discovery only; confirm details directly with providers.',
     badge: 'Public discovery search',
-    submittedHeading: 'Submitted search filters',
-    noFiltersHeading: 'Start a public healthcare search',
-    emptyLabel: 'No search filters were submitted yet.',
-    preparationHeading: 'Search results are being prepared',
-    preparationBody:
-      'DrKhaleej is expanding public discovery as reviewed provider information is onboarded. Results will appear only when safe public listing data is available, so this page does not show fake counts, ratings, reviews, or verified badges.',
-    preparationItems: [
-      'Your search is preserved in the route query parameters.',
-      'Public provider discovery will use reviewed public information only.',
-      'Confirm clinical details directly with the provider before making care decisions.'
-    ],
-    labels: {
-      q: 'Search term',
-      providerType: 'Provider type',
-      specialty: 'Specialty',
-      city: 'City',
-      area: 'Area',
-      contentType: 'Search category'
-    },
-    emptyValue: 'Not selected'
+    searchTermLabel: 'Search term',
+    emptyTitle: 'Start with a search term',
+    emptyBody: 'Use the home search box or add a search term. Results appear only from public eligible data.',
+    errorTitle: 'Search is temporarily unavailable',
+    errorBody: 'Public search could not be loaded safely. No private data is exposed here.',
+    doctorsTitle: 'Doctors',
+    centersTitle: 'Centers',
+    servicesTitle: 'Services',
+    areasTitle: 'Areas',
+    noResults: 'No public eligible results were found for this search yet.',
+    profileCta: 'View public profile',
+    previewOnly: 'Preview only'
   },
   ar: {
     title: 'البحث عن الرعاية الصحية في عُمان',
-    description: 'أصبحت طلبات البحث مرتبطة بالمسار بأمان بينما يوسّع DrKhaleej الاكتشاف العام بمعلومات مقدمي الخدمة بعد مراجعتها.',
+    description: 'ابحث في بيانات عامة تمت مراجعتها للأطباء والعيادات والخدمات والمناطق في عُمان. اكتشاف عام فقط، ويجب تأكيد التفاصيل مباشرة مع مقدمي الخدمة.',
     badge: 'بحث الاكتشاف العام',
-    submittedHeading: 'فلاتر البحث المرسلة',
-    noFiltersHeading: 'ابدأ بحثًا عامًا عن الرعاية الصحية',
-    emptyLabel: 'لم يتم إرسال فلاتر بحث بعد.',
-    preparationHeading: 'يتم تجهيز نتائج البحث',
-    preparationBody:
-      'يوسّع DrKhaleej الاكتشاف العام مع إدخال معلومات مقدمي الخدمة بعد مراجعتها. ستظهر النتائج فقط عند توفر بيانات عامة آمنة، لذلك لا تعرض هذه الصفحة أعدادًا أو تقييمات أو مراجعات أو شارات موثقة وهمية.',
-    preparationItems: [
-      'يتم حفظ البحث في معاملات الاستعلام داخل المسار.',
-      'سيستخدم الاكتشاف العام معلومات عامة تمت مراجعتها فقط.',
-      'يرجى تأكيد التفاصيل الطبية مباشرة مع مقدم الخدمة قبل اتخاذ قرارات الرعاية.'
-    ],
-    labels: {
-      q: 'عبارة البحث',
-      providerType: 'نوع مقدم الخدمة',
-      specialty: 'التخصص',
-      city: 'المدينة',
-      area: 'المنطقة',
-      contentType: 'فئة البحث'
-    },
-    emptyValue: 'غير محدد'
+    searchTermLabel: 'عبارة البحث',
+    emptyTitle: 'ابدأ بعبارة بحث',
+    emptyBody: 'استخدم مربع البحث في الصفحة الرئيسية أو أضف عبارة بحث. تظهر النتائج فقط من البيانات العامة المؤهلة.',
+    errorTitle: 'البحث غير متاح مؤقتاً',
+    errorBody: 'تعذر تحميل البحث العام بأمان. لا يتم عرض أي بيانات خاصة هنا.',
+    doctorsTitle: 'الأطباء',
+    centersTitle: 'المراكز',
+    servicesTitle: 'الخدمات',
+    areasTitle: 'المناطق',
+    noResults: 'لا توجد نتائج عامة مؤهلة لهذا البحث حتى الآن.',
+    profileCta: 'عرض الملف العام',
+    previewOnly: 'معاينة فقط'
   }
 };
 
-const firstSearchParamValue = (value: string | string[] | undefined) => {
+function firstSearchParamValue(value: string | string[] | undefined): string {
   const rawValue = Array.isArray(value) ? value[0] : value;
+  return rawValue ? rawValue.trim().slice(0, 80) : '';
+}
 
-  if (!rawValue) {
-    return '';
-  }
+function preferredText(locale: PublicCatalogLocale, en: string | null, ar: string | null): string | null {
+  return locale === 'ar' ? ar ?? en : en ?? ar;
+}
 
-  return rawValue.trim().slice(0, 120);
-};
+function neutralLabel(value: string): string {
+  return value
+    .split('_')
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase())
+    .join(' ');
+}
 
-const submittedFilters = (searchParams: SearchParams) =>
-  filterKeys
-    .map((key) => ({ key, value: firstSearchParamValue(searchParams[key]) }))
-    .filter(({ value }) => value.length > 0);
+function ResultCard({
+  title,
+  description,
+  label,
+  href,
+  cta,
+}: {
+  title: string;
+  description?: string | null;
+  label?: string | null;
+  href?: string | null;
+  cta: string;
+}) {
+  return (
+    <li className="rounded-3xl border border-emerald-100/80 bg-white/85 p-4 shadow-sm ring-1 ring-white/70 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md sm:p-5">
+      <div className="space-y-3">
+        {label ? <p className="inline-flex w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">{label}</p> : null}
+        <h3 className="text-base font-semibold leading-7 text-slate-950">
+          {href ? (
+            <Link href={href} className="underline-offset-4 hover:text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
+        </h3>
+        {description ? <p className="text-sm leading-6 text-slate-600">{description}</p> : null}
+        {href ? (
+          <Link href={href} className="inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
+            {cta}
+          </Link>
+        ) : null}
+      </div>
+    </li>
+  );
+}
+
+function ResultGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-3xl border border-emerald-100/80 bg-gradient-to-br from-white via-emerald-50/30 to-cyan-50/30 p-4 shadow-[0_18px_50px_rgba(15,118,110,0.08)] ring-1 ring-white/80 sm:p-6">
+      <h2 className="text-lg font-semibold leading-7 tracking-[-0.01em] text-slate-950 sm:text-xl">{title}</h2>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country } = await params;
-
-  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) {
-    return {};
-  }
-
+  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) return {};
   const copy = copyByLocale[locale];
-
-  return buildLocalizedMetadata({
-    locale,
-    country,
-    pathname: '/search',
-    title: copy.title,
-    description: copy.description
-  });
+  const metadata = buildLocalizedMetadata({ locale, country, pathname: '/search', title: copy.title, description: copy.description });
+  return { ...metadata, robots: explicitSearchRobots };
 }
 
-export default async function PublicRoutePage({
-  params,
-  searchParams
-}: {
-  params: Promise<Params>;
-  searchParams: Promise<SearchParams>;
-}) {
+export default async function PublicSearchPage({ params, searchParams }: { params: Promise<Params>; searchParams: Promise<SearchParams> }) {
   const { locale, country } = await params;
+  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
 
-  if (!isSupportedLocale(locale) || !isSupportedCountry(country)) {
-    notFound();
-  }
-
-  const copy = copyByLocale[locale];
-  const dir = localeDirection(locale);
-  const filters = submittedFilters(await searchParams);
-  const hasFilters = filters.length > 0;
-
-  const badgeStyle = dir === 'rtl' ? { ...styles.badge, ...styles.rtlBadge } : styles.badge;
-  const h1Style = dir === 'rtl' ? { ...styles.h1, ...styles.rtlH1 } : styles.h1;
+  const safeLocale = locale as SupportedLocale;
+  const safeCountry = country as SupportedCountry;
+  const dir = localeDirection(safeLocale);
+  const copy = copyByLocale[safeLocale];
+  const submitted = await searchParams;
+  const query = firstSearchParamValue(submitted.q);
+  const result = query.length >= 2 ? await searchPublicCatalog(query, { limit: 12 }) : null;
+  const hasResults = Boolean(result?.ok && (result.data.centers.length || result.data.doctors.length || result.data.services.length || result.data.areas.length));
 
   return (
-    <main className="dm-public-search" dir={dir} style={styles.main}>
-      <section className="dm-public-search__hero" aria-labelledby="dm-public-search-title" style={{ ...styles.section, ...styles.hero }}>
-        <span className="dm-public-search__badge" style={badgeStyle}>{copy.badge}</span>
-        <h1 id="dm-public-search-title" style={h1Style}>{copy.title}</h1>
-        <p style={styles.p}>{copy.description}</p>
-      </section>
-
-      <section className="dm-public-search__panel" aria-labelledby="dm-public-search-summary-title" style={styles.panel}>
-        <div style={styles.stack}>
-          <span style={badgeStyle}>{hasFilters ? copy.submittedHeading : copy.noFiltersHeading}</span>
-          <h2 id="dm-public-search-summary-title" style={styles.h2}>{hasFilters ? copy.submittedHeading : copy.noFiltersHeading}</h2>
-          <p style={styles.p}>{hasFilters ? copy.preparationBody : copy.emptyLabel}</p>
+    <main className="home-foundation dm2026-home-page dm-public-search" dir={dir} data-country={safeCountry} data-locale={safeLocale}>
+      <section className="mx-auto grid w-full max-w-6xl gap-5 px-4 py-8 sm:px-6 lg:px-8 lg:py-12" aria-labelledby="dm-public-search-title">
+        <div className="rounded-[2rem] border border-emerald-100/80 bg-gradient-to-br from-white via-emerald-50/40 to-cyan-50/40 p-5 shadow-[0_24px_70px_rgba(15,118,110,0.1)] ring-1 ring-white/80 sm:p-8">
+          <p className="inline-flex w-fit rounded-full border border-emerald-100 bg-white/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-800">{copy.badge}</p>
+          <h1 id="dm-public-search-title" className="mt-4 max-w-4xl text-4xl font-semibold leading-[0.98] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-6xl">
+            {copy.title}
+          </h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">{copy.description}</p>
+          {query ? (
+            <p className="mt-5 inline-flex rounded-full border border-emerald-100 bg-white/80 px-3 py-1.5 text-sm font-semibold text-slate-700">
+              {copy.searchTermLabel}: <span className="ms-1 text-emerald-800">{query}</span>
+            </p>
+          ) : null}
         </div>
 
-        {hasFilters ? (
-          <dl className="dm-public-search__filters" style={styles.filters}>
-            {filters.map(({ key, value }) => (
-              <div key={key} style={styles.filterCard}>
-                <dt style={styles.dt}>{copy.labels[key]}</dt>
-                <dd style={styles.dd}>{value || copy.emptyValue}</dd>
-              </div>
-            ))}
-          </dl>
+        {!query ? (
+          <ResultGroup title={copy.emptyTitle}>
+            <p className="text-sm leading-7 text-slate-600">{copy.emptyBody}</p>
+          </ResultGroup>
         ) : null}
-      </section>
 
-      <section className="dm-public-search__state" aria-labelledby="dm-public-search-state-title" style={{ ...styles.panel, ...styles.stack }}>
-        <span style={badgeStyle}>{copy.emptyValue}</span>
-        <h2 id="dm-public-search-state-title" style={styles.h2}>{copy.preparationHeading}</h2>
-        <p style={styles.p}>{copy.preparationBody}</p>
-        <ul style={styles.ul}>
-          {copy.preparationItems.map((item) => (
-            <li key={item} style={styles.li}>{item}</li>
-          ))}
-        </ul>
+        {result && !result.ok ? (
+          <ResultGroup title={copy.errorTitle}>
+            <p className="text-sm leading-7 text-slate-600">{copy.errorBody}</p>
+          </ResultGroup>
+        ) : null}
+
+        {result?.ok && !hasResults ? (
+          <ResultGroup title={copy.noResults}>
+            <p className="text-sm leading-7 text-slate-600">{copy.noResults}</p>
+          </ResultGroup>
+        ) : null}
+
+        {result?.ok && result.data.doctors.length > 0 ? (
+          <ResultGroup title={copy.doctorsTitle}>
+            <ul className="grid gap-3 md:grid-cols-2" role="list">
+              {result.data.doctors.map((doctor: PublicDoctorSummary) => {
+                const name = preferredText(safeLocale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
+                const href = publicDoctorDetailRoute(safeLocale, doctor.defaultCountry, doctor.slug);
+                return <ResultCard key={doctor.id} title={name} label={neutralLabel(doctor.titleEn)} href={href} cta={copy.profileCta} />;
+              })}
+            </ul>
+          </ResultGroup>
+        ) : null}
+
+        {result?.ok && result.data.centers.length > 0 ? (
+          <ResultGroup title={copy.centersTitle}>
+            <ul className="grid gap-3 md:grid-cols-2" role="list">
+              {result.data.centers.map((center: PublicCenterSummary) => {
+                const name = preferredText(safeLocale, center.nameEn, center.nameAr) ?? center.nameEn;
+                const description = preferredText(safeLocale, center.shortDescriptionEn, center.shortDescriptionAr) ?? preferredText(safeLocale, center.descriptionEn, center.descriptionAr);
+                const href = publicCenterDetailRoute(safeLocale, center.defaultCountry, center.slug);
+                return <ResultCard key={center.id} title={name} description={description} label={neutralLabel(center.centerType)} href={href} cta={copy.profileCta} />;
+              })}
+            </ul>
+          </ResultGroup>
+        ) : null}
+
+        {result?.ok && result.data.services.length > 0 ? (
+          <ResultGroup title={copy.servicesTitle}>
+            <ul className="grid gap-3 md:grid-cols-2" role="list">
+              {result.data.services.map((service: PublicServiceSummary) => {
+                const name = preferredText(safeLocale, service.nameEn, service.nameAr) ?? service.nameEn;
+                const description = preferredText(safeLocale, service.descriptionEn, service.descriptionAr);
+                return <ResultCard key={service.id} title={name} description={description} label={copy.previewOnly} cta={copy.profileCta} />;
+              })}
+            </ul>
+          </ResultGroup>
+        ) : null}
+
+        {result?.ok && result.data.areas.length > 0 ? (
+          <ResultGroup title={copy.areasTitle}>
+            <ul className="grid gap-3 md:grid-cols-2" role="list">
+              {result.data.areas.map((area: PublicGeoAreaSummary) => {
+                const name = preferredText(safeLocale, area.nameEn, area.nameAr) ?? area.nameEn;
+                return <ResultCard key={area.id} title={name} label={copy.previewOnly} cta={copy.profileCta} />;
+              })}
+            </ul>
+          </ResultGroup>
+        ) : null}
       </section>
     </main>
   );
