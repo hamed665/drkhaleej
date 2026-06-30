@@ -6,6 +6,7 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildLabsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
+import { PublicDirectoryQueryNotice } from "@/components/public/public-directory-query-notice";
 import {
   centerTypeDirectoryResultFromSearch,
   firstDirectorySearchParamValue,
@@ -94,6 +95,7 @@ export default async function PublicLabsPage({
   const emptyText = isDirectorySearch
     ? searchEmptyCopyByLocale[safeLocale]
     : compactEmptyCopyByLocale[safeLocale];
+  const clearSearchHref = `/${safeLocale}/${safeCountry}/labs`;
   const whatsAppNumber = getPublicWhatsAppNumber();
   const whatsAppHref = buildWhatsAppUrl(
     whatsAppNumber,
@@ -111,6 +113,12 @@ export default async function PublicLabsPage({
       <PublicDiscoveryResultsShell2026
         config={config}
         isEmpty={result.ok && result.data.length === 0}
+        hasActiveQuery={isDirectorySearch}
+        activeQueryNotice={
+          isDirectorySearch ? (
+            <PublicDirectoryQueryNotice locale={safeLocale} query={query} clearHref={clearSearchHref} />
+          ) : null
+        }
         compactEmptyText={emptyText}
       >
         <PublicDirectoryListingContent
