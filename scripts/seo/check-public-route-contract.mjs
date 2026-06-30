@@ -100,12 +100,37 @@ for (const token of [
   assertIncludes(urlRegistryV2Source, token, `URL registry v2 must keep search noindex/exclude token: ${token}`);
 }
 
-for (const token of ['generateMetadata', "pathname: '/search'", 'SearchParams', 'submittedFilters', 'dm-public-search']) {
-  assertIncludes(searchPageSource, token, `search page must keep safe utility token: ${token}`);
+for (const token of [
+  'generateMetadata',
+  "pathname: '/search'",
+  'SearchParams',
+  'searchPublicCatalog(query, { limit: 12 })',
+  'explicitSearchRobots',
+  'robots: explicitSearchRobots',
+  'dm-public-search',
+  'home-foundation dm2026-home-page dm-public-search',
+  'publicDoctorDetailRoute',
+  'publicCenterDetailRoute',
+  'ResultCard',
+  'ResultGroup',
+  'query.length >= 2',
+  'copy.previewOnly',
+]) {
+  assertIncludes(searchPageSource, token, `search page must keep runtime-safe token: ${token}`);
 }
 
-for (const token of ['listPublicImportSitemapEntries', 'sitemapEligible: true', 'sitemapPolicy: \'include\'']) {
-  assertExcludes(searchPageSource, token, `search page must not include sitemap/index expansion token: ${token}`);
+for (const token of [
+  'submittedFilters',
+  'listPublicImportSitemapEntries',
+  'sitemapEligible: true',
+  "sitemapPolicy: 'include'",
+  'rating',
+  'insurance',
+  'Book now',
+  'Open now',
+  'verified badge',
+]) {
+  assertExcludes(searchPageSource, token, `search page must not include unsafe or stale token: ${token}`);
 }
 
 for (const token of [
