@@ -67,7 +67,7 @@ for (const forbiddenToken of [
 const directoryContracts = [
   {
     path: 'src/app/[locale]/[country]/doctors/page.tsx',
-    tokens: ['listPublicDoctors({ country: safeCountry })', 'PublicDirectoryListingContent', 'variant="doctor"', 'result={result}'],
+    tokens: ['listPublicDoctors({ country: safeCountry })', 'searchPublicCatalog(query, { limit: 24 })', 'doctorResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="doctor"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/centers/page.tsx',
@@ -97,6 +97,22 @@ for (const contract of directoryContracts) {
   }
 }
 
+const doctorsPage = readFile('src/app/[locale]/[country]/doctors/page.tsx');
+for (const token of [
+  'type SearchParams = Record<string, string | string[] | undefined>',
+  'searchParams: Promise<SearchParams>',
+  'firstSearchParamValue',
+  'searchResultsHeading',
+  'searchResultsSubtext',
+  'searchEmptyText',
+  'pathname: "/doctors"',
+]) {
+  assertIncludes(doctorsPage, token, 'src/app/[locale]/[country]/doctors/page.tsx');
+}
+for (const forbiddenToken of ['sitemapPolicy', 'generateStaticParams', 'specialtySlug', 'areaSlug', 'geo_area', 'AggregateRating']) {
+  assertNotIncludes(doctorsPage, forbiddenToken, 'src/app/[locale]/[country]/doctors/page.tsx');
+}
+
 const directorySearchContractPath = 'docs/seo/directory-search-filter-contract.md';
 const directorySearchContract = readFile(directorySearchContractPath);
 for (const token of [
@@ -121,4 +137,4 @@ for (const token of [
   assertIncludes(packageContent, token, packagePath);
 }
 
-console.log('Public listing card safety, directory graph, and directory search contract checks passed.');
+console.log('Public listing card safety, directory graph, and doctors q SSR directory search checks passed.');
