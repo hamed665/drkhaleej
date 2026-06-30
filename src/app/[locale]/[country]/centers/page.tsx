@@ -6,12 +6,12 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildCentersDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
+import {
+  centerDirectoryResultFromSearch,
+  firstDirectorySearchParamValue,
+  isDirectorySearchQuery,
+} from "@/lib/catalog/public-directory-query";
 import { listPublicCenters, searchPublicCatalog } from "@/lib/catalog/public-eligible-queries";
-import type {
-  PublicCatalogQueryResult,
-  PublicCatalogSearchResult,
-  PublicCenterSummary,
-} from "@/lib/catalog/public-types";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -51,22 +51,6 @@ const metadataCopyByLocale: Record<
   },
 };
 
-function firstSearchParamValue(value: string | string[] | undefined): string {
-  const rawValue = Array.isArray(value) ? value[0] : value;
-  return rawValue ? rawValue.trim().slice(0, 80) : "";
-}
-
-function centerResultFromSearch(
-  result: PublicCatalogQueryResult<PublicCatalogSearchResult>,
-): PublicCatalogQueryResult<PublicCenterSummary[]> {
-  return {
-    ok: result.ok,
-    data: result.ok ? result.data.centers : [],
-    emptyReason: result.emptyReason,
-    error: result.error,
-  };
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -98,10 +82,10 @@ export default async function PublicCentersPage({
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
   const config = cleanConfigBrand(buildCentersDiscoveryConfig(safeLocale, safeCountry, dir));
-  const query = firstSearchParamValue((await searchParams).q);
-  const isDirectorySearch = query.length >= 2;
+  const query = firstDirectorySearchParamValue((await searchParams).q);
+  const isDirectorySearch = isDirectorySearchQuery(query);
   const result = isDirectorySearch
-    ? centerResultFromSearch(await searchPublicCatalog(query, { limit: 24 }))
+    ? centerDirectoryResultFromSearch(await searchPublicCatalog(query, { limit: 24 }))
     : await listPublicCenters({ country: safeCountry });
   const emptyText = isDirectorySearch
     ? searchEmptyCopyByLocale[safeLocale]

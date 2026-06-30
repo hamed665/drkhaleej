@@ -64,26 +64,41 @@ for (const forbiddenToken of [
   assertNotIncludes(cardContent, forbiddenToken, cardPath);
 }
 
+const directoryQueryHelperPath = 'src/lib/catalog/public-directory-query.ts';
+const directoryQueryHelper = readFile(directoryQueryHelperPath);
+for (const token of [
+  'PublicDirectorySearchParamValue',
+  'firstDirectorySearchParamValue',
+  'isDirectorySearchQuery',
+  'doctorDirectoryResultFromSearch',
+  'centerDirectoryResultFromSearch',
+  'centerTypeDirectoryResultFromSearch',
+  'query.length >= 2',
+  'PublicCatalogQueryResult<PublicCatalogSearchResult>',
+]) {
+  assertIncludes(directoryQueryHelper, token, directoryQueryHelperPath);
+}
+
 const directoryContracts = [
   {
     path: 'src/app/[locale]/[country]/doctors/page.tsx',
-    tokens: ['listPublicDoctors({ country: safeCountry })', 'searchPublicCatalog(query, { limit: 24 })', 'doctorResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="doctor"', 'result={result}', 'emptyText={emptyText}'],
+    tokens: ['listPublicDoctors({ country: safeCountry })', 'searchPublicCatalog(query, { limit: 24 })', 'doctorDirectoryResultFromSearch', 'isDirectorySearchQuery(query)', 'firstDirectorySearchParamValue', 'PublicDirectoryListingContent', 'variant="doctor"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/centers/page.tsx',
-    tokens: ['listPublicCenters({ country: safeCountry })', 'searchPublicCatalog(query, { limit: 24 })', 'centerResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
+    tokens: ['listPublicCenters({ country: safeCountry })', 'searchPublicCatalog(query, { limit: 24 })', 'centerDirectoryResultFromSearch', 'isDirectorySearchQuery(query)', 'firstDirectorySearchParamValue', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/labs/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "laboratory"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
+    tokens: ['listPublicCenters({', 'centerType: "laboratory"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeDirectoryResultFromSearch', 'isDirectorySearchQuery(query)', 'firstDirectorySearchParamValue', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/pharmacies/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "pharmacy"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
+    tokens: ['listPublicCenters({', 'centerType: "pharmacy"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeDirectoryResultFromSearch', 'isDirectorySearchQuery(query)', 'firstDirectorySearchParamValue', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/hospitals/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "hospital"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
+    tokens: ['listPublicCenters({', 'centerType: "hospital"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeDirectoryResultFromSearch', 'isDirectorySearchQuery(query)', 'firstDirectorySearchParamValue', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
 ];
 
@@ -92,7 +107,18 @@ for (const contract of directoryContracts) {
   for (const token of contract.tokens) {
     assertIncludes(content, token, contract.path);
   }
-  for (const forbiddenToken of ['contactActions', 'Book now', 'Open now', 'Verified', 'rating', 'insurance']) {
+  for (const forbiddenToken of [
+    'contactActions',
+    'Book now',
+    'Open now',
+    'Verified',
+    'rating',
+    'insurance',
+    'function firstSearchParamValue',
+    'function doctorResultFromSearch',
+    'function centerResultFromSearch',
+    'function centerTypeResultFromSearch',
+  ]) {
     assertNotIncludes(content, forbiddenToken, contract.path);
   }
 }
@@ -101,7 +127,6 @@ const doctorsPage = readFile('src/app/[locale]/[country]/doctors/page.tsx');
 for (const token of [
   'type SearchParams = Record<string, string | string[] | undefined>',
   'searchParams: Promise<SearchParams>',
-  'firstSearchParamValue',
   'searchResultsHeading',
   'searchResultsSubtext',
   'searchEmptyText',
@@ -117,9 +142,7 @@ const centersPage = readFile('src/app/[locale]/[country]/centers/page.tsx');
 for (const token of [
   'type SearchParams = Record<string, string | string[] | undefined>',
   'searchParams: Promise<SearchParams>',
-  'firstSearchParamValue',
   'searchEmptyCopyByLocale',
-  'centerResultFromSearch',
   'pathname: "/centers"',
 ]) {
   assertIncludes(centersPage, token, 'src/app/[locale]/[country]/centers/page.tsx');
@@ -137,9 +160,8 @@ for (const routePath of [
   for (const token of [
     'type SearchParams = Record<string, string | string[] | undefined>',
     'searchParams: Promise<SearchParams>',
-    'firstSearchParamValue',
     'searchEmptyCopyByLocale',
-    'centerTypeResultFromSearch',
+    'centerTypeDirectoryResultFromSearch',
   ]) {
     assertIncludes(routePage, token, routePath);
   }
@@ -178,4 +200,4 @@ for (const token of [
   assertIncludes(packageContent, token, packagePath);
 }
 
-console.log('Public listing card safety, directory graph, and center-type q SSR directory search checks passed.');
+console.log('Public listing card safety, directory graph, and shared directory query helpers checks passed.');

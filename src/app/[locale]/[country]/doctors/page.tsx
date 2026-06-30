@@ -6,12 +6,12 @@ import { DoctorsSearch2026 } from "@/components/public/doctors/DoctorsSearch2026
 import { PublicDiscoveryFaq2026 } from "@/components/public/discovery/PublicDiscoveryFaq2026";
 import { buildDiscoveryFaq } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
+import {
+  doctorDirectoryResultFromSearch,
+  firstDirectorySearchParamValue,
+  isDirectorySearchQuery,
+} from "@/lib/catalog/public-directory-query";
 import { listPublicDoctors, searchPublicCatalog } from "@/lib/catalog/public-eligible-queries";
-import type {
-  PublicCatalogQueryResult,
-  PublicCatalogSearchResult,
-  PublicDoctorSummary,
-} from "@/lib/catalog/public-types";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -90,22 +90,6 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   },
 };
 
-function firstSearchParamValue(value: string | string[] | undefined): string {
-  const rawValue = Array.isArray(value) ? value[0] : value;
-  return rawValue ? rawValue.trim().slice(0, 80) : "";
-}
-
-function doctorResultFromSearch(
-  result: PublicCatalogQueryResult<PublicCatalogSearchResult>,
-): PublicCatalogQueryResult<PublicDoctorSummary[]> {
-  return {
-    ok: result.ok,
-    data: result.ok ? result.data.doctors : [],
-    emptyReason: result.emptyReason,
-    error: result.error,
-  };
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -138,10 +122,10 @@ export default async function PublicDoctorsPage({
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
   const copy = copyByLocale[safeLocale];
-  const query = firstSearchParamValue((await searchParams).q);
-  const isDirectorySearch = query.length >= 2;
+  const query = firstDirectorySearchParamValue((await searchParams).q);
+  const isDirectorySearch = isDirectorySearchQuery(query);
   const result = isDirectorySearch
-    ? doctorResultFromSearch(await searchPublicCatalog(query, { limit: 24 }))
+    ? doctorDirectoryResultFromSearch(await searchPublicCatalog(query, { limit: 24 }))
     : await listPublicDoctors({ country: safeCountry });
   const whatsAppNumber = getPublicWhatsAppNumber();
   const whatsAppHref = buildWhatsAppUrl(whatsAppNumber, copy.whatsappMessage);
