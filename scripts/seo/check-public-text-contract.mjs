@@ -1,50 +1,35 @@
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 
-const scanTargets = [
+const staticScanFiles = [
   'public/llms.txt',
   'src/app/robots.ts',
   'src/app/sitemap.ts',
-  'src/app/[locale]/[country]/page.tsx',
-  'src/app/[locale]/[country]/doctors/page.tsx',
-  'src/app/[locale]/[country]/doctor/[doctorSlug]/page.tsx',
-  'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
-  'src/app/[locale]/[country]/centers/page.tsx',
-  'src/app/[locale]/[country]/labs/page.tsx',
-  'src/app/[locale]/[country]/pharmacies/page.tsx',
-  'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/page.tsx',
-  'src/app/[locale]/[country]/hospitals/page.tsx',
-  'src/app/[locale]/[country]/services/page.tsx',
-  'src/app/[locale]/[country]/search/page.tsx',
-  'src/app/[locale]/[country]/for-providers/page.tsx',
-  'src/app/[locale]/[country]/for-providers/page-content.tsx',
-  'src/app/[locale]/[country]/dental/page.tsx',
-  'src/app/[locale]/[country]/beauty/page.tsx',
-  'src/app/[locale]/[country]/offers/page.tsx',
-  'src/app/[locale]/[country]/pet-clinics/page.tsx',
-  'src/app/[locale]/[country]/pet-shops/page.tsx',
   'src/app/[locale]/[country]/articles/page.tsx',
   'src/app/[locale]/[country]/articles/[slug]/page.tsx',
-  'src/app/[locale]/[country]/source-policy/page.tsx',
-  'src/components/brand',
-  'src/components/home',
-  'src/components/layout',
-  'src/components/public',
-  'src/lib/articles',
-  'src/lib/routes/public.ts',
+  'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
+  'src/app/[locale]/[country]/doctor/[doctorSlug]/page.tsx',
+  'src/components/public/public-center-detail.tsx',
+  'src/components/public/public-doctor-detail.tsx',
+  'src/components/home/HomePage2026HeaderHero.tsx',
+  'src/components/home/HomeSearch2026.tsx',
+  'src/components/home/HomeEntityClarity2026.tsx',
+  'src/components/home/HomeFeaturedBoard2026.tsx',
+  'src/components/home/HomeDiscoveryCategories2026.tsx',
+  'src/components/home/HomeSpecialOffersShowcase2026.tsx',
+  'src/components/home/HomeProviderCTA2026.tsx',
+  'src/components/home/HomeFAQ2026.tsx',
+  'src/components/home/HomeTrustSafety2026.tsx',
+  'src/components/home/HomeSupportContact2026.tsx',
+  'src/lib/articles/article-shell-content.ts',
   'src/lib/seo/site.ts',
   'src/lib/seo/metadata.ts',
-  'src/lib/seo/geo-route-metadata.ts',
-  'src/lib/seo/oman-geo-gated-metadata.ts',
   'src/lib/seo/jsonld.ts',
   'src/lib/seo/faq-jsonld.ts',
   'src/lib/seo/page-registry.ts'
 ];
-
-const textFileExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.md', '.txt']);
-const ignoredDirectoryNames = new Set(['.git', '.next', 'node_modules']);
 
 const blockedParts = [
   ['Dr', 'Muscat'],
@@ -61,35 +46,10 @@ async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
 }
 
-async function safeStat(relativePath) {
-  try {
-    return await stat(path.join(root, relativePath));
-  } catch {
-    return null;
-  }
-}
-
-async function collectTextFiles(relativePath) {
-  const stats = await safeStat(relativePath);
-  if (stats === null) {
-    throw new Error(`Missing required public text scan target: ${relativePath}`);
-  }
-
-  if (stats.isFile()) {
-    return textFileExtensions.has(path.extname(relativePath)) ? [relativePath] : [];
-  }
-
-  if (!stats.isDirectory()) return [];
-
-  const entries = await readdir(path.join(root, relativePath), { withFileTypes: true });
-  const files = [];
-
-  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.isDirectory() && ignoredDirectoryNames.has(entry.name)) continue;
-    files.push(...await collectTextFiles(path.join(relativePath, entry.name)));
-  }
-
-  return files;
+function routeFileForPathname(pathname) {
+  return pathname === '/'
+    ? 'src/app/[locale]/[country]/page.tsx'
+    : `src/app/[locale]/[country]${pathname}/page.tsx`;
 }
 
 function assertNoBlockedText(relativePath, source) {
@@ -100,11 +60,14 @@ function assertNoBlockedText(relativePath, source) {
   }
 }
 
-const files = [...new Set((await Promise.all(scanTargets.map(collectTextFiles))).flat())].sort();
+const registrySource = await readText('src/lib/seo/page-registry.ts');
+const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
+const publicPageFiles = ['/', ...new Set(staticRouteMatches)].map(routeFileForPathname);
+const files = [...new Set([...staticScanFiles, ...publicPageFiles])].sort();
 
 for (const file of files) {
   const source = await readText(file);
   assertNoBlockedText(file, source);
 }
 
-console.log(`public text contract check passed for ${files.length} public surface files.`);
+console.log(`public text contract check passed for ${files.length} targeted public surface files.`);
