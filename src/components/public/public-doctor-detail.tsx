@@ -1,45 +1,17 @@
 import { formatPublicLocationSummary, getPublicDirectionsUrl } from '@/lib/catalog/public-location';
-import type { PublicCatalogLocale, PublicDoctorDetail } from '@/lib/catalog/public-types';
+import type { PublicCatalogLocale, PublicDoctorDetail as PublicDoctorDetailData } from '@/lib/catalog/public-types';
 import { publicCenterDetailRoute } from '@/lib/routes/public';
 
-import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
 import { PublicContactActions } from './public-contact-actions';
 import { PublicLicenseInfoCard } from './public-license-info-card';
 
 type PublicDoctorDetailProps = {
   locale: PublicCatalogLocale;
-  doctor: PublicDoctorDetail;
+  doctor: PublicDoctorDetailData;
 };
 
-type DoctorDetailCopy = {
-  aboutTitle: string;
-  detailsTitle: string;
-  servicesTitle: string;
-  servicesDescription: string;
-  practiceLocationsTitle: string;
-  practiceLocationsDescription: string;
-  trustTitle: string;
-  trustVerified: string;
-  trustPlaceholder: string;
-  futureTitle: string;
-  futureDescription: string;
-  futureSlots: string[];
-  disclaimerTitle: string;
-  disclaimerBody: string;
-  genderLabel: string;
-  specialtyLabel: string;
-  yearsExperienceLabel: string;
-  noBio: string;
-  noServices: string;
-  noPracticeLocations: string;
-  noLocation: string;
-  centerProfileLabel: string;
-  directionsLabel: string;
-  practiceDirectionsAriaLabel: string;
-};
-
-const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
+const copyByLocale = {
   en: {
     aboutTitle: 'About this doctor',
     detailsTitle: 'Professional details',
@@ -48,21 +20,13 @@ const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
     practiceLocationsTitle: 'Practice locations preview',
     practiceLocationsDescription: 'Only connected center names, public branch labels, and general area, city, and country information are shown in this phase.',
     trustTitle: 'Profile verification',
-    trustVerified: 'This public profile is marked as verified in DrMuscat records. This is not a license or MOH approval claim.',
+    trustVerified: 'This public profile is marked as verified in DrKhaleej records. This is not a license or MOH approval claim.',
     trustPlaceholder: 'License and verification details will be added after the provider verification foundation is complete.',
     futureTitle: 'Future doctor profile sections',
     futureDescription: 'These areas are reserved for later approved phases and are not active yet.',
-    futureSlots: [
-      'Directions',
-      'Reviews',
-      'Ratings',
-      'Media/gallery',
-      'Video',
-      'Premium profile'
-    ],
-    disclaimerTitle: 'Medical safety note',
-    disclaimerBody:
-      'This public profile is for healthcare discovery only. It is not medical advice, diagnosis, emergency guidance, a provider endorsement, or a guarantee of availability.',
+    futureSlots: ['Directions', 'Reviews', 'Ratings', 'Media/gallery', 'Video', 'Premium profile'],
+    disclaimerTitle: 'Discovery safety note',
+    disclaimerBody: 'This public profile is for healthcare discovery only. Confirm clinical details directly with the provider before making care decisions.',
     genderLabel: 'Gender',
     specialtyLabel: 'Primary specialty',
     yearsExperienceLabel: 'Years of experience',
@@ -82,21 +46,13 @@ const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
     practiceLocationsTitle: 'لمحة عن مواقع الممارسة',
     practiceLocationsDescription: 'تظهر في هذه المرحلة أسماء المراكز المرتبطة وأسماء الفروع العامة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
     trustTitle: 'توثيق الملف',
-    trustVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrMuscat. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
+    trustVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrKhaleej. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
     trustPlaceholder: 'ستضاف تفاصيل الترخيص والتوثيق بعد اكتمال أساس توثيق مقدمي الخدمة.',
     futureTitle: 'أقسام ملف الطبيب المستقبلية',
     futureDescription: 'هذه المساحات محجوزة لمراحل لاحقة معتمدة وليست مفعلة حالياً.',
-    futureSlots: [
-      'الاتجاهات',
-      'المراجعات',
-      'التقييمات',
-      'المعرض',
-      'الفيديو',
-      'الملف المميز'
-    ],
-    disclaimerTitle: 'ملاحظة السلامة الطبية',
-    disclaimerBody:
-      'هذا الملف العام مخصص لاكتشاف خدمات الرعاية الصحية فقط. ولا يعد نصيحة طبية أو تشخيصاً أو إرشاداً للطوارئ أو تزكية لمقدم الخدمة أو ضماناً للتوفر.',
+    futureSlots: ['الاتجاهات', 'المراجعات', 'التقييمات', 'المعرض', 'الفيديو', 'الملف المميز'],
+    disclaimerTitle: 'ملاحظة سلامة الاكتشاف',
+    disclaimerBody: 'هذا الملف العام مخصص لاكتشاف خدمات الرعاية فقط. يرجى تأكيد التفاصيل مباشرة مع مقدم الخدمة قبل اتخاذ قرارات الرعاية.',
     genderLabel: 'الجنس',
     specialtyLabel: 'التخصص الأساسي',
     yearsExperienceLabel: 'سنوات الخبرة',
@@ -108,11 +64,10 @@ const copyByLocale: Record<PublicCatalogLocale, DoctorDetailCopy> = {
     directionsLabel: 'فتح في الخرائط',
     practiceDirectionsAriaLabel: 'فتح موقع الممارسة في الخرائط'
   }
-};
+} as const satisfies Record<PublicCatalogLocale, Record<string, string | string[]>>;
 
 function preferredText(locale: PublicCatalogLocale, en: string | null, ar: string | null): string | null {
-  if (locale === 'ar') return ar ?? en;
-  return en ?? ar;
+  return locale === 'ar' ? ar ?? en : en ?? ar;
 }
 
 function formatNeutralLabel(value: string): string {
@@ -122,27 +77,34 @@ function formatNeutralLabel(value: string): string {
     .join(' ');
 }
 
+function DetailItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+      <dt className="text-xs font-medium text-slate-500">{label}</dt>
+      <dd className="mt-2 text-sm font-semibold text-slate-950">{value}</dd>
+    </div>
+  );
+}
+
 export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) {
   const copy = copyByLocale[locale];
-  const displayName = preferredText(locale, doctor.displayNameEn, doctor.displayNameAr) ?? preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
   const bio = preferredText(locale, doctor.bioEn, doctor.bioAr);
   const primarySpecialtyName = doctor.primarySpecialty
     ? preferredText(locale, doctor.primarySpecialty.nameEn, doctor.primarySpecialty.nameAr) ?? doctor.primarySpecialty.nameEn
     : null;
   const gender = doctor.gender !== 'unspecified' ? formatNeutralLabel(doctor.gender) : null;
-  const profileImage = doctor.profileImage;
 
   return (
     <div className="mt-10 space-y-5">
       <PublicCenterDetailSection title={copy.aboutTitle}>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          {profileImage ? (
+          {doctor.profileImage ? (
             <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
               <img
-                src={profileImage.url}
-                alt={profileImage.altText}
-                width={profileImage.width ?? undefined}
-                height={profileImage.height ?? undefined}
+                src={doctor.profileImage.url}
+                alt={doctor.profileImage.altText}
+                width={doctor.profileImage.width ?? undefined}
+                height={doctor.profileImage.height ?? undefined}
                 decoding="async"
                 className="h-full w-full object-cover"
               />
@@ -162,24 +124,9 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
 
       <PublicCenterDetailSection title={copy.detailsTitle}>
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {gender ? (
-            <div className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-              <dt className="text-xs font-medium text-slate-500">{copy.genderLabel}</dt>
-              <dd className="mt-2 text-sm font-semibold text-slate-950">{gender}</dd>
-            </div>
-          ) : null}
-          {doctor.yearsExperience !== null ? (
-            <div className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-              <dt className="text-xs font-medium text-slate-500">{copy.yearsExperienceLabel}</dt>
-              <dd className="mt-2 text-sm font-semibold text-slate-950">{doctor.yearsExperience}</dd>
-            </div>
-          ) : null}
-          {primarySpecialtyName ? (
-            <div className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-              <dt className="text-xs font-medium text-slate-500">{copy.specialtyLabel}</dt>
-              <dd className="mt-2 text-sm font-semibold text-slate-950">{primarySpecialtyName}</dd>
-            </div>
-          ) : null}
+          {gender ? <DetailItem label={copy.genderLabel} value={gender} /> : null}
+          {doctor.yearsExperience !== null ? <DetailItem label={copy.yearsExperienceLabel} value={doctor.yearsExperience} /> : null}
+          {primarySpecialtyName ? <DetailItem label={copy.specialtyLabel} value={primarySpecialtyName} /> : null}
         </dl>
         {doctor.licenseInfo ? (
           <div className="mt-4">
@@ -194,7 +141,6 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
             {doctor.services.map((service) => {
               const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
               const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
-
               return (
                 <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
                   <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
@@ -214,50 +160,21 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
             {doctor.practiceLocations.map((practiceLocation) => {
               const centerName = preferredText(locale, practiceLocation.center.nameEn, practiceLocation.center.nameAr) ?? practiceLocation.center.nameEn;
               const locationText = formatPublicLocationSummary(locale, practiceLocation.location);
-              const specialtyName = practiceLocation.primarySpecialty
-                ? preferredText(locale, practiceLocation.primarySpecialty.nameEn, practiceLocation.primarySpecialty.nameAr) ?? practiceLocation.primarySpecialty.nameEn
-                : null;
               const directionsUrl = getPublicDirectionsUrl(practiceLocation.location);
-
               return (
                 <li key={practiceLocation.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
                   <h3 className="text-sm font-semibold leading-6 text-slate-950">{centerName}</h3>
-                  <div className="mt-2 space-y-2 text-sm leading-6 text-slate-600">
-                    <p>{locationText ?? copy.noLocation}</p>
-                    {specialtyName ? <p>{specialtyName}</p> : null}
-                  </div>
-                  <div className="mt-4 space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <PublicContactActions actions={practiceLocation.contactActions} locale={locale} />
-                      {directionsUrl ? (
-                        <a
-                          href={directionsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={copy.practiceDirectionsAriaLabel}
-                          className="inline-flex w-fit rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                        >
-                          {copy.directionsLabel}
-                        </a>
-                      ) : null}
-                      <a
-                        href={publicCenterDetailRoute(locale, doctor.defaultCountry, practiceLocation.center.slug)}
-                        className="inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline"
-                      >
-                        {copy.centerProfileLabel}
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{locationText ?? copy.noLocation}</p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <PublicContactActions actions={practiceLocation.contactActions} locale={locale} />
+                    {directionsUrl ? (
+                      <a href={directionsUrl} target="_blank" rel="noopener noreferrer" aria-label={copy.practiceDirectionsAriaLabel} className="inline-flex w-fit rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                        {copy.directionsLabel}
                       </a>
-                    </div>
-                    {practiceLocation.contactActions.length > 0 ? (
-                      <PublicCallbackRequestForm
-                        locale={locale}
-                        countryCode={doctor.defaultCountry}
-                        centerId={practiceLocation.center.id}
-                        centerLocationId={practiceLocation.location?.id ?? null}
-                        doctorId={doctor.id}
-                        doctorPracticeLocationId={practiceLocation.id}
-                        variant="practice"
-                      />
                     ) : null}
+                    <a href={publicCenterDetailRoute(locale, doctor.defaultCountry, practiceLocation.center.slug)} className="inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
+                      {copy.centerProfileLabel}
+                    </a>
                   </div>
                 </li>
               );
@@ -269,9 +186,7 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
       </PublicCenterDetailSection>
 
       <PublicCenterDetailSection title={copy.trustTitle}>
-        <p className="text-sm leading-6 text-slate-700">
-          {doctor.verificationStatus === 'verified' ? copy.trustVerified : copy.trustPlaceholder}
-        </p>
+        <p className="text-sm leading-6 text-slate-700">{doctor.verificationStatus === 'verified' ? copy.trustVerified : copy.trustPlaceholder}</p>
       </PublicCenterDetailSection>
 
       <PublicCenterDetailSection title={copy.futureTitle} description={copy.futureDescription}>
