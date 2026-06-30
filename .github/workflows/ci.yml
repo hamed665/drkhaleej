@@ -96,10 +96,13 @@ jobs:
       - name: Hospital route diagnostics
         run: pnpm import:hospital-profile-route:validate
 
-      - name: Admin remainder diagnostics
+      - name: Admin access diagnostics
         run: |
           pnpm admin:draft-verification-guard:validate
           pnpm admin:role-runtime-guard:validate
+
+      - name: Admin location diagnostics
+        run: |
           pnpm admin:location-contract:validate
           pnpm admin:location-create-runtime:validate
           pnpm admin:location-edit-runtime:validate
@@ -107,10 +110,16 @@ jobs:
           pnpm admin:location-review-contract:validate
           pnpm admin:location-review-runtime:validate
           pnpm admin:location-review-ui:validate
+
+      - name: Admin contact diagnostics
+        run: |
           pnpm admin:quality-internal-gate:validate
           pnpm admin:contact-visibility-contract:validate
           pnpm admin:contact-review-guard:validate
           pnpm admin:provider-publication-contract:validate
+
+      - name: Admin launch diagnostics
+        run: |
           pnpm admin:final-chain:validate
           pnpm admin:launch-checklist:validate
           pnpm admin:post-activation:validate
@@ -118,6 +127,9 @@ jobs:
           pnpm admin:audit-log-readonly:validate
           pnpm admin:final-launch-recap:validate
           pnpm admin:soft-launch-checklist:validate
+
+      - name: Admin batch diagnostics
+        run: |
           pnpm admin:r1:validate
           pnpm admin:readiness-bundle:validate
           pnpm admin:cw:validate
