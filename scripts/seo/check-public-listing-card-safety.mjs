@@ -1,5 +1,6 @@
 import './check-directory-query-smoke.mjs';
 import './check-public-profile-readiness-smoke.mjs';
+import './check-public-profile-summary-contract.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
