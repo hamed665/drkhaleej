@@ -73,6 +73,7 @@ export default async function AdminActiveCentersPage() {
                   <th className="px-4 py-3">Public flags</th>
                   <th className="px-4 py-3">Verification</th>
                   <th className="px-4 py-3">Public routes</th>
+                  <th className="px-4 py-3">Readiness</th>
                   <th className="px-4 py-3">Updated</th>
                 </tr>
               </thead>
@@ -101,6 +102,11 @@ export default async function AdminActiveCentersPage() {
                           Arabic public profile
                         </Link>
                       </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <Link href={`/admin/active-centers/${center.id}`} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                        View public state readiness
+                      </Link>
                     </td>
                     <td className="px-4 py-4 text-slate-600">{formatDate(center.updatedAt)}</td>
                   </tr>

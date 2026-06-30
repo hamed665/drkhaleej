@@ -5,6 +5,7 @@ import type { Database } from "@/lib/supabase/types";
 import { requireAdminPermission } from "@/server/admin/permissions";
 
 type CenterRow = Database["public"]["Tables"]["centers"]["Row"];
+type AdminAuditEventRow = Database["public"]["Tables"]["admin_audit_events"]["Row"];
 type ProviderStatus = Database["public"]["Enums"]["provider_status"];
 
 type ActiveCenterStateRow = Pick<
@@ -18,12 +19,19 @@ type ActiveCenterStateRow = Pick<
   | "deleted_at"
 >;
 
+type ActivationAuditRow = Pick<
+  AdminAuditEventRow,
+  "action" | "actor_email" | "created_at" | "summary"
+>;
+
 type QueryError = { message?: string };
 type QueryResponse<T> = { data: T | null; error: QueryError | null };
 
 type QueryBuilder<T> = PromiseLike<QueryResponse<T>> & {
   eq(column: string, value: unknown): QueryBuilder<T>;
+  limit(count: number): QueryBuilder<T>;
   maybeSingle(): Promise<QueryResponse<T>>;
+  order(column: string, options: { ascending?: boolean }): QueryBuilder<T>;
   select(columns: string): QueryBuilder<T>;
 };
 
@@ -31,7 +39,16 @@ type UntypedSupabaseClient = {
   from<T>(table: string): QueryBuilder<T>;
 };
 
+export type ActiveCenterPublicStateActivationAuditEvidence = {
+  action: "draft_center.public_profile_activated";
+  actorEmail: string | null;
+  createdAt: string | null;
+  found: boolean;
+  summary: string | null;
+};
+
 export type ActiveCenterPublicStateEvidenceSummary = {
+  activationAudit: ActiveCenterPublicStateActivationAuditEvidence;
   auditRequired: true;
   centerStatus: ProviderStatus;
   commercialStateUnchanged: true;
@@ -47,15 +64,34 @@ export type ActiveCenterPublicStateEvidenceSummary = {
 
 export type ActiveCenterPublicStateReadiness = {
   blockers: string[];
+  canDeactivate: boolean;
   canPreparePublicStateChange: boolean;
   evidenceSummary: ActiveCenterPublicStateEvidenceSummary;
   futureMutationRequired: true;
+  publicPaths: {
+    ar: string | null;
+    en: string | null;
+  };
+  statusSummary: {
+    deletedAt: string | null;
+    hasRecentActivationAudit: boolean;
+    isActive: boolean;
+    status: ProviderStatus;
+  };
   warnings: string[];
 };
 
 export type ActiveCenterPublicStateReadinessResult =
   | { ok: true; readiness: ActiveCenterPublicStateReadiness }
   | { ok: false; reason: "not_found" | "unavailable" };
+
+const missingActivationAudit: ActiveCenterPublicStateActivationAuditEvidence = {
+  action: "draft_center.public_profile_activated",
+  actorEmail: null,
+  createdAt: null,
+  found: false,
+  summary: null,
+};
 
 function readinessClient(): UntypedSupabaseClient {
   return createSupabaseServiceRoleClient() as unknown as UntypedSupabaseClient;
@@ -84,7 +120,42 @@ function buildPublicPaths(center: ActiveCenterStateRow) {
   };
 }
 
-function evaluateActiveCenterPublicState(center: ActiveCenterStateRow): ActiveCenterPublicStateReadiness {
+function mapActivationAudit(
+  row: ActivationAuditRow | null,
+): ActiveCenterPublicStateActivationAuditEvidence {
+  if (row === null) return missingActivationAudit;
+
+  return {
+    action: "draft_center.public_profile_activated",
+    actorEmail: row.actor_email,
+    createdAt: row.created_at,
+    found: true,
+    summary: row.summary,
+  };
+}
+
+async function getLatestActivationAuditEvidence(
+  centerId: string,
+): Promise<ActiveCenterPublicStateActivationAuditEvidence> {
+  const { data, error } = await readinessClient()
+    .from<ActivationAuditRow>("admin_audit_events")
+    .select("action,actor_email,created_at,summary")
+    .eq("entity_id", centerId)
+    .eq("entity_type", "center")
+    .eq("action", "draft_center.public_profile_activated")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error !== null) return missingActivationAudit;
+
+  return mapActivationAudit(data);
+}
+
+function evaluateActiveCenterPublicState(
+  center: ActiveCenterStateRow,
+  activationAudit: ActiveCenterPublicStateActivationAuditEvidence,
+): ActiveCenterPublicStateReadiness {
   const blockers: string[] = [];
   const warnings: string[] = [];
   const paths = buildPublicPaths(center);
@@ -113,10 +184,18 @@ function evaluateActiveCenterPublicState(center: ActiveCenterStateRow): ActiveCe
     warnings.push("Claimable state must be preserved by the future public state action.");
   }
 
+  if (!activationAudit.found) {
+    warnings.push("Activation audit evidence was not found for this center.");
+  }
+
+  const canPreparePublicStateChange = blockers.length === 0;
+
   return {
     blockers,
-    canPreparePublicStateChange: blockers.length === 0,
+    canDeactivate: canPreparePublicStateChange,
+    canPreparePublicStateChange,
     evidenceSummary: {
+      activationAudit,
       auditRequired: true,
       centerStatus: center.status,
       commercialStateUnchanged: true,
@@ -130,6 +209,16 @@ function evaluateActiveCenterPublicState(center: ActiveCenterStateRow): ActiveCe
       slug: center.slug,
     },
     futureMutationRequired: true,
+    publicPaths: {
+      ar: paths.publicPathAr,
+      en: paths.publicPathEn,
+    },
+    statusSummary: {
+      deletedAt: center.deleted_at,
+      hasRecentActivationAudit: activationAudit.found,
+      isActive: center.is_active,
+      status: center.status,
+    },
     warnings,
   };
 }
@@ -152,5 +241,7 @@ export async function getAdminActiveCenterPublicStateReadiness(
   if (error !== null) return { ok: false, reason: "unavailable" };
   if (center === null) return { ok: false, reason: "not_found" };
 
-  return { ok: true, readiness: evaluateActiveCenterPublicState(center) };
+  const activationAudit = await getLatestActivationAuditEvidence(centerId);
+
+  return { ok: true, readiness: evaluateActiveCenterPublicState(center, activationAudit) };
 }

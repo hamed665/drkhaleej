@@ -28,6 +28,8 @@ for (const token of [
   'English public profile',
   'Arabic public profile',
   'Back to draft centers',
+  'View public state readiness',
+  'href={`/admin/active-centers/${center.id}`}',
 ]) {
   mustHave(page, token, pagePath);
 }
@@ -44,6 +46,44 @@ for (const token of [
   'revalidatePath',
 ]) {
   mustNotHave(page, token, pagePath);
+}
+
+const detailPagePath = 'src/app/admin/active-centers/[centerId]/page.tsx';
+const detailPage = readFile(detailPagePath);
+for (const token of [
+  'export default async function AdminActiveCenterPublicStateReadinessPage',
+  'getAdminActiveCenterPublicStateReadiness(centerId)',
+  'ACTIVE_CENTER_PUBLIC_STATE_READINESS',
+  'No action available here',
+  'Read-only public state readiness',
+  'draft_center.public_profile_activated',
+  'Activation audit evidence',
+  'English public path',
+  'Arabic public path',
+  'Contact visibility unchanged',
+  'Commercial state unchanged',
+  'Back to active centers',
+]) {
+  mustHave(detailPage, token, detailPagePath);
+}
+for (const token of [
+  '"use client"',
+  'useActionState',
+  '<form',
+  'action={',
+  'method="post"',
+  'type="submit"',
+  'DraftCenterEditForm',
+  'activateDraftCenterPublicProfile',
+  'updateDraft',
+  'createDraft',
+  'revalidatePath',
+  'writeAdminAuditEvent',
+  '.insert(',
+  '.update(',
+  '.delete(',
+]) {
+  mustNotHave(detailPage, token, detailPagePath);
 }
 
 const helperPath = 'src/server/admin/active-centers.ts';
@@ -69,6 +109,39 @@ for (const token of [
   'requireAdminPermission("draft_centers.update")',
 ]) {
   mustNotHave(helper, token, helperPath);
+}
+
+const readinessHelperPath = 'src/server/admin/active-center-public-state-readiness.ts';
+const readinessHelper = readFile(readinessHelperPath);
+for (const token of [
+  'getAdminActiveCenterPublicStateReadiness',
+  'requireAdminPermission("draft_centers.update")',
+  '.from<ActiveCenterStateRow>("centers")',
+  '.from<ActivationAuditRow>("admin_audit_events")',
+  '.eq("entity_id", centerId)',
+  '.eq("entity_type", "center")',
+  '.eq("action", "draft_center.public_profile_activated")',
+  'activationAudit',
+  'statusSummary',
+  'publicPaths',
+  'canDeactivate',
+  'hasRecentActivationAudit',
+  'contactVisibilityUnchanged: true',
+  'commercialStateUnchanged: true',
+  'futureMutationRequired: true',
+]) {
+  mustHave(readinessHelper, token, readinessHelperPath);
+}
+for (const token of [
+  '.insert(',
+  '.update(',
+  '.delete(',
+  'revalidatePath',
+  'redirect(',
+  'writeAdminAuditEvent',
+  'insertAuditEvent',
+]) {
+  mustNotHave(readinessHelper, token, readinessHelperPath);
 }
 
 const pkg = readFile('package.json');
