@@ -1,5 +1,6 @@
 import type { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
+import { isPublicImportProfileIndexEligible } from "@/lib/catalog/public-import-profile-index-eligibility";
 import {
   buildPublicImportProfileMetaDescription,
   buildPublicImportProfileSummary,
@@ -168,12 +169,14 @@ export default function PublicImportedHospitalProfilePage({
   const arabicAlternate = absoluteUrl(`/ar/${country}/hospitals/${hospitalSlug}`);
   const location = localArea([profile.area, profile.wilayat, profile.governorate]);
   const serviceSignals = [...profile.services, ...profile.departments].slice(0, 8);
+  const importIndexEligibility = isPublicImportProfileIndexEligible(profile);
 
   return (
     <>
       <Head>
         <title>{metadataTitle(title)}</title>
         <meta name="description" content={description} />
+        <meta name="robots" content={importIndexEligibility.eligible ? "index,follow" : "noindex,follow"} />
         <link rel="canonical" href={canonical} />
         <link rel="alternate" hrefLang="en-OM" href={englishAlternate} />
         <link rel="alternate" hrefLang="ar-OM" href={arabicAlternate} />
