@@ -46,7 +46,7 @@ for (const token of [
   'setPrimaryDraftCenterLocationCandidate',
   'Selection stays private and inactive.',
   'Select candidate',
-  'Candidate edits and selection stay private.',
+  'Candidate edits, selection, and quality readiness stay private.',
 ]) {
   assertIncludes(panelContent, token, panelPath);
 }
