@@ -33,6 +33,7 @@ for (const token of [
   'claim state',
   'billing state',
   'commercial add-ons',
+  'generated public profile summaries outside the summary contract',
   'Use only the final gated control in the publication readiness panel.',
   '/admin/draft-centers',
   '/admin/active-centers',
@@ -41,7 +42,11 @@ for (const token of [
   'English public profile route',
   'Arabic public profile route',
   'public eligibility wrapper',
+  'generated fact-based profile summary is visible in the About section',
+  'provider description or biography does not replace the generated summary baseline',
+  'metadata description remains profile-specific through the profile summary contract',
   'medical safety note is visible',
+  'generated profile summary',
   'best or top provider',
   'rating or review score',
   'open-now availability',
@@ -53,6 +58,7 @@ for (const token of [
   'Do not manually insert public sitemap entries during soft launch.',
   'separate deactivate or unpublish workflow',
   'final action succeeded without manual database edits',
+  'generated fact-based profile summary is visible',
 ]) {
   mustHave(checklist, token, checklistPath);
 }
@@ -65,11 +71,15 @@ for (const relativePath of [
   'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
   'src/server/admin/draft-center-public-activation-actions.ts',
   'src/server/admin/draft-center-publication-readiness.ts',
+  'src/lib/catalog/public-profile-summary.ts',
+  'src/lib/catalog/public-profile-summary.test.ts',
+  'docs/seo/public-profile-summary-contract.md',
   'scripts/admin/check-final-route-indexability-sanity.mjs',
   'scripts/admin/check-final-launch-chain-recap.mjs',
   'scripts/admin/check-active-centers-readonly-view.mjs',
   'scripts/admin/check-audit-log-readonly-route.mjs',
   'scripts/seo/check-public-launch-safe-ui.mjs',
+  'scripts/seo/check-public-profile-summary-contract.mjs',
 ]) {
   readFile(relativePath);
 }
@@ -95,6 +105,17 @@ for (const token of [
   'draft_center.public_profile_activated',
 ]) {
   mustHave(activeCenters, token, activeCentersPath);
+}
+
+const summaryContractPath = 'docs/seo/public-profile-summary-contract.md';
+const summaryContract = readFile(summaryContractPath);
+for (const token of [
+  'Every indexable public doctor or center profile must use the shared summary helpers',
+  'buildPublicCenterProfileSummary',
+  'buildPublicDoctorProfileSummary',
+  'buildPublicProfileMetaDescription',
+]) {
+  mustHave(summaryContract, token, summaryContractPath);
 }
 
 const packagePath = 'package.json';
