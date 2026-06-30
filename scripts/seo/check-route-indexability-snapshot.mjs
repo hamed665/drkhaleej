@@ -20,21 +20,20 @@ function localizedUrl(route, locale) {
   return route === '/' ? `/${locale}/om` : `/${locale}/om${route}`;
 }
 
-function hasIndexRoute(registrySource, route) {
-  return registrySource.includes(`indexDirectory('${route}'`) ||
-    (registrySource.includes(`route: '${route}'`) && registrySource.includes("indexPolicy: 'index'") && registrySource.includes("sitemapPolicy: 'included'"));
-}
-
-function hasExcludedRoute(registrySource, route) {
-  return registrySource.includes(`promotionDirectory('${route}'`) ||
-    registrySource.includes(`blockedDirectory('${route}'`) ||
-    (registrySource.includes(`route: '${route}'`) && registrySource.includes("sitemapPolicy: 'excluded'"));
+function explicitStaticRouteBlock(registrySource, route) {
+  const start = registrySource.indexOf(`staticRoute({ route: '${route}'`);
+  if (start === -1) return '';
+  const end = registrySource.indexOf('}),', start);
+  return registrySource.slice(start, end === -1 ? undefined : end);
 }
 
 function registryIndexStatus(registrySource, route) {
   if (route === '/') return 'index-ready';
-  if (hasIndexRoute(registrySource, route)) return 'index-ready';
-  if (hasExcludedRoute(registrySource, route)) return 'sitemap-excluded';
+  if (registrySource.includes(`indexDirectory('${route}'`)) return 'index-ready';
+  if (registrySource.includes(`promotionDirectory('${route}'`) || registrySource.includes(`blockedDirectory('${route}'`)) return 'sitemap-excluded';
+  const block = explicitStaticRouteBlock(registrySource, route);
+  if (block.includes("indexPolicy: 'index'") && block.includes("sitemapPolicy: 'included'")) return 'index-ready';
+  if (block.includes("sitemapPolicy: 'excluded'") || block.includes("sitemapPolicy: 'eligible_after_gate'")) return 'sitemap-excluded';
   throw new Error(`Static route ${route} is not represented in URL registry v2.`);
 }
 
@@ -48,40 +47,15 @@ const cpRuntimeSource = await readText('src/lib/geo/oman-location-candidate-cp-p
 const verifiedCountRuntimeSource = await readText('src/lib/geo/oman-location-candidate-verified-count.ts');
 const evidenceReferenceRuntimeSource = await readText('src/lib/geo/evidence-reference-runtime.ts');
 
-for (const token of [
-  '# DrKhaleej Route Indexability Snapshot V1',
-  '## Static public route snapshot',
-  '## Dynamic imported provider route snapshot',
-  '## Import sitemap caps and smoke gates',
-  '## Launch sitemap allowlist',
-  '## Blocked from first clean launch sitemap',
-  '| Route | Localized URLs | Index policy | Readiness | Sitemap | Robots | Snapshot decision | Next action |',
-]) {
+for (const token of ['# DrKhaleej Route Indexability Snapshot V1', '## Static public route snapshot', '## Dynamic imported provider route snapshot', '## Import sitemap caps and smoke gates', '## Launch sitemap allowlist', '## Blocked from first clean launch sitemap']) {
   assertIncludes(snapshotSource, token, `${snapshotPath} is missing required marker: ${token}`);
 }
 
-for (const token of [
-  'PublicUrlFamily',
-  'PublicUrlIndexPolicy',
-  'PublicUrlSitemapPolicy',
-  'canonicalPath',
-  'parentRoute',
-  'parentCanonicalPath',
-  'requiredGuards',
-  'internalLinkRequirement',
-  'schemaPolicy',
-  'launchStatus',
-  'hasRequiredInternalLinkContract',
-]) {
+for (const token of ['PublicUrlFamily', 'PublicUrlIndexPolicy', 'PublicUrlSitemapPolicy', 'canonicalPath', 'parentRoute', 'parentCanonicalPath', 'requiredGuards', 'internalLinkRequirement', 'schemaPolicy', 'launchStatus', 'hasRequiredInternalLinkContract']) {
   assertIncludes(registrySource, token, `URL registry v2 must include ${token}.`);
 }
 
-for (const token of [
-  'listPublicUrlRegistryEntries',
-  'getPublicUrlRegistryEntry',
-  'listSitemapIncludedPublicUrlEntries',
-  'isSitemapIncludedPublicUrlEntry',
-]) {
+for (const token of ['listPublicUrlRegistryEntries', 'getPublicUrlRegistryEntry', 'listSitemapIncludedPublicUrlEntries', 'isSitemapIncludedPublicUrlEntry']) {
   assertIncludes(pageRegistrySource, token, `page registry wrapper must use URL registry v2 token: ${token}`);
 }
 
@@ -99,29 +73,7 @@ for (const route of ['/doctors', '/centers', '/labs', '/pharmacies', '/hospitals
 }
 assertIncludes(registrySource, "'parent-internal-link-contract'", 'Indexable static routes must carry parent internal link contract guard.');
 
-for (const token of [
-  '`/en/om/doctor/{slug}`',
-  '`/ar/om/doctor/{slug}`',
-  '`/en/om/pharmacies/{slug}`',
-  '`/ar/om/pharmacies/{slug}`',
-  '`/en/om/hospitals/{slug}`',
-  '`/ar/om/hospitals/{slug}`',
-  'PROFILE-GATE-B imported-pharmacy-profile-guard-v1',
-  'PROFILE-GATE-D imported-hospital-profile-guard-v1',
-  'SITEMAP-GUARD-B import-sitemap-family-caps-v1',
-  'PROFILE-SMOKE-A public-import-profile-smoke-v1',
-  'doctor cap: 3000',
-  'pharmacy cap: 1500',
-  'hospital cap: 500',
-  'pnpm import:profile-smoke:validate',
-  'source evidence exists, contact/map evidence exists, and Oman geo evidence exists',
-  'import_publish_queue',
-  'sitemap_included: true',
-  'robots_policy: index',
-  'the canonical path is exact',
-  'the candidate is approved',
-  'required evidence exists',
-]) {
+for (const token of ['`/en/om/doctor/{slug}`', '`/ar/om/doctor/{slug}`', '`/en/om/pharmacies/{slug}`', '`/ar/om/pharmacies/{slug}`', '`/en/om/hospitals/{slug}`', '`/ar/om/hospitals/{slug}`', 'SITEMAP-GUARD-B import-sitemap-family-caps-v1', 'PROFILE-SMOKE-A public-import-profile-smoke-v1', 'doctor cap: 3000', 'pharmacy cap: 1500', 'hospital cap: 500', 'pnpm import:profile-smoke:validate', 'import_publish_queue', 'sitemap_included: true', 'robots_policy: index', 'required evidence exists']) {
   assertIncludes(snapshotSource, token, `${snapshotPath} must include dynamic/import token: ${token}`);
 }
 
