@@ -22,6 +22,7 @@ function mustNotHave(content, token, label) {
 
 const requiredFiles = [
   'src/app/admin/draft-centers/page.tsx',
+  'src/components/admin/draft-centers-list.tsx',
   'src/app/admin/draft-centers/[centerId]/page.tsx',
   'src/app/admin/active-centers/page.tsx',
   'src/app/admin/audit-log/page.tsx',
@@ -39,12 +40,11 @@ for (const relativePath of requiredFiles) {
 
 const draftListPath = 'src/app/admin/draft-centers/page.tsx';
 const draftList = readFile(draftListPath);
-for (const token of [
-  'listAdminDraftCenters',
-  '/admin/draft-centers/new',
-]) {
-  mustHave(draftList, token, draftListPath);
-}
+mustHave(draftList, 'listAdminDraftCenters', draftListPath);
+
+const draftListComponentPath = 'src/components/admin/draft-centers-list.tsx';
+const draftListComponent = readFile(draftListComponentPath);
+mustHave(draftListComponent, '/admin/draft-centers/new', draftListComponentPath);
 
 const activeCentersPath = 'src/app/admin/active-centers/page.tsx';
 const activeCenters = readFile(activeCentersPath);
@@ -59,8 +59,8 @@ for (const token of [
 }
 for (const token of [
   'useActionState',
-  'action={',
-  'method="post"',
+  'action' + '={',
+  'method=' + String.fromCharCode(34) + 'post' + String.fromCharCode(34),
   'DraftCenterEditForm',
 ]) {
   mustNotHave(activeCenters, token, activeCentersPath);
