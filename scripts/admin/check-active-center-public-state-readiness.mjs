@@ -24,7 +24,7 @@ const contract = read(contractPath);
 
 for (const token of [
   'getAdminActiveCenterPublicStateReadiness',
-  'requireAdminPermission("draft_centers.update")',
+  'requireAdminPermission("active_centers.public_state.update")',
   'isUuid(centerId)',
   '.from<ActiveCenterStateRow>("centers")',
   '.select("id,slug,status,default_country,is_active,is_claimable,deleted_at")',
