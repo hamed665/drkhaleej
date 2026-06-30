@@ -90,4 +90,6 @@ for (const pathname of publicPathnames) {
   assertProtectedConfig(file, source);
 }
 
+await import('./check-sitemap-hreflang-parity.mjs');
+
 console.log('route contract and LLM policy check passed.');
