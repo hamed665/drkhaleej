@@ -6,7 +6,12 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildPharmaciesDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
-import { listPublicCenters } from "@/lib/catalog/public-eligible-queries";
+import { listPublicCenters, searchPublicCatalog } from "@/lib/catalog/public-eligible-queries";
+import type {
+  PublicCatalogQueryResult,
+  PublicCatalogSearchResult,
+  PublicCenterSummary,
+} from "@/lib/catalog/public-types";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -18,10 +23,16 @@ import { buildLocalizedMetadata } from "@/lib/seo/metadata";
 import { buildFaqJsonLd } from "@/lib/seo/faq-jsonld";
 
 type Params = { locale: string; country: string };
+type SearchParams = Record<string, string | string[] | undefined>;
 
 const compactEmptyCopyByLocale: Record<SupportedLocale, string> = {
   en: "Approved pharmacy listings will appear here after review.",
   ar: "ستظهر قوائم الصيدليات المعتمدة هنا بعد المراجعة.",
+};
+
+const searchEmptyCopyByLocale: Record<SupportedLocale, string> = {
+  en: "No public eligible pharmacy results matched this search yet.",
+  ar: "لا توجد نتائج صيدليات عامة مؤهلة لهذا البحث حتى الآن.",
 };
 
 const metadataCopyByLocale: Record<
@@ -39,6 +50,23 @@ const metadataCopyByLocale: Record<
       "تصفح الصيدليات وخدمات الوصول للأدوية والمنتجات الصحية واحتياجات الرعاية في عُمان. اكتشاف عام فقط وليس نصيحة طبية.",
   },
 };
+
+function firstSearchParamValue(value: string | string[] | undefined): string {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  return rawValue ? rawValue.trim().slice(0, 80) : "";
+}
+
+function centerTypeResultFromSearch(
+  result: PublicCatalogQueryResult<PublicCatalogSearchResult>,
+  centerType: PublicCenterSummary["centerType"],
+): PublicCatalogQueryResult<PublicCenterSummary[]> {
+  return {
+    ok: result.ok,
+    data: result.ok ? result.data.centers.filter((center) => center.centerType === centerType) : [],
+    emptyReason: result.emptyReason,
+    error: result.error,
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -59,8 +87,10 @@ export async function generateMetadata({
 
 export default async function PublicPharmaciesPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { locale, country } = await params;
   if (!isSupportedLocale(locale) || !isSupportedCountry(country)) notFound();
@@ -69,10 +99,17 @@ export default async function PublicPharmaciesPage({
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
   const config = cleanConfigBrand(buildPharmaciesDiscoveryConfig(safeLocale, safeCountry, dir));
-  const result = await listPublicCenters({
-    country: safeCountry,
-    centerType: "pharmacy",
-  });
+  const query = firstSearchParamValue((await searchParams).q);
+  const isDirectorySearch = query.length >= 2;
+  const result = isDirectorySearch
+    ? centerTypeResultFromSearch(await searchPublicCatalog(query, { limit: 24 }), "pharmacy")
+    : await listPublicCenters({
+        country: safeCountry,
+        centerType: "pharmacy",
+      });
+  const emptyText = isDirectorySearch
+    ? searchEmptyCopyByLocale[safeLocale]
+    : compactEmptyCopyByLocale[safeLocale];
 
   return (
     <main
@@ -85,13 +122,13 @@ export default async function PublicPharmaciesPage({
       <PublicDiscoveryResultsShell2026
         config={config}
         isEmpty={result.ok && result.data.length === 0}
-        compactEmptyText={compactEmptyCopyByLocale[safeLocale]}
+        compactEmptyText={emptyText}
       >
         <PublicDirectoryListingContent
           locale={safeLocale}
           variant="center"
           result={result}
-          emptyText={compactEmptyCopyByLocale[safeLocale]}
+          emptyText={emptyText}
         />
       </PublicDiscoveryResultsShell2026>
       {config.faq ? (

@@ -75,15 +75,15 @@ const directoryContracts = [
   },
   {
     path: 'src/app/[locale]/[country]/labs/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "laboratory"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+    tokens: ['listPublicCenters({', 'centerType: "laboratory"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/pharmacies/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "pharmacy"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+    tokens: ['listPublicCenters({', 'centerType: "pharmacy"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
   {
     path: 'src/app/[locale]/[country]/hospitals/page.tsx',
-    tokens: ['listPublicCenters({', 'centerType: "hospital"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+    tokens: ['listPublicCenters({', 'centerType: "hospital"', 'searchPublicCatalog(query, { limit: 24 })', 'centerTypeResultFromSearch', 'query.length >= 2', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}', 'emptyText={emptyText}'],
   },
 ];
 
@@ -128,6 +128,26 @@ for (const forbiddenToken of ['sitemapPolicy', 'generateStaticParams', 'specialt
   assertNotIncludes(centersPage, forbiddenToken, 'src/app/[locale]/[country]/centers/page.tsx');
 }
 
+for (const routePath of [
+  'src/app/[locale]/[country]/labs/page.tsx',
+  'src/app/[locale]/[country]/pharmacies/page.tsx',
+  'src/app/[locale]/[country]/hospitals/page.tsx',
+]) {
+  const routePage = readFile(routePath);
+  for (const token of [
+    'type SearchParams = Record<string, string | string[] | undefined>',
+    'searchParams: Promise<SearchParams>',
+    'firstSearchParamValue',
+    'searchEmptyCopyByLocale',
+    'centerTypeResultFromSearch',
+  ]) {
+    assertIncludes(routePage, token, routePath);
+  }
+  for (const forbiddenToken of ['sitemapPolicy', 'generateStaticParams', 'specialtySlug', 'areaSlug', 'geo_area', 'AggregateRating']) {
+    assertNotIncludes(routePage, forbiddenToken, routePath);
+  }
+}
+
 const directorySearchContractPath = 'docs/seo/directory-search-filter-contract.md';
 const directorySearchContract = readFile(directorySearchContractPath);
 for (const token of [
@@ -137,7 +157,11 @@ for (const token of [
   'Canonical metadata remains the base directory path.',
   '`q` text search on `/doctors`',
   '`q` text search on `/centers`',
+  '`q` text search on `/labs` with `centerType: "laboratory"`',
+  '`q` text search on `/pharmacies` with `centerType: "pharmacy"`',
+  '`q` text search on `/hospitals` with `centerType: "hospital"`',
   'center results narrowed to `PublicCenterSummary[]`',
+  'center-type directory results narrowed to the required `PublicCenterSummary["centerType"]`',
   'SSR execution using `searchPublicCatalog`',
   'client-only filtering that changes the URL without changing the server-rendered results',
   'Specialty and area filters only after their gates and canonical rules exist.',
@@ -154,4 +178,4 @@ for (const token of [
   assertIncludes(packageContent, token, packagePath);
 }
 
-console.log('Public listing card safety, directory graph, and doctors/centers q SSR directory search checks passed.');
+console.log('Public listing card safety, directory graph, and center-type q SSR directory search checks passed.');

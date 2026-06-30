@@ -18,9 +18,13 @@ Allowed in the current rollout:
 
 - `q` text search on `/doctors`
 - `q` text search on `/centers`
+- `q` text search on `/labs` with `centerType: "laboratory"`
+- `q` text search on `/pharmacies` with `centerType: "pharmacy"`
+- `q` text search on `/hospitals` with `centerType: "hospital"`
 - SSR execution using `searchPublicCatalog`
 - doctor results narrowed to `PublicDoctorSummary[]`
 - center results narrowed to `PublicCenterSummary[]`
+- center-type directory results narrowed to the required `PublicCenterSummary["centerType"]`
 - existing `PublicDirectoryListingContent` and `PublicListingGrid`
 
 Not allowed yet:
