@@ -14,11 +14,13 @@ Directory pages may support user-side discovery filters, but they must not becom
 
 Directory filtering must use public eligible data only.
 
-Allowed for the first rollout:
+Allowed in the current rollout:
 
 - `q` text search on `/doctors`
+- `q` text search on `/centers`
 - SSR execution using `searchPublicCatalog`
 - doctor results narrowed to `PublicDoctorSummary[]`
+- center results narrowed to `PublicCenterSummary[]`
 - existing `PublicDirectoryListingContent` and `PublicListingGrid`
 
 Not allowed yet:
