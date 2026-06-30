@@ -1,5 +1,8 @@
+import Link from 'next/link';
+
 import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import type { PublicCatalogLocale, PublicCenterDetail as PublicCenterDetailData } from '@/lib/catalog/public-types';
+import { publicDoctorDetailRoute } from '@/lib/routes/public';
 
 import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
@@ -36,6 +39,7 @@ type CenterDetailCopy = {
   noLocation: string;
   directionsLabel: string;
   directionsAriaLabel: string;
+  doctorProfileLabel: string;
 };
 
 const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
@@ -63,7 +67,8 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     noDoctors: 'No public doctors are connected to this profile yet.',
     noLocation: 'General location details are not available yet.',
     directionsLabel: 'Open in Maps',
-    directionsAriaLabel: 'Open this location in maps'
+    directionsAriaLabel: 'Open this location in maps',
+    doctorProfileLabel: 'View doctor profile'
   },
   ar: {
     aboutTitle: 'عن هذا المركز',
@@ -89,7 +94,8 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     noDoctors: 'لا يوجد أطباء عامون مرتبطون بهذا الملف حتى الآن.',
     noLocation: 'تفاصيل الموقع العامة غير متاحة بعد.',
     directionsLabel: 'فتح في الخرائط',
-    directionsAriaLabel: 'فتح هذا الموقع في الخرائط'
+    directionsAriaLabel: 'فتح هذا الموقع في الخرائط',
+    doctorProfileLabel: 'عرض ملف الطبيب'
   }
 };
 
@@ -237,11 +243,19 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
           <ul className="grid gap-3 sm:grid-cols-2" role="list">
             {center.doctors.map((doctor) => {
               const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
+              const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
 
               return (
                 <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <h3 className="text-sm font-semibold leading-6 text-slate-950">{doctorName}</h3>
+                  <h3>
+                    <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
+                      {doctorName}
+                    </Link>
+                  </h3>
                   <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
+                  <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
+                    {copy.doctorProfileLabel}
+                  </Link>
                 </li>
               );
             })}
