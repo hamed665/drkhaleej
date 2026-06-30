@@ -83,6 +83,34 @@ for (const forbiddenToken of [
   assertNotIncludes(summaryHelper, forbiddenToken, summaryHelperPath);
 }
 
+const summaryTestPath = 'src/lib/catalog/public-profile-summary.test.ts';
+const summaryTest = readFile(summaryTestPath);
+for (const token of [
+  "describe('public profile summaries'",
+  'buildPublicCenterProfileSummary',
+  'buildPublicDoctorProfileSummary',
+  'buildPublicProfileMetaDescription',
+  'expectNoForbiddenClaims',
+  'builds a fact-based center summary from profile data',
+  'builds a fact-based doctor summary from specialty and practice data',
+  'builds localized Arabic summaries from the same approved data',
+  'builds metadata descriptions that stay within snippet length',
+  'public pharmacy profile',
+  'public doctor profile in Oman',
+  'toBeLessThanOrEqual(155)',
+  'صيدلية الخوير',
+  'د. سارة أحمد',
+]) {
+  assertIncludes(summaryTest, token, summaryTestPath);
+}
+for (const forbiddenToken of [
+  'trusted by thousands',
+  'insurance accepted',
+  'MOH approved',
+]) {
+  assertIncludes(summaryTest, forbiddenToken, summaryTestPath);
+}
+
 const importSummaryHelperPath = 'src/lib/catalog/public-import-profile-summary.ts';
 const importSummaryHelper = readFile(importSummaryHelperPath);
 for (const token of [
