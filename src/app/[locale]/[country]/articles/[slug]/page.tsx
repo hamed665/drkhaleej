@@ -2,11 +2,16 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArticleDetailShell } from '@/components/public/articles/article-detail-shell';
 import { ArticlesShellStyles } from '@/components/public/articles/articles-hub-shell';
-import { articleShellContent, findArticleShellCard } from '@/lib/articles/article-shell-content';
+import { findArticleShellCard } from '@/lib/articles/article-shell-content';
 import { isSupportedCountry, isSupportedLocale, localeDirection, type SupportedCountry, type SupportedLocale } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
 type Params = { locale: string; country: string; slug: string };
+
+const detailDescriptionByLocale: Record<SupportedLocale, string> = {
+  en: 'Reviewed DrKhaleej guide preview for public healthcare discovery in Oman.',
+  ar: 'معاينة دليل DrKhaleej لاكتشاف خدمات الرعاية العامة في عُمان.'
+};
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, country, slug } = await params;
@@ -26,8 +31,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     locale: safeLocale,
     country: country as SupportedCountry,
     pathname: `/articles/${slug}`,
-    title: `${card.title} | DrMuscat`,
-    description: articleShellContent[safeLocale].detail.excerpt
+    title: `${card.title} | DrKhaleej`,
+    description: detailDescriptionByLocale[safeLocale]
   });
 }
 

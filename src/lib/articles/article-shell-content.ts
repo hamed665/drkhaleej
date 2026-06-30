@@ -92,9 +92,95 @@ export type ArticleShellCopy = {
   };
 };
 
+const articleCardsEn: readonly ArticleShellCard[] = [
+  {
+    slug: 'how-to-choose-a-dental-clinic-in-muscat',
+    category: 'Dental',
+    title: 'How to choose a dental clinic in Muscat',
+    excerpt: 'A practical guide format for comparing clinic information, location, services, and questions to ask before booking.',
+    readingTime: '5 min read',
+    mediaLabel: 'Guide preview',
+    contentLabel: 'Guide',
+    tone: 'teal'
+  },
+  {
+    slug: 'what-to-check-before-booking-dermatology',
+    category: 'Dermatology / Beauty',
+    title: 'What to check before booking a dermatology consultation',
+    excerpt: 'A clear guide format for preparing for a dermatology consultation and reviewing provider information.',
+    readingTime: '4 min read',
+    mediaLabel: 'Video guide area',
+    contentLabel: 'Video-ready',
+    tone: 'rose'
+  },
+  {
+    slug: 'understanding-clinic-services-in-oman',
+    category: 'Clinics & Hospitals',
+    title: 'Understanding clinic services in Oman',
+    excerpt: 'A service explainer format for understanding clinic pages, service details, and practical care options.',
+    readingTime: '6 min read',
+    mediaLabel: 'Editorial media',
+    contentLabel: 'Guide',
+    tone: 'gold'
+  },
+  {
+    slug: 'questions-before-a-wellness-treatment',
+    category: 'Wellness',
+    title: 'Questions to ask before a wellness treatment',
+    excerpt: 'An appointment-preparation format for wellness services without treatment instructions or outcome claims.',
+    readingTime: '4 min read',
+    mediaLabel: 'Visual guide area',
+    contentLabel: 'Guide',
+    tone: 'mint'
+  }
+];
+
+const articleCardsAr: readonly ArticleShellCard[] = [
+  {
+    slug: 'how-to-choose-a-dental-clinic-in-muscat',
+    category: 'الأسنان',
+    title: 'كيف تختار عيادة أسنان في مسقط',
+    excerpt: 'صيغة دليل عملية لمقارنة معلومات العيادات والموقع والخدمات والأسئلة قبل الحجز.',
+    readingTime: '٥ دقائق قراءة',
+    mediaLabel: 'معاينة الدليل',
+    contentLabel: 'دليل',
+    tone: 'teal'
+  },
+  {
+    slug: 'what-to-check-before-booking-dermatology',
+    category: 'الجلدية / التجميل',
+    title: 'ما الذي يمكن التحقق منه قبل حجز استشارة جلدية',
+    excerpt: 'صيغة واضحة للتحضير لاستشارة جلدية ومراجعة معلومات مقدم الخدمة.',
+    readingTime: '٤ دقائق قراءة',
+    mediaLabel: 'مساحة فيديو',
+    contentLabel: 'جاهز للفيديو',
+    tone: 'rose'
+  },
+  {
+    slug: 'understanding-clinic-services-in-oman',
+    category: 'العيادات والمستشفيات',
+    title: 'فهم خدمات العيادات في عُمان',
+    excerpt: 'صيغة شرح لفهم صفحات العيادات وتفاصيل الخدمات وخيارات الرعاية العملية.',
+    readingTime: '٦ دقائق قراءة',
+    mediaLabel: 'وسائط تحريرية',
+    contentLabel: 'دليل',
+    tone: 'gold'
+  },
+  {
+    slug: 'questions-before-a-wellness-treatment',
+    category: 'الرفاهية',
+    title: 'أسئلة قبل اختيار خدمة رفاهية',
+    excerpt: 'صيغة تحضير للموعد في خدمات الرفاهية دون تعليمات علاجية أو وعود بنتائج.',
+    readingTime: '٤ دقائق قراءة',
+    mediaLabel: 'مساحة مرئية',
+    contentLabel: 'دليل',
+    tone: 'mint'
+  }
+];
+
 export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
   en: {
-    eyebrow: 'DrMuscat Articles',
+    eyebrow: 'DrKhaleej Articles',
     heroTitle: 'Practical health guides for choosing care in Oman',
     heroIntro:
       'Browse clear, locally focused guides about clinics, beauty, wellness, pharmacies, and labs. Content is informational and does not replace professional medical advice.',
@@ -114,20 +200,20 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     sectionLabel: 'Health guides',
     categorySectionTitle: 'Browse by topic',
     listFooterTitle: 'Explore more guides as the library grows',
-    listFooterBody: 'The grid stays easy to scan as the DrMuscat library grows, with room for category browsing and more guide navigation.',
+    listFooterBody: 'The grid stays easy to scan as the DrKhaleej library grows, with room for category browsing and more guide navigation.',
     listFooterCta: 'Browse all guides',
     faqEyebrow: 'Articles FAQ',
     faqTitle: 'Helpful answers before you read',
-    faqIntro: 'Clear notes on how DrMuscat articles support informed care decisions without replacing professional medical advice.',
+    faqIntro: 'Clear notes on how DrKhaleej articles support informed care decisions without replacing professional medical advice.',
     faqs: [
-      { question: 'Are DrMuscat articles medical advice?', answer: 'No. They are informational guides and do not replace advice from a qualified healthcare professional.' },
+      { question: 'Are DrKhaleej articles medical advice?', answer: 'No. They are informational guides and do not replace advice from a qualified healthcare professional.' },
       { question: 'Will articles include doctors and clinics?', answer: 'Article pages can connect to related doctors, centers, offers, and clearly labeled sponsored placements when available.' },
       { question: 'Will videos be included?', answer: 'Yes. Article pages are designed to support YouTube and short video guides when editorial media is available.' },
       { question: 'Are sponsored placements labeled?', answer: 'Yes. Sponsored or promoted placements should always be clearly labeled.' }
     ],
     updatesEyebrow: 'Editorial updates',
     newsletterTitle: 'Follow upcoming guides',
-    newsletterBody: 'Readers will be able to follow upcoming guides when article updates are available on DrMuscat.',
+    newsletterBody: 'Readers will be able to follow upcoming guides when article updates are available on DrKhaleej.',
     disclaimerTitle: 'Medical disclaimer',
     disclaimerBody:
       'These article pages are informational only. They do not diagnose, treat, prescribe, rank providers, or replace advice from a qualified healthcare professional.',
@@ -135,54 +221,13 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     readGuide: 'Read guide',
     imageReady: 'Editorial image area',
     videoReady: 'Video-ready',
-    cards: [
-      {
-        slug: 'how-to-choose-a-dental-clinic-in-muscat',
-        category: 'Dental',
-        title: 'How to choose a dental clinic in Muscat',
-        excerpt: 'A practical guide format for comparing clinic information, location, services, and questions to ask before booking.',
-        readingTime: '5 min read',
-        mediaLabel: 'Guide preview',
-        contentLabel: 'Guide',
-        tone: 'teal'
-      },
-      {
-        slug: 'what-to-check-before-booking-dermatology',
-        category: 'Dermatology / Beauty',
-        title: 'What to check before booking a dermatology consultation',
-        excerpt: 'A clear guide format for preparing for a dermatology consultation and reviewing provider information.',
-        readingTime: '4 min read',
-        mediaLabel: 'Video guide area',
-        contentLabel: 'Video-ready',
-        tone: 'rose'
-      },
-      {
-        slug: 'understanding-clinic-services-in-oman',
-        category: 'Clinics & Hospitals',
-        title: 'Understanding clinic services in Oman',
-        excerpt: 'A service explainer format for understanding clinic pages, service details, and practical care options.',
-        readingTime: '6 min read',
-        mediaLabel: 'Editorial media',
-        contentLabel: 'Guide',
-        tone: 'gold'
-      },
-      {
-        slug: 'questions-before-a-wellness-treatment',
-        category: 'Wellness',
-        title: 'Questions to ask before a wellness treatment',
-        excerpt: 'An appointment-preparation format for wellness services without treatment instructions or outcome claims.',
-        readingTime: '4 min read',
-        mediaLabel: 'Visual guide area',
-        contentLabel: 'Guide',
-        tone: 'mint'
-      }
-    ],
+    cards: articleCardsEn,
     detail: {
       badge: 'Health guide',
       titlePrefix: '',
       excerpt: 'A polished health guide format for reviewed information, editorial media, related care options, and clearly labeled sponsored placements without publishing medical advice.',
       authorLabel: 'By',
-      authorValue: 'DrMuscat editorial team',
+      authorValue: 'DrKhaleej editorial team',
       reviewerLabel: 'Medical reviewer',
       reviewerValue: 'Reviewer to be assigned',
       updatedLabel: 'Last updated',
@@ -214,7 +259,7 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     }
   },
   ar: {
-    eyebrow: 'مقالات DrMuscat',
+    eyebrow: 'مقالات DrKhaleej',
     heroTitle: 'أدلة صحية تساعدك على اختيار الرعاية في عُمان',
     heroIntro:
       'تصفح أدلة واضحة ومحلية عن العيادات والتجميل والرفاهية والصيدليات والمختبرات. المحتوى معلوماتي ولا يغني عن المشورة الطبية المتخصصة.',
@@ -234,20 +279,20 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     sectionLabel: 'الأدلة الصحية',
     categorySectionTitle: 'تصفح حسب الموضوع',
     listFooterTitle: 'استكشف المزيد من الأدلة مع نمو المكتبة',
-    listFooterBody: 'يبقى العرض شبكياً وسهل التصفح مع نمو مكتبة DrMuscat، مع مساحة لتصفح الموضوعات والمزيد من الأدلة.',
+    listFooterBody: 'يبقى العرض شبكياً وسهل التصفح مع نمو مكتبة DrKhaleej، مع مساحة لتصفح الموضوعات والمزيد من الأدلة.',
     listFooterCta: 'تصفح كل الأدلة',
     faqEyebrow: 'أسئلة المقالات',
     faqTitle: 'إجابات مفيدة قبل القراءة',
-    faqIntro: 'ملاحظات واضحة حول دور مقالات DrMuscat في دعم قراراتك دون أن تكون بديلاً عن الاستشارة الطبية المتخصصة.',
+    faqIntro: 'ملاحظات واضحة حول دور مقالات DrKhaleej في دعم قراراتك دون أن تكون بديلاً عن الاستشارة الطبية المتخصصة.',
     faqs: [
-      { question: 'هل مقالات DrMuscat نصيحة طبية؟', answer: 'لا. هي أدلة معلوماتية ولا تغني عن استشارة مختص صحي مؤهل.' },
+      { question: 'هل مقالات DrKhaleej نصيحة طبية؟', answer: 'لا. هي أدلة معلوماتية ولا تغني عن استشارة مختص صحي مؤهل.' },
       { question: 'هل ستتضمن المقالات أطباء وعيادات؟', answer: 'يمكن لصفحات المقالات ربط أطباء ومراكز وعروض ومساحات رعاية واضحة عند توفرها.' },
       { question: 'هل ستتوفر فيديوهات؟', answer: 'نعم. صفحات المقالات مصممة لدعم فيديوهات YouTube والمقاطع القصيرة عند توفر الوسائط التحريرية.' },
       { question: 'هل يتم توضيح المحتوى الممول؟', answer: 'نعم. يجب دائماً تمييز أي مساحة رعاية أو ترويج بوضوح.' }
     ],
     updatesEyebrow: 'تحديثات تحريرية',
     newsletterTitle: 'تابع الأدلة القادمة',
-    newsletterBody: 'يمكن للقراء متابعة الأدلة القادمة عند توفر تحديثات المقالات على DrMuscat.',
+    newsletterBody: 'يمكن للقراء متابعة الأدلة القادمة عند توفر تحديثات المقالات على DrKhaleej.',
     disclaimerTitle: 'تنبيه طبي',
     disclaimerBody:
       'هذه الصفحات معلوماتية فقط. لا تقدم تشخيصاً أو علاجاً أو وصفات أو ترتيباً لمقدمي الخدمة، ولا تغني عن استشارة مختص مؤهل.',
@@ -255,54 +300,13 @@ export const articleShellContent: Record<SupportedLocale, ArticleShellCopy> = {
     readGuide: 'اقرأ الدليل',
     imageReady: 'مساحة صورة تحريرية',
     videoReady: 'جاهز للفيديو',
-    cards: [
-      {
-        slug: 'how-to-choose-a-dental-clinic-in-muscat',
-        category: 'الأسنان',
-        title: 'كيف تختار عيادة أسنان في مسقط',
-        excerpt: 'صيغة دليل عملية لمقارنة معلومات العيادات والموقع والخدمات والأسئلة قبل الحجز.',
-        readingTime: '٥ دقائق قراءة',
-        mediaLabel: 'معاينة الدليل',
-        contentLabel: 'دليل',
-        tone: 'teal'
-      },
-      {
-        slug: 'what-to-check-before-booking-dermatology',
-        category: 'الجلدية / التجميل',
-        title: 'ما الذي يمكن التحقق منه قبل حجز استشارة جلدية',
-        excerpt: 'صيغة واضحة للتحضير لاستشارة جلدية ومراجعة معلومات مقدم الخدمة.',
-        readingTime: '٤ دقائق قراءة',
-        mediaLabel: 'مساحة فيديو',
-        contentLabel: 'جاهز للفيديو',
-        tone: 'rose'
-      },
-      {
-        slug: 'understanding-clinic-services-in-oman',
-        category: 'العيادات والمستشفيات',
-        title: 'فهم خدمات العيادات في عُمان',
-        excerpt: 'صيغة شرح لفهم صفحات العيادات وتفاصيل الخدمات وخيارات الرعاية العملية.',
-        readingTime: '٦ دقائق قراءة',
-        mediaLabel: 'وسائط تحريرية',
-        contentLabel: 'دليل',
-        tone: 'gold'
-      },
-      {
-        slug: 'questions-before-a-wellness-treatment',
-        category: 'الرفاهية',
-        title: 'أسئلة قبل اختيار خدمة رفاهية',
-        excerpt: 'صيغة تحضير للموعد في خدمات الرفاهية دون تعليمات علاجية أو وعود بنتائج.',
-        readingTime: '٤ دقائق قراءة',
-        mediaLabel: 'مساحة مرئية',
-        contentLabel: 'دليل',
-        tone: 'mint'
-      }
-    ],
+    cards: articleCardsAr,
     detail: {
       badge: 'دليل صحي',
       titlePrefix: '',
       excerpt: 'صيغة دليل صحية مصقولة للمعلومات المراجعة والوسائط التحريرية وخيارات الرعاية ذات الصلة ومساحات الرعاية الواضحة دون نشر نصائح طبية.',
       authorLabel: 'بقلم',
-      authorValue: 'فريق DrMuscat التحريري',
+      authorValue: 'فريق DrKhaleej التحريري',
       reviewerLabel: 'المراجع الطبي',
       reviewerValue: 'يحدد عند تجهيز الدليل',
       updatedLabel: 'آخر تحديث',
