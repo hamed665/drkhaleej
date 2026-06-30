@@ -62,9 +62,11 @@ function uniqueNonEmpty(values: Array<string | null | undefined>): string[] {
 function listPreview(locale: PublicCatalogLocale, values: string[], max = 2): string | null {
   const names = values.slice(0, max);
   if (names.length === 0) return null;
-  if (names.length === 1) return names[0];
-  if (locale === 'ar') return names.join(' و');
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+  if (names.length === 1) return names[0] ?? null;
+  const lastName = names[names.length - 1];
+  if (!lastName) return null;
+  if (locale === 'ar') return names.join(' و ');
+  return `${names.slice(0, -1).join(', ')} and ${lastName}`;
 }
 
 export function buildPublicProfileMetaDescription(summary: string): string {
