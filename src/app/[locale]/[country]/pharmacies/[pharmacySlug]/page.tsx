@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
+  buildPublicImportProfileMetaDescription,
+  buildPublicImportProfileSummary,
+  type PublicImportProfileSummaryInput,
+} from "@/lib/catalog/public-import-profile-summary";
+import {
   isSupportedCountry,
   isSupportedLocale,
   localeDirection,
@@ -32,22 +37,18 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     sourceLabel: "Source",
   },
   ar: {
-    badge: "\u0645\u0644\u0641 \u0635\u064a\u062f\u0644\u064a\u0629 \u0639\u0627\u0645",
-    fallbackTitle: "\u0645\u0644\u0641 \u0635\u064a\u062f\u0644\u064a\u0629 | DrKhaleej",
-    fallbackDescription: "\u0627\u0637\u0644\u0639 \u0639\u0644\u0649 \u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0639\u0627\u0645\u0629 \u0645\u0631\u0627\u062c\u0639\u0629 \u0639\u0646 \u0627\u0644\u0635\u064a\u062f\u0644\u064a\u0627\u062a \u0641\u064a \u0639\u064f\u0645\u0627\u0646 \u0639\u0628\u0631 DrKhaleej.",
-    overviewTitle: "\u0646\u0638\u0631\u0629 \u0639\u0627\u0645\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u0644\u0641",
-    servicesTitle: "\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0635\u064a\u062f\u0644\u064a\u0629",
-    contactTitle: "\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0648\u0627\u0644\u0627\u062a\u062c\u0627\u0647\u0627\u062a",
-    sourceLabel: "\u0627\u0644\u0645\u0635\u062f\u0631",
+    badge: "ملف صيدلية عام",
+    fallbackTitle: "ملف صيدلية | DrKhaleej",
+    fallbackDescription: "اطلع على معلومات عامة مراجعة عن الصيدليات في عُمان عبر DrKhaleej.",
+    overviewTitle: "نظرة عامة على الملف",
+    servicesTitle: "خدمات الصيدلية",
+    contactTitle: "التواصل والاتجاهات",
+    sourceLabel: "المصدر",
   },
 };
 
 function metadataTitle(name: string): string {
   return `${name} | DrKhaleej`;
-}
-
-function profileDescription(name: string): string {
-  return `${name} on DrKhaleej. Public pharmacy discovery in Oman only; not medical advice or emergency care.`;
 }
 
 function displayName(locale: SupportedLocale, name: string, nameAr: string | null): string {
@@ -78,12 +79,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const name = displayName(locale, result.profile.name, result.profile.nameAr);
+  const profileSummary = buildPublicImportProfileSummary(locale, result.profile satisfies PublicImportProfileSummaryInput);
   return buildLocalizedMetadata({
     locale,
     country,
     pathname: `/pharmacies/${pharmacySlug}`,
     title: metadataTitle(name),
-    description: profileDescription(name),
+    description: buildPublicImportProfileMetaDescription(profileSummary),
   });
 }
 
@@ -98,6 +100,7 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
   const profile = result.profile;
   const dir = localeDirection(locale);
   const title = displayName(locale, profile.name, profile.nameAr);
+  const profileSummary = buildPublicImportProfileSummary(locale, profile satisfies PublicImportProfileSummaryInput);
   const location = localArea([profile.area, profile.wilayat, profile.governorate]);
   const serviceSignals = [...profile.services, ...profile.departments].slice(0, 8);
 
@@ -108,13 +111,14 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
           <span className="dm2026-badge">{copy.badge}</span>
           <h1 id="pharmacy-profile-title">{title}</h1>
           {profile.nameAr && locale !== "ar" ? <p>{profile.nameAr}</p> : null}
-          <p>{profileDescription(title)}</p>
+          <p>{profileSummary}</p>
         </div>
       </section>
 
       <section className="dm2026-container dm2026-doctors-listings" aria-labelledby="pharmacy-profile-overview-title">
         <div className="dm2026-card-soft">
           <h2 id="pharmacy-profile-overview-title">{copy.overviewTitle}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">{profileSummary}</p>
           <dl className="mt-4 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
             <div>
               <dt className="font-semibold text-slate-950">Location</dt>
