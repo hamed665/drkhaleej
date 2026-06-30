@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { normalizePublicBrandMetadata } from '@/lib/brand/public-brand-metadata';
 import {
-  getPublicSeoPageDefinition,
-  isSitemapReadySeoPageDefinition
-} from '@/lib/seo/page-registry';
+  getPublicUrlRegistryEntry,
+  isIndexablePublicUrlEntry,
+} from '@/lib/seo/url-registry';
 import { localizedPathname, siteConfig, type SiteCountry, type SiteLocale } from './site';
 
 type BuildLocalizedMetadataInput = {
@@ -32,8 +32,8 @@ function openGraphLocale(locale: SiteLocale, country: SiteCountry): string {
 }
 
 function robotsForStaticSeoPage(pathname: string, locale: SiteLocale, country: SiteCountry): Metadata['robots'] | undefined {
-  const page = getPublicSeoPageDefinition({ pathname, locale, country });
-  if (page === null || isSitemapReadySeoPageDefinition(page)) return undefined;
+  const entry = getPublicUrlRegistryEntry({ route: pathname, locale, country });
+  if (entry === null || isIndexablePublicUrlEntry(entry)) return undefined;
 
   return noindexFollowRobots;
 }
