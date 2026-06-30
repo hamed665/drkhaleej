@@ -13,7 +13,6 @@ const scanTargets = [
   'src/components/layout',
   'src/components/public',
   'src/lib/articles',
-  'src/lib/brand',
   'src/lib/routes/public.ts',
   'src/lib/seo'
 ];
