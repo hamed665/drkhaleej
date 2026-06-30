@@ -91,5 +91,6 @@ for (const pathname of publicPathnames) {
 }
 
 await import('./check-sitemap-hreflang-parity.mjs');
+await import('./check-search-mode-contract.mjs');
 
 console.log('route contract and LLM policy check passed.');
