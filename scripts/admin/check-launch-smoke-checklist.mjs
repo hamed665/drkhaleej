@@ -116,10 +116,10 @@ mustHave(eligibleRouteCheck, 'getPublicCenterBySlug', 'scripts/seo/check-public-
 const packagePath = 'package.json';
 const packageJson = readFile(packagePath);
 for (const token of [
-  '"admin:launch-smoke-checklist:validate": "node scripts/admin/check-launch-smoke-checklist.mjs"',
-  'pnpm admin:launch-smoke-checklist:validate',
+  '"admin:launch-checklist:validate": "node scripts/admin/check-launch-smoke-checklist.mjs"',
+  'pnpm admin:launch-checklist:validate',
 ]) {
   mustHave(packageJson, token, packagePath);
 }
 
-console.log('Launch smoke checklist checks passed.');
+console.log('Launch checklist checks passed.');
