@@ -6,12 +6,12 @@ import { PublicDiscoveryResultsShell2026 } from "@/components/public/discovery/P
 import { buildHospitalsDiscoveryConfig } from "@/components/public/discovery/publicDiscoveryPageConfig";
 import { cleanConfigBrand } from "@/components/public/discovery/configBrand";
 import { PublicDirectoryListingContent } from "@/components/public/public-directory-listing-content";
+import {
+  centerTypeDirectoryResultFromSearch,
+  firstDirectorySearchParamValue,
+  isDirectorySearchQuery,
+} from "@/lib/catalog/public-directory-query";
 import { listPublicCenters, searchPublicCatalog } from "@/lib/catalog/public-eligible-queries";
-import type {
-  PublicCatalogQueryResult,
-  PublicCatalogSearchResult,
-  PublicCenterSummary,
-} from "@/lib/catalog/public-types";
 import {
   isSupportedCountry,
   isSupportedLocale,
@@ -51,23 +51,6 @@ const searchEmptyCopyByLocale: Record<SupportedLocale, string> = {
   ar: "لا توجد نتائج مستشفيات عامة مؤهلة لهذا البحث حتى الآن.",
 };
 
-function firstSearchParamValue(value: string | string[] | undefined): string {
-  const rawValue = Array.isArray(value) ? value[0] : value;
-  return rawValue ? rawValue.trim().slice(0, 80) : "";
-}
-
-function centerTypeResultFromSearch(
-  result: PublicCatalogQueryResult<PublicCatalogSearchResult>,
-  centerType: PublicCenterSummary["centerType"],
-): PublicCatalogQueryResult<PublicCenterSummary[]> {
-  return {
-    ok: result.ok,
-    data: result.ok ? result.data.centers.filter((center) => center.centerType === centerType) : [],
-    emptyReason: result.emptyReason,
-    error: result.error,
-  };
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -99,10 +82,10 @@ export default async function PublicHospitalsPage({
   const safeCountry = country as SupportedCountry;
   const dir = localeDirection(safeLocale);
   const config = cleanConfigBrand(buildHospitalsDiscoveryConfig(safeLocale, safeCountry, dir));
-  const query = firstSearchParamValue((await searchParams).q);
-  const isDirectorySearch = query.length >= 2;
+  const query = firstDirectorySearchParamValue((await searchParams).q);
+  const isDirectorySearch = isDirectorySearchQuery(query);
   const result = isDirectorySearch
-    ? centerTypeResultFromSearch(await searchPublicCatalog(query, { limit: 24 }), "hospital")
+    ? centerTypeDirectoryResultFromSearch(await searchPublicCatalog(query, { limit: 24 }), "hospital")
     : await listPublicCenters({
         country: safeCountry,
         centerType: "hospital",
