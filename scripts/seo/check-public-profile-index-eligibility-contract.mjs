@@ -1,4 +1,5 @@
 import './check-public-profile-metadata-index-gate.mjs';
+import './check-public-profile-completeness-signals.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
