@@ -4,6 +4,7 @@ import { publicCenterDetailRoute } from '@/lib/routes/public';
 
 import { PublicCenterDetailSection } from './public-center-detail-section';
 import { PublicContactActions } from './public-contact-actions';
+import { PublicDoctorPracticeCallback } from './public-doctor-practice-callback';
 import { PublicLicenseInfoCard } from './public-license-info-card';
 
 type PublicDoctorDetailProps = {
@@ -176,6 +177,7 @@ export function PublicDoctorDetail({ locale, doctor }: PublicDoctorDetailProps) 
                       {copy.centerProfileLabel}
                     </a>
                   </div>
+                  <PublicDoctorPracticeCallback locale={locale} doctor={doctor} practiceLocation={practiceLocation} />
                 </li>
               );
             })}
