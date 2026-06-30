@@ -64,6 +64,39 @@ for (const forbiddenToken of [
   assertNotIncludes(cardContent, forbiddenToken, cardPath);
 }
 
+const directoryContracts = [
+  {
+    path: 'src/app/[locale]/[country]/doctors/page.tsx',
+    tokens: ['listPublicDoctors({ country: safeCountry })', 'PublicDirectoryListingContent', 'variant="doctor"', 'result={result}'],
+  },
+  {
+    path: 'src/app/[locale]/[country]/centers/page.tsx',
+    tokens: ['listPublicCenters({ country: safeCountry })', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+  },
+  {
+    path: 'src/app/[locale]/[country]/labs/page.tsx',
+    tokens: ['listPublicCenters({', 'centerType: "laboratory"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+  },
+  {
+    path: 'src/app/[locale]/[country]/pharmacies/page.tsx',
+    tokens: ['listPublicCenters({', 'centerType: "pharmacy"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+  },
+  {
+    path: 'src/app/[locale]/[country]/hospitals/page.tsx',
+    tokens: ['listPublicCenters({', 'centerType: "hospital"', 'PublicDirectoryListingContent', 'variant="center"', 'result={result}'],
+  },
+];
+
+for (const contract of directoryContracts) {
+  const content = readFile(contract.path);
+  for (const token of contract.tokens) {
+    assertIncludes(content, token, contract.path);
+  }
+  for (const forbiddenToken of ['contactActions', 'Book now', 'Open now', 'Verified', 'rating', 'insurance']) {
+    assertNotIncludes(content, forbiddenToken, contract.path);
+  }
+}
+
 const packagePath = 'package.json';
 const packageContent = readFile(packagePath);
 for (const token of [
@@ -73,4 +106,4 @@ for (const token of [
   assertIncludes(packageContent, token, packagePath);
 }
 
-console.log('Public listing card safety checks passed.');
+console.log('Public listing card safety and directory graph checks passed.');
