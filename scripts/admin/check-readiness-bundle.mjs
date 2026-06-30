@@ -32,12 +32,19 @@ for (const token of [
   'public catalog eligibility wrapper',
   'guarded public center detail route',
   'public launch-safe UI guard',
+  'fact-based public profile summaries',
+  'public profile summary contract',
+  'profile summary contract guard',
+  'profile summary unit tests',
+  'Manual provider copy can appear when approved, but it must not replace the generated summary baseline.',
+  'listing card safety guard',
   'sitemap and import family validators',
   'soft launch operator checklist',
   'first provider rehearsal document',
   'bulk provider rollout',
   'live active-provider editing',
   'manual sitemap insertion',
+  'manual removal of generated public profile summaries',
 ]) {
   mustHave(doc, token, docPath);
 }
@@ -71,14 +78,28 @@ for (const file of [
   'docs/admin/final-launch-chain-recap.md',
   'docs/admin/soft-launch-operator-checklist.md',
   'docs/admin/first-provider-rehearsal.md',
+  'docs/seo/public-profile-summary-contract.md',
   'src/app/admin/draft-centers/page.tsx',
   'src/app/admin/active-centers/page.tsx',
   'src/app/admin/audit-log/page.tsx',
   'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
   'src/server/admin/draft-center-publication-readiness.ts',
   'src/server/admin/draft-center-public-activation-actions.ts',
+  'src/lib/catalog/public-profile-summary.ts',
+  'src/lib/catalog/public-profile-summary.test.ts',
+  'scripts/seo/check-public-profile-summary-contract.mjs',
 ]) {
   readFile(file);
+}
+
+const summaryGuard = readFile('scripts/seo/check-public-profile-summary-contract.mjs');
+for (const token of [
+  'docs/seo/public-profile-summary-contract.md',
+  'buildPublicCenterProfileSummary',
+  'buildPublicDoctorProfileSummary',
+  'buildPublicProfileMetaDescription',
+]) {
+  mustHave(summaryGuard, token, 'scripts/seo/check-public-profile-summary-contract.mjs');
 }
 
 const pkg = readFile('package.json');
