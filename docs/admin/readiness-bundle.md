@@ -45,11 +45,17 @@ The public side now has:
 - guarded public center detail route
 - public launch-safe UI guard
 - listing card safety guard
+- fact-based public profile summaries
+- public profile summary contract
+- profile summary contract guard
+- profile summary unit tests
 - safe contact fallback copy
 - medical safety copy
 - sitemap and import family validators
 
 Public center detail must continue loading through the eligibility wrapper, not raw catalog queries.
+
+Public doctor and center profile pages must keep rendering fact-based profile summaries through the shared summary helpers. Manual provider copy can appear when approved, but it must not replace the generated summary baseline.
 
 ## Completed operator chain
 
@@ -90,6 +96,8 @@ These public and import validators must remain wired into `seo:check`:
 - `import:sitemap-family-caps:validate`
 - `import:profile-smoke:validate`
 
+The listing card safety validator also imports the public profile summary contract guard. That guard must keep checking the summary helper, metadata usage, public UI rendering, documentation contract, and unit test coverage.
+
 ## Not approved by this bundle
 
 This bundle does not approve:
@@ -104,6 +112,7 @@ This bundle does not approve:
 - booking claims
 - insurance claims
 - manual sitemap insertion
+- manual removal of generated public profile summaries
 
 Each of those requires a separate contract, implementation, audit behavior, and validator.
 
