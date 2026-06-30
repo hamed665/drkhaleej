@@ -47,5 +47,7 @@ export const localeCountryDiscoveryRoutePattern =
   /^\/(en|ar)\/(om)\/(doctors|dental|centers|labs|pharmacies|hospitals|offers|beauty|pet-clinics|pet-shops|services|search)(?:\/)?$/;
 export const publicProviderRoutePattern =
   /^\/(en|ar)\/(om)\/for-providers(?:\/)?$/;
+export const publicCenterDetailRoutePattern =
+  /^\/(en|ar)\/(om)\/center\/([^/]+)(?:\/)?$/;
 export const publicDoctorDetailRoutePattern =
   /^\/(en|ar)\/(om)\/doctor\/([^/]+)(?:\/)?$/;
