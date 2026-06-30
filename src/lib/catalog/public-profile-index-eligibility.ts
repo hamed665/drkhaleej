@@ -56,6 +56,10 @@ function hasText(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function firstNonEmptyText(values: Array<string | null | undefined>): string | null {
+  return values.find(hasText) ?? null;
+}
+
 function normalizeText(value: string): string {
   return value.normalize('NFKC').replace(/\s+/g, ' ').trim().toLowerCase();
 }
@@ -77,11 +81,11 @@ function containsUnsafeClaim(values: Array<string | null | undefined>): boolean 
 }
 
 function centerDisplayName(center: PublicCenterDetail): string | null {
-  return center.nameEn || center.nameAr;
+  return firstNonEmptyText([center.nameEn, center.nameAr]);
 }
 
 function doctorDisplayName(doctor: PublicDoctorDetail): string | null {
-  return doctor.displayNameEn || doctor.displayNameAr || doctor.fullNameEn || doctor.fullNameAr;
+  return firstNonEmptyText([doctor.displayNameEn, doctor.displayNameAr, doctor.fullNameEn, doctor.fullNameAr]);
 }
 
 function centerHasRelationSignal(center: PublicCenterDetail): boolean {
