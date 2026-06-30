@@ -7,6 +7,7 @@ type Props = {
   children: ReactNode;
   isEmpty?: boolean;
   hasActiveQuery?: boolean;
+  activeQueryNotice?: ReactNode;
   compactEmptyText?: string;
   compactEmptySearchText?: string;
   compactEmptySearchHint?: string;
@@ -17,6 +18,7 @@ export function PublicDiscoveryResultsShell2026({
   children,
   isEmpty = false,
   hasActiveQuery = false,
+  activeQueryNotice,
   compactEmptyText,
   compactEmptySearchText,
   compactEmptySearchHint,
@@ -35,6 +37,7 @@ export function PublicDiscoveryResultsShell2026({
       }
       aria-labelledby={`${config.resultsId}-title`}
     >
+      {activeQueryNotice}
       {shouldShowCompactEmpty ? (
         <div
           className="dm2026-public-discovery-empty-compact dm2026-card-soft"
