@@ -1,26 +1,24 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 
-const staticScanFiles = [
+const scanTargets = [
   'public/llms.txt',
-  'src/components/home/HomePage2026HeaderHero.tsx',
-  'src/components/home/HomeSearch2026.tsx',
-  'src/components/home/HomeEntityClarity2026.tsx',
-  'src/components/home/HomeFeaturedBoard2026.tsx',
-  'src/components/home/HomeDiscoveryCategories2026.tsx',
-  'src/components/home/HomeSpecialOffersShowcase2026.tsx',
-  'src/components/home/HomeProviderCTA2026.tsx',
-  'src/components/home/HomeFAQ2026.tsx',
-  'src/components/home/HomeTrustSafety2026.tsx',
-  'src/components/home/HomeSupportContact2026.tsx',
-  'src/lib/seo/site.ts',
-  'src/lib/seo/metadata.ts',
-  'src/lib/seo/jsonld.ts',
-  'src/lib/seo/faq-jsonld.ts',
-  'src/lib/seo/page-registry.ts'
+  'src/app/robots.ts',
+  'src/app/sitemap.ts',
+  'src/app/[locale]/[country]',
+  'src/components/brand',
+  'src/components/home',
+  'src/components/layout',
+  'src/components/public',
+  'src/lib/brand',
+  'src/lib/routes/public.ts',
+  'src/lib/seo'
 ];
+
+const textFileExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.md', '.txt']);
+const ignoredDirectoryNames = new Set(['.git', '.next', 'node_modules']);
 
 const blockedParts = [
   ['Dr', 'Muscat'],
@@ -37,28 +35,50 @@ async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
 }
 
-function routeFileForPathname(pathname) {
-  return pathname === '/'
-    ? 'src/app/[locale]/[country]/page.tsx'
-    : `src/app/[locale]/[country]${pathname}/page.tsx`;
+async function safeStat(relativePath) {
+  try {
+    return await stat(path.join(root, relativePath));
+  } catch {
+    return null;
+  }
+}
+
+async function collectTextFiles(relativePath) {
+  const stats = await safeStat(relativePath);
+  if (stats === null) {
+    throw new Error(`Missing required public text scan target: ${relativePath}`);
+  }
+
+  if (stats.isFile()) {
+    return textFileExtensions.has(path.extname(relativePath)) ? [relativePath] : [];
+  }
+
+  if (!stats.isDirectory()) return [];
+
+  const entries = await readdir(path.join(root, relativePath), { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.isDirectory() && ignoredDirectoryNames.has(entry.name)) continue;
+    files.push(...await collectTextFiles(path.join(relativePath, entry.name)));
+  }
+
+  return files;
 }
 
 function assertNoBlockedText(relativePath, source) {
   for (const value of blockedValues) {
     if (source.includes(value)) {
-      throw new Error(`${relativePath} contains previous public name text.`);
+      throw new Error(`${relativePath} contains previous public brand text: ${value}`);
     }
   }
 }
 
-const registrySource = await readText('src/lib/seo/page-registry.ts');
-const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
-const publicPageFiles = ['/', ...new Set(staticRouteMatches)].map(routeFileForPathname);
-const files = [...new Set([...staticScanFiles, ...publicPageFiles])];
+const files = [...new Set((await Promise.all(scanTargets.map(collectTextFiles))).flat())].sort();
 
 for (const file of files) {
   const source = await readText(file);
   assertNoBlockedText(file, source);
 }
 
-console.log(`public text contract check passed for ${files.length} files.`);
+console.log(`public text contract check passed for ${files.length} public surface files.`);
