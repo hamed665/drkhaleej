@@ -34,6 +34,7 @@ During soft launch, do not manually change:
 - taxonomy assignments after readiness review
 - contact visibility after activation
 - sitemap entries outside the guarded flow
+- generated public profile summaries outside the summary contract
 
 If any of these must change, stop and create a separate contract and validator first.
 
@@ -70,6 +71,9 @@ Check both public profile routes recorded by the action:
 Expected public behavior:
 
 - the profile loads only through the public eligibility wrapper
+- generated fact-based profile summary is visible in the About section
+- provider description or biography does not replace the generated summary baseline
+- metadata description remains profile-specific through the profile summary contract
 - contact actions only show approved public contact values
 - safe fallback copy appears when contact actions are absent
 - medical safety note is visible
@@ -78,7 +82,7 @@ Expected public behavior:
 
 ## Public claims that must not appear
 
-The public profile and listing cards must not claim:
+The public profile, generated profile summary, and listing cards must not claim:
 
 - best or top provider
 - rating or review score
@@ -117,6 +121,7 @@ A provider passes the soft-launch operator check only when:
 - admin active centers view shows the provider read-only
 - audit log shows activation evidence
 - English and Arabic public routes load safely
+- generated fact-based profile summary is visible
 - public UI does not show unsupported claims
 - sitemap behavior remains guarded
 
