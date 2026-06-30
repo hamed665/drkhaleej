@@ -12,6 +12,8 @@ import {
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
 
+const publicBrandName = 'DrKhaleej';
+
 type Params = { locale: string; country: string; centerSlug: string };
 
 type RouteCopy = {
@@ -23,13 +25,13 @@ type RouteCopy = {
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
     badge: 'Public center profile',
-    fallbackTitle: 'Medical Center Profile | DrMuscat',
-    fallbackDescription: 'View public medical center information in Oman on DrMuscat.'
+    fallbackTitle: `Medical Center Profile | ${publicBrandName}`,
+    fallbackDescription: `View public medical center information in Oman on ${publicBrandName}.`
   },
   ar: {
     badge: 'ملف مركز عام',
-    fallbackTitle: 'ملف مركز طبي | DrMuscat',
-    fallbackDescription: 'اطلع على معلومات عامة عن المراكز الطبية في عُمان عبر DrMuscat.'
+    fallbackTitle: `ملف مركز طبي | ${publicBrandName}`,
+    fallbackDescription: `اطلع على معلومات عامة عن المراكز الطبية في عُمان عبر ${publicBrandName}.`
   }
 };
 
@@ -38,8 +40,8 @@ function preferredText(locale: SupportedLocale, en: string | null, ar: string | 
   return en ?? ar;
 }
 
-function metadataTitle(locale: SupportedLocale, name: string): string {
-  return locale === 'ar' ? `${name} | DrMuscat` : `${name} | DrMuscat`;
+function metadataTitle(name: string): string {
+  return `${name} | ${publicBrandName}`;
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -69,7 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     locale,
     country,
     pathname: `/center/${centerSlug}`,
-    title: metadataTitle(locale, centerName),
+    title: metadataTitle(centerName),
     description
   });
 }
