@@ -4,6 +4,7 @@ import { PublicCenterDetail } from '@/components/public/public-center-detail';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
+import { isPublicProfileIndexEligible } from '@/lib/catalog/public-profile-index-eligibility';
 import {
   buildPublicCenterProfileSummary,
   buildPublicProfileMetaDescription,
@@ -16,6 +17,7 @@ import {
   type SupportedLocale
 } from '@/lib/i18n/config';
 import { buildLocalizedMetadata } from '@/lib/seo/metadata';
+import { applyProfileMetadataIndexGate } from '@/lib/seo/profile-metadata-index-gate';
 
 const publicBrandName = 'DrKhaleej';
 
@@ -87,14 +89,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const centerName = preferredText(locale, result.data.nameEn, result.data.nameAr) ?? result.data.nameEn;
   const profileSummary = buildPublicCenterProfileSummary(locale, result.data);
-
-  return buildLocalizedMetadata({
+  const metadata = buildLocalizedMetadata({
     locale,
     country,
     pathname: `/center/${centerSlug}`,
     title: metadataTitle(centerName),
     description: buildPublicProfileMetaDescription(profileSummary)
   });
+  const indexEligibility = isPublicProfileIndexEligible(result.data, {
+    kind: 'center',
+    locale,
+    fromPublicEligibleQuery: true,
+  });
+
+  return applyProfileMetadataIndexGate(metadata, indexEligibility);
 }
 
 export default async function PublicCenterDetailPage({ params }: { params: Promise<Params> }) {
