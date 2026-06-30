@@ -115,7 +115,7 @@ const readinessHelperPath = 'src/server/admin/active-center-public-state-readine
 const readinessHelper = readFile(readinessHelperPath);
 for (const token of [
   'getAdminActiveCenterPublicStateReadiness',
-  'requireAdminPermission("draft_centers.update")',
+  'requireAdminPermission("active_centers.public_state.update")',
   '.from<ActiveCenterStateRow>("centers")',
   '.from<ActivationAuditRow>("admin_audit_events")',
   '.eq("entity_id", centerId)',
@@ -142,6 +142,64 @@ for (const token of [
   'insertAuditEvent',
 ]) {
   mustNotHave(readinessHelper, token, readinessHelperPath);
+}
+
+const actionPath = 'src/server/admin/active-center-public-state-actions.ts';
+const action = readFile(actionPath);
+for (const token of [
+  '"use server";',
+  'export async function deactivateActiveCenterPublicProfile',
+  'requireAdminPermission("active_centers.public_state.update")',
+  'const reason = formString(formData, "reason")',
+  'getAdminActiveCenterPublicStateReadiness(centerId)',
+  'readiness.canDeactivate',
+  '.select("id,slug,status,default_country,is_active,deleted_at")',
+  '.eq("status", "active")',
+  '.eq("is_active", true)',
+  'status: "inactive"',
+  'is_active: false',
+  '.update(updatePayload)',
+  'writeAdminAuditEvent({',
+  'permissionKey: "active_centers.public_state.update"',
+  'action: "active_center.public_profile_deactivated"',
+  'reason,',
+  'revalidatePath(enPath)',
+  'revalidatePath(arPath)',
+  'revalidatePath("/sitemap.xml")',
+  'revalidatePath("/admin/active-centers")',
+  'revalidatePath(`/admin/active-centers/${centerId}`)',
+]) {
+  mustHave(action, token, actionPath);
+}
+for (const token of [
+  'useActionState',
+  '<form',
+  'type="submit"',
+  'DraftCenterEditForm',
+  'activateDraftCenterPublicProfile',
+  'verification_status',
+  'contact_visibility',
+  'subscription',
+  'billing',
+  'sponsored',
+  'is_claimable',
+  '.delete(',
+]) {
+  mustNotHave(action, token, actionPath);
+}
+
+const auditPath = 'src/server/admin/audit-log.ts';
+const audit = readFile(auditPath);
+mustHave(audit, '| "active_center.public_profile_deactivated"', auditPath);
+
+const permissionsPath = 'src/lib/admin/permissions.ts';
+const permissions = readFile(permissionsPath);
+for (const token of [
+  'label: "Active Centers"',
+  '"active_centers.public_state.update"',
+  'operations_manager: { label: "Operations manager"',
+]) {
+  mustHave(permissions, token, permissionsPath);
 }
 
 const pkg = readFile('package.json');
