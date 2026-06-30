@@ -97,6 +97,21 @@ for (const contract of directoryContracts) {
   }
 }
 
+const directorySearchContractPath = 'docs/seo/directory-search-filter-contract.md';
+const directorySearchContract = readFile(directorySearchContractPath);
+for (const token of [
+  'Directory search and filter contract',
+  'Query and filter URL variants are user state only.',
+  'Directory query variants must not enter the sitemap.',
+  'Canonical metadata remains the base directory path.',
+  '`q` text search on `/doctors`',
+  'SSR execution using `searchPublicCatalog`',
+  'client-only filtering that changes the URL without changing the server-rendered results',
+  'Specialty and area filters only after their gates and canonical rules exist.',
+]) {
+  assertIncludes(directorySearchContract, token, directorySearchContractPath);
+}
+
 const packagePath = 'package.json';
 const packageContent = readFile(packagePath);
 for (const token of [
@@ -106,4 +121,4 @@ for (const token of [
   assertIncludes(packageContent, token, packagePath);
 }
 
-console.log('Public listing card safety and directory graph checks passed.');
+console.log('Public listing card safety, directory graph, and directory search contract checks passed.');
