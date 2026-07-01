@@ -1,5 +1,5 @@
 import type { PublicContactAction } from '@/lib/catalog/public-contact';
-import { getPublicCenterPublicInfo, type PublicCenterPublicLocationInfo } from '@/lib/catalog/public-center-public-info';
+import type { PublicCenterPublicInfo as PublicCenterPublicInfoData, PublicCenterPublicLocationInfo } from '@/lib/catalog/public-center-public-info';
 import {
   formatPublicLocationGeoLine,
   formatPublicLocationName,
@@ -15,6 +15,7 @@ type PublicCenterPublicInfoProps = {
   locale: PublicCatalogLocale;
   centerId: string;
   countryCode: CountryCode;
+  publicInfo: PublicCenterPublicInfoData;
   contactTitle: string;
   contactUnavailable: string;
   locationTitle: string;
@@ -136,10 +137,11 @@ function buildRenderLocations(
   return locationItems;
 }
 
-export async function PublicCenterPublicInfo({
+export function PublicCenterPublicInfo({
   locale,
   centerId,
   countryCode,
+  publicInfo,
   contactTitle,
   contactUnavailable,
   locationTitle,
@@ -151,7 +153,6 @@ export async function PublicCenterPublicInfo({
   fallbackLocations,
   showSafeContactFallback
 }: PublicCenterPublicInfoProps) {
-  const publicInfo = await getPublicCenterPublicInfo(centerId);
   const centerActions = mergeContactActions(publicInfo.contactActions, fallbackContactActions);
   const firstLocationActions =
     publicInfo.locations.find((location) => location.contactActions.length > 0)?.contactActions ??
