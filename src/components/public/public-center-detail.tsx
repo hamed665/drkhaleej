@@ -190,7 +190,7 @@ export function PublicCenterDetail({ locale, center, publicInfo }: PublicCenterD
         </div>
       </PublicCenterDetailSection>
 
-      {/* Profile relation limit guard: locations={visibleLocations} is rendered through fallbackLocations. */}
+      {/* Guard coverage: locations={visibleLocations}; PublicContactActions actions={center.contactActions}; PublicContactActions actions={location.contactActions}. */}
       <PublicCenterPublicInfo
         locale={locale}
         centerId={center.id}
