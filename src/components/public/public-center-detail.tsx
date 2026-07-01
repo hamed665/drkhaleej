@@ -1,6 +1,13 @@
 import Link from 'next/link';
 
 import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
+import {
+  hiddenPublicProfileRelationCount,
+  limitPublicProfileRelations,
+  PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT,
+  PUBLIC_CENTER_PROFILE_LOCATION_LIMIT,
+  PUBLIC_CENTER_PROFILE_SERVICE_LIMIT,
+} from '@/lib/catalog/public-profile-relation-limits';
 import { buildPublicCenterProfileSummary } from '@/lib/catalog/public-profile-summary';
 import type { PublicCatalogLocale, PublicCenterDetail as PublicCenterDetailData } from '@/lib/catalog/public-types';
 import { publicDoctorDetailRoute } from '@/lib/routes/public';
@@ -38,6 +45,7 @@ type CenterDetailCopy = {
   noServices: string;
   noDoctors: string;
   noLocation: string;
+  moreRelationsNotice: string;
   directionsLabel: string;
   directionsAriaLabel: string;
   doctorProfileLabel: string;
@@ -67,6 +75,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     noServices: 'No public services are connected to this profile yet.',
     noDoctors: 'No public doctors are connected to this profile yet.',
     noLocation: 'General location details are not available yet.',
+    moreRelationsNotice: 'More related items may be surfaced after review.',
     directionsLabel: 'Open in Maps',
     directionsAriaLabel: 'Open this location in maps',
     doctorProfileLabel: 'View doctor profile'
@@ -94,6 +103,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     noServices: 'لا توجد خدمات عامة مرتبطة بهذا الملف حتى الآن.',
     noDoctors: 'لا يوجد أطباء عامون مرتبطون بهذا الملف حتى الآن.',
     noLocation: 'تفاصيل الموقع العامة غير متاحة بعد.',
+    moreRelationsNotice: 'قد تظهر عناصر مرتبطة إضافية بعد المراجعة.',
     directionsLabel: 'فتح في الخرائط',
     directionsAriaLabel: 'فتح هذا الموقع في الخرائط',
     doctorProfileLabel: 'عرض ملف الطبيب'
@@ -112,6 +122,12 @@ function formatNeutralLabel(value: string): string {
     .join(' ');
 }
 
+function MoreRelationsNotice({ hiddenCount, label }: { hiddenCount: number; label: string }) {
+  if (hiddenCount === 0) return null;
+
+  return <p className="mt-3 text-xs font-medium text-slate-500">{label}</p>;
+}
+
 export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) {
   const copy = copyByLocale[locale];
   const description =
@@ -119,6 +135,12 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
     preferredText(locale, center.descriptionEn, center.descriptionAr);
   const profileSummary = buildPublicCenterProfileSummary(locale, center);
   const locationText = formatPublicLocationSummary(locale, center.location);
+  const visibleLocations = limitPublicProfileRelations(center.locations, PUBLIC_CENTER_PROFILE_LOCATION_LIMIT);
+  const visibleServices = limitPublicProfileRelations(center.services, PUBLIC_CENTER_PROFILE_SERVICE_LIMIT);
+  const visibleDoctors = limitPublicProfileRelations(center.doctors, PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT);
+  const hiddenLocationCount = hiddenPublicProfileRelationCount(center.locations, PUBLIC_CENTER_PROFILE_LOCATION_LIMIT);
+  const hiddenServiceCount = hiddenPublicProfileRelationCount(center.services, PUBLIC_CENTER_PROFILE_SERVICE_LIMIT);
+  const hiddenDoctorCount = hiddenPublicProfileRelationCount(center.doctors, PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT);
   const showSafeContactFallback = center.contactActions.length === 0 && center.locations.length > 0;
 
   return (
@@ -192,12 +214,13 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         locale={locale}
         title={copy.locationTitle}
         description={copy.locationDescription}
-        locations={center.locations}
+        locations={visibleLocations}
         emptyLabel={copy.noLocation}
         directionsLabel={copy.directionsLabel}
         directionsAriaLabel={() => copy.directionsAriaLabel}
         renderLocationActions={(location) => <PublicContactActions actions={location.contactActions} locale={locale} />}
       />
+      <MoreRelationsNotice hiddenCount={hiddenLocationCount} label={copy.moreRelationsNotice} />
 
       {center.galleryImages.length > 0 ? (
         <PublicCenterDetailSection title={copy.galleryTitle}>
@@ -222,47 +245,53 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
       ) : null}
 
       <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
-        {center.services.length > 0 ? (
-          <ul className="grid gap-3 sm:grid-cols-2" role="list">
-            {center.services.map((service) => {
-              const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
-              const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
+        {visibleServices.length > 0 ? (
+          <>
+            <ul className="grid gap-3 sm:grid-cols-2" role="list">
+              {visibleServices.map((service) => {
+                const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
+                const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
 
-              return (
-                <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
-                  {serviceDescription ? <p className="mt-2 text-sm leading-6 text-slate-600">{serviceDescription}</p> : null}
-                </li>
-              );
-            })}
-          </ul>
+                return (
+                  <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+                    <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
+                    {serviceDescription ? <p className="mt-2 text-sm leading-6 text-slate-600">{serviceDescription}</p> : null}
+                  </li>
+                );
+              })}
+            </ul>
+            <MoreRelationsNotice hiddenCount={hiddenServiceCount} label={copy.moreRelationsNotice} />
+          </>
         ) : (
           <p className="text-sm leading-6 text-slate-600">{copy.noServices}</p>
         )}
       </PublicCenterDetailSection>
 
       <PublicCenterDetailSection title={copy.doctorsTitle} description={copy.doctorsDescription}>
-        {center.doctors.length > 0 ? (
-          <ul className="grid gap-3 sm:grid-cols-2" role="list">
-            {center.doctors.map((doctor) => {
-              const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
-              const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
+        {visibleDoctors.length > 0 ? (
+          <>
+            <ul className="grid gap-3 sm:grid-cols-2" role="list">
+              {visibleDoctors.map((doctor) => {
+                const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
+                const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
 
-              return (
-                <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <h3>
-                    <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
-                      {doctorName}
+                return (
+                  <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+                    <h3>
+                      <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
+                        {doctorName}
+                      </Link>
+                    </h3>
+                    <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
+                    <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
+                      {copy.doctorProfileLabel}
                     </Link>
-                  </h3>
-                  <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
-                  <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
-                    {copy.doctorProfileLabel}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+            <MoreRelationsNotice hiddenCount={hiddenDoctorCount} label={copy.moreRelationsNotice} />
+          </>
         ) : (
           <p className="text-sm leading-6 text-slate-600">{copy.noDoctors}</p>
         )}

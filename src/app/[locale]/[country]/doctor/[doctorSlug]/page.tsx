@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { GuardedImportProfilePage } from '@/components/public/import-profile/GuardedImportProfilePage';
-import { PublicDoctorDetail } from '@/components/public/public-doctor-detail';
+import { PublicDoctorDetailLimited } from '@/components/public/public-doctor-detail-limited';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicDoctorBySlug } from '@/lib/catalog/public-eligible-queries';
@@ -149,7 +149,7 @@ export default async function PublicDoctorDetailPage({ params }: { params: Promi
         heroBadge={copy.badge}
         heroTitle={doctorName}
         heroDescription={profileSummary}
-        content={<PublicDoctorDetail locale={locale} doctor={result.data} />}
+        content={<PublicDoctorDetailLimited locale={locale} doctor={result.data} />}
       />
     );
   }
