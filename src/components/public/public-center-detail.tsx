@@ -12,10 +12,8 @@ import { buildPublicCenterProfileSummary } from '@/lib/catalog/public-profile-su
 import type { PublicCatalogLocale, PublicCenterDetail as PublicCenterDetailData } from '@/lib/catalog/public-types';
 import { publicDoctorDetailRoute } from '@/lib/routes/public';
 
-import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
-import { PublicContactActions } from './public-contact-actions';
-import { PublicLocationSection } from './public-location-section';
+import { PublicCenterPublicInfo } from './public-center-public-info';
 import { PublicLicenseInfoCard } from './public-license-info-card';
 
 type PublicCenterDetailProps = {
@@ -141,7 +139,9 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
   const hiddenLocationCount = hiddenPublicProfileRelationCount(center.locations, PUBLIC_CENTER_PROFILE_LOCATION_LIMIT);
   const hiddenServiceCount = hiddenPublicProfileRelationCount(center.services, PUBLIC_CENTER_PROFILE_SERVICE_LIMIT);
   const hiddenDoctorCount = hiddenPublicProfileRelationCount(center.doctors, PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT);
-  const showSafeContactFallback = center.contactActions.length === 0 && center.locations.length > 0;
+  const hasCenterContactActions = center.contactActions.length > 0;
+  const hasLocationContactActions = visibleLocations.some((location) => location.contactActions.length > 0);
+  const showSafeContactFallback = !hasCenterContactActions && !hasLocationContactActions && center.locations.length > 0;
 
   return (
     <div className="mt-10 space-y-5">
@@ -187,38 +187,20 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         </div>
       </PublicCenterDetailSection>
 
-      {center.contactActions.length > 0 ? (
-        <PublicCenterDetailSection title={copy.contactTitle}>
-          <div className="space-y-4">
-            <PublicContactActions actions={center.contactActions} locale={locale} />
-            <PublicCallbackRequestForm
-              locale={locale}
-              countryCode={center.defaultCountry}
-              centerId={center.id}
-              centerLocationId={null}
-              doctorId={null}
-              doctorPracticeLocationId={null}
-              variant="center"
-            />
-          </div>
-        </PublicCenterDetailSection>
-      ) : null}
-
-      {showSafeContactFallback ? (
-        <PublicCenterDetailSection title={copy.contactTitle}>
-          <p className="text-sm leading-6 text-slate-600">{copy.contactUnavailable}</p>
-        </PublicCenterDetailSection>
-      ) : null}
-
-      <PublicLocationSection
+      <PublicCenterPublicInfo
         locale={locale}
-        title={copy.locationTitle}
-        description={copy.locationDescription}
-        locations={visibleLocations}
-        emptyLabel={copy.noLocation}
+        centerId={center.id}
+        countryCode={center.defaultCountry}
+        contactTitle={copy.contactTitle}
+        contactUnavailable={copy.contactUnavailable}
+        locationTitle={copy.locationTitle}
+        locationDescription={copy.locationDescription}
+        noLocation={copy.noLocation}
         directionsLabel={copy.directionsLabel}
         directionsAriaLabel={() => copy.directionsAriaLabel}
-        renderLocationActions={(location) => <PublicContactActions actions={location.contactActions} locale={locale} />}
+        fallbackContactActions={center.contactActions}
+        fallbackLocations={visibleLocations}
+        showSafeContactFallback={showSafeContactFallback}
       />
       <MoreRelationsNotice hiddenCount={hiddenLocationCount} label={copy.moreRelationsNotice} />
 
