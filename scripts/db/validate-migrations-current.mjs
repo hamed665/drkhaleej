@@ -9,9 +9,18 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyValidator = path.join(repoRoot, 'scripts', 'db', 'validate-migrations-taxrlsa.mjs');
+const functionSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-security-function-search-path.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
+const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
+const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
+const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
+
+const currentOnlyMigrations = [
+  [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
+  [functionSearchPathMigrationName, functionSearchPathMigrationPath, hiddenFunctionSearchPathMigrationPath],
+];
 
 function fail(message) {
   console.error(`ERROR: SEC-SCHEDULE-RLS-A: ${message}`);
@@ -57,24 +66,41 @@ function validateScheduleRlsMigration() {
   }
 }
 
-function runLegacyValidatorWithoutScheduleRlsMigration() {
-  requireCondition(existsSync(scheduleRlsMigrationPath), `${scheduleRlsMigrationName} is missing before legacy validation.`);
-  requireCondition(!existsSync(hiddenScheduleRlsMigrationPath), 'Hidden schedule RLS migration file already exists.');
+function validateFunctionSearchPathMigration() {
+  execFileSync(process.execPath, [functionSearchPathValidator], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+}
 
-  renameSync(scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath);
+function runLegacyValidatorWithoutCurrentOnlyMigrations() {
+  for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
+    requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
+    requireCondition(!existsSync(hiddenMigrationPath), `Hidden migration file already exists for ${migrationName}.`);
+  }
+
+  const renamedMigrations = [];
   try {
+    for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
+      renameSync(migrationPath, hiddenMigrationPath);
+      renamedMigrations.push([migrationName, migrationPath, hiddenMigrationPath]);
+    }
+
     execFileSync(process.execPath, [legacyValidator], {
       cwd: repoRoot,
       stdio: 'inherit',
     });
   } finally {
-    if (existsSync(hiddenScheduleRlsMigrationPath)) {
-      renameSync(hiddenScheduleRlsMigrationPath, scheduleRlsMigrationPath);
+    for (const [, migrationPath, hiddenMigrationPath] of renamedMigrations.reverse()) {
+      if (existsSync(hiddenMigrationPath)) {
+        renameSync(hiddenMigrationPath, migrationPath);
+      }
     }
   }
 }
 
-runLegacyValidatorWithoutScheduleRlsMigration();
+runLegacyValidatorWithoutCurrentOnlyMigrations();
 validateScheduleRlsMigration();
+validateFunctionSearchPathMigration();
 
 console.log('Current migration validation passed.');
