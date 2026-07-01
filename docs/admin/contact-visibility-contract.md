@@ -52,7 +52,9 @@ Required value checks:
 - `public_whatsapp_phone_visible` requires a non-empty WhatsApp phone
 - `public_email_visible` requires a non-empty email
 
-Email visibility may be reviewed as a flag in this workflow, but public email rendering or `mailto:` links require a later public-contact rendering contract.
+Public email rendering or `mailto:` links are allowed only through the approved public-contact rendering contract.
+
+Website links may render only when the contact row has been reviewed and the stored URL passes the public URL normalizer.
 
 ## Side effects
 
