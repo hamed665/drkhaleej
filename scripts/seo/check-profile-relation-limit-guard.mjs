@@ -59,7 +59,7 @@ for (const token of [
   'hiddenServiceCount',
   'hiddenDoctorCount',
   'MoreRelationsNotice',
-  'locations={visibleLocations}',
+  'fallbackLocations={visibleLocations}',
   'visibleServices.map',
   'visibleDoctors.map',
 ]) {
