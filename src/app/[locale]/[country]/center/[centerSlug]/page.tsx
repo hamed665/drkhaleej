@@ -4,6 +4,7 @@ import { PublicCenterDetail } from '@/components/public/public-center-detail';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
+import { getPublicCenterPublicInfo } from '@/lib/catalog/public-center-public-info';
 import { isPublicProfileIndexEligible } from '@/lib/catalog/public-profile-index-eligibility';
 import {
   buildPublicCenterProfileSummary,
@@ -126,6 +127,7 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
 
   if (!result.data) notFound();
 
+  const publicInfo = await getPublicCenterPublicInfo(result.data.id);
   const centerName = preferredText(locale, result.data.nameEn, result.data.nameAr) ?? result.data.nameEn;
   const profileSummary = buildPublicCenterProfileSummary(locale, result.data);
   const description =
@@ -139,7 +141,7 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
       heroBadge={copy.badge}
       heroTitle={centerName}
       heroDescription={description}
-      content={<PublicCenterDetail locale={locale} center={result.data} />}
+      content={<PublicCenterDetail locale={locale} center={result.data} publicInfo={publicInfo} />}
     />
   );
 }
