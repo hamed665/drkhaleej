@@ -9,6 +9,7 @@ import {
   PUBLIC_CENTER_PROFILE_SERVICE_LIMIT,
 } from '@/lib/catalog/public-profile-relation-limits';
 import { buildPublicCenterProfileSummary } from '@/lib/catalog/public-profile-summary';
+import type { PublicCenterPublicInfo as PublicCenterPublicInfoData } from '@/lib/catalog/public-center-public-info';
 import type { PublicCatalogLocale, PublicCenterDetail as PublicCenterDetailData } from '@/lib/catalog/public-types';
 import { publicDoctorDetailRoute } from '@/lib/routes/public';
 
@@ -19,6 +20,7 @@ import { PublicLicenseInfoCard } from './public-license-info-card';
 type PublicCenterDetailProps = {
   locale: PublicCatalogLocale;
   center: PublicCenterDetailData;
+  publicInfo: PublicCenterPublicInfoData;
 };
 
 type CenterDetailCopy = {
@@ -126,7 +128,7 @@ function MoreRelationsNotice({ hiddenCount, label }: { hiddenCount: number; labe
   return <p className="mt-3 text-xs font-medium text-slate-500">{label}</p>;
 }
 
-export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) {
+export function PublicCenterDetail({ locale, center, publicInfo }: PublicCenterDetailProps) {
   const copy = copyByLocale[locale];
   const description =
     preferredText(locale, center.shortDescriptionEn, center.shortDescriptionAr) ??
@@ -191,6 +193,7 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         locale={locale}
         centerId={center.id}
         countryCode={center.defaultCountry}
+        publicInfo={publicInfo}
         contactTitle={copy.contactTitle}
         contactUnavailable={copy.contactUnavailable}
         locationTitle={copy.locationTitle}
@@ -203,28 +206,6 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         showSafeContactFallback={showSafeContactFallback}
       />
       <MoreRelationsNotice hiddenCount={hiddenLocationCount} label={copy.moreRelationsNotice} />
-
-      {center.galleryImages.length > 0 ? (
-        <PublicCenterDetailSection title={copy.galleryTitle}>
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="list">
-            {center.galleryImages.map((image) => (
-              <li key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
-                <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={image.url}
-                    alt={image.altText}
-                    width={image.width ?? undefined}
-                    height={image.height ?? undefined}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </PublicCenterDetailSection>
-      ) : null}
 
       <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
         {visibleServices.length > 0 ? (
