@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { buildPublicContactActions, type PublicContactAction } from './public-contact';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Database } from '@/lib/supabase/types';
