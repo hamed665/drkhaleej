@@ -10,16 +10,21 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyValidator = path.join(repoRoot, 'scripts', 'db', 'validate-migrations-taxrlsa.mjs');
 const functionSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-security-function-search-path.mjs');
+const helperSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-sensitive-helper-search-path.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
+const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
+const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
+const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
   [functionSearchPathMigrationName, functionSearchPathMigrationPath, hiddenFunctionSearchPathMigrationPath],
+  [helperSearchPathMigrationName, helperSearchPathMigrationPath, hiddenHelperSearchPathMigrationPath],
 ];
 
 function fail(message) {
@@ -73,6 +78,13 @@ function validateFunctionSearchPathMigration() {
   });
 }
 
+function validateHelperSearchPathMigration() {
+  execFileSync(process.execPath, [helperSearchPathValidator], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -102,5 +114,6 @@ function runLegacyValidatorWithoutCurrentOnlyMigrations() {
 runLegacyValidatorWithoutCurrentOnlyMigrations();
 validateScheduleRlsMigration();
 validateFunctionSearchPathMigration();
+validateHelperSearchPathMigration();
 
 console.log('Current migration validation passed.');
