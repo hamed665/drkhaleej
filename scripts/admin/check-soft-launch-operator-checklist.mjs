@@ -1,3 +1,4 @@
+import './check-soft-launch-manual-qa-evidence.mjs';
 import '../db/check-security-warning-backlog.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
