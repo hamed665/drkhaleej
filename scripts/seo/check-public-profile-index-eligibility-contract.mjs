@@ -1,3 +1,4 @@
+import './check-soft-launch-profile-seo-gate.mjs';
 import './check-public-profile-metadata-index-gate.mjs';
 import './check-public-profile-completeness-signals.mjs';
 import './check-profile-graph-anchor-text.mjs';
