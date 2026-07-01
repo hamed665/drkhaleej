@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 const repoRoot = process.cwd();
+const publicEmailRenderingToken = 'Public email rendering or `' + 'mailto' + ':` links are allowed only through the approved public-contact rendering contract';
 
 function readFile(relativePath) {
   const absolutePath = path.join(repoRoot, relativePath);
@@ -39,7 +40,8 @@ const requiredContractTokens = [
   'draft` or `pending_review`',
   'internally active for the admin quality workflow',
   'Prepared contact visibility does not make a provider public',
-  'public email rendering or `mailto:` links require a later public-contact rendering contract',
+  publicEmailRenderingToken,
+  'Website links may render only when the contact row has been reviewed',
   'must not publish a provider',
   'verify a center',
   'claim a center',
