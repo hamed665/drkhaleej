@@ -42,6 +42,8 @@ const requiredContractTokens = [
   'Prepared contact visibility does not make a provider public',
   publicEmailRenderingToken,
   'Website links may render only when the contact row has been reviewed',
+  'Verified active center directory fallback may render stored center or location contact fields',
+  'must still block rejected or suspended contact review states',
   'must not publish a provider',
   'verify a center',
   'claim a center',
@@ -52,8 +54,8 @@ const requiredContractTokens = [
   'admin draft center detail page only',
   'Every successful contact visibility change must write an admin audit event',
   'provider or center is public eligible',
-  'contact visibility flag is `true`',
-  '`contact_review_status` is `approved`',
+  'contact visibility flag is `true` or verified active center directory fallback is allowed',
+  '`contact_review_status` is `approved` or verified active center directory fallback is allowed',
 ];
 
 for (const token of requiredContractTokens) {
