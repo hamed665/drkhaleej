@@ -41,6 +41,9 @@ const SAFE_LICENSE_NUMBER_PATTERN = /^[A-Za-z0-9 .\-/]+$/;
 const CENTER_MEDIA_QUERY_LIMIT = 24;
 const CENTER_GALLERY_IMAGE_LIMIT = 8;
 
+const PUBLIC_CENTER_DETAIL_SELECT = 'id,slug,name_en,name_ar,center_type,description_en,description_ar,short_description_en,short_description_ar,default_country,verification_status,primary_phone,secondary_phone,whatsapp_phone,email,website_url,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,public_email_visible,contact_review_status';
+const PUBLIC_CENTER_LOCATION_SELECT = 'id,center_id,name_en,name_ar,area_id,city_id,country_id,is_primary,sort_order,map_url,primary_phone,secondary_phone,whatsapp_phone,email,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,public_email_visible,contact_review_status';
+
 type CenterRow = Database['public']['Tables']['centers']['Row'];
 type CenterLocationRow = Database['public']['Tables']['center_locations']['Row'];
 type CenterServiceRow = Database['public']['Tables']['center_services']['Row'];
@@ -105,7 +108,6 @@ function clampLimit(limit: number | undefined): number {
   if (limit < 1) return 1;
   return Math.min(limit, MAX_LIMIT);
 }
-
 
 function normalizeSearchQuery(input: string): string {
   return input
@@ -199,7 +201,6 @@ async function getPublicLicenseInfoForEntity(
     error: false
   };
 }
-
 
 function normalizePublicCatalogLocale(locale: PublicCatalogLocale | undefined): PublicCatalogLocale {
   return locale === 'ar' ? 'ar' : 'en';
@@ -355,9 +356,12 @@ type PublicCenterContactRow = Pick<
   | 'primary_phone'
   | 'secondary_phone'
   | 'whatsapp_phone'
+  | 'email'
+  | 'website_url'
   | 'public_primary_phone_visible'
   | 'public_secondary_phone_visible'
   | 'public_whatsapp_phone_visible'
+  | 'public_email_visible'
   | 'contact_review_status'
 >;
 
@@ -388,9 +392,12 @@ function mapCenterDetailRow(
       primaryPhone: row.primary_phone,
       secondaryPhone: row.secondary_phone,
       whatsappPhone: row.whatsapp_phone,
+      email: row.email,
+      websiteUrl: row.website_url,
       publicPrimaryPhoneVisible: row.public_primary_phone_visible,
       publicSecondaryPhoneVisible: row.public_secondary_phone_visible,
-      publicWhatsappPhoneVisible: row.public_whatsapp_phone_visible
+      publicWhatsappPhoneVisible: row.public_whatsapp_phone_visible,
+      publicEmailVisible: row.public_email_visible
     })
   };
 }
@@ -440,9 +447,11 @@ function mapPublicProviderLocationSummary(
       primaryPhone: location.primary_phone,
       secondaryPhone: location.secondary_phone,
       whatsappPhone: location.whatsapp_phone,
+      email: location.email,
       publicPrimaryPhoneVisible: location.public_primary_phone_visible,
       publicSecondaryPhoneVisible: location.public_secondary_phone_visible,
-      publicWhatsappPhoneVisible: location.public_whatsapp_phone_visible
+      publicWhatsappPhoneVisible: location.public_whatsapp_phone_visible,
+      publicEmailVisible: location.public_email_visible
     })
   };
 }
@@ -517,9 +526,11 @@ type PublicCenterLocationLookupRow = Pick<
   | 'primary_phone'
   | 'secondary_phone'
   | 'whatsapp_phone'
+  | 'email'
   | 'public_primary_phone_visible'
   | 'public_secondary_phone_visible'
   | 'public_whatsapp_phone_visible'
+  | 'public_email_visible'
   | 'contact_review_status'
 >;
 
@@ -712,9 +723,7 @@ async function listPublicDoctorPracticeLocations(
 
   const { data: centers, error: centersError } = await supabase
     .from('centers')
-    .select(
-      'id,slug,name_en,name_ar,center_type,description_en,description_ar,short_description_en,short_description_ar,default_country,verification_status,primary_phone,secondary_phone,whatsapp_phone,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,contact_review_status'
-    )
+    .select(PUBLIC_CENTER_DETAIL_SELECT)
     .in('id', centerIds);
 
   if (centersError) return { practiceLocations: [], error: true };
@@ -724,7 +733,7 @@ async function listPublicDoctorPracticeLocations(
 
   const { data: centerLocations, error: centerLocationsError } = await supabase
     .from('center_locations')
-    .select('id,center_id,name_en,name_ar,area_id,city_id,country_id,is_primary,sort_order,map_url,primary_phone,secondary_phone,whatsapp_phone,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,contact_review_status')
+    .select(PUBLIC_CENTER_LOCATION_SELECT)
     .in('center_id', centerIds)
     .order('is_primary', { ascending: false })
     .order('sort_order', { ascending: true });
@@ -784,9 +793,12 @@ async function listPublicDoctorPracticeLocations(
               primaryPhone: center.primary_phone,
               secondaryPhone: center.secondary_phone,
               whatsappPhone: center.whatsapp_phone,
+              email: center.email,
+              websiteUrl: center.website_url,
               publicPrimaryPhoneVisible: center.public_primary_phone_visible,
               publicSecondaryPhoneVisible: center.public_secondary_phone_visible,
-              publicWhatsappPhoneVisible: center.public_whatsapp_phone_visible
+              publicWhatsappPhoneVisible: center.public_whatsapp_phone_visible,
+              publicEmailVisible: center.public_email_visible
             });
           })()
         }
@@ -846,7 +858,6 @@ export async function listPublicCenters(options: PublicCenterListOptions = {}): 
   return createSuccessResult(data.map(mapCenterRow));
 }
 
-
 async function getPublicCenterLocations(
   centerId: string,
   limit = 6
@@ -855,7 +866,7 @@ async function getPublicCenterLocations(
 
   const { data, error } = await supabase
     .from('center_locations')
-    .select('id,center_id,name_en,name_ar,area_id,city_id,country_id,is_primary,sort_order,map_url,primary_phone,secondary_phone,whatsapp_phone,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,contact_review_status')
+    .select(PUBLIC_CENTER_LOCATION_SELECT)
     .eq('center_id', centerId)
     .order('is_primary', { ascending: false })
     .order('sort_order', { ascending: true })
@@ -951,9 +962,7 @@ export async function getPublicCenterBySlug(
 
   let query = supabase
     .from('centers')
-    .select(
-      'id,slug,name_en,name_ar,center_type,description_en,description_ar,short_description_en,short_description_ar,default_country,verification_status,primary_phone,secondary_phone,whatsapp_phone,public_primary_phone_visible,public_secondary_phone_visible,public_whatsapp_phone_visible,contact_review_status'
-    )
+    .select(PUBLIC_CENTER_DETAIL_SELECT)
     .eq('slug', options.slug)
     .limit(1);
 
@@ -1006,7 +1015,6 @@ export async function listPublicDoctors(options: PublicDoctorListOptions = {}): 
 
   return createSuccessResult(data.map(mapDoctorRow));
 }
-
 
 export async function getPublicDoctorBySlug(
   options: PublicDoctorDetailOptions
