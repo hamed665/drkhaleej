@@ -52,7 +52,30 @@ Required value checks:
 - `public_whatsapp_phone_visible` requires a non-empty WhatsApp phone
 - `public_email_visible` requires a non-empty email
 
-Email visibility may be reviewed as a flag in this workflow, but public email rendering or `mailto:` links require a later public-contact rendering contract.
+Public email rendering is now allowed only through the public-contact rendering contract: `mailto:` links require `public_email_visible = true`, a non-empty email value, and `contact_review_status = approved`.
+
+Center website rendering is allowed only when `contact_review_status = approved` and the website URL normalizes to a safe `http` or `https` URL. Location-level website rendering remains out of scope because `center_locations` does not own a website URL field.
+
+## Public contact rendering contract
+
+The public renderer may output only approved and normalized contact actions.
+
+Allowed public action families:
+
+- `tel:` for approved visible phone values
+- `https://wa.me/` for approved visible WhatsApp values
+- `mailto:` for approved visible email values
+- safe `http` or `https` website links for approved center website values
+
+The public renderer must reject unsafe, malformed, or non-public contact values before building a link.
+
+Safety rules:
+
+- email actions require `public_email_visible = true`
+- website actions do not use an email visibility flag and must rely on `contact_review_status = approved`
+- website actions must reject `javascript:`, `data:`, credentialed URLs, whitespace, HTML-like characters, and non-HTTP protocols
+- external public contact links must use `noopener`, `noreferrer`, and `nofollow`
+- public listing cards must not render contact actions
 
 ## Side effects
 
