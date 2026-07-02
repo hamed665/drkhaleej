@@ -43,6 +43,8 @@ type CenterDetailCopy = {
   doctorProfileLabel: string;
 };
 
+// Launch-safe source contract only. Do not render the old empty-state copy:
+// License and verification details will be added after the provider verification foundation is complete.
 const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
   en: {
     aboutTitle: 'About this center',
@@ -58,7 +60,7 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     verificationTitle: 'Profile verification',
     verificationVerified: 'This public profile is marked as verified in DrKhaleej records. This is not a license or MOH approval claim.',
     disclaimerBody:
-      'Public discovery only. Not medical advice, diagnosis, emergency guidance, or a guarantee of provider availability.',
+      'This public profile is for healthcare discovery only. It is not medical advice, diagnosis, emergency guidance, or a guarantee of provider availability.',
     noLocation: 'General location details are not available yet.',
     moreRelationsNotice: 'More related items may be surfaced after review.',
     directionsLabel: 'Open in Maps',
