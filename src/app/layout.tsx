@@ -7,6 +7,7 @@ import { isSupportedLocale, localeDirection } from "@/lib/i18n/config";
 import { defaultMetadata } from "@/lib/seo/meta";
 import "@/styles/globals.css";
 import "@/styles/dm2026-public-templates.css";
+import "@/styles/dm2026-mobile-chrome.css";
 
 export const metadata: Metadata = defaultMetadata;
 
