@@ -44,7 +44,7 @@ type CenterContactCopy = {
   callbackHint: string;
   branchLabel: string;
   addressLabel: string;
-  locationLabel: string;
+  openLocationLabel: string;
 };
 
 const contactCopyByLocale: Record<PublicCatalogLocale, CenterContactCopy> = {
@@ -55,7 +55,7 @@ const contactCopyByLocale: Record<PublicCatalogLocale, CenterContactCopy> = {
     callbackHint: 'Optional form for non-urgent contact.',
     branchLabel: 'Branch',
     addressLabel: 'Address',
-    locationLabel: 'Location'
+    openLocationLabel: 'Open location'
   },
   ar: {
     eyebrow: 'تواصل عام سريع',
@@ -64,7 +64,7 @@ const contactCopyByLocale: Record<PublicCatalogLocale, CenterContactCopy> = {
     callbackHint: 'نموذج اختياري للتواصل غير العاجل.',
     branchLabel: 'الفرع',
     addressLabel: 'العنوان',
-    locationLabel: 'الموقع'
+    openLocationLabel: 'فتح الموقع'
   }
 };
 
@@ -239,10 +239,9 @@ export function PublicCenterPublicInfo({
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={directionsAriaLabel(primaryLocationLabel)}
-                      className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                      className="inline-flex w-fit rounded-full bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     >
-                      <span aria-hidden="true">Map</span>
-                      <span>{copy.locationLabel}</span>
+                      {copy.openLocationLabel}
                     </a>
                   ) : null}
                 </div>
@@ -282,41 +281,21 @@ export function PublicCenterPublicInfo({
       <PublicCenterDetailSection title={locationTitle} description={locationDescription}>
         {locationItems.length > 0 ? (
           <ul className="grid gap-4 sm:grid-cols-2" role="list">
-            {locationItems.map((location) => {
-              const locationLabel = location.locationName ?? location.geoLine ?? location.addressLine ?? noLocation;
-
-              return (
-                <li key={location.id} className="rounded-3xl border border-emerald-100 bg-white/95 p-5 shadow-sm ring-1 ring-emerald-50/70">
-                  <div className="space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">{copy.branchLabel}</p>
-                    {location.locationName ? <h3 className="text-base font-bold leading-7 text-slate-950">{location.locationName}</h3> : null}
-                    {location.geoLine ? <p className="text-sm leading-6 text-slate-600">{location.geoLine}</p> : null}
-                    {location.addressLine ? (
-                      <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3">
-                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{copy.addressLabel}</p>
-                        <p className="mt-1 text-sm leading-6 text-slate-800">{location.addressLine}</p>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap items-center gap-3">
-                    {location.directionsUrl ? (
-                      <a
-                        href={location.directionsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={directionsAriaLabel(locationLabel)}
-                        className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                      >
-                        <span aria-hidden="true">Map</span>
-                        <span>{directionsLabel}</span>
-                      </a>
-                    ) : null}
-                    {location.contactActions.length > 0 ? <PublicContactActions actions={location.contactActions} locale={locale} /> : null}
-                  </div>
-                </li>
-              );
-            })}
+            {locationItems.map((location) => (
+              <li key={location.id} className="rounded-3xl border border-emerald-100 bg-white/95 p-5 shadow-sm ring-1 ring-emerald-50/70">
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">{copy.branchLabel}</p>
+                  {location.locationName ? <h3 className="text-base font-bold leading-7 text-slate-950">{location.locationName}</h3> : null}
+                  {location.geoLine ? <p className="text-sm leading-6 text-slate-600">{location.geoLine}</p> : null}
+                  {location.addressLine ? (
+                    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{copy.addressLabel}</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-800">{location.addressLine}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </li>
+            ))}
           </ul>
         ) : (
           <p className="text-sm leading-6 text-slate-600">{publicInfo.error ? contactUnavailable : noLocation}</p>
