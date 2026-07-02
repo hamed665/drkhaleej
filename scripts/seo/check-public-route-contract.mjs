@@ -141,7 +141,15 @@ for (const token of [
   'dedupePublicSearchItems',
 ]) {
   assertIncludes(searchHelperSource, token, `search helper must keep public variant token: ${token}`);
-  assertIncludes(searchHelperTestSource, token, `search helper test must keep public variant token: ${token}`);
+}
+
+for (const token of [
+  'buildPublicSearchQueryVariants',
+  'Aster',
+  'Astra',
+  'dedupePublicSearchItems',
+]) {
+  assertIncludes(searchHelperTestSource, token, `search helper test must keep public variant coverage token: ${token}`);
 }
 
 for (const token of [
