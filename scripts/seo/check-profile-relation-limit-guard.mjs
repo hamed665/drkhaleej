@@ -46,6 +46,24 @@ for (const token of [
   assertIncludes(helperTest, token, helperTestPath);
 }
 
+const centerShellPath = 'src/components/public/public-page-shell.tsx';
+const centerShell = readFile(centerShellPath);
+for (const token of [
+  'heroActions?: ReactNode',
+  'actions={heroActions}',
+]) {
+  assertIncludes(centerShell, token, centerShellPath);
+}
+
+const centerRoutePath = 'src/app/[locale]/[country]/center/[centerSlug]/page.tsx';
+const centerRoute = readFile(centerRoutePath);
+for (const token of [
+  'PublicContactActions',
+  'heroActions={<PublicContactActions actions={result.data.contactActions} locale={locale} />}',
+]) {
+  assertIncludes(centerRoute, token, centerRoutePath);
+}
+
 const centerDetailPath = 'src/components/public/public-center-detail.tsx';
 const centerDetail = readFile(centerDetailPath);
 for (const token of [
@@ -60,12 +78,31 @@ for (const token of [
   'hiddenDoctorCount',
   'MoreRelationsNotice',
   'locations={visibleLocations}',
+  'visibleServices.length > 0 ?',
   'visibleServices.map',
+  'visibleDoctors.length > 0 ?',
   'visibleDoctors.map',
+  'showCallbackRequest',
+  'showSafeContactFallback',
+  'showVerification',
+  'Public discovery only. Not medical advice',
 ]) {
   assertIncludes(centerDetail, token, centerDetailPath);
 }
-for (const token of ['center.services.map', 'center.doctors.map', 'locations={center.locations}', 'Math.random', 'sort(() =>']) {
+for (const token of [
+  'center.services.map',
+  'center.doctors.map',
+  'locations={center.locations}',
+  'renderLocationActions',
+  'futureSlots',
+  'futureTitle',
+  'verificationPlaceholder',
+  'noServices',
+  'noDoctors',
+  '<PublicContactActions actions={center.contactActions}',
+  'Math.random',
+  'sort(() =>',
+]) {
   assertNotIncludes(centerDetail, token, centerDetailPath);
 }
 
