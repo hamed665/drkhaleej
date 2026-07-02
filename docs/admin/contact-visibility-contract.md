@@ -56,6 +56,8 @@ Public email rendering or `mailto:` links are allowed only through the approved 
 
 Website links may render only when the contact row has been reviewed and the stored URL passes the public URL normalizer.
 
+Verified active center directory fallback may render stored center or location contact fields when an already-public verified center missed pre-activation contact visibility preparation. This fallback must remain read-only, must not mutate visibility flags, and must still block rejected or suspended contact review states.
+
 ## Side effects
 
 The contact visibility workflow must not publish a provider, activate a center publicly, verify a center, claim a center, change billing, change sponsorship, change publication readiness, create public routes, or update sitemap eligibility.
@@ -85,9 +87,9 @@ A contact field may display publicly only when:
 
 - the provider or center is public eligible
 - the related location is active when location-level contact is used
-- the contact visibility flag is `true`
+- the contact visibility flag is `true` or verified active center directory fallback is allowed
 - the contact value is non-empty
-- `contact_review_status` is `approved`
+- `contact_review_status` is `approved` or verified active center directory fallback is allowed
 - the row is not suspended, rejected, deleted, or otherwise blocked by the publication eligibility layer
 
 ## Guard requirement
