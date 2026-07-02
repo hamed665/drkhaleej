@@ -50,6 +50,10 @@ const registrySource = await readText('src/lib/seo/page-registry.ts');
 const urlRegistryV2Source = await readText('src/lib/seo/url-registry-v2.ts');
 const searchModeContractSource = await readText('docs/seo/search-mode-contract.md');
 const searchPageSource = await readText('src/app/[locale]/[country]/search/page.tsx');
+const searchComponentSource = await readText('src/components/public/public-search-results-page.tsx');
+const searchHelperSource = await readText('src/lib/catalog/public-search.ts');
+const searchHelperTestSource = await readText('src/lib/catalog/public-search.test.ts');
+const searchRuntimeSource = `${searchPageSource}\n${searchComponentSource}`;
 const staticRouteMatches = [...registrySource.matchAll(/['"](\/[a-z0-9-]+)['"]/gi)].map((match) => match[1]);
 const publicPathnames = ['/', ...new Set(staticRouteMatches)].sort();
 
@@ -104,9 +108,18 @@ for (const token of [
   'generateMetadata',
   "pathname: '/search'",
   'SearchParams',
-  'searchPublicCatalog(query, { limit: 12 })',
   'explicitSearchRobots',
   'robots: explicitSearchRobots',
+  'PublicSearchResultsPage',
+]) {
+  assertIncludes(searchPageSource, token, `search page must keep route-safe token: ${token}`);
+}
+
+for (const token of [
+  'searchPublicCatalog',
+  'searchPublicCatalogWithVariants(query, { limit: SEARCH_RESULT_LIMIT })',
+  'buildPublicSearchQueryVariants',
+  'dedupePublicSearchItems',
   'dm-public-search',
   'home-foundation dm2026-home-page dm-public-search',
   'publicDoctorDetailRoute',
@@ -115,8 +128,28 @@ for (const token of [
   'ResultGroup',
   'query.length >= 2',
   'copy.previewOnly',
+  'Centers, hospitals, labs and pharmacies',
 ]) {
-  assertIncludes(searchPageSource, token, `search page must keep runtime-safe token: ${token}`);
+  assertIncludes(searchComponentSource, token, `search component must keep runtime-safe token: ${token}`);
+}
+
+for (const token of [
+  'PUBLIC_SEARCH_MIN_QUERY_LENGTH',
+  'buildPublicSearchQueryVariants',
+  'Aster',
+  'Astra',
+  'dedupePublicSearchItems',
+]) {
+  assertIncludes(searchHelperSource, token, `search helper must keep public variant token: ${token}`);
+}
+
+for (const token of [
+  'buildPublicSearchQueryVariants',
+  'Aster',
+  'Astra',
+  'dedupePublicSearchItems',
+]) {
+  assertIncludes(searchHelperTestSource, token, `search helper test must keep public variant coverage token: ${token}`);
 }
 
 for (const token of [
@@ -130,7 +163,7 @@ for (const token of [
   'Open now',
   'verified badge',
 ]) {
-  assertExcludes(searchPageSource, token, `search page must not include unsafe or stale token: ${token}`);
+  assertExcludes(searchRuntimeSource, token, `search runtime must not include unsafe or stale token: ${token}`);
 }
 
 for (const token of [
