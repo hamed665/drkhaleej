@@ -34,8 +34,8 @@ for (const token of [
   '`/${locale}/${country}/doctor/${doctorSlug}`',
   'publicCenterDetailRoutePattern',
   'publicDoctorDetailRoutePattern',
-  '^\/(en|ar)\/(om)\/center\/',
-  '^\/(en|ar)\/(om)\/doctor\/',
+  '^\\/(en|ar)\\/(om)\\/center\\/',
+  '^\\/(en|ar)\\/(om)\\/doctor\\/',
 ]) {
   assertIncludes(routeHelper, token, routeHelperPath);
 }
