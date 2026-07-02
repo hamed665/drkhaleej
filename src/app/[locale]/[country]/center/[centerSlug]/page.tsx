@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicCenterDetail } from '@/components/public/public-center-detail';
+import { PublicContactActions } from '@/components/public/public-contact-actions';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
@@ -139,6 +140,7 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
       heroBadge={copy.badge}
       heroTitle={centerName}
       heroDescription={description}
+      heroActions={<PublicContactActions actions={result.data.contactActions} locale={locale} />}
       content={<PublicCenterDetail locale={locale} center={result.data} />}
     />
   );
