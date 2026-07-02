@@ -134,6 +134,7 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
     preferredText(locale, result.data.shortDescriptionEn, result.data.shortDescriptionAr) ??
     preferredText(locale, result.data.descriptionEn, result.data.descriptionAr) ??
     profileSummary;
+  const heroImage = result.data.coverImage ?? result.data.galleryImages[0] ?? null;
 
   return (
     <PublicPageShell
@@ -141,6 +142,16 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
       heroBadge={copy.badge}
       heroTitle={centerName}
       heroDescription={description}
+      heroMedia={
+        heroImage
+          ? {
+              url: heroImage.url,
+              altText: heroImage.altText,
+              width: heroImage.width,
+              height: heroImage.height
+            }
+          : null
+      }
       content={<PublicCenterDetail locale={locale} center={result.data} publicInfo={publicInfo} />}
     />
   );
