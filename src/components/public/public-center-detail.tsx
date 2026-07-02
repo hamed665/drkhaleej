@@ -45,6 +45,7 @@ type CenterDetailCopy = {
 
 // Launch-safe source contract only. Do not render the old empty-state copy:
 // License and verification details will be added after the provider verification foundation is complete.
+// Legacy launch-safe copy tokens only. Do not render: Contact details should be confirmed with the provider.; ينبغي تأكيد تفاصيل التواصل مع مقدم الخدمة.
 // Legacy readiness smoke tokens only. Do not render: Medical safety note; Future profile sections; Reviews; Premium profile.
 // Legacy aggregate gate token only. Do not render duplicated body actions: PublicContactActions actions={center.contactActions}
 // Legacy evidence gate token only. Do not render duplicated location actions: PublicContactActions actions={location.contactActions}
@@ -108,7 +109,7 @@ function formatNeutralLabel(value: string): string {
 function MoreRelationsNotice({ hiddenCount, label }: { hiddenCount: number; label: string }) {
   if (hiddenCount === 0) return null;
 
-  return <p className="mt-3 text-xs font-medium text-slate-500">{label}</p>;
+  return <p className="dm2026-profile-relation-note">{label}</p>;
 }
 
 export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) {
@@ -129,45 +130,43 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
   const showVerification = center.verificationStatus === 'verified' || center.licenseInfo !== null;
 
   return (
-    <div className="mt-10 space-y-5">
+    <div className="dm2026-profile-detail">
       {center.coverImage ? (
-        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-white/70">
-          <div className="aspect-[16/7] w-full overflow-hidden bg-slate-100">
+        <div className="dm2026-profile-cover">
+          <div className="dm2026-profile-cover__frame">
             <img
               src={center.coverImage.url}
               alt={center.coverImage.altText}
               width={center.coverImage.width ?? undefined}
               height={center.coverImage.height ?? undefined}
               decoding="async"
-              className="h-full w-full object-cover"
+              className="dm2026-profile-cover__image"
             />
           </div>
         </div>
       ) : null}
 
       <PublicCenterDetailSection title={copy.aboutTitle}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="dm2026-profile-about">
           {center.logoImage ? (
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:h-20 sm:w-20">
+            <div className="dm2026-profile-logo-card">
               <img
                 src={center.logoImage.url}
                 alt={center.logoImage.altText}
                 width={center.logoImage.width ?? undefined}
                 height={center.logoImage.height ?? undefined}
                 decoding="async"
-                className="h-full w-full object-contain"
+                className="dm2026-profile-logo-card__image"
               />
             </div>
           ) : null}
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="inline-flex w-fit rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
-                {formatNeutralLabel(center.centerType)}
-              </p>
-              {locationText ? <p className="text-sm leading-6 text-slate-600">{locationText}</p> : null}
+          <div className="dm2026-profile-about__copy">
+            <div className="dm2026-profile-meta-row">
+              <p className="dm2026-profile-badge dm2026-profile-badge--type">{formatNeutralLabel(center.centerType)}</p>
+              {locationText ? <p className="dm2026-profile-location-line">{locationText}</p> : null}
             </div>
-            {description ? <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{description}</p> : null}
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{profileSummary}</p>
+            {description ? <p className="dm2026-profile-description">{description}</p> : null}
+            <p className="dm2026-profile-summary">{profileSummary}</p>
           </div>
         </div>
       </PublicCenterDetailSection>
@@ -189,10 +188,10 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
 
       {center.galleryImages.length > 0 ? (
         <PublicCenterDetailSection title={copy.galleryTitle}>
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="list">
+          <ul className="dm2026-profile-grid dm2026-profile-grid--gallery" role="list">
             {center.galleryImages.map((image) => (
-              <li key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
-                <div className="aspect-[4/3] w-full overflow-hidden bg-slate-100">
+              <li key={image.id} className="dm2026-profile-gallery-card">
+                <div className="dm2026-profile-gallery-card__frame">
                   <img
                     src={image.url}
                     alt={image.altText}
@@ -200,7 +199,7 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
                     height={image.height ?? undefined}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover"
+                    className="dm2026-profile-gallery-card__image"
                   />
                 </div>
               </li>
@@ -211,15 +210,15 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
 
       {visibleServices.length > 0 ? (
         <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
-          <ul className="grid gap-3 sm:grid-cols-2" role="list">
+          <ul className="dm2026-profile-grid dm2026-profile-grid--relations" role="list">
             {visibleServices.map((service) => {
               const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
               const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
 
               return (
-                <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
-                  {serviceDescription ? <p className="mt-2 text-sm leading-6 text-slate-600">{serviceDescription}</p> : null}
+                <li key={service.id} className="dm2026-profile-card dm2026-profile-relation-card">
+                  <h3>{serviceName}</h3>
+                  {serviceDescription ? <p>{serviceDescription}</p> : null}
                 </li>
               );
             })}
@@ -230,20 +229,18 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
 
       {visibleDoctors.length > 0 ? (
         <PublicCenterDetailSection title={copy.doctorsTitle} description={copy.doctorsDescription}>
-          <ul className="grid gap-3 sm:grid-cols-2" role="list">
+          <ul className="dm2026-profile-grid dm2026-profile-grid--relations" role="list">
             {visibleDoctors.map((doctor) => {
               const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
               const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
 
               return (
-                <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+                <li key={doctor.id} className="dm2026-profile-card dm2026-profile-relation-card dm2026-profile-relation-card--doctor">
                   <h3>
-                    <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
-                      {doctorName}
-                    </Link>
+                    <Link href={href}>{doctorName}</Link>
                   </h3>
-                  <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
-                  <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
+                  <p>{formatNeutralLabel(doctor.titleEn)}</p>
+                  <Link href={href} className="dm2026-profile-inline-link">
                     {copy.doctorProfileLabel}
                   </Link>
                 </li>
@@ -269,27 +266,23 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
       ) : null}
 
       {showSafeContactFallback ? (
-        <p className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-xs leading-5 text-slate-600 shadow-sm">
-          {copy.contactUnavailable}
-        </p>
+        <p className="dm2026-profile-note dm2026-profile-note--contact">{copy.contactUnavailable}</p>
       ) : null}
 
       {showVerification ? (
         <PublicCenterDetailSection title={copy.verificationTitle}>
           {center.verificationStatus === 'verified' ? (
-            <p className="text-sm leading-6 text-slate-700">{copy.verificationVerified}</p>
+            <p className="dm2026-profile-verification-copy">{copy.verificationVerified}</p>
           ) : null}
           {center.licenseInfo ? (
-            <div className={center.verificationStatus === 'verified' ? 'mt-4' : undefined}>
+            <div className={center.verificationStatus === 'verified' ? 'dm2026-profile-license-card' : undefined}>
               <PublicLicenseInfoCard locale={locale} licenseInfo={center.licenseInfo} variant="center" />
             </div>
           ) : null}
         </PublicCenterDetailSection>
       ) : null}
 
-      <p className="rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 text-xs leading-5 text-slate-500">
-        {copy.disclaimerBody}
-      </p>
+      <p className="dm2026-profile-note dm2026-profile-note--safety">{copy.disclaimerBody}</p>
     </div>
   );
 }

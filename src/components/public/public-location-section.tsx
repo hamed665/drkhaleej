@@ -35,7 +35,7 @@ export function PublicLocationSection({
   return (
     <PublicCenterDetailSection title={title} description={description}>
       {locations.length > 0 ? (
-        <ul className="grid gap-3 sm:grid-cols-2" role="list">
+        <ul className="dm2026-profile-grid dm2026-profile-grid--locations" role="list">
           {locations.map((location) => {
             const locationName = formatPublicLocationName(locale, location);
             const geoLine = formatPublicLocationGeoLine(locale, location);
@@ -43,30 +43,28 @@ export function PublicLocationSection({
             const directionsUrl = getPublicDirectionsUrl(location);
 
             return (
-              <li key={location.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                {locationName ? <h3 className="text-sm font-semibold leading-6 text-slate-950">{locationName}</h3> : null}
-                <p className={locationName ? 'mt-2 text-sm leading-6 text-slate-600' : 'text-sm leading-6 text-slate-600'}>
-                  {geoLine ?? emptyLabel}
-                </p>
-                {renderLocationActions ? <div className="mt-4">{renderLocationActions(location)}</div> : null}
+              <li key={location.id} className="dm2026-profile-card dm2026-profile-location-card">
+                {locationName ? <h3>{locationName}</h3> : null}
+                <p className="dm2026-profile-location-card__geo">{geoLine ?? emptyLabel}</p>
+                {renderLocationActions ? <div className="dm2026-profile-action-row">{renderLocationActions(location)}</div> : null}
                 {directionsLabel && directionsUrl ? (
                   <a
                     href={directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={directionsAriaLabel ? directionsAriaLabel(locationLabel) : directionsLabel}
-                    className={(renderLocationActions ? 'mt-3' : 'mt-4') + ' inline-flex w-fit rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2'}
+                    className="dm2026-profile-action dm2026-profile-action--secondary"
                   >
                     {directionsLabel}
                   </a>
                 ) : null}
-                {renderLocationMeta ? <div className="mt-3">{renderLocationMeta(location)}</div> : null}
+                {renderLocationMeta ? <div className="dm2026-profile-location-card__meta">{renderLocationMeta(location)}</div> : null}
               </li>
             );
           })}
         </ul>
       ) : (
-        <p className="text-sm leading-6 text-slate-600">{emptyLabel}</p>
+        <p className="dm2026-profile-empty">{emptyLabel}</p>
       )}
     </PublicCenterDetailSection>
   );

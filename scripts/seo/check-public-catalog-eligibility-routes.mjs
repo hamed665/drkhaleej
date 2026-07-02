@@ -106,14 +106,26 @@ for (const forbiddenToken of [
 const sectionPath = 'src/components/public/public-center-detail-section.tsx';
 const section = readFile(sectionPath);
 for (const token of [
-  'rounded-3xl',
-  'bg-gradient-to-br',
-  'from-white via-emerald-50/30 to-cyan-50/30',
-  'p-4',
-  'sm:p-6',
-  'sm:text-xl',
+  'dm2026-profile-section',
+  'dm2026-profile-section__header',
+  'dm2026-profile-section__body',
 ]) {
   assertIncludes(section, token, sectionPath);
+}
+
+const layoutPath = 'src/app/layout.tsx';
+const layout = readFile(layoutPath);
+assertIncludes(layout, '@/styles/dm2026-public-profile.css', layoutPath);
+
+const publicProfileCssPath = 'src/styles/dm2026-public-profile.css';
+const publicProfileCss = readFile(publicProfileCssPath);
+for (const token of [
+  '.dm2026-profile-section',
+  '.dm2026-profile-section__header',
+  '.dm2026-profile-section__body',
+  '.dm2026-profile-card',
+]) {
+  assertIncludes(publicProfileCss, token, publicProfileCssPath);
 }
 
 console.log('Public catalog eligibility route and profile relationship link checks passed.');
