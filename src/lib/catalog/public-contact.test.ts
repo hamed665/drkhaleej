@@ -37,7 +37,7 @@ describe('public contact actions', () => {
     expect(actions).toEqual([]);
   });
 
-  it('blocks all actions before contact review approval', () => {
+  it('blocks all actions before contact review approval without directory fallback', () => {
     const actions = buildPublicContactActions({
       contactReviewStatus: 'pending',
       primaryPhone: '+968 2412 3456',
@@ -50,6 +50,23 @@ describe('public contact actions', () => {
     });
 
     expect(actions).toEqual([]);
+  });
+
+  it('allows verified active center directory fallback when explicit flags were not prepared before activation', () => {
+    const actions = buildPublicContactActions({
+      contactReviewStatus: 'pending',
+      country: 'om',
+      primaryPhone: '+968 2412 3456',
+      whatsappPhone: '91234567',
+      email: 'info@example.com',
+      websiteUrl: 'https://example.com',
+      publicPrimaryPhoneVisible: false,
+      publicWhatsappPhoneVisible: false,
+      publicEmailVisible: false,
+      allowPublicDirectoryFallback: true,
+    });
+
+    expect(actions.map((action) => action.kind)).toEqual(['call', 'whatsapp', 'email', 'website']);
   });
 
   it('normalizes only safe public email and website hrefs', () => {
