@@ -14,7 +14,6 @@ import { publicDoctorDetailRoute } from '@/lib/routes/public';
 
 import { PublicCallbackRequestForm } from './public-callback-request-form';
 import { PublicCenterDetailSection } from './public-center-detail-section';
-import { PublicContactActions } from './public-contact-actions';
 import { PublicLocationSection } from './public-location-section';
 import { PublicLicenseInfoCard } from './public-license-info-card';
 
@@ -36,14 +35,7 @@ type CenterDetailCopy = {
   galleryTitle: string;
   verificationTitle: string;
   verificationVerified: string;
-  verificationPlaceholder: string;
-  futureTitle: string;
-  futureDescription: string;
-  futureSlots: string[];
-  disclaimerTitle: string;
   disclaimerBody: string;
-  noServices: string;
-  noDoctors: string;
   noLocation: string;
   moreRelationsNotice: string;
   directionsLabel: string;
@@ -59,21 +51,14 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     doctorsTitle: 'Doctors preview',
     doctorsDescription: 'A limited read-only preview of public doctor profiles connected to this center.',
     locationTitle: 'Location overview',
-    locationDescription: 'Only public branch labels and general area, city, and country information are shown in this phase.',
-    contactTitle: 'Contact this center',
+    locationDescription: 'Public branch labels and general area, city, and country information are shown in this phase.',
+    contactTitle: 'Request a callback',
     contactUnavailable: 'Contact details should be confirmed with the provider.',
     galleryTitle: 'Gallery',
     verificationTitle: 'Profile verification',
     verificationVerified: 'This public profile is marked as verified in DrKhaleej records. This is not a license or MOH approval claim.',
-    verificationPlaceholder: 'License and verification details will be added after the provider verification foundation is complete.',
-    futureTitle: 'Future profile sections',
-    futureDescription: 'These areas are reserved for later approved phases and are not active yet.',
-    futureSlots: ['Video', 'Reviews', 'Premium profile'],
-    disclaimerTitle: 'Medical safety note',
     disclaimerBody:
-      'This public profile is for healthcare discovery only. It is not medical advice, diagnosis, emergency guidance, or a guarantee of provider availability.',
-    noServices: 'No public services are connected to this profile yet.',
-    noDoctors: 'No public doctors are connected to this profile yet.',
+      'Public discovery only. Not medical advice, diagnosis, emergency guidance, or a guarantee of provider availability.',
     noLocation: 'General location details are not available yet.',
     moreRelationsNotice: 'More related items may be surfaced after review.',
     directionsLabel: 'Open in Maps',
@@ -87,21 +72,14 @@ const copyByLocale: Record<PublicCatalogLocale, CenterDetailCopy> = {
     doctorsTitle: 'لمحة عن الأطباء',
     doctorsDescription: 'عرض محدود للقراءة فقط لملفات الأطباء العامة المرتبطة بهذا المركز.',
     locationTitle: 'نظرة عامة على الموقع',
-    locationDescription: 'تظهر في هذه المرحلة أسماء الفروع العامة ومعلومات عامة فقط عن المنطقة والمدينة والدولة.',
-    contactTitle: 'التواصل مع المركز',
+    locationDescription: 'تظهر أسماء الفروع العامة ومعلومات عامة عن المنطقة والمدينة والدولة في هذه المرحلة.',
+    contactTitle: 'طلب اتصال',
     contactUnavailable: 'ينبغي تأكيد تفاصيل التواصل مع مقدم الخدمة.',
     galleryTitle: 'المعرض',
     verificationTitle: 'توثيق الملف',
     verificationVerified: 'هذا الملف العام محدد كملف موثق في سجلات DrKhaleej. هذا ليس ادعاءً بترخيص أو اعتماد من وزارة الصحة.',
-    verificationPlaceholder: 'ستضاف تفاصيل الترخيص والتوثيق بعد اكتمال أساس توثيق مقدمي الخدمة.',
-    futureTitle: 'أقسام الملف المستقبلية',
-    futureDescription: 'هذه المساحات محجوزة لمراحل لاحقة معتمدة وليست مفعلة حالياً.',
-    futureSlots: ['الفيديو', 'المراجعات', 'الملف المميز'],
-    disclaimerTitle: 'ملاحظة السلامة الطبية',
     disclaimerBody:
-      'هذا الملف العام مخصص لاكتشاف خدمات الرعاية الصحية فقط. ولا يعد نصيحة طبية أو تشخيصاً أو إرشاداً للطوارئ أو ضماناً لتوفر مقدم الخدمة.',
-    noServices: 'لا توجد خدمات عامة مرتبطة بهذا الملف حتى الآن.',
-    noDoctors: 'لا يوجد أطباء عامون مرتبطون بهذا الملف حتى الآن.',
+      'اكتشاف عام فقط. لا يعد نصيحة طبية أو تشخيصاً أو إرشاداً للطوارئ أو ضماناً لتوفر مقدم الخدمة.',
     noLocation: 'تفاصيل الموقع العامة غير متاحة بعد.',
     moreRelationsNotice: 'قد تظهر عناصر مرتبطة إضافية بعد المراجعة.',
     directionsLabel: 'فتح في الخرائط',
@@ -141,12 +119,14 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
   const hiddenLocationCount = hiddenPublicProfileRelationCount(center.locations, PUBLIC_CENTER_PROFILE_LOCATION_LIMIT);
   const hiddenServiceCount = hiddenPublicProfileRelationCount(center.services, PUBLIC_CENTER_PROFILE_SERVICE_LIMIT);
   const hiddenDoctorCount = hiddenPublicProfileRelationCount(center.doctors, PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT);
-  const showSafeContactFallback = center.contactActions.length === 0 && center.locations.length > 0;
+  const showCallbackRequest = center.contactActions.length > 0;
+  const showSafeContactFallback = center.contactActions.length === 0 && visibleLocations.length > 0;
+  const showVerification = center.verificationStatus === 'verified' || center.licenseInfo !== null;
 
   return (
     <div className="mt-10 space-y-5">
       {center.coverImage ? (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-white/70">
           <div className="aspect-[16/7] w-full overflow-hidden bg-slate-100">
             <img
               src={center.coverImage.url}
@@ -187,40 +167,20 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         </div>
       </PublicCenterDetailSection>
 
-      {center.contactActions.length > 0 ? (
-        <PublicCenterDetailSection title={copy.contactTitle}>
-          <div className="space-y-4">
-            <PublicContactActions actions={center.contactActions} locale={locale} />
-            <PublicCallbackRequestForm
-              locale={locale}
-              countryCode={center.defaultCountry}
-              centerId={center.id}
-              centerLocationId={null}
-              doctorId={null}
-              doctorPracticeLocationId={null}
-              variant="center"
-            />
-          </div>
-        </PublicCenterDetailSection>
+      {visibleLocations.length > 0 ? (
+        <>
+          <PublicLocationSection
+            locale={locale}
+            title={copy.locationTitle}
+            description={copy.locationDescription}
+            locations={visibleLocations}
+            emptyLabel={copy.noLocation}
+            directionsLabel={copy.directionsLabel}
+            directionsAriaLabel={() => copy.directionsAriaLabel}
+          />
+          <MoreRelationsNotice hiddenCount={hiddenLocationCount} label={copy.moreRelationsNotice} />
+        </>
       ) : null}
-
-      {showSafeContactFallback ? (
-        <PublicCenterDetailSection title={copy.contactTitle}>
-          <p className="text-sm leading-6 text-slate-600">{copy.contactUnavailable}</p>
-        </PublicCenterDetailSection>
-      ) : null}
-
-      <PublicLocationSection
-        locale={locale}
-        title={copy.locationTitle}
-        description={copy.locationDescription}
-        locations={visibleLocations}
-        emptyLabel={copy.noLocation}
-        directionsLabel={copy.directionsLabel}
-        directionsAriaLabel={() => copy.directionsAriaLabel}
-        renderLocationActions={(location) => <PublicContactActions actions={location.contactActions} locale={locale} />}
-      />
-      <MoreRelationsNotice hiddenCount={hiddenLocationCount} label={copy.moreRelationsNotice} />
 
       {center.galleryImages.length > 0 ? (
         <PublicCenterDetailSection title={copy.galleryTitle}>
@@ -244,83 +204,87 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         </PublicCenterDetailSection>
       ) : null}
 
-      <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
-        {visibleServices.length > 0 ? (
-          <>
-            <ul className="grid gap-3 sm:grid-cols-2" role="list">
-              {visibleServices.map((service) => {
-                const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
-                const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
+      {visibleServices.length > 0 ? (
+        <PublicCenterDetailSection title={copy.servicesTitle} description={copy.servicesDescription}>
+          <ul className="grid gap-3 sm:grid-cols-2" role="list">
+            {visibleServices.map((service) => {
+              const serviceName = preferredText(locale, service.nameEn, service.nameAr) ?? service.nameEn;
+              const serviceDescription = preferredText(locale, service.descriptionEn, service.descriptionAr);
 
-                return (
-                  <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                    <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
-                    {serviceDescription ? <p className="mt-2 text-sm leading-6 text-slate-600">{serviceDescription}</p> : null}
-                  </li>
-                );
-              })}
-            </ul>
-            <MoreRelationsNotice hiddenCount={hiddenServiceCount} label={copy.moreRelationsNotice} />
-          </>
-        ) : (
-          <p className="text-sm leading-6 text-slate-600">{copy.noServices}</p>
-        )}
-      </PublicCenterDetailSection>
+              return (
+                <li key={service.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+                  <h3 className="text-sm font-semibold leading-6 text-slate-950">{serviceName}</h3>
+                  {serviceDescription ? <p className="mt-2 text-sm leading-6 text-slate-600">{serviceDescription}</p> : null}
+                </li>
+              );
+            })}
+          </ul>
+          <MoreRelationsNotice hiddenCount={hiddenServiceCount} label={copy.moreRelationsNotice} />
+        </PublicCenterDetailSection>
+      ) : null}
 
-      <PublicCenterDetailSection title={copy.doctorsTitle} description={copy.doctorsDescription}>
-        {visibleDoctors.length > 0 ? (
-          <>
-            <ul className="grid gap-3 sm:grid-cols-2" role="list">
-              {visibleDoctors.map((doctor) => {
-                const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
-                const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
+      {visibleDoctors.length > 0 ? (
+        <PublicCenterDetailSection title={copy.doctorsTitle} description={copy.doctorsDescription}>
+          <ul className="grid gap-3 sm:grid-cols-2" role="list">
+            {visibleDoctors.map((doctor) => {
+              const doctorName = preferredText(locale, doctor.fullNameEn, doctor.fullNameAr) ?? doctor.fullNameEn;
+              const href = publicDoctorDetailRoute(locale, doctor.defaultCountry, doctor.slug);
 
-                return (
-                  <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
-                    <h3>
-                      <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
-                        {doctorName}
-                      </Link>
-                    </h3>
-                    <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
-                    <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
-                      {copy.doctorProfileLabel}
+              return (
+                <li key={doctor.id} className="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4">
+                  <h3>
+                    <Link href={href} className="text-sm font-semibold leading-6 text-slate-950 underline-offset-4 hover:text-emerald-800 hover:underline">
+                      {doctorName}
                     </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <MoreRelationsNotice hiddenCount={hiddenDoctorCount} label={copy.moreRelationsNotice} />
-          </>
-        ) : (
-          <p className="text-sm leading-6 text-slate-600">{copy.noDoctors}</p>
-        )}
-      </PublicCenterDetailSection>
+                  </h3>
+                  <p className="mt-2 text-xs font-medium text-slate-500">{formatNeutralLabel(doctor.titleEn)}</p>
+                  <Link href={href} className="mt-3 inline-flex text-xs font-semibold text-emerald-800 underline-offset-4 hover:underline">
+                    {copy.doctorProfileLabel}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <MoreRelationsNotice hiddenCount={hiddenDoctorCount} label={copy.moreRelationsNotice} />
+        </PublicCenterDetailSection>
+      ) : null}
 
-      <PublicCenterDetailSection title={copy.verificationTitle}>
-        <p className="text-sm leading-6 text-slate-700">
-          {center.verificationStatus === 'verified' ? copy.verificationVerified : copy.verificationPlaceholder}
+      {showCallbackRequest ? (
+        <PublicCenterDetailSection title={copy.contactTitle}>
+          <PublicCallbackRequestForm
+            locale={locale}
+            countryCode={center.defaultCountry}
+            centerId={center.id}
+            centerLocationId={null}
+            doctorId={null}
+            doctorPracticeLocationId={null}
+            variant="center"
+          />
+        </PublicCenterDetailSection>
+      ) : null}
+
+      {showSafeContactFallback ? (
+        <p className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-xs leading-5 text-slate-600 shadow-sm">
+          {copy.contactUnavailable}
         </p>
-        {center.licenseInfo ? (
-          <div className="mt-4">
-            <PublicLicenseInfoCard locale={locale} licenseInfo={center.licenseInfo} variant="center" />
-          </div>
-        ) : null}
-      </PublicCenterDetailSection>
+      ) : null}
 
-      <PublicCenterDetailSection title={copy.futureTitle} description={copy.futureDescription}>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" role="list">
-          {copy.futureSlots.map((slot) => (
-            <li key={slot} className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-4 py-3 text-sm text-slate-600">
-              {slot}
-            </li>
-          ))}
-        </ul>
-      </PublicCenterDetailSection>
+      {showVerification ? (
+        <PublicCenterDetailSection title={copy.verificationTitle}>
+          {center.verificationStatus === 'verified' ? (
+            <p className="text-sm leading-6 text-slate-700">{copy.verificationVerified}</p>
+          ) : null}
+          {center.licenseInfo ? (
+            <div className={center.verificationStatus === 'verified' ? 'mt-4' : undefined}>
+              <PublicLicenseInfoCard locale={locale} licenseInfo={center.licenseInfo} variant="center" />
+            </div>
+          ) : null}
+        </PublicCenterDetailSection>
+      ) : null}
 
-      <PublicCenterDetailSection title={copy.disclaimerTitle}>
-        <p className="text-sm leading-6 text-slate-700">{copy.disclaimerBody}</p>
-      </PublicCenterDetailSection>
+      <p className="rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 text-xs leading-5 text-slate-500">
+        {copy.disclaimerBody}
+      </p>
     </div>
   );
 }
