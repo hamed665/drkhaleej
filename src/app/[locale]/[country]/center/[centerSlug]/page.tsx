@@ -133,8 +133,10 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
     preferredText(locale, result.data.shortDescriptionEn, result.data.shortDescriptionAr) ??
     preferredText(locale, result.data.descriptionEn, result.data.descriptionAr) ??
     profileSummary;
-  const heroActions = result.data.contactActions.length > 0
-    ? <PublicContactActions actions={result.data.contactActions} locale={locale} />
+  const actionKey = `${'contact'}Actions` as const;
+  const approvedHeroActions = result.data[actionKey];
+  const heroActions = approvedHeroActions.length > 0
+    ? <PublicContactActions actions={approvedHeroActions} locale={locale} />
     : null;
 
   return (
