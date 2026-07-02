@@ -176,9 +176,26 @@ for (const token of [
   'buildPublicCenterProfileSummary',
   'const profileSummary = buildPublicCenterProfileSummary(locale, center)',
   '{profileSummary}',
-  'description ? <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{description}</p> : null',
+  'description ? <p className="dm2026-profile-description">{description}</p> : null',
+  '<p className="dm2026-profile-summary">{profileSummary}</p>',
+  'dm2026-profile-detail',
 ]) {
   assertIncludes(centerDetail, token, centerDetailPath);
+}
+
+const layoutPath = 'src/app/layout.tsx';
+const layout = readFile(layoutPath);
+assertIncludes(layout, '@/styles/dm2026-public-profile.css', layoutPath);
+
+const publicProfileCssPath = 'src/styles/dm2026-public-profile.css';
+const publicProfileCss = readFile(publicProfileCssPath);
+for (const token of [
+  '.dm2026-profile-detail',
+  '.dm2026-profile-section',
+  '.dm2026-profile-card',
+  '.dm2026-profile-note--safety',
+]) {
+  assertIncludes(publicProfileCss, token, publicProfileCssPath);
 }
 
 const doctorDetailPath = 'src/components/public/public-doctor-detail.tsx';
