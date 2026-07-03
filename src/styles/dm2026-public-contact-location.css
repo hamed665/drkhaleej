@@ -61,6 +61,29 @@
   margin-block-start: 0.32rem;
 }
 
+.dm2026-profile-location-card__address {
+  display: grid;
+  gap: 0.28rem;
+  border: 1px solid rgba(196, 222, 216, 0.58);
+  border-radius: 0.92rem;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 0.68rem 0.78rem;
+}
+
+.dm2026-profile-location-card__address span {
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: 0.72rem;
+  font-weight: 840;
+  line-height: 1;
+}
+
+.dm2026-profile-location-card__address p {
+  margin: 0;
+  color: var(--dm-ink-700, #2e3a3b);
+  font-size: 0.86rem;
+  line-height: 1.58;
+}
+
 .dm2026-profile-location-card__footer {
   display: flex;
   flex-wrap: wrap;

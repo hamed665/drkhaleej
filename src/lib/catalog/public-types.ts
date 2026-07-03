@@ -135,6 +135,13 @@ export type PublicProviderLocationSummary = {
   id: string;
   locationNameEn: string | null;
   locationNameAr: string | null;
+  addressLine1En?: string | null;
+  addressLine1Ar?: string | null;
+  addressLine2En?: string | null;
+  addressLine2Ar?: string | null;
+  landmarkEn?: string | null;
+  landmarkAr?: string | null;
+  postalCode?: string | null;
   areaNameEn: string | null;
   areaNameAr: string | null;
   cityNameEn: string | null;

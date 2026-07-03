@@ -22,6 +22,17 @@ type PublicLocationSectionProps = {
   renderLocationActions?: (location: PublicProviderLocationSummary) => ReactNode;
 };
 
+function preferredLocationText(locale: PublicCatalogLocale, en: string | null | undefined, ar: string | null | undefined): string | null {
+  if (locale === 'ar') return ar ?? en ?? null;
+  return en ?? ar ?? null;
+}
+
+function joinAddressParts(parts: Array<string | null | undefined>): string | null {
+  const cleanedParts = parts.map((part) => part?.trim()).filter((part): part is string => Boolean(part));
+
+  return cleanedParts.join(', ') || null;
+}
+
 export function PublicLocationSection({
   locale,
   title,
@@ -35,6 +46,7 @@ export function PublicLocationSection({
   renderLocationActions
 }: PublicLocationSectionProps) {
   const resolvedPrimaryLocationLabel = primaryLocationLabel ?? (locale === 'ar' ? 'الفرع الرئيسي' : 'Primary branch');
+  const addressLabel = locale === 'ar' ? 'العنوان' : 'Address';
 
   return (
     <PublicCenterDetailSection title={title} description={description}>
@@ -43,6 +55,10 @@ export function PublicLocationSection({
           {locations.map((location) => {
             const locationName = formatPublicLocationName(locale, location);
             const geoLine = formatPublicLocationGeoLine(locale, location);
+            const addressLine1 = preferredLocationText(locale, location.addressLine1En, location.addressLine1Ar);
+            const addressLine2 = preferredLocationText(locale, location.addressLine2En, location.addressLine2Ar);
+            const landmark = preferredLocationText(locale, location.landmarkEn, location.landmarkAr);
+            const addressText = joinAddressParts([addressLine1, addressLine2, landmark, location.postalCode, geoLine]);
             const locationLabel = locationName ?? geoLine ?? emptyLabel;
             const directionsUrl = getPublicDirectionsUrl(location);
             const cardClassName = location.isPrimary
@@ -60,6 +76,13 @@ export function PublicLocationSection({
                     <span className="dm2026-profile-location-card__badge">{resolvedPrimaryLocationLabel}</span>
                   ) : null}
                 </div>
+
+                {addressText ? (
+                  <div className="dm2026-profile-location-card__address">
+                    <span>{addressLabel}</span>
+                    <p>{addressText}</p>
+                  </div>
+                ) : null}
 
                 {renderLocationActions ? <div className="dm2026-profile-action-row">{renderLocationActions(location)}</div> : null}
 
