@@ -1,4 +1,5 @@
 import './check-active-center-public-state-action-guard.mjs';
+import './check-active-center-contact-edit-guard.mjs';
 
 import fs from 'node:fs';
 import path from 'node:path';
