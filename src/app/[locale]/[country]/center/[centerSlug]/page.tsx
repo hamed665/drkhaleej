@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PublicCenterDetailAddress } from '@/components/public/public-center-detail-address';
+import { PublicCenterDetail } from '@/components/public/public-center-detail';
 import { PublicContactActions } from '@/components/public/public-contact-actions';
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
+import { loadPublicCenterLocationExtra } from '@/lib/catalog/public-center-location-extra';
 import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import { isPublicProfileIndexEligible } from '@/lib/catalog/public-profile-index-eligibility';
 import {
@@ -147,13 +148,14 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
 
   if (!result.data) notFound();
 
-  const centerName = preferredText(locale, result.data.nameEn, result.data.nameAr) ?? result.data.nameEn;
-  const profileSummary = buildPublicCenterProfileSummary(locale, result.data);
+  const center = await loadPublicCenterLocationExtra(result.data);
+  const centerName = preferredText(locale, center.nameEn, center.nameAr) ?? center.nameEn;
+  const profileSummary = buildPublicCenterProfileSummary(locale, center);
   const description = buildPublicProfileMetaDescription(profileSummary);
-  const locationLine = formatPublicLocationSummary(locale, result.data.location);
-  const centerTypeLabel = formatNeutralLabel(result.data.centerType);
+  const locationLine = formatPublicLocationSummary(locale, center.location);
+  const centerTypeLabel = formatNeutralLabel(center.centerType);
   const actionKey = `${'contact'}Actions` as const;
-  const approvedHeroActions = result.data[actionKey];
+  const approvedHeroActions = center[actionKey];
   const heroActions = approvedHeroActions.length > 0
     ? <PublicContactActions actions={approvedHeroActions} locale={locale} />
     : null;
@@ -176,7 +178,7 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
       heroActions={heroActions}
       heroMeta={heroMeta}
       heroVariant="profile"
-      content={<PublicCenterDetailAddress locale={locale} center={result.data} />}
+      content={<PublicCenterDetail locale={locale} center={center} />}
     />
   );
 }
