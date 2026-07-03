@@ -206,7 +206,7 @@ export default async function AdminActiveCenterContactEditPage({ params }: PageP
             <div>
               <h3 className="text-lg font-bold text-slate-950">Public contact details</h3>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Empty fields are saved as empty and will not be marked visible. This form does not edit verification, billing, claim, taxonomy, descriptions, media, services, or commercial state.
+                Empty fields are saved as empty and will not be marked visible. Call numbers power public Call buttons. WhatsApp number powers only the public WhatsApp button. This form does not edit verification, billing, claim, taxonomy, descriptions, media, services, or commercial state.
               </p>
             </div>
             <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
@@ -216,7 +216,7 @@ export default async function AdminActiveCenterContactEditPage({ params }: PageP
 
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <label className="block text-sm font-semibold text-slate-800">
-              Primary phone
+              Call center phone
               <input
                 name="primaryPhone"
                 defaultValue={center.primaryPhone ?? ""}
@@ -225,9 +225,12 @@ export default async function AdminActiveCenterContactEditPage({ params }: PageP
                 maxLength={64}
                 className={inputClassName()}
               />
+              <span className="mt-1 block text-xs font-normal text-slate-500">
+                Used for the public Call button. Use the direct hospital or call-center phone number.
+              </span>
             </label>
             <label className="block text-sm font-semibold text-slate-800">
-              Secondary phone
+              Secondary call phone
               <input
                 name="secondaryPhone"
                 defaultValue={center.secondaryPhone ?? ""}
@@ -235,6 +238,9 @@ export default async function AdminActiveCenterContactEditPage({ params }: PageP
                 maxLength={64}
                 className={inputClassName()}
               />
+              <span className="mt-1 block text-xs font-normal text-slate-500">
+                Optional second public Call button number.
+              </span>
             </label>
             <label className="block text-sm font-semibold text-slate-800">
               WhatsApp phone
@@ -245,6 +251,9 @@ export default async function AdminActiveCenterContactEditPage({ params }: PageP
                 maxLength={64}
                 className={inputClassName()}
               />
+              <span className="mt-1 block text-xs font-normal text-slate-500">
+                Used only for the public WhatsApp button.
+              </span>
             </label>
             <label className="block text-sm font-semibold text-slate-800">
               Email
