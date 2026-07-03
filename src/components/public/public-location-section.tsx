@@ -34,6 +34,8 @@ export function PublicLocationSection({
   renderLocationMeta,
   renderLocationActions
 }: PublicLocationSectionProps) {
+  const resolvedPrimaryLocationLabel = primaryLocationLabel ?? (locale === 'ar' ? 'الفرع الرئيسي' : 'Primary branch');
+
   return (
     <PublicCenterDetailSection title={title} description={description}>
       {locations.length > 0 ? (
@@ -54,8 +56,8 @@ export function PublicLocationSection({
                     <h3>{locationLabel}</h3>
                     <p className="dm2026-profile-location-card__geo">{geoLine ?? emptyLabel}</p>
                   </div>
-                  {location.isPrimary && primaryLocationLabel ? (
-                    <span className="dm2026-profile-location-card__badge">{primaryLocationLabel}</span>
+                  {location.isPrimary ? (
+                    <span className="dm2026-profile-location-card__badge">{resolvedPrimaryLocationLabel}</span>
                   ) : null}
                 </div>
 
