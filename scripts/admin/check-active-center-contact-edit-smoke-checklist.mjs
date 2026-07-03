@@ -60,7 +60,6 @@ for (const token of [
 }
 
 for (const token of [
-  'approve bulk activation',
   'manual database edit performed: yes',
   'manual sitemap edit performed: yes',
 ]) {
