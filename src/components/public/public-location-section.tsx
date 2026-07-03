@@ -16,6 +16,7 @@ type PublicLocationSectionProps = {
   locations: PublicProviderLocationSummary[];
   emptyLabel: string;
   directionsLabel?: string;
+  primaryLocationLabel?: string;
   directionsAriaLabel?: (locationLabel: string) => string;
   renderLocationMeta?: (location: PublicProviderLocationSummary) => ReactNode;
   renderLocationActions?: (location: PublicProviderLocationSummary) => ReactNode;
@@ -28,6 +29,7 @@ export function PublicLocationSection({
   locations,
   emptyLabel,
   directionsLabel,
+  primaryLocationLabel,
   directionsAriaLabel,
   renderLocationMeta,
   renderLocationActions
@@ -41,24 +43,38 @@ export function PublicLocationSection({
             const geoLine = formatPublicLocationGeoLine(locale, location);
             const locationLabel = locationName ?? geoLine ?? emptyLabel;
             const directionsUrl = getPublicDirectionsUrl(location);
+            const cardClassName = location.isPrimary
+              ? 'dm2026-profile-card dm2026-profile-location-card dm2026-profile-location-card--primary'
+              : 'dm2026-profile-card dm2026-profile-location-card';
 
             return (
-              <li key={location.id} className="dm2026-profile-card dm2026-profile-location-card">
-                {locationName ? <h3>{locationName}</h3> : null}
-                <p className="dm2026-profile-location-card__geo">{geoLine ?? emptyLabel}</p>
+              <li key={location.id} className={cardClassName}>
+                <div className="dm2026-profile-location-card__header">
+                  <div>
+                    <h3>{locationLabel}</h3>
+                    <p className="dm2026-profile-location-card__geo">{geoLine ?? emptyLabel}</p>
+                  </div>
+                  {location.isPrimary && primaryLocationLabel ? (
+                    <span className="dm2026-profile-location-card__badge">{primaryLocationLabel}</span>
+                  ) : null}
+                </div>
+
                 {renderLocationActions ? <div className="dm2026-profile-action-row">{renderLocationActions(location)}</div> : null}
-                {directionsLabel && directionsUrl ? (
-                  <a
-                    href={directionsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={directionsAriaLabel ? directionsAriaLabel(locationLabel) : directionsLabel}
-                    className="dm2026-profile-action dm2026-profile-action--secondary"
-                  >
-                    {directionsLabel}
-                  </a>
-                ) : null}
-                {renderLocationMeta ? <div className="dm2026-profile-location-card__meta">{renderLocationMeta(location)}</div> : null}
+
+                <div className="dm2026-profile-location-card__footer">
+                  {directionsLabel && directionsUrl ? (
+                    <a
+                      href={directionsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={directionsAriaLabel ? directionsAriaLabel(locationLabel) : directionsLabel}
+                      className="dm2026-profile-action dm2026-profile-action--secondary dm2026-profile-location-card__directions"
+                    >
+                      {directionsLabel}
+                    </a>
+                  ) : null}
+                  {renderLocationMeta ? <div className="dm2026-profile-location-card__meta">{renderLocationMeta(location)}</div> : null}
+                </div>
               </li>
             );
           })}
