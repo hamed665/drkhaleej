@@ -49,7 +49,7 @@ export const adminModuleGroups: AdminModuleGroup[] = [
       {
         title: "Active Centers",
         description:
-          "Operational view for active centers with a guarded public contact correction route. Full profile editing, verification, billing, claim, and commercial controls remain unavailable here.",
+          "Operational view for active centers with guarded basic profile and public contact correction routes. Verification, billing, claim, taxonomy, media, location, and commercial controls remain separate.",
         status: "Partial",
         href: "/admin/active-centers",
       },
