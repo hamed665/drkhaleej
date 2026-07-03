@@ -169,3 +169,10 @@
     align-items: end;
   }
 }
+
+@media (max-width: 48rem) {
+  .public-page-shell {
+    padding-block-start: 4rem;
+    padding-block-end: 5.2rem;
+  }
+}
