@@ -54,12 +54,16 @@ for (const token of [
   'listAdminActiveCenters()',
   'ACTIVE_PROVIDER_OPERATIONS_VIEW',
   'No database error details are exposed here.',
-  'operational visibility and narrow public contact corrections',
+  'Guarded basic profile and public contact correction routes are available.',
+  'basic profile copy corrections',
+  'narrow public contact corrections',
   'draft_center.public_profile_activated',
   'English public profile',
   'Arabic public profile',
   'View public action gates',
+  'Edit basic profile info',
   'Edit public contact info',
+  '/edit-profile',
   '/edit-contact',
 ]) {
   mustHave(page, token, pagePath);
@@ -84,8 +88,8 @@ for (const token of [
   'title: "Active Centers"',
   'status: "Partial"',
   'href: "/admin/active-centers"',
-  'guarded public contact correction route',
-  'Full profile editing, verification, billing, claim, and commercial controls remain unavailable here.',
+  'guarded basic profile and public contact correction routes',
+  'remain separate.',
 ]) {
   mustHave(controlCenter, token, controlCenterPath);
 }
