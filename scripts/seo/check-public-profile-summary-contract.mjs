@@ -144,7 +144,9 @@ const centerRoute = readFile(centerRoutePath);
 for (const token of [
   'buildPublicCenterProfileSummary',
   'buildPublicProfileMetaDescription',
-  'const profileSummary = buildPublicCenterProfileSummary(locale, result.data)',
+  'loadPublicCenterLocationExtra',
+  'const center = await loadPublicCenterLocationExtra(result.data)',
+  'const profileSummary = buildPublicCenterProfileSummary(locale, center)',
   'description: buildPublicProfileMetaDescription(profileSummary)',
   'heroDescription={description}',
   'profileSummary',
