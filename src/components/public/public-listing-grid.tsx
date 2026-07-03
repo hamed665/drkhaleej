@@ -27,25 +27,25 @@ export function PublicListingGrid(props: PublicListingGridProps) {
   const ariaLabel = props.locale === 'ar' ? 'القوائم العامة' : 'Public listings';
 
   return (
-    <section className="mt-10" aria-label={ariaLabel}>
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+    <section className="dm2026-listing-grid-shell" aria-label={ariaLabel}>
+      <ul className="dm2026-listing-grid" role="list">
         {props.variant === 'center'
           ? props.items.map((item) => (
-              <li key={item.id} className="min-w-0">
+              <li key={item.id}>
                 <PublicListingCard locale={props.locale} variant="center" item={item} />
               </li>
             ))
           : null}
         {props.variant === 'doctor'
           ? props.items.map((item) => (
-              <li key={item.id} className="min-w-0">
+              <li key={item.id}>
                 <PublicListingCard locale={props.locale} variant="doctor" item={item} />
               </li>
             ))
           : null}
         {props.variant === 'service'
           ? props.items.map((item) => (
-              <li key={item.id} className="min-w-0">
+              <li key={item.id}>
                 <PublicListingCard locale={props.locale} variant="service" item={item} />
               </li>
             ))
