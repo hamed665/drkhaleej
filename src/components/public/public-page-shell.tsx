@@ -9,6 +9,8 @@ type PublicPageShellProps = {
   heroTitle: string;
   heroDescription: string;
   heroActions?: ReactNode;
+  heroMeta?: ReactNode;
+  heroVariant?: 'default' | 'profile';
   content?: ReactNode;
   panelHeading?: string;
   panelBody?: string;
@@ -22,6 +24,8 @@ export function PublicPageShell({
   heroTitle,
   heroDescription,
   heroActions,
+  heroMeta,
+  heroVariant,
   content,
   panelHeading,
   panelBody,
@@ -30,7 +34,15 @@ export function PublicPageShell({
 }: PublicPageShellProps) {
   return (
     <div className="public-page-shell" dir={dir}>
-      <PublicRouteHero badge={heroBadge} title={heroTitle} description={heroDescription} dir={dir} actions={heroActions} />
+      <PublicRouteHero
+        badge={heroBadge}
+        title={heroTitle}
+        description={heroDescription}
+        dir={dir}
+        actions={heroActions}
+        meta={heroMeta}
+        variant={heroVariant}
+      />
       {content ??
         (panelHeading && panelBody && gridTitle && gridItems ? (
           <>
