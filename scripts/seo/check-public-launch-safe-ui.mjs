@@ -85,6 +85,11 @@ for (const token of [
   'getPublicDirectionsUrl',
   'target="_blank"',
   'rel="noopener noreferrer"',
+  'resolvedPrimaryLocationLabel',
+  'dm2026-profile-location-card__header',
+  'dm2026-profile-location-card__badge',
+  'dm2026-profile-location-card__footer',
+  'dm2026-profile-location-card__directions',
 ]) {
   mustHave(location, token, locationPath);
 }
@@ -94,8 +99,36 @@ for (const token of [
   'Open now',
   'Top rated',
   'Accepts insurance',
+  'PublicContactActions actions={location.contactActions}',
 ]) {
   mustNotHave(location, token, locationPath);
+}
+
+const layoutPath = 'src/app/layout.tsx';
+const layout = readFile(layoutPath);
+mustHave(layout, '@/styles/dm2026-public-contact-location.css', layoutPath);
+
+const contactLocationCssPath = 'src/styles/dm2026-public-contact-location.css';
+const contactLocationCss = readFile(contactLocationCssPath);
+for (const token of [
+  '.dm2026-profile-location-card--primary',
+  '.dm2026-profile-location-card__badge',
+  '.dm2026-profile-location-card__directions',
+  '.dm2026-profile-note--contact',
+]) {
+  mustHave(contactLocationCss, token, contactLocationCssPath);
+}
+
+const contractPath = 'docs/seo/public-contact-location-ui-contract.md';
+const contract = readFile(contractPath);
+for (const token of [
+  'Public contact and location UI contract',
+  'unreviewed contact values',
+  'duplicated provider contact actions inside location cards',
+  'noopener noreferrer',
+  'does not change provider data',
+]) {
+  mustHave(contract, token, contractPath);
 }
 
 const packagePath = 'package.json';
