@@ -13,14 +13,22 @@ function isExternalPublicContactAction(action: PublicContactAction): boolean {
   return action.kind === 'whatsapp' || action.kind === 'website';
 }
 
+function contactActionOrder(action: PublicContactAction): number {
+  if (action.kind === 'whatsapp') return 10;
+  if (action.kind === 'website') return 20;
+  if (action.kind === 'email') return 30;
+  return 40;
+}
+
 export function PublicContactActions({ actions, locale, className }: PublicContactActionsProps) {
   if (actions.length === 0) return null;
 
   const containerClassName = ['flex flex-wrap items-center gap-3', className].filter(Boolean).join(' ');
+  const orderedActions = [...actions].sort((firstAction, secondAction) => contactActionOrder(firstAction) - contactActionOrder(secondAction));
 
   return (
     <div className={containerClassName} aria-label={locale === 'ar' ? 'إجراءات التواصل العامة' : 'Public contact actions'}>
-      {actions.map((action) => {
+      {orderedActions.map((action) => {
         const label = locale === 'ar' ? action.labelAr : action.labelEn;
         const ariaLabel = locale === 'ar' ? action.ariaLabelAr : action.ariaLabelEn;
         const isExternalAction = isExternalPublicContactAction(action);
