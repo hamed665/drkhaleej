@@ -51,6 +51,164 @@
   margin-block-start: 0.72rem;
 }
 
+/* PR 705: public search and listing card visual system. */
+.dm2026-listing-grid-shell {
+  margin-block-start: clamp(1.35rem, 3vw, 2.35rem);
+}
+
+.dm2026-listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18.5rem), 1fr));
+  gap: clamp(0.82rem, 1.8vw, 1.1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dm2026-listing-grid > li {
+  min-inline-size: 0;
+}
+
+.dm2026-listing-card {
+  position: relative;
+  isolation: isolate;
+  min-block-size: 100%;
+  display: grid;
+  gap: 0.78rem;
+  overflow: hidden;
+  border: 1px solid rgba(196, 222, 216, 0.7);
+  border-radius: clamp(1.05rem, 2vw, 1.38rem);
+  background:
+    radial-gradient(360px circle at 8% 0%, rgba(42, 161, 146, 0.085), transparent 48%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(246, 252, 250, 0.76));
+  box-shadow:
+    0 14px 38px rgba(7, 48, 44, 0.065),
+    0 1px 0 rgba(255, 255, 255, 0.84) inset;
+  padding: clamp(0.92rem, 2vw, 1.15rem);
+}
+
+.dm2026-listing-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(14, 110, 100, 0.025) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(14, 110, 100, 0.02) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 70%);
+  pointer-events: none;
+}
+
+.dm2026-listing-card__header,
+.dm2026-listing-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.72rem;
+}
+
+.dm2026-listing-card__mark {
+  inline-size: 2.35rem;
+  block-size: 2.35rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(42, 161, 146, 0.22);
+  border-radius: 0.86rem;
+  background: rgba(236, 250, 247, 0.86);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: 0.95rem;
+  font-weight: 850;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.dm2026-listing-card__eyebrow {
+  inline-size: fit-content;
+  margin: 0;
+  border: 1px solid rgba(42, 161, 146, 0.18);
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--dm-ink-600, #45514f);
+  font-size: 0.72rem;
+  font-weight: 780;
+  line-height: 1;
+  padding: 0.42rem 0.62rem;
+}
+
+.dm2026-listing-card__title {
+  margin: 0;
+  color: var(--dm-teal-950, #07302c);
+  font-size: clamp(1rem, 1.55vw, 1.18rem);
+  font-weight: 780;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+}
+
+.dm2026-listing-card__title a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 0.18rem;
+}
+
+.dm2026-listing-card__title a:hover,
+.dm2026-listing-card__title a:focus-visible {
+  color: var(--dm-color-brand-strong, #0b6f63);
+  text-decoration: underline;
+}
+
+.dm2026-listing-card__description {
+  margin: 0;
+  color: var(--dm-ink-600, #45514f);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.88rem;
+  line-height: 1.62;
+}
+
+.dm2026-listing-card__footer {
+  margin-block-start: 0.1rem;
+  color: var(--dm-ink-500, #5c6b6b);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dm2026-listing-card__footer p,
+.dm2026-listing-card__coming-soon {
+  margin: 0;
+}
+
+.dm2026-listing-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border-radius: var(--dm-radius-pill, 999px);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-decoration: none;
+  text-underline-offset: 0.18rem;
+  white-space: nowrap;
+}
+
+.dm2026-listing-card__cta:hover,
+.dm2026-listing-card__cta:focus-visible {
+  text-decoration: underline;
+}
+
+.dm2026-listing-card__coming-soon {
+  color: var(--dm-ink-500, #5c6b6b);
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+[dir='rtl'] .dm2026-listing-card__title {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
 @media (max-width: 42rem) {
   .dm2026-profile-footer-stack {
     gap: 0.62rem;
@@ -66,5 +224,20 @@
 
   .dm2026-profile-footer-stack .dm2026-profile-note--safety {
     font-size: 0.75rem;
+  }
+
+  .dm2026-listing-card {
+    gap: 0.68rem;
+    padding: 0.86rem;
+  }
+
+  .dm2026-listing-card__header,
+  .dm2026-listing-card__footer {
+    gap: 0.52rem;
+  }
+
+  .dm2026-listing-card__mark {
+    inline-size: 2.12rem;
+    block-size: 2.12rem;
   }
 }
