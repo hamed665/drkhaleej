@@ -32,17 +32,17 @@ export default async function AdminActiveCentersPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">READ_ONLY_ACTIVE_PROVIDER_VIEW</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">ACTIVE_PROVIDER_OPERATIONS_VIEW</p>
         <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] text-slate-950">Active Centers</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Read-only view for centers that have left the draft workflow. Editing, verification changes, contact visibility changes, billing, claim, and commercial controls are intentionally not available here.
+          Operational view for centers that have left the draft workflow. Full profile editing, verification changes, billing, claim, and commercial controls are intentionally not available here. A guarded public contact edit route is available for public contact details only.
         </p>
       </section>
 
       <section className="rounded-3xl border border-cyan-100 bg-cyan-50/60 p-5 text-cyan-950">
         <h3 className="text-lg font-bold">Review path</h3>
         <p className="mt-2 max-w-3xl text-sm leading-6">
-          Use this page for read-only operational visibility. Activation evidence remains in the audit log under the action <code>draft_center.public_profile_activated</code>.
+          Use this page for operational visibility and narrow public contact corrections. Activation evidence remains in the audit log under the action <code>draft_center.public_profile_activated</code>.
         </p>
       </section>
 
@@ -110,6 +110,9 @@ export default async function AdminActiveCentersPage() {
                         </Link>
                         <Link href={`/admin/active-centers/${center.id}/gates`} className="font-semibold text-cyan-700 hover:text-cyan-900">
                           View public action gates
+                        </Link>
+                        <Link href={`/admin/active-centers/${center.id}/edit-contact`} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                          Edit public contact info
                         </Link>
                       </div>
                     </td>

@@ -50,9 +50,11 @@ const activeCentersPath = 'src/app/admin/active-centers/page.tsx';
 const activeCenters = readFile(activeCentersPath);
 for (const token of [
   'listAdminActiveCenters()',
-  'READ_ONLY_ACTIVE_PROVIDER_VIEW',
+  'ACTIVE_PROVIDER_OPERATIONS_VIEW',
   'English public profile',
   'Arabic public profile',
+  'View public action gates',
+  'Edit public contact info',
   'draft_center.public_profile_activated',
 ]) {
   mustHave(activeCenters, token, activeCentersPath);

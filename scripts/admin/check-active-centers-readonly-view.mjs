@@ -52,12 +52,15 @@ const page = readFile(pagePath);
 for (const token of [
   'export default async function AdminActiveCentersPage',
   'listAdminActiveCenters()',
-  'READ_ONLY_ACTIVE_PROVIDER_VIEW',
+  'ACTIVE_PROVIDER_OPERATIONS_VIEW',
   'No database error details are exposed here.',
-  'read-only operational visibility',
+  'operational visibility and narrow public contact corrections',
   'draft_center.public_profile_activated',
   'English public profile',
   'Arabic public profile',
+  'View public action gates',
+  'Edit public contact info',
+  '/edit-contact',
 ]) {
   mustHave(page, token, pagePath);
 }
@@ -79,9 +82,10 @@ const controlCenterPath = 'src/lib/admin/control-center.ts';
 const controlCenter = readFile(controlCenterPath);
 for (const token of [
   'title: "Active Centers"',
-  'status: "Read-only"',
+  'status: "Partial"',
   'href: "/admin/active-centers"',
-  'No active-provider edit controls are available here.',
+  'guarded public contact correction route',
+  'Full profile editing, verification, billing, claim, and commercial controls remain unavailable here.',
 ]) {
   mustHave(controlCenter, token, controlCenterPath);
 }
@@ -95,4 +99,4 @@ for (const token of [
   mustHave(packageJson, token, packagePath);
 }
 
-console.log('Active centers read-only view checks passed.');
+console.log('Active centers operations view checks passed.');

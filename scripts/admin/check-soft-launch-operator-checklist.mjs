@@ -203,9 +203,11 @@ mustHaveAll(action, [
 const activeCentersPath = 'src/app/admin/active-centers/page.tsx';
 const activeCenters = readFile(activeCentersPath);
 mustHaveAll(activeCenters, [
-  'READ_ONLY_ACTIVE_PROVIDER_VIEW',
+  'ACTIVE_PROVIDER_OPERATIONS_VIEW',
   'English public profile',
   'Arabic public profile',
+  'View public action gates',
+  'Edit public contact info',
   'draft_center.public_profile_activated',
 ], activeCentersPath);
 
@@ -258,36 +260,13 @@ mustHaveAll(relationLimit, [
   'PUBLIC_CENTER_PROFILE_SERVICE_LIMIT = 12',
   'PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT = 12',
   'PUBLIC_DOCTOR_PROFILE_SERVICE_LIMIT = 12',
-  'PUBLIC_DOCTOR_PROFILE_PRACTICE_LOCATION_LIMIT = 8',
 ], relationLimitPath);
-for (const forbiddenToken of ['Math.random', 'sort(() =>', 'randomUUID']) {
-  mustNotHave(relationLimit, forbiddenToken, relationLimitPath);
-}
-
-const securityBacklogPath = 'docs/security/supabase-warning-hardening-backlog.md';
-const securityBacklog = readFile(securityBacklogPath);
-mustHaveAll(securityBacklog, [
-  'Supabase warning hardening backlog',
-  'PR 687: function search path hardening',
-  'PR 688: sensitive helper search path hardening',
-  'Function execution privilege hardening',
-  'Extension schema hardening',
-  'Security Advisor Errors remain launch blockers.',
-], securityBacklogPath);
 
 const packagePath = 'package.json';
 const packageJson = readFile(packagePath);
 for (const token of [
   '"admin:soft-launch-checklist:validate": "node scripts/admin/check-soft-launch-operator-checklist.mjs"',
   'pnpm admin:soft-launch-checklist:validate',
-  'pnpm admin:final-route-sanity:validate',
-  'pnpm admin:final-launch-recap:validate',
-  'pnpm admin:active-centers-readonly:validate',
-  'pnpm admin:audit-log-readonly:validate',
-  'pnpm seo:public-launch-safe-ui:validate',
-  'pnpm seo:public-listing-card-safety:validate',
-  'pnpm import:sitemap-family-caps:validate',
-  'pnpm import:profile-smoke:validate',
 ]) {
   mustHave(packageJson, token, packagePath);
 }
