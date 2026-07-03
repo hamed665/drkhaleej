@@ -63,5 +63,5 @@ export async function loadPublicCenterLocationExtra(center: PublicCenterDetail):
 
   if (error || !data) return center;
 
-  return applyLocationExtra(center, data as LocationExtraRow[]);
+  return applyLocationExtra(center, data as unknown as LocationExtraRow[]);
 }
