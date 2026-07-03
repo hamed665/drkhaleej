@@ -43,6 +43,12 @@ for (const token of [
   'getPrimaryActiveLocation(centerId)',
   'Controlled edit surface for an already-active center.',
   '6 fields only',
+  'Call center phone',
+  'Used for the public Call button. Use the direct hospital or call-center phone number.',
+  'Secondary call phone',
+  'Optional second public Call button number.',
+  'WhatsApp phone',
+  'Used only for the public WhatsApp button.',
   'Save public contact details',
   'View public action gates',
   'Check gates after saving',
@@ -51,6 +57,8 @@ for (const token of [
 }
 
 mustNotHave(editPage, 'return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);', editPagePath);
+mustNotHave(editPage, '>\n              Primary phone\n', editPagePath);
+mustNotHave(editPage, '>\n              Secondary phone\n', editPagePath);
 
 const allowedFieldNames = uniqueSorted([
   'centerId',
