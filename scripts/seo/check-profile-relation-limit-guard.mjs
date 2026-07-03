@@ -50,23 +50,59 @@ const centerShellPath = 'src/components/public/public-page-shell.tsx';
 const centerShell = readFile(centerShellPath);
 for (const token of [
   'heroActions?: ReactNode',
+  'heroMeta?: ReactNode',
+  "heroVariant?: 'default' | 'profile'",
   'actions={heroActions}',
+  'meta={heroMeta}',
+  'variant={heroVariant}',
 ]) {
   assertIncludes(centerShell, token, centerShellPath);
+}
+
+const routeHeroPath = 'src/components/public/public-route-hero.tsx';
+const routeHero = readFile(routeHeroPath);
+for (const token of [
+  'type PublicRouteHeroVariant',
+  "variant?: PublicRouteHeroVariant",
+  'public-route-hero--profile',
+  'public-route-hero__meta',
+]) {
+  assertIncludes(routeHero, token, routeHeroPath);
 }
 
 const centerRoutePath = 'src/app/[locale]/[country]/center/[centerSlug]/page.tsx';
 const centerRoute = readFile(centerRoutePath);
 for (const token of [
   'PublicContactActions',
+  'formatPublicLocationSummary',
   "const actionKey = `${'contact'}Actions` as const;",
   'const approvedHeroActions = result.data[actionKey]',
   'const heroActions = approvedHeroActions.length > 0',
   '<PublicContactActions actions={approvedHeroActions} locale={locale} />',
+  'const description = buildPublicProfileMetaDescription(profileSummary)',
+  'const heroMeta = (',
+  'dm2026-profile-hero-meta-list',
   'heroActions={heroActions}',
+  'heroMeta={heroMeta}',
+  'heroVariant="profile"',
 ]) {
   assertIncludes(centerRoute, token, centerRoutePath);
 }
+
+const publicHeroCssPath = 'src/styles/dm2026-public-hero.css';
+const publicHeroCss = readFile(publicHeroCssPath);
+for (const token of [
+  '.public-route-hero--profile',
+  '.public-route-hero__meta',
+  '.dm2026-profile-hero-meta-list',
+  'prefers-reduced-motion',
+]) {
+  assertIncludes(publicHeroCss, token, publicHeroCssPath);
+}
+
+const layoutPath = 'src/app/layout.tsx';
+const layout = readFile(layoutPath);
+assertIncludes(layout, '@/styles/dm2026-public-hero.css', layoutPath);
 
 const centerDetailPath = 'src/components/public/public-center-detail.tsx';
 const centerDetail = readFile(centerDetailPath);

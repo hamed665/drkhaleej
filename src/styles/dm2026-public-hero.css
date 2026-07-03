@@ -1,0 +1,210 @@
+/* PR 702: premium public center profile hero. CSS-only visual layer; no index/schema/data changes. */
+.public-route-hero--profile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(176, 212, 204, 0.72);
+  border-radius: clamp(1.35rem, 3vw, 2.25rem);
+  background:
+    radial-gradient(680px circle at 4% 0%, rgba(42, 161, 146, 0.16), transparent 50%),
+    radial-gradient(520px circle at 100% 10%, rgba(201, 162, 75, 0.12), transparent 45%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(242, 251, 249, 0.88) 50%, rgba(255, 250, 238, 0.72));
+  box-shadow:
+    0 26px 70px rgba(7, 48, 44, 0.13),
+    0 1px 0 rgba(255, 255, 255, 0.92) inset;
+}
+
+.public-route-hero--profile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(14, 110, 100, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(14, 110, 100, 0.028) 1px, transparent 1px);
+  background-size: 2.7rem 2.7rem;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.48), transparent 76%);
+  pointer-events: none;
+}
+
+.public-route-hero--profile .public-route-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.36fr);
+  gap: clamp(1rem, 3vw, 2.35rem);
+  align-items: center;
+  padding: clamp(1.15rem, 3.2vw, 2.35rem);
+}
+
+.public-route-hero--profile .public-route-hero__inner::after {
+  content: '';
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  align-self: stretch;
+  min-block-size: clamp(12rem, 19vw, 18rem);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: clamp(1.1rem, 2.2vw, 1.65rem);
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.9), transparent 17%),
+    radial-gradient(circle at 74% 72%, rgba(42, 161, 146, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(14, 110, 100, 0.2), rgba(239, 248, 245, 0.86));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 22px 48px rgba(7, 48, 44, 0.11);
+}
+
+.public-route-hero--profile .public-route-hero__badge,
+.public-route-hero--profile .public-route-hero__title,
+.public-route-hero--profile .public-route-hero__description,
+.public-route-hero--profile .public-route-hero__meta,
+.public-route-hero--profile .public-route-hero__actions {
+  grid-column: 1;
+}
+
+.public-route-hero--profile .public-route-hero__badge {
+  width: fit-content;
+  margin: 0;
+  border: 1px solid rgba(42, 161, 146, 0.24);
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(236, 250, 247, 0.84);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: clamp(0.72rem, 1vw, 0.82rem);
+  font-weight: 820;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  padding: 0.5rem 0.72rem;
+  text-transform: uppercase;
+}
+
+.public-route-hero--profile .public-route-hero__title {
+  max-inline-size: 14ch;
+  margin: 0;
+  color: var(--dm-teal-950, #07302c);
+  font-size: clamp(2.12rem, 5.4vw, 4.65rem);
+  font-weight: 780;
+  letter-spacing: -0.06em;
+  line-height: 0.96;
+}
+
+.public-route-hero--profile .public-route-hero__description {
+  max-inline-size: 54rem;
+  margin: 0;
+  color: var(--dm-ink-700, #2e3a3b);
+  font-size: clamp(0.98rem, 1.35vw, 1.12rem);
+  line-height: 1.72;
+}
+
+.public-route-hero--profile .public-route-hero__meta {
+  margin-block-start: 0.1rem;
+}
+
+.dm2026-profile-hero-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dm2026-profile-hero-meta-list li {
+  min-block-size: 2.16rem;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(14, 110, 100, 0.14);
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--dm-ink-700, #2e3a3b);
+  font-size: 0.8rem;
+  font-weight: 760;
+  line-height: 1.15;
+  padding: 0.48rem 0.72rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.dm2026-profile-hero-meta-list li:first-child {
+  border-color: rgba(42, 161, 146, 0.22);
+  background: rgba(239, 246, 244, 0.88);
+  color: var(--dm-color-brand-strong, #0b6f63);
+}
+
+.public-route-hero--profile .public-route-hero__actions {
+  margin-block-start: 0.2rem;
+}
+
+.public-route-hero--profile .public-route-hero__actions a {
+  min-block-size: 2.45rem;
+  border-radius: var(--dm-radius-pill, 999px);
+  font-size: 0.82rem;
+  box-shadow: 0 10px 24px rgba(7, 48, 44, 0.08);
+}
+
+[dir='rtl'] .public-route-hero--profile .public-route-hero__badge {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+[dir='rtl'] .public-route-hero--profile .public-route-hero__title {
+  letter-spacing: 0;
+  line-height: 1.16;
+}
+
+[dir='rtl'] .public-route-hero--profile .public-route-hero__description {
+  line-height: 1.86;
+}
+
+@media (max-width: 58rem) {
+  .public-route-hero--profile .public-route-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .public-route-hero--profile .public-route-hero__inner::after {
+    display: none;
+  }
+
+  .public-route-hero--profile .public-route-hero__title {
+    max-inline-size: 16ch;
+  }
+}
+
+@media (max-width: 42rem) {
+  .public-route-hero--profile {
+    border-radius: 1.2rem;
+  }
+
+  .public-route-hero--profile .public-route-hero__inner {
+    gap: 0.72rem;
+    padding: 0.92rem;
+  }
+
+  .public-route-hero--profile .public-route-hero__title {
+    font-size: clamp(1.72rem, 9vw, 2.55rem);
+    line-height: 1.03;
+  }
+
+  .public-route-hero--profile .public-route-hero__description {
+    font-size: 0.9rem;
+    line-height: 1.62;
+  }
+
+  .dm2026-profile-hero-meta-list {
+    gap: 0.36rem;
+  }
+
+  .dm2026-profile-hero-meta-list li {
+    min-block-size: 2rem;
+    font-size: 0.74rem;
+    padding: 0.42rem 0.58rem;
+  }
+
+  .public-route-hero--profile .public-route-hero__actions a {
+    min-block-size: 2.25rem;
+    font-size: 0.76rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-route-hero--profile .public-route-hero__actions a {
+    transition-duration: 1ms;
+  }
+}

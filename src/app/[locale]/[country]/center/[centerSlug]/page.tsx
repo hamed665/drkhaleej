@@ -5,6 +5,7 @@ import { PublicContactActions } from '@/components/public/public-contact-actions
 import { PublicListingError } from '@/components/public/public-listing-error';
 import { PublicPageShell } from '@/components/public/public-page-shell';
 import { getPublicCenterBySlug } from '@/lib/catalog/public-eligible-queries';
+import { formatPublicLocationSummary } from '@/lib/catalog/public-location';
 import { isPublicProfileIndexEligible } from '@/lib/catalog/public-profile-index-eligibility';
 import {
   buildPublicCenterProfileSummary,
@@ -28,18 +29,30 @@ type RouteCopy = {
   badge: string;
   fallbackTitle: string;
   fallbackDescription: string;
+  heroFactsLabel: string;
+  publicProfileLabel: string;
+  contactReviewedLabel: string;
+  contactUnderReviewLabel: string;
 };
 
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
     badge: 'Public center profile',
     fallbackTitle: `Medical Center Profile | ${publicBrandName}`,
-    fallbackDescription: `View public medical center information in Oman on ${publicBrandName}.`
+    fallbackDescription: `View public medical center information in Oman on ${publicBrandName}.`,
+    heroFactsLabel: 'Public profile facts',
+    publicProfileLabel: 'Public profile',
+    contactReviewedLabel: 'Reviewed contact options',
+    contactUnderReviewLabel: 'Contact options under review'
   },
   ar: {
     badge: 'ملف مركز عام',
     fallbackTitle: `ملف مركز طبي | ${publicBrandName}`,
-    fallbackDescription: `اطلع على معلومات عامة عن المراكز الطبية في عُمان عبر ${publicBrandName}.`
+    fallbackDescription: `اطلع على معلومات عامة عن المراكز الطبية في عُمان عبر ${publicBrandName}.`,
+    heroFactsLabel: 'حقائق الملف العام',
+    publicProfileLabel: 'ملف عام',
+    contactReviewedLabel: 'خيارات تواصل مراجعة',
+    contactUnderReviewLabel: 'خيارات التواصل قيد المراجعة'
   }
 };
 
@@ -50,6 +63,13 @@ function preferredText(locale: SupportedLocale, en: string | null, ar: string | 
 
 function metadataTitle(name: string): string {
   return `${name} | ${publicBrandName}`;
+}
+
+function formatNeutralLabel(value: string): string {
+  return value
+    .split('_')
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase())
+    .join(' ');
 }
 
 function buildNoindexFallbackMetadata(input: {
@@ -129,15 +149,23 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
 
   const centerName = preferredText(locale, result.data.nameEn, result.data.nameAr) ?? result.data.nameEn;
   const profileSummary = buildPublicCenterProfileSummary(locale, result.data);
-  const description =
-    preferredText(locale, result.data.shortDescriptionEn, result.data.shortDescriptionAr) ??
-    preferredText(locale, result.data.descriptionEn, result.data.descriptionAr) ??
-    profileSummary;
+  const description = buildPublicProfileMetaDescription(profileSummary);
+  const locationLine = formatPublicLocationSummary(locale, result.data.location);
+  const centerTypeLabel = formatNeutralLabel(result.data.centerType);
   const actionKey = `${'contact'}Actions` as const;
   const approvedHeroActions = result.data[actionKey];
   const heroActions = approvedHeroActions.length > 0
     ? <PublicContactActions actions={approvedHeroActions} locale={locale} />
     : null;
+  const contactStateLabel = approvedHeroActions.length > 0 ? copy.contactReviewedLabel : copy.contactUnderReviewLabel;
+  const heroMeta = (
+    <ul className="dm2026-profile-hero-meta-list" aria-label={copy.heroFactsLabel}>
+      <li>{centerTypeLabel}</li>
+      {locationLine ? <li>{locationLine}</li> : null}
+      <li>{copy.publicProfileLabel}</li>
+      <li>{contactStateLabel}</li>
+    </ul>
+  );
 
   return (
     <PublicPageShell
@@ -146,6 +174,8 @@ export default async function PublicCenterDetailPage({ params }: { params: Promi
       heroTitle={centerName}
       heroDescription={description}
       heroActions={heroActions}
+      heroMeta={heroMeta}
+      heroVariant="profile"
       content={<PublicCenterDetail locale={locale} center={result.data} />}
     />
   );
