@@ -25,7 +25,7 @@ export function PublicPageShell({
   heroDescription,
   heroActions,
   heroMeta,
-  heroVariant,
+  heroVariant = 'default',
   content,
   panelHeading,
   panelBody,
