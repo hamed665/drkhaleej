@@ -104,9 +104,14 @@ export default async function AdminActiveCentersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <Link href={`/admin/active-centers/${center.id}`} className="font-semibold text-cyan-700 hover:text-cyan-900">
-                        View public state readiness
-                      </Link>
+                      <div className="flex flex-col gap-2">
+                        <Link href={`/admin/active-centers/${center.id}`} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                          View public state readiness
+                        </Link>
+                        <Link href={`/admin/active-centers/${center.id}/gates`} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                          View public action gates
+                        </Link>
+                      </div>
                     </td>
                     <td className="px-4 py-4 text-slate-600">{formatDate(center.updatedAt)}</td>
                   </tr>
