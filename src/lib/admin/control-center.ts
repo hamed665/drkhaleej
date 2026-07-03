@@ -49,8 +49,8 @@ export const adminModuleGroups: AdminModuleGroup[] = [
       {
         title: "Active Centers",
         description:
-          "Read-only operational view for centers that have left the draft workflow. No active-provider edit controls are available here.",
-        status: "Read-only",
+          "Operational view for active centers with a guarded public contact correction route. Full profile editing, verification, billing, claim, and commercial controls remain unavailable here.",
+        status: "Partial",
         href: "/admin/active-centers",
       },
       {
@@ -218,33 +218,5 @@ export const partialAdminModules: AdminModule[] = [
       "Read-only quality signals are available inside draft center detail screens.",
     status: "Partial",
     href: "/admin/draft-centers",
-  },
-  {
-    title: "Draft center taxonomy",
-    description:
-      "Taxonomy assignment exists for draft centers; broader taxonomy administration remains planned.",
-    status: "Partial",
-    href: "/admin/draft-centers",
-  },
-  {
-    title: "Public center eligibility guard",
-    description:
-      "SEO validation now checks that public center-family routes use the explicit eligibility wrapper instead of raw catalog queries.",
-    status: "Active",
-    href: "/admin/draft-centers",
-  },
-  {
-    title: "Import staging",
-    description:
-      "Unified import staging tables and read-only admin inspection are available; upload/parsing/publishing are deferred.",
-    status: "Partial",
-    href: "/admin/imports",
-  },
-  {
-    title: "Lead history",
-    description:
-      "Status, priority, and draft-center creation history are visible for provider onboarding leads.",
-    status: "Read-only",
-    href: "/admin/provider-onboarding-leads",
   },
 ];
