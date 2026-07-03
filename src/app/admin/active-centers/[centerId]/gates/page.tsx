@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { getActiveCenterContactReadiness } from "@/server/admin/active-center-contact-readiness";
+import { prepareActiveCenterPublicContacts as runGateUpdate } from "@/server/admin/active-center-contact-actions";
 
 type PageProps = { params: Promise<{ centerId: string }> };
 
@@ -21,7 +22,11 @@ export default async function AdminActiveCenterGatesPage({ params }: PageProps) 
 
   return (
     <main className="space-y-4">
-      <h2 className="text-2xl font-bold text-slate-950">Public action gates</h2>
+      <h2 className="text-2xl font-bold text-slate-950">Public gates</h2>
+      <form action={runGateUpdate}>
+        <input name="centerId" type="hidden" value={centerId} />
+        <button type="submit">Apply</button>
+      </form>
       <dl className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <div><dt>Review</dt><dd>{item.contactReviewStatus ?? "missing"}</dd></div>
         <div><dt>Actions</dt><dd>{item.centerRenderableActionCount}</dd></div>
