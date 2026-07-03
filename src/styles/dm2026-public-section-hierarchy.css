@@ -1,0 +1,70 @@
+/* PR 704: public profile section hierarchy. Visual-only grouping for lower-priority profile notes. */
+.dm2026-profile-footer-stack {
+  display: grid;
+  gap: clamp(0.68rem, 1.5vw, 0.95rem);
+  margin-block-start: clamp(0.1rem, 1vw, 0.35rem);
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-section {
+  gap: 0.72rem;
+  border-color: rgba(196, 222, 216, 0.54);
+  background:
+    radial-gradient(360px circle at 8% 0%, rgba(42, 161, 146, 0.058), transparent 48%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(249, 252, 251, 0.72));
+  box-shadow:
+    0 12px 34px rgba(7, 48, 44, 0.052),
+    0 1px 0 rgba(255, 255, 255, 0.78) inset;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-section__header {
+  gap: 0.32rem;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-section__header h2 {
+  font-size: clamp(1.02rem, 1.8vw, 1.26rem);
+  letter-spacing: -0.02em;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-note {
+  border-radius: clamp(0.95rem, 2vw, 1.25rem);
+  box-shadow:
+    0 10px 24px rgba(7, 48, 44, 0.045),
+    0 1px 0 rgba(255, 255, 255, 0.72) inset;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-note--safety {
+  border-color: rgba(196, 222, 216, 0.48);
+  background: rgba(249, 252, 251, 0.74);
+  color: var(--dm-ink-500, #5c6b6b);
+  font-size: 0.78rem;
+  font-weight: 580;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-verification-copy {
+  max-inline-size: 60rem;
+  color: var(--dm-ink-600, #45514f);
+  font-size: 0.88rem;
+  line-height: 1.62;
+}
+
+.dm2026-profile-footer-stack .dm2026-profile-license-card {
+  margin-block-start: 0.72rem;
+}
+
+@media (max-width: 42rem) {
+  .dm2026-profile-footer-stack {
+    gap: 0.62rem;
+  }
+
+  .dm2026-profile-footer-stack .dm2026-profile-section {
+    padding: 0.78rem;
+  }
+
+  .dm2026-profile-footer-stack .dm2026-profile-section__header h2 {
+    font-size: 1rem;
+  }
+
+  .dm2026-profile-footer-stack .dm2026-profile-note--safety {
+    font-size: 0.75rem;
+  }
+}

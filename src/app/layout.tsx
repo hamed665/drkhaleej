@@ -11,6 +11,7 @@ import "@/styles/dm2026-mobile-chrome.css";
 import "@/styles/dm2026-public-profile.css";
 import "@/styles/dm2026-public-hero.css";
 import "@/styles/dm2026-public-contact-location.css";
+import "@/styles/dm2026-public-section-hierarchy.css";
 
 export const metadata: Metadata = defaultMetadata;
 

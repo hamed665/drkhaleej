@@ -251,38 +251,40 @@ export function PublicCenterDetail({ locale, center }: PublicCenterDetailProps) 
         </PublicCenterDetailSection>
       ) : null}
 
-      {showCallbackRequest ? (
-        <PublicCenterDetailSection title={copy.contactTitle}>
-          <PublicCallbackRequestForm
-            locale={locale}
-            countryCode={center.defaultCountry}
-            centerId={center.id}
-            centerLocationId={null}
-            doctorId={null}
-            doctorPracticeLocationId={null}
-            variant="center"
-          />
-        </PublicCenterDetailSection>
-      ) : null}
+      <div className="dm2026-profile-footer-stack">
+        {showCallbackRequest ? (
+          <PublicCenterDetailSection title={copy.contactTitle}>
+            <PublicCallbackRequestForm
+              locale={locale}
+              countryCode={center.defaultCountry}
+              centerId={center.id}
+              centerLocationId={null}
+              doctorId={null}
+              doctorPracticeLocationId={null}
+              variant="center"
+            />
+          </PublicCenterDetailSection>
+        ) : null}
 
-      {showSafeContactFallback ? (
-        <p className="dm2026-profile-note dm2026-profile-note--contact">{copy.contactUnavailable}</p>
-      ) : null}
+        {showSafeContactFallback ? (
+          <p className="dm2026-profile-note dm2026-profile-note--contact">{copy.contactUnavailable}</p>
+        ) : null}
 
-      {showVerification ? (
-        <PublicCenterDetailSection title={copy.verificationTitle}>
-          {center.verificationStatus === 'verified' ? (
-            <p className="dm2026-profile-verification-copy">{copy.verificationVerified}</p>
-          ) : null}
-          {center.licenseInfo ? (
-            <div className={center.verificationStatus === 'verified' ? 'dm2026-profile-license-card' : undefined}>
-              <PublicLicenseInfoCard locale={locale} licenseInfo={center.licenseInfo} variant="center" />
-            </div>
-          ) : null}
-        </PublicCenterDetailSection>
-      ) : null}
+        {showVerification ? (
+          <PublicCenterDetailSection title={copy.verificationTitle}>
+            {center.verificationStatus === 'verified' ? (
+              <p className="dm2026-profile-verification-copy">{copy.verificationVerified}</p>
+            ) : null}
+            {center.licenseInfo ? (
+              <div className={center.verificationStatus === 'verified' ? 'dm2026-profile-license-card' : undefined}>
+                <PublicLicenseInfoCard locale={locale} licenseInfo={center.licenseInfo} variant="center" />
+              </div>
+            ) : null}
+          </PublicCenterDetailSection>
+        ) : null}
 
-      <p className="dm2026-profile-note dm2026-profile-note--safety">{copy.disclaimerBody}</p>
+        <p className="dm2026-profile-note dm2026-profile-note--safety">{copy.disclaimerBody}</p>
+      </div>
     </div>
   );
 }
