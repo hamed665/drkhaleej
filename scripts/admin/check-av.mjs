@@ -24,13 +24,16 @@ const pagePath = 'src/app/admin/active-centers/page.tsx';
 const page = readFile(pagePath);
 for (const token of [
   'listAdminActiveCenters()',
-  'READ_ONLY_ACTIVE_PROVIDER_VIEW',
-  'Read-only view for centers that have left the draft workflow.',
-  'read-only operational visibility',
+  'ACTIVE_PROVIDER_OPERATIONS_VIEW',
+  'Operational view for centers that have left the draft workflow.',
+  'operational visibility and narrow public contact corrections',
   'English public profile',
   'Arabic public profile',
   'Back to draft centers',
   'View public state readiness',
+  'View public action gates',
+  'Edit public contact info',
+  'href={`/admin/active-centers/${center.id}/edit-contact`}',
   'href={`/admin/active-centers/${center.id}`}',
 ]) {
   mustHave(page, token, pagePath);
