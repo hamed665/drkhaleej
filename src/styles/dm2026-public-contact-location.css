@@ -1,0 +1,136 @@
+/* PR 703: public contact and location experience. CSS-only polish for reviewed public profile facts. */
+.dm2026-profile-grid--locations {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
+.dm2026-profile-location-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  gap: 0.82rem;
+  padding: clamp(0.95rem, 2vw, 1.2rem);
+}
+
+.dm2026-profile-location-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(320px circle at 12% 0%, rgba(42, 161, 146, 0.1), transparent 48%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(243, 251, 249, 0.66));
+  pointer-events: none;
+}
+
+.dm2026-profile-location-card--primary {
+  border-color: rgba(42, 161, 146, 0.34);
+  box-shadow:
+    0 16px 38px rgba(7, 48, 44, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.82) inset;
+}
+
+.dm2026-profile-location-card__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.72rem;
+  align-items: start;
+}
+
+.dm2026-profile-location-card__header h3 {
+  margin: 0;
+  max-inline-size: 28rem;
+}
+
+.dm2026-profile-location-card__badge {
+  inline-size: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(42, 161, 146, 0.24);
+  border-radius: var(--dm-radius-pill, 999px);
+  background: rgba(236, 250, 247, 0.9);
+  color: var(--dm-color-brand-strong, #0b6f63);
+  font-size: 0.72rem;
+  font-weight: 820;
+  line-height: 1;
+  padding: 0.42rem 0.62rem;
+  white-space: nowrap;
+}
+
+.dm2026-profile-location-card__geo {
+  margin-block-start: 0.32rem;
+}
+
+.dm2026-profile-location-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.62rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-start: 0.1rem;
+}
+
+.dm2026-profile-location-card__directions {
+  min-block-size: 2.42rem;
+  background:
+    linear-gradient(135deg, rgba(14, 110, 100, 0.98), rgba(42, 161, 146, 0.94));
+  border-color: rgba(14, 110, 100, 0.2);
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(7, 94, 84, 0.18);
+}
+
+.dm2026-profile-location-card__directions:hover,
+.dm2026-profile-location-card__directions:focus-visible {
+  background:
+    linear-gradient(135deg, rgba(7, 94, 84, 0.98), rgba(14, 110, 100, 0.94));
+  border-color: rgba(7, 94, 84, 0.3);
+  color: #fff;
+}
+
+.dm2026-profile-location-card__meta {
+  color: var(--dm-ink-500, #5c6b6b);
+  font-size: 0.8rem;
+  line-height: 1.52;
+}
+
+.dm2026-profile-note--contact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.58rem;
+}
+
+.dm2026-profile-note--contact::after {
+  content: '';
+  flex: 0 0 0.52rem;
+  inline-size: 0.52rem;
+  block-size: 0.52rem;
+  margin-block-start: 0.43rem;
+  border-radius: 999px;
+  background: rgba(201, 162, 75, 0.72);
+  box-shadow: 0 0 0 0.24rem rgba(201, 162, 75, 0.12);
+  order: -1;
+}
+
+@media (max-width: 42rem) {
+  .dm2026-profile-location-card {
+    gap: 0.68rem;
+    padding: 0.82rem;
+  }
+
+  .dm2026-profile-location-card__header {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .dm2026-profile-location-card__badge {
+    font-size: 0.68rem;
+  }
+
+  .dm2026-profile-location-card__footer {
+    align-items: stretch;
+  }
+
+  .dm2026-profile-location-card__directions {
+    inline-size: 100%;
+  }
+}
