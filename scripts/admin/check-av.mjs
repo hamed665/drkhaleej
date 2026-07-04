@@ -2,6 +2,7 @@ import './check-active-center-public-state-action-guard.mjs';
 import './check-active-center-contact-edit-guard.mjs';
 import './check-active-center-contact-edit-smoke-checklist.mjs';
 import './check-active-center-basic-profile-guard.mjs';
+import './check-active-center-basic-profile-checklist.mjs';
 
 import fs from 'node:fs';
 import path from 'node:path';
