@@ -17,6 +17,7 @@ export type AdminAuditAction =
   | "active_center.public_profile_deactivated"
   | "active_center.public_contact_actions_prepared"
   | "active_center.basic_profile_updated"
+  | "active_center.primary_location_updated"
   | "subscription.assigned"
   | "subscription_plan_catalog.synced"
   | "commercial_addon.assigned"
