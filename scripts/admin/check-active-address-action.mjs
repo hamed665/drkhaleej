@@ -44,8 +44,8 @@ const auditPath = 'src/server/admin/audit-log.ts';
 const audit = readFile(auditPath);
 mustHave(audit, '| "active_center.primary_location_updated"', auditPath);
 
-const avPath = 'scripts/admin/check-av.mjs';
-const av = readFile(avPath);
-mustHave(av, "import './check-active-address-action.mjs';", avPath);
+const locationGuardPath = 'scripts/admin/check-active-locations-view.mjs';
+const locationGuard = readFile(locationGuardPath);
+mustHave(locationGuard, "import './check-active-address-action.mjs';", locationGuardPath);
 
 console.log('Active address action checks passed.');
