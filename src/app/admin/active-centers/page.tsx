@@ -111,6 +111,9 @@ export default async function AdminActiveCentersPage() {
                         <Link href={`/admin/active-centers/${center.id}/gates`} className="font-semibold text-cyan-700 hover:text-cyan-900">
                           View public action gates
                         </Link>
+                        <Link href={`/admin/active-centers/${center.id}/locations`} className="font-semibold text-cyan-700 hover:text-cyan-900">
+                          View active locations
+                        </Link>
                         <Link href={`/admin/active-centers/${center.id}/edit-profile`} className="font-semibold text-cyan-700 hover:text-cyan-900">
                           Edit basic profile info
                         </Link>
