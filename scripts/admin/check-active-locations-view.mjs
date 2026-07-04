@@ -35,6 +35,7 @@ for (const token of [
   'getAdminActiveCenterLocations(centerId)',
   'Read-only view for active center location records.',
   'Open map URL',
+  'Edit primary location',
 ]) {
   mustHave(page, token, pagePath);
 }

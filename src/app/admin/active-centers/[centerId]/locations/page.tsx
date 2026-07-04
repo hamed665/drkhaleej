@@ -126,6 +126,9 @@ export default async function AdminActiveCenterLocationsPage({ params }: PagePro
           <Link href={`/admin/active-centers/${center.id}`} className="text-cyan-700 hover:text-cyan-900">
             Public state readiness
           </Link>
+          <Link href={`/admin/active-centers/${center.id}/locations/edit-primary`} className="text-cyan-700 hover:text-cyan-900">
+            Edit primary location
+          </Link>
           <Link href={`/admin/active-centers/${center.id}/edit-contact`} className="text-cyan-700 hover:text-cyan-900">
             Edit public contact info
           </Link>
