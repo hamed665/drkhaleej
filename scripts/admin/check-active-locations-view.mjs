@@ -1,4 +1,5 @@
 import './check-active-address-action.mjs';
+import './check-active-address-page.mjs';
 
 import fs from 'node:fs';
 import path from 'node:path';
