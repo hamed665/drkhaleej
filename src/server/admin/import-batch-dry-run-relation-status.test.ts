@@ -10,7 +10,7 @@ function localSuggestionRow(input: {
   relationStatus?: string | null;
   requiresReview?: boolean;
 }): ImportBatchDryRunLocalSuggestionRow {
-  return {
+  const row: ImportBatchDryRunLocalSuggestionRow = {
     sourceFamily: "doctor",
     sourceKey: "doctor-source",
     sourceArea: "Al Khuwair",
@@ -25,9 +25,16 @@ function localSuggestionRow(input: {
     lastCheckedAt: "2026-07-01",
     confidence: "high",
     publicVisible: true,
-    relationStatus: input.relationStatus,
-    requiresReview: input.requiresReview,
   };
+
+  if (input.relationStatus !== undefined) {
+    row.relationStatus = input.relationStatus;
+  }
+  if (input.requiresReview !== undefined) {
+    row.requiresReview = input.requiresReview;
+  }
+
+  return row;
 }
 
 describe("buildImportBatchDryRunLocalSuggestionSummary relation status", () => {
