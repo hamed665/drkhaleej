@@ -97,6 +97,11 @@ function normalizeFamily(value: string | null): ImportBatchDryRunLocalSuggestion
   return familyAliases[value.trim().toLowerCase()] ?? null;
 }
 
+function dryRunFamilyValue(value: string | null): ImportBatchDryRunLocalSuggestionFamily {
+  const normalized = normalizeFamily(value);
+  return (normalized ?? value ?? "unsupported") as ImportBatchDryRunLocalSuggestionFamily;
+}
+
 function shouldIncludeCandidate(candidate: ImportBatchDryRunTransformedCandidate): boolean {
   const status = candidate.candidateStatus?.trim().toLowerCase();
   return status !== "rejected" && status !== "removed" && status !== "held";
@@ -214,7 +219,8 @@ function localSourceFamily(row: JsonRecord, fallbackFamily: ImportBatchDryRunLoc
 }
 
 function targetFamily(row: JsonRecord): ImportBatchDryRunLocalSuggestionFamily {
-  return normalizeFamily(stringValue(row, "targetFamily", "target_family", "entityType", "entity_type", "family")) ?? "hospital";
+  const rawFamily = stringValue(row, "targetFamily", "target_family", "entityType", "entity_type", "family");
+  return dryRunFamilyValue(rawFamily);
 }
 
 function toLocalSuggestionRow(
