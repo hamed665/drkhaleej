@@ -12,6 +12,7 @@ function mustContain(source, token, label) {
 }
 
 const bridgeSource = await readText('src/server/admin/import-first-batch-dry-run-bridge.ts');
+const adapterSource = await readText('src/server/admin/import-batch-dry-run-payload-adapter.ts');
 const reportSource = await readText('src/server/admin/import-batch-dry-run-report.ts');
 const selectionSource = await readText('src/server/admin/import-first-batch-selection.ts');
 const packageSource = await readText('package.json');
@@ -22,9 +23,14 @@ for (const token of [
   'buildImportBatchDryRunReport',
   'buildImportBatchDryRunHospitalRelationSummary',
   'buildImportBatchDryRunLocalSuggestionSummary',
+  'buildImportBatchDryRunPayloadExtraction',
+  'ImportBatchDryRunTransformedCandidate',
+  'transformedCandidates',
+  'payloadExtraction',
   'validateFirstBatchSelection',
   'defaultChecks',
   'selectedCandidateIds',
+  'uniqueStrings',
   'defaultCandidateHospitalKeys',
   'defaultLocalSuggestionCandidateKeys',
   'mergeLocalSuggestionCandidateKeys',
@@ -52,6 +58,41 @@ for (const token of [
   'beauty: []',
 ]) {
   mustContain(bridgeSource, token, 'first batch local suggestion candidate key map');
+}
+
+for (const token of [
+  'ImportBatchDryRunTransformedCandidate',
+  'ImportBatchDryRunPayloadExtraction',
+  'candidatePayload: unknown',
+  'buildImportBatchDryRunPayloadExtraction',
+  'mergeCandidateKeys',
+  'hospitalDoctorRows',
+  'localSuggestionRows',
+  'toHospitalRelationRow',
+  'toLocalSuggestionRow',
+  'relations',
+  'doctors',
+  'localSuggestions',
+  'local_suggestions',
+  'nearby',
+  'branchVerified',
+  'branch_verified',
+  'publicVisible',
+  'public_visible',
+  'sourceUrl',
+  'lastCheckedAt',
+  'last_verified_date',
+  'confidence',
+  'doctorName',
+  'doctor_name_en',
+  'targetFamily',
+  'target_key',
+  'targetArea',
+  'targetGovernorate',
+  'diagnostic_imaging',
+  'beauty_salon',
+]) {
+  mustContain(adapterSource, token, 'dry-run payload adapter');
 }
 
 for (const token of [
