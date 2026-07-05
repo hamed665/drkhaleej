@@ -22,3 +22,5 @@ jobs:
         run: node scripts/import/check-first-batch-dry-run-runner.mjs
       - name: Validate first-batch CSV transformer
         run: node scripts/import/check-first-batch-csv-transformer.mjs
+      - name: Validate first-batch dry-run report review gate
+        run: node scripts/import/check-first-batch-dry-run-report-review.mjs
