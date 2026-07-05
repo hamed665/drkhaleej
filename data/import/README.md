@@ -26,8 +26,10 @@ tmp/first-batch.dry-run-report.json
 Before any real dry-run PR is reviewed, run:
 
 ```bash
+node scripts/import/check-first-batch-private-data-guard.mjs
 node scripts/import/check-first-batch-dry-run-runner.mjs
 node scripts/import/check-first-batch-csv-transformer.mjs
+node scripts/import/check-first-batch-dry-run-report-review.mjs
 ```
 
 Then transform and run the reviewed CSV:
@@ -43,4 +45,12 @@ node scripts/import/run-first-batch-dry-run.mjs \
   --output ./tmp/first-batch.dry-run-report.json
 ```
 
-A real import write path must not be built until a reviewed dry-run report returns `decision: go`.
+Then validate the generated report before review:
+
+```bash
+node scripts/import/validate-first-batch-dry-run-report.mjs \
+  --input ./tmp/first-batch.dry-run-report.json \
+  --expect go
+```
+
+A real import write path must not be built until a reviewed dry-run report returns `decision: go` and passes the report validator with `--expect go`.
