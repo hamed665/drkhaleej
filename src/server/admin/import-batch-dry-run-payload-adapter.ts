@@ -158,6 +158,10 @@ function geoRecord(payload: JsonRecord): JsonRecord {
   return record(payload, "geo");
 }
 
+function rowSourceName(row: JsonRecord): string | null {
+  return stringValue(sourceRecord(row), "sourceName", "source_name");
+}
+
 function rowSourceUrl(row: JsonRecord): string | null {
   return stringValue(sourceRecord(row), "sourceUrl", "source_url", "url");
 }
@@ -242,6 +246,7 @@ function toLocalSuggestionRow(
     targetArea: stringValue(row, "targetArea", "target_area", "area"),
     targetGovernorate: stringValue(row, "targetGovernorate", "target_governorate", "governorate"),
     targetName: stringValue(row, "targetName", "target_name", "displayName", "display_name", "name", "nameEn"),
+    sourceName: rowSourceName(row),
     sourceUrl: rowSourceUrl(row),
     lastCheckedAt: rowLastCheckedAt(row),
     confidence: rowConfidence(row),

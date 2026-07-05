@@ -91,6 +91,7 @@ export type ImportBatchDryRunLocalSuggestionBlocker = {
   targetArea: string | null;
   targetGovernorate: string | null;
   targetName: string | null;
+  sourceName: string | null;
   sourceUrl: string | null;
   notes: string | null;
 };
@@ -119,6 +120,7 @@ export type ImportBatchDryRunLocalSuggestionRow = {
   targetArea: string | null;
   targetGovernorate: string | null;
   targetName: string | null;
+  sourceName?: string | null;
   sourceUrl: string | null;
   lastCheckedAt: string | null;
   confidence: string | null;
@@ -309,6 +311,10 @@ function needsLocalSuggestionReview(row: ImportBatchDryRunLocalSuggestionRow): b
   return row.requiresReview === true || (relationStatus !== null && relationStatus !== "active" && relationStatus !== "approved");
 }
 
+function hasLocalSuggestionSourceAnchor(row: ImportBatchDryRunLocalSuggestionRow): boolean {
+  return cleanText(row.sourceName) !== null || cleanText(row.sourceUrl) !== null;
+}
+
 function hospitalRelationBlocker(
   row: ImportBatchDryRunHospitalRelationRow,
   reason: ImportBatchDryRunHospitalRelationBlockerReason,
@@ -340,6 +346,7 @@ function localSuggestionBlocker(
     targetArea: cleanText(row.targetArea),
     targetGovernorate: cleanText(row.targetGovernorate),
     targetName: cleanText(row.targetName),
+    sourceName: cleanText(row.sourceName),
     sourceUrl: cleanText(row.sourceUrl),
     notes,
   };
@@ -416,8 +423,8 @@ function localSuggestionBlockers(
   ) {
     blockers.push(localSuggestionBlocker(row, "location_mismatch", "Source and target must share the same area and governorate before public local suggestion."));
   }
-  if (cleanText(row.sourceUrl) === null) {
-    blockers.push(localSuggestionBlocker(row, "source_missing", "Local suggestion source URL is required before public display."));
+  if (!hasLocalSuggestionSourceAnchor(row)) {
+    blockers.push(localSuggestionBlocker(row, "source_missing", "Local suggestion source name or URL is required before public display."));
   }
   if (cleanText(row.lastCheckedAt) === null) {
     blockers.push(localSuggestionBlocker(row, "last_checked_missing", "Local suggestion last checked date is required before public display."));
