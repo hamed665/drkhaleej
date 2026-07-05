@@ -43,6 +43,24 @@ for (const token of [
 }
 
 for (const token of [
+  'export type PublicImportHospitalRelatedDoctor',
+  'doctors: PublicImportHospitalRelatedDoctor[];',
+  'const relatedDoctorLimit = 24;',
+  'function relatedDoctorRows(payload: JsonRecord): JsonRecord[]',
+  'function approvedRelatedDoctor(row: JsonRecord): PublicImportHospitalRelatedDoctor | null',
+  'const branchVerified = booleanValue(row, "branchVerified") ?? booleanValue(row, "branch_verified")',
+  'const publicVisible = booleanValue(row, "publicVisible") ?? booleanValue(row, "public_visible")',
+  'if (branchVerified !== true) return null;',
+  'if (publicVisible !== true) return null;',
+  'if (relationStatus !== null && relationStatus !== "active" && relationStatus !== "approved") return null;',
+  'if (confidence !== null && confidence !== "high" && confidence !== "medium") return null;',
+  'if (!hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)) return null;',
+  'doctors: approvedRelatedDoctors(payload),',
+]) {
+  assertIncludes(guardSource, token, `${guardPath} must preserve guarded related-doctor token ${token}`);
+}
+
+for (const token of [
   'robots_policy',
   'canonical_path',
   'import_entity_candidate_id',
