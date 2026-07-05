@@ -22,6 +22,21 @@ type PublicImportHospitalRelatedDoctor = {
   confidence: string | null;
 };
 
+type PublicImportHospitalLocalSuggestionFamily = "doctor" | "pharmacy" | "hospital" | "radiology" | "dentistry" | "beauty";
+
+type PublicImportHospitalLocalSuggestion = {
+  family: PublicImportHospitalLocalSuggestionFamily;
+  name: string;
+  nameAr: string | null;
+  slug: string | null;
+  area: string;
+  governorate: string;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  lastCheckedAt: string | null;
+  confidence: "high" | "medium";
+};
+
 type PublicImportHospitalProfile = {
   family: "hospitals";
   canonicalPath: string;
@@ -35,6 +50,7 @@ type PublicImportHospitalProfile = {
   departments: string[];
   languages: string[];
   doctors: PublicImportHospitalRelatedDoctor[];
+  localSuggestions: PublicImportHospitalLocalSuggestion[];
   phoneE164: string | null;
   whatsappE164: string | null;
   email: string | null;
@@ -69,6 +85,9 @@ type RouteCopy = {
   doctorsTitle: string;
   doctorsDescription: string;
   doctorProfileLabel: string;
+  localSuggestionsTitle: string;
+  localSuggestionsDescription: string;
+  localSuggestionSourceLabel: string;
   contactTitle: string;
   sourceLabel: string;
   relatedTitle: string;
@@ -96,6 +115,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     doctorsTitle: "Doctors connected to this hospital",
     doctorsDescription: "Public doctor links appear only when the hospital relationship has reviewed source evidence.",
     doctorProfileLabel: "View doctor profile",
+    localSuggestionsTitle: "Nearby care in the same area",
+    localSuggestionsDescription: "These links appear only when the nearby relationship has reviewed source evidence and a matching area.",
+    localSuggestionSourceLabel: "Source checked",
     contactTitle: "Contact and directions",
     sourceLabel: "Source",
     relatedTitle: "Explore related care options",
@@ -115,6 +137,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     doctorsTitle: "أطباء مرتبطون بهذا المستشفى",
     doctorsDescription: "تظهر روابط الأطباء العامة فقط عند وجود دليل مصدر للعلاقة مع المستشفى.",
     doctorProfileLabel: "عرض ملف الطبيب",
+    localSuggestionsTitle: "رعاية قريبة في نفس المنطقة",
+    localSuggestionsDescription: "تظهر هذه الروابط فقط عند وجود دليل مصدر ومطابقة واضحة للمنطقة.",
+    localSuggestionSourceLabel: "تم التحقق من المصدر",
     contactTitle: "التواصل والاتجاهات",
     sourceLabel: "المصدر",
     relatedTitle: "استكشف خيارات رعاية مرتبطة",
@@ -180,6 +205,32 @@ function doctorDisplayName(locale: SupportedLocale, doctor: PublicImportHospital
   return locale === "ar" && doctor.nameAr ? doctor.nameAr : doctor.name;
 }
 
+function localSuggestionDisplayName(locale: SupportedLocale, suggestion: PublicImportHospitalLocalSuggestion): string {
+  return locale === "ar" && suggestion.nameAr ? suggestion.nameAr : suggestion.name;
+}
+
+function localSuggestionFamilyLabel(locale: SupportedLocale, family: PublicImportHospitalLocalSuggestionFamily): string {
+  const labels: Record<SupportedLocale, Record<PublicImportHospitalLocalSuggestionFamily, string>> = {
+    en: {
+      doctor: "Doctor",
+      pharmacy: "Pharmacy",
+      hospital: "Hospital",
+      radiology: "Radiology",
+      dentistry: "Dentistry",
+      beauty: "Beauty",
+    },
+    ar: {
+      doctor: "طبيب",
+      pharmacy: "صيدلية",
+      hospital: "مستشفى",
+      radiology: "أشعة",
+      dentistry: "أسنان",
+      beauty: "تجميل",
+    },
+  };
+  return labels[locale][family];
+}
+
 function localArea(parts: Array<string | null>): string {
   return parts.filter(Boolean).join(", ") || "Oman";
 }
@@ -202,6 +253,13 @@ function publicHospitalsHref(locale: SupportedLocale, country: string): string {
 
 function publicDoctorHref(locale: SupportedLocale, country: string, doctor: PublicImportHospitalRelatedDoctor): string {
   return doctor.slug ? `/${locale}/${country}/doctor/${doctor.slug}` : publicSearchHref(locale, country, doctor.name);
+}
+
+function publicLocalSuggestionHref(locale: SupportedLocale, country: string, suggestion: PublicImportHospitalLocalSuggestion): string {
+  if (suggestion.slug && suggestion.family === "doctor") return `/${locale}/${country}/doctor/${suggestion.slug}`;
+  if (suggestion.slug && suggestion.family === "pharmacy") return `/${locale}/${country}/pharmacies/${suggestion.slug}`;
+  if (suggestion.slug && suggestion.family === "hospital") return `/${locale}/${country}/hospitals/${suggestion.slug}`;
+  return publicSearchHref(locale, country, `${suggestion.name} ${suggestion.area}`);
 }
 
 function uniqueText(values: Array<string | null | undefined>): string[] {
@@ -418,6 +476,34 @@ export default function PublicImportedHospitalProfilePage({
                       <Link href={publicDoctorHref(locale, country, doctor)} className="mt-3 inline-flex text-xs font-semibold text-slate-700 underline-offset-4 hover:underline">
                         {copy.doctorProfileLabel}
                       </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+
+          {profile.localSuggestions.length > 0 ? (
+            <div className="dm2026-card-soft mt-4">
+              <h2>{copy.localSuggestionsTitle}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{copy.localSuggestionsDescription}</p>
+              <ul className="mt-3 grid gap-3 md:grid-cols-2" role="list">
+                {profile.localSuggestions.map((suggestion) => {
+                  const suggestionName = localSuggestionDisplayName(locale, suggestion);
+                  return (
+                    <li key={`${suggestion.family}:${suggestion.slug ?? suggestion.name}`} className="rounded-2xl border border-slate-200 bg-white p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{localSuggestionFamilyLabel(locale, suggestion.family)}</p>
+                      <h3 className="mt-1">
+                        <Link href={publicLocalSuggestionHref(locale, country, suggestion)} className="text-sm font-semibold text-slate-950 underline-offset-4 hover:underline">
+                          {suggestionName}
+                        </Link>
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        {[suggestion.area, suggestion.governorate].filter(Boolean).join(" · ")}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-slate-500">
+                        {copy.localSuggestionSourceLabel}: {suggestion.lastCheckedAt}
+                      </p>
                     </li>
                   );
                 })}
