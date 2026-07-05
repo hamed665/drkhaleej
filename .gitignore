@@ -146,3 +146,9 @@ vite.config.ts.timestamp-*
 data/seo/*.json
 !data/seo/.gitkeep
 !data/seo/README.md
+
+# First-batch import private data and generated local dry-run outputs
+data/import/private/
+tmp/first-batch*.json
+tmp/first-batch*.csv
+.tmp/import-first-batch-*
