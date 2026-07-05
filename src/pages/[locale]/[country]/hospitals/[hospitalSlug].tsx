@@ -10,6 +10,18 @@ import {
 import { isSupportedCountry, isSupportedLocale, localeDirection, type SupportedLocale } from "@/lib/i18n/config";
 import { siteConfig } from "@/lib/seo/site";
 
+type PublicImportHospitalRelatedDoctor = {
+  name: string;
+  nameAr: string | null;
+  slug: string | null;
+  specialty: string | null;
+  department: string | null;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  lastCheckedAt: string | null;
+  confidence: string | null;
+};
+
 type PublicImportHospitalProfile = {
   family: "hospitals";
   canonicalPath: string;
@@ -22,6 +34,7 @@ type PublicImportHospitalProfile = {
   services: string[];
   departments: string[];
   languages: string[];
+  doctors: PublicImportHospitalRelatedDoctor[];
   phoneE164: string | null;
   whatsappE164: string | null;
   email: string | null;
@@ -51,6 +64,9 @@ type RouteCopy = {
   badge: string;
   overviewTitle: string;
   servicesTitle: string;
+  doctorsTitle: string;
+  doctorsDescription: string;
+  doctorProfileLabel: string;
   contactTitle: string;
   sourceLabel: string;
   relatedTitle: string;
@@ -73,6 +89,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     badge: "Public hospital profile",
     overviewTitle: "Profile overview",
     servicesTitle: "Hospital services",
+    doctorsTitle: "Doctors connected to this hospital",
+    doctorsDescription: "Public doctor links appear only when the hospital relationship has reviewed source evidence.",
+    doctorProfileLabel: "View doctor profile",
     contactTitle: "Contact and directions",
     sourceLabel: "Source",
     relatedTitle: "Explore related care options",
@@ -87,6 +106,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     badge: "ملف مستشفى عام",
     overviewTitle: "نظرة عامة على الملف",
     servicesTitle: "خدمات المستشفى",
+    doctorsTitle: "أطباء مرتبطون بهذا المستشفى",
+    doctorsDescription: "تظهر روابط الأطباء العامة فقط عند وجود دليل مصدر للعلاقة مع المستشفى.",
+    doctorProfileLabel: "عرض ملف الطبيب",
     contactTitle: "التواصل والاتجاهات",
     sourceLabel: "المصدر",
     relatedTitle: "استكشف خيارات رعاية مرتبطة",
@@ -148,6 +170,10 @@ function displayName(locale: SupportedLocale, name: string, nameAr: string | nul
   return locale === "ar" && nameAr ? nameAr : name;
 }
 
+function doctorDisplayName(locale: SupportedLocale, doctor: PublicImportHospitalRelatedDoctor): string {
+  return locale === "ar" && doctor.nameAr ? doctor.nameAr : doctor.name;
+}
+
 function localArea(parts: Array<string | null>): string {
   return parts.filter(Boolean).join(", ") || "Oman";
 }
@@ -162,6 +188,10 @@ function publicSearchHref(locale: SupportedLocale, country: string, query: strin
 
 function publicHospitalsHref(locale: SupportedLocale, country: string): string {
   return `/${locale}/${country}/hospitals`;
+}
+
+function publicDoctorHref(locale: SupportedLocale, country: string, doctor: PublicImportHospitalRelatedDoctor): string {
+  return doctor.slug ? `/${locale}/${country}/doctor/${doctor.slug}` : publicSearchHref(locale, country, doctor.name);
 }
 
 function uniqueText(values: Array<string | null | undefined>): string[] {
@@ -332,6 +362,35 @@ export default function PublicImportedHospitalProfilePage({
                   </Link>
                 ))}
               </div>
+            </div>
+          ) : null}
+
+          {profile.doctors.length > 0 ? (
+            <div className="dm2026-card-soft mt-4">
+              <h2>{copy.doctorsTitle}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{copy.doctorsDescription}</p>
+              <ul className="mt-3 grid gap-3 md:grid-cols-2" role="list">
+                {profile.doctors.map((doctor) => {
+                  const doctorName = doctorDisplayName(locale, doctor);
+                  return (
+                    <li key={doctor.slug ?? doctor.name} className="rounded-2xl border border-slate-200 bg-white p-4">
+                      <h3>
+                        <Link href={publicDoctorHref(locale, country, doctor)} className="text-sm font-semibold text-slate-950 underline-offset-4 hover:underline">
+                          {doctorName}
+                        </Link>
+                      </h3>
+                      {doctor.specialty || doctor.department ? (
+                        <p className="mt-2 text-sm leading-6 text-slate-600">
+                          {[doctor.specialty, doctor.department].filter(Boolean).join(" · ")}
+                        </p>
+                      ) : null}
+                      <Link href={publicDoctorHref(locale, country, doctor)} className="mt-3 inline-flex text-xs font-semibold text-slate-700 underline-offset-4 hover:underline">
+                        {copy.doctorProfileLabel}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           ) : null}
 
