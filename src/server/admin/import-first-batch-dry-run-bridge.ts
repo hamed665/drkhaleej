@@ -15,6 +15,10 @@ import {
   type ImportBatchDryRunSitemapSummary,
 } from "./import-batch-dry-run-report";
 import {
+  buildImportBatchDryRunPayloadExtraction,
+  type ImportBatchDryRunTransformedCandidate,
+} from "./import-batch-dry-run-payload-adapter";
+import {
   firstBatchFamilies,
   firstBatchCaps,
   validateFirstBatchSelection,
@@ -29,6 +33,7 @@ export type BuildFirstBatchDryRunReportInput = {
   commitSha?: string | null;
   checks?: readonly ImportBatchDryRunCheck[];
   sitemap?: ImportBatchDryRunSitemapSummary;
+  transformedCandidates?: readonly ImportBatchDryRunTransformedCandidate[];
   hospitalRelationRows?: readonly ImportBatchDryRunHospitalRelationRow[];
   candidateHospitalKeys?: readonly string[];
   localSuggestionRows?: readonly ImportBatchDryRunLocalSuggestionRow[];
@@ -46,6 +51,15 @@ function toDryRunFamily(family: ImportFirstBatchFamily): ImportBatchDryRunFamily
 
 function selectedCandidateIds(selection: ImportFirstBatchSelection, family: ImportFirstBatchFamily): string[] {
   return selection.rows.filter((row) => row.family === family && row.qaStatus === "selected").map((row) => row.candidateId);
+}
+
+function uniqueStrings(values: readonly string[]): string[] {
+  const result: string[] = [];
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (trimmed.length > 0 && !result.includes(trimmed)) result.push(trimmed);
+  }
+  return result;
 }
 
 function defaultCandidateHospitalKeys(selection: ImportFirstBatchSelection): readonly string[] {
@@ -146,13 +160,21 @@ export function buildFirstBatchDryRunReport(input: BuildFirstBatchDryRunReportIn
       return [family, buildFamilySummary(input.selection, family, familyBlockers)];
     }),
   ) as Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  const payloadExtraction = buildImportBatchDryRunPayloadExtraction({
+    candidates: input.transformedCandidates ?? [],
+    candidateKeys: mergeLocalSuggestionCandidateKeys(input.selection, input.localSuggestionCandidateKeys),
+  });
   const hospitalRelations = buildImportBatchDryRunHospitalRelationSummary({
-    rows: input.hospitalRelationRows ?? [],
-    candidateHospitalKeys: input.candidateHospitalKeys ?? defaultCandidateHospitalKeys(input.selection),
+    rows: [...payloadExtraction.hospitalRelationRows, ...(input.hospitalRelationRows ?? [])],
+    candidateHospitalKeys: uniqueStrings([
+      ...defaultCandidateHospitalKeys(input.selection),
+      ...payloadExtraction.candidateHospitalKeys,
+      ...(input.candidateHospitalKeys ?? []),
+    ]),
   });
   const localSuggestions = buildImportBatchDryRunLocalSuggestionSummary({
-    rows: input.localSuggestionRows ?? [],
-    candidateKeys: mergeLocalSuggestionCandidateKeys(input.selection, input.localSuggestionCandidateKeys),
+    rows: [...payloadExtraction.localSuggestionRows, ...(input.localSuggestionRows ?? [])],
+    candidateKeys: payloadExtraction.localSuggestionCandidateKeys,
   });
 
   return buildImportBatchDryRunReport({
