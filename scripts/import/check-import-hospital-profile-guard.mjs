@@ -18,6 +18,10 @@ function assertIncludes(source, token, message) {
   assert(source.includes(token), message);
 }
 
+function assertNotIncludes(source, token, message) {
+  assert(!source.includes(token), message);
+}
+
 const guardSource = await readText(guardPath);
 const importSitemapSource = await readText(importSitemapPath);
 const transformContractSource = await readText(transformContractPath);
@@ -63,27 +67,27 @@ for (const token of [
 }
 
 for (const token of [
+  'buildPublicImportLocalSuggestions',
+  'type PublicImportLocalSuggestion',
+  'localSuggestions: PublicImportLocalSuggestion[];',
+  'sourceFamily: "hospital"',
+  'sourceSlug: currentHospitalSlug(path)',
+  'limit: 12',
+  'localSuggestions: buildPublicImportLocalSuggestions({',
+]) {
+  assertIncludes(guardSource, token, `${guardPath} must use shared local-suggestion guard token ${token}`);
+}
+
+for (const forbiddenToken of [
   'export type PublicImportHospitalLocalSuggestionFamily',
   'export type PublicImportHospitalLocalSuggestion',
-  'localSuggestions: PublicImportHospitalLocalSuggestion[];',
-  'const localSuggestionLimit = 12;',
   'localSuggestionFamilyAliases',
-  'diagnostic_imaging',
-  'beauty_salon',
   'function localSuggestionRows(payload: JsonRecord): JsonRecord[]',
-  'recordArray(relations, "localSuggestions")',
-  'recordArray(relations, "local_suggestions")',
-  'recordArray(relations, "nearby")',
   'function approvedLocalSuggestion(',
   'function approvedLocalSuggestions(',
-  'locationKey(sourceArea) !== locationKey(targetArea)',
-  'locationKey(sourceGovernorate) !== locationKey(targetGovernorate)',
-  'publicVisible !== true',
-  'confidence !== "high" && confidence !== "medium"',
-  'family === "hospital" && sourceHospitalSlug !== null && slug === sourceHospitalSlug',
   'localSuggestions: approvedLocalSuggestions(payload, geo, currentHospitalSlug(path)),',
 ]) {
-  assertIncludes(guardSource, token, `${guardPath} must preserve guarded local-suggestion token ${token}`);
+  assertNotIncludes(guardSource, forbiddenToken, `${guardPath} must not keep duplicate local-suggestion token ${forbiddenToken}`);
 }
 
 for (const token of [
