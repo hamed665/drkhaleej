@@ -28,3 +28,5 @@ jobs:
         run: node scripts/import/check-first-batch-dry-run-report-review.mjs
       - name: Validate first-batch write path contract
         run: node scripts/import/check-first-batch-write-path-contract.mjs
+      - name: Validate first-batch publish gate contract
+        run: node scripts/import/check-first-batch-publish-gate-contract.mjs
