@@ -14,6 +14,7 @@ Use this template for the first real dry-run review. This is a review aid, not a
 
 ```bash
 node scripts/import/check-first-batch-private-data-guard.mjs
+node scripts/import/check-first-batch-source-evidence-contract.mjs
 node scripts/import/check-first-batch-dry-run-runner.mjs
 node scripts/import/check-first-batch-csv-transformer.mjs
 node scripts/import/check-first-batch-dry-run-report-review.mjs
@@ -75,7 +76,9 @@ node scripts/import/validate-first-batch-dry-run-report.mjs \
 - Rows with `source_name` only:
 - Rows with `source_url` only:
 - Rows with both source name and URL:
+- Rows missing `source_name` and `source_url`: must be zero
 - Rows missing `last_checked_at`: must be zero
+- Rows with vague source labels such as Google, web, internet, found online, search result, or notes: must be zero
 
 ## Held or removed rows
 
