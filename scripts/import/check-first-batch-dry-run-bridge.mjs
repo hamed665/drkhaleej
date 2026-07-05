@@ -11,6 +11,10 @@ function mustContain(source, token, label) {
   if (!source.includes(token)) throw new Error(`${label} must include ${token}`);
 }
 
+function mustNotContain(source, token, label) {
+  if (source.includes(token)) throw new Error(`${label} must not include ${token}`);
+}
+
 const bridgeSource = await readText('src/server/admin/import-first-batch-dry-run-bridge.ts');
 const adapterSource = await readText('src/server/admin/import-batch-dry-run-payload-adapter.ts');
 const reportSource = await readText('src/server/admin/import-batch-dry-run-report.ts');
@@ -91,9 +95,15 @@ for (const token of [
   'targetGovernorate',
   'diagnostic_imaging',
   'beauty_salon',
+  'dryRunFamilyValue',
+  'const rawFamily = stringValue(row, "targetFamily", "target_family", "entityType", "entity_type", "family");',
+  'return dryRunFamilyValue(rawFamily);',
+  'normalized ?? value ?? "unsupported"',
 ]) {
   mustContain(adapterSource, token, 'dry-run payload adapter');
 }
+
+mustNotContain(adapterSource, '?? "hospital"', 'dry-run payload adapter target family extraction');
 
 for (const token of [
   'canonical_unsafe',
@@ -117,6 +127,7 @@ for (const token of [
   'ImportBatchDryRunHospitalRelationRow',
   'ImportBatchDryRunLocalSuggestionRow',
   'ImportBatchDryRunLocalSuggestionCandidateKeys',
+  'unsupported_family',
 ]) {
   mustContain(reportSource, token, 'dry-run report contract');
 }
