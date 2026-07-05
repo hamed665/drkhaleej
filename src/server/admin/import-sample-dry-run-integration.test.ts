@@ -17,12 +17,17 @@ import {
 type CsvRow = Record<string, string>;
 
 function parseCsv(source: string): CsvRow[] {
-  const [headerLine, ...lines] = source.trim().split(/\r?\n/);
-  if (!headerLine) throw new Error("CSV sample must include a header row.");
+  const lines = source.trim().split(/\r?\n/);
+  const headerLine = lines.shift();
+  if (headerLine === undefined) throw new Error("CSV sample must include a header row.");
   const headers = headerLine.split(",");
   return lines.map((line) => {
     const values = line.split(",");
-    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
+    const row: CsvRow = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] ?? "";
+    });
+    return row;
   });
 }
 
