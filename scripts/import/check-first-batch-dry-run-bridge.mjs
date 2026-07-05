@@ -83,6 +83,8 @@ for (const token of [
   'branch_verified',
   'publicVisible',
   'public_visible',
+  'sourceName',
+  'source_name',
   'sourceUrl',
   'lastCheckedAt',
   'last_verified_date',
@@ -127,6 +129,9 @@ for (const token of [
   'ImportBatchDryRunHospitalRelationRow',
   'ImportBatchDryRunLocalSuggestionRow',
   'ImportBatchDryRunLocalSuggestionCandidateKeys',
+  'sourceName: string | null;',
+  'hasLocalSuggestionSourceAnchor',
+  'Local suggestion source name or URL is required before public display.',
   'unsupported_family',
 ]) {
   mustContain(reportSource, token, 'dry-run report contract');
