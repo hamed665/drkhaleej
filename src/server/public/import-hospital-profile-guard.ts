@@ -1,6 +1,10 @@
 import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
+import {
+  buildPublicImportLocalSuggestions,
+  type PublicImportLocalSuggestion,
+} from "./import-local-suggestion-guard";
 
 export type PublicImportHospitalRelatedDoctor = {
   name: string;
@@ -12,21 +16,6 @@ export type PublicImportHospitalRelatedDoctor = {
   sourceUrl: string | null;
   lastCheckedAt: string | null;
   confidence: string | null;
-};
-
-export type PublicImportHospitalLocalSuggestionFamily = "doctor" | "pharmacy" | "hospital" | "radiology" | "dentistry" | "beauty";
-
-export type PublicImportHospitalLocalSuggestion = {
-  family: PublicImportHospitalLocalSuggestionFamily;
-  name: string;
-  nameAr: string | null;
-  slug: string | null;
-  area: string;
-  governorate: string;
-  sourceName: string | null;
-  sourceUrl: string | null;
-  lastCheckedAt: string | null;
-  confidence: "high" | "medium";
 };
 
 export type PublicImportHospitalProfile = {
@@ -42,7 +31,7 @@ export type PublicImportHospitalProfile = {
   departments: string[];
   languages: string[];
   doctors: PublicImportHospitalRelatedDoctor[];
-  localSuggestions: PublicImportHospitalLocalSuggestion[];
+  localSuggestions: PublicImportLocalSuggestion[];
   phoneE164: string | null;
   whatsappE164: string | null;
   email: string | null;
@@ -93,31 +82,6 @@ type JsonRecord = Record<string, unknown>;
 
 const lookupLimit = 1000;
 const relatedDoctorLimit = 24;
-const localSuggestionLimit = 12;
-
-const localSuggestionFamilyAliases: Record<string, PublicImportHospitalLocalSuggestionFamily> = {
-  doctor: "doctor",
-  doctors: "doctor",
-  physician: "doctor",
-  physicians: "doctor",
-  pharmacy: "pharmacy",
-  pharmacies: "pharmacy",
-  hospital: "hospital",
-  hospitals: "hospital",
-  radiology: "radiology",
-  radiologies: "radiology",
-  imaging: "radiology",
-  diagnostic_imaging: "radiology",
-  dentistry: "dentistry",
-  dental: "dentistry",
-  dentist: "dentistry",
-  dentists: "dentistry",
-  beauty: "beauty",
-  beauty_center: "beauty",
-  beauty_centers: "beauty",
-  beauty_salon: "beauty",
-  beauty_salons: "beauty",
-};
 
 function client(): ProfileClient {
   return createSupabaseServiceRoleClient() as unknown as ProfileClient;
@@ -146,27 +110,6 @@ function stringValue(value: JsonRecord, key: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function stringValueAny(value: JsonRecord, ...keys: readonly string[]): string | null {
-  for (const key of keys) {
-    const next = stringValue(value, key);
-    if (next !== null) return next;
-  }
-  return null;
-}
-
-function booleanValue(value: JsonRecord, key: string): boolean | null {
-  const next = value[key];
-  return typeof next === "boolean" ? next : null;
-}
-
-function booleanValueAny(value: JsonRecord, ...keys: readonly string[]): boolean | null {
-  for (const key of keys) {
-    const next = booleanValue(value, key);
-    if (next !== null) return next;
-  }
-  return null;
-}
-
 function numberValue(value: JsonRecord, key: string): number | null {
   const next = value[key];
   return typeof next === "number" && Number.isFinite(next) ? next : null;
@@ -191,15 +134,6 @@ function canonicalPath(locale: string, country: string, slug: string): string | 
 
 function currentHospitalSlug(path: string): string | null {
   return safeSlug(path.split("/").filter(Boolean).at(-1) ?? "");
-}
-
-function cleanLocation(value: string | null): string | null {
-  const trimmed = value?.trim();
-  return trimmed && trimmed.length > 0 ? trimmed : null;
-}
-
-function locationKey(value: string): string {
-  return value.trim().toLocaleLowerCase();
 }
 
 function safeQueueRow(row: QueueRow, path: string): boolean {
@@ -249,35 +183,9 @@ function relatedDoctorRows(payload: JsonRecord): JsonRecord[] {
   return [...fromRelations, ...fromRoot];
 }
 
-function localSuggestionRows(payload: JsonRecord): JsonRecord[] {
-  const relations = record(payload, "relations");
-  return [
-    ...recordArray(relations, "localSuggestions"),
-    ...recordArray(relations, "local_suggestions"),
-    ...recordArray(relations, "nearby"),
-    ...recordArray(payload, "localSuggestions"),
-    ...recordArray(payload, "local_suggestions"),
-    ...recordArray(payload, "nearby"),
-  ];
-}
-
 function relatedDoctorSource(row: JsonRecord): JsonRecord {
   const source = record(row, "source");
   return Object.keys(source).length > 0 ? source : row;
-}
-
-function normalizeLocalSuggestionFamily(value: string | null): PublicImportHospitalLocalSuggestionFamily | null {
-  if (value === null) return null;
-  return localSuggestionFamilyAliases[value.trim().toLocaleLowerCase()] ?? null;
-}
-
-function localSuggestionFamily(row: JsonRecord): PublicImportHospitalLocalSuggestionFamily | null {
-  return normalizeLocalSuggestionFamily(stringValueAny(row, "targetFamily", "target_family", "entityType", "entity_type", "family"));
-}
-
-function localSuggestionSlug(row: JsonRecord): string | null {
-  const rawSlug = stringValueAny(row, "slug", "targetSlug", "target_slug", "candidateSlug", "candidate_slug");
-  return rawSlug ? safeSlug(rawSlug) : null;
 }
 
 function approvedRelatedDoctor(row: JsonRecord): PublicImportHospitalRelatedDoctor | null {
@@ -288,8 +196,8 @@ function approvedRelatedDoctor(row: JsonRecord): PublicImportHospitalRelatedDoct
   const sourceName = stringValue(source, "sourceName");
   const sourceUrl = stringValue(source, "sourceUrl");
   const lastCheckedAt = stringValue(source, "lastCheckedAt");
-  const branchVerified = booleanValue(row, "branchVerified") ?? booleanValue(row, "branch_verified");
-  const publicVisible = booleanValue(row, "publicVisible") ?? booleanValue(row, "public_visible");
+  const branchVerified = stringValue(row, "branchVerified") === "true" ? true : row.branchVerified === true || row.branch_verified === true;
+  const publicVisible = stringValue(row, "publicVisible") === "true" ? true : row.publicVisible === true || row.public_visible === true;
   const relationStatus = stringValue(row, "relationStatus") ?? stringValue(row, "relationshipStatus") ?? stringValue(row, "status");
   const confidence = stringValue(row, "confidence");
 
@@ -328,72 +236,6 @@ function approvedRelatedDoctors(payload: JsonRecord): PublicImportHospitalRelate
   }
 
   return doctors;
-}
-
-function approvedLocalSuggestion(
-  row: JsonRecord,
-  sourceGeo: JsonRecord,
-  sourceHospitalSlug: string | null,
-): PublicImportHospitalLocalSuggestion | null {
-  const source = relatedDoctorSource(row);
-  const family = localSuggestionFamily(row);
-  const name = stringValueAny(row, "targetName", "target_name", "displayName", "display_name", "name", "nameEn");
-  const slug = localSuggestionSlug(row);
-  const sourceArea = cleanLocation(stringValue(sourceGeo, "area"));
-  const sourceGovernorate = cleanLocation(stringValue(sourceGeo, "governorate"));
-  const targetArea = cleanLocation(stringValueAny(row, "targetArea", "target_area", "area"));
-  const targetGovernorate = cleanLocation(stringValueAny(row, "targetGovernorate", "target_governorate", "governorate"));
-  const sourceName = stringValueAny(source, "sourceName", "source_name");
-  const sourceUrl = stringValueAny(source, "sourceUrl", "source_url", "url");
-  const lastCheckedAt = stringValueAny(source, "lastCheckedAt", "last_checked_at", "lastVerifiedDate", "last_verified_date");
-  const publicVisible = booleanValueAny(row, "publicVisible", "public_visible");
-  const relationStatus = stringValueAny(row, "relationStatus", "relationshipStatus", "status", "relation_status");
-  const confidence = stringValue(row, "confidence");
-
-  if (family === null) return null;
-  if (name === null) return null;
-  if (sourceArea === null || sourceGovernorate === null || targetArea === null || targetGovernorate === null) return null;
-  if (locationKey(sourceArea) !== locationKey(targetArea)) return null;
-  if (locationKey(sourceGovernorate) !== locationKey(targetGovernorate)) return null;
-  if (publicVisible !== true) return null;
-  if (relationStatus !== null && relationStatus !== "active" && relationStatus !== "approved") return null;
-  if (confidence !== "high" && confidence !== "medium") return null;
-  if (!hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)) return null;
-  if (family === "hospital" && sourceHospitalSlug !== null && slug === sourceHospitalSlug) return null;
-
-  return {
-    family,
-    name,
-    nameAr: stringValueAny(row, "targetNameAr", "target_name_ar", "nameAr"),
-    slug,
-    area: targetArea,
-    governorate: targetGovernorate,
-    sourceName,
-    sourceUrl,
-    lastCheckedAt,
-    confidence,
-  };
-}
-
-function approvedLocalSuggestions(
-  payload: JsonRecord,
-  sourceGeo: JsonRecord,
-  sourceHospitalSlug: string | null,
-): PublicImportHospitalLocalSuggestion[] {
-  const seen = new Set<string>();
-  const suggestions: PublicImportHospitalLocalSuggestion[] = [];
-
-  for (const row of localSuggestionRows(payload)) {
-    const suggestion = approvedLocalSuggestion(row, sourceGeo, sourceHospitalSlug);
-    if (suggestion === null) continue;
-    const key = `${suggestion.family}:${suggestion.slug ?? suggestion.name.toLocaleLowerCase()}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    suggestions.push(suggestion);
-    if (suggestions.length >= localSuggestionLimit) break;
-  }
-
-  return suggestions;
 }
 
 function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): PublicImportHospitalProfile | null {
@@ -437,7 +279,13 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     departments: stringArray(taxonomy, "departments"),
     languages: stringArray(payload, "languages"),
     doctors: approvedRelatedDoctors(payload),
-    localSuggestions: approvedLocalSuggestions(payload, geo, currentHospitalSlug(path)),
+    localSuggestions: buildPublicImportLocalSuggestions({
+      payload,
+      sourceGeo: geo,
+      sourceFamily: "hospital",
+      sourceSlug: currentHospitalSlug(path),
+      limit: 12,
+    }),
     phoneE164,
     whatsappE164,
     email,
