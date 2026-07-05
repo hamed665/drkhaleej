@@ -4,6 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const guardPath = 'src/server/public/import-hospital-profile-guard.ts';
 const importSitemapPath = 'src/server/public/import-sitemap.ts';
+const transformContractPath = 'docs/import/hospital-doctor-relations-transform-contract.md';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -19,6 +20,7 @@ function assertIncludes(source, token, message) {
 
 const guardSource = await readText(guardPath);
 const importSitemapSource = await readText(importSitemapPath);
+const transformContractSource = await readText(transformContractPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -58,6 +60,31 @@ for (const token of [
   'doctors: approvedRelatedDoctors(payload),',
 ]) {
   assertIncludes(guardSource, token, `${guardPath} must preserve guarded related-doctor token ${token}`);
+}
+
+for (const token of [
+  'Doctor_Hospital_Relations',
+  '`relation_key`',
+  '`doctor_key`',
+  '`hospital_key`',
+  '`doctor_name_en`',
+  '`branch_verified`',
+  '`source_url`',
+  '`last_verified_date`',
+  '`confidence`',
+  '"relations": {',
+  '"doctors": []',
+  '"branchVerified": true',
+  '"publicVisible": true',
+  '"relationStatus": "active"',
+  '"sourceUrl": "https://example.com/doctors"',
+  'A relation can be emitted with `publicVisible: true` only when all rules below pass:',
+  '`confidence` is `high` or `medium`',
+  'The transformer must set `publicVisible: false` or omit the row from public relation payloads when:',
+  '`confidence` is `medium_low`, `low`, empty, or unknown',
+  'The existing public hospital profile guard remains the final fail-closed runtime boundary for public doctor suggestions.',
+]) {
+  assertIncludes(transformContractSource, token, `${transformContractPath} must preserve transform contract token ${token}`);
 }
 
 for (const token of [
