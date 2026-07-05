@@ -67,6 +67,39 @@ for (const token of [
 }
 
 for (const token of [
+  'ImportBatchDryRunLocalSuggestionFamily',
+  'ImportBatchDryRunLocalSuggestionBlockerReason',
+  'ImportBatchDryRunLocalSuggestionRow',
+  'ImportBatchDryRunLocalSuggestionCandidateKeys',
+  'BuildImportBatchDryRunLocalSuggestionSummaryInput',
+  'ImportBatchDryRunLocalSuggestionSummary',
+  'emptyImportBatchDryRunLocalSuggestionSummary',
+  'buildImportBatchDryRunLocalSuggestionSummary',
+  'localSuggestionBlockers',
+  'localSuggestionBlocker',
+  'isSupportedLocalSuggestionConfidence',
+  'needsLocalSuggestionReview',
+  'source_candidate_missing',
+  'target_candidate_missing',
+  'target_name_missing',
+  'location_mismatch',
+  'same_entity_self_link',
+  'unsupported_family',
+  'sourceEntitySuggestionCount',
+  'locationClusterCount',
+  'hasNoUnsafePublicLocalSuggestions',
+  'localSuggestions: ImportBatchDryRunLocalSuggestionSummary;',
+  'localSuggestions?: ImportBatchDryRunLocalSuggestionSummary;',
+  'localSuggestions.unsafePublicCount === 0',
+  'localSuggestions.unsafePublicBlockers.length === 0',
+  'radiology',
+  'dentistry',
+  'beauty',
+]) {
+  assertIncludes(contractSource, token, 'local suggestion dry-run contract');
+}
+
+for (const token of [
   '# DrKhaleej Import Batch Dry-Run Report V1',
   'drkhaleej.import.batchDryRun.v1',
   '## Source of truth',
@@ -77,6 +110,12 @@ for (const token of [
   '"blockedFromPublicReasons": []',
   '## Hospital relation dry-run summary',
   'A blocked relation does not automatically fail the whole hospital import rehearsal. An unsafe public relation does.',
+  '"localSuggestions": {',
+  '"sourceEntitySuggestionCount": 0',
+  '"locationClusterCount": 0',
+  '## Location-aware cross-family suggestion dry-run summary',
+  'hospital page in Al Khuwair can later suggest nearby hospitals, pharmacies, doctors, radiology, dentistry, and beauty providers',
+  'A blocked local suggestion does not automatically fail the import rehearsal. An unsafe public local suggestion does.',
   '## Report decision rule',
 ]) {
   assertIncludes(docsSource, token, 'dry-run report docs');

@@ -1,4 +1,6 @@
 import {
+  buildImportBatchDryRunHospitalRelationSummary,
+  buildImportBatchDryRunLocalSuggestionSummary,
   buildImportBatchDryRunReport,
   importBatchDryRunRequiredChecks,
   type ImportBatchDryRunBlocker,
@@ -6,6 +8,9 @@ import {
   type ImportBatchDryRunCheck,
   type ImportBatchDryRunFamily,
   type ImportBatchDryRunFamilySummary,
+  type ImportBatchDryRunHospitalRelationRow,
+  type ImportBatchDryRunLocalSuggestionCandidateKeys,
+  type ImportBatchDryRunLocalSuggestionRow,
   type ImportBatchDryRunReport,
   type ImportBatchDryRunSitemapSummary,
 } from "./import-batch-dry-run-report";
@@ -24,6 +29,10 @@ export type BuildFirstBatchDryRunReportInput = {
   commitSha?: string | null;
   checks?: readonly ImportBatchDryRunCheck[];
   sitemap?: ImportBatchDryRunSitemapSummary;
+  hospitalRelationRows?: readonly ImportBatchDryRunHospitalRelationRow[];
+  candidateHospitalKeys?: readonly string[];
+  localSuggestionRows?: readonly ImportBatchDryRunLocalSuggestionRow[];
+  localSuggestionCandidateKeys?: ImportBatchDryRunLocalSuggestionCandidateKeys;
   notes?: readonly string[];
 };
 
@@ -33,6 +42,35 @@ function defaultChecks(): readonly ImportBatchDryRunCheck[] {
 
 function toDryRunFamily(family: ImportFirstBatchFamily): ImportBatchDryRunFamily {
   return family;
+}
+
+function selectedCandidateIds(selection: ImportFirstBatchSelection, family: ImportFirstBatchFamily): string[] {
+  return selection.rows.filter((row) => row.family === family && row.qaStatus === "selected").map((row) => row.candidateId);
+}
+
+function defaultCandidateHospitalKeys(selection: ImportFirstBatchSelection): readonly string[] {
+  return selectedCandidateIds(selection, "hospital");
+}
+
+function defaultLocalSuggestionCandidateKeys(selection: ImportFirstBatchSelection): ImportBatchDryRunLocalSuggestionCandidateKeys {
+  return {
+    doctor: selectedCandidateIds(selection, "doctor"),
+    pharmacy: selectedCandidateIds(selection, "pharmacy"),
+    hospital: selectedCandidateIds(selection, "hospital"),
+    radiology: [],
+    dentistry: [],
+    beauty: [],
+  };
+}
+
+function mergeLocalSuggestionCandidateKeys(
+  selection: ImportFirstBatchSelection,
+  candidateKeys?: ImportBatchDryRunLocalSuggestionCandidateKeys,
+): ImportBatchDryRunLocalSuggestionCandidateKeys {
+  return {
+    ...defaultLocalSuggestionCandidateKeys(selection),
+    ...(candidateKeys ?? {}),
+  };
 }
 
 function mapSelectionIssueReason(reason: string): ImportBatchDryRunBlockerReason {
@@ -108,6 +146,14 @@ export function buildFirstBatchDryRunReport(input: BuildFirstBatchDryRunReportIn
       return [family, buildFamilySummary(input.selection, family, familyBlockers)];
     }),
   ) as Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  const hospitalRelations = buildImportBatchDryRunHospitalRelationSummary({
+    rows: input.hospitalRelationRows ?? [],
+    candidateHospitalKeys: input.candidateHospitalKeys ?? defaultCandidateHospitalKeys(input.selection),
+  });
+  const localSuggestions = buildImportBatchDryRunLocalSuggestionSummary({
+    rows: input.localSuggestionRows ?? [],
+    candidateKeys: mergeLocalSuggestionCandidateKeys(input.selection, input.localSuggestionCandidateKeys),
+  });
 
   return buildImportBatchDryRunReport({
     rehearsalId: input.selection.selectionId,
@@ -116,6 +162,8 @@ export function buildFirstBatchDryRunReport(input: BuildFirstBatchDryRunReportIn
     checks: input.checks ?? defaultChecks(),
     sitemap: input.sitemap ?? defaultSitemapSummary(input.selection),
     byFamily,
+    hospitalRelations,
+    localSuggestions,
     caps: input.selection.caps,
     notes: input.notes ?? [],
   });
