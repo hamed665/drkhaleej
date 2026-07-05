@@ -128,7 +128,7 @@ const localSuggestionRows = [
     targetKey: "clinic-al-khuwair-one",
     targetName: "Unsupported Clinic One",
   }),
-] as unknown as Parameters<typeof buildImportBatchDryRunLocalSuggestionSummary>[0]["rows"];
+];
 
 const hospitalRelationRows = [
   hospitalRow({}),
@@ -138,12 +138,12 @@ const hospitalRelationRows = [
     confidence: "medium",
     relationStatus: "disputed",
   }),
-] as unknown as Parameters<typeof buildImportBatchDryRunHospitalRelationSummary>[0]["rows"];
+];
 
 describe("representative first-batch dry-run fixtures", () => {
   it("summarizes safe, unsafe, and private suggestions without publish side effects", () => {
     const localSuggestions = buildImportBatchDryRunLocalSuggestionSummary({
-      rows: localSuggestionRows,
+      rows: localSuggestionRows as never,
       candidateKeys: {
         doctor: ["doctor-al-khuwair-one"],
         pharmacy: ["pharmacy-al-khuwair-one"],
@@ -151,14 +151,14 @@ describe("representative first-batch dry-run fixtures", () => {
       },
     });
     const hospitalRelations = buildImportBatchDryRunHospitalRelationSummary({
-      rows: hospitalRelationRows,
+      rows: hospitalRelationRows as never,
       candidateHospitalKeys: ["hospital-al-khuwair-one"],
     });
     const report = buildImportBatchDryRunReport({
       rehearsalId: "first-batch-representative-fixture",
       generatedAt: "2026-07-05T00:00:00.000Z",
       commitSha: "representative-fixture",
-      checks: passingChecks(),
+      checks: passingChecks() as never,
       sitemap: {
         beforeUrlCount: 0,
         afterUrlCount: 3,
@@ -170,7 +170,7 @@ describe("representative first-batch dry-run fixtures", () => {
         doctor: familySummary(),
         pharmacy: familySummary(),
         hospital: familySummary(),
-      },
+      } as never,
       hospitalRelations,
       localSuggestions,
       notes: ["Representative fixture only; no database, route, sitemap, or publish writes."],
