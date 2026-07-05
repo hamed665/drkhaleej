@@ -11,6 +11,7 @@ The report is a dry-run artifact only. It records whether a frozen doctor, pharm
 | Surface | Source |
 | --- | --- |
 | Type contract | `src/server/admin/import-batch-dry-run-report.ts` |
+| First batch bridge | `src/server/admin/import-first-batch-dry-run-bridge.ts` |
 | Rehearsal checklist | `docs/import/DRKHALEEJ_IMPORT_BATCH_REHEARSAL_V1.md` |
 | Hospital doctor relation transform contract | `docs/import/hospital-doctor-relations-transform-contract.md` |
 | Readiness audit | `src/server/admin/import-publish-readiness-audit.ts` |
@@ -115,6 +116,17 @@ If any required check fails, the report decision must be `no_go`.
     "unsafePublicBlockers": [],
     "blockedFromPublicReasons": []
   },
+  "localSuggestions": {
+    "totalRows": 0,
+    "publicVisibleCount": 0,
+    "blockedFromPublicCount": 0,
+    "privateReviewCount": 0,
+    "sourceEntitySuggestionCount": 0,
+    "locationClusterCount": 0,
+    "unsafePublicCount": 0,
+    "unsafePublicBlockers": [],
+    "blockedFromPublicReasons": []
+  },
   "notes": []
 }
 ```
@@ -140,6 +152,48 @@ Allowed `unsafePublicBlockers[].reason` and `blockedFromPublicReasons[].reason` 
 - `ambiguous_review_required`
 
 A blocked relation does not automatically fail the whole hospital import rehearsal. An unsafe public relation does.
+
+## Location-aware cross-family suggestion dry-run summary
+
+`localSuggestions` reports same-area cross-family suggestion rows prepared for public profile pages.
+
+This is intentionally generic so a hospital page in Al Khuwair can later suggest nearby hospitals, pharmacies, doctors, radiology, dentistry, and beauty providers, and a pharmacy page can suggest nearby doctors, hospitals, radiology, dentistry, and beauty providers without one-off logic. That is what software is supposed to do, despite our industry's tireless campaign against dignity.
+
+A local suggestion is public-safe only when:
+
+- source and target families are supported: `doctor`, `pharmacy`, `hospital`, `radiology`, `dentistry`, `beauty`;
+- source and target keys both exist in the dry-run candidate key map;
+- source and target area and governorate match;
+- target display name is present;
+- source/evidence URL is present;
+- last checked date is present;
+- confidence is `high` or `medium`;
+- the row is not marked for review, ambiguous, disputed, duplicate, or branch-review-only;
+- the row is not a self-link from an entity page back to itself.
+
+The local summary separates these states:
+
+- `publicVisibleCount`: suggestions allowed to become public local recommendation links on source entity pages.
+- `sourceEntitySuggestionCount`: number of source entity pages with at least one public-safe local suggestion.
+- `locationClusterCount`: number of same-area/governorate clusters that have public-safe local suggestions.
+- `blockedFromPublicCount`: suggestions that are safely omitted from public UI and may stay private/admin-review only.
+- `privateReviewCount`: suggestions that pass the data gates but are not yet marked public.
+- `unsafePublicCount`: suggestions that were marked or prepared for public display but fail the local suggestion gates. Any non-zero value forces `decision: "no_go"`.
+
+Allowed local suggestion `unsafePublicBlockers[].reason` and `blockedFromPublicReasons[].reason` values are:
+
+- `source_candidate_missing`
+- `target_candidate_missing`
+- `target_name_missing`
+- `location_mismatch`
+- `source_missing`
+- `last_checked_missing`
+- `confidence_unsupported`
+- `same_entity_self_link`
+- `unsupported_family`
+- `ambiguous_review_required`
+
+A blocked local suggestion does not automatically fail the import rehearsal. An unsafe public local suggestion does.
 
 ## Blocker reasons
 
@@ -176,6 +230,8 @@ The report decision is `go` only when:
 - sitemap counts stay within the first rehearsal caps;
 - representative profile samples pass;
 - `hospitalRelations.unsafePublicCount` is zero;
-- `hospitalRelations.unsafePublicBlockers` is empty.
+- `hospitalRelations.unsafePublicBlockers` is empty;
+- `localSuggestions.unsafePublicCount` is zero;
+- `localSuggestions.unsafePublicBlockers` is empty.
 
 Otherwise the decision is `no_go`.
