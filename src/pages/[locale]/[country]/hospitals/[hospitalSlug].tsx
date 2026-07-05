@@ -162,8 +162,8 @@ async function loadHospitalProfile(
   return payload.ok ? payload.profile : null;
 }
 
-function metadataTitle(name: string): string {
-  return `${name} | DrKhaleej`;
+function metadataTitle(locale: SupportedLocale, name: string, location: string): string {
+  return locale === "ar" ? `${name} في ${location} | DrKhaleej` : `${name} in ${location} | DrKhaleej`;
 }
 
 function displayName(locale: SupportedLocale, name: string, nameAr: string | null): string {
@@ -298,6 +298,7 @@ export default function PublicImportedHospitalProfilePage({
   const englishAlternate = absoluteUrl(`/en/${country}/hospitals/${hospitalSlug}`);
   const arabicAlternate = absoluteUrl(`/ar/${country}/hospitals/${hospitalSlug}`);
   const location = localArea([profile.area, profile.wilayat, profile.governorate]);
+  const metaTitle = metadataTitle(locale, title, location);
   const serviceSignals = uniqueText([...profile.services, ...profile.departments]).slice(0, 8);
   const relatedInternalLinks = buildRelatedInternalLinks({ locale, country, profile, serviceSignals });
   const importIndexEligibility = isPublicImportProfileIndexEligible(profile);
@@ -305,7 +306,7 @@ export default function PublicImportedHospitalProfilePage({
   return (
     <>
       <Head>
-        <title>{metadataTitle(title)}</title>
+        <title>{metaTitle}</title>
         <meta name="description" content={description} />
         <meta name="robots" content={importIndexEligibility.eligible ? "index,follow" : "noindex,follow"} />
         <link rel="canonical" href={canonical} />
@@ -314,11 +315,11 @@ export default function PublicImportedHospitalProfilePage({
         <link rel="alternate" hrefLang="x-default" href={englishAlternate} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={siteConfig.siteName} />
-        <meta property="og:title" content={metadataTitle(title)} />
+        <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={metadataTitle(title)} />
+        <meta name="twitter:title" content={metaTitle} />
         <meta name="twitter:description" content={description} />
       </Head>
 
