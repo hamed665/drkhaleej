@@ -45,6 +45,23 @@ for (const token of [
   'profile.lastCheckedAt',
   'profile.sourceName ?? profile.sourceUrl',
   'Confirm details directly with the provider',
+  'import Link from "next/link"',
+  'PublicImportLocalSuggestion',
+  'PublicImportLocalSuggestionFamily',
+  'localSuggestionsTitle',
+  'localSuggestionsDescription',
+  'localSuggestionSourceLabel',
+  'function localSuggestionDisplayName',
+  'function localSuggestionFamilyLabel',
+  'function publicLocalSuggestionHref',
+  'suggestion.family === "doctor"',
+  'suggestion.family === "pharmacy"',
+  'suggestion.family === "hospital"',
+  'profile.localSuggestions.length > 0',
+  'profile.localSuggestions.map',
+  'localSuggestionFamilyLabel(locale, suggestion.family)',
+  'publicLocalSuggestionHref(locale, country, suggestion)',
+  'suggestion.lastCheckedAt',
 ]) {
   assertIncludes(routeSource, token, `${routePath} must include ${token}`);
 }
@@ -68,8 +85,8 @@ for (const forbiddenToken of [
 }
 
 for (const token of [
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  String.raw`^\/(en|ar)\/om\/doctor\/`,
+  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
   'hasReviewedImportEvidence',
   'import_entity_candidate_id',
 ]) {

@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const guardPath = 'src/server/public/import-pharmacy-profile-guard.ts';
+const localSuggestionGuardPath = 'src/server/public/import-local-suggestion-guard.ts';
 const importSitemapPath = 'src/server/public/import-sitemap.ts';
 
 async function readText(relativePath) {
@@ -18,6 +19,7 @@ function assertIncludes(source, token, message) {
 }
 
 const guardSource = await readText(guardPath);
+const localSuggestionGuardSource = await readText(localSuggestionGuardPath);
 const importSitemapSource = await readText(importSitemapPath);
 const packageSource = await readText('package.json');
 
@@ -38,8 +40,26 @@ for (const token of [
   'hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)',
   'hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })',
   'hasLocalGeo(geo)',
+  'buildPublicImportLocalSuggestions',
+  'localSuggestions: PublicImportLocalSuggestion[];',
+  'sourceFamily: "pharmacy"',
+  'sourceSlug: currentPharmacySlug(path)',
 ]) {
   assertIncludes(guardSource, token, `${guardPath} must include ${token}`);
+}
+
+for (const token of [
+  'export type PublicImportLocalSuggestionFamily',
+  'export type PublicImportLocalSuggestion',
+  'buildPublicImportLocalSuggestions',
+  'localSuggestionFamilyAliases',
+  'localSuggestionRows',
+  'approvedLocalSuggestion',
+  'publicVisible !== true',
+  'confidence !== "high" && confidence !== "medium"',
+  'family === sourceFamily && sourceSlug !== null && slug === sourceSlug',
+]) {
+  assertIncludes(localSuggestionGuardSource, token, `${localSuggestionGuardPath} must include ${token}`);
 }
 
 for (const token of [
@@ -54,8 +74,8 @@ for (const token of [
 }
 
 for (const token of [
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  String.raw`^\/(en|ar)\/om\/doctor\/`,
+  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
   'target_entity_type',
 ]) {
   assertIncludes(importSitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);

@@ -1,6 +1,10 @@
 import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
+import {
+  buildPublicImportLocalSuggestions,
+  type PublicImportLocalSuggestion,
+} from "./import-local-suggestion-guard";
 
 export type PublicImportPharmacyProfile = {
   family: "pharmacies";
@@ -14,6 +18,7 @@ export type PublicImportPharmacyProfile = {
   services: string[];
   departments: string[];
   languages: string[];
+  localSuggestions: PublicImportLocalSuggestion[];
   phoneE164: string | null;
   whatsappE164: string | null;
   email: string | null;
@@ -107,6 +112,10 @@ function canonicalPath(locale: string, country: string, slug: string): string | 
   return `/${locale}/${country}/pharmacies/${slug}`;
 }
 
+function currentPharmacySlug(path: string): string | null {
+  return safeSlug(path.split("/").filter(Boolean).at(-1) ?? "");
+}
+
 function safeQueueRow(row: QueueRow, path: string): boolean {
   if (row.target_entity_type !== "pharmacy") return false;
   if (row.publish_status !== "index_eligible") return false;
@@ -187,6 +196,13 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     services: stringArray(taxonomy, "services"),
     departments: stringArray(taxonomy, "departments"),
     languages: stringArray(payload, "languages"),
+    localSuggestions: buildPublicImportLocalSuggestions({
+      payload,
+      sourceGeo: geo,
+      sourceFamily: "pharmacy",
+      sourceSlug: currentPharmacySlug(path),
+      limit: 12,
+    }),
     phoneE164,
     whatsappE164,
     email,

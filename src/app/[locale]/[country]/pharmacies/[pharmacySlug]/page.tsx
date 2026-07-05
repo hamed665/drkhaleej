@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isPublicImportProfileIndexEligible } from "@/lib/catalog/public-import-profile-index-eligibility";
 import {
@@ -15,6 +16,7 @@ import {
 import { buildLocalizedMetadata } from "@/lib/seo/metadata";
 import { buildProfileNoindexMetadata } from "@/lib/seo/profile-metadata-index-gate";
 import { getPublicImportPharmacyProfile } from "@/server/public/import-pharmacy-profile-guard";
+import type { PublicImportLocalSuggestion, PublicImportLocalSuggestionFamily } from "@/server/public/import-local-suggestion-guard";
 
 type Params = { locale: string; country: string; pharmacySlug: string };
 
@@ -24,6 +26,9 @@ type RouteCopy = {
   fallbackDescription: string;
   overviewTitle: string;
   servicesTitle: string;
+  localSuggestionsTitle: string;
+  localSuggestionsDescription: string;
+  localSuggestionSourceLabel: string;
   contactTitle: string;
   sourceLabel: string;
 };
@@ -35,6 +40,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     fallbackDescription: "View reviewed public pharmacy information in Oman on DrKhaleej.",
     overviewTitle: "Profile overview",
     servicesTitle: "Pharmacy services",
+    localSuggestionsTitle: "Nearby care in the same area",
+    localSuggestionsDescription: "These links appear only when the nearby relationship has reviewed source evidence and a matching area.",
+    localSuggestionSourceLabel: "Source checked",
     contactTitle: "Contact and directions",
     sourceLabel: "Source",
   },
@@ -44,6 +52,9 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
     fallbackDescription: "اطلع على معلومات عامة مراجعة عن الصيدليات في عُمان عبر DrKhaleej.",
     overviewTitle: "نظرة عامة على الملف",
     servicesTitle: "خدمات الصيدلية",
+    localSuggestionsTitle: "رعاية قريبة في نفس المنطقة",
+    localSuggestionsDescription: "تظهر هذه الروابط فقط عند وجود دليل مصدر ومطابقة واضحة للمنطقة.",
+    localSuggestionSourceLabel: "تم التحقق من المصدر",
     contactTitle: "التواصل والاتجاهات",
     sourceLabel: "المصدر",
   },
@@ -57,8 +68,45 @@ function displayName(locale: SupportedLocale, name: string, nameAr: string | nul
   return locale === "ar" && nameAr ? nameAr : name;
 }
 
+function localSuggestionDisplayName(locale: SupportedLocale, suggestion: PublicImportLocalSuggestion): string {
+  return locale === "ar" && suggestion.nameAr ? suggestion.nameAr : suggestion.name;
+}
+
+function localSuggestionFamilyLabel(locale: SupportedLocale, family: PublicImportLocalSuggestionFamily): string {
+  const labels: Record<SupportedLocale, Record<PublicImportLocalSuggestionFamily, string>> = {
+    en: {
+      doctor: "Doctor",
+      pharmacy: "Pharmacy",
+      hospital: "Hospital",
+      radiology: "Radiology",
+      dentistry: "Dentistry",
+      beauty: "Beauty",
+    },
+    ar: {
+      doctor: "طبيب",
+      pharmacy: "صيدلية",
+      hospital: "مستشفى",
+      radiology: "أشعة",
+      dentistry: "أسنان",
+      beauty: "تجميل",
+    },
+  };
+  return labels[locale][family];
+}
+
 function localArea(parts: Array<string | null>): string {
   return parts.filter(Boolean).join(", ") || "Oman";
+}
+
+function publicSearchHref(locale: SupportedLocale, country: string, query: string): string {
+  return `/${locale}/${country}/search?q=${encodeURIComponent(query)}`;
+}
+
+function publicLocalSuggestionHref(locale: SupportedLocale, country: string, suggestion: PublicImportLocalSuggestion): string {
+  if (suggestion.slug && suggestion.family === "doctor") return `/${locale}/${country}/doctor/${suggestion.slug}`;
+  if (suggestion.slug && suggestion.family === "pharmacy") return `/${locale}/${country}/pharmacies/${suggestion.slug}`;
+  if (suggestion.slug && suggestion.family === "hospital") return `/${locale}/${country}/hospitals/${suggestion.slug}`;
+  return publicSearchHref(locale, country, `${suggestion.name} ${suggestion.area}`);
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -150,6 +198,34 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
                 </span>
               ))}
             </div>
+          </div>
+        ) : null}
+
+        {profile.localSuggestions.length > 0 ? (
+          <div className="dm2026-card-soft mt-4">
+            <h2>{copy.localSuggestionsTitle}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{copy.localSuggestionsDescription}</p>
+            <ul className="mt-3 grid gap-3 md:grid-cols-2" role="list">
+              {profile.localSuggestions.map((suggestion) => {
+                const suggestionName = localSuggestionDisplayName(locale, suggestion);
+                return (
+                  <li key={`${suggestion.family}:${suggestion.slug ?? suggestion.name}`} className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{localSuggestionFamilyLabel(locale, suggestion.family)}</p>
+                    <h3 className="mt-1">
+                      <Link href={publicLocalSuggestionHref(locale, country, suggestion)} className="text-sm font-semibold text-slate-950 underline-offset-4 hover:underline">
+                        {suggestionName}
+                      </Link>
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      {[suggestion.area, suggestion.governorate].filter(Boolean).join(" · ")}
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      {copy.localSuggestionSourceLabel}: {suggestion.lastCheckedAt}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         ) : null}
 
