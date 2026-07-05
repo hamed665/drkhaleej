@@ -67,6 +67,28 @@ for (const token of [
   assertIncludes(routeSource, token, `${routePath} must include ${token}`);
 }
 
+for (const token of [
+  'type PublicImportHospitalLocalSuggestionFamily',
+  'type PublicImportHospitalLocalSuggestion',
+  'localSuggestions: PublicImportHospitalLocalSuggestion[];',
+  'localSuggestionsTitle',
+  'localSuggestionsDescription',
+  'localSuggestionSourceLabel',
+  'function localSuggestionDisplayName',
+  'function localSuggestionFamilyLabel',
+  'function publicLocalSuggestionHref',
+  'suggestion.family === "doctor"',
+  'suggestion.family === "pharmacy"',
+  'suggestion.family === "hospital"',
+  'profile.localSuggestions.length > 0',
+  'profile.localSuggestions.map',
+  'localSuggestionFamilyLabel(locale, suggestion.family)',
+  'publicLocalSuggestionHref(locale, country, suggestion)',
+  'suggestion.lastCheckedAt',
+]) {
+  assertIncludes(routeSource, `${token}`, `${routePath} must preserve guarded local suggestion route token ${token}`);
+}
+
 for (const forbiddenToken of [
   'application/ld+json',
   'buildFaqJsonLd',
@@ -98,9 +120,9 @@ for (const token of [
 }
 
 for (const token of [
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  '^\/(en|ar)\/om\/doctor\/',
+  '^\/(en|ar)\/om\/pharmacies\/',
+  '^\/(en|ar)\/om\/hospitals\/',
   'hasReviewedImportEvidence',
 ]) {
   assertIncludes(sitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
