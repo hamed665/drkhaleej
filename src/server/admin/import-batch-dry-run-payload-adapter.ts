@@ -84,10 +84,25 @@ function stringValue(value: JsonRecord, ...keys: readonly string[]): string | nu
   return null;
 }
 
+function booleanAliasValue(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return false;
+  }
+  if (typeof value !== "string") return null;
+
+  const normalized = value.trim().toLowerCase();
+  if (normalized === "true" || normalized === "yes" || normalized === "1") return true;
+  if (normalized === "" || normalized === "false" || normalized === "no" || normalized === "0") return false;
+  return false;
+}
+
 function booleanValue(value: JsonRecord, ...keys: readonly string[]): boolean | null {
   for (const key of keys) {
-    const next = value[key];
-    if (typeof next === "boolean") return next;
+    const next = booleanAliasValue(value[key]);
+    if (next !== null) return next;
   }
   return null;
 }
