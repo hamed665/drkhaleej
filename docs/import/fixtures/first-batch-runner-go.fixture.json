@@ -1,0 +1,116 @@
+{
+  "rehearsalId": "first-batch-runner-go-fixture",
+  "generatedAt": "2026-07-05T00:00:00.000Z",
+  "commitSha": "runner-go-fixture",
+  "checks": [
+    { "key": "ci_green", "passed": true, "notes": null },
+    { "key": "seo_check_green", "passed": true, "notes": null },
+    { "key": "readiness_audit_zero_blockers", "passed": true, "notes": null },
+    { "key": "sitemap_diff_frozen", "passed": true, "notes": null },
+    { "key": "representative_profile_smoke_passed", "passed": true, "notes": null },
+    { "key": "blocked_route_classes_absent", "passed": true, "notes": null }
+  ],
+  "sitemap": {
+    "beforeUrlCount": 100,
+    "afterUrlCount": 103,
+    "importedDeltaCount": 3,
+    "unexpectedUrlCount": 0,
+    "unexpectedUrls": []
+  },
+  "byFamily": {
+    "doctor": {
+      "selectedCount": 1,
+      "eligibleCount": 1,
+      "blockedCount": 0,
+      "sitemapUrlCount": 1,
+      "sampledUrlCount": 1,
+      "blockers": [],
+      "samples": [
+        {
+          "family": "doctor",
+          "locale": "en",
+          "canonicalPath": "/en/om/doctor/runner-go-doctor-one",
+          "renderedName": "Runner Go Doctor One",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        }
+      ]
+    },
+    "pharmacy": {
+      "selectedCount": 1,
+      "eligibleCount": 1,
+      "blockedCount": 0,
+      "sitemapUrlCount": 1,
+      "sampledUrlCount": 1,
+      "blockers": [],
+      "samples": [
+        {
+          "family": "pharmacy",
+          "locale": "en",
+          "canonicalPath": "/en/om/pharmacies/runner-go-pharmacy-one",
+          "renderedName": "Runner Go Pharmacy One",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        }
+      ]
+    },
+    "hospital": {
+      "selectedCount": 1,
+      "eligibleCount": 1,
+      "blockedCount": 0,
+      "sitemapUrlCount": 1,
+      "sampledUrlCount": 1,
+      "blockers": [],
+      "samples": [
+        {
+          "family": "hospital",
+          "locale": "en",
+          "canonicalPath": "/en/om/hospitals/runner-go-hospital-one",
+          "renderedName": "Runner Go Hospital One",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        }
+      ]
+    }
+  },
+  "hospitalRelations": {
+    "totalRows": 1,
+    "candidateHospitalCount": 1,
+    "publicVisibleCount": 1,
+    "blockedFromPublicCount": 0,
+    "privateReviewCount": 0,
+    "hospitalSuggestionCount": 1,
+    "unsafePublicCount": 0,
+    "unsafePublicBlockers": [],
+    "blockedFromPublicReasons": []
+  },
+  "localSuggestions": {
+    "totalRows": 2,
+    "publicVisibleCount": 2,
+    "blockedFromPublicCount": 0,
+    "privateReviewCount": 0,
+    "sourceEntitySuggestionCount": 2,
+    "locationClusterCount": 1,
+    "unsafePublicCount": 0,
+    "unsafePublicBlockers": [],
+    "blockedFromPublicReasons": []
+  },
+  "notes": [
+    "Runner fixture only; no import, publish, sitemap, route, schema, database, or network side effects."
+  ]
+}
