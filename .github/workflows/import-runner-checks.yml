@@ -18,6 +18,8 @@ jobs:
           node-version: '22'
       - name: Validate first-batch private data guard
         run: node scripts/import/check-first-batch-private-data-guard.mjs
+      - name: Validate first-batch source evidence contract
+        run: node scripts/import/check-first-batch-source-evidence-contract.mjs
       - name: Validate first-batch dry-run runner
         run: node scripts/import/check-first-batch-dry-run-runner.mjs
       - name: Validate first-batch CSV transformer

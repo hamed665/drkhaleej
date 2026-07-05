@@ -8,6 +8,7 @@ The first real batch must pass through these local-only tools:
 
 ```bash
 node scripts/import/check-first-batch-private-data-guard.mjs
+node scripts/import/check-first-batch-source-evidence-contract.mjs
 node scripts/import/check-first-batch-dry-run-runner.mjs
 node scripts/import/check-first-batch-csv-transformer.mjs
 node scripts/import/check-first-batch-dry-run-report-review.mjs
@@ -67,6 +68,16 @@ Each selected candidate row must include:
 | `qa_status` | `selected`, `held`, or `removed` |
 | `locale` | `en` or `ar`; default should be `en` when absent |
 | `slug` | public-safe slug matching the route family |
+
+## Source evidence review
+
+Before transform, review the real CSV against:
+
+```text
+docs/import/first-batch-source-evidence-contract.md
+```
+
+Selected rows must not have vague source labels such as `Google`, `web`, `internet`, `found online`, `search result`, or `notes`. Rows missing both `source_name` and `source_url` must be zero, and rows missing `last_checked_at` must be zero. Yes, this is tedious. So is cleaning up bad public healthcare data after search engines have cached it.
 
 ## Required local suggestion fields
 
@@ -172,4 +183,4 @@ A real dry-run PR should include:
 
 ## Merge rule
 
-The real dry-run PR may merge only when the report is `go`, report validation passes with `--expect go`, and CI is green. The import write path must be a later PR with its own contract. Dry-run first, write path later; civilization depends on tiny acts of restraint like this.
+The real dry-run PR may merge only when the report is `go`, report validation passes with `--expect go`, source evidence review is complete, and CI is green. The import write path must be a later PR with its own contract. Dry-run first, write path later; civilization depends on tiny acts of restraint like this.
