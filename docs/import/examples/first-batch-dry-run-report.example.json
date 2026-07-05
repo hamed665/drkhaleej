@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "drkhaleej.import.batchDryRun.v1",
+  "rehearsalId": "first-batch-example-unsafe",
+  "generatedAt": "2026-07-05T00:00:00.000Z",
+  "commitSha": "example-only",
+  "decision": "no_go",
+  "caps": {
+    "doctor": 50,
+    "pharmacy": 25,
+    "hospital": 10
+  },
+  "checks": [
+    {
+      "key": "ci_green",
+      "passed": true,
+      "notes": "Example assumes CI passed for the rehearsal commit."
+    },
+    {
+      "key": "seo_check_green",
+      "passed": true,
+      "notes": "Example assumes SEO validation passed without publish side effects."
+    },
+    {
+      "key": "readiness_audit_zero_blockers",
+      "passed": true,
+      "notes": "No first-batch profile readiness blockers in this example."
+    },
+    {
+      "key": "sitemap_diff_frozen",
+      "passed": true,
+      "notes": "Sitemap output is frozen for dry-run inspection."
+    },
+    {
+      "key": "representative_profile_smoke_passed",
+      "passed": true,
+      "notes": "Representative private smoke checks passed."
+    },
+    {
+      "key": "blocked_route_classes_absent",
+      "passed": true,
+      "notes": "No route, sitemap, schema, or public-rendering expansion is present."
+    }
+  ],
+  "sitemap": {
+    "beforeUrlCount": 0,
+    "afterUrlCount": 0,
+    "importedDeltaCount": 0,
+    "unexpectedUrlCount": 0,
+    "unexpectedUrls": []
+  },
+  "byFamily": {
+    "doctor": {
+      "selectedCount": 2,
+      "eligibleCount": 2,
+      "blockedCount": 0,
+      "sitemapUrlCount": 0,
+      "sampledUrlCount": 0,
+      "blockers": [],
+      "samples": []
+    },
+    "pharmacy": {
+      "selectedCount": 2,
+      "eligibleCount": 2,
+      "blockedCount": 0,
+      "sitemapUrlCount": 0,
+      "sampledUrlCount": 0,
+      "blockers": [],
+      "samples": []
+    },
+    "hospital": {
+      "selectedCount": 1,
+      "eligibleCount": 1,
+      "blockedCount": 0,
+      "sitemapUrlCount": 0,
+      "sampledUrlCount": 0,
+      "blockers": [],
+      "samples": []
+    }
+  },
+  "hospitalRelations": {
+    "totalRows": 2,
+    "candidateHospitalCount": 1,
+    "publicVisibleCount": 1,
+    "blockedFromPublicCount": 0,
+    "privateReviewCount": 0,
+    "hospitalSuggestionCount": 1,
+    "unsafePublicCount": 1,
+    "unsafePublicBlockers": [
+      {
+        "reason": "ambiguous_review_required",
+        "hospitalKey": "hospital-al-khuwair-one",
+        "doctorKey": "doctor-al-khuwair-one",
+        "doctorName": "Disputed Hospital Doctor One",
+        "sourceUrl": "https://example.com/hospital-doctor-disputed-source",
+        "notes": "Relation is marked for review or has an unsupported status."
+      }
+    ],
+    "blockedFromPublicReasons": []
+  },
+  "localSuggestions": {
+    "totalRows": 12,
+    "publicVisibleCount": 2,
+    "blockedFromPublicCount": 0,
+    "privateReviewCount": 1,
+    "sourceEntitySuggestionCount": 2,
+    "locationClusterCount": 1,
+    "unsafePublicCount": 9,
+    "unsafePublicBlockers": [
+      {
+        "reason": "source_missing",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Missing Source Evidence Pharmacy",
+        "sourceName": null,
+        "sourceUrl": null,
+        "notes": "Local suggestion source name or URL is required before public display."
+      },
+      {
+        "reason": "last_checked_missing",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Missing Last Checked Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Local suggestion last checked date is required before public display."
+      },
+      {
+        "reason": "location_mismatch",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Qurum",
+        "targetGovernorate": "Muscat",
+        "targetName": "Wrong Location Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Source and target must share the same area and governorate before public local suggestion."
+      },
+      {
+        "reason": "target_candidate_missing",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-not-selected",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Missing Target Candidate Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Target entity must exist in the dry-run candidate key map."
+      },
+      {
+        "reason": "source_candidate_missing",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-not-in-candidates",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Source Candidate Missing Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Source entity must exist in the dry-run candidate key map."
+      },
+      {
+        "reason": "same_entity_self_link",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "doctor",
+        "targetKey": "doctor-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Representative Doctor One",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Local suggestion must not point an entity page back to itself."
+      },
+      {
+        "reason": "ambiguous_review_required",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Requires Review Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Local suggestion is marked for review or has an unsupported status."
+      },
+      {
+        "reason": "ambiguous_review_required",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "pharmacy-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Disputed Pharmacy",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Local suggestion is marked for review or has an unsupported status."
+      },
+      {
+        "reason": "unsupported_family",
+        "sourceFamily": "doctor",
+        "sourceKey": "doctor-al-khuwair-one",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "clinic",
+        "targetKey": "clinic-al-khuwair-one",
+        "targetArea": "Al Khuwair",
+        "targetGovernorate": "Muscat",
+        "targetName": "Unsupported Clinic One",
+        "sourceName": "Provider official website",
+        "sourceUrl": null,
+        "notes": "Local suggestion family must be supported before public display."
+      }
+    ],
+    "blockedFromPublicReasons": []
+  },
+  "notes": [
+    "Example data is fictional and must not be treated as provider truth.",
+    "decision is no_go because unsafePublicCount is greater than zero.",
+    "This example documents dry-run output only; it does not authorize database writes, route creation, sitemap changes, schema markup, or public profile rendering."
+  ]
+}
