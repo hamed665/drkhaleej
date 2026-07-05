@@ -11,6 +11,7 @@ The report is a dry-run artifact only. It records whether a frozen doctor, pharm
 | Surface | Source |
 | --- | --- |
 | Type contract | `src/server/admin/import-batch-dry-run-report.ts` |
+| Payload adapter | `src/server/admin/import-batch-dry-run-payload-adapter.ts` |
 | First batch bridge | `src/server/admin/import-first-batch-dry-run-bridge.ts` |
 | Rehearsal checklist | `docs/import/DRKHALEEJ_IMPORT_BATCH_REHEARSAL_V1.md` |
 | Hospital doctor relation transform contract | `docs/import/hospital-doctor-relations-transform-contract.md` |
@@ -130,6 +131,20 @@ If any required check fails, the report decision must be `no_go`.
   "notes": []
 }
 ```
+
+## Payload adapter extraction
+
+The first batch bridge may receive transformed candidate payloads through `transformedCandidates`.
+
+`src/server/admin/import-batch-dry-run-payload-adapter.ts` converts those payloads into dry-run rows before the report is built:
+
+- hospital candidates produce `hospitalRelationRows` from `candidate_payload.relations.doctors[]` and root `candidate_payload.doctors[]`;
+- all supported candidates may produce `localSuggestionRows` from `candidate_payload.relations.localSuggestions[]`, `candidate_payload.relations.local_suggestions[]`, `candidate_payload.relations.nearby[]`, and matching root arrays;
+- supported candidate families are normalized from singular/plural aliases for doctor, pharmacy, hospital, radiology, dentistry, and beauty;
+- rejected, removed, and held candidates are ignored when building candidate key maps;
+- manually supplied `hospitalRelationRows`, `localSuggestionRows`, and candidate key maps are still merged into the report input for rehearsal overrides.
+
+The adapter is pure and does not read the database, publish rows, or change sitemap state. It exists so the dry-run report can consume the same transformed `candidate_payload` shape that the public profile guards later read, because duplicating reality is apparently still considered bad engineering.
 
 ## Hospital relation dry-run summary
 
