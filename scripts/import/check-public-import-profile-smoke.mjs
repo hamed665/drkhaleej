@@ -1,4 +1,5 @@
 import './check-import-profile-index-eligibility.mjs';
+import './check-import-local-suggestion-guard.mjs';
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
