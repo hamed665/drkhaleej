@@ -62,6 +62,8 @@ type MaybeParam = string | string[] | undefined;
 
 type RouteCopy = {
   badge: string;
+  breadcrumbHomeLabel: string;
+  breadcrumbHospitalsLabel: string;
   overviewTitle: string;
   servicesTitle: string;
   doctorsTitle: string;
@@ -87,6 +89,8 @@ type RelatedInternalLink = {
 const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   en: {
     badge: "Public hospital profile",
+    breadcrumbHomeLabel: "Home",
+    breadcrumbHospitalsLabel: "Hospitals in Oman",
     overviewTitle: "Profile overview",
     servicesTitle: "Hospital services",
     doctorsTitle: "Doctors connected to this hospital",
@@ -104,6 +108,8 @@ const copyByLocale: Record<SupportedLocale, RouteCopy> = {
   },
   ar: {
     badge: "ملف مستشفى عام",
+    breadcrumbHomeLabel: "الرئيسية",
+    breadcrumbHospitalsLabel: "المستشفيات في عُمان",
     overviewTitle: "نظرة عامة على الملف",
     servicesTitle: "خدمات المستشفى",
     doctorsTitle: "أطباء مرتبطون بهذا المستشفى",
@@ -180,6 +186,10 @@ function localArea(parts: Array<string | null>): string {
 
 function absoluteUrl(pathname: string): string {
   return new URL(pathname, siteConfig.baseUrl).toString();
+}
+
+function publicHomeHref(locale: SupportedLocale, country: string): string {
+  return `/${locale}/${country}`;
 }
 
 function publicSearchHref(locale: SupportedLocale, country: string, query: string): string {
@@ -324,6 +334,26 @@ export default function PublicImportedHospitalProfilePage({
       </Head>
 
       <main className="home-foundation dm2026-home-page" dir={dir} data-profile-family={profile.family}>
+        <nav className="dm2026-container mt-4 text-xs text-slate-500" aria-label={locale === "ar" ? "مسار التصفح" : "Breadcrumb"}>
+          <ol className="flex flex-wrap items-center gap-2" role="list">
+            <li>
+              <Link href={publicHomeHref(locale, country)} className="underline-offset-4 hover:underline">
+                {copy.breadcrumbHomeLabel}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link href={publicHospitalsHref(locale, country)} className="underline-offset-4 hover:underline">
+                {copy.breadcrumbHospitalsLabel}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-slate-700">
+              {title}
+            </li>
+          </ol>
+        </nav>
+
         <section className="dm2026-container dm2026-search-surface" aria-labelledby="hospital-profile-title">
           <div className="dm2026-doctors-hero__copy">
             <span className="dm2026-badge">{copy.badge}</span>
