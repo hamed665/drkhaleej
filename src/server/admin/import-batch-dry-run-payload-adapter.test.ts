@@ -1,12 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildImportBatchDryRunPayloadExtraction } from "./import-batch-dry-run-payload-adapter";
-import {
-  buildImportBatchDryRunHospitalRelationSummary,
-  buildImportBatchDryRunLocalSuggestionSummary,
-  buildImportBatchDryRunReport,
-  importBatchDryRunRequiredChecks,
-} from "./import-batch-dry-run-report";
+import { buildImportBatchDryRunLocalSuggestionSummary } from "./import-batch-dry-run-report";
 
 describe("buildImportBatchDryRunPayloadExtraction", () => {
   it("keeps unsupported local suggestion targets unsafe instead of defaulting to hospital", () => {
@@ -168,9 +163,27 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
     expect(blockersByTargetKey.get("pharmacy-missing-source-anchor")).toBe("source_missing");
   });
 
-  it("summarizes representative first-batch fixtures before publish", () => {
+  it("summarizes representative first-batch fixtures before publish", async () => {
+    type HospitalSummary = {
+      publicVisibleCount: number;
+      unsafePublicCount: number;
+      unsafePublicBlockers: readonly { reason: string }[];
+    };
+    type DryRunReport = {
+      decision: "go" | "no_go";
+    };
+    const reportModule = await import("./import-batch-dry-run-report");
+    const buildHospitalSummary = reportModule.buildImportBatchDryRunHospitalRelationSummary as (input: {
+      rows: readonly unknown[];
+      candidateHospitalKeys: readonly string[];
+    }) => HospitalSummary;
+    const buildReport = reportModule.buildImportBatchDryRunReport as (input: Record<string, unknown>) => DryRunReport;
     const checkedAt = "2026-07-05";
-    const passingChecks = importBatchDryRunRequiredChecks.map((key) => ({ key, passed: true, notes: null }));
+    const passingChecks = (reportModule.importBatchDryRunRequiredChecks as readonly string[]).map((key) => ({
+      key,
+      passed: true,
+      notes: null,
+    }));
     const familySummary = {
       selectedCount: 1,
       eligibleCount: 1,
@@ -187,10 +200,7 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
           entityType: "doctor",
           candidateStatus: "approved",
           candidatePayload: {
-            geo: {
-              area: "Al Khuwair",
-              governorate: "Muscat",
-            },
+            geo: { area: "Al Khuwair", governorate: "Muscat" },
             relations: {
               localSuggestions: [
                 {
@@ -312,10 +322,7 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
           entityType: "pharmacy",
           candidateStatus: "approved",
           candidatePayload: {
-            geo: {
-              area: "Al Khuwair",
-              governorate: "Muscat",
-            },
+            geo: { area: "Al Khuwair", governorate: "Muscat" },
             relations: {
               localSuggestions: [
                 {
@@ -338,10 +345,7 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
           entityType: "hospital",
           candidateStatus: "approved",
           candidatePayload: {
-            geo: {
-              area: "Al Khuwair",
-              governorate: "Muscat",
-            },
+            geo: { area: "Al Khuwair", governorate: "Muscat" },
             relations: {
               doctors: [
                 {
@@ -390,11 +394,11 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
       rows: [...extraction.localSuggestionRows, sourceCandidateMissingRow as never],
       candidateKeys: extraction.localSuggestionCandidateKeys,
     });
-    const hospitalRelations = buildImportBatchDryRunHospitalRelationSummary({
+    const hospitalRelations = buildHospitalSummary({
       rows: extraction.hospitalRelationRows,
       candidateHospitalKeys: extraction.candidateHospitalKeys,
     });
-    const report = buildImportBatchDryRunReport({
+    const report = buildReport({
       rehearsalId: "first-batch-representative-fixture",
       generatedAt: "2026-07-05T00:00:00.000Z",
       commitSha: "representative-fixture",
