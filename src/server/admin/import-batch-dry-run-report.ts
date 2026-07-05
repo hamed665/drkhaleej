@@ -25,6 +25,15 @@ export type ImportBatchDryRunBlockerReason =
   | "unexpected_route_class"
   | "representative_smoke_failed";
 
+export type ImportBatchDryRunHospitalRelationBlockerReason =
+  | "branch_not_verified"
+  | "source_missing"
+  | "last_checked_missing"
+  | "confidence_unsupported"
+  | "doctor_name_missing"
+  | "hospital_mismatch"
+  | "ambiguous_review_required";
+
 export type ImportBatchDryRunReportSchemaVersion = "drkhaleej.import.batchDryRun.v1";
 
 export type ImportBatchDryRunCaps = Record<ImportBatchDryRunFamily, number>;
@@ -41,6 +50,15 @@ export type ImportBatchDryRunBlocker = {
   queueId: string | null;
   candidateId: string | null;
   canonicalPath: string | null;
+  notes: string | null;
+};
+
+export type ImportBatchDryRunHospitalRelationBlocker = {
+  reason: ImportBatchDryRunHospitalRelationBlockerReason;
+  hospitalKey: string | null;
+  doctorKey: string | null;
+  doctorName: string | null;
+  sourceUrl: string | null;
   notes: string | null;
 };
 
@@ -68,6 +86,18 @@ export type ImportBatchDryRunFamilySummary = {
   samples: readonly ImportBatchDryRunSample[];
 };
 
+export type ImportBatchDryRunHospitalRelationSummary = {
+  totalRows: number;
+  candidateHospitalCount: number;
+  publicVisibleCount: number;
+  blockedFromPublicCount: number;
+  privateReviewCount: number;
+  hospitalSuggestionCount: number;
+  unsafePublicCount: number;
+  unsafePublicBlockers: readonly ImportBatchDryRunHospitalRelationBlocker[];
+  blockedFromPublicReasons: readonly ImportBatchDryRunHospitalRelationBlocker[];
+};
+
 export type ImportBatchDryRunSitemapSummary = {
   beforeUrlCount: number;
   afterUrlCount: number;
@@ -86,6 +116,7 @@ export type ImportBatchDryRunReport = {
   checks: readonly ImportBatchDryRunCheck[];
   sitemap: ImportBatchDryRunSitemapSummary;
   byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  hospitalRelations: ImportBatchDryRunHospitalRelationSummary;
   notes: readonly string[];
 };
 
@@ -96,6 +127,7 @@ export type BuildImportBatchDryRunReportInput = {
   checks: readonly ImportBatchDryRunCheck[];
   sitemap: ImportBatchDryRunSitemapSummary;
   byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  hospitalRelations?: ImportBatchDryRunHospitalRelationSummary;
   caps?: ImportBatchDryRunCaps;
   notes?: readonly string[];
 };
@@ -132,6 +164,20 @@ export function emptyImportBatchDryRunFamilySummary(): ImportBatchDryRunFamilySu
   };
 }
 
+export function emptyImportBatchDryRunHospitalRelationSummary(): ImportBatchDryRunHospitalRelationSummary {
+  return {
+    totalRows: 0,
+    candidateHospitalCount: 0,
+    publicVisibleCount: 0,
+    blockedFromPublicCount: 0,
+    privateReviewCount: 0,
+    hospitalSuggestionCount: 0,
+    unsafePublicCount: 0,
+    unsafePublicBlockers: [],
+    blockedFromPublicReasons: [],
+  };
+}
+
 export function createEmptyImportBatchDryRunReport(input: {
   rehearsalId: string;
   generatedAt: string;
@@ -158,6 +204,7 @@ export function createEmptyImportBatchDryRunReport(input: {
       pharmacy: emptyImportBatchDryRunFamilySummary(),
       hospital: emptyImportBatchDryRunFamilySummary(),
     },
+    hospitalRelations: emptyImportBatchDryRunHospitalRelationSummary(),
     notes: input.notes ?? [],
   };
 }
@@ -183,22 +230,30 @@ function familyHasNoBlockers(byFamily: Record<ImportBatchDryRunFamily, ImportBat
   });
 }
 
+function hasNoUnsafePublicHospitalRelations(hospitalRelations: ImportBatchDryRunHospitalRelationSummary): boolean {
+  return hospitalRelations.unsafePublicCount === 0 && hospitalRelations.unsafePublicBlockers.length === 0;
+}
+
 export function decideImportBatchDryRunReport(input: {
   checks: readonly ImportBatchDryRunCheck[];
   sitemap: ImportBatchDryRunSitemapSummary;
   byFamily: Record<ImportBatchDryRunFamily, ImportBatchDryRunFamilySummary>;
+  hospitalRelations?: ImportBatchDryRunHospitalRelationSummary;
   caps?: ImportBatchDryRunCaps;
 }): ImportBatchDryRunDecision {
   const caps = input.caps ?? firstImportBatchDryRunCaps;
+  const hospitalRelations = input.hospitalRelations ?? emptyImportBatchDryRunHospitalRelationSummary();
   if (!hasAllRequiredChecks(input.checks)) return "no_go";
   if (input.sitemap.unexpectedUrlCount > 0 || input.sitemap.unexpectedUrls.length > 0) return "no_go";
   if (!familyWithinCaps(input.byFamily, caps)) return "no_go";
   if (!familyHasNoBlockers(input.byFamily)) return "no_go";
+  if (!hasNoUnsafePublicHospitalRelations(hospitalRelations)) return "no_go";
   return "go";
 }
 
 export function buildImportBatchDryRunReport(input: BuildImportBatchDryRunReportInput): ImportBatchDryRunReport {
   const caps = input.caps ?? firstImportBatchDryRunCaps;
+  const hospitalRelations = input.hospitalRelations ?? emptyImportBatchDryRunHospitalRelationSummary();
   return {
     schemaVersion: importBatchDryRunSchemaVersion,
     rehearsalId: input.rehearsalId,
@@ -208,12 +263,14 @@ export function buildImportBatchDryRunReport(input: BuildImportBatchDryRunReport
       checks: input.checks,
       sitemap: input.sitemap,
       byFamily: input.byFamily,
+      hospitalRelations,
       caps,
     }),
     caps,
     checks: input.checks,
     sitemap: input.sitemap,
     byFamily: input.byFamily,
+    hospitalRelations,
     notes: input.notes ?? [],
   };
 }
