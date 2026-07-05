@@ -110,6 +110,11 @@ function stringValue(value: JsonRecord, key: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function booleanValue(value: JsonRecord, key: string): boolean | null {
+  const next = value[key];
+  return typeof next === "boolean" ? next : null;
+}
+
 function numberValue(value: JsonRecord, key: string): number | null {
   const next = value[key];
   return typeof next === "number" && Number.isFinite(next) ? next : null;
@@ -196,8 +201,8 @@ function approvedRelatedDoctor(row: JsonRecord): PublicImportHospitalRelatedDoct
   const sourceName = stringValue(source, "sourceName");
   const sourceUrl = stringValue(source, "sourceUrl");
   const lastCheckedAt = stringValue(source, "lastCheckedAt");
-  const branchVerified = stringValue(row, "branchVerified") === "true" ? true : row.branchVerified === true || row.branch_verified === true;
-  const publicVisible = stringValue(row, "publicVisible") === "true" ? true : row.publicVisible === true || row.public_visible === true;
+  const branchVerified = booleanValue(row, "branchVerified") ?? booleanValue(row, "branch_verified");
+  const publicVisible = booleanValue(row, "publicVisible") ?? booleanValue(row, "public_visible");
   const relationStatus = stringValue(row, "relationStatus") ?? stringValue(row, "relationshipStatus") ?? stringValue(row, "status");
   const confidence = stringValue(row, "confidence");
 
