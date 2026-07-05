@@ -173,13 +173,15 @@ describe("buildImportBatchDryRunPayloadExtraction", () => {
       decision: "go" | "no_go";
     };
     const reportModule = await import("./import-batch-dry-run-report");
-    const buildHospitalSummary = reportModule.buildImportBatchDryRunHospitalRelationSummary as (input: {
+    const buildHospitalSummary = reportModule.buildImportBatchDryRunHospitalRelationSummary as unknown as (input: {
       rows: readonly unknown[];
       candidateHospitalKeys: readonly string[];
     }) => HospitalSummary;
-    const buildReport = reportModule.buildImportBatchDryRunReport as (input: Record<string, unknown>) => DryRunReport;
+    const buildReport = reportModule.buildImportBatchDryRunReport as unknown as (
+      input: Record<string, unknown>,
+    ) => DryRunReport;
     const checkedAt = "2026-07-05";
-    const passingChecks = (reportModule.importBatchDryRunRequiredChecks as readonly string[]).map((key) => ({
+    const passingChecks = (reportModule.importBatchDryRunRequiredChecks as unknown as readonly string[]).map((key) => ({
       key,
       passed: true,
       notes: null,
