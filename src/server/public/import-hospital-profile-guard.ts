@@ -2,6 +2,18 @@ import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 
+export type PublicImportHospitalRelatedDoctor = {
+  name: string;
+  nameAr: string | null;
+  slug: string | null;
+  specialty: string | null;
+  department: string | null;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  lastCheckedAt: string | null;
+  confidence: string | null;
+};
+
 export type PublicImportHospitalProfile = {
   family: "hospitals";
   canonicalPath: string;
@@ -14,6 +26,7 @@ export type PublicImportHospitalProfile = {
   services: string[];
   departments: string[];
   languages: string[];
+  doctors: PublicImportHospitalRelatedDoctor[];
   phoneE164: string | null;
   whatsappE164: string | null;
   email: string | null;
@@ -63,6 +76,7 @@ type CandidateRow = {
 type JsonRecord = Record<string, unknown>;
 
 const lookupLimit = 1000;
+const relatedDoctorLimit = 24;
 
 function client(): ProfileClient {
   return createSupabaseServiceRoleClient() as unknown as ProfileClient;
@@ -78,11 +92,22 @@ function record(value: unknown, key: string): JsonRecord {
   return isRecord(next) ? next : {};
 }
 
+function recordArray(value: JsonRecord, key: string): JsonRecord[] {
+  const next = value[key];
+  if (!Array.isArray(next)) return [];
+  return next.filter(isRecord);
+}
+
 function stringValue(value: JsonRecord, key: string): string | null {
   const next = value[key];
   if (typeof next !== "string") return null;
   const trimmed = next.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function booleanValue(value: JsonRecord, key: string): boolean | null {
+  const next = value[key];
+  return typeof next === "boolean" ? next : null;
 }
 
 function numberValue(value: JsonRecord, key: string): number | null {
@@ -147,6 +172,68 @@ function hasLocalGeo(geo: JsonRecord): boolean {
   );
 }
 
+function relatedDoctorRows(payload: JsonRecord): JsonRecord[] {
+  const relations = record(payload, "relations");
+  const fromRelations = recordArray(relations, "doctors");
+  const fromRoot = recordArray(payload, "doctors");
+  return [...fromRelations, ...fromRoot];
+}
+
+function relatedDoctorSource(row: JsonRecord): JsonRecord {
+  const source = record(row, "source");
+  return Object.keys(source).length > 0 ? source : row;
+}
+
+function approvedRelatedDoctor(row: JsonRecord): PublicImportHospitalRelatedDoctor | null {
+  const source = relatedDoctorSource(row);
+  const name = stringValue(row, "name") ?? stringValue(row, "fullName") ?? stringValue(row, "nameEn");
+  const rawSlug = stringValue(row, "slug") ?? stringValue(row, "doctorSlug");
+  const slug = rawSlug ? safeSlug(rawSlug) : null;
+  const sourceName = stringValue(source, "sourceName");
+  const sourceUrl = stringValue(source, "sourceUrl");
+  const lastCheckedAt = stringValue(source, "lastCheckedAt");
+  const branchVerified = booleanValue(row, "branchVerified") ?? booleanValue(row, "branch_verified");
+  const publicVisible = booleanValue(row, "publicVisible") ?? booleanValue(row, "public_visible");
+  const relationStatus = stringValue(row, "relationStatus") ?? stringValue(row, "relationshipStatus") ?? stringValue(row, "status");
+  const confidence = stringValue(row, "confidence");
+
+  if (name === null) return null;
+  if (branchVerified !== true) return null;
+  if (publicVisible !== true) return null;
+  if (relationStatus !== null && relationStatus !== "active" && relationStatus !== "approved") return null;
+  if (confidence !== null && confidence !== "high" && confidence !== "medium") return null;
+  if (!hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)) return null;
+
+  return {
+    name,
+    nameAr: stringValue(row, "nameAr"),
+    slug,
+    specialty: stringValue(row, "specialty") ?? stringValue(row, "primarySpecialty"),
+    department: stringValue(row, "department"),
+    sourceName,
+    sourceUrl,
+    lastCheckedAt,
+    confidence,
+  };
+}
+
+function approvedRelatedDoctors(payload: JsonRecord): PublicImportHospitalRelatedDoctor[] {
+  const seen = new Set<string>();
+  const doctors: PublicImportHospitalRelatedDoctor[] = [];
+
+  for (const row of relatedDoctorRows(payload)) {
+    const doctor = approvedRelatedDoctor(row);
+    if (doctor === null) continue;
+    const key = doctor.slug ?? doctor.name.toLocaleLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    doctors.push(doctor);
+    if (doctors.length >= relatedDoctorLimit) break;
+  }
+
+  return doctors;
+}
+
 function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): PublicImportHospitalProfile | null {
   if (candidate.entity_type !== "hospital") return null;
   if (candidate.candidate_status !== "approved") return null;
@@ -187,6 +274,7 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     services: stringArray(taxonomy, "services"),
     departments: stringArray(taxonomy, "departments"),
     languages: stringArray(payload, "languages"),
+    doctors: approvedRelatedDoctors(payload),
     phoneE164,
     whatsappE164,
     email,
