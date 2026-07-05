@@ -20,8 +20,20 @@ for (const token of [
   'buildFirstBatchDryRunReport',
   'BuildFirstBatchDryRunReportInput',
   'buildImportBatchDryRunReport',
+  'buildImportBatchDryRunHospitalRelationSummary',
+  'buildImportBatchDryRunLocalSuggestionSummary',
   'validateFirstBatchSelection',
   'defaultChecks',
+  'selectedCandidateIds',
+  'defaultCandidateHospitalKeys',
+  'defaultLocalSuggestionCandidateKeys',
+  'mergeLocalSuggestionCandidateKeys',
+  'hospitalRelationRows',
+  'candidateHospitalKeys',
+  'localSuggestionRows',
+  'localSuggestionCandidateKeys',
+  'hospitalRelations',
+  'localSuggestions',
   'mapSelectionIssueReason',
   'issueToBlocker',
   'buildFamilySummary',
@@ -29,6 +41,17 @@ for (const token of [
   'firstBatchFamilies',
 ]) {
   mustContain(bridgeSource, token, 'first batch dry-run bridge');
+}
+
+for (const token of [
+  'doctor: selectedCandidateIds(selection, "doctor")',
+  'pharmacy: selectedCandidateIds(selection, "pharmacy")',
+  'hospital: selectedCandidateIds(selection, "hospital")',
+  'radiology: []',
+  'dentistry: []',
+  'beauty: []',
+]) {
+  mustContain(bridgeSource, token, 'first batch local suggestion candidate key map');
 }
 
 for (const token of [
@@ -46,8 +69,13 @@ for (const token of [
 
 for (const token of [
   'buildImportBatchDryRunReport',
+  'buildImportBatchDryRunHospitalRelationSummary',
+  'buildImportBatchDryRunLocalSuggestionSummary',
   'importBatchDryRunRequiredChecks',
   'firstImportBatchDryRunCaps',
+  'ImportBatchDryRunHospitalRelationRow',
+  'ImportBatchDryRunLocalSuggestionRow',
+  'ImportBatchDryRunLocalSuggestionCandidateKeys',
 ]) {
   mustContain(reportSource, token, 'dry-run report contract');
 }
