@@ -36,8 +36,17 @@ for (const token of [
 
 for (const token of [
   'ImportBatchDryRunHospitalRelationBlockerReason',
+  'ImportBatchDryRunHospitalRelationRow',
+  'BuildImportBatchDryRunHospitalRelationSummaryInput',
   'ImportBatchDryRunHospitalRelationSummary',
   'emptyImportBatchDryRunHospitalRelationSummary',
+  'buildImportBatchDryRunHospitalRelationSummary',
+  'hospitalRelationBlockers',
+  'hospitalRelationBlocker',
+  'isSupportedHospitalRelationConfidence',
+  'needsHospitalRelationReview',
+  'candidateHospitalKeys: readonly string[];',
+  'rows: readonly ImportBatchDryRunHospitalRelationRow[];',
   'hospitalRelations: ImportBatchDryRunHospitalRelationSummary;',
   'hospitalRelations?: ImportBatchDryRunHospitalRelationSummary;',
   'hasNoUnsafePublicHospitalRelations',
@@ -48,6 +57,11 @@ for (const token of [
   'hospitalSuggestionCount',
   'unsafePublicBlockers',
   'blockedFromPublicReasons',
+  'branch_not_verified',
+  'last_checked_missing',
+  'confidence_unsupported',
+  'hospital_mismatch',
+  'ambiguous_review_required',
 ]) {
   assertIncludes(contractSource, token, 'hospital relation dry-run contract');
 }
