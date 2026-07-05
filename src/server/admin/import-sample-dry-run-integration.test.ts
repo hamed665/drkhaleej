@@ -31,8 +31,12 @@ function parseCsv(source: string): CsvRow[] {
   });
 }
 
-function boolValue(value: string): boolean {
-  return value.trim().toLowerCase() === "true";
+function value(row: CsvRow, key: string): string {
+  return row[key] ?? "";
+}
+
+function boolValue(row: CsvRow, key: string): boolean {
+  return value(row, key).trim().toLowerCase() === "true";
 }
 
 function checkRows(): readonly ImportBatchDryRunCheck[] {
@@ -48,50 +52,52 @@ function familySummary(selectedCount: number): ImportBatchDryRunFamilySummary {
 }
 
 function countFamily(rows: readonly CsvRow[], family: ImportBatchDryRunFamily): number {
-  return rows.filter((row) => row.row_type === "candidate" && row.family === family && row.qa_status === "selected").length;
+  return rows.filter((row) => value(row, "row_type") === "candidate" && value(row, "family") === family && value(row, "qa_status") === "selected").length;
 }
 
 function relationPayload(row: CsvRow): Record<string, unknown> {
   return {
-    source_family: row.source_family,
-    source_key: row.source_key,
-    source_area: row.source_area,
-    source_governorate: row.source_governorate,
-    target_family: row.target_family,
-    target_key: row.target_key,
-    target_name: row.target_name,
-    target_area: row.target_area,
-    target_governorate: row.target_governorate,
-    source_name: row.source_name,
-    source_url: row.source_url,
-    last_checked_at: row.last_checked_at,
-    public_visible: boolValue(row.public_visible),
-    confidence: row.confidence,
-    relation_status: row.relation_status,
-    requires_review: boolValue(row.requires_review),
-    notes: row.notes,
+    source_family: value(row, "source_family"),
+    source_key: value(row, "source_key"),
+    source_area: value(row, "source_area"),
+    source_governorate: value(row, "source_governorate"),
+    target_family: value(row, "target_family"),
+    target_key: value(row, "target_key"),
+    target_name: value(row, "target_name"),
+    target_area: value(row, "target_area"),
+    target_governorate: value(row, "target_governorate"),
+    source_name: value(row, "source_name"),
+    source_url: value(row, "source_url"),
+    last_checked_at: value(row, "last_checked_at"),
+    public_visible: boolValue(row, "public_visible"),
+    confidence: value(row, "confidence"),
+    relation_status: value(row, "relation_status"),
+    requires_review: boolValue(row, "requires_review"),
+    notes: value(row, "notes"),
   };
 }
 
 function transformedCandidates(rows: readonly CsvRow[]): readonly ImportBatchDryRunTransformedCandidate[] {
   return rows
-    .filter((row) => row.row_type === "candidate")
-    .map((candidate) => ({
-      candidateKey: candidate.candidate_key,
-      entityType: candidate.family,
-      candidateStatus: "approved",
-      candidatePayload: {
-        geo: {
-          area: candidate.area,
-          governorate: candidate.governorate,
+    .filter((row) => value(row, "row_type") === "candidate")
+    .map((candidate) =>
+      ({
+        candidateKey: value(candidate, "candidate_key"),
+        entityType: value(candidate, "family"),
+        candidateStatus: "approved",
+        candidatePayload: {
+          geo: {
+            area: value(candidate, "area"),
+            governorate: value(candidate, "governorate"),
+          },
+          relations: {
+            local_suggestions: rows
+              .filter((row) => value(row, "row_type") === "local_suggestion" && value(row, "source_key") === value(candidate, "candidate_key"))
+              .map(relationPayload),
+          },
         },
-        relations: {
-          local_suggestions: rows
-            .filter((row) => row.row_type === "local_suggestion" && row.source_key === candidate.candidate_key)
-            .map(relationPayload),
-        },
-      },
-    }));
+      }) satisfies ImportBatchDryRunTransformedCandidate,
+    );
 }
 
 describe("first-batch sample dry-run integration", () => {
