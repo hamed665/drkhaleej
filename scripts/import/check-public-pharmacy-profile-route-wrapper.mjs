@@ -49,6 +49,28 @@ for (const token of [
   assertIncludes(routeSource, token, `${routePath} must include ${token}`);
 }
 
+for (const token of [
+  'import Link from "next/link"',
+  'PublicImportLocalSuggestion',
+  'PublicImportLocalSuggestionFamily',
+  'localSuggestionsTitle',
+  'localSuggestionsDescription',
+  'localSuggestionSourceLabel',
+  'function localSuggestionDisplayName',
+  'function localSuggestionFamilyLabel',
+  'function publicLocalSuggestionHref',
+  'suggestion.family === "doctor"',
+  'suggestion.family === "pharmacy"',
+  'suggestion.family === "hospital"',
+  'profile.localSuggestions.length > 0',
+  'profile.localSuggestions.map',
+  'localSuggestionFamilyLabel(locale, suggestion.family)',
+  'publicLocalSuggestionHref(locale, country, suggestion)',
+  'suggestion.lastCheckedAt',
+]) {
+  assertIncludes(routeSource, token, `${routePath} must preserve guarded local suggestion route token ${token}`);
+}
+
 for (const forbiddenToken of [
   'application/ld+json',
   'buildFaqJsonLd',
@@ -68,8 +90,8 @@ for (const forbiddenToken of [
 }
 
 for (const token of [
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  '^\/(en|ar)\/om\/doctor\/',
+  '^\/(en|ar)\/om\/pharmacies\/',
   'hasReviewedImportEvidence',
   'import_entity_candidate_id',
 ]) {
