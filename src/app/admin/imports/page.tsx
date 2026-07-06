@@ -27,13 +27,28 @@ export default async function AdminImportsPage() {
 
   if (!result.ok) {
     return (
-      <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-950">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em]">ADM-IMPORT-A</p>
-        <h2 className="mt-2 text-2xl font-bold">Import batches unavailable</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6">
-          Import staging records could not be loaded right now. No raw database error is exposed here.
-        </p>
-      </section>
+      <div className="space-y-6">
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-950">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em]">ADM-IMPORT-A</p>
+              <h2 className="mt-2 text-2xl font-bold">Import batches unavailable</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6">
+                Import staging records could not be loaded right now. No raw database error is exposed here.
+              </p>
+              <p className="mt-3 max-w-3xl text-sm leading-6">
+                The upload workspace remains available, but this warning usually means the production database cannot read the import staging tables yet. Check that the import staging migrations are applied before expecting batch history or uploads to persist.
+              </p>
+            </div>
+            <Link
+              href="/admin/imports/upload"
+              className="inline-flex w-fit rounded-2xl bg-amber-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-950"
+            >
+              Open upload workspace
+            </Link>
+          </div>
+        </section>
+      </div>
     );
   }
 
