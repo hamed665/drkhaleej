@@ -6,6 +6,26 @@ This contract maps the uploaded legacy import templates to the DrKhaleej fast-la
 
 It is a launch-readiness contract, not a data import. No real provider rows are published by this document. No route, sitemap entry, structured data block, ad slot, offer, review, booking, payment, or provider dashboard capability is approved here. The point is to stop the usual spreadsheet-to-production circus before the clowns find the database.
 
+## Upload workspace
+
+The protected admin upload path is `/admin/imports/upload`.
+
+This route is guarded by `imports.upload` and uses the existing import upload server action to parse approved spreadsheets into protected staging tables only.
+
+Upload rules for this phase:
+
+- staging only;
+- maximum file size: 5 MB;
+- maximum staged parsed rows: 500;
+- accepted extensions: `.xlsx`, `.csv`, `.tsv`;
+- supported templates: Doctor Profile v3, Pharmacy v1, Hospital v1;
+- no public profile creation;
+- no index promotion;
+- no sitemap update;
+- no structured data output;
+- no media upload;
+- no review, rating, booking, insurance, claim, offer, or provider-dashboard activation.
+
 ## Source templates reviewed
 
 | Template | Launch use | Header row rule |
