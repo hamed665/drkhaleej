@@ -1,4 +1,10 @@
 import type {
+  CenterType,
+  DoctorTitle,
+  PublicCenterSummary,
+  PublicDoctorSummary,
+} from "./public-types";
+import type {
   PublicProviderDiscoveryEntry,
   PublicProviderEntityType,
   PublicProviderFamily,
@@ -30,6 +36,102 @@ function matchesProviderOptions(entry: PublicProviderDiscoveryEntry, options: Pu
   if (options.family && entry.family !== options.family) return false;
   if (options.entityType && entry.entityType !== options.entityType) return false;
   return true;
+}
+
+function centerFamily(centerType: CenterType): PublicProviderFamily {
+  if (centerType === "hospital") return "hospitals";
+  if (centerType === "pharmacy") return "pharmacies";
+  if (centerType === "lab") return "labs";
+  if (centerType === "radiology") return "radiology";
+  if (centerType === "beauty") return "beauty";
+  return "centers";
+}
+
+function centerEntityType(centerType: CenterType): PublicProviderEntityType {
+  if (centerType === "hospital") return "hospital";
+  if (centerType === "pharmacy") return "pharmacy";
+  if (centerType === "lab") return "lab";
+  if (centerType === "radiology") return "radiology";
+  if (centerType === "beauty") return "beauty";
+  return "clinic";
+}
+
+function familyPath(family: PublicProviderFamily, slug: string): string {
+  return `/${family}/${slug}`;
+}
+
+function doctorTitleLabel(title: DoctorTitle): string {
+  return title === "dr" ? "Dr." : title;
+}
+
+export function publicProviderFromManualCenter(summary: PublicCenterSummary): PublicProviderDiscoveryEntry {
+  const family = centerFamily(summary.centerType);
+
+  return {
+    id: `manual:center:${summary.id}`,
+    sourceKind: "manual",
+    entityType: centerEntityType(summary.centerType),
+    family,
+    slug: summary.slug,
+    canonicalPath: familyPath(family, summary.slug),
+    nameEn: summary.nameEn,
+    nameAr: summary.nameAr,
+    descriptionEn: summary.descriptionEn ?? summary.shortDescriptionEn,
+    descriptionAr: summary.descriptionAr ?? summary.shortDescriptionAr,
+    country: summary.defaultCountry,
+    governorate: null,
+    wilayat: null,
+    area: null,
+    services: [],
+    departments: [],
+    languages: [],
+    sourceName: null,
+    sourceUrl: null,
+    lastCheckedAt: null,
+    publicDetailEligible: true,
+    publicDiscoveryEligible: true,
+    publicSitemapEligible: true,
+  };
+}
+
+export function publicProviderFromManualDoctor(summary: PublicDoctorSummary): PublicProviderDiscoveryEntry {
+  return {
+    id: `manual:doctor:${summary.id}`,
+    sourceKind: "manual",
+    entityType: "doctor",
+    family: "doctors",
+    slug: summary.slug,
+    canonicalPath: familyPath("doctors", summary.slug),
+    nameEn: `${doctorTitleLabel(summary.titleEn)} ${summary.fullNameEn}`,
+    nameAr: summary.fullNameAr,
+    descriptionEn: null,
+    descriptionAr: null,
+    country: summary.defaultCountry,
+    governorate: null,
+    wilayat: null,
+    area: null,
+    services: [],
+    departments: [],
+    languages: [],
+    sourceName: null,
+    sourceUrl: null,
+    lastCheckedAt: null,
+    publicDetailEligible: true,
+    publicDiscoveryEligible: true,
+    publicSitemapEligible: true,
+  };
+}
+
+export function publicProvidersFromManualCenters(
+  summaries: readonly PublicCenterSummary[],
+): PublicProviderDiscoveryEntry[] {
+  return summaries.map(publicProviderFromManualCenter);
+}
+
+export function publicProvidersFromManualDoctors(
+  summaries: readonly PublicDoctorSummary[],
+): PublicProviderDiscoveryEntry[] {
+  return summaries.map(publicProviderFromManualDoctor);
 }
 
 export function mergePublicProviderDiscoveryEntries(
