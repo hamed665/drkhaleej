@@ -5,6 +5,7 @@ import type {
   PublicDoctorSummary,
 } from "./public-types";
 import type {
+  PublicProviderCountry,
   PublicProviderDiscoveryEntry,
   PublicProviderEntityType,
   PublicProviderFamily,
@@ -38,21 +39,27 @@ function matchesProviderOptions(entry: PublicProviderDiscoveryEntry, options: Pu
   return true;
 }
 
+function publicProviderCountry(country: string): PublicProviderCountry | null {
+  return country === "om" ? "om" : null;
+}
+
 function centerFamily(centerType: CenterType): PublicProviderFamily {
   if (centerType === "hospital") return "hospitals";
   if (centerType === "pharmacy") return "pharmacies";
-  if (centerType === "lab") return "labs";
-  if (centerType === "radiology") return "radiology";
-  if (centerType === "beauty") return "beauty";
+  if (centerType === "laboratory") return "labs";
+  if (centerType === "imaging_center") return "radiology";
+  if (centerType === "dental_clinic") return "dentistry";
+  if (centerType === "beauty_clinic" || centerType === "spa") return "beauty";
   return "centers";
 }
 
 function centerEntityType(centerType: CenterType): PublicProviderEntityType {
   if (centerType === "hospital") return "hospital";
   if (centerType === "pharmacy") return "pharmacy";
-  if (centerType === "lab") return "lab";
-  if (centerType === "radiology") return "radiology";
-  if (centerType === "beauty") return "beauty";
+  if (centerType === "laboratory") return "lab";
+  if (centerType === "imaging_center") return "radiology";
+  if (centerType === "dental_clinic") return "dentistry";
+  if (centerType === "beauty_clinic" || centerType === "spa") return "beauty";
   return "clinic";
 }
 
@@ -64,7 +71,10 @@ function doctorTitleLabel(title: DoctorTitle): string {
   return title === "dr" ? "Dr." : title;
 }
 
-export function publicProviderFromManualCenter(summary: PublicCenterSummary): PublicProviderDiscoveryEntry {
+export function publicProviderFromManualCenter(summary: PublicCenterSummary): PublicProviderDiscoveryEntry | null {
+  const country = publicProviderCountry(summary.defaultCountry);
+  if (!country) return null;
+
   const family = centerFamily(summary.centerType);
 
   return {
@@ -78,7 +88,7 @@ export function publicProviderFromManualCenter(summary: PublicCenterSummary): Pu
     nameAr: summary.nameAr,
     descriptionEn: summary.descriptionEn ?? summary.shortDescriptionEn,
     descriptionAr: summary.descriptionAr ?? summary.shortDescriptionAr,
-    country: summary.defaultCountry,
+    country,
     governorate: null,
     wilayat: null,
     area: null,
@@ -94,7 +104,10 @@ export function publicProviderFromManualCenter(summary: PublicCenterSummary): Pu
   };
 }
 
-export function publicProviderFromManualDoctor(summary: PublicDoctorSummary): PublicProviderDiscoveryEntry {
+export function publicProviderFromManualDoctor(summary: PublicDoctorSummary): PublicProviderDiscoveryEntry | null {
+  const country = publicProviderCountry(summary.defaultCountry);
+  if (!country) return null;
+
   return {
     id: `manual:doctor:${summary.id}`,
     sourceKind: "manual",
@@ -106,7 +119,7 @@ export function publicProviderFromManualDoctor(summary: PublicDoctorSummary): Pu
     nameAr: summary.fullNameAr,
     descriptionEn: null,
     descriptionAr: null,
-    country: summary.defaultCountry,
+    country,
     governorate: null,
     wilayat: null,
     area: null,
@@ -125,13 +138,19 @@ export function publicProviderFromManualDoctor(summary: PublicDoctorSummary): Pu
 export function publicProvidersFromManualCenters(
   summaries: readonly PublicCenterSummary[],
 ): PublicProviderDiscoveryEntry[] {
-  return summaries.map(publicProviderFromManualCenter);
+  return summaries.flatMap((summary) => {
+    const entry = publicProviderFromManualCenter(summary);
+    return entry ? [entry] : [];
+  });
 }
 
 export function publicProvidersFromManualDoctors(
   summaries: readonly PublicDoctorSummary[],
 ): PublicProviderDiscoveryEntry[] {
-  return summaries.map(publicProviderFromManualDoctor);
+  return summaries.flatMap((summary) => {
+    const entry = publicProviderFromManualDoctor(summary);
+    return entry ? [entry] : [];
+  });
 }
 
 export function mergePublicProviderDiscoveryEntries(
