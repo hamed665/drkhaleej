@@ -40,13 +40,23 @@ export default async function AdminImportsPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-3xl border border-cyan-100 bg-cyan-50/70 p-6 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-A</p>
-        <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em] text-slate-950">
-          Unified import staging
-        </h2>
-        <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Uploads parse approved spreadsheets into staging rows; public sitemap entries are now gated by reviewed queue state.
-        </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-800">ADM-IMPORT-A</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em] text-slate-950">
+              Unified import staging
+            </h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
+              Protected staging foundation for doctor, hospital, pharmacy, clinic, laboratory, and medical-center import batches. Uploads parse approved spreadsheets into staging rows; public sitemap entries are now gated by reviewed queue state.
+            </p>
+          </div>
+          <Link
+            href="/admin/imports/upload"
+            className="inline-flex w-fit rounded-2xl bg-cyan-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-cyan-800"
+          >
+            Upload spreadsheet
+          </Link>
+        </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">Visible batches</p>
@@ -57,8 +67,8 @@ export default async function AdminImportsPage() {
             <p className="mt-2 text-3xl font-bold text-slate-950">{result.limit}</p>
           </div>
           <div className="rounded-2xl border border-cyan-200 bg-white/80 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">Public state</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">Gated sitemap only</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">Upload path</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">/admin/imports/upload</p>
           </div>
         </div>
       </section>
