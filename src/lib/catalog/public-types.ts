@@ -69,6 +69,7 @@ export type PublicCenterSummary = {
   shortDescriptionEn: string | null;
   shortDescriptionAr: string | null;
   defaultCountry: CountryCode;
+  publicProfilePath?: string;
 };
 
 export type PublicDoctorSummary = {
@@ -139,59 +140,43 @@ export type PublicProviderLocationSummary = {
   addressLine1Ar?: string | null;
   addressLine2En?: string | null;
   addressLine2Ar?: string | null;
-  landmarkEn?: string | null;
-  landmarkAr?: string | null;
-  postalCode?: string | null;
+  areaId: string | null;
   areaNameEn: string | null;
   areaNameAr: string | null;
+  cityId: string | null;
   cityNameEn: string | null;
   cityNameAr: string | null;
+  countryId: string | null;
   countryNameEn: string | null;
   countryNameAr: string | null;
-  mapUrl: string | null;
+  postalCode: string | null;
+  latitude: number | null;
+  longitude: number | null;
   isPrimary: boolean;
-  sortOrder: number;
   contactActions: PublicContactAction[];
 };
 
-export type PublicCenterDetailLocationSummary = PublicProviderLocationSummary;
-
 export type PublicCenterDetail = PublicCenterSummary & {
-  verificationStatus: VerificationStatus;
-  licenseInfo: PublicLicenseInfo | null;
+  license: PublicLicenseInfo | null;
   location: PublicProviderLocationSummary | null;
   locations: PublicProviderLocationSummary[];
   services: PublicCenterDetailServiceSummary[];
   doctors: PublicCenterDetailDoctorSummary[];
-  contactActions: PublicContactAction[];
-  galleryImages: PublicMediaImage[];
-  logoImage: PublicMediaImage | null;
-  coverImage: PublicMediaImage | null;
+  media: PublicMediaImage[];
 };
 
 export type PublicDoctorPracticeLocationSummary = {
   id: string;
-  center: Pick<PublicCenterSummary, 'id' | 'slug' | 'nameEn' | 'nameAr' | 'centerType' | 'shortDescriptionEn' | 'shortDescriptionAr' | 'defaultCountry'> & {
-    verificationStatus: VerificationStatus;
-  };
-  primarySpecialty: PublicDoctorDetailSpecialtySummary | null;
+  center: PublicCenterSummary;
   location: PublicProviderLocationSummary | null;
   contactActions: PublicContactAction[];
 };
 
 export type PublicDoctorDetail = PublicDoctorSummary & {
-  displayNameEn: string | null;
-  licenseInfo: PublicLicenseInfo | null;
-  displayNameAr: string | null;
-  bioEn: string | null;
-  bioAr: string | null;
-  profileImageUrl: string | null;
-  profileImage: PublicMediaImage | null;
-  yearsExperience: number | null;
-  verificationStatus: VerificationStatus;
-  primarySpecialty: PublicDoctorDetailSpecialtySummary | null;
+  specialties: PublicDoctorDetailSpecialtySummary[];
   services: PublicDoctorDetailServiceSummary[];
   practiceLocations: PublicDoctorPracticeLocationSummary[];
+  media: PublicMediaImage[];
 };
 
 export type PublicCatalogSearchResult = {
@@ -201,42 +186,27 @@ export type PublicCatalogSearchResult = {
   areas: PublicGeoAreaSummary[];
 };
 
-export type PublicListOptions = {
+export type PublicCenterListOptions = {
+  country?: CountryCode;
+  centerType?: CenterType;
   limit?: number;
 };
 
-export type PublicCenterListOptions = PublicListOptions & {
+export type PublicDoctorListOptions = {
   country?: CountryCode;
-  centerType?: CenterType;
+  limit?: number;
+};
+
+export type PublicSearchOptions = {
+  limit?: number;
 };
 
 export type PublicCenterDetailOptions = {
   slug: string;
-  country?: CountryCode;
-  locale?: PublicCatalogLocale;
-  servicesLimit?: number;
-  doctorsLimit?: number;
-};
-
-export type PublicDoctorListOptions = PublicListOptions & {
   country?: CountryCode;
 };
 
 export type PublicDoctorDetailOptions = {
   slug: string;
   country?: CountryCode;
-  locale?: PublicCatalogLocale;
-  servicesLimit?: number;
-  practiceLocationsLimit?: number;
 };
-
-export type PublicServiceListOptions = PublicListOptions & {
-  categoryId?: string;
-};
-
-export type PublicGeoAreaListOptions = PublicListOptions & {
-  countryId?: string;
-  cityId?: string;
-};
-
-export type PublicSearchOptions = PublicListOptions;
