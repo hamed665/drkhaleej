@@ -1,3 +1,4 @@
+import './check-import-upload-workspace.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -81,6 +82,9 @@ for (const requiredGate of [
   'source and last checked date',
   'contact or map/direction signal',
   'Pharmacy and hospital profile routes stay blocked',
+  '/admin/imports/upload',
+  'imports.upload',
+  'staging only',
 ]) {
   assertIncludes(docsSource, requiredGate, `Docs must include launch rule: ${requiredGate}`);
 }
