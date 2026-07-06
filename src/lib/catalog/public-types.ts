@@ -69,6 +69,7 @@ export type PublicCenterSummary = {
   shortDescriptionEn: string | null;
   shortDescriptionAr: string | null;
   defaultCountry: CountryCode;
+  publicProfilePath?: string;
 };
 
 export type PublicDoctorSummary = {
