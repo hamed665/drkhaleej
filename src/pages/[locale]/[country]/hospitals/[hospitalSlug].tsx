@@ -181,6 +181,14 @@ async function loadHospitalProfile(
   country: string,
   hospitalSlug: string,
 ): Promise<PublicImportHospitalProfile | null> {
+  try {
+    const { getPublicImportHospitalProfile } = await import("@/server/public/import-hospital-profile-guard");
+    const directResult = await getPublicImportHospitalProfile({ locale, country, hospitalSlug });
+    if (directResult.ok) return directResult.profile;
+  } catch {
+    // Fall back to the internal API wrapper below. The page should not fail only because the direct server import path is unavailable.
+  }
+
   const endpointUrl = hospitalProfileEndpointUrl(context, locale, country, hospitalSlug);
   if (endpointUrl === null) return null;
 
