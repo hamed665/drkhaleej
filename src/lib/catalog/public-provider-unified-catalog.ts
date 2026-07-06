@@ -46,18 +46,20 @@ function publicProviderCountry(country: string): PublicProviderCountry | null {
 function centerFamily(centerType: CenterType): PublicProviderFamily {
   if (centerType === "hospital") return "hospitals";
   if (centerType === "pharmacy") return "pharmacies";
-  if (centerType === "lab") return "labs";
-  if (centerType === "radiology") return "radiology";
-  if (centerType === "beauty") return "beauty";
+  if (centerType === "laboratory") return "labs";
+  if (centerType === "imaging_center") return "radiology";
+  if (centerType === "dental_clinic") return "dentistry";
+  if (centerType === "beauty_clinic" || centerType === "spa") return "beauty";
   return "centers";
 }
 
 function centerEntityType(centerType: CenterType): PublicProviderEntityType {
   if (centerType === "hospital") return "hospital";
   if (centerType === "pharmacy") return "pharmacy";
-  if (centerType === "lab") return "lab";
-  if (centerType === "radiology") return "radiology";
-  if (centerType === "beauty") return "beauty";
+  if (centerType === "laboratory") return "lab";
+  if (centerType === "imaging_center") return "radiology";
+  if (centerType === "dental_clinic") return "dentistry";
+  if (centerType === "beauty_clinic" || centerType === "spa") return "beauty";
   return "clinic";
 }
 
