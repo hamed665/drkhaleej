@@ -1,10 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { isSupportedCountry, isSupportedLocale } from "@/lib/i18n/config";
-import { getPublicImportHospitalProfile } from "@/server/public/import-hospital-profile-guard";
+import {
+  getPublicImportHospitalProfile,
+  type PublicImportHospitalProfile,
+} from "@/server/public/import-hospital-profile-guard";
 
 type HospitalProfileResponse =
-  | { ok: true; profile: Awaited<ReturnType<typeof getPublicImportHospitalProfile>> extends { ok: true; profile: infer Profile } ? Profile : never }
+  | { ok: true; profile: PublicImportHospitalProfile }
   | { ok: false };
 
 function singleParam(value: string | string[] | undefined): string | null {
