@@ -16,6 +16,7 @@ const manifest = await readText('fixtures/import/import-readiness-runner.manifes
 const runner = await readText('scripts/import/run-import-readiness.mjs');
 const workflow = await readText('.github/workflows/import-readiness-contract.yml');
 const hospitalHold = await readText('docs/import/public-hospital-hold-contract.md');
+const runtimeDecision = await readText('docs/import/FIRST_BATCH_BRIDGE_RUNTIME_PATH_DECISION.md');
 
 for (const token of [
   '# Import Readiness Status After Manifest',
@@ -38,6 +39,7 @@ for (const token of [
 for (const token of [
   'runner manifest guard',
   'workflow runner guard',
+  'first batch bridge runtime path decision',
   'hospital public hold',
   'first batch dry-run fixture',
   'generated first batch dry-run fixture',
@@ -52,5 +54,6 @@ for (const token of [
 mustContain(runner, 'fixtures/import/import-readiness-runner.manifest.json', 'import readiness runner');
 mustContain(workflow, 'node scripts/import/run-import-readiness.mjs', 'import readiness workflow');
 mustContain(hospitalHold, 'Imported hospital records must remain private', 'hospital hold contract');
+mustContain(runtimeDecision, '`selected_runtime_path`: `tsx`', 'runtime path decision');
 
 console.log('import readiness status after manifest check passed.');
