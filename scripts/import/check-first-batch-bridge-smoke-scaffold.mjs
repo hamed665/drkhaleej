@@ -21,13 +21,21 @@ const packageJson = await read('package.json');
 const preflight = await read('docs/import/TSX_DEPENDENCY_IMPLEMENTATION_PREFLIGHT.md');
 
 for (const token of [
-  'buildFirstBatchDryRunReport',
+  'pending_tsx_dependency',
   'first-batch-dry-run.input.json',
-  'drkhaleej.import.batchDryRun.v1',
-  'report.decision !== "no_go"',
-  'first batch dry-run bridge smoke passed.',
+  'buildFirstBatchDryRunReport',
+  'no_go',
 ]) {
   requireText(smoke, token, 'first batch bridge smoke scaffold');
+}
+
+for (const token of [
+  'from "../../src/server/admin/import-first-batch-dry-run-bridge"',
+  'await readFile(',
+  'buildFirstBatchDryRunReport({',
+  'report.decision !== "no_go"',
+]) {
+  rejectText(smoke, token, 'first batch bridge smoke scaffold before tsx implementation');
 }
 
 rejectText(packageJson, '"tsx"', 'package json before dependency implementation');
