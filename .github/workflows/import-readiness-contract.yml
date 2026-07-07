@@ -32,23 +32,5 @@ jobs:
         with:
           node-version: 22
 
-      - name: Check imported hospital public hold
-        run: node scripts/import/check-imported-hospital-public-hold.mjs
-
-      - name: Check first batch dry-run fixture
-        run: node scripts/import/check-first-batch-real-fixture.mjs
-
-      - name: Check generated first batch dry-run fixture
-        run: node scripts/import/generate-first-batch-dry-run-fixture.mjs --check
-
-      - name: Check first batch generator bridge alignment
-        run: node scripts/import/check-first-batch-generator-bridge-alignment.mjs
-
-      - name: Check first batch bridge runtime preflight
-        run: node scripts/import/check-first-batch-bridge-runtime-preflight.mjs
-
-      - name: Check import public release preflight
-        run: node scripts/import/check-import-public-release-preflight-contract.mjs
-
-      - name: Check import readiness combined smoke
-        run: node scripts/import/check-import-readiness-combined-smoke.mjs
+      - name: Run import readiness contract
+        run: node scripts/import/run-import-readiness.mjs
