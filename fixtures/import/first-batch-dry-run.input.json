@@ -1,0 +1,272 @@
+{
+  "schemaVersion": "drkhaleej.import.firstBatchDryRunInput.v1",
+  "selection": {
+    "schemaVersion": "drkhaleej.import.firstBatchSelection.v1",
+    "selectionId": "first-batch-real-fixture-v1",
+    "generatedAt": "2026-07-07T00:00:00.000Z",
+    "caps": {
+      "doctor": 50,
+      "pharmacy": 25,
+      "hospital": 10
+    },
+    "rows": [
+      {
+        "family": "doctor",
+        "queueId": "fixture-doctor-cardiologist-muscat",
+        "candidateId": "fixture-cardiologist-muscat",
+        "canonicalPath": "/en/om/doctor/fixture-cardiologist-muscat",
+        "locale": "en",
+        "slug": "fixture-cardiologist-muscat",
+        "displayName": "Fixture Cardiologist Muscat",
+        "area": "Bosher",
+        "governorate": "Muscat",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/doctor-cardiologist",
+        "lastCheckedAt": "2026-07-07",
+        "contactOrMapSignal": "map",
+        "qaOwner": "import-readiness",
+        "qaStatus": "selected",
+        "qaNotes": null
+      },
+      {
+        "family": "doctor",
+        "queueId": "fixture-doctor-dermatologist-muscat",
+        "candidateId": "fixture-dermatologist-muscat",
+        "canonicalPath": "/ar/om/doctor/fixture-dermatologist-muscat",
+        "locale": "ar",
+        "slug": "fixture-dermatologist-muscat",
+        "displayName": "طبيب جلدية تجريبي مسقط",
+        "area": "Al Khuwair",
+        "governorate": "Muscat",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/doctor-dermatologist",
+        "lastCheckedAt": "2026-07-07",
+        "contactOrMapSignal": "phone",
+        "qaOwner": "import-readiness",
+        "qaStatus": "selected",
+        "qaNotes": null
+      },
+      {
+        "family": "pharmacy",
+        "queueId": "fixture-pharmacy-bosher-queue",
+        "candidateId": "fixture-pharmacy-bosher",
+        "canonicalPath": "/en/om/pharmacies/fixture-pharmacy-bosher",
+        "locale": "en",
+        "slug": "fixture-pharmacy-bosher",
+        "displayName": "Fixture Pharmacy Bosher",
+        "area": "Bosher",
+        "governorate": "Muscat",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/pharmacy-bosher",
+        "lastCheckedAt": "2026-07-07",
+        "contactOrMapSignal": "map",
+        "qaOwner": "import-readiness",
+        "qaStatus": "selected",
+        "qaNotes": null
+      },
+      {
+        "family": "hospital",
+        "queueId": "fixture-hospital-public-held",
+        "candidateId": "fixture-hospital-candidate-held",
+        "canonicalPath": "/en/om/hospitals/fixture-hospital-public-held",
+        "locale": "en",
+        "slug": "fixture-hospital-public-held",
+        "displayName": "Fixture Hospital Public Held",
+        "area": "Bosher",
+        "governorate": "Muscat",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/hospital-held",
+        "lastCheckedAt": "2026-07-07",
+        "contactOrMapSignal": "map",
+        "qaOwner": "import-readiness",
+        "qaStatus": "selected",
+        "qaNotes": "Selected for dry-run only; public release is blocked."
+      },
+      {
+        "family": "hospital",
+        "queueId": "fixture-hospital-public-held-ar",
+        "candidateId": "fixture-hospital-candidate-held-ar",
+        "canonicalPath": "/ar/om/hospitals/fixture-hospital-public-held-ar",
+        "locale": "ar",
+        "slug": "fixture-hospital-public-held-ar",
+        "displayName": "مستشفى تجريبي محجوز للنشر",
+        "area": "Al Khuwair",
+        "governorate": "Muscat",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/hospital-held-ar",
+        "lastCheckedAt": "2026-07-07",
+        "contactOrMapSignal": "phone",
+        "qaOwner": "import-readiness",
+        "qaStatus": "selected",
+        "qaNotes": "Selected for dry-run only; public release is blocked."
+      }
+    ]
+  },
+  "checks": [
+    { "key": "ci_green", "passed": true, "notes": "Fixture assumes CI is evaluated separately." },
+    { "key": "seo_check_green", "passed": true, "notes": "Fixture assumes SEO static checks are evaluated separately." },
+    { "key": "readiness_audit_zero_blockers", "passed": false, "notes": "Hospital public release remains blocked until real data blockers are zero." },
+    { "key": "sitemap_diff_frozen", "passed": true, "notes": "No imported hospital URLs are expected in sitemap during hold." },
+    { "key": "representative_profile_smoke_passed", "passed": false, "notes": "Hospital representative public smoke is intentionally not enabled yet." },
+    { "key": "blocked_route_classes_absent", "passed": true, "notes": "Unsupported route classes remain absent from public release." }
+  ],
+  "sitemap": {
+    "beforeUrlCount": 0,
+    "afterUrlCount": 0,
+    "importedDeltaCount": 0,
+    "unexpectedUrlCount": 0,
+    "unexpectedUrls": []
+  },
+  "familyOverrides": {
+    "doctor": {
+      "sitemapUrlCount": 2,
+      "sampledUrlCount": 2,
+      "samples": [
+        {
+          "family": "doctor",
+          "locale": "en",
+          "canonicalPath": "/en/om/doctor/fixture-cardiologist-muscat",
+          "renderedName": "Fixture Cardiologist Muscat",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        },
+        {
+          "family": "doctor",
+          "locale": "ar",
+          "canonicalPath": "/ar/om/doctor/fixture-dermatologist-muscat",
+          "renderedName": "طبيب جلدية تجريبي مسقط",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        }
+      ]
+    },
+    "pharmacy": {
+      "sitemapUrlCount": 1,
+      "sampledUrlCount": 1,
+      "samples": [
+        {
+          "family": "pharmacy",
+          "locale": "en",
+          "canonicalPath": "/en/om/pharmacies/fixture-pharmacy-bosher",
+          "renderedName": "Fixture Pharmacy Bosher",
+          "hasLocationEvidence": true,
+          "hasSourceEvidence": true,
+          "hasContactOrMapEvidence": true,
+          "hasCanonical": true,
+          "hasLocaleAlternates": true,
+          "passed": true,
+          "notes": null
+        }
+      ]
+    },
+    "hospital": {
+      "eligibleCount": 0,
+      "sitemapUrlCount": 0,
+      "sampledUrlCount": 0,
+      "blockers": [
+        {
+          "family": "hospital",
+          "reason": "unexpected_route_class",
+          "queueId": "fixture-hospital-public-held",
+          "candidateId": "fixture-hospital-candidate-held",
+          "canonicalPath": "/en/om/hospitals/fixture-hospital-public-held",
+          "notes": "Imported hospitals are intentionally held from public release until unified discovery and relation gates pass."
+        },
+        {
+          "family": "hospital",
+          "reason": "representative_smoke_failed",
+          "queueId": "fixture-hospital-public-held-ar",
+          "candidateId": "fixture-hospital-candidate-held-ar",
+          "canonicalPath": "/ar/om/hospitals/fixture-hospital-public-held-ar",
+          "notes": "Hospital smoke is blocked because public route must return notFound during readiness."
+        }
+      ],
+      "samples": []
+    }
+  },
+  "hospitalRelations": {
+    "totalRows": 2,
+    "candidateHospitalCount": 2,
+    "publicVisibleCount": 0,
+    "blockedFromPublicCount": 2,
+    "privateReviewCount": 0,
+    "hospitalSuggestionCount": 0,
+    "unsafePublicCount": 0,
+    "unsafePublicBlockers": [],
+    "blockedFromPublicReasons": [
+      {
+        "reason": "branch_not_verified",
+        "hospitalKey": "fixture-hospital-public-held",
+        "doctorKey": "fixture-cardiologist-muscat",
+        "doctorName": "Fixture Cardiologist Muscat",
+        "sourceUrl": "https://example.com/fixture/source/hospital-doctor",
+        "notes": "Relation remains private until branch verification is complete."
+      },
+      {
+        "reason": "ambiguous_review_required",
+        "hospitalKey": "fixture-hospital-public-held-ar",
+        "doctorKey": "fixture-dermatologist-muscat",
+        "doctorName": "طبيب جلدية تجريبي مسقط",
+        "sourceUrl": "https://example.com/fixture/source/hospital-doctor-ar",
+        "notes": "Relation is review-only and cannot become a public suggestion."
+      }
+    ]
+  },
+  "localSuggestions": {
+    "totalRows": 3,
+    "publicVisibleCount": 1,
+    "blockedFromPublicCount": 2,
+    "privateReviewCount": 0,
+    "sourceEntitySuggestionCount": 1,
+    "locationClusterCount": 1,
+    "unsafePublicCount": 0,
+    "unsafePublicBlockers": [],
+    "blockedFromPublicReasons": [
+      {
+        "reason": "unsupported_family",
+        "sourceFamily": "hospital",
+        "sourceKey": "fixture-hospital-public-held",
+        "sourceArea": "Bosher",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "clinic",
+        "targetKey": "fixture-clinic-hidden",
+        "targetArea": "Bosher",
+        "targetGovernorate": "Muscat",
+        "targetName": "Fixture Clinic Hidden",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/local-suggestion",
+        "notes": "Clinic is not part of the supported public local suggestion family set."
+      },
+      {
+        "reason": "location_mismatch",
+        "sourceFamily": "hospital",
+        "sourceKey": "fixture-hospital-public-held-ar",
+        "sourceArea": "Al Khuwair",
+        "sourceGovernorate": "Muscat",
+        "targetFamily": "pharmacy",
+        "targetKey": "fixture-pharmacy-bosher",
+        "targetArea": "Bosher",
+        "targetGovernorate": "Muscat",
+        "targetName": "Fixture Pharmacy Bosher",
+        "sourceName": "Fixture import source",
+        "sourceUrl": "https://example.com/fixture/source/local-suggestion-mismatch",
+        "notes": "Cross-area local suggestion remains blocked."
+      }
+    ]
+  },
+  "notes": [
+    "This fixture is intentionally no_go while imported hospitals are under public hold.",
+    "Doctor and pharmacy rows can be used to rehearse safe public import promotion.",
+    "Hospital rows are present to prove the dry-run blocks them from public release instead of silently publishing them."
+  ]
+}
