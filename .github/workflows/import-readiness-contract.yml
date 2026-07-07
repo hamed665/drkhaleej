@@ -1,0 +1,39 @@
+name: Import Readiness Contract
+
+on:
+  pull_request:
+    paths:
+      - "docs/import/**"
+      - "fixtures/import/**"
+      - "scripts/import/**"
+      - "src/app/**/hospitals/**"
+      - "src/server/public/import-sitemap.ts"
+      - ".github/workflows/import-readiness-contract.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/import/**"
+      - "fixtures/import/**"
+      - "scripts/import/**"
+      - "src/app/**/hospitals/**"
+      - "src/server/public/import-sitemap.ts"
+      - ".github/workflows/import-readiness-contract.yml"
+
+jobs:
+  import-readiness-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check imported hospital public hold
+        run: node scripts/import/check-imported-hospital-public-hold.mjs
+
+      - name: Check first batch dry-run fixture
+        run: node scripts/import/check-first-batch-real-fixture.mjs
