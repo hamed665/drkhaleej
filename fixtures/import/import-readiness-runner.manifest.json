@@ -22,6 +22,10 @@
       "command": ["scripts/import/check-tsx-dependency-implementation-preflight.mjs"]
     },
     {
+      "label": "tsx implementation checklist",
+      "command": ["scripts/import/check-tsx-implementation-checklist.mjs"]
+    },
+    {
       "label": "hospital public hold",
       "command": ["scripts/import/check-imported-hospital-public-hold.mjs"]
     },
