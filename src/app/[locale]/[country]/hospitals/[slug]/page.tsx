@@ -7,6 +7,11 @@ import {
 } from "@/lib/i18n/config";
 import { buildProfileNoindexMetadata } from "@/lib/seo/profile-metadata-index-gate";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const PUBLIC_HOSPITAL_HOLD_REASON = "imported_hospital_public_hold";
+
 type Params = { locale: string; country: string; slug: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -15,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   return buildProfileNoindexMetadata({
     title: "Hospital profile unavailable | DrKhaleej",
-    description: "This imported hospital profile is temporarily unavailable while public discovery is being prepared.",
+    description: `This hospital profile is temporarily unavailable while public discovery is being prepared. Hold reason: ${PUBLIC_HOSPITAL_HOLD_REASON}.`,
   });
 }
 

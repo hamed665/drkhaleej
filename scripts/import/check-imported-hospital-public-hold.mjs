@@ -32,6 +32,9 @@ const legacyHospitalDiscoverySource = await readOptionalText('src/lib/catalog/pu
 
 for (const token of [
   'ImportedHospitalDetailPublicHoldPage',
+  'export const dynamic = "force-dynamic";',
+  'export const revalidate = 0;',
+  'PUBLIC_HOSPITAL_HOLD_REASON',
   'buildProfileNoindexMetadata',
   'Hospital profile unavailable | DrKhaleej',
   'notFound();',
