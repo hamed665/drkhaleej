@@ -46,3 +46,6 @@ jobs:
 
       - name: Check import public release preflight
         run: node scripts/import/check-import-public-release-preflight-contract.mjs
+
+      - name: Check import readiness combined smoke
+        run: node scripts/import/check-import-readiness-combined-smoke.mjs
