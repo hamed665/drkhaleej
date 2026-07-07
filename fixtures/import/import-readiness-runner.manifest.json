@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "drkhaleej.import.readinessRunnerManifest.v1",
+  "checks": [
+    {
+      "label": "runner manifest guard",
+      "command": ["scripts/import/check-import-readiness-runner-manifest.mjs"]
+    },
+    {
+      "label": "workflow runner guard",
+      "command": ["scripts/import/check-import-readiness-workflow-runner.mjs"]
+    },
+    {
+      "label": "hospital public hold",
+      "command": ["scripts/import/check-imported-hospital-public-hold.mjs"]
+    },
+    {
+      "label": "first batch dry-run fixture",
+      "command": ["scripts/import/check-first-batch-real-fixture.mjs"]
+    },
+    {
+      "label": "generated first batch dry-run fixture",
+      "command": ["scripts/import/generate-first-batch-dry-run-fixture.mjs", "--check"]
+    },
+    {
+      "label": "first batch generator bridge alignment",
+      "command": ["scripts/import/check-first-batch-generator-bridge-alignment.mjs"]
+    },
+    {
+      "label": "first batch bridge runtime preflight",
+      "command": ["scripts/import/check-first-batch-bridge-runtime-preflight.mjs"]
+    },
+    {
+      "label": "import public release preflight",
+      "command": ["scripts/import/check-import-public-release-preflight-contract.mjs"]
+    },
+    {
+      "label": "combined smoke",
+      "command": ["scripts/import/check-import-readiness-combined-smoke.mjs"]
+    }
+  ]
+}
