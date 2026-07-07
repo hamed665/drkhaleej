@@ -29,12 +29,15 @@ for (const token of [
   'check-first-batch-bridge-runtime-preflight.mjs',
   'check-import-public-release-preflight-contract.mjs',
   'check-import-readiness-combined-smoke.mjs',
+  'check-import-readiness-status-after-manifest.mjs',
 ]) {
   mustNotContain(workflow, token, 'import readiness workflow direct check list');
 }
 
 for (const token of [
   'check-import-readiness-runner-manifest.mjs',
+  'check-import-readiness-workflow-runner.mjs',
+  'check-import-readiness-status-after-manifest.mjs',
   'check-imported-hospital-public-hold.mjs',
   'check-first-batch-real-fixture.mjs',
   'generate-first-batch-dry-run-fixture.mjs',
