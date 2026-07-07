@@ -29,9 +29,11 @@ for (const token of [
   'family-specific parallel public catalog',
   'runner manifest guard',
   'workflow runner guard',
+  'tsx dependency implementation preflight',
+  'tsx implementation checklist',
   'imported hospital public hold',
   'first-batch bridge runtime preflight',
-  'ready_for_runtime_bridge_selection',
+  'ready_for_tsx_dependency_implementation',
 ]) {
   mustContain(doc, token, 'import readiness status doc');
 }
@@ -40,6 +42,8 @@ for (const token of [
   'runner manifest guard',
   'workflow runner guard',
   'first batch bridge runtime path decision',
+  'tsx dependency implementation preflight',
+  'tsx implementation checklist',
   'hospital public hold',
   'first batch dry-run fixture',
   'generated first batch dry-run fixture',
