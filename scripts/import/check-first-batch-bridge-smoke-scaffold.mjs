@@ -19,6 +19,7 @@ const smoke = await read('scripts/import/smoke-first-batch-dry-run-bridge.ts');
 const manifest = await read('fixtures/import/import-readiness-runner.manifest.json');
 const packageJson = await read('package.json');
 const preflight = await read('docs/import/TSX_DEPENDENCY_IMPLEMENTATION_PREFLIGHT.md');
+const vercelSafeRule = await read('docs/import/VERCEL_SAFE_IMPORT_SCAFFOLD_RULE.md');
 
 for (const token of [
   'pending_tsx_dependency',
@@ -36,6 +37,16 @@ for (const token of [
   'report.decision !== "no_go"',
 ]) {
   rejectText(smoke, token, 'first batch bridge smoke scaffold before tsx implementation');
+}
+
+for (const token of [
+  '# Vercel-Safe Import Scaffold Rule',
+  'must not import the TypeScript bridge',
+  'must not import the TypeScript bridge or execute fixture IO before the selected runtime exists',
+  'wiring the scaffold file into the import-readiness manifest',
+  'This rule can be retired only in the same PR that adds the pinned `tsx` dependency',
+]) {
+  requireText(vercelSafeRule, token, 'vercel-safe import scaffold rule');
 }
 
 rejectText(packageJson, '"tsx"', 'package json before dependency implementation');
