@@ -41,5 +41,8 @@ jobs:
       - name: Check generated first batch dry-run fixture
         run: node scripts/import/generate-first-batch-dry-run-fixture.mjs --check
 
+      - name: Check first batch generator bridge alignment
+        run: node scripts/import/check-first-batch-generator-bridge-alignment.mjs
+
       - name: Check import public release preflight
         run: node scripts/import/check-import-public-release-preflight-contract.mjs
