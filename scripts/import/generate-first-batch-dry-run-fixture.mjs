@@ -7,6 +7,16 @@ const inputFile = 'fixtures/import/first-batch-dry-run.input.json';
 const outputFile = 'fixtures/import/first-batch-dry-run.fixture.json';
 const families = ['doctor', 'pharmacy', 'hospital'];
 
+// Mirrors the public shape produced by src/server/admin/import-first-batch-dry-run-bridge.ts.
+// Keep this generator fixture-only until Node can execute the TypeScript bridge directly in CI.
+const bridgeContract = {
+  builder: 'buildFirstBatchDryRunReport',
+  selection: 'ImportFirstBatchSelection',
+  report: 'ImportBatchDryRunReport',
+  checks: 'importBatchDryRunRequiredChecks',
+  families: 'firstBatchFamilies',
+};
+
 async function readJson(file) {
   return JSON.parse(await readFile(path.join(root, file), 'utf8'));
 }
@@ -63,7 +73,9 @@ function buildReport(input) {
 const input = await readJson(inputFile);
 const output = formatJson(buildReport(input));
 
-if (process.argv.includes('--write')) {
+if (process.argv.includes('--bridge-contract')) {
+  process.stdout.write(formatJson(bridgeContract));
+} else if (process.argv.includes('--write')) {
   await writeFile(path.join(root, outputFile), output);
   console.log('fixture written');
 } else if (process.argv.includes('--check')) {
