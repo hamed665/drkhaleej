@@ -38,13 +38,14 @@ The manifest currently covers these gates:
 
 1. runner manifest guard;
 2. workflow runner guard;
-3. imported hospital public hold;
-4. first-batch dry-run fixture validation;
-5. generated fixture check;
-6. first-batch generator bridge alignment;
-7. first-batch bridge runtime preflight;
-8. import public release preflight;
-9. combined smoke.
+3. import readiness status after manifest;
+4. imported hospital public hold;
+5. first-batch dry-run fixture validation;
+6. generated fixture check;
+7. first-batch generator bridge alignment;
+8. first-batch bridge runtime preflight;
+9. import public release preflight;
+10. combined smoke.
 
 ## Remaining work before real import promotion
 
