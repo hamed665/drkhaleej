@@ -10,6 +10,10 @@
       "command": ["scripts/import/check-import-readiness-workflow-runner.mjs"]
     },
     {
+      "label": "import readiness status after manifest",
+      "command": ["scripts/import/check-import-readiness-status-after-manifest.mjs"]
+    },
+    {
       "label": "hospital public hold",
       "command": ["scripts/import/check-imported-hospital-public-hold.mjs"]
     },
