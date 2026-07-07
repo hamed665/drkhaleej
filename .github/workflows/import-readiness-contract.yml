@@ -37,3 +37,6 @@ jobs:
 
       - name: Check first batch dry-run fixture
         run: node scripts/import/check-first-batch-real-fixture.mjs
+
+      - name: Check import public release preflight
+        run: node scripts/import/check-import-public-release-preflight-contract.mjs
