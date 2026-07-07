@@ -3,9 +3,11 @@ import path from 'node:path';
 
 const root = process.cwd();
 const workflowPath = '.github/workflows/import-readiness-contract.yml';
+const manifestPath = 'fixtures/import/import-readiness-runner.manifest.json';
 
 const workflow = await readFile(path.join(root, workflowPath), 'utf8');
 const runner = await readFile(path.join(root, 'scripts/import/run-import-readiness.mjs'), 'utf8');
+const manifest = await readFile(path.join(root, manifestPath), 'utf8');
 
 function mustContain(source, token, label) {
   if (!source.includes(token)) throw new Error(`${label} must include ${token}`);
@@ -17,6 +19,7 @@ function mustNotContain(source, token, label) {
 
 mustContain(workflow, 'Run import readiness contract', 'import readiness workflow');
 mustContain(workflow, 'node scripts/import/run-import-readiness.mjs', 'import readiness workflow');
+mustContain(runner, manifestPath, 'import readiness runner');
 
 for (const token of [
   'check-imported-hospital-public-hold.mjs',
@@ -31,6 +34,7 @@ for (const token of [
 }
 
 for (const token of [
+  'check-import-readiness-runner-manifest.mjs',
   'check-imported-hospital-public-hold.mjs',
   'check-first-batch-real-fixture.mjs',
   'generate-first-batch-dry-run-fixture.mjs',
@@ -40,7 +44,7 @@ for (const token of [
   'check-import-public-release-preflight-contract.mjs',
   'check-import-readiness-combined-smoke.mjs',
 ]) {
-  mustContain(runner, token, 'import readiness runner');
+  mustContain(manifest, token, 'import readiness runner manifest');
 }
 
 console.log('import readiness workflow runner check passed.');

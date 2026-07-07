@@ -1,26 +1,25 @@
 import { execFile } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
+const root = process.cwd();
+const manifestPath = 'fixtures/import/import-readiness-runner.manifest.json';
 
-const checks = [
-  ['workflow runner guard', ['scripts/import/check-import-readiness-workflow-runner.mjs']],
-  ['hospital public hold', ['scripts/import/check-imported-hospital-public-hold.mjs']],
-  ['first batch dry-run fixture', ['scripts/import/check-first-batch-real-fixture.mjs']],
-  ['generated first batch dry-run fixture', ['scripts/import/generate-first-batch-dry-run-fixture.mjs', '--check']],
-  ['first batch generator bridge alignment', ['scripts/import/check-first-batch-generator-bridge-alignment.mjs']],
-  ['first batch bridge runtime preflight', ['scripts/import/check-first-batch-bridge-runtime-preflight.mjs']],
-  ['import public release preflight', ['scripts/import/check-import-public-release-preflight-contract.mjs']],
-  ['combined smoke', ['scripts/import/check-import-readiness-combined-smoke.mjs']],
-];
+const manifest = JSON.parse(await readFile(path.join(root, manifestPath), 'utf8'));
 
-for (const [label, args] of checks) {
-  const [script, ...scriptArgs] = args;
+if (manifest.schemaVersion !== 'drkhaleej.import.readinessRunnerManifest.v1') {
+  throw new Error('Unsupported import readiness runner manifest schema.');
+}
+
+for (const check of manifest.checks) {
+  const [script, ...scriptArgs] = check.command;
   await execFileAsync(process.execPath, [script, ...scriptArgs], {
-    cwd: process.cwd(),
+    cwd: root,
     stdio: 'pipe',
   });
-  console.log(`passed: ${label}`);
+  console.log(`passed: ${check.label}`);
 }
 
 console.log('import readiness runner passed.');
