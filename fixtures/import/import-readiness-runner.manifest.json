@@ -14,6 +14,10 @@
       "command": ["scripts/import/check-import-readiness-status-after-manifest.mjs"]
     },
     {
+      "label": "first batch bridge runtime path decision",
+      "command": ["scripts/import/check-first-batch-bridge-runtime-path-decision.mjs"]
+    },
+    {
       "label": "hospital public hold",
       "command": ["scripts/import/check-imported-hospital-public-hold.mjs"]
     },
