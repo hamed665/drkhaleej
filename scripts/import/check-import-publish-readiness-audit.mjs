@@ -4,6 +4,7 @@ import './check-import-domain-entity-contract.mjs';
 import './check-import-canonical-geo-contract.mjs';
 import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
+import './check-import-internal-link-generator.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -15,6 +16,7 @@ const domainPath = 'src/server/admin/import-entity-domain.ts';
 const geoPath = 'src/server/admin/import-canonical-geo.ts';
 const validationPath = 'src/server/admin/import-publication-validation.ts';
 const linkRulePath = 'src/server/admin/import-link-rule-matrix.ts';
+const linkGeneratorPath = 'src/server/admin/import-internal-link-generator.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -39,6 +41,7 @@ const domainSource = await readText(domainPath);
 const geoSource = await readText(geoPath);
 const validationSource = await readText(validationPath);
 const linkRuleSource = await readText(linkRulePath);
+const linkGeneratorSource = await readText(linkGeneratorPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -172,6 +175,24 @@ for (const linkRuleToken of [
   'isImportEntityLinkAllowed',
 ]) {
   assertIncludes(linkRuleSource, linkRuleToken, `${linkRulePath} must include ${linkRuleToken}`);
+}
+
+for (const linkGeneratorToken of [
+  'ImportInternalLinkCandidate',
+  'ImportInternalLinkSource',
+  'ImportGeneratedInternalLink',
+  'ImportInternalLinkGenerationInput',
+  'IMPORT_INTERNAL_LINK_GENERATOR_VERSION',
+  'IMPORT_INTERNAL_LINK_RULE_VERSION',
+  'generateImportInternalLinks',
+  'getImportLinkRuleDecision',
+  'generatedLinksByRule',
+  'maxLinksByRule',
+  'allowed_rule_geo_quality_specialty_filter',
+  'rule_version',
+  'generator_version',
+]) {
+  assertIncludes(linkGeneratorSource, linkGeneratorToken, `${linkGeneratorPath} must include ${linkGeneratorToken}`);
 }
 
 for (const forbiddenToken of [
