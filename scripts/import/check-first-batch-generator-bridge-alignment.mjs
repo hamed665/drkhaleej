@@ -15,7 +15,7 @@ const generator = await readText('scripts/import/generate-first-batch-dry-run-fi
 const bridge = await readText('src/server/admin/import-first-batch-dry-run-bridge.ts');
 const selection = await readText('src/server/admin/import-first-batch-selection.ts');
 const report = await readText('src/server/admin/import-batch-dry-run-report.ts');
-const workflow = await readText('.github/workflows/import-readiness-contract.yml');
+const manifest = await readText('fixtures/import/import-readiness-runner.manifest.json');
 
 for (const token of [
   'bridgeContract',
@@ -57,10 +57,12 @@ for (const token of [
   mustContain(report, token, 'dry-run report contract');
 }
 
-mustContain(
-  workflow,
-  'node scripts/import/generate-first-batch-dry-run-fixture.mjs --check',
-  'import readiness workflow',
-);
+for (const token of [
+  'generated first batch dry-run fixture',
+  'scripts/import/generate-first-batch-dry-run-fixture.mjs',
+  '--check',
+]) {
+  mustContain(manifest, token, 'import readiness runner manifest');
+}
 
 console.log('first batch generator bridge alignment check passed.');
