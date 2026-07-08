@@ -28,7 +28,6 @@ for (const token of [
   'const publicImportSitemapFamilyCaps = {',
   'doctor: 3000,',
   'pharmacy: 1500,',
-  'hospital: 500,',
   'satisfies Record<SupportedImportSitemapEntityType, number>',
   'const publicImportSitemapLimit = Object.values(publicImportSitemapFamilyCaps).reduce',
   'function emptyFamilyCounters():',
@@ -37,6 +36,10 @@ for (const token of [
   'familyCounts[entry.entityType] += 1;',
   'return applyFamilyCaps(entries);',
   'filter((entry): entry is InternalImportSitemapEntry => entry !== null)',
+  'decidePublicSitemapEligibility',
+  'minimumInternalLinksPassed',
+  'hreflangReady',
+  'blockedByImportedHospitalRelease',
 ]) {
   assertIncludes(sitemapSource, token, `${sitemapPath} must include ${token}`);
 }
@@ -44,7 +47,6 @@ for (const token of [
 for (const token of [
   '^\\/(en|ar)\\/om\\/doctor\\/',
   '^\\/(en|ar)\\/om\\/pharmacies\\/',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
   'hasReviewedImportEvidence',
   '.select("id, target_entity_type, updated_at, metadata")',
   '.eq("publish_status", "index_eligible")',
@@ -55,6 +57,12 @@ for (const token of [
 }
 
 for (const forbiddenToken of [
+  'hospital: 500,',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  '| "hospital"',
+  'value === "hospital"',
+  'case "hospital":',
+  '/hospitals/',
   'booking',
   'insurance',
   'claim',
@@ -72,4 +80,4 @@ for (const packageToken of [
   assertIncludes(packageSource, packageToken, `package.json must include ${packageToken}.`);
 }
 
-console.log('import sitemap family caps check passed.');
+console.log('import sitemap family caps hold check passed.');
