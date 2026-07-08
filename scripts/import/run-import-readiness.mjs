@@ -15,10 +15,17 @@ if (manifest.schemaVersion !== 'drkhaleej.import.readinessRunnerManifest.v1') {
 
 for (const check of manifest.checks) {
   const [script, ...scriptArgs] = check.command;
-  await execFileAsync(process.execPath, [script, ...scriptArgs], {
-    cwd: root,
-    stdio: 'pipe',
-  });
+  try {
+    await execFileAsync(process.execPath, [script, ...scriptArgs], {
+      cwd: root,
+      stdio: 'pipe',
+    });
+  } catch (error) {
+    console.error(`failed: ${check.label}`);
+    if (error?.stdout) console.error(String(error.stdout));
+    if (error?.stderr) console.error(String(error.stderr));
+    throw error;
+  }
   console.log(`passed: ${check.label}`);
 }
 
