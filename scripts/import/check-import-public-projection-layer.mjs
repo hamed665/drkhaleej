@@ -27,7 +27,11 @@ for (const token of [
   'IMPORT_PUBLIC_PROJECTION_TABLES',
   'IMPORT_PUBLIC_REQUIRED_ENTITY_PROJECTION_KINDS',
   'IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND',
+  'IMPORT_PUBLIC_PROJECTION_MISSING_BLOCKER_BY_KIND',
+  'IMPORT_PUBLIC_ALLOWED_RENDER_DATA_SOURCES',
   'IMPORT_PUBLIC_PROJECTION_MAX_RECORD_PAYLOAD_KB',
+  'uniquePublicPageDataSources',
+  'uniquePublicProjectionBlockers',
   'getPublicProjectionDataSources',
   'getImportPublicProjectionBlockers',
   'isImportPublicProjectionManifestReady',
@@ -46,6 +50,19 @@ for (const table of [
   'public_area_page_projection',
 ]) {
   assert(source.includes(table), `public projection layer must include table ${table}.`);
+}
+
+for (const dataSource of [
+  'public_indexable_entities',
+  'entity_internal_links_cache',
+  'schema_projection',
+  'canonical_geo_projection',
+  'public_content_projection',
+  'public_seo_projection',
+  'public_nearby_entities_projection',
+  'public_llm_answer_projection',
+]) {
+  assert(source.includes(dataSource), `public projection layer must allow data source ${dataSource}.`);
 }
 
 for (const kind of [
