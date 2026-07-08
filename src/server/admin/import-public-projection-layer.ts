@@ -95,7 +95,7 @@ export const IMPORT_PUBLIC_REQUIRED_ENTITY_PROJECTION_KINDS = [
   "llm_answer",
 ] as const satisfies readonly ImportPublicProjectionKind[];
 
-export const IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND = {
+export const IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND: Record<ImportPublicProjectionKind, ImportPublicPageDataSource> = {
   entity: "public_indexable_entities",
   geo: "canonical_geo_projection",
   seo: "public_seo_projection",
@@ -104,7 +104,31 @@ export const IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND = {
   nearby_entities: "public_nearby_entities_projection",
   llm_answer: "public_llm_answer_projection",
   area_page: "public_content_projection",
-} as const satisfies Record<ImportPublicProjectionKind, ImportPublicPageDataSource>;
+};
+
+export const IMPORT_PUBLIC_PROJECTION_MISSING_BLOCKER_BY_KIND: Record<
+  (typeof IMPORT_PUBLIC_REQUIRED_ENTITY_PROJECTION_KINDS)[number],
+  ImportPublicProjectionBlocker
+> = {
+  entity: "entity_projection_missing",
+  geo: "geo_projection_missing",
+  seo: "seo_projection_missing",
+  schema: "schema_projection_missing",
+  internal_links: "internal_links_projection_missing",
+  nearby_entities: "nearby_entities_projection_missing",
+  llm_answer: "llm_answer_projection_missing",
+};
+
+export const IMPORT_PUBLIC_ALLOWED_RENDER_DATA_SOURCES = [
+  "public_indexable_entities",
+  "entity_internal_links_cache",
+  "schema_projection",
+  "canonical_geo_projection",
+  "public_content_projection",
+  "public_seo_projection",
+  "public_nearby_entities_projection",
+  "public_llm_answer_projection",
+] as const satisfies readonly ImportPublicPageDataSource[];
 
 export const IMPORT_PUBLIC_PROJECTION_MAX_RECORD_PAYLOAD_KB = 96;
 
@@ -112,14 +136,20 @@ function hasRequiredKind(records: readonly ImportPublicProjectionRecord[], kind:
   return records.some((record) => record.kind === kind && record.status === "ready");
 }
 
+function uniquePublicPageDataSources(values: readonly ImportPublicPageDataSource[]): readonly ImportPublicPageDataSource[] {
+  return Array.from(new Set(values));
+}
+
+function uniquePublicProjectionBlockers(values: readonly ImportPublicProjectionBlocker[]): readonly ImportPublicProjectionBlocker[] {
+  return Array.from(new Set(values));
+}
+
 export function getPublicProjectionDataSources(records: readonly ImportPublicProjectionRecord[]): readonly ImportPublicPageDataSource[] {
-  return [
-    ...new Set(
-      records
-        .filter((record) => record.status === "ready")
-        .map((record) => IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND[record.kind]),
-    ),
-  ];
+  return uniquePublicPageDataSources(
+    records
+      .filter((record) => record.status === "ready")
+      .map((record) => IMPORT_PUBLIC_PROJECTION_DATA_SOURCE_BY_KIND[record.kind]),
+  );
 }
 
 export function getImportPublicProjectionBlockers(manifest: ImportPublicProjectionManifest): readonly ImportPublicProjectionBlocker[] {
@@ -127,10 +157,7 @@ export function getImportPublicProjectionBlockers(manifest: ImportPublicProjecti
   const records = manifest.records;
 
   for (const kind of IMPORT_PUBLIC_REQUIRED_ENTITY_PROJECTION_KINDS) {
-    if (!hasRequiredKind(records, kind)) {
-      const blocker = `${kind}_projection_missing` as ImportPublicProjectionBlocker;
-      blockers.push(blocker);
-    }
+    if (!hasRequiredKind(records, kind)) blockers.push(IMPORT_PUBLIC_PROJECTION_MISSING_BLOCKER_BY_KIND[kind]);
   }
 
   for (const record of records) {
@@ -142,19 +169,10 @@ export function getImportPublicProjectionBlockers(manifest: ImportPublicProjecti
   }
 
   for (const dataSource of manifest.renderPlan.dataSources) {
-    if (dataSource === "public_indexable_entities") continue;
-    if (dataSource === "entity_internal_links_cache") continue;
-    if (dataSource === "schema_projection") continue;
-    if (dataSource === "canonical_geo_projection") continue;
-    if (dataSource === "public_content_projection") continue;
-    if (dataSource === "public_seo_projection") continue;
-    if (dataSource === "public_nearby_entities_projection") continue;
-    if (dataSource === "public_llm_answer_projection") continue;
-
-    blockers.push("raw_import_source_in_public_render");
+    if (!IMPORT_PUBLIC_ALLOWED_RENDER_DATA_SOURCES.includes(dataSource)) blockers.push("raw_import_source_in_public_render");
   }
 
-  return [...new Set(blockers)];
+  return uniquePublicProjectionBlockers(blockers);
 }
 
 export function isImportPublicProjectionManifestReady(manifest: ImportPublicProjectionManifest): boolean {
