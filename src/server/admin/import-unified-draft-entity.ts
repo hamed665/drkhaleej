@@ -114,7 +114,9 @@ export function buildUnifiedDraftEntity(input: ImportUnifiedDraftEntityInput): I
   const source = resolveImportDraftEntitySource(input.source) ?? "manual";
   const domainResolution = resolveImportEntityDomain(input.entityType);
   const duplicateCandidateIds = input.duplicateCandidateIds ?? [];
-  const requiresManualReview = input.requiresManualReview ?? source === "ai_assisted" || duplicateCandidateIds.length > 0;
+  const requiresManualReview =
+  input.requiresManualReview ??
+  (source === "ai_assisted" || duplicateCandidateIds.length > 0);
 
   return {
     draftId: input.draftId ?? "",
