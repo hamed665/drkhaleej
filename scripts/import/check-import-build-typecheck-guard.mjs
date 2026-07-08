@@ -40,6 +40,7 @@ for (const requiredValidator of [
   './check-import-publish-lifecycle.mjs',
   './check-import-domain-entity-contract.mjs',
   './check-import-canonical-geo-contract.mjs',
+  './check-import-unified-draft-entity.mjs',
   './check-import-publication-validation.mjs',
   './check-import-link-rule-matrix.mjs',
   './check-import-internal-link-generator.mjs',
