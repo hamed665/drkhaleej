@@ -7,6 +7,7 @@ import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
 import './check-import-internal-link-cache.mjs';
 import './check-import-sitemap-eligibility.mjs';
+import './check-import-schema-generator.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -21,6 +22,8 @@ const linkRulePath = 'src/server/admin/import-link-rule-matrix.ts';
 const linkGeneratorPath = 'src/server/admin/import-internal-link-generator.ts';
 const linkCachePath = 'src/server/admin/import-internal-link-cache.ts';
 const sitemapEligibilityPath = 'src/server/admin/import-sitemap-eligibility-contract.ts';
+const schemaGeneratorPath = 'src/server/admin/import-schema-generator.ts';
+const schemaValidationPath = 'src/server/admin/import-schema-validation.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -48,6 +51,8 @@ const linkRuleSource = await readText(linkRulePath);
 const linkGeneratorSource = await readText(linkGeneratorPath);
 const linkCacheSource = await readText(linkCachePath);
 const sitemapEligibilitySource = await readText(sitemapEligibilityPath);
+const schemaGeneratorSource = await readText(schemaGeneratorPath);
+const schemaValidationSource = await readText(schemaValidationPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -119,6 +124,9 @@ for (const domainToken of [
   'non_medical_beauty',
   'wellness',
   'fitness',
+  'ivf_center',
+  'hair_transplant_clinic',
+  'sports_medicine_doctor',
   'resolveImportEntityDomain',
   'getDomainSeparationViolations',
   'isCrossDomainBlockedByDefault',
@@ -237,6 +245,38 @@ for (const sitemapEligibilityToken of [
   'canonical_not_validated',
 ]) {
   assertIncludes(sitemapEligibilitySource, sitemapEligibilityToken, `${sitemapEligibilityPath} must include ${sitemapEligibilityToken}`);
+}
+
+for (const schemaToken of [
+  'ImportSchemaType',
+  'ImportSchemaEntityInput',
+  'ImportGeneratedSchema',
+  'IMPORT_SCHEMA_TYPES_BY_ENTITY_TYPE',
+  'generateEntitySchema',
+  'getImportSchemaTypesForEntityType',
+  'Hospital',
+  'Physician',
+  'Pharmacy',
+  'VeterinaryCare',
+  'PetStore',
+  'SportsActivityLocation',
+]) {
+  assertIncludes(schemaGeneratorSource, schemaToken, `${schemaGeneratorPath} must include ${schemaToken}`);
+}
+
+for (const schemaValidationToken of [
+  'ImportSchemaValidationBlocker',
+  'ImportSchemaValidationInput',
+  'schema_domain_mismatch',
+  'schema_name_missing',
+  'schema_url_missing',
+  'schema_address_missing',
+  'schema_geo_missing',
+  'getSchemaBlockers',
+  'validateGeneratedSchema',
+  'isSchemaReady',
+]) {
+  assertIncludes(schemaValidationSource, schemaValidationToken, `${schemaValidationPath} must include ${schemaValidationToken}`);
 }
 
 for (const forbiddenToken of [
