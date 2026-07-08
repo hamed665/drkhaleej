@@ -8,6 +8,7 @@ import './check-import-internal-link-generator.mjs';
 import './check-import-internal-link-cache.mjs';
 import './check-import-sitemap-eligibility.mjs';
 import './check-import-schema-generator.mjs';
+import './check-import-readiness-engine.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -24,6 +25,7 @@ const linkCachePath = 'src/server/admin/import-internal-link-cache.ts';
 const sitemapEligibilityPath = 'src/server/admin/import-sitemap-eligibility-contract.ts';
 const schemaGeneratorPath = 'src/server/admin/import-schema-generator.ts';
 const schemaValidationPath = 'src/server/admin/import-schema-validation.ts';
+const readinessEnginePath = 'src/server/admin/import-readiness-engine.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -53,6 +55,7 @@ const linkCacheSource = await readText(linkCachePath);
 const sitemapEligibilitySource = await readText(sitemapEligibilityPath);
 const schemaGeneratorSource = await readText(schemaGeneratorPath);
 const schemaValidationSource = await readText(schemaValidationPath);
+const readinessEngineSource = await readText(readinessEnginePath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -277,6 +280,22 @@ for (const schemaValidationToken of [
   'isSchemaReady',
 ]) {
   assertIncludes(schemaValidationSource, schemaValidationToken, `${schemaValidationPath} must include ${schemaValidationToken}`);
+}
+
+for (const readinessEngineToken of [
+  'ImportReadinessCategory',
+  'ImportReadinessSeverity',
+  'ImportReadinessNextAction',
+  'ImportReadinessBlocker',
+  'ImportReadinessInput',
+  'ImportEntityReadiness',
+  'categoryWeights',
+  'scoreFromBlockers',
+  'selectNextAction',
+  'getEntityReadiness',
+  'getEntityReadinessScore',
+]) {
+  assertIncludes(readinessEngineSource, readinessEngineToken, `${readinessEnginePath} must include ${readinessEngineToken}`);
 }
 
 for (const forbiddenToken of [
