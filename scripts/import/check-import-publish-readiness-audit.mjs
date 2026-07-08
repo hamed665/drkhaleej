@@ -1,5 +1,6 @@
 import './check-import-publish-lock.mjs';
 import './check-import-publish-lifecycle.mjs';
+import './check-import-domain-entity-contract.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -7,6 +8,7 @@ const root = process.cwd();
 const auditPath = 'src/server/admin/import-publish-readiness-audit.ts';
 const lockPath = 'src/server/admin/import-publish-lock.ts';
 const lifecyclePath = 'src/server/admin/import-publish-lifecycle.ts';
+const domainPath = 'src/server/admin/import-entity-domain.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -27,6 +29,7 @@ function assertNotIncludes(source, token, message) {
 const auditSource = await readText(auditPath);
 const lockSource = await readText(lockPath);
 const lifecycleSource = await readText(lifecyclePath);
+const domainSource = await readText(domainPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -86,6 +89,23 @@ for (const lifecycleToken of [
   'duplicate_check_missing',
 ]) {
   assertIncludes(lifecycleSource, lifecycleToken, `${lifecyclePath} must include ${lifecycleToken}`);
+}
+
+for (const domainToken of [
+  'ImportEntityDomain',
+  'ImportEntityType',
+  'IMPORT_ENTITY_DOMAIN_BY_TYPE',
+  'human_healthcare',
+  'pet_healthcare',
+  'medical_beauty',
+  'non_medical_beauty',
+  'wellness',
+  'fitness',
+  'resolveImportEntityDomain',
+  'getDomainSeparationViolations',
+  'isCrossDomainBlockedByDefault',
+]) {
+  assertIncludes(domainSource, domainToken, `${domainPath} must include ${domainToken}`);
 }
 
 for (const forbiddenToken of [
