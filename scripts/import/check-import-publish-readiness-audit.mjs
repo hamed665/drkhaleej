@@ -1,10 +1,12 @@
 import './check-import-publish-lock.mjs';
+import './check-import-publish-lifecycle.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 const auditPath = 'src/server/admin/import-publish-readiness-audit.ts';
 const lockPath = 'src/server/admin/import-publish-lock.ts';
+const lifecyclePath = 'src/server/admin/import-publish-lifecycle.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -24,6 +26,7 @@ function assertNotIncludes(source, token, message) {
 
 const auditSource = await readText(auditPath);
 const lockSource = await readText(lockPath);
+const lifecycleSource = await readText(lifecyclePath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -67,6 +70,22 @@ for (const lockToken of [
   'sitemap_included: false',
 ]) {
   assertIncludes(lockSource, lockToken, `${lockPath} must include ${lockToken}`);
+}
+
+for (const lifecycleToken of [
+  'ImportEntityLifecycleState',
+  'canPublishEntity',
+  'getPublishBlockers',
+  'getReadinessStatus',
+  'manual_approval_missing',
+  'seo_not_validated',
+  'geo_not_validated',
+  'content_not_validated',
+  'relations_not_validated',
+  'schema_not_validated',
+  'duplicate_check_missing',
+]) {
+  assertIncludes(lifecycleSource, lifecycleToken, `${lifecyclePath} must include ${lifecycleToken}`);
 }
 
 for (const forbiddenToken of [
