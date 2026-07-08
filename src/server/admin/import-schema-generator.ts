@@ -110,8 +110,8 @@ export function getImportSchemaTypesForEntityType(entityType: ImportEntityType):
   return IMPORT_SCHEMA_TYPES_BY_ENTITY_TYPE[entityType];
 }
 
-function buildBreadcrumb(items: ImportSchemaEntityInput["breadcrumb_items"]): ImportGeneratedSchema["breadcrumb"] | undefined {
-  if (items.length === 0) return undefined;
+function buildBreadcrumb(items: ImportSchemaEntityInput["breadcrumb_items"]): NonNullable<ImportGeneratedSchema["breadcrumb"]> | null {
+  if (items.length === 0) return null;
 
   return {
     "@type": "BreadcrumbList",
@@ -124,8 +124,8 @@ function buildBreadcrumb(items: ImportSchemaEntityInput["breadcrumb_items"]): Im
   };
 }
 
-function buildFaq(items: NonNullable<ImportSchemaEntityInput["faq_items"]>): ImportGeneratedSchema["faq"] | undefined {
-  if (items.length === 0) return undefined;
+function buildFaq(items: NonNullable<ImportSchemaEntityInput["faq_items"]>): NonNullable<ImportGeneratedSchema["faq"]> | null {
+  if (items.length === 0) return null;
 
   return {
     "@type": "FAQPage",
@@ -138,7 +138,7 @@ function buildFaq(items: NonNullable<ImportSchemaEntityInput["faq_items"]>): Imp
 }
 
 export function generateEntitySchema(entity: ImportSchemaEntityInput): ImportGeneratedSchema {
-  return {
+  const schema: ImportGeneratedSchema = {
     "@context": "https://schema.org",
     "@type": getImportSchemaTypesForEntityType(entity.entity_type),
     "@id": `${entity.url ?? entity.entity_id}#schema`,
@@ -147,9 +147,25 @@ export function generateEntitySchema(entity: ImportSchemaEntityInput): ImportGen
     telephone: entity.telephone,
     address: entity.address,
     geo: entity.geo,
-    openingHours: entity.opening_hours.length > 0 ? entity.opening_hours : undefined,
-    sameAs: entity.same_as.length > 0 ? entity.same_as : undefined,
-    breadcrumb: buildBreadcrumb(entity.breadcrumb_items),
-    faq: buildFaq(entity.faq_items ?? []),
   };
+
+  if (entity.opening_hours.length > 0) {
+    schema.openingHours = entity.opening_hours;
+  }
+
+  if (entity.same_as.length > 0) {
+    schema.sameAs = entity.same_as;
+  }
+
+  const breadcrumb = buildBreadcrumb(entity.breadcrumb_items);
+  if (breadcrumb !== null) {
+    schema.breadcrumb = breadcrumb;
+  }
+
+  const faq = buildFaq(entity.faq_items ?? []);
+  if (faq !== null) {
+    schema.faq = faq;
+  }
+
+  return schema;
 }
