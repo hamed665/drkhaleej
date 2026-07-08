@@ -13,10 +13,17 @@ const checks = [
 ];
 
 for (const [label, script, ...args] of checks) {
-  await execFileAsync(process.execPath, [script, ...args], {
-    cwd: process.cwd(),
-    stdio: 'pipe',
-  });
+  try {
+    await execFileAsync(process.execPath, [script, ...args], {
+      cwd: process.cwd(),
+      stdio: 'pipe',
+    });
+  } catch (error) {
+    console.error(`failed: ${label}`);
+    if (error?.stdout) console.error(String(error.stdout));
+    if (error?.stderr) console.error(String(error.stderr));
+    throw error;
+  }
   console.log(`passed: ${label}`);
 }
 
