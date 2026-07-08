@@ -15,11 +15,22 @@ if (manifest.schemaVersion !== 'drkhaleej.import.readinessRunnerManifest.v1') {
 
 for (const check of manifest.checks) {
   const [script, ...scriptArgs] = check.command;
-  await execFileAsync(process.execPath, [script, ...scriptArgs], {
-    cwd: root,
-    stdio: 'pipe',
-  });
-  console.log(`passed: ${check.label}`);
+
+  try {
+    const result = await execFileAsync(process.execPath, [script, ...scriptArgs], {
+      cwd: root,
+      stdio: 'pipe',
+    });
+
+    if (result.stdout.trim().length > 0) console.log(result.stdout.trim());
+    if (result.stderr.trim().length > 0) console.error(result.stderr.trim());
+    console.log(`passed: ${check.label}`);
+  } catch (error) {
+    console.error(`failed: ${check.label}`);
+    if (typeof error.stdout === 'string' && error.stdout.trim().length > 0) console.error(error.stdout.trim());
+    if (typeof error.stderr === 'string' && error.stderr.trim().length > 0) console.error(error.stderr.trim());
+    throw error;
+  }
 }
 
 console.log('import readiness runner passed.');
