@@ -10,6 +10,7 @@ import './check-import-sitemap-eligibility.mjs';
 import './check-import-schema-generator.mjs';
 import './check-import-readiness-engine.mjs';
 import './check-import-admin-readiness-panel.mjs';
+import './check-import-performance-guard.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -28,6 +29,7 @@ const schemaGeneratorPath = 'src/server/admin/import-schema-generator.ts';
 const schemaValidationPath = 'src/server/admin/import-schema-validation.ts';
 const readinessEnginePath = 'src/server/admin/import-readiness-engine.ts';
 const adminReadinessPanelPath = 'src/server/admin/import-admin-readiness-panel.ts';
+const performanceGuardPath = 'src/server/admin/import-performance-guard.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -59,6 +61,7 @@ const schemaGeneratorSource = await readText(schemaGeneratorPath);
 const schemaValidationSource = await readText(schemaValidationPath);
 const readinessEngineSource = await readText(readinessEnginePath);
 const adminReadinessPanelSource = await readText(adminReadinessPanelPath);
+const performanceGuardSource = await readText(performanceGuardPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -316,6 +319,20 @@ for (const adminPanelToken of [
   'filterAdminReadinessRows',
 ]) {
   assertIncludes(adminReadinessPanelSource, adminPanelToken, `${adminReadinessPanelPath} must include ${adminPanelToken}`);
+}
+
+for (const performanceToken of [
+  'ImportPublicPageDataSource',
+  'ImportPublicRenderOperation',
+  'ImportPerformanceBudget',
+  'ImportPublicRenderPlan',
+  'ImportPerformanceBlocker',
+  'IMPORT_PUBLIC_PERFORMANCE_BUDGET',
+  'blockedPublicRenderOperations',
+  'getImportPerformanceBlockers',
+  'isImportPublicRenderPlanWithinBudget',
+]) {
+  assertIncludes(performanceGuardSource, performanceToken, `${performanceGuardPath} must include ${performanceToken}`);
 }
 
 for (const forbiddenToken of [
