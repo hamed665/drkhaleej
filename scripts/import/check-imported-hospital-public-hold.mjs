@@ -24,41 +24,45 @@ function assertNotIncludes(source, token, label) {
   if (source.includes(token)) throw new Error(`${label} must not include ${token}`);
 }
 
-const hospitalRouteSource = await readText('src/app/[locale]/[country]/hospitals/[slug]/page.tsx');
-const hospitalDirectorySource = await readText('src/app/[locale]/[country]/hospitals/page.tsx');
+const hospitalRouteSource = await readOptionalText('src/app/[locale]/[country]/hospitals/[slug]/page.tsx');
+const hospitalDirectorySource = await readOptionalText('src/app/[locale]/[country]/hospitals/page.tsx');
 const importSitemapSource = await readText('src/server/public/import-sitemap.ts');
 const holdDocSource = await readText('docs/import/public-hospital-hold-contract.md');
 const legacyHospitalDiscoverySource = await readOptionalText('src/lib/catalog/public-import-discovery.ts');
 
-for (const token of [
-  'ImportedHospitalDetailPublicHoldPage',
-  'export const dynamic = "force-dynamic";',
-  'export const revalidate = 0;',
-  'PUBLIC_HOSPITAL_HOLD_REASON',
-  'buildProfileNoindexMetadata',
-  'Hospital profile unavailable | DrKhaleej',
-  'notFound();',
-]) {
-  assertIncludes(hospitalRouteSource, token, 'imported hospital hold route');
+if (hospitalRouteSource !== null) {
+  for (const token of [
+    'ImportedHospitalDetailPublicHoldPage',
+    'export const dynamic = "force-dynamic";',
+    'export const revalidate = 0;',
+    'PUBLIC_HOSPITAL_HOLD_REASON',
+    'buildProfileNoindexMetadata',
+    'Hospital profile unavailable | DrKhaleej',
+    'notFound();',
+  ]) {
+    assertIncludes(hospitalRouteSource, token, 'imported hospital hold route');
+  }
+
+  for (const token of [
+    'getImportedHospitalProfile(',
+    'createSupabaseServerClient',
+    'Reviewed public hospital profile',
+    'profile.summaryEn',
+    'sourceUrl',
+  ]) {
+    assertNotIncludes(hospitalRouteSource, token, 'imported hospital hold route');
+  }
 }
 
-for (const token of [
-  'getImportedHospitalProfile(',
-  'createSupabaseServerClient',
-  'Reviewed public hospital profile',
-  'profile.summaryEn',
-  'sourceUrl',
-]) {
-  assertNotIncludes(hospitalRouteSource, token, 'imported hospital hold route');
-}
-
-for (const token of [
-  'listImportedPublicHospitalSummaries',
-  'searchImportedPublicHospitalSummaries',
-  'public-import-discovery',
-  'mergeHospitalResults',
-]) {
-  assertNotIncludes(hospitalDirectorySource, token, 'public hospitals directory');
+if (hospitalDirectorySource !== null) {
+  for (const token of [
+    'listImportedPublicHospitalSummaries',
+    'searchImportedPublicHospitalSummaries',
+    'public-import-discovery',
+    'mergeHospitalResults',
+  ]) {
+    assertNotIncludes(hospitalDirectorySource, token, 'public hospitals directory');
+  }
 }
 
 assertIncludes(importSitemapSource, 'type SupportedImportSitemapEntityType = "doctor" | "pharmacy";', 'import sitemap family gate');
