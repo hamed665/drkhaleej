@@ -33,4 +33,12 @@ jobs:
           node-version: 22
 
       - name: Run import readiness contract
-        run: node scripts/import/run-import-readiness.mjs
+        run: node scripts/import/run-import-readiness.mjs 2>&1 | tee import-readiness-contract.log
+
+      - name: Upload import readiness failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: import-readiness-contract-log
+          path: import-readiness-contract.log
+          if-no-files-found: ignore
