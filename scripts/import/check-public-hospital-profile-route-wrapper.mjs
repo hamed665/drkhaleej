@@ -48,6 +48,7 @@ const routeSource = await readText(routePath);
 const apiRouteSource = await readText(apiRoutePath);
 const sitemapSource = await readText(sitemapPath);
 const packageSource = await readText('package.json');
+const holdDocSource = await readText('docs/import/public-hospital-hold-contract.md');
 
 for (const token of [
   'getServerSideProps',
@@ -122,10 +123,31 @@ for (const token of [
 for (const token of [
   String.raw`^\/(en|ar)\/om\/doctor\/`,
   String.raw`^\/(en|ar)\/om\/pharmacies\/`,
-  String.raw`^\/(en|ar)\/om\/hospitals\/`,
   'hasReviewedImportEvidence',
+  'decidePublicSitemapEligibility',
+  'minimumInternalLinksPassed',
+  'hreflangReady',
+  'blockedByImportedHospitalRelease',
 ]) {
   assertIncludes(sitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);
+}
+
+for (const forbiddenSitemapToken of [
+  String.raw`^\/(en|ar)\/om\/hospitals\/`,
+  '| "hospital"',
+  'value === "hospital"',
+  'case "hospital":',
+  '/hospitals/',
+]) {
+  assertNotIncludes(sitemapSource, forbiddenSitemapToken, `import sitemap must not include held hospital sitemap token ${forbiddenSitemapToken}`);
+}
+
+for (const holdToken of [
+  '# Imported Hospital Public Hold Contract',
+  'public sitemap entry',
+  'public sitemap eligibility is downstream of public discovery eligibility, canonical resolution, hreflang readiness, minimum internal-link coverage, and content score',
+]) {
+  assertIncludes(holdDocSource, holdToken, `docs/import/public-hospital-hold-contract.md must include ${holdToken}.`);
 }
 
 for (const packageToken of [
@@ -136,4 +158,4 @@ for (const packageToken of [
   assertIncludes(packageSource, packageToken, `package.json must include ${packageToken}.`);
 }
 
-console.log('public hospital profile route wrapper check passed.');
+console.log('public hospital profile route wrapper hold check passed.');
