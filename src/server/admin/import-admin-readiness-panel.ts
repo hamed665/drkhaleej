@@ -37,13 +37,9 @@ export type ImportAdminReadinessEntityRow = {
 export type ImportAdminReadinessFilter = {
   entity_type?: ImportEntityType;
   entity_domain?: ImportEntityDomain;
-  country_code?: string;
-  governorate_id?: string;
-  city_id?: string;
-  area_id?: string;
   ready_state?: "ready" | "blocked";
-  manual_approved?: boolean;
   sitemap_eligible?: boolean;
+  blocker_category?: ImportReadinessCategory;
 };
 
 export type ImportAdminReadinessSummary = {
@@ -142,7 +138,7 @@ export function filterAdminReadinessRows(
     .filter((row) => (filter.ready_state === "ready" ? row.readiness.publishReady : true))
     .filter((row) => (filter.ready_state === "blocked" ? !row.readiness.publishReady : true))
     .filter((row) => (filter.sitemap_eligible === undefined ? true : row.readiness.sitemapReady === filter.sitemap_eligible))
-    .filter((row) => (filter.manual_approved === undefined ? true : hasReadinessCategory(row.readiness, "manual") !== filter.manual_approved));
+    .filter((row) => (filter.blocker_category ? hasReadinessCategory(row.readiness, filter.blocker_category) : true));
 }
 
 function hasReadinessCategory(readiness: ImportEntityReadiness, category: ImportReadinessCategory): boolean {
