@@ -43,6 +43,7 @@ for (const requiredValidator of [
   './check-import-unified-draft-entity.mjs',
   './check-import-oman-geo-authority-registry.mjs',
   './check-import-geo-alias-duplicate-guard.mjs',
+  './check-import-public-projection-layer.mjs',
   './check-import-publication-validation.mjs',
   './check-import-link-rule-matrix.mjs',
   './check-import-internal-link-generator.mjs',
