@@ -6,6 +6,7 @@ import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
 import './check-import-internal-link-cache.mjs';
+import './check-import-sitemap-eligibility.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -19,6 +20,7 @@ const validationPath = 'src/server/admin/import-publication-validation.ts';
 const linkRulePath = 'src/server/admin/import-link-rule-matrix.ts';
 const linkGeneratorPath = 'src/server/admin/import-internal-link-generator.ts';
 const linkCachePath = 'src/server/admin/import-internal-link-cache.ts';
+const sitemapEligibilityPath = 'src/server/admin/import-sitemap-eligibility-contract.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -45,6 +47,7 @@ const validationSource = await readText(validationPath);
 const linkRuleSource = await readText(linkRulePath);
 const linkGeneratorSource = await readText(linkGeneratorPath);
 const linkCacheSource = await readText(linkCachePath);
+const sitemapEligibilitySource = await readText(sitemapEligibilityPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -217,6 +220,23 @@ for (const linkCacheToken of [
   'is_active',
 ]) {
   assertIncludes(linkCacheSource, linkCacheToken, `${linkCachePath} must include ${linkCacheToken}`);
+}
+
+for (const sitemapEligibilityToken of [
+  'ImportSitemapEligibilityEntity',
+  'ImportSitemapEligibilityBlocker',
+  'IMPORT_SITEMAP_VALIDATED_PROJECTION',
+  'public_indexable_entities',
+  'IMPORT_SITEMAP_FILES',
+  'getSitemapBlockers',
+  'isSitemapEligible',
+  'visibility_not_public',
+  'index_policy_not_index',
+  'sitemap_policy_not_included',
+  'duplicate_check_not_passed',
+  'canonical_not_validated',
+]) {
+  assertIncludes(sitemapEligibilitySource, sitemapEligibilityToken, `${sitemapEligibilityPath} must include ${sitemapEligibilityToken}`);
 }
 
 for (const forbiddenToken of [
