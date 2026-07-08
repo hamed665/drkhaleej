@@ -13,22 +13,30 @@ if (manifest.schemaVersion !== 'drkhaleej.import.readinessRunnerManifest.v1') {
   throw new Error('Unsupported import readiness runner manifest schema.');
 }
 
+function getProcessOutput(error, key) {
+  if (typeof error !== 'object' || error === null || !(key in error)) return null;
+
+  const value = error[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
 for (const check of manifest.checks) {
   const [script, ...scriptArgs] = check.command;
 
   try {
-    const result = await execFileAsync(process.execPath, [script, ...scriptArgs], {
+    await execFileAsync(process.execPath, [script, ...scriptArgs], {
       cwd: root,
       stdio: 'pipe',
     });
 
-    if (result.stdout.trim().length > 0) console.log(result.stdout.trim());
-    if (result.stderr.trim().length > 0) console.error(result.stderr.trim());
     console.log(`passed: ${check.label}`);
   } catch (error) {
+    const stdout = getProcessOutput(error, 'stdout');
+    const stderr = getProcessOutput(error, 'stderr');
+
     console.error(`failed: ${check.label}`);
-    if (typeof error.stdout === 'string' && error.stdout.trim().length > 0) console.error(error.stdout.trim());
-    if (typeof error.stderr === 'string' && error.stderr.trim().length > 0) console.error(error.stderr.trim());
+    if (stdout !== null) console.error(stdout);
+    if (stderr !== null) console.error(stderr);
     throw error;
   }
 }
