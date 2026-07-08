@@ -58,15 +58,16 @@ export type ImportPublicRenderPlan = {
   dataSources: readonly ImportPublicPageDataSource[];
   queryCount: number;
   estimatedPayloadKb: number;
-  estimatedHtmlPayloadKb: number;
-  estimatedRouteJsPayloadKb: number;
-  aboveFoldImageCount: number;
-  estimatedLargestContentfulPaintMs: number | null;
-  estimatedInteractionToNextPaintMs: number | null;
-  estimatedCumulativeLayoutShift: number | null;
+  estimatedTtfbMs?: number | null;
+  estimatedHtmlPayloadKb?: number | null;
+  estimatedRouteJsPayloadKb?: number | null;
+  aboveFoldImageCount?: number | null;
+  estimatedLargestContentfulPaintMs?: number | null;
+  estimatedInteractionToNextPaintMs?: number | null;
+  estimatedCumulativeLayoutShift?: number | null;
   usesIsrOrStaticGeneration: boolean;
-  usesOptimizedImages: boolean;
-  usesOptimizedFonts: boolean;
+  usesOptimizedImages?: boolean | null;
+  usesOptimizedFonts?: boolean | null;
 };
 
 export type ImportPerformanceBlocker =
@@ -134,8 +135,12 @@ const blockedPublicRenderOperations = new Map<ImportPublicRenderOperation, Impor
   ["load_large_client_bundle", "large_client_bundle_loading"],
 ]);
 
-function isMetricOverBudget(value: number | null, max: number): boolean {
+function isMetricOverBudget(value: number | null | undefined, max: number): boolean {
   return typeof value === "number" && Number.isFinite(value) && value > max;
+}
+
+function isExplicitlyFalse(value: boolean | null | undefined): boolean {
+  return value === false;
 }
 
 export function getImportPerformanceBlockers(
@@ -145,6 +150,7 @@ export function getImportPerformanceBlockers(
   const blockers: ImportPerformanceBlocker[] = [];
 
   if (plan.queryCount > budget.maxPublicRenderQueries) blockers.push("too_many_public_render_queries");
+  if (isMetricOverBudget(plan.estimatedTtfbMs, budget.maxPublicRenderTtfbMs)) blockers.push("public_render_ttfb_over_budget");
   if (isMetricOverBudget(plan.estimatedLargestContentfulPaintMs, budget.maxLargestContentfulPaintMs)) {
     blockers.push("largest_contentful_paint_over_budget");
   }
@@ -155,12 +161,12 @@ export function getImportPerformanceBlockers(
     blockers.push("cumulative_layout_shift_over_budget");
   }
   if (plan.estimatedPayloadKb > budget.maxPublicRenderPayloadKb) blockers.push("public_render_payload_too_large");
-  if (plan.estimatedHtmlPayloadKb > budget.maxHtmlPayloadKb) blockers.push("html_payload_too_large");
-  if (plan.estimatedRouteJsPayloadKb > budget.maxRouteJsPayloadKb) blockers.push("route_js_payload_too_large");
-  if (plan.aboveFoldImageCount > budget.maxAboveFoldImageCount) blockers.push("too_many_above_fold_images");
+  if (isMetricOverBudget(plan.estimatedHtmlPayloadKb, budget.maxHtmlPayloadKb)) blockers.push("html_payload_too_large");
+  if (isMetricOverBudget(plan.estimatedRouteJsPayloadKb, budget.maxRouteJsPayloadKb)) blockers.push("route_js_payload_too_large");
+  if (isMetricOverBudget(plan.aboveFoldImageCount, budget.maxAboveFoldImageCount)) blockers.push("too_many_above_fold_images");
   if (budget.requireStaticOrIsr && !plan.usesIsrOrStaticGeneration) blockers.push("missing_isr_or_static_generation");
-  if (budget.requireOptimizedImages && !plan.usesOptimizedImages) blockers.push("images_not_optimized");
-  if (budget.requireOptimizedFonts && !plan.usesOptimizedFonts) blockers.push("fonts_not_optimized");
+  if (budget.requireOptimizedImages && isExplicitlyFalse(plan.usesOptimizedImages)) blockers.push("images_not_optimized");
+  if (budget.requireOptimizedFonts && isExplicitlyFalse(plan.usesOptimizedFonts)) blockers.push("fonts_not_optimized");
 
   if (budget.requireCachedInternalLinks && !plan.dataSources.includes("entity_internal_links_cache")) {
     blockers.push("internal_links_not_cached");
@@ -205,5 +211,5 @@ export function isImportPublicRenderPlanFastEnoughForTarget(
   plan: ImportPublicRenderPlan,
   budget: ImportPerformanceBudget = IMPORT_PUBLIC_PERFORMANCE_BUDGET,
 ): boolean {
-  return plan.estimatedLargestContentfulPaintMs !== null && plan.estimatedLargestContentfulPaintMs <= budget.maxLargestContentfulPaintMs;
+  return typeof plan.estimatedLargestContentfulPaintMs === "number" && plan.estimatedLargestContentfulPaintMs <= budget.maxLargestContentfulPaintMs;
 }
