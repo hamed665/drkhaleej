@@ -229,6 +229,7 @@ assertFileIncludes('src/lib/catalog/public-profile-completeness.ts', [
   'hasRelationSignal',
   'hasSafetyCopy',
   'hasUnsafeClaimFree',
+  'unsafeClaimPhrases',
   'score',
   'percentage',
   'missing',
@@ -275,7 +276,6 @@ assertFileIncludes('src/app/[locale]/[country]/center/[centerSlug]/page.tsx', [
 assertCriticalFilesDoNotContain([
   'src/lib/catalog/public-profile-summary.ts',
   'src/lib/catalog/public-import-profile-summary.ts',
-  'src/lib/catalog/public-profile-completeness.ts',
   'src/lib/seo/profile-metadata-index-gate.ts',
 ], [
   'best',
