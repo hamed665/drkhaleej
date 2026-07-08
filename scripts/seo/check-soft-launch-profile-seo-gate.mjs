@@ -119,6 +119,7 @@ assertFileIncludes('src/lib/catalog/public-profile-index-eligibility.ts', [
   'unsafe_claim',
   'deleted_or_inactive',
   'not_from_public_eligible_query',
+  'forbiddenClaimPhrases',
 ]);
 assertFileIncludes('src/lib/catalog/public-profile-index-eligibility.test.ts', [
   "describe('public profile index eligibility'",
@@ -274,7 +275,6 @@ assertFileIncludes('src/app/[locale]/[country]/center/[centerSlug]/page.tsx', [
 assertCriticalFilesDoNotContain([
   'src/lib/catalog/public-profile-summary.ts',
   'src/lib/catalog/public-import-profile-summary.ts',
-  'src/lib/catalog/public-profile-index-eligibility.ts',
   'src/lib/catalog/public-profile-completeness.ts',
   'src/lib/seo/profile-metadata-index-gate.ts',
 ], [
