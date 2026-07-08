@@ -2,6 +2,7 @@ import './check-import-publish-lock.mjs';
 import './check-import-publish-lifecycle.mjs';
 import './check-import-domain-entity-contract.mjs';
 import './check-import-canonical-geo-contract.mjs';
+import './check-import-unified-draft-entity.mjs';
 import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
