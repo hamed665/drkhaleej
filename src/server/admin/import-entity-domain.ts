@@ -18,10 +18,25 @@ export type ImportEntityType =
   | "dental_clinic"
   | "dentist"
   | "dermatologist"
+  | "gynecologist"
+  | "fertility_clinic"
+  | "ivf_center"
+  | "reproductive_medicine_doctor"
+  | "embryology_lab"
+  | "andrology_lab"
+  | "hair_transplant_clinic"
+  | "hair_transplant_doctor"
+  | "plastic_surgeon"
+  | "aesthetic_doctor"
   | "medical_beauty_clinic"
   | "salon"
   | "spa"
   | "gym"
+  | "fitness_center"
+  | "personal_trainer"
+  | "yoga_studio"
+  | "pilates_studio"
+  | "sports_medicine_doctor"
   | "physiotherapy"
   | "wellness_center"
   | "vet_doctor"
@@ -30,6 +45,28 @@ export type ImportEntityType =
   | "pet_shop"
   | "pet_grooming"
   | "pet_boarding";
+
+export type ImportDoctorSpecialty =
+  | "cardiology"
+  | "dermatology"
+  | "gynecology"
+  | "fertility_ivf"
+  | "reproductive_medicine"
+  | "embryology"
+  | "andrology"
+  | "dentistry"
+  | "pediatrics"
+  | "orthopedics"
+  | "ent"
+  | "ophthalmology"
+  | "psychiatry"
+  | "psychology"
+  | "nutrition"
+  | "physiotherapy"
+  | "sports_medicine"
+  | "plastic_surgery"
+  | "hair_transplant"
+  | "aesthetic_medicine";
 
 export type ImportEntityDomainResolution = {
   entityType: ImportEntityType;
@@ -55,10 +92,25 @@ export const IMPORT_ENTITY_DOMAIN_BY_TYPE = {
   dental_clinic: "human_healthcare",
   dentist: "human_healthcare",
   dermatologist: "human_healthcare",
+  gynecologist: "human_healthcare",
+  fertility_clinic: "human_healthcare",
+  ivf_center: "human_healthcare",
+  reproductive_medicine_doctor: "human_healthcare",
+  embryology_lab: "human_healthcare",
+  andrology_lab: "human_healthcare",
+  hair_transplant_clinic: "medical_beauty",
+  hair_transplant_doctor: "medical_beauty",
+  plastic_surgeon: "medical_beauty",
+  aesthetic_doctor: "medical_beauty",
   medical_beauty_clinic: "medical_beauty",
   salon: "non_medical_beauty",
   spa: "non_medical_beauty",
   gym: "fitness",
+  fitness_center: "fitness",
+  personal_trainer: "fitness",
+  yoga_studio: "fitness",
+  pilates_studio: "fitness",
+  sports_medicine_doctor: "human_healthcare",
   physiotherapy: "human_healthcare",
   wellness_center: "wellness",
   vet_doctor: "pet_healthcare",
@@ -68,6 +120,29 @@ export const IMPORT_ENTITY_DOMAIN_BY_TYPE = {
   pet_grooming: "pet_healthcare",
   pet_boarding: "pet_healthcare",
 } as const satisfies Record<ImportEntityType, ImportEntityDomain>;
+
+export const IMPORT_DOCTOR_SPECIALTIES = [
+  "cardiology",
+  "dermatology",
+  "gynecology",
+  "fertility_ivf",
+  "reproductive_medicine",
+  "embryology",
+  "andrology",
+  "dentistry",
+  "pediatrics",
+  "orthopedics",
+  "ent",
+  "ophthalmology",
+  "psychiatry",
+  "psychology",
+  "nutrition",
+  "physiotherapy",
+  "sports_medicine",
+  "plastic_surgery",
+  "hair_transplant",
+  "aesthetic_medicine",
+] as const satisfies readonly ImportDoctorSpecialty[];
 
 const supportedDomains = new Set<ImportEntityDomain>([
   "human_healthcare",
@@ -79,6 +154,7 @@ const supportedDomains = new Set<ImportEntityDomain>([
 ]);
 
 const supportedEntityTypes = new Set<ImportEntityType>(Object.keys(IMPORT_ENTITY_DOMAIN_BY_TYPE) as ImportEntityType[]);
+const supportedDoctorSpecialties = new Set<ImportDoctorSpecialty>(IMPORT_DOCTOR_SPECIALTIES);
 
 export function isImportEntityDomain(value: string | null | undefined): value is ImportEntityDomain {
   return supportedDomains.has(value as ImportEntityDomain);
@@ -86,6 +162,10 @@ export function isImportEntityDomain(value: string | null | undefined): value is
 
 export function isImportEntityType(value: string | null | undefined): value is ImportEntityType {
   return supportedEntityTypes.has(value as ImportEntityType);
+}
+
+export function isImportDoctorSpecialty(value: string | null | undefined): value is ImportDoctorSpecialty {
+  return supportedDoctorSpecialties.has(value as ImportDoctorSpecialty);
 }
 
 export function resolveImportEntityDomain(entityType: string | null | undefined): ImportEntityDomainResolution | null {
