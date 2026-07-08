@@ -11,6 +11,7 @@ import './check-import-schema-generator.mjs';
 import './check-import-readiness-engine.mjs';
 import './check-import-admin-readiness-panel.mjs';
 import './check-import-performance-guard.mjs';
+import './check-import-manual-publish-flow.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -30,6 +31,7 @@ const schemaValidationPath = 'src/server/admin/import-schema-validation.ts';
 const readinessEnginePath = 'src/server/admin/import-readiness-engine.ts';
 const adminReadinessPanelPath = 'src/server/admin/import-admin-readiness-panel.ts';
 const performanceGuardPath = 'src/server/admin/import-performance-guard.ts';
+const manualPublishFlowPath = 'src/server/admin/import-manual-publish-flow.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -62,6 +64,7 @@ const schemaValidationSource = await readText(schemaValidationPath);
 const readinessEngineSource = await readText(readinessEnginePath);
 const adminReadinessPanelSource = await readText(adminReadinessPanelPath);
 const performanceGuardSource = await readText(performanceGuardPath);
+const manualPublishFlowSource = await readText(manualPublishFlowPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -333,6 +336,20 @@ for (const performanceToken of [
   'isImportPublicRenderPlanWithinBudget',
 ]) {
   assertIncludes(performanceGuardSource, performanceToken, `${performanceGuardPath} must include ${performanceToken}`);
+}
+
+for (const manualPublishFlowToken of [
+  'ImportManualPublishStep',
+  'ImportManualPublishStepStatus',
+  'ImportManualPublishBlocker',
+  'ImportManualPublishFlowInput',
+  'ImportManualPublishFlowStep',
+  'ImportManualPublishFlowResult',
+  'IMPORT_MANUAL_PUBLISH_ORDER',
+  'getManualPublishFlow',
+  'canManualPublish',
+]) {
+  assertIncludes(manualPublishFlowSource, manualPublishFlowToken, `${manualPublishFlowPath} must include ${manualPublishFlowToken}`);
 }
 
 for (const forbiddenToken of [
