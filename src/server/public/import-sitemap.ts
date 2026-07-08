@@ -1,5 +1,6 @@
 import "server-only";
 
+import { decidePublicSitemapEligibility } from "@/lib/seo/sitemap/sitemap-eligibility-gate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
@@ -60,6 +61,10 @@ function readString(value: JsonRecord, key: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function readBoolean(value: JsonRecord, key: string): boolean {
+  return value[key] === true;
+}
+
 function supportedEntityType(value: string): SupportedImportSitemapEntityType | null {
   if (value === "doctor" || value === "pharmacy") return value;
   return null;
@@ -96,6 +101,28 @@ function hasReviewedImportEvidence(metadata: JsonRecord): boolean {
   return readString(metadata, "import_entity_candidate_id") !== null;
 }
 
+function importSitemapEligibilityPassed(
+  entityType: SupportedImportSitemapEntityType,
+  metadata: JsonRecord,
+  canonicalPath: string,
+): boolean {
+  if (!isSafePublicCanonicalPathForEntity(entityType, canonicalPath)) return false;
+
+  return decidePublicSitemapEligibility({
+    pathname: canonicalPath,
+    entityType,
+    canonicalPath,
+    publicRouteEnabled: readBoolean(metadata, "public_route_enabled"),
+    publicSafe: readBoolean(metadata, "public_safe"),
+    indexable: readString(metadata, "robots_policy") === "index",
+    sitemapEligible: readBoolean(metadata, "sitemap_included"),
+    hreflangReady: readBoolean(metadata, "hreflang_ready"),
+    minimumInternalLinksPassed: readBoolean(metadata, "minimum_internal_links_passed"),
+    contentScorePassed: readBoolean(metadata, "content_score_passed"),
+    blockedByImportedHospitalRelease: readBoolean(metadata, "blocked_by_imported_hospital_release"),
+  }).eligible;
+}
+
 function rowToSitemapEntry(row: IncludedImportSitemapRow): InternalImportSitemapEntry | null {
   const entityType = supportedEntityType(row.target_entity_type);
   if (entityType === null) return null;
@@ -103,7 +130,8 @@ function rowToSitemapEntry(row: IncludedImportSitemapRow): InternalImportSitemap
   if (!hasReviewedImportEvidence(row.metadata)) return null;
 
   const canonicalPath = readString(row.metadata, "canonical_path");
-  if (canonicalPath === null || !isSafePublicCanonicalPathForEntity(entityType, canonicalPath)) return null;
+  if (canonicalPath === null) return null;
+  if (!importSitemapEligibilityPassed(entityType, row.metadata, canonicalPath)) return null;
 
   return {
     entityType,
