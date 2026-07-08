@@ -22,13 +22,18 @@ function assertNotIncludes(source, token, message) {
 
 const sitemapSource = await readText(sitemapPath);
 const packageSource = await readText('package.json');
+const holdDocSource = await readText('docs/import/public-hospital-hold-contract.md');
 
 for (const token of [
-  'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";',
-  'if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;',
-  'case "hospital":',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'type SupportedImportSitemapEntityType = "doctor" | "pharmacy";',
+  'if (value === "doctor" || value === "pharmacy") return value;',
+  'doctor: 3000',
+  'pharmacy: 1500',
   'hasReviewedImportEvidence',
+  'decidePublicSitemapEligibility',
+  'minimumInternalLinksPassed',
+  'hreflangReady',
+  'blockedByImportedHospitalRelease',
   'metadata.sitemap_included !== true',
   'readString(metadata, "robots_policy") !== "index"',
   'readString(metadata, "canonical_path") === null',
@@ -42,7 +47,12 @@ for (const token of [
 }
 
 for (const forbiddenToken of [
+  '| "hospital"',
+  'value === "hospital"',
+  'case "hospital":',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
   '/hospital/',
+  '/hospitals/',
   'rating',
   'booking',
   'insurance',
@@ -50,6 +60,14 @@ for (const forbiddenToken of [
   'provider-dashboard',
 ]) {
   assertNotIncludes(sitemapSource, forbiddenToken, `${sitemapPath} must not include ${forbiddenToken}.`);
+}
+
+for (const holdToken of [
+  '# Imported Hospital Public Hold Contract',
+  'public sitemap entry',
+  'public sitemap eligibility is downstream of public discovery eligibility, canonical resolution, hreflang readiness, minimum internal-link coverage, and content score',
+]) {
+  assertIncludes(holdDocSource, holdToken, `docs/import/public-hospital-hold-contract.md must include ${holdToken}.`);
 }
 
 for (const packageToken of [
@@ -60,4 +78,4 @@ for (const packageToken of [
   assertIncludes(packageSource, packageToken, `package.json must include ${packageToken}.`);
 }
 
-console.log('import hospital sitemap promotion check passed.');
+console.log('import hospital sitemap public hold check passed.');
