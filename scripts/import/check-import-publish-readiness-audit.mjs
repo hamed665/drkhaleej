@@ -15,5 +15,6 @@ import './check-import-manual-publish-flow.mjs';
 import './check-import-queue-dashboard.mjs';
 import './check-import-admin-capability-audit.mjs';
 import './check-import-validator-ci-audit.mjs';
+import './check-import-admin-action-contract.mjs';
 
 console.log('import publish readiness audit check passed.');
