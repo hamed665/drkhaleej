@@ -13,5 +13,6 @@ import './check-import-admin-readiness-panel.mjs';
 import './check-import-performance-guard.mjs';
 import './check-import-manual-publish-flow.mjs';
 import './check-import-queue-dashboard.mjs';
+import './check-import-admin-capability-audit.mjs';
 
 console.log('import publish readiness audit check passed.');
