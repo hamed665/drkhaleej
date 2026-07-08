@@ -2,6 +2,7 @@ import './check-import-publish-lock.mjs';
 import './check-import-publish-lifecycle.mjs';
 import './check-import-domain-entity-contract.mjs';
 import './check-import-canonical-geo-contract.mjs';
+import './check-import-publication-validation.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -11,6 +12,7 @@ const lockPath = 'src/server/admin/import-publish-lock.ts';
 const lifecyclePath = 'src/server/admin/import-publish-lifecycle.ts';
 const domainPath = 'src/server/admin/import-entity-domain.ts';
 const geoPath = 'src/server/admin/import-canonical-geo.ts';
+const validationPath = 'src/server/admin/import-publication-validation.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -33,6 +35,7 @@ const lockSource = await readText(lockPath);
 const lifecycleSource = await readText(lifecyclePath);
 const domainSource = await readText(domainPath);
 const geoSource = await readText(geoPath);
+const validationSource = await readText(validationPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -126,6 +129,24 @@ for (const geoToken of [
   'geo_validated',
 ]) {
   assertIncludes(geoSource, geoToken, `${geoPath} must include ${geoToken}`);
+}
+
+for (const validationToken of [
+  'ImportPublicationValidationBlocker',
+  'ImportPublicationValidationInput',
+  'isValidImportSlug',
+  'isValidImportCanonicalPath',
+  'getImportPublicationValidationBlockers',
+  'isImportPublicationValidationReady',
+  'slug_invalid',
+  'title_too_short',
+  'meta_description_too_short',
+  'canonical_invalid',
+  'minimum_content_incomplete',
+  'schema_invalid',
+  'internal_links_missing',
+]) {
+  assertIncludes(validationSource, validationToken, `${validationPath} must include ${validationToken}`);
 }
 
 for (const forbiddenToken of [
