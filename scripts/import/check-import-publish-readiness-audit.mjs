@@ -5,6 +5,7 @@ import './check-import-canonical-geo-contract.mjs';
 import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
+import './check-import-internal-link-cache.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -17,6 +18,7 @@ const geoPath = 'src/server/admin/import-canonical-geo.ts';
 const validationPath = 'src/server/admin/import-publication-validation.ts';
 const linkRulePath = 'src/server/admin/import-link-rule-matrix.ts';
 const linkGeneratorPath = 'src/server/admin/import-internal-link-generator.ts';
+const linkCachePath = 'src/server/admin/import-internal-link-cache.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -42,6 +44,7 @@ const geoSource = await readText(geoPath);
 const validationSource = await readText(validationPath);
 const linkRuleSource = await readText(linkRulePath);
 const linkGeneratorSource = await readText(linkGeneratorPath);
+const linkCacheSource = await readText(linkCachePath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -193,6 +196,27 @@ for (const linkGeneratorToken of [
   'generator_version',
 ]) {
   assertIncludes(linkGeneratorSource, linkGeneratorToken, `${linkGeneratorPath} must include ${linkGeneratorToken}`);
+}
+
+for (const linkCacheToken of [
+  'ImportInternalLinkCacheRow',
+  'ImportInternalLinkCacheWriteInput',
+  'ImportInternalLinkCacheReadFilter',
+  'IMPORT_INTERNAL_LINK_CACHE_TABLE',
+  'entity_internal_links_cache',
+  'IMPORT_INTERNAL_LINK_CACHE_REQUIRED_COLUMNS',
+  'toImportInternalLinkCacheRow',
+  'isImportInternalLinkCacheRowActive',
+  'filterImportInternalLinkCacheRows',
+  'rule_id',
+  'rule_version',
+  'generator_version',
+  'generated_reason',
+  'generated_at',
+  'expires_at',
+  'is_active',
+]) {
+  assertIncludes(linkCacheSource, linkCacheToken, `${linkCachePath} must include ${linkCacheToken}`);
 }
 
 for (const forbiddenToken of [
