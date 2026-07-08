@@ -34,7 +34,8 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          pnpm routes:check 2>&1 | tee routes-check.log
+          find 'src/app/[locale]/[country]/hospitals' -maxdepth 2 -print | sort | tee routes-check.log
+          pnpm routes:check 2>&1 | tee -a routes-check.log
       - name: Upload routes check failure log
         if: failure()
         uses: actions/upload-artifact@v4
