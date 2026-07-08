@@ -3,6 +3,7 @@ import './check-import-publish-lifecycle.mjs';
 import './check-import-domain-entity-contract.mjs';
 import './check-import-canonical-geo-contract.mjs';
 import './check-import-publication-validation.mjs';
+import './check-import-link-rule-matrix.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -13,6 +14,7 @@ const lifecyclePath = 'src/server/admin/import-publish-lifecycle.ts';
 const domainPath = 'src/server/admin/import-entity-domain.ts';
 const geoPath = 'src/server/admin/import-canonical-geo.ts';
 const validationPath = 'src/server/admin/import-publication-validation.ts';
+const linkRulePath = 'src/server/admin/import-link-rule-matrix.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -36,6 +38,7 @@ const lifecycleSource = await readText(lifecyclePath);
 const domainSource = await readText(domainPath);
 const geoSource = await readText(geoPath);
 const validationSource = await readText(validationPath);
+const linkRuleSource = await readText(linkRulePath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -147,6 +150,28 @@ for (const validationToken of [
   'internal_links_missing',
 ]) {
   assertIncludes(validationSource, validationToken, `${validationPath} must include ${validationToken}`);
+}
+
+for (const linkRuleToken of [
+  'ImportEntityLinkRule',
+  'IMPORT_ENTITY_LINK_RULES',
+  'source_type',
+  'target_type',
+  'source_domain',
+  'target_domain',
+  'allowed',
+  'priority',
+  'max_links',
+  'max_distance_km',
+  'same_city_required',
+  'same_area_boost',
+  'same_specialty_required',
+  'min_quality_score',
+  'findImportEntityLinkRule',
+  'getImportLinkRuleDecision',
+  'isImportEntityLinkAllowed',
+]) {
+  assertIncludes(linkRuleSource, linkRuleToken, `${linkRulePath} must include ${linkRuleToken}`);
 }
 
 for (const forbiddenToken of [
