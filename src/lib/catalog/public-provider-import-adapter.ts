@@ -1,3 +1,7 @@
+import {
+  resolvePublicProviderCanonicalRoute,
+  type PublicProviderRouteFamily,
+} from "./public-provider-route-resolver";
 import type {
   PublicProviderDiscoveryEntry,
   PublicProviderEntityType,
@@ -44,6 +48,17 @@ const FAMILY_BY_ENTITY: Partial<Record<PublicProviderEntityType, PublicProviderF
   beauty: "beauty",
 };
 
+const ROUTE_FAMILY_BY_ENTITY: Partial<Record<PublicProviderEntityType, PublicProviderRouteFamily>> = {
+  doctor: "doctor",
+  pharmacy: "pharmacy",
+  hospital: "hospital",
+  clinic: "clinic",
+  lab: "lab",
+  radiology: "imaging_center",
+  dentistry: "dental_clinic",
+  beauty: "beauty_clinic",
+};
+
 function record(value: PublicImportJson | undefined): JsonRecord {
   if (value === null || value === undefined || typeof value !== "object" || Array.isArray(value)) return {};
   return value;
@@ -83,6 +98,11 @@ function normalizedPath(path: string | null): string | null {
 function slugFromPath(path: string): string | null {
   const slug = path.split("/").filter(Boolean).at(-1);
   return slug && /^[a-z0-9-]+$/.test(slug) ? slug : null;
+}
+
+function localeFromPath(path: string): "en" | "ar" | null {
+  const [locale] = path.split("/").filter(Boolean);
+  return locale === "en" || locale === "ar" ? locale : null;
 }
 
 function candidateRoot(candidate: PublicImportProviderCandidateRow | null): JsonRecord {
@@ -151,12 +171,27 @@ export function buildImportedProviderDiscoveryEntry(
   const family = FAMILY_BY_ENTITY[entityType];
   if (!family) return null;
 
-  const metadata = record(row.metadata);
-  const canonicalPath = normalizedPath(text(metadata, "canonical_path", "canonicalPath"));
-  if (!canonicalPath) return null;
+  const routeFamily = ROUTE_FAMILY_BY_ENTITY[entityType];
+  if (!routeFamily) return null;
 
-  const slug = slugFromPath(canonicalPath);
+  const metadata = record(row.metadata);
+  const metadataCanonicalPath = normalizedPath(text(metadata, "canonical_path", "canonicalPath"));
+  if (!metadataCanonicalPath) return null;
+
+  const slug = slugFromPath(metadataCanonicalPath);
   if (!slug) return null;
+
+  const locale = localeFromPath(metadataCanonicalPath);
+  if (!locale) return null;
+
+  const resolvedRoute = resolvePublicProviderCanonicalRoute({
+    family: routeFamily,
+    slug,
+    locale,
+    country: "om",
+  });
+
+  const canonicalPath = resolvedRoute.canonicalPath ?? metadataCanonicalPath;
 
   const nameEn = candidateText(candidate, "name", "nameEn", "name_en", "fullNameEn", "full_name_en") ?? text(metadata, "name", "nameEn", "name_en", "title");
   if (!nameEn) return null;
@@ -164,14 +199,14 @@ export function buildImportedProviderDiscoveryEntry(
   const location = candidateLocation(candidate);
   const evidence = sourceEvidence(metadata, candidate);
   const lastCheckedAt = evidence.lastCheckedAt ?? row.updated_at;
-  const routeMatchesFamily = canonicalPath.split("/").filter(Boolean).includes(family);
+  const routeMatchesResolver = Boolean(resolvedRoute.publicRouteEnabled && resolvedRoute.canonicalPath === metadataCanonicalPath);
   const hasGeo = location.area !== null || location.wilayat !== null || location.governorate !== null;
   const hasSource = evidence.sourceName !== null || evidence.sourceUrl !== null;
   const statusAllowsDetail = row.publish_status === "index_eligible" || row.publish_status === "published";
   const robotsAllowsIndex = row.robots_policy === undefined || row.robots_policy === null || row.robots_policy === "index";
 
-  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && approvedCandidate(candidate, entityType) && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
-  const publicDiscoveryEligible = Boolean(publicDetailEligible && routeMatchesFamily);
+  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && approvedCandidate(candidate, entityType) && routeMatchesResolver && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
+  const publicDiscoveryEligible = Boolean(publicDetailEligible && routeMatchesResolver);
   const publicSitemapEligible = Boolean(publicDiscoveryEligible && row.sitemap_policy === "included" && robotsAllowsIndex);
 
   return {
