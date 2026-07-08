@@ -1,6 +1,7 @@
 import './check-import-publish-lock.mjs';
 import './check-import-publish-lifecycle.mjs';
 import './check-import-domain-entity-contract.mjs';
+import './check-import-canonical-geo-contract.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -9,6 +10,7 @@ const auditPath = 'src/server/admin/import-publish-readiness-audit.ts';
 const lockPath = 'src/server/admin/import-publish-lock.ts';
 const lifecyclePath = 'src/server/admin/import-publish-lifecycle.ts';
 const domainPath = 'src/server/admin/import-entity-domain.ts';
+const geoPath = 'src/server/admin/import-canonical-geo.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -30,6 +32,7 @@ const auditSource = await readText(auditPath);
 const lockSource = await readText(lockPath);
 const lifecycleSource = await readText(lifecyclePath);
 const domainSource = await readText(domainPath);
+const geoSource = await readText(geoPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -106,6 +109,23 @@ for (const domainToken of [
   'isCrossDomainBlockedByDefault',
 ]) {
   assertIncludes(domainSource, domainToken, `${domainPath} must include ${domainToken}`);
+}
+
+for (const geoToken of [
+  'ImportCanonicalGeo',
+  'ImportGeoResolutionStatus',
+  'IMPORT_CANONICAL_GEO_REQUIRED_TABLES',
+  'IMPORT_CANONICAL_OMAN_GEO_SEED_AREAS',
+  'getCanonicalGeoBlockers',
+  'isCanonicalGeoPublishReady',
+  'geo_countries',
+  'geo_governorates',
+  'geo_cities',
+  'geo_areas',
+  'geo_confidence_score',
+  'geo_validated',
+]) {
+  assertIncludes(geoSource, geoToken, `${geoPath} must include ${geoToken}`);
 }
 
 for (const forbiddenToken of [
