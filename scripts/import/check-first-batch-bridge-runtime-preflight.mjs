@@ -15,6 +15,10 @@ function mustNotContain(source, token, label) {
   if (source.includes(token)) throw new Error(`${label} must not include ${token}`);
 }
 
+function mustNotMatch(source, pattern, label) {
+  if (pattern.test(source)) throw new Error(`${label} must not match ${pattern}`);
+}
+
 const doc = await readText('docs/import/first-batch-bridge-runtime-preflight.md');
 const generator = await readText('scripts/import/generate-first-batch-dry-run-fixture.mjs');
 const packageJson = await readText('package.json');
@@ -42,11 +46,13 @@ for (const token of [
   mustContain(generator, token, 'first batch fixture generator');
 }
 
-for (const token of [
-  'src/server/admin/import-first-batch-dry-run-bridge.ts',
-  'buildFirstBatchDryRunReport(',
+for (const pattern of [
+  /from\s+['"][^'"]*import-first-batch-dry-run-bridge['"]/, 
+  /import\(\s*['"][^'"]*import-first-batch-dry-run-bridge['"]\s*\)/,
+  /require\(\s*['"][^'"]*import-first-batch-dry-run-bridge['"]\s*\)/,
+  /buildFirstBatchDryRunReport\s*\(/,
 ]) {
-  mustNotContain(generator, token, 'fixture-only generator runtime import');
+  mustNotMatch(generator, pattern, 'fixture-only generator runtime import');
 }
 
 for (const token of ['"tsx"', '"ts-node"', '"tsimp"', '"esbuild-register"']) {
