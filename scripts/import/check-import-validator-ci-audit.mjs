@@ -42,6 +42,7 @@ for (const validator of [
   './check-import-canonical-geo-contract.mjs',
   './check-import-unified-draft-entity.mjs',
   './check-import-oman-geo-authority-registry.mjs',
+  './check-import-geo-alias-duplicate-guard.mjs',
   './check-import-publication-validation.mjs',
   './check-import-link-rule-matrix.mjs',
   './check-import-internal-link-generator.mjs',
