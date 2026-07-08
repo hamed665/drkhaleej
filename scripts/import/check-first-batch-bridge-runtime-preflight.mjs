@@ -43,7 +43,10 @@ for (const token of [
 }
 
 for (const token of [
-  'src/server/admin/import-first-batch-dry-run-bridge.ts',
+  'from "../src/server/admin/import-first-batch-dry-run-bridge"',
+  "from '../src/server/admin/import-first-batch-dry-run-bridge'",
+  'from "src/server/admin/import-first-batch-dry-run-bridge"',
+  "from 'src/server/admin/import-first-batch-dry-run-bridge'",
   'buildFirstBatchDryRunReport(',
 ]) {
   mustNotContain(generator, token, 'fixture-only generator runtime import');
@@ -55,7 +58,7 @@ for (const token of ['"tsx"', '"ts-node"', '"tsimp"', '"esbuild-register"']) {
 
 mustContain(
   workflow,
-  'node scripts/import/check-import-readiness-combined-smoke.mjs',
+  'node scripts/import/run-import-readiness.mjs',
   'import readiness workflow',
 );
 
