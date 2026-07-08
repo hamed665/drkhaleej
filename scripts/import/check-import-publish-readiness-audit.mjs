@@ -1,8 +1,10 @@
+import './check-import-publish-lock.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
 const auditPath = 'src/server/admin/import-publish-readiness-audit.ts';
+const lockPath = 'src/server/admin/import-publish-lock.ts';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -21,6 +23,7 @@ function assertNotIncludes(source, token, message) {
 }
 
 const auditSource = await readText(auditPath);
+const lockSource = await readText(lockPath);
 const packageSource = await readText('package.json');
 
 for (const token of [
@@ -51,6 +54,19 @@ for (const token of [
   'rowIssues',
 ]) {
   assertIncludes(auditSource, token, `${auditPath} must include ${token}`);
+}
+
+for (const lockToken of [
+  'IMPORT_PUBLISH_LOCK_DEFAULTS',
+  'visibility: "private"',
+  'index_policy: "noindex"',
+  'sitemap_policy: "excluded"',
+  'manual_approved: false',
+  'public_ready: false',
+  'robots_policy: "noindex"',
+  'sitemap_included: false',
+]) {
+  assertIncludes(lockSource, lockToken, `${lockPath} must include ${lockToken}`);
 }
 
 for (const forbiddenToken of [
