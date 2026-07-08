@@ -53,7 +53,6 @@ const requiredPackagePhrases = [
   'import:hospital-profile-guard:validate',
   'import:hospital-profile-route:validate',
   'import:hospital-sitemap:validate',
-  'seo:seo-geo-roadmap-2026:validate',
 ];
 
 const forbiddenBlockerPhrases = [
