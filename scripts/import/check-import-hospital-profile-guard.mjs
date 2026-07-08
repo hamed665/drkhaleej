@@ -129,10 +129,24 @@ for (const token of [
 for (const token of [
   String.raw`^\/(en|ar)\/om\/doctor\/`,
   String.raw`^\/(en|ar)\/om\/pharmacies\/`,
-  String.raw`^\/(en|ar)\/om\/hospitals\/`,
   'target_entity_type',
+  'decidePublicSitemapEligibility',
+  'minimumInternalLinksPassed',
+  'hreflangReady',
+  'blockedByImportedHospitalRelease',
 ]) {
-  assertIncludes(importSitemapSource, token, `import sitemap must preserve reviewed sitemap token ${token}`);
+  assertIncludes(importSitemapSource, token, `import sitemap must preserve held-safe sitemap token ${token}`);
+}
+
+for (const forbiddenToken of [
+  String.raw`^\/(en|ar)\/om\/hospitals\/`,
+  '| "hospital"',
+  'value === "hospital"',
+  'case "hospital":',
+  '/hospitals/',
+  'hospital: 500,',
+]) {
+  assertNotIncludes(importSitemapSource, forbiddenToken, `import sitemap must keep hospital held: ${forbiddenToken}`);
 }
 
 for (const packageToken of [
