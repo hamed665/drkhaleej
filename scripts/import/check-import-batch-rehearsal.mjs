@@ -26,6 +26,7 @@ const snapshotSource = await readText('docs/seo/DRKHALEEJ_ROUTE_INDEXABILITY_SNA
 const auditSource = await readText('src/server/admin/import-publish-readiness-audit.ts');
 const sitemapSource = await readText('src/server/public/import-sitemap.ts');
 const smokeSource = await readText('scripts/import/check-public-import-profile-smoke.mjs');
+const holdDocSource = await readText('docs/import/public-hospital-hold-contract.md');
 
 for (const token of [
   '# DrKhaleej Import Batch Rehearsal V1',
@@ -39,7 +40,6 @@ for (const token of [
   '| Family | Canonical pattern | Current public status | Sitemap cap | First rehearsal cap |',
   '| doctor | `/en/om/doctor/{slug}`, `/ar/om/doctor/{slug}` | guarded index path | 3000 | 50 |',
   '| pharmacy | `/en/om/pharmacies/{slug}`, `/ar/om/pharmacies/{slug}` | guarded index path | 1500 | 25 |',
-  '| hospital | `/en/om/hospitals/{slug}`, `/ar/om/hospitals/{slug}` | guarded index path | 500 | 10 |',
 ]) {
   assertIncludes(rehearsalSource, token, `${rehearsalPath} must include ${token}`);
 }
@@ -58,7 +58,6 @@ for (const token of [
 }
 
 for (const token of [
-  '`target_entity_type` is exactly `doctor`, `pharmacy`, or `hospital`.',
   '`publish_status` is exactly `index_eligible`.',
   '`index_policy` is exactly `index`.',
   '`sitemap_policy` is exactly `included`.',
@@ -75,7 +74,6 @@ for (const token of [
 }
 
 for (const token of [
-  'Maximum: 50 doctors, 25 pharmacies, 10 hospitals.',
   'The audit must show zero blockers for the selected rows.',
   'Public sitemap diff matches only the frozen batch.',
   'Representative page smoke checks pass.',
@@ -131,11 +129,25 @@ for (const token of [
 for (const token of [
   'doctor: 3000,',
   'pharmacy: 1500,',
-  'hospital: 500,',
   'applyFamilyCaps(entries)',
   'hasReviewedImportEvidence',
+  'decidePublicSitemapEligibility',
+  'minimumInternalLinksPassed',
+  'hreflangReady',
+  'blockedByImportedHospitalRelease',
 ]) {
   assertIncludes(sitemapSource, token, `import sitemap must preserve ${token}.`);
+}
+
+for (const forbiddenToken of [
+  'hospital: 500,',
+  '| "hospital"',
+  'value === "hospital"',
+  'case "hospital":',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  '/hospitals/',
+]) {
+  assertNotIncludes(sitemapSource, forbiddenToken, `import sitemap must keep hospital held: ${forbiddenToken}.`);
 }
 
 for (const token of [
@@ -152,10 +164,16 @@ for (const token of [
 for (const token of [
   'doctor cap: 3000',
   'pharmacy cap: 1500',
-  'hospital cap: 500',
   'PROFILE-SMOKE-A public-import-profile-smoke-v1',
 ]) {
   assertIncludes(snapshotSource, token, `route indexability snapshot must preserve ${token}.`);
+}
+
+for (const holdToken of [
+  '# Imported Hospital Public Hold Contract',
+  'public sitemap entry',
+]) {
+  assertIncludes(holdDocSource, holdToken, `hospital hold doc must preserve ${holdToken}.`);
 }
 
 for (const packageToken of [
