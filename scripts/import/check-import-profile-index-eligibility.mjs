@@ -89,6 +89,9 @@ const hospitalGuardPath = 'src/server/public/import-hospital-profile-guard.ts';
 const hospitalGuard = await readText(hospitalGuardPath);
 for (const token of [
   'getPublicImportHospitalProfile',
+  'isPublicImportProfileIndexEligible',
+  'const importIndexEligibility = isPublicImportProfileIndexEligible(profile)',
+  'if (!importIndexEligibility.eligible) return null',
   'isRecord(row.metadata)',
   'row.publish_status !== "index_eligible"',
   'row.index_policy !== "index"',
