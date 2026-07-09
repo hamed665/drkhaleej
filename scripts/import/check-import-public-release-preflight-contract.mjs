@@ -13,6 +13,8 @@ function assertIncludes(source, token, label) {
 
 const doc = await readText('docs/import/public-release-preflight-contract.md');
 const workflow = await readText('.github/workflows/import-readiness-contract.yml');
+const manifestSource = await readText('fixtures/import/import-readiness-runner.manifest.json');
+const manifest = JSON.parse(manifestSource);
 const holdDoc = await readText('docs/import/public-hospital-hold-contract.md');
 const fixtureDoc = await readText('docs/import/DRKHALEEJ_FIRST_BATCH_REAL_FIXTURE_V1.md');
 const fixtureCheck = await readText('scripts/import/check-first-batch-real-fixture.mjs');
@@ -37,11 +39,24 @@ for (const token of [
   assertIncludes(doc, token, 'public release preflight docs');
 }
 
-for (const token of [
-  'node scripts/import/check-imported-hospital-public-hold.mjs',
-  'node scripts/import/check-first-batch-real-fixture.mjs',
+assertIncludes(
+  workflow,
+  'node scripts/import/run-import-readiness.mjs',
+  'import readiness workflow',
+);
+
+const manifestCommands = new Set(
+  manifest.checks.map((check) => check.command.join(' ')),
+);
+
+for (const command of [
+  'scripts/import/check-imported-hospital-public-hold.mjs',
+  'scripts/import/check-first-batch-real-fixture.mjs',
+  'scripts/import/check-import-public-release-preflight-contract.mjs',
 ]) {
-  assertIncludes(workflow, token, 'import readiness workflow');
+  if (!manifestCommands.has(command)) {
+    throw new Error(`import readiness manifest must include ${command}`);
+  }
 }
 
 for (const token of [
