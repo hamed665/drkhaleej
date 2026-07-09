@@ -15,7 +15,7 @@ type ImportSitemapClient = {
   from<T extends object = Record<string, unknown>>(table: string): ImportSitemapQueryBuilder<T>;
 };
 
-type SupportedImportSitemapEntityType = "doctor" | "pharmacy";
+type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";
 
 type IncludedImportSitemapRow = {
   id: string;
@@ -36,6 +36,7 @@ type InternalImportSitemapEntry = PublicImportSitemapEntry & {
 };
 
 const publicImportSitemapFamilyCaps = {
+  hospital: 500,
   doctor: 3000,
   pharmacy: 1500,
 } as const satisfies Record<SupportedImportSitemapEntityType, number>;
@@ -61,12 +62,13 @@ function readString(value: JsonRecord, key: string): string | null {
 }
 
 function supportedEntityType(value: string): SupportedImportSitemapEntityType | null {
-  if (value === "doctor" || value === "pharmacy") return value;
+  if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;
   return null;
 }
 
 function emptyFamilyCounters(): Record<SupportedImportSitemapEntityType, number> {
   return {
+    hospital: 0,
     doctor: 0,
     pharmacy: 0,
   };
@@ -81,6 +83,8 @@ function isSafePublicCanonicalPathForEntity(
       return /^\/(en|ar)\/om\/doctor\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
     case "pharmacy":
       return /^\/(en|ar)\/om\/pharmacies\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
+    case "hospital":
+      return /^\/(en|ar)\/om\/hospitals\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
   }
 }
 
