@@ -22,6 +22,11 @@ function assertNotIncludes(source, token, message) {
   assert(!source.includes(token), message);
 }
 
+function assertNoUnconditionalPassFunction(source, functionName, message) {
+  const pattern = new RegExp(`function\\s+${functionName}\\s*\\([^)]*\\)\\s*:\\s*boolean\\s*{\\s*return\\s+true;\\s*}`, 'm');
+  assert(!pattern.test(source), message);
+}
+
 const generatorSource = await readText(generatorPath);
 const ruleSource = await readText(rulePath);
 const architectureSource = await readText(architecturePath);
@@ -70,8 +75,13 @@ for (const token of [
   assertIncludes(generatorSource, token, `${generatorPath} must include ${token}`);
 }
 
+assertNoUnconditionalPassFunction(
+  generatorSource,
+  'candidatePassesRule',
+  `${generatorPath} must not make candidatePassesRule an unconditional true shortcut.`,
+);
+
 for (const forbiddenToken of [
-  'return true;',
   'Number.POSITIVE_INFINITY',
   'generateImportInternalLinksForRuleLimit',
   'decision.decision === "blocked" && false',
