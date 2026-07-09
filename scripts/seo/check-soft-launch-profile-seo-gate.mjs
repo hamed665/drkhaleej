@@ -37,18 +37,6 @@ function assertFileNotIncludes(relativePath, tokens) {
   return content;
 }
 
-function assertCriticalFilesDoNotContain(paths, tokens) {
-  for (const relativePath of paths) {
-    const content = readFile(relativePath).toLowerCase();
-    for (const token of tokens) {
-      const normalizedToken = token.toLowerCase();
-      if (content.includes(normalizedToken)) {
-        throw new Error(`${relativePath} contains forbidden public SEO claim token: ${token}`);
-      }
-    }
-  }
-}
-
 const docPath = 'docs/seo/soft-launch-profile-seo-gate.md';
 assertFileIncludes(docPath, [
   'Soft launch profile SEO gate',
