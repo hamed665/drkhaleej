@@ -31,18 +31,7 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Routes check
-        shell: bash
-        run: |
-          set -o pipefail
-          find 'src/app/[locale]/[country]/hospitals' -maxdepth 2 -print | sort | tee routes-check.log
-          pnpm routes:check 2>&1 | tee -a routes-check.log
-      - name: Upload routes check failure log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: routes-check-log
-          path: routes-check.log
-          if-no-files-found: ignore
+        run: pnpm routes:check
       - name: Env check
         run: pnpm env:check
       - name: Validate migrations
