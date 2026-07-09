@@ -21,6 +21,11 @@ function assertNotIncludes(source, token, message) {
   assert(!source.includes(token), message);
 }
 
+function assertNoExactObjectMapping(source, key, value, message) {
+  const pattern = new RegExp(`(^|\\n)\\s*${key}:\\s*${JSON.stringify(value)}\\s*,`, 'm');
+  assert(!pattern.test(source), message);
+}
+
 const domainSource = await readText(domainPath);
 const architectureSource = await readText(architecturePath);
 
@@ -94,6 +99,7 @@ for (const token of [
   'yoga_studio: "fitness"',
   'pilates_studio: "fitness"',
   'sports_medicine_doctor: "human_healthcare"',
+  'vet_doctor: "pet_healthcare"',
   'pet_clinic: "pet_healthcare"',
   'pet_shop: "pet_healthcare"',
   'IMPORT_DOCTOR_SPECIALTIES',
@@ -112,18 +118,25 @@ for (const token of [
   assertIncludes(domainSource, token, `${domainPath} must include ${token}`);
 }
 
-for (const forbiddenToken of [
-  'doctor: "pet_healthcare"',
-  'hospital: "pet_healthcare"',
-  'pet_clinic: "human_healthcare"',
-  'pet_shop: "human_healthcare"',
-  'salon: "medical_beauty"',
-  'hair_transplant_clinic: "non_medical_beauty"',
-  'ivf_center: "medical_beauty"',
-  'fitness_center: "human_healthcare"',
+for (const [key, value] of [
+  ['doctor', 'pet_healthcare'],
+  ['hospital', 'pet_healthcare'],
+  ['pet_clinic', 'human_healthcare'],
+  ['pet_shop', 'human_healthcare'],
+  ['salon', 'medical_beauty'],
+  ['hair_transplant_clinic', 'non_medical_beauty'],
+  ['ivf_center', 'medical_beauty'],
+  ['fitness_center', 'human_healthcare'],
 ]) {
-  assertNotIncludes(domainSource, forbiddenToken, `${domainPath} must not include unsafe domain mapping ${forbiddenToken}.`);
+  assertNoExactObjectMapping(
+    domainSource,
+    key,
+    value,
+    `${domainPath} must not include unsafe domain mapping ${key}: ${JSON.stringify(value)}.`,
+  );
 }
+
+assertNotIncludes(domainSource, 'doctor: "pet_healthcare",', `${domainPath} must not map doctor to pet healthcare.`);
 
 for (const token of [
   'PR 3: Domain + Entity Type Contract',
