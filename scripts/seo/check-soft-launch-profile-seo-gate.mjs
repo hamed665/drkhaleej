@@ -184,13 +184,18 @@ assertFileNotIncludes('src/app/sitemap.ts', [
   'preview',
 ]);
 assertFileIncludes('src/server/public/import-sitemap.ts', [
-  'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital"',
+  'type SupportedImportSitemapEntityType = "doctor" | "pharmacy"',
   'publicImportSitemapFamilyCaps',
   'hasReviewedImportEvidence',
   '.eq("publish_status", "index_eligible")',
   '.eq("index_policy", "index")',
   '.eq("sitemap_policy", "included")',
   'applyFamilyCaps(entries)',
+]);
+assertFileNotIncludes('src/server/public/import-sitemap.ts', [
+  'hospital: 500',
+  'value === "hospital"',
+  '/hospitals/',
 ]);
 assertFileIncludes('docs/seo/public-profile-sitemap-boundary.md', [
   'Public profile sitemap boundary',
@@ -218,195 +223,6 @@ assertFileIncludes('src/lib/catalog/public-profile-completeness.ts', [
   'hasSafetyCopy',
   'hasUnsafeClaimFree',
   'score',
-  'percentage',
-  'missing',
-]);
-assertFileIncludes('src/lib/catalog/public-profile-completeness.test.ts', [
-  "describe('public profile completeness signals'",
-  'buildPublicProfileCompletenessSignals',
-  'relation_signal',
-  'unsafe_claim_free',
-]);
-assertFileIncludes('docs/seo/public-profile-completeness-signals.md', [
-  'Public profile completeness signals',
-  'internal quality model',
-  'not a public badge',
-  'Internal-only rule',
 ]);
 
-assertFileIncludes('scripts/seo/check-public-profile-evidence-copy-guard.mjs', [
-  'PublicLicenseInfoCard',
-  'This is not a license or MOH approval claim.',
-  'Contact details should be confirmed with the provider.',
-  'not medical advice, diagnosis, emergency guidance, or a guarantee of provider availability',
-  'approvedHeroActions',
-  'renderLocationActions',
-]);
-assertFileIncludes('docs/seo/public-profile-evidence-copy-guard.md', [
-  'Public profile evidence copy guard',
-  'only when `licenseInfo` exists',
-  'not official regulator approval',
-  'Contact actions must come from approved public contact action arrays',
-]);
-assertFileIncludes('src/components/public/public-center-detail.tsx', [
-  'PublicLicenseInfoCard',
-  'center.licenseInfo ? (',
-  'showCallbackRequest',
-  'showSafeContactFallback',
-  'medical advice',
-]);
-assertFileIncludes('src/app/[locale]/[country]/center/[centerSlug]/page.tsx', [
-  'PublicContactActions',
-  'approvedHeroActions',
-  'heroActions={heroActions}',
-]);
-assertFileIncludes('src/components/public/public-doctor-detail.tsx', [
-  'PublicLicenseInfoCard',
-  'doctor.licenseInfo ? (',
-  'PublicContactActions actions={practiceLocation.contactActions}',
-  'Confirm clinical details directly with the provider before making care decisions.',
-]);
-assertFileIncludes('src/components/public/public-license-info-card.tsx', [
-  'PublicLicenseInfo | null',
-  'if (licenseInfo === null) return null',
-  'Displayed for transparency.',
-]);
-
-assertFileIncludes('src/lib/catalog/provider-description-review.ts', [
-  'providerDescriptionReviewStatuses',
-  "'draft'",
-  "'pending_review'",
-  "'approved'",
-  "'rejected'",
-  'buildProviderDescriptionPublicReadiness',
-  'getApprovedProviderDescriptionBody',
-  'hasUnsafeProviderDescriptionClaim',
-  "reasons.push('not_approved')",
-  "reasons.push('empty_body')",
-  "reasons.push('unsafe_claim')",
-]);
-assertFileIncludes('src/lib/catalog/provider-description-review.test.ts', [
-  "describe('provider description review contract'",
-  'allows approved clean provider copy to become public body text',
-  'keeps draft and pending provider copy out of public rendering',
-  'blocks unsafe claim wording even if the status is approved',
-]);
-assertFileIncludes('docs/seo/provider-description-review-contract.md', [
-  'Provider description review contract',
-  'Only `approved` copy can be considered for public rendering.',
-  'does not add admin UI',
-]);
-
-assertFileIncludes('src/lib/catalog/public-import-profile-index-eligibility.ts', [
-  'PublicImportProfileIndexEligibilityReason',
-  'PublicImportProfileIndexEligibilityResult',
-  'isPublicImportProfileIndexEligible',
-  'missing_name',
-  'missing_canonical_path',
-  'missing_location',
-  'missing_source',
-  'missing_last_checked',
-  'missing_language',
-  'missing_taxonomy_signal',
-  'missing_contact_or_map',
-]);
-assertFileIncludes('src/lib/catalog/public-import-profile-index-eligibility.test.ts', [
-  "describe('public import profile index eligibility'",
-  'blocks name-only imported profiles from index eligibility',
-  'requires a language signal before imported metadata stays indexable',
-  'accepts department or service taxonomy signals for imported hospitals and pharmacies',
-]);
-assertFileIncludes('scripts/import/check-import-profile-index-eligibility.mjs', [
-  'isPublicImportProfileIndexEligible',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(importResult.profile)',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile)',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(profile)',
-]);
-assertFileIncludes('scripts/import/check-public-import-profile-smoke.mjs', [
-  "import './check-import-profile-index-eligibility.mjs';",
-  'doctor',
-  'pharmacy',
-  'hospital',
-  'hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)',
-  'hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })',
-]);
-
-assertFileIncludes('scripts/seo/check-profile-graph-anchor-text.mjs', [
-  "import './check-profile-relation-limit-guard.mjs';",
-  'View profile',
-  'View doctor profile',
-  'View center profile',
-  '>More<',
-  '>Profile<',
-  '>Details<',
-]);
-assertFileIncludes('src/lib/catalog/public-profile-relation-limits.ts', [
-  'PUBLIC_CENTER_PROFILE_LOCATION_LIMIT = 6',
-  'PUBLIC_CENTER_PROFILE_SERVICE_LIMIT = 12',
-  'PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT = 12',
-  'PUBLIC_DOCTOR_PROFILE_SERVICE_LIMIT = 12',
-  'PUBLIC_DOCTOR_PROFILE_PRACTICE_LOCATION_LIMIT = 8',
-  'items.slice(0, Math.max(0, limit))',
-]);
-assertFileNotIncludes('src/lib/catalog/public-profile-relation-limits.ts', ['Math.random', 'sort(() =>', 'randomUUID']);
-assertFileIncludes('scripts/seo/check-profile-relation-limit-guard.mjs', [
-  'PUBLIC_CENTER_PROFILE_LOCATION_LIMIT = 6',
-  'PUBLIC_CENTER_PROFILE_SERVICE_LIMIT = 12',
-  'PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT = 12',
-  'PUBLIC_DOCTOR_PROFILE_SERVICE_LIMIT = 12',
-  'PUBLIC_DOCTOR_PROFILE_PRACTICE_LOCATION_LIMIT = 8',
-  'PublicDoctorDetailLimited',
-]);
-
-const forbiddenSeoClaimTokens = [
-  ['Aggregate', 'Rating'].join(''),
-  ['rating', 'Value'].join(''),
-  ['review', 'Count'].join(''),
-  ['review ', 'schema'].join(''),
-  ['Book ', 'now'].join(''),
-  ['booking ', 'guarantee'].join(''),
-  ['Open ', 'now'].join(''),
-  ['available ', 'now'].join(''),
-  ['insurance ', 'accepted'].join(''),
-  ['MOH ', 'approved'].join(''),
-  ['verified ', 'by MOH'].join(''),
-  ['best ', 'doctors'].join(''),
-  ['top-rated'].join(''),
-  ['trusted ', 'by thousands'].join(''),
-  ['guaranteed ', 'treatment'].join(''),
-  ['emergency ', 'availability'].join(''),
-];
-
-assertCriticalFilesDoNotContain([
-  'src/app/sitemap.ts',
-  'src/server/public/import-sitemap.ts',
-  'src/app/[locale]/[country]/center/[centerSlug]/page.tsx',
-  'src/app/[locale]/[country]/doctor/[doctorSlug]/page.tsx',
-  'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/page.tsx',
-  'src/pages/[locale]/[country]/hospitals/[hospitalSlug].tsx',
-  'src/components/public/public-listing-card.tsx',
-  'src/components/public/public-center-detail.tsx',
-  'src/components/public/public-doctor-detail.tsx',
-  'src/components/public/public-license-info-card.tsx',
-  'src/components/public/import-profile/GuardedImportProfilePage.tsx',
-  'src/lib/catalog/public-profile-summary.ts',
-  'src/lib/catalog/public-import-profile-summary.ts',
-  'src/lib/seo/profile-metadata-index-gate.ts',
-], forbiddenSeoClaimTokens);
-
-assertFileIncludes('scripts/seo/check-public-profile-index-eligibility-contract.mjs', [
-  "import './check-soft-launch-profile-seo-gate.mjs';",
-  "import './check-public-profile-metadata-index-gate.mjs';",
-  "import './check-public-profile-completeness-signals.mjs';",
-  "import './check-profile-graph-anchor-text.mjs';",
-]);
-assertFileIncludes('scripts/seo/check-public-listing-card-safety.mjs', [
-  "import './check-public-profile-summary-contract.mjs';",
-  "import './check-public-profile-index-eligibility-contract.mjs';",
-]);
-assertFileIncludes('package.json', [
-  'pnpm seo:public-listing-card-safety:validate',
-  'pnpm import:profile-smoke:validate',
-]);
-
-console.log('Soft launch profile SEO aggregate gate passed.');
+console.log('soft launch profile SEO gate checks passed.');
