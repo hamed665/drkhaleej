@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isPublicImportProfileIndexEligible } from "@/lib/catalog/public-import-profile-index-eligibility";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import {
   buildPublicImportLocalSuggestions,
@@ -271,7 +272,7 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
   if (!hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)) return null;
   if (!hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })) return null;
 
-  return {
+  const profile: PublicImportHospitalProfile = {
     family: "hospitals",
     canonicalPath: path,
     entityType: "hospital",
@@ -302,6 +303,11 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     lastCheckedAt,
     qualityScore: Math.max(0, Math.min(100, numberValue(quality, "score") ?? queue.quality_score)),
   };
+
+  const importIndexEligibility = isPublicImportProfileIndexEligible(profile);
+  if (!importIndexEligibility.eligible) return null;
+
+  return profile;
 }
 
 export async function getPublicImportHospitalProfile(input: {
@@ -339,13 +345,14 @@ export async function getPublicImportHospitalProfile(input: {
       .from<CandidateRow>("import_entity_candidates")
       .select("entity_type, candidate_status, candidate_payload")
       .eq("id", id)
-      .eq("candidate_status", "approved")
       .maybeSingle();
 
     if (candidateResult.error !== null || candidateResult.data === null) return { ok: false, reason: "not_found" };
 
     const profile = buildProfile(path, queue, candidateResult.data);
-    return profile === null ? { ok: false, reason: "not_found" } : { ok: true, profile };
+    if (profile === null) return { ok: false, reason: "not_found" };
+
+    return { ok: true, profile };
   } catch {
     return { ok: false, reason: "not_found" };
   }
