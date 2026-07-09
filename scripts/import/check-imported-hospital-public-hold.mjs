@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
@@ -7,11 +7,12 @@ async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
 }
 
-async function readOptionalText(relativePath) {
+async function pathExists(relativePath) {
   try {
-    return await readText(relativePath);
+    await access(path.join(root, relativePath));
+    return true;
   } catch (error) {
-    if (error && error.code === 'ENOENT') return null;
+    if (error && error.code === 'ENOENT') return false;
     throw error;
   }
 }
@@ -24,32 +25,19 @@ function assertNotIncludes(source, token, label) {
   if (source.includes(token)) throw new Error(`${label} must not include ${token}`);
 }
 
-const hospitalRouteSource = await readText('src/app/[locale]/[country]/hospitals/[slug]/page.tsx');
+const hospitalDetailRoutePath = 'src/app/[locale]/[country]/hospitals/[slug]/page.tsx';
+const hospitalDetailLayoutPath = 'src/app/[locale]/[country]/hospitals/[slug]/layout.tsx';
 const hospitalDirectorySource = await readText('src/app/[locale]/[country]/hospitals/page.tsx');
 const importSitemapSource = await readText('src/server/public/import-sitemap.ts');
 const holdDocSource = await readText('docs/import/public-hospital-hold-contract.md');
-const legacyHospitalDiscoverySource = await readOptionalText('src/lib/catalog/public-import-discovery.ts');
+const legacyHospitalDiscoveryExists = await pathExists('src/lib/catalog/public-import-discovery.ts');
 
-for (const token of [
-  'ImportedHospitalDetailPublicHoldPage',
-  'export const dynamic = "force-dynamic";',
-  'export const revalidate = 0;',
-  'PUBLIC_HOSPITAL_HOLD_REASON',
-  'buildProfileNoindexMetadata',
-  'Hospital profile unavailable | DrKhaleej',
-  'notFound();',
-]) {
-  assertIncludes(hospitalRouteSource, token, 'imported hospital hold route');
+if (await pathExists(hospitalDetailRoutePath)) {
+  throw new Error(`${hospitalDetailRoutePath} must not exist while imported hospital detail pages are blocked.`);
 }
 
-for (const token of [
-  'getImportedHospitalProfile(',
-  'createSupabaseServerClient',
-  'Reviewed public hospital profile',
-  'profile.summaryEn',
-  'sourceUrl',
-]) {
-  assertNotIncludes(hospitalRouteSource, token, 'imported hospital hold route');
+if (await pathExists(hospitalDetailLayoutPath)) {
+  throw new Error(`${hospitalDetailLayoutPath} must not exist while imported hospital detail pages are blocked.`);
 }
 
 for (const token of [
@@ -61,22 +49,43 @@ for (const token of [
   assertNotIncludes(hospitalDirectorySource, token, 'public hospitals directory');
 }
 
-assertIncludes(importSitemapSource, 'type SupportedImportSitemapEntityType = "doctor" | "pharmacy";', 'import sitemap family gate');
-assertIncludes(importSitemapSource, 'doctor: 3000', 'import sitemap family gate');
-assertIncludes(importSitemapSource, 'pharmacy: 1500', 'import sitemap family gate');
-assertNotIncludes(importSitemapSource, 'hospital: 500', 'import sitemap family gate');
-assertNotIncludes(importSitemapSource, 'value === "hospital"', 'import sitemap family gate');
-assertNotIncludes(importSitemapSource, '/hospitals/', 'import sitemap family gate');
+for (const token of [
+  'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital"',
+  'hospital: 500',
+  'doctor: 3000',
+  'pharmacy: 1500',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  '.eq("publish_status", "index_eligible")',
+  '.eq("index_policy", "index")',
+  '.eq("sitemap_policy", "included")',
+  'hasReviewedImportEvidence',
+  'readString(metadata, "canonical_path") === null',
+  'readString(metadata, "import_entity_candidate_id") !== null',
+]) {
+  assertIncludes(importSitemapSource, token, 'import sitemap family gate');
+}
 
-if (legacyHospitalDiscoverySource !== null) {
-  throw new Error('src/lib/catalog/public-import-discovery.ts must not exist while imported hospitals are on public hold.');
+for (const token of [
+  'rating',
+  'booking',
+  'insurance',
+  'provider-dashboard',
+  'admin',
+  'preview',
+]) {
+  assertNotIncludes(importSitemapSource, token, 'import sitemap family gate');
+}
+
+if (legacyHospitalDiscoveryExists) {
+  throw new Error('src/lib/catalog/public-import-discovery.ts must not exist while imported hospitals are excluded from public discovery results.');
 }
 
 for (const token of [
   '# Imported Hospital Public Hold Contract',
   'detail page returning `200`',
   'public hospital directory listing',
-  'public sitemap entry',
+  'public search result',
+  'public sitemap entry is allowed only after import sitemap eligibility passes',
   'first-batch dry-run fixture passes',
   'public sitemap eligibility is downstream of public discovery eligibility',
 ]) {
