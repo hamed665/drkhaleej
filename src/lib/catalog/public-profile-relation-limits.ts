@@ -8,7 +8,9 @@ export const PUBLIC_PROFILE_RELATED_PROVIDER_LIMIT = 8;
 export const PUBLIC_IMPORT_PROFILE_LOCAL_SUGGESTION_LIMIT = 12;
 
 export function limitPublicProfileRelations<T>(items: readonly T[], limit: number): T[] {
-  return items.slice(0, Math.max(0, limit));
+  const safeLimit = Math.max(0, limit);
+  if (safeLimit === 0) return [];
+  return items.slice(0, limit);
 }
 
 export function hiddenPublicProfileRelationCount(items: readonly unknown[], limit: number): number {
