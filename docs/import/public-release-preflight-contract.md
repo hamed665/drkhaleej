@@ -28,7 +28,9 @@ Every PR that opens or expands imported public visibility must prove all of the 
 
 ## Hospital-specific hold
 
-Imported hospitals remain blocked until the hospital public hold contract is retired by a dedicated PR. That PR must reference the fixture that turns hospital release from blocked to eligible and must use the unified public provider projection.
+Imported hospital detail and discovery remain blocked until the hospital public hold contract is retired by a dedicated PR. Hospital sitemap eligibility remains guarded by import queue readiness, `index_eligible`, `index`, `included`, reviewed import evidence, safe canonical path, and the hospital family cap.
+
+The PR that retires the hospital hold must reference the fixture that turns hospital release from blocked to eligible and must use the unified public provider projection.
 
 ## No shortcut rule
 
