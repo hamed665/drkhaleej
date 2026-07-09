@@ -496,7 +496,39 @@ Rules:
 - Schema validation failure blocks publish and sitemap eligibility.
 - Generated schema should be precomputed or stored in a lightweight projection for public rendering.
 
-## PR 10: Admin SEO Readiness Panel
+## PR 10: Performance Guard
+
+Goal: public profile pages must stay fast and avoid heavy runtime work.
+
+Public rendering must read from lightweight projections and caches only.
+
+Rules:
+
+- Public render must not generate links, schema, or geo calculations on the fly.
+- Public render query count should stay within a small fixed budget.
+- Internal links must come from `entity_internal_links_cache`.
+- Schema must come from a precomputed projection.
+- Canonical geo must come from a projection/cache.
+- Sitemap runtime must not run heavy validation or geo queries.
+- Admin/import workflows may perform heavy validation outside the public render path.
+
+Performance target:
+
+```text
+Public pages should remain under 2 seconds for TTFB/render budget under normal production conditions.
+```
+
+Recommended public read path:
+
+```text
+entity profile projection
+precomputed schema
+entity_internal_links_cache
+canonical_geo_projection
+public_indexable_entities or equivalent validated projection
+```
+
+## PR 11: Admin SEO Readiness Panel
 
 Goal: make readiness visible before manual approval.
 
@@ -535,7 +567,7 @@ Rules:
 - Manual approval must be explicit.
 - Admin must be able to see why a record is blocked.
 
-## PR 11: Manual Publish Flow
+## PR 12: Manual Publish Flow
 
 Goal: publishing must happen through one explicit controlled flow.
 
@@ -558,34 +590,6 @@ Rules:
 - Failed publish attempts should return blockers, not partially publish.
 - Unpublish must reverse public visibility and sitemap inclusion without deleting import evidence.
 
-## PR 12: Performance Guard
-
-Goal: public profile pages must stay fast and avoid heavy runtime work.
-
-Rules:
-
-- Public pages should read only page-ready data.
-- Internal links must be read from cache.
-- Schema should be precomputed or lightweight.
-- Sitemap runtime must not run heavy validation or geo queries.
-- No heavy distance calculation should happen during public page render.
-- Admin/import workflows may perform heavy validation outside the public render path.
-
-Performance target:
-
-```text
-Public pages should remain under 2 seconds for TTFB/render budget under normal production conditions.
-```
-
-Recommended public read path:
-
-```text
-entity profile projection
-precomputed schema
-entity_internal_links_cache
-public_indexable_entities or equivalent validated projection
-```
-
 ## Execution order
 
 The implementation order must remain:
@@ -600,9 +604,9 @@ The implementation order must remain:
 7. Internal Link Generator + Versioned Cache
 8. Sitemap Eligibility
 9. Schema Generator + Validation
-10. Admin SEO Readiness Panel
-11. Manual Publish Flow
-12. Performance Guard
+10. Performance Guard
+11. Admin SEO Readiness Panel
+12. Manual Publish Flow
 ```
 
 Do not start with internal linking, schema expansion, or sitemap expansion before import publish lock and entity lifecycle are in place.
