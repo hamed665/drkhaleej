@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* Wireframe page helper — listens to the shell for the notes toggle */
 (function(){
   function apply(show){
