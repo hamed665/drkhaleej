@@ -26,9 +26,12 @@ for (const token of [
   'PUBLIC_CENTER_PROFILE_DOCTOR_LIMIT = 12',
   'PUBLIC_DOCTOR_PROFILE_SERVICE_LIMIT = 12',
   'PUBLIC_DOCTOR_PROFILE_PRACTICE_LOCATION_LIMIT = 8',
+  'PUBLIC_DOCTOR_PROFILE_CENTER_LIMIT = 6',
+  'PUBLIC_PROFILE_RELATED_PROVIDER_LIMIT = 8',
+  'PUBLIC_IMPORT_PROFILE_LOCAL_SUGGESTION_LIMIT = 12',
   'limitPublicProfileRelations',
   'hiddenPublicProfileRelationCount',
-  'items.slice(0, Math.max(0, limit))',
+  'slice(0, limit)',
 ]) {
   assertIncludes(helper, token, helperPath);
 }
