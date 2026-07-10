@@ -49,11 +49,15 @@ export const IMPORT_INTERNAL_LINK_GENERATOR_VERSION = "import-internal-link-gene
 export const IMPORT_INTERNAL_LINK_RULE_VERSION = "import-link-rule-matrix-v1";
 
 function candidatePassesRule(rule: ImportEntityLinkRule, candidate: ImportInternalLinkCandidate): boolean {
-  if (candidate.quality_score < rule.min_quality_score) return false;
-  if (rule.same_city_required && candidate.same_city !== true) return false;
-  if (rule.same_specialty_required && candidate.same_specialty !== true) return false;
-  if (rule.max_distance_km !== null && candidate.distance_km !== null && candidate.distance_km > rule.max_distance_km) return false;
-  return true;
+  const meetsQualityScore = candidate.quality_score >= rule.min_quality_score;
+  const meetsCityRequirement = !rule.same_city_required || candidate.same_city === true;
+  const meetsSpecialtyRequirement = !rule.same_specialty_required || candidate.same_specialty === true;
+  const meetsDistanceRequirement =
+    rule.max_distance_km === null ||
+    candidate.distance_km === null ||
+    candidate.distance_km <= rule.max_distance_km;
+
+  return meetsQualityScore && meetsCityRequirement && meetsSpecialtyRequirement && meetsDistanceRequirement;
 }
 
 function scoreCandidate(rule: ImportEntityLinkRule, candidate: ImportInternalLinkCandidate): number {
