@@ -32,5 +32,8 @@ jobs:
         with:
           node-version: 22
 
+      - name: Run first batch fixture check
+        run: node scripts/import/generate-first-batch-dry-run-fixture.mjs --check
+
       - name: Run import readiness contract
         run: node scripts/import/run-import-readiness.mjs
