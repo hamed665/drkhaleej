@@ -15,10 +15,14 @@ function mustNotContain(source, token, label) {
   if (source.includes(token)) throw new Error(`${label} must not include ${token}`);
 }
 
+function mustNotMatch(source, pattern, label, tokenLabel) {
+  if (pattern.test(source)) throw new Error(`${label} must not include runtime import ${tokenLabel}`);
+}
+
 const doc = await readText('docs/import/first-batch-bridge-runtime-preflight.md');
 const generator = await readText('scripts/import/generate-first-batch-dry-run-fixture.mjs');
 const packageJson = await readText('package.json');
-const workflow = await readText('.github/workflows/import-readiness-contract.yml');
+const manifest = await readText('fixtures/import/import-readiness-runner.manifest.json');
 
 for (const token of [
   '# First Batch Bridge Runtime Preflight',
@@ -43,20 +47,28 @@ for (const token of [
 }
 
 for (const token of [
-  'src/server/admin/import-first-batch-dry-run-bridge.ts',
   'buildFirstBatchDryRunReport(',
 ]) {
   mustNotContain(generator, token, 'fixture-only generator runtime import');
+}
+
+for (const [pattern, tokenLabel] of [
+  [/from\s+['"][^'"]*import-first-batch-dry-run-bridge(?:\.ts)?['"]/, 'static bridge import'],
+  [/import\s*\(\s*['"][^'"]*import-first-batch-dry-run-bridge(?:\.ts)?['"]\s*\)/, 'dynamic bridge import'],
+  [/require\s*\(\s*['"][^'"]*import-first-batch-dry-run-bridge(?:\.ts)?['"]\s*\)/, 'CommonJS bridge import'],
+]) {
+  mustNotMatch(generator, pattern, 'fixture-only generator runtime import', tokenLabel);
 }
 
 for (const token of ['"tsx"', '"ts-node"', '"tsimp"', '"esbuild-register"']) {
   mustNotContain(packageJson, token, 'package TypeScript script runner state');
 }
 
-mustContain(
-  workflow,
-  'node scripts/import/check-import-readiness-combined-smoke.mjs',
-  'import readiness workflow',
-);
+for (const token of [
+  'check-first-batch-bridge-runtime-preflight.mjs',
+  'check-import-readiness-combined-smoke.mjs',
+]) {
+  mustContain(manifest, token, 'import readiness runner manifest');
+}
 
 console.log('first batch bridge runtime preflight check passed.');
