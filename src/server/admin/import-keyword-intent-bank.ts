@@ -66,7 +66,7 @@ export type ImportKeywordIntentRecord = {
 };
 
 export type ImportKeywordIntentBankManifest = {
-  schemaVersion: "drmuscat.import.keywordIntentBank.v1";
+  schemaVersion: "drkhaleej.import.keywordIntentBank.v1";
   sourceFile: string;
   sourceSha256: string;
   totalRows: number;
@@ -109,7 +109,7 @@ export function getImportKeywordIntentBankBlockers(
 ): readonly ImportKeywordIntentBankBlocker[] {
   const blockers: ImportKeywordIntentBankBlocker[] = [];
 
-  if (manifest.schemaVersion !== "drmuscat.import.keywordIntentBank.v1") blockers.push("schema_version_invalid");
+  if (manifest.schemaVersion !== "drkhaleej.import.keywordIntentBank.v1") blockers.push("schema_version_invalid");
   if (!sourceHashPattern.test(manifest.sourceSha256)) blockers.push("source_hash_invalid");
   if (manifest.totalRows <= 0 || manifest.totalRows !== manifest.englishRows + manifest.arabicRows) blockers.push("row_count_invalid");
   if (manifest.englishRows !== manifest.arabicRows) blockers.push("language_balance_invalid");

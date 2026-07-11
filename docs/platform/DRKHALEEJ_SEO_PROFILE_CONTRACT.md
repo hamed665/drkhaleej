@@ -1,4 +1,4 @@
-# DrMuscat SEO Profile Contract
+# DrKhaleej SEO Profile Contract
 
 ## Purpose
 
@@ -43,4 +43,4 @@ The SEO profile requires ready `entity`, `geo`, and `seo` projection records for
 - No publish mutation.
 - No runtime public behavior.
 
-Fixture coverage proves that `seoProfileReady` can be true while `publishReady` and `sitemapEligible` remain false. This separation is intentional, because one boolean to rule them all usually ends with one boolean lying to everyone.
+Fixture coverage proves that `seoProfileReady` can be true while `publishReady` and `sitemapEligible` remain false.

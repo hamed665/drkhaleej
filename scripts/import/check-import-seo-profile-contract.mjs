@@ -4,7 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const contractPath = 'src/server/admin/import-seo-profile-contract.ts';
 const fixturePath = 'fixtures/import/import-seo-profile-contract.fixture.json';
-const docsPath = 'docs/platform/DRMUSCAT_SEO_PROFILE_CONTRACT.md';
+const docsPath = 'docs/platform/DRKHALEEJ_SEO_PROFILE_CONTRACT.md';
 const auditPath = 'scripts/import/check-import-publish-readiness-audit.mjs';
 
 function assert(condition, message) {
@@ -78,7 +78,7 @@ for (const token of [
 }
 
 assert(
-  fixture.schemaVersion === 'drmuscat.import.seoProfileContract.v1',
+  fixture.schemaVersion === 'drkhaleej.import.seoProfileContract.v1',
   'SEO profile fixture schema version is invalid.',
 );
 assert(Array.isArray(fixture.cases) && fixture.cases.length >= 4, 'SEO profile fixture must include at least four cases.');

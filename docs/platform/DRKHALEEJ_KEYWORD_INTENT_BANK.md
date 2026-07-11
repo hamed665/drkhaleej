@@ -1,4 +1,4 @@
-# DrMuscat Keyword + Intent Bank
+# DrKhaleej Keyword + Intent Bank
 
 ## Purpose
 
@@ -8,7 +8,7 @@ Planning data only.
 
 ## Reviewed source
 
-- File: `drmuscat-seo-keyword-universe-master-v1.2-completed.xlsx`
+- File: `drkhaleej-seo-keyword-universe-master-v1.2-completed.xlsx`
 - SHA-256: `a98d6eb5eef6f83ee66ea091cc7b50d8945c5457d5cbba203ee4a830cd14cfff`
 - Total rows: 1,532
 - English rows: 766
@@ -21,18 +21,7 @@ English and Arabic only.
 
 ## Contract boundary
 
-Every record must retain:
-
-- language;
-- keyword and Arabic pair;
-- topic and subcluster;
-- intent type;
-- route family and planning URL candidate;
-- priority and risk;
-- medical, legal, and pharmacist review flags;
-- safe title pattern and forbidden-use rule;
-- fail-closed import decision;
-- `planning_only` route status.
+Every record must retain language, keyword pairing, topic, intent, route family, planning URL candidate, priority, risk, review flags, safe title rules, fail-closed import decision, and `planning_only` route status.
 
 A keyword row cannot make an entity SEO-ready, publish-ready, sitemap-eligible, indexable, or publicly rendered. Those remain separate downstream contracts.
 
@@ -52,13 +41,6 @@ Rows marked `blocked` are safety policy records and must never produce pages. Al
 
 ## Future use
 
-Later phases may consume this bank for:
+Later phases may consume this bank for SEO/GEO/LLM readiness composition, page-value evaluation, internal-link planning, nearby and area eligibility, safe LLM answer targets, and final sitemap eligibility.
 
-- SEO/GEO/LLM readiness composition;
-- page-value evaluation;
-- internal-link planning;
-- nearby and area eligibility;
-- safe LLM answer targets;
-- final sitemap eligibility.
-
-The bank describes demand and intent. It does not confer permission. A spreadsheet with ambition is still just a spreadsheet, despite what quarterly planning meetings imply.
+The bank describes demand and intent. It does not confer permission.

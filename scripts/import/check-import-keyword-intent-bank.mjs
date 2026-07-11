@@ -4,7 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const contractPath = 'src/server/admin/import-keyword-intent-bank.ts';
 const fixturePath = 'fixtures/import/import-keyword-intent-bank.fixture.json';
-const docsPath = 'docs/platform/DRMUSCAT_KEYWORD_INTENT_BANK.md';
+const docsPath = 'docs/platform/DRKHALEEJ_KEYWORD_INTENT_BANK.md';
 const auditPath = 'scripts/import/check-import-publish-readiness-audit.mjs';
 
 function assert(condition, message) {
@@ -63,8 +63,8 @@ for (const forbidden of [
   assert(!source.includes(forbidden), `keyword intent bank must not include runtime token ${forbidden}.`);
 }
 
-assert(fixture.schemaVersion === 'drmuscat.import.keywordIntentBank.v1', 'fixture schema version is invalid.');
-assert(fixture.sourceFile === 'drmuscat-seo-keyword-universe-master-v1.2-completed.xlsx', 'fixture source file is invalid.');
+assert(fixture.schemaVersion === 'drkhaleej.import.keywordIntentBank.v1', 'fixture schema version is invalid.');
+assert(fixture.sourceFile === 'drkhaleej-seo-keyword-universe-master-v1.2-completed.xlsx', 'fixture source file is invalid.');
 assert(/^[a-f0-9]{64}$/.test(fixture.sourceSha256), 'fixture source hash is invalid.');
 assert(fixture.totalRows === 1532, 'fixture total row count must match reviewed workbook.');
 assert(fixture.englishRows === 766 && fixture.arabicRows === 766, 'fixture language counts must remain balanced.');
