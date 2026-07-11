@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "drkhaleej.import.llmAnswerProjection.v1",
+  "cases": [
+    {
+      "id": "ready-but-private",
+      "input": {
+        "llmReady": true,
+        "projectionRecordReady": true,
+        "routeMatches": true,
+        "answerEnPresent": true,
+        "answerArPresent": true,
+        "citationsPresent": true,
+        "evidenceIdsPresent": true,
+        "disclaimersPresent": true,
+        "unsafeClaimPresent": false,
+        "withinLengthLimit": true,
+        "versionsPresent": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "llmAnswerProjectionReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "missing-bilingual-answer",
+      "input": {
+        "llmReady": true,
+        "projectionRecordReady": true,
+        "routeMatches": true,
+        "answerEnPresent": true,
+        "answerArPresent": false,
+        "citationsPresent": true,
+        "evidenceIdsPresent": true,
+        "disclaimersPresent": true,
+        "unsafeClaimPresent": false,
+        "withinLengthLimit": true,
+        "versionsPresent": true
+      },
+      "expected": { "llmAnswerProjectionReady": false }
+    },
+    {
+      "id": "citation-and-evidence-blocked",
+      "input": {
+        "llmReady": true,
+        "projectionRecordReady": true,
+        "routeMatches": true,
+        "answerEnPresent": true,
+        "answerArPresent": true,
+        "citationsPresent": false,
+        "evidenceIdsPresent": false,
+        "disclaimersPresent": true,
+        "unsafeClaimPresent": false,
+        "withinLengthLimit": true,
+        "versionsPresent": true
+      },
+      "expected": { "llmAnswerProjectionReady": false }
+    },
+    {
+      "id": "unsafe-or-undisclaimed",
+      "input": {
+        "llmReady": true,
+        "projectionRecordReady": true,
+        "routeMatches": true,
+        "answerEnPresent": true,
+        "answerArPresent": true,
+        "citationsPresent": true,
+        "evidenceIdsPresent": true,
+        "disclaimersPresent": false,
+        "unsafeClaimPresent": true,
+        "withinLengthLimit": true,
+        "versionsPresent": true
+      },
+      "expected": { "llmAnswerProjectionReady": false }
+    },
+    {
+      "id": "projection-route-and-version-blocked",
+      "input": {
+        "llmReady": true,
+        "projectionRecordReady": false,
+        "routeMatches": false,
+        "answerEnPresent": true,
+        "answerArPresent": true,
+        "citationsPresent": true,
+        "evidenceIdsPresent": true,
+        "disclaimersPresent": true,
+        "unsafeClaimPresent": false,
+        "withinLengthLimit": true,
+        "versionsPresent": false
+      },
+      "expected": { "llmAnswerProjectionReady": false }
+    },
+    {
+      "id": "upstream-or-length-blocked",
+      "input": {
+        "llmReady": false,
+        "projectionRecordReady": true,
+        "routeMatches": true,
+        "answerEnPresent": true,
+        "answerArPresent": true,
+        "citationsPresent": true,
+        "evidenceIdsPresent": true,
+        "disclaimersPresent": true,
+        "unsafeClaimPresent": false,
+        "withinLengthLimit": false,
+        "versionsPresent": true
+      },
+      "expected": { "llmAnswerProjectionReady": false }
+    }
+  ]
+}
