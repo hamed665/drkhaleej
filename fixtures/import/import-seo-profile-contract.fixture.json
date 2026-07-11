@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "drmuscat.import.seoProfileContract.v1",
+  "schemaVersion": "drkhaleej.import.seoProfileContract.v1",
   "cases": [
     {
       "id": "seo-ready-not-publish-ready",
