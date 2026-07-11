@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../db/check-import-pharmacy-private-publish-rpc.mjs';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
