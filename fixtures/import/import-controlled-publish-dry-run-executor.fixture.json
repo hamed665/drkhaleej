@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "drkhaleej.import.controlledPublishDryRunExecutor.v1",
+  "cases": [
+    {
+      "id": "plan-ready-no-writes",
+      "input": {
+        "controlledPublishContractReady": true,
+        "executorInfrastructureReady": true,
+        "persistenceSchemaReady": true,
+        "entityId": "entity-001",
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-001:v7",
+        "expectedVersion": "v7",
+        "currentVersion": "v7",
+        "currentStateComplete": true,
+        "desiredRoutePresent": true,
+        "desiredProjectionPresent": true
+      },
+      "expected": {
+        "planReady": true,
+        "executionReady": false,
+        "mutationEnabled": false,
+        "bulkAllowed": false,
+        "databaseOperationCount": 0
+      }
+    },
+    {
+      "id": "version-mismatch-blocked",
+      "input": {
+        "controlledPublishContractReady": true,
+        "executorInfrastructureReady": true,
+        "persistenceSchemaReady": true,
+        "entityId": "entity-002",
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-002:v3",
+        "expectedVersion": "v3",
+        "currentVersion": "v4",
+        "currentStateComplete": true,
+        "desiredRoutePresent": true,
+        "desiredProjectionPresent": true
+      },
+      "expected": {"planReady": false, "blockers": ["version_mismatch"]}
+    },
+    {
+      "id": "upstream-contracts-blocked",
+      "input": {
+        "controlledPublishContractReady": false,
+        "executorInfrastructureReady": false,
+        "persistenceSchemaReady": false,
+        "entityId": "entity-003",
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-003:v1",
+        "expectedVersion": "v1",
+        "currentVersion": "v1",
+        "currentStateComplete": true,
+        "desiredRoutePresent": true,
+        "desiredProjectionPresent": true
+      },
+      "expected": {
+        "planReady": false,
+        "blockers": [
+          "controlled_publish_contract_not_ready",
+          "executor_infrastructure_not_ready",
+          "persistence_schema_not_ready"
+        ]
+      }
+    },
+    {
+      "id": "snapshot-and-target-incomplete",
+      "input": {
+        "controlledPublishContractReady": true,
+        "executorInfrastructureReady": true,
+        "persistenceSchemaReady": true,
+        "entityId": "entity-004",
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-004:v5",
+        "expectedVersion": "v5",
+        "currentVersion": "v5",
+        "currentStateComplete": false,
+        "desiredRoutePresent": false,
+        "desiredProjectionPresent": false
+      },
+      "expected": {
+        "planReady": false,
+        "blockers": [
+          "canonical_route_missing",
+          "projection_version_missing",
+          "snapshot_incomplete"
+        ]
+      }
+    }
+  ]
+}
