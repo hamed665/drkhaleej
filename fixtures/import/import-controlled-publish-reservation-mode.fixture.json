@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "drkhaleej.import.controlledPublishReservationMode.v1",
+  "cases": [
+    {
+      "id": "canary-ready-mode-disabled",
+      "input": {
+        "orchestrationReady": true,
+        "environment": "preview",
+        "allowedEnvironment": "preview",
+        "entityId": "11111111-1111-4111-8111-111111111111",
+        "canaryEntityId": "11111111-1111-4111-8111-111111111111",
+        "actorId": "22222222-2222-4222-8222-222222222222",
+        "allowedActorIds": ["22222222-2222-4222-8222-222222222222"],
+        "approvalTokenMatches": true
+      },
+      "expected": {
+        "reservationOnlyReady": true,
+        "reservationAttempted": false,
+        "executionReady": false,
+        "mutationEnabled": false,
+        "terminalPersistenceAllowed": false,
+        "entityMutationAllowed": false,
+        "bulkAllowed": false,
+        "blockers": ["reservation_only_mode_disabled"]
+      }
+    },
+    {
+      "id": "production-blocked",
+      "input": {
+        "orchestrationReady": true,
+        "environment": "production",
+        "allowedEnvironment": "preview"
+      },
+      "expected": {
+        "reservationOnlyReady": false,
+        "reservationAttempted": false,
+        "blockers": ["environment_not_allowed", "reservation_only_mode_disabled"]
+      }
+    },
+    {
+      "id": "wrong-canary-blocked",
+      "input": {
+        "entityId": "33333333-3333-4333-8333-333333333333",
+        "canaryEntityId": "11111111-1111-4111-8111-111111111111"
+      },
+      "expected": {
+        "reservationOnlyReady": false,
+        "reservationAttempted": false,
+        "blockers": ["canary_entity_mismatch", "reservation_only_mode_disabled"]
+      }
+    },
+    {
+      "id": "actor-blocked",
+      "input": {
+        "actorAllowed": false
+      },
+      "expected": {
+        "reservationOnlyReady": false,
+        "reservationAttempted": false,
+        "blockers": ["actor_not_allowed", "reservation_only_mode_disabled"]
+      }
+    },
+    {
+      "id": "approval-token-blocked",
+      "input": {
+        "approvalTokenMatches": false
+      },
+      "expected": {
+        "reservationOnlyReady": false,
+        "reservationAttempted": false,
+        "blockers": ["approval_token_missing", "reservation_only_mode_disabled"]
+      }
+    }
+  ]
+}
