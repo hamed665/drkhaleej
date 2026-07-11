@@ -18,6 +18,7 @@ import './check-import-internal-link-cache.mjs';
 import './check-import-internal-link-intelligence.mjs';
 import './check-import-nearby-projection-engine.mjs';
 import './check-import-llm-answer-projection.mjs';
+import './check-import-area-landing-eligibility.mjs';
 import './check-import-sitemap-eligibility.mjs';
 import './check-import-schema-generator.mjs';
 import './check-import-readiness-engine.mjs';
