@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyRlsStaticTest = path.join(repoRoot, 'scripts', 'db', 'test-rls-static.mjs');
+const publishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-publish-transaction-rpcs.mjs');
 
 const migrations = {
   taxRls: '0055_taxonomy_public_rls.sql',
@@ -27,6 +28,7 @@ const migrations = {
   importRelationCandidates: '0064_import_relation_candidates.sql',
   scheduleRlsHardening: '0065_schedule_appointment_rls_hardening.sql',
   publishPersistence: '0068_import_publish_persistence_schema.sql',
+  publishRpcs: '0069_import_publish_transaction_rpcs.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -229,6 +231,14 @@ function validatePublishPersistenceRlsMigration() {
   }
 }
 
+function validatePublishRpcSecurityMigration() {
+  readMigration('publishRpcs');
+  execFileSync(process.execPath, [publishRpcValidator], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+}
+
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
@@ -263,6 +273,7 @@ validateFacilityDepartmentRlsMigration();
 validateImportRelationCandidatesRlsMigration();
 validateScheduleRlsHardeningMigration();
 validatePublishPersistenceRlsMigration();
+validatePublishRpcSecurityMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');

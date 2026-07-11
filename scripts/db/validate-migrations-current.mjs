@@ -11,24 +11,29 @@ const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyValidator = path.join(repoRoot, 'scripts', 'db', 'validate-migrations-taxrlsa.mjs');
 const functionSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-security-function-search-path.mjs');
 const helperSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-sensitive-helper-search-path.mjs');
+const publishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-publish-transaction-rpcs.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
 const publishPersistenceMigrationName = '0068_import_publish_persistence_schema.sql';
+const publishRpcMigrationName = '0069_import_publish_transaction_rpcs.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
 const publishPersistenceMigrationPath = path.join(migrationsDir, publishPersistenceMigrationName);
+const publishRpcMigrationPath = path.join(migrationsDir, publishRpcMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
 const hiddenPublishPersistenceMigrationPath = path.join(migrationsDir, `.publish-persistence-${publishPersistenceMigrationName}.hidden`);
+const hiddenPublishRpcMigrationPath = path.join(migrationsDir, `.publish-rpc-${publishRpcMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
   [functionSearchPathMigrationName, functionSearchPathMigrationPath, hiddenFunctionSearchPathMigrationPath],
   [helperSearchPathMigrationName, helperSearchPathMigrationPath, hiddenHelperSearchPathMigrationPath],
   [publishPersistenceMigrationName, publishPersistenceMigrationPath, hiddenPublishPersistenceMigrationPath],
+  [publishRpcMigrationName, publishRpcMigrationPath, hiddenPublishRpcMigrationPath],
 ];
 
 function fail(message) {
@@ -117,6 +122,14 @@ function validatePublishPersistenceMigration() {
   ]) requirePattern(content, pattern, message);
 }
 
+function validatePublishRpcMigration() {
+  requireCondition(existsSync(publishRpcMigrationPath), `${publishRpcMigrationName} is missing.`);
+  execFileSync(process.execPath, [publishRpcValidator], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -148,5 +161,6 @@ validateScheduleRlsMigration();
 validateFunctionSearchPathMigration();
 validateHelperSearchPathMigration();
 validatePublishPersistenceMigration();
+validatePublishRpcMigration();
 
 console.log('Current migration validation passed.');
