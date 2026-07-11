@@ -22,8 +22,8 @@ DECLARE
   v_center public.centers%ROWTYPE;
   v_source jsonb;
   v_actual_version text;
-  v_audit_id uuid;
   v_terminal_result jsonb;
+  v_terminal_persist jsonb;
 BEGIN
   IF p_idempotency_record_id IS NULL
     OR p_rollback_snapshot_id IS NULL
@@ -156,23 +156,28 @@ BEGIN
   WHERE id = p_rollback_snapshot_id;
 
   UPDATE public.import_publish_idempotency_records
-  SET status = 'rolled_back', terminal_result = v_terminal_result, updated_at = clock_timestamp()
+  SET status = 'in_progress', terminal_result = NULL, updated_at = clock_timestamp()
   WHERE id = p_idempotency_record_id;
 
-  INSERT INTO public.import_publish_audit_events (
-    entity_id, actor_profile_id, idempotency_record_id, rollback_snapshot_id,
-    event_type, outcome, schema_version, expected_version, actual_version, event_payload
-  ) VALUES (
-    p_entity_id, p_actor_profile_id, p_idempotency_record_id, p_rollback_snapshot_id,
-    'rollback_succeeded', 'rolled_back', p_audit_schema_version,
-    p_expected_current_version, v_actual_version, v_terminal_result
-  ) RETURNING id INTO v_audit_id;
+  SELECT public.import_publish_persist_terminal_result(
+    p_idempotency_record_id,
+    p_entity_id,
+    p_actor_profile_id,
+    'rolled_back',
+    v_actual_version,
+    v_terminal_result,
+    p_audit_schema_version
+  ) INTO v_terminal_persist;
+
+  IF coalesce(v_terminal_persist->>'status', '') NOT IN ('rolled_back','replayed') THEN
+    RAISE EXCEPTION 'rollback_terminal_persistence_failed' USING ERRCODE = 'P0001';
+  END IF;
 
   RETURN jsonb_build_object(
     'status', 'rolled_back',
     'entityId', p_entity_id,
     'actualVersion', v_actual_version,
-    'auditEventId', v_audit_id
+    'terminalPersistence', v_terminal_persist
   );
 END;
 $$;
@@ -186,4 +191,4 @@ GRANT EXECUTE ON FUNCTION public.import_rollback_pharmacy_private(
 
 COMMENT ON FUNCTION public.import_rollback_pharmacy_private(
   uuid, uuid, uuid, uuid, text, text, text
-) IS 'Atomic service-role-only rollback of one private pharmacy using a protected snapshot, optimistic locking, and append-only audit.';
+) IS 'Atomic service-role-only rollback of one private pharmacy using a protected snapshot, optimistic locking, and shared terminal audit persistence.';
