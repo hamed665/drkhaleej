@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "drkhaleej.import.realReservationCanary.v1",
+  "cases": [
+    {
+      "id": "preview-allowed",
+      "environment": "preview",
+      "executionEnabled": true,
+      "actorAllowed": true,
+      "entityAllowed": true,
+      "approvalTokenMatches": true,
+      "expected": { "attempted": true }
+    },
+    {
+      "id": "production-blocked",
+      "environment": "production",
+      "executionEnabled": true,
+      "actorAllowed": true,
+      "entityAllowed": true,
+      "approvalTokenMatches": true,
+      "expected": { "attempted": false, "blocker": "environment_not_preview" }
+    },
+    {
+      "id": "actor-blocked",
+      "environment": "preview",
+      "executionEnabled": true,
+      "actorAllowed": false,
+      "entityAllowed": true,
+      "approvalTokenMatches": true,
+      "expected": { "attempted": false, "blocker": "actor_not_allowed" }
+    },
+    {
+      "id": "entity-blocked",
+      "environment": "preview",
+      "executionEnabled": true,
+      "actorAllowed": true,
+      "entityAllowed": false,
+      "approvalTokenMatches": true,
+      "expected": { "attempted": false, "blocker": "entity_not_allowed" }
+    }
+  ],
+  "safety": {
+    "terminalPersistenceAllowed": false,
+    "entityMutationAllowed": false,
+    "routeMutationAllowed": false,
+    "sitemapMutationAllowed": false,
+    "bulkAllowed": false
+  }
+}
