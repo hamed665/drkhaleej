@@ -5,6 +5,7 @@ import './check-import-canonical-geo-contract.mjs';
 import './check-import-unified-draft-entity.mjs';
 import './check-import-intake-convergence.mjs';
 import './check-import-pharmacy-private-mutation-adapter.mjs';
+import './check-import-supabase-pharmacy-private-mutation-writer.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
