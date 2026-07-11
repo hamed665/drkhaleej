@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "drkhaleej.import.areaLandingEligibility.v1",
+  "cases": [
+    {
+      "id": "eligible-but-private",
+      "inputs": {
+        "geoSeedReady": true,
+        "canonicalAreaReady": true,
+        "areaProjectionReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "nearbyProjectionReady": true,
+        "englishKeywordTarget": true,
+        "arabicKeywordTarget": true,
+        "verifiedProviderCount": 7,
+        "distinctSpecialtyCount": 4,
+        "uniqueLocalFactCount": 8,
+        "duplicateAreaRisk": false,
+        "manualReviewComplete": true
+      },
+      "expected": {
+        "areaLandingEligible": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "thin-provider-density",
+      "inputs": {
+        "geoSeedReady": true,
+        "canonicalAreaReady": true,
+        "areaProjectionReady": true,
+        "pageValueReady": false,
+        "internalLinksReady": false,
+        "nearbyProjectionReady": false,
+        "englishKeywordTarget": true,
+        "arabicKeywordTarget": true,
+        "verifiedProviderCount": 2,
+        "distinctSpecialtyCount": 1,
+        "uniqueLocalFactCount": 3,
+        "duplicateAreaRisk": false,
+        "manualReviewComplete": true
+      },
+      "expected": {
+        "areaLandingEligible": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "missing-arabic-target",
+      "inputs": {
+        "geoSeedReady": true,
+        "canonicalAreaReady": true,
+        "areaProjectionReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "nearbyProjectionReady": true,
+        "englishKeywordTarget": true,
+        "arabicKeywordTarget": false,
+        "verifiedProviderCount": 6,
+        "distinctSpecialtyCount": 4,
+        "uniqueLocalFactCount": 7,
+        "duplicateAreaRisk": false,
+        "manualReviewComplete": true
+      },
+      "expected": {
+        "areaLandingEligible": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "duplicate-area-and-unreviewed",
+      "inputs": {
+        "geoSeedReady": true,
+        "canonicalAreaReady": true,
+        "areaProjectionReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "nearbyProjectionReady": true,
+        "englishKeywordTarget": true,
+        "arabicKeywordTarget": true,
+        "verifiedProviderCount": 8,
+        "distinctSpecialtyCount": 5,
+        "uniqueLocalFactCount": 9,
+        "duplicateAreaRisk": true,
+        "manualReviewComplete": false
+      },
+      "expected": {
+        "areaLandingEligible": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    }
+  ]
+}
