@@ -2,9 +2,11 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
-const contractPath = 'src/server/admin/import-sitemap-eligibility-contract.ts';
+const contractPath = 'src/server/admin/import-sitemap-eligibility-2026.ts';
+const legacyContractPath = 'src/server/admin/import-sitemap-eligibility-contract.ts';
 const existingAdminPath = 'src/server/admin/import-sitemap-eligibility.ts';
-const architecturePath = 'docs/platform/DRMUSCAT_IMPORT_READINESS_CONTROLLED_PUBLISHING_ARCHITECTURE_V1.md';
+const fixturePath = 'fixtures/import/import-sitemap-eligibility-2026.fixture.json';
+const docsPath = 'docs/platform/DRKHALEEJ_SITEMAP_ELIGIBILITY_2026.md';
 
 async function readText(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -14,48 +16,47 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function assertIncludes(source, token, message) {
-  assert(source.includes(token), message);
-}
-
-function assertNotIncludes(source, token, message) {
-  assert(!source.includes(token), message);
-}
-
-const contractSource = await readText(contractPath);
-const existingAdminSource = await readText(existingAdminPath);
-const architectureSource = await readText(architecturePath);
+const contract = await readText(contractPath);
+const legacyContract = await readText(legacyContractPath);
+const existingAdmin = await readText(existingAdminPath);
+const docs = await readText(docsPath);
+const fixture = JSON.parse(await readText(fixturePath));
 
 for (const token of [
-  'export type ImportSitemapVisibilityPolicy = "private" | "public";',
-  'export type ImportSitemapIndexPolicy = "noindex" | "index";',
-  'export type ImportSitemapPolicy = "excluded" | "included";',
-  'export type ImportSitemapEligibilityEntity',
-  'visibility: ImportSitemapVisibilityPolicy | null',
-  'index_policy: ImportSitemapIndexPolicy | null',
-  'sitemap_policy: ImportSitemapPolicy | null',
-  'seo_validated: boolean | null',
-  'geo_validated: boolean | null',
-  'content_validated: boolean | null',
-  'schema_validated: boolean | null',
-  'relations_validated: boolean | null',
-  'duplicate_check_passed: boolean | null',
-  'manual_approved: boolean | null',
-  'canonical_validated: boolean | null',
-  'export type ImportSitemapEligibilityBlocker',
+  'ImportSitemap2026PageClass',
+  'ImportSitemapEligibility2026Input',
+  'ImportSitemapEligibility2026Blocker',
+  'ImportSitemapEligibility2026Result',
+  'IMPORT_SITEMAP_2026_VALIDATED_PROJECTION',
+  'IMPORT_SITEMAP_2026_FILES',
+  'getImportSitemapEligibility2026',
+  'isImportSitemapEligible2026',
+  'public_indexable_entities',
+]) {
+  assert(contract.includes(token), `Sitemap Eligibility 2026 contract must include ${token}.`);
+}
+
+for (const blocker of [
   'visibility_not_public',
   'index_policy_not_index',
   'sitemap_policy_not_included',
-  'seo_not_validated',
-  'geo_not_validated',
-  'content_not_validated',
-  'schema_not_validated',
-  'relations_not_validated',
+  'publish_not_ready',
+  'seo_profile_not_ready',
+  'page_value_not_ready',
+  'internal_links_not_ready',
+  'area_landing_not_eligible',
+  'public_projection_not_ready',
+  'schema_projection_not_ready',
+  'performance_budget_not_ready',
   'duplicate_check_not_passed',
   'manual_approval_missing',
-  'canonical_not_validated',
-  'IMPORT_SITEMAP_VALIDATED_PROJECTION = "public_indexable_entities"',
-  'IMPORT_SITEMAP_FILES',
+  'canonical_path_missing',
+  'canonical_route_mismatch',
+]) {
+  assert(contract.includes(blocker), `Sitemap Eligibility 2026 blockers must include ${blocker}.`);
+}
+
+for (const sitemapFile of [
   '/sitemaps/doctors.xml',
   '/sitemaps/pharmacies.xml',
   '/sitemaps/hospitals.xml',
@@ -65,20 +66,27 @@ for (const token of [
   '/sitemaps/pet.xml',
   '/sitemaps/locations.xml',
   '/sitemaps/articles.xml',
-  'export function getSitemapBlockers',
-  'export function isSitemapEligible',
 ]) {
-  assertIncludes(contractSource, token, `${contractPath} must include ${token}`);
+  assert(contract.includes(sitemapFile), `Sitemap Eligibility 2026 must preserve family file ${sitemapFile}.`);
 }
 
-for (const forbiddenToken of [
-  'return true;',
-  'visibility: "public"',
-  'index_policy: "index"',
-  'sitemap_policy: "included"',
-  'manual_approved: true',
+for (const forbidden of [
+  'createSupabaseServiceRoleClient',
+  'insert(',
+  'update(',
+  'delete(',
+  'publishEntity',
+  'generateSitemapXml',
 ]) {
-  assertNotIncludes(contractSource, forbiddenToken, `${contractPath} must not include unsafe shortcut ${forbiddenToken}.`);
+  assert(!contract.includes(forbidden), `Sitemap Eligibility 2026 must not include runtime mutation token ${forbidden}.`);
+}
+
+for (const token of [
+  'ImportSitemapEligibilityEntity',
+  'getSitemapBlockers',
+  'isSitemapEligible',
+]) {
+  assert(legacyContract.includes(token), `Legacy sitemap compatibility contract must preserve ${token}.`);
 }
 
 for (const token of [
@@ -86,26 +94,53 @@ for (const token of [
   'requireAdminPermission("imports.read")',
   'sitemapIncluded: false',
 ]) {
-  assertIncludes(existingAdminSource, token, `${existingAdminPath} must preserve existing admin sitemap candidate behavior token ${token}`);
+  assert(existingAdmin.includes(token), `Existing admin sitemap read model must preserve ${token}.`);
 }
 
 for (const token of [
-  'PR 8: Sitemap Eligibility',
-  'isSitemapEligible(entity)',
-  'visibility = public',
-  'index_policy = index',
-  'sitemap_policy = included',
-  'seo_validated = true',
-  'geo_validated = true',
-  'content_validated = true',
-  'schema_validated = true',
-  'relations_validated = true',
-  'duplicate_check_passed = true',
-  'manual_approved = true',
-  'Sitemap generation must not read from raw entity tables directly.',
+  'replaces the old boolean-only sitemap authority',
   'public_indexable_entities',
+  'publishReady',
+  'sitemapEligible',
+  'No sitemap XML',
+  'No database write or migration',
+  'No publish mutation',
 ]) {
-  assertIncludes(architectureSource, token, `${architecturePath} must include sitemap eligibility contract token ${token}`);
+  assert(docs.includes(token), `Sitemap Eligibility 2026 docs must include ${token}.`);
 }
 
-console.log('import sitemap eligibility check passed.');
+assert(
+  fixture.schemaVersion === 'drkhaleej.import.sitemapEligibility2026.v1',
+  'Sitemap Eligibility 2026 fixture schema version is invalid.',
+);
+assert(Array.isArray(fixture.cases) && fixture.cases.length >= 5, 'Sitemap Eligibility 2026 fixture must include at least five cases.');
+
+for (const testCase of fixture.cases) {
+  const dependencies = testCase.dependencies;
+  const required = [
+    dependencies.visibilityPublic,
+    dependencies.indexPolicyIndex,
+    dependencies.sitemapPolicyIncluded,
+    dependencies.publishReady,
+    dependencies.seoProfileReady,
+    dependencies.pageValueReady,
+    dependencies.internalLinksReady,
+    dependencies.publicProjectionReady,
+    dependencies.schemaProjectionReady,
+    dependencies.performanceBudgetReady,
+    dependencies.duplicateCheckPassed,
+    dependencies.manualApprovalComplete,
+    dependencies.canonicalRouteAligned,
+  ];
+  if (testCase.pageClass === 'area_landing') required.push(dependencies.areaLandingEligible);
+  const computed = required.every((value) => value === true);
+  assert(
+    computed === testCase.expected.sitemapEligible,
+    `Sitemap Eligibility 2026 fixture case ${testCase.id} has inconsistent expectation.`,
+  );
+}
+
+const privateCase = fixture.cases.find((item) => item.id === 'area-eligible-but-private');
+assert(privateCase?.expected.sitemapEligible === false, 'Eligible area fixture must remain sitemap-ineligible while private.');
+
+console.log('import Sitemap Eligibility 2026 check passed.');
