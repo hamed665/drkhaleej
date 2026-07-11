@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "drkhaleej.import.databaseTransactionRpcContract.v1",
+  "cases": [
+    {
+      "id": "contract-ready-rpc-disabled",
+      "input": {
+        "adapterContractReady": true,
+        "persistenceSchemaReady": true,
+        "privateSchemaPresent": true,
+        "securityMode": "invoker",
+        "searchPathPinned": true,
+        "publicExecuteRevoked": true,
+        "authenticatedExecuteGranted": false,
+        "serviceRoleExecuteGranted": true,
+        "inputValidationPresent": true,
+        "singleTransactionGuaranteed": true,
+        "idempotencyConflictCheckPresent": true,
+        "optimisticLockCheckPresent": true,
+        "rollbackSnapshotWritePresent": true,
+        "auditStartWritePresent": true,
+        "terminalResultWritePresent": true,
+        "rpcEnabled": false
+      },
+      "expected": {
+        "contractReady": true,
+        "rpcReady": false,
+        "executionReady": false,
+        "mutationEnabled": false,
+        "bulkAllowed": false,
+        "blockers": ["rpc_not_enabled"]
+      }
+    },
+    {
+      "id": "unsafe-security-definer",
+      "input": {
+        "adapterContractReady": true,
+        "persistenceSchemaReady": true,
+        "privateSchemaPresent": true,
+        "securityMode": "definer",
+        "searchPathPinned": false,
+        "publicExecuteRevoked": false,
+        "authenticatedExecuteGranted": true,
+        "serviceRoleExecuteGranted": true,
+        "inputValidationPresent": true,
+        "singleTransactionGuaranteed": true,
+        "idempotencyConflictCheckPresent": true,
+        "optimisticLockCheckPresent": true,
+        "rollbackSnapshotWritePresent": true,
+        "auditStartWritePresent": true,
+        "terminalResultWritePresent": true,
+        "rpcEnabled": false
+      },
+      "expectedBlockers": [
+        "security_invoker_not_declared",
+        "search_path_not_pinned",
+        "public_execute_not_revoked",
+        "authenticated_execute_present",
+        "rpc_not_enabled"
+      ]
+    },
+    {
+      "id": "transaction-stages-incomplete",
+      "input": {
+        "adapterContractReady": true,
+        "persistenceSchemaReady": true,
+        "privateSchemaPresent": true,
+        "securityMode": "invoker",
+        "searchPathPinned": true,
+        "publicExecuteRevoked": true,
+        "authenticatedExecuteGranted": false,
+        "serviceRoleExecuteGranted": true,
+        "inputValidationPresent": true,
+        "singleTransactionGuaranteed": false,
+        "idempotencyConflictCheckPresent": false,
+        "optimisticLockCheckPresent": false,
+        "rollbackSnapshotWritePresent": false,
+        "auditStartWritePresent": false,
+        "terminalResultWritePresent": false,
+        "rpcEnabled": false
+      },
+      "expectedContractReady": false
+    }
+  ]
+}
