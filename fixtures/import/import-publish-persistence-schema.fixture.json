@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "drkhaleej.import.publishPersistenceSchema.v1",
+  "cases": [
+    {
+      "id": "schema-ready-execution-disabled",
+      "input": {
+        "migrationPresent": true,
+        "availableTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "rlsEnabledTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "publicPolicyPresent": false,
+        "idempotencyUnique": true,
+        "retentionConstraintsPresent": true,
+        "hashConstraintsPresent": true,
+        "auditChainDeleteRestricted": true
+      },
+      "expected": {"schemaReady": true, "executionReady": false, "mutationEnabled": false, "bulkAllowed": false}
+    },
+    {
+      "id": "missing-tables-and-rls",
+      "input": {
+        "migrationPresent": true,
+        "availableTables": ["import_publish_idempotency_records"],
+        "rlsEnabledTables": [],
+        "publicPolicyPresent": false,
+        "idempotencyUnique": true,
+        "retentionConstraintsPresent": true,
+        "hashConstraintsPresent": true,
+        "auditChainDeleteRestricted": true
+      },
+      "expected": {"schemaReady": false}
+    },
+    {
+      "id": "unsafe-public-policy",
+      "input": {
+        "migrationPresent": true,
+        "availableTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "rlsEnabledTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "publicPolicyPresent": true,
+        "idempotencyUnique": true,
+        "retentionConstraintsPresent": true,
+        "hashConstraintsPresent": true,
+        "auditChainDeleteRestricted": true
+      },
+      "expected": {"schemaReady": false}
+    },
+    {
+      "id": "integrity-controls-missing",
+      "input": {
+        "migrationPresent": true,
+        "availableTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "rlsEnabledTables": ["import_publish_idempotency_records", "import_publish_rollback_snapshots", "import_publish_audit_events"],
+        "publicPolicyPresent": false,
+        "idempotencyUnique": false,
+        "retentionConstraintsPresent": false,
+        "hashConstraintsPresent": false,
+        "auditChainDeleteRestricted": false
+      },
+      "expected": {"schemaReady": false}
+    }
+  ]
+}
