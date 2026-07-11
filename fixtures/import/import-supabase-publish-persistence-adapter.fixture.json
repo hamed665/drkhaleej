@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "drkhaleej.import.supabasePublishPersistenceAdapter.v1",
+  "rpcNames": [
+    "import_publish_reserve_snapshot_audit",
+    "import_publish_persist_terminal_result"
+  ],
+  "cases": [
+    {
+      "id": "reservation-normalizes",
+      "rpcStatus": "reserved",
+      "expectedKind": "reserved"
+    },
+    {
+      "id": "same-request-replays",
+      "rpcStatus": "replayed",
+      "expectedKind": "replayed"
+    },
+    {
+      "id": "request-mismatch-conflicts",
+      "rpcStatus": "conflict",
+      "rpcReason": "idempotency_request_mismatch",
+      "expectedKind": "conflict",
+      "expectedReason": "idempotency_key_request_hash_mismatch"
+    },
+    {
+      "id": "in-progress-conflicts",
+      "rpcStatus": "conflict",
+      "rpcReason": "request_already_in_progress",
+      "expectedKind": "conflict"
+    },
+    {
+      "id": "rpc-error-fails-closed",
+      "rpcError": true,
+      "expectedKind": "failed",
+      "expectedReason": "rpc_failed"
+    },
+    {
+      "id": "terminal-result-persists",
+      "rpcStatus": "succeeded",
+      "expectedKind": "persisted"
+    }
+  ],
+  "safety": {
+    "serverOnly": true,
+    "rpcOnly": true,
+    "entityMutation": false,
+    "routeMutation": false,
+    "sitemapMutation": false,
+    "adminAction": false,
+    "bulkPublish": false
+  }
+}

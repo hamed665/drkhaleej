@@ -36,6 +36,36 @@ export type ImportPublishPersistenceTerminalResult = {
   committedAt: string | null;
 };
 
+export type ImportPublishPersistenceTerminalWriteRequest = {
+  reservationId: string;
+  entityId: string;
+  actorId: string;
+  outcome: ImportPublishPersistenceTerminalResult["status"];
+  actualVersion: string;
+  terminalResult: ImportPublishPersistenceTerminalResult;
+  auditSchemaVersion: string;
+};
+
+export type ImportPublishPersistenceTerminalWriteResult =
+  | {
+      kind: "persisted";
+      reservationId: string;
+      auditEventId: string;
+      outcome: ImportPublishPersistenceTerminalResult["status"];
+    }
+  | {
+      kind: "replayed";
+      terminalResult: ImportPublishPersistenceTerminalResult;
+    }
+  | {
+      kind: "conflict";
+      reason: "terminal_identity_mismatch";
+    }
+  | {
+      kind: "failed";
+      reason: "idempotency_record_not_found" | "rollback_snapshot_not_found" | "rpc_failed";
+    };
+
 export type ImportPublishPersistenceTransactionResult =
   | {
       kind: "reserved";
@@ -49,11 +79,15 @@ export type ImportPublishPersistenceTransactionResult =
     }
   | {
       kind: "conflict";
-      reason: "idempotency_key_request_hash_mismatch" | "expected_version_mismatch";
+      reason:
+        | "idempotency_key_request_hash_mismatch"
+        | "expected_version_mismatch"
+        | "request_already_in_progress"
+        | "concurrent_idempotency_conflict";
     }
   | {
       kind: "failed";
-      reason: "transaction_aborted";
+      reason: "transaction_aborted" | "rpc_failed";
     };
 
 export interface ImportPrivatePublishPersistenceAdapter {
@@ -62,8 +96,8 @@ export interface ImportPrivatePublishPersistenceAdapter {
   ): Promise<ImportPublishPersistenceTransactionResult>;
 
   persistTerminalResult(
-    result: ImportPublishPersistenceTerminalResult,
-  ): Promise<void>;
+    request: ImportPublishPersistenceTerminalWriteRequest,
+  ): Promise<ImportPublishPersistenceTerminalWriteResult>;
 }
 
 export type ImportPublishPersistenceAdapterReadinessInput = {
