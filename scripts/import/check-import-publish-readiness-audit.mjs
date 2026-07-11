@@ -8,6 +8,7 @@ import './check-import-geo-alias-duplicate-guard.mjs';
 import './check-import-public-projection-layer.mjs';
 import './check-import-seo-profile-contract.mjs';
 import './check-import-keyword-intent-bank.mjs';
+import './check-import-seo-geo-llm-readiness.mjs';
 import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
