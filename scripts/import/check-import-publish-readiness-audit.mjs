@@ -34,6 +34,7 @@ import './check-import-controlled-publish-dry-run-executor.mjs';
 import './check-import-publish-reservation-snapshot-transaction.mjs';
 import './check-import-private-persistence-adapter.mjs';
 import './check-import-database-transaction-rpc-contract.mjs';
+import './check-import-publish-rpc-migration.mjs';
 import './check-import-queue-dashboard.mjs';
 import './check-import-admin-capability-audit.mjs';
 import './check-import-validator-ci-audit.mjs';
