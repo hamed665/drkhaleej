@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "drmuscat.import.seoProfileContract.v1",
+  "cases": [
+    {
+      "id": "seo-ready-not-publish-ready",
+      "dependencies": {
+        "unifiedDraftReady": true,
+        "entityDomainAndTypeReady": true,
+        "canonicalGeoReady": true,
+        "sourceEvidenceReady": true,
+        "duplicateGuardReady": true,
+        "publicationValidationReady": true,
+        "publicProjectionReady": true,
+        "performanceBudgetReady": true
+      },
+      "expected": {
+        "seoProfileReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "missing-source-evidence",
+      "dependencies": {
+        "unifiedDraftReady": false,
+        "entityDomainAndTypeReady": true,
+        "canonicalGeoReady": true,
+        "sourceEvidenceReady": false,
+        "duplicateGuardReady": true,
+        "publicationValidationReady": true,
+        "publicProjectionReady": true,
+        "performanceBudgetReady": true
+      },
+      "expected": {
+        "seoProfileReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "duplicate-blocked",
+      "dependencies": {
+        "unifiedDraftReady": false,
+        "entityDomainAndTypeReady": true,
+        "canonicalGeoReady": true,
+        "sourceEvidenceReady": true,
+        "duplicateGuardReady": false,
+        "publicationValidationReady": false,
+        "publicProjectionReady": true,
+        "performanceBudgetReady": true
+      },
+      "expected": {
+        "seoProfileReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "projection-or-performance-blocked",
+      "dependencies": {
+        "unifiedDraftReady": true,
+        "entityDomainAndTypeReady": true,
+        "canonicalGeoReady": true,
+        "sourceEvidenceReady": true,
+        "duplicateGuardReady": true,
+        "publicationValidationReady": true,
+        "publicProjectionReady": false,
+        "performanceBudgetReady": false
+      },
+      "expected": {
+        "seoProfileReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    }
+  ]
+}
