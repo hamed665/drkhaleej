@@ -12,21 +12,25 @@ const legacyValidator = path.join(repoRoot, 'scripts', 'db', 'validate-migration
 const functionSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-security-function-search-path.mjs');
 const helperSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-sensitive-helper-search-path.mjs');
 const publishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-publish-transaction-rpcs.mjs');
+const pharmacyPublishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-pharmacy-private-publish-rpc.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
 const publishPersistenceMigrationName = '0068_import_publish_persistence_schema.sql';
 const publishRpcMigrationName = '0069_import_publish_transaction_rpcs.sql';
+const pharmacyPublishRpcMigrationName = '0070_import_pharmacy_private_publish_rpc.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
 const publishPersistenceMigrationPath = path.join(migrationsDir, publishPersistenceMigrationName);
 const publishRpcMigrationPath = path.join(migrationsDir, publishRpcMigrationName);
+const pharmacyPublishRpcMigrationPath = path.join(migrationsDir, pharmacyPublishRpcMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
 const hiddenPublishPersistenceMigrationPath = path.join(migrationsDir, `.publish-persistence-${publishPersistenceMigrationName}.hidden`);
 const hiddenPublishRpcMigrationPath = path.join(migrationsDir, `.publish-rpc-${publishRpcMigrationName}.hidden`);
+const hiddenPharmacyPublishRpcMigrationPath = path.join(migrationsDir, `.pharmacy-publish-rpc-${pharmacyPublishRpcMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -34,6 +38,7 @@ const currentOnlyMigrations = [
   [helperSearchPathMigrationName, helperSearchPathMigrationPath, hiddenHelperSearchPathMigrationPath],
   [publishPersistenceMigrationName, publishPersistenceMigrationPath, hiddenPublishPersistenceMigrationPath],
   [publishRpcMigrationName, publishRpcMigrationPath, hiddenPublishRpcMigrationPath],
+  [pharmacyPublishRpcMigrationName, pharmacyPublishRpcMigrationPath, hiddenPharmacyPublishRpcMigrationPath],
 ];
 
 function fail(message) {
@@ -66,32 +71,22 @@ function validateScheduleRlsMigration() {
     [/\bfor\s+insert\b/i, '0065 must not add insert policies.'],
     [/\bfor\s+update\b/i, '0065 must not add update policies.'],
     [/\bfor\s+delete\b/i, '0065 must not add delete policies.'],
-  ]) {
-    forbidPattern(content, pattern, message);
-  }
+  ]) forbidPattern(content, pattern, message);
 
   for (const [pattern, message] of [
     [/SEC-SCHEDULE-RLS-A: schedule and appointment table RLS hardening/i, '0065 must include the schedule RLS hardening marker.'],
     [/alter\s+table\s+public\.doctor_schedules\s+enable\s+row\s+level\s+security/i, '0065 must enable RLS on doctor_schedules.'],
     [/alter\s+table\s+public\.doctor_schedule_exceptions\s+enable\s+row\s+level\s+security/i, '0065 must enable RLS on doctor_schedule_exceptions.'],
     [/alter\s+table\s+public\.appointment_slots\s+enable\s+row\s+level\s+security/i, '0065 must enable RLS on appointment_slots.'],
-  ]) {
-    requirePattern(content, pattern, message);
-  }
+  ]) requirePattern(content, pattern, message);
 }
 
 function validateFunctionSearchPathMigration() {
-  execFileSync(process.execPath, [functionSearchPathValidator], {
-    cwd: repoRoot,
-    stdio: 'inherit',
-  });
+  execFileSync(process.execPath, [functionSearchPathValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
 function validateHelperSearchPathMigration() {
-  execFileSync(process.execPath, [helperSearchPathValidator], {
-    cwd: repoRoot,
-    stdio: 'inherit',
-  });
+  execFileSync(process.execPath, [helperSearchPathValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
 function validatePublishPersistenceMigration() {
@@ -124,10 +119,12 @@ function validatePublishPersistenceMigration() {
 
 function validatePublishRpcMigration() {
   requireCondition(existsSync(publishRpcMigrationPath), `${publishRpcMigrationName} is missing.`);
-  execFileSync(process.execPath, [publishRpcValidator], {
-    cwd: repoRoot,
-    stdio: 'inherit',
-  });
+  execFileSync(process.execPath, [publishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+
+function validatePharmacyPublishRpcMigration() {
+  requireCondition(existsSync(pharmacyPublishRpcMigrationPath), `${pharmacyPublishRpcMigrationName} is missing.`);
+  execFileSync(process.execPath, [pharmacyPublishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
@@ -143,15 +140,10 @@ function runLegacyValidatorWithoutCurrentOnlyMigrations() {
       renamedMigrations.push([migrationName, migrationPath, hiddenMigrationPath]);
     }
 
-    execFileSync(process.execPath, [legacyValidator], {
-      cwd: repoRoot,
-      stdio: 'inherit',
-    });
+    execFileSync(process.execPath, [legacyValidator], { cwd: repoRoot, stdio: 'inherit' });
   } finally {
     for (const [, migrationPath, hiddenMigrationPath] of renamedMigrations.reverse()) {
-      if (existsSync(hiddenMigrationPath)) {
-        renameSync(hiddenMigrationPath, migrationPath);
-      }
+      if (existsSync(hiddenMigrationPath)) renameSync(hiddenMigrationPath, migrationPath);
     }
   }
 }
@@ -162,5 +154,6 @@ validateFunctionSearchPathMigration();
 validateHelperSearchPathMigration();
 validatePublishPersistenceMigration();
 validatePublishRpcMigration();
+validatePharmacyPublishRpcMigration();
 
 console.log('Current migration validation passed.');
