@@ -27,6 +27,7 @@ import './check-import-admin-geo-performance-readonly.mjs';
 import './check-import-admin-readiness-review-readonly.mjs';
 import './check-import-performance-guard.mjs';
 import './check-import-manual-publish-flow.mjs';
+import './check-import-controlled-single-publish-contract.mjs';
 import './check-import-queue-dashboard.mjs';
 import './check-import-admin-capability-audit.mjs';
 import './check-import-validator-ci-audit.mjs';

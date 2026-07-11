@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "drkhaleej.import.controlledSinglePublishContract.v1",
+  "cases": [
+    {
+      "id": "contract-ready-execution-disabled",
+      "input": {
+        "entityIds": ["entity-001"],
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-001:v7",
+        "expectedVersion": "v7",
+        "readinessReady": true,
+        "manualPublishFlowReady": true,
+        "sitemapEligible": true,
+        "auditLogAvailable": true,
+        "rollbackSnapshotId": "snapshot-001",
+        "transactionBoundary": "single_transaction",
+        "dryRunReviewed": true,
+        "mutationEnabled": false
+      },
+      "expected": {
+        "contractReady": true,
+        "executionReady": false,
+        "bulkAllowed": false,
+        "blockers": ["mutation_not_enabled"]
+      }
+    },
+    {
+      "id": "multiple-targets-blocked",
+      "input": {
+        "entityIds": ["entity-001", "entity-002"],
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:multiple:v1",
+        "expectedVersion": "v1",
+        "readinessReady": true,
+        "manualPublishFlowReady": true,
+        "sitemapEligible": true,
+        "auditLogAvailable": true,
+        "rollbackSnapshotId": "snapshot-002",
+        "transactionBoundary": "single_transaction",
+        "dryRunReviewed": true,
+        "mutationEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "executionReady": false,
+        "bulkAllowed": false,
+        "blockers": ["multiple_targets_not_allowed", "mutation_not_enabled"]
+      }
+    },
+    {
+      "id": "missing-audit-and-rollback-blocked",
+      "input": {
+        "entityIds": ["entity-003"],
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-003:v2",
+        "expectedVersion": "v2",
+        "readinessReady": true,
+        "manualPublishFlowReady": true,
+        "sitemapEligible": true,
+        "auditLogAvailable": false,
+        "rollbackSnapshotId": null,
+        "transactionBoundary": "single_transaction",
+        "dryRunReviewed": true,
+        "mutationEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "executionReady": false,
+        "bulkAllowed": false,
+        "blockers": ["audit_log_unavailable", "rollback_snapshot_missing", "mutation_not_enabled"]
+      }
+    },
+    {
+      "id": "readiness-and-dry-run-blocked",
+      "input": {
+        "entityIds": ["entity-004"],
+        "actorId": "admin-001",
+        "idempotencyKey": "publish:entity-004:v3",
+        "expectedVersion": "v3",
+        "readinessReady": false,
+        "manualPublishFlowReady": false,
+        "sitemapEligible": false,
+        "auditLogAvailable": true,
+        "rollbackSnapshotId": "snapshot-004",
+        "transactionBoundary": null,
+        "dryRunReviewed": false,
+        "mutationEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "executionReady": false,
+        "bulkAllowed": false,
+        "blockers": [
+          "readiness_not_ready",
+          "manual_publish_flow_blocked",
+          "sitemap_not_eligible",
+          "transaction_boundary_missing",
+          "dry_run_not_reviewed",
+          "mutation_not_enabled"
+        ]
+      }
+    }
+  ]
+}
