@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "drkhaleej.import.privatePersistenceAdapter.v1",
+  "cases": [
+    {
+      "id": "contract-ready-adapter-disabled",
+      "input": {
+        "transactionContractReady": true,
+        "privateServerBoundaryPresent": true,
+        "atomicTransactionSupported": true,
+        "idempotencyReservationSupported": true,
+        "rollbackSnapshotWriteSupported": true,
+        "auditEventWriteSupported": true,
+        "replayLookupSupported": true,
+        "conflictDetectionSupported": true,
+        "terminalResultWriteSupported": true,
+        "adapterEnabled": false
+      },
+      "expected": {
+        "contractReady": true,
+        "adapterReady": false,
+        "executionReady": false,
+        "mutationEnabled": false,
+        "bulkAllowed": false,
+        "blockers": ["adapter_not_enabled"]
+      }
+    },
+    {
+      "id": "missing-atomic-transaction",
+      "input": {
+        "transactionContractReady": true,
+        "privateServerBoundaryPresent": true,
+        "atomicTransactionSupported": false,
+        "idempotencyReservationSupported": true,
+        "rollbackSnapshotWriteSupported": true,
+        "auditEventWriteSupported": true,
+        "replayLookupSupported": true,
+        "conflictDetectionSupported": true,
+        "terminalResultWriteSupported": true,
+        "adapterEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "blockers": ["atomic_transaction_missing", "adapter_not_enabled"]
+      }
+    },
+    {
+      "id": "missing-replay-conflict-support",
+      "input": {
+        "transactionContractReady": true,
+        "privateServerBoundaryPresent": true,
+        "atomicTransactionSupported": true,
+        "idempotencyReservationSupported": true,
+        "rollbackSnapshotWriteSupported": true,
+        "auditEventWriteSupported": true,
+        "replayLookupSupported": false,
+        "conflictDetectionSupported": false,
+        "terminalResultWriteSupported": true,
+        "adapterEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "blockers": ["replay_lookup_missing", "conflict_detection_missing", "adapter_not_enabled"]
+      }
+    },
+    {
+      "id": "missing-terminal-result-write",
+      "input": {
+        "transactionContractReady": true,
+        "privateServerBoundaryPresent": true,
+        "atomicTransactionSupported": true,
+        "idempotencyReservationSupported": true,
+        "rollbackSnapshotWriteSupported": true,
+        "auditEventWriteSupported": true,
+        "replayLookupSupported": true,
+        "conflictDetectionSupported": true,
+        "terminalResultWriteSupported": false,
+        "adapterEnabled": false
+      },
+      "expected": {
+        "contractReady": false,
+        "blockers": ["terminal_result_write_missing", "adapter_not_enabled"]
+      }
+    }
+  ]
+}
