@@ -77,10 +77,13 @@ describe("Supabase pharmacy private mutation writer", () => {
         p_execution_started_audit_id: "audit-001",
         p_patch: expect.objectContaining({
           name_en: "Controlled Pharmacy",
-          status: undefined,
         }),
       }),
     );
+
+    const rpcArgs = rpc.mock.calls[0]?.[1] as { p_patch?: Record<string, unknown> } | undefined;
+    expect(rpcArgs?.p_patch).not.toHaveProperty("status");
+    expect(rpcArgs?.p_patch).not.toHaveProperty("is_active");
   });
 
   it("fails closed on malformed or errored RPC responses", async () => {
