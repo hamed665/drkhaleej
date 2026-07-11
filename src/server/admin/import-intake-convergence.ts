@@ -86,25 +86,33 @@ export function selectFirstPrivatePublishFamily(
   evidenceRows: readonly ImportFamilyEvidence[],
 ): ImportFamilySelectionResult {
   const blockers: string[] = [];
-  const byFamily = new Map(evidenceRows.map((row) => [row.family, row]));
+  const byFamily = new Map<ImportPublishFamily, ImportFamilyEvidence>(
+    evidenceRows.map((row) => [row.family, row]),
+  );
   const families: readonly ImportPublishFamily[] = ["doctor", "hospital", "pharmacy"];
 
   for (const family of families) {
     if (!byFamily.has(family)) blockers.push(`family_evidence_missing:${family}`);
   }
 
-  const scores = Object.fromEntries(
-    families.map((family) => [family, byFamily.has(family) ? scoreFamily(byFamily.get(family)!) : null]),
-  ) as Record<ImportPublishFamily, number | null>;
+  const scores: Record<ImportPublishFamily, number | null> = {
+    doctor: byFamily.has("doctor") ? scoreFamily(byFamily.get("doctor")!) : null,
+    hospital: byFamily.has("hospital") ? scoreFamily(byFamily.get("hospital")!) : null,
+    pharmacy: byFamily.has("pharmacy") ? scoreFamily(byFamily.get("pharmacy")!) : null,
+  };
 
   const eligibleFamilies = families.filter((family) => scores[family] !== null);
   const ordered = [...eligibleFamilies].sort((left, right) => scores[left]! - scores[right]!);
+  const first = ordered.at(0) ?? null;
+  const second = ordered.at(1) ?? null;
 
-  if (ordered.length === 0) blockers.push("no_family_ready");
-  if (ordered.length > 1 && scores[ordered[0]] === scores[ordered[1]]) blockers.push("family_score_tie");
+  if (first === null) blockers.push("no_family_ready");
+  if (first !== null && second !== null && scores[first] === scores[second]) {
+    blockers.push("family_score_tie");
+  }
 
   return {
-    selectedFamily: blockers.length === 0 ? ordered[0] ?? null : null,
+    selectedFamily: blockers.length === 0 ? first : null,
     eligibleFamilies,
     scores,
     blockers: [...new Set(blockers)],
