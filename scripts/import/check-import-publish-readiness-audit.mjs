@@ -31,6 +31,7 @@ import './check-import-controlled-single-publish-contract.mjs';
 import './check-import-publish-executor-infrastructure.mjs';
 import './check-import-publish-persistence-schema.mjs';
 import './check-import-controlled-publish-dry-run-executor.mjs';
+import './check-import-publish-reservation-snapshot-transaction.mjs';
 import './check-import-queue-dashboard.mjs';
 import './check-import-admin-capability-audit.mjs';
 import './check-import-validator-ci-audit.mjs';

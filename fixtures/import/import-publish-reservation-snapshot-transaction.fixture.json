@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "drkhaleej.import.publishReservationSnapshotTransaction.v1",
+  "cases": [
+    {
+      "id": "contract-ready-persistence-disabled",
+      "input": {
+        "dryRunPlanReady": true,
+        "persistenceSchemaReady": true,
+        "transactionCoordinatorAvailable": true,
+        "entityId": "00000000-0000-0000-0000-000000000001",
+        "actorId": "00000000-0000-0000-0000-000000000002",
+        "idempotencyKey": "publish:entity-1:v7",
+        "requestHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expectedVersion": "v7",
+        "rollbackSnapshotComplete": true,
+        "auditSchemaVersion": "v1",
+        "reservationTtlHours": 72,
+        "rollbackRetentionDays": 90,
+        "persistenceEnabled": false
+      },
+      "expected": {
+        "contractReady": true,
+        "persistenceReady": false,
+        "executionReady": false,
+        "mutationEnabled": false,
+        "bulkAllowed": false,
+        "blockers": ["persistence_not_enabled"],
+        "databaseOperationCount": 0
+      }
+    },
+    {
+      "id": "invalid-hash-and-version",
+      "input": {
+        "dryRunPlanReady": true,
+        "persistenceSchemaReady": true,
+        "transactionCoordinatorAvailable": true,
+        "entityId": "entity-2",
+        "actorId": "actor-2",
+        "idempotencyKey": "publish:entity-2",
+        "requestHash": "bad-hash",
+        "expectedVersion": "",
+        "rollbackSnapshotComplete": true,
+        "auditSchemaVersion": "v1",
+        "reservationTtlHours": 72,
+        "rollbackRetentionDays": 90,
+        "persistenceEnabled": false
+      },
+      "expected": {"contractReady": false, "blockers": ["request_hash_invalid", "expected_version_missing", "persistence_not_enabled"]}
+    },
+    {
+      "id": "missing-upstream-and-snapshot",
+      "input": {
+        "dryRunPlanReady": false,
+        "persistenceSchemaReady": false,
+        "transactionCoordinatorAvailable": false,
+        "entityId": "entity-3",
+        "actorId": "actor-3",
+        "idempotencyKey": "publish:entity-3",
+        "requestHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "expectedVersion": "v1",
+        "rollbackSnapshotComplete": false,
+        "auditSchemaVersion": "v1",
+        "reservationTtlHours": 72,
+        "rollbackRetentionDays": 90,
+        "persistenceEnabled": false
+      },
+      "expected": {"contractReady": false}
+    },
+    {
+      "id": "retention-out-of-range",
+      "input": {
+        "dryRunPlanReady": true,
+        "persistenceSchemaReady": true,
+        "transactionCoordinatorAvailable": true,
+        "entityId": "entity-4",
+        "actorId": "actor-4",
+        "idempotencyKey": "publish:entity-4",
+        "requestHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "expectedVersion": "v1",
+        "rollbackSnapshotComplete": true,
+        "auditSchemaVersion": "v1",
+        "reservationTtlHours": 2,
+        "rollbackRetentionDays": 7,
+        "persistenceEnabled": false
+      },
+      "expected": {"contractReady": false, "blockers": ["reservation_ttl_invalid", "rollback_retention_invalid", "persistence_not_enabled"]}
+    }
+  ]
+}
