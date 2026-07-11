@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "drkhaleej.import.pageValueGate.v1",
+  "cases": [
+    {
+      "id": "valuable-private-entity-profile",
+      "pageClass": "entity_profile",
+      "compositionReady": true,
+      "contentProjectionReady": true,
+      "metrics": {
+        "verifiedUniqueFactCount": 9,
+        "sourceEvidenceCount": 3,
+        "contentCompletenessPercent": 88,
+        "duplicateSimilarityPercent": 12,
+        "geoSpecificityScore": 90,
+        "actionableContactFieldCount": 3,
+        "usefulInternalLinkCount": 5,
+        "templatedContentRatioPercent": 30,
+        "verifiedProviderCoverageCount": 1,
+        "thinPageRisk": false
+      },
+      "expected": {
+        "pageValueReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "thin-and-duplicated-page",
+      "pageClass": "entity_profile",
+      "compositionReady": true,
+      "contentProjectionReady": true,
+      "metrics": {
+        "verifiedUniqueFactCount": 3,
+        "sourceEvidenceCount": 1,
+        "contentCompletenessPercent": 45,
+        "duplicateSimilarityPercent": 72,
+        "geoSpecificityScore": 55,
+        "actionableContactFieldCount": 1,
+        "usefulInternalLinkCount": 1,
+        "templatedContentRatioPercent": 80,
+        "verifiedProviderCoverageCount": 1,
+        "thinPageRisk": true
+      },
+      "expected": {
+        "pageValueReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "area-page-with-insufficient-provider-coverage",
+      "pageClass": "area_landing",
+      "compositionReady": true,
+      "contentProjectionReady": true,
+      "metrics": {
+        "verifiedUniqueFactCount": 10,
+        "sourceEvidenceCount": 4,
+        "contentCompletenessPercent": 90,
+        "duplicateSimilarityPercent": 10,
+        "geoSpecificityScore": 95,
+        "actionableContactFieldCount": 2,
+        "usefulInternalLinkCount": 6,
+        "templatedContentRatioPercent": 25,
+        "verifiedProviderCoverageCount": 2,
+        "thinPageRisk": false
+      },
+      "expected": {
+        "pageValueReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "valuable-content-with-readiness-blocker",
+      "pageClass": "guide",
+      "compositionReady": false,
+      "contentProjectionReady": true,
+      "metrics": {
+        "verifiedUniqueFactCount": 12,
+        "sourceEvidenceCount": 5,
+        "contentCompletenessPercent": 92,
+        "duplicateSimilarityPercent": 8,
+        "geoSpecificityScore": 80,
+        "actionableContactFieldCount": 1,
+        "usefulInternalLinkCount": 7,
+        "templatedContentRatioPercent": 20,
+        "verifiedProviderCoverageCount": 2,
+        "thinPageRisk": false
+      },
+      "expected": {
+        "pageValueReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "valuable-content-without-content-projection",
+      "pageClass": "service_directory",
+      "compositionReady": true,
+      "contentProjectionReady": false,
+      "metrics": {
+        "verifiedUniqueFactCount": 8,
+        "sourceEvidenceCount": 3,
+        "contentCompletenessPercent": 82,
+        "duplicateSimilarityPercent": 18,
+        "geoSpecificityScore": 78,
+        "actionableContactFieldCount": 2,
+        "usefulInternalLinkCount": 4,
+        "templatedContentRatioPercent": 40,
+        "verifiedProviderCoverageCount": 4,
+        "thinPageRisk": false
+      },
+      "expected": {
+        "pageValueReady": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    }
+  ]
+}
