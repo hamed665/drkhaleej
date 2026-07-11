@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { ImportPublishFamily } from "./import-intake-convergence";
+import type { ImportPublishPersistenceTransactionResult } from "./import-private-persistence-adapter";
 import {
   getUnifiedDraftEntityBlockers,
   type ImportUnifiedDraftEntityInput,
@@ -8,6 +10,8 @@ import {
 export type ImportPharmacyPrivateMutationBlocker =
   | "execution_disabled"
   | "family_not_pharmacy"
+  | "selected_family_not_pharmacy"
+  | "reservation_not_reserved"
   | "draft_not_ready"
   | "actor_missing"
   | "idempotency_key_missing"
@@ -16,7 +20,9 @@ export type ImportPharmacyPrivateMutationBlocker =
   | "bulk_not_allowed";
 
 export type ImportPharmacyPrivateMutationRequest = {
-  family: "pharmacy";
+  family: ImportPublishFamily;
+  selectedFamily: ImportPublishFamily | null;
+  reservationResult: ImportPublishPersistenceTransactionResult;
   draft: ImportUnifiedDraftEntityInput;
   actorId: string;
   idempotencyKey: string;
@@ -31,6 +37,9 @@ export type ImportPharmacyPrivateMutationPayload = {
   actorId: string;
   idempotencyKey: string;
   expectedVersion: string;
+  reservationId: string;
+  rollbackSnapshotId: string;
+  auditEventId: string;
   draft: ImportUnifiedDraftEntityInput;
   visibility: "private";
   publicRouteEnabled: false;
@@ -54,7 +63,7 @@ export type ImportPharmacyPrivateMutationResult =
     }
   | {
       kind: "conflict";
-      reason: "expected_version_mismatch" | "idempotency_mismatch";
+      reason: "expected_version_mismatch" | "idempotency_mismatch" | "reservation_identity_mismatch";
     }
   | {
       kind: "rolled_back";
@@ -73,7 +82,10 @@ export interface ImportPharmacyPrivateMutationWriter {
   mutateOne(payload: ImportPharmacyPrivateMutationPayload): Promise<
     | { kind: "mutated"; entityId: string; actualVersion: string }
     | { kind: "replayed"; entityId: string; actualVersion: string }
-    | { kind: "conflict"; reason: "expected_version_mismatch" | "idempotency_mismatch" }
+    | {
+        kind: "conflict";
+        reason: "expected_version_mismatch" | "idempotency_mismatch" | "reservation_identity_mismatch";
+      }
     | { kind: "failed_after_write" }
     | { kind: "failed" }
   >;
@@ -88,6 +100,8 @@ export function getImportPharmacyPrivateMutationBlockers(
 
   if (!request.executionEnabled) blockers.push("execution_disabled");
   if (request.family !== "pharmacy") blockers.push("family_not_pharmacy");
+  if (request.selectedFamily !== "pharmacy") blockers.push("selected_family_not_pharmacy");
+  if (request.reservationResult.kind !== "reserved") blockers.push("reservation_not_reserved");
   if (getUnifiedDraftEntityBlockers(request.draft).length > 0) blockers.push("draft_not_ready");
   if (request.actorId.trim().length === 0) blockers.push("actor_missing");
   if (request.idempotencyKey.trim().length === 0) blockers.push("idempotency_key_missing");
@@ -99,11 +113,18 @@ export function getImportPharmacyPrivateMutationBlockers(
 }
 
 function toPayload(request: ImportPharmacyPrivateMutationRequest): ImportPharmacyPrivateMutationPayload {
+  if (request.reservationResult.kind !== "reserved") {
+    throw new Error("pharmacy private mutation payload requires a reserved transaction");
+  }
+
   return {
     family: "pharmacy",
     actorId: request.actorId,
     idempotencyKey: request.idempotencyKey,
     expectedVersion: request.expectedVersion,
+    reservationId: request.reservationResult.reservationId,
+    rollbackSnapshotId: request.reservationResult.rollbackSnapshotId,
+    auditEventId: request.reservationResult.auditEventId,
     draft: request.draft,
     visibility: "private",
     publicRouteEnabled: false,
