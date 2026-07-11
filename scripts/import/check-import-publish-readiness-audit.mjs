@@ -42,6 +42,7 @@ import './check-import-preview-runtime-boundary.mjs';
 import './check-import-persistence-readback-verifier.mjs';
 import './check-import-real-reservation-canary.mjs';
 import './check-import-real-reservation-canary-fixture.mjs';
+import './check-import-reservation-recovery.mjs';
 import './check-import-database-transaction-rpc-contract.mjs';
 import './check-import-publish-rpc-migration.mjs';
 import './check-import-queue-dashboard.mjs';
