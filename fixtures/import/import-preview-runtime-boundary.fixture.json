@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "drkhaleej.import.previewRuntimeBoundary.v1",
+  "cases": [
+    {
+      "id": "preview-ready-client-constructed-rpc-disabled",
+      "input": {
+        "environment": "preview",
+        "supabaseUrl": "https://example.supabase.co",
+        "serviceRoleKey": "service-role-secret",
+        "allowedActorIds": "actor-1",
+        "allowedEntityIds": "entity-1"
+      },
+      "expected": {
+        "boundaryReady": true,
+        "clientConstructed": true,
+        "rpcClientAvailable": true,
+        "rpcExecutionAllowed": false,
+        "blockers": ["runtime_execution_disabled"]
+      }
+    },
+    {
+      "id": "production-blocked",
+      "input": {
+        "environment": "production",
+        "supabaseUrl": "https://example.supabase.co",
+        "serviceRoleKey": "service-role-secret",
+        "allowedActorIds": "actor-1",
+        "allowedEntityIds": "entity-1"
+      },
+      "expected": {
+        "boundaryReady": false,
+        "clientConstructed": false,
+        "rpcClientAvailable": false,
+        "blockers": ["environment_not_preview", "runtime_execution_disabled"]
+      }
+    },
+    {
+      "id": "missing-secrets-blocked",
+      "input": {
+        "environment": "preview",
+        "supabaseUrl": "",
+        "serviceRoleKey": "",
+        "allowedActorIds": "actor-1",
+        "allowedEntityIds": "entity-1"
+      },
+      "expected": {
+        "boundaryReady": false,
+        "clientConstructed": false,
+        "rpcClientAvailable": false,
+        "blockers": ["supabase_url_missing", "service_role_key_missing", "runtime_execution_disabled"]
+      }
+    },
+    {
+      "id": "missing-allowlists-blocked",
+      "input": {
+        "environment": "preview",
+        "supabaseUrl": "https://example.supabase.co",
+        "serviceRoleKey": "service-role-secret",
+        "allowedActorIds": "",
+        "allowedEntityIds": ""
+      },
+      "expected": {
+        "boundaryReady": false,
+        "clientConstructed": false,
+        "rpcClientAvailable": false,
+        "blockers": ["actor_allowlist_missing", "entity_allowlist_missing", "runtime_execution_disabled"]
+      }
+    }
+  ],
+  "safety": {
+    "previewOnly": true,
+    "secretLoggingAllowed": false,
+    "rpcExecutionAllowed": false,
+    "entityMutationAllowed": false,
+    "terminalPersistenceAllowed": false,
+    "bulkAllowed": false
+  }
+}
