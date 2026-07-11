@@ -14,6 +14,7 @@ import './check-import-publication-validation.mjs';
 import './check-import-link-rule-matrix.mjs';
 import './check-import-internal-link-generator.mjs';
 import './check-import-internal-link-cache.mjs';
+import './check-import-internal-link-intelligence.mjs';
 import './check-import-sitemap-eligibility.mjs';
 import './check-import-schema-generator.mjs';
 import './check-import-readiness-engine.mjs';
