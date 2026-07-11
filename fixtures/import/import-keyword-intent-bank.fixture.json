@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "drmuscat.import.keywordIntentBank.v1",
-  "sourceFile": "drmuscat-seo-keyword-universe-master-v1.2-completed.xlsx",
+  "schemaVersion": "drkhaleej.import.keywordIntentBank.v1",
+  "sourceFile": "drkhaleej-seo-keyword-universe-master-v1.2-completed.xlsx",
   "sourceSha256": "a98d6eb5eef6f83ee66ea091cc7b50d8945c5457d5cbba203ee4a830cd14cfff",
   "totalRows": 1532,
   "englishRows": 766,
