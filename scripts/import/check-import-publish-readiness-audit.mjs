@@ -35,6 +35,7 @@ import './check-import-publish-reservation-snapshot-transaction.mjs';
 import './check-import-private-persistence-adapter.mjs';
 import './check-import-supabase-publish-persistence-adapter.mjs';
 import './check-import-controlled-publish-orchestrator.mjs';
+import './check-import-controlled-publish-reservation-mode.mjs';
 import './check-import-database-transaction-rpc-contract.mjs';
 import './check-import-publish-rpc-migration.mjs';
 import './check-import-queue-dashboard.mjs';
