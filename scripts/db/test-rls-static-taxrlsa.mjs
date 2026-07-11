@@ -26,6 +26,7 @@ const migrations = {
   facilityDepartment: '0063_facility_department_foundation.sql',
   importRelationCandidates: '0064_import_relation_candidates.sql',
   scheduleRlsHardening: '0065_schedule_appointment_rls_hardening.sql',
+  publishPersistence: '0068_import_publish_persistence_schema.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -212,6 +213,22 @@ function validateScheduleRlsHardeningMigration() {
   }
 }
 
+function validatePublishPersistenceRlsMigration() {
+  const content = readMigration('publishPersistence');
+  validateNoAdminPolicies(content, '0068');
+  for (const tableName of [
+    'import_publish_idempotency_records',
+    'import_publish_rollback_snapshots',
+    'import_publish_audit_events',
+  ]) {
+    requirePattern(
+      content,
+      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
+      `0068 must enable RLS on ${tableName}.`,
+    );
+  }
+}
+
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
@@ -245,6 +262,7 @@ validateDoctorPracticeHardeningRlsMigration();
 validateFacilityDepartmentRlsMigration();
 validateImportRelationCandidatesRlsMigration();
 validateScheduleRlsHardeningMigration();
+validatePublishPersistenceRlsMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');

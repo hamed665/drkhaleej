@@ -14,17 +14,21 @@ const helperSearchPathValidator = path.join(repoRoot, 'scripts', 'db', 'check-se
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
+const publishPersistenceMigrationName = '0068_import_publish_persistence_schema.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
+const publishPersistenceMigrationPath = path.join(migrationsDir, publishPersistenceMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
+const hiddenPublishPersistenceMigrationPath = path.join(migrationsDir, `.publish-persistence-${publishPersistenceMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
   [functionSearchPathMigrationName, functionSearchPathMigrationPath, hiddenFunctionSearchPathMigrationPath],
   [helperSearchPathMigrationName, helperSearchPathMigrationPath, hiddenHelperSearchPathMigrationPath],
+  [publishPersistenceMigrationName, publishPersistenceMigrationPath, hiddenPublishPersistenceMigrationPath],
 ];
 
 function fail(message) {
@@ -85,6 +89,34 @@ function validateHelperSearchPathMigration() {
   });
 }
 
+function validatePublishPersistenceMigration() {
+  requireCondition(existsSync(publishPersistenceMigrationPath), `${publishPersistenceMigrationName} is missing.`);
+  const content = readFileSync(publishPersistenceMigrationPath, 'utf8');
+
+  for (const [pattern, message] of [
+    [/\binsert\s+into\b/i, '0068 must not seed rows.'],
+    [/\bdrop\b/i, '0068 must not contain DROP statements.'],
+    [/\bcreate\s+policy\b/i, '0068 must not create anon/authenticated policies.'],
+    [/\bto\s+anon\b/i, '0068 must not grant anon access.'],
+    [/\bto\s+authenticated\b/i, '0068 must not grant authenticated access.'],
+    [/\bto\s+service_role\b/i, '0068 must not add explicit service_role grants.'],
+  ]) forbidPattern(content, pattern, message);
+
+  for (const [pattern, message] of [
+    [/IMPORT-PUBLISH-C: controlled publish persistence schema/i, '0068 must include its migration marker.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_publish_idempotency_records/i, '0068 must create idempotency persistence.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_publish_rollback_snapshots/i, '0068 must create rollback snapshots.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_publish_audit_events/i, '0068 must create publish audit events.'],
+    [/idempotency_key\s+text\s+not\s+null\s+unique/i, '0068 must enforce unique idempotency keys.'],
+    [/request_hash\s+~\s+'\^\[a-f0-9\]\{64\}\$'/i, '0068 must validate request hashes.'],
+    [/snapshot_hash\s+~\s+'\^\[a-f0-9\]\{64\}\$'/i, '0068 must validate snapshot hashes.'],
+    [/on\s+delete\s+restrict/i, '0068 must prevent destructive audit-chain cascades.'],
+    [/alter\s+table\s+public\.import_publish_idempotency_records\s+enable\s+row\s+level\s+security/i, '0068 must enable RLS on idempotency records.'],
+    [/alter\s+table\s+public\.import_publish_rollback_snapshots\s+enable\s+row\s+level\s+security/i, '0068 must enable RLS on rollback snapshots.'],
+    [/alter\s+table\s+public\.import_publish_audit_events\s+enable\s+row\s+level\s+security/i, '0068 must enable RLS on audit events.'],
+  ]) requirePattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -115,5 +147,6 @@ runLegacyValidatorWithoutCurrentOnlyMigrations();
 validateScheduleRlsMigration();
 validateFunctionSearchPathMigration();
 validateHelperSearchPathMigration();
+validatePublishPersistenceMigration();
 
 console.log('Current migration validation passed.');
