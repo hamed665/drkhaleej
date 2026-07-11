@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "drkhaleej.import.seoGeoLlmReadiness.v1",
+  "cases": [
+    {
+      "id": "all-readiness-green-but-private",
+      "input": {
+        "seoProfileReady": true,
+        "keywordBankReady": true,
+        "geoAuthorityReady": true,
+        "geoProjectionReady": true,
+        "llmProjectionReady": true,
+        "hasBilingualLlmAnswerTarget": true,
+        "hasEvidenceCitations": true,
+        "hasRequiredMedicalSafetyReview": true,
+        "blockedOrUnsafeIntent": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "seoReady": true,
+        "geoReady": true,
+        "llmReady": true,
+        "compositionReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "geo-authority-blocked",
+      "input": {
+        "seoProfileReady": true,
+        "keywordBankReady": true,
+        "geoAuthorityReady": false,
+        "geoProjectionReady": true,
+        "llmProjectionReady": true,
+        "hasBilingualLlmAnswerTarget": true,
+        "hasEvidenceCitations": true,
+        "hasRequiredMedicalSafetyReview": true,
+        "blockedOrUnsafeIntent": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "seoReady": true,
+        "geoReady": false,
+        "llmReady": false,
+        "compositionReady": false
+      }
+    },
+    {
+      "id": "llm-evidence-blocked",
+      "input": {
+        "seoProfileReady": true,
+        "keywordBankReady": true,
+        "geoAuthorityReady": true,
+        "geoProjectionReady": true,
+        "llmProjectionReady": true,
+        "hasBilingualLlmAnswerTarget": true,
+        "hasEvidenceCitations": false,
+        "hasRequiredMedicalSafetyReview": true,
+        "blockedOrUnsafeIntent": false,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "seoReady": true,
+        "geoReady": true,
+        "llmReady": false,
+        "compositionReady": false
+      }
+    },
+    {
+      "id": "unsafe-intent-blocked",
+      "input": {
+        "seoProfileReady": true,
+        "keywordBankReady": true,
+        "geoAuthorityReady": true,
+        "geoProjectionReady": true,
+        "llmProjectionReady": true,
+        "hasBilingualLlmAnswerTarget": true,
+        "hasEvidenceCitations": true,
+        "hasRequiredMedicalSafetyReview": true,
+        "blockedOrUnsafeIntent": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "seoReady": true,
+        "geoReady": true,
+        "llmReady": false,
+        "compositionReady": false
+      }
+    }
+  ]
+}
