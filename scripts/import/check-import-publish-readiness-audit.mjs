@@ -24,6 +24,7 @@ import './check-import-schema-generator.mjs';
 import './check-import-readiness-engine.mjs';
 import './check-import-admin-readiness-panel.mjs';
 import './check-import-admin-geo-performance-readonly.mjs';
+import './check-import-admin-readiness-review-readonly.mjs';
 import './check-import-performance-guard.mjs';
 import './check-import-manual-publish-flow.mjs';
 import './check-import-queue-dashboard.mjs';
