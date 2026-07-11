@@ -22,8 +22,8 @@ DECLARE
   v_snapshot public.import_publish_rollback_snapshots%ROWTYPE;
   v_center public.centers%ROWTYPE;
   v_actual_version text;
-  v_terminal_audit_id uuid;
   v_terminal_result jsonb;
+  v_terminal_persist jsonb;
   v_allowed_keys constant text[] := ARRAY[
     'name_en','name_ar','legal_name','slug','primary_phone','secondary_phone',
     'whatsapp_phone','email','website_url','logo_url','cover_image_url',
@@ -164,24 +164,25 @@ BEGIN
     'sitemapEligible', false
   );
 
-  UPDATE public.import_publish_idempotency_records
-  SET status = 'succeeded', terminal_result = v_terminal_result, updated_at = clock_timestamp()
-  WHERE id = p_idempotency_record_id;
+  SELECT public.import_publish_persist_terminal_result(
+    p_idempotency_record_id,
+    p_entity_id,
+    p_actor_profile_id,
+    'succeeded',
+    v_actual_version,
+    v_terminal_result,
+    p_audit_schema_version
+  ) INTO v_terminal_persist;
 
-  INSERT INTO public.import_publish_audit_events (
-    entity_id, actor_profile_id, idempotency_record_id, rollback_snapshot_id,
-    event_type, outcome, schema_version, expected_version, actual_version, event_payload
-  ) VALUES (
-    p_entity_id, p_actor_profile_id, p_idempotency_record_id, p_rollback_snapshot_id,
-    'execution_succeeded', 'succeeded', p_audit_schema_version,
-    p_expected_version, v_actual_version, v_terminal_result
-  ) RETURNING id INTO v_terminal_audit_id;
+  IF coalesce(v_terminal_persist->>'status', '') NOT IN ('succeeded','replayed') THEN
+    RAISE EXCEPTION 'terminal_persistence_failed' USING ERRCODE = 'P0001';
+  END IF;
 
   RETURN jsonb_build_object(
     'status', 'mutated',
     'entityId', p_entity_id,
     'actualVersion', v_actual_version,
-    'auditEventId', v_terminal_audit_id
+    'terminalPersistence', v_terminal_persist
   );
 END;
 $$;
