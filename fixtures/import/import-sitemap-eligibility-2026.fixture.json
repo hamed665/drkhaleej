@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "drkhaleej.import.sitemapEligibility2026.v1",
+  "cases": [
+    {
+      "id": "fully-eligible-entity",
+      "pageClass": "entity_profile",
+      "dependencies": {
+        "visibilityPublic": true,
+        "indexPolicyIndex": true,
+        "sitemapPolicyIncluded": true,
+        "publishReady": true,
+        "seoProfileReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "areaLandingEligible": true,
+        "publicProjectionReady": true,
+        "schemaProjectionReady": true,
+        "performanceBudgetReady": true,
+        "duplicateCheckPassed": true,
+        "manualApprovalComplete": true,
+        "canonicalRouteAligned": true
+      },
+      "expected": {"sitemapEligible": true}
+    },
+    {
+      "id": "area-eligible-but-private",
+      "pageClass": "area_landing",
+      "dependencies": {
+        "visibilityPublic": false,
+        "indexPolicyIndex": false,
+        "sitemapPolicyIncluded": false,
+        "publishReady": false,
+        "seoProfileReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "areaLandingEligible": true,
+        "publicProjectionReady": true,
+        "schemaProjectionReady": true,
+        "performanceBudgetReady": true,
+        "duplicateCheckPassed": true,
+        "manualApprovalComplete": true,
+        "canonicalRouteAligned": true
+      },
+      "expected": {"sitemapEligible": false}
+    },
+    {
+      "id": "public-but-thin-and-unapproved",
+      "pageClass": "entity_profile",
+      "dependencies": {
+        "visibilityPublic": true,
+        "indexPolicyIndex": true,
+        "sitemapPolicyIncluded": true,
+        "publishReady": true,
+        "seoProfileReady": true,
+        "pageValueReady": false,
+        "internalLinksReady": false,
+        "areaLandingEligible": true,
+        "publicProjectionReady": true,
+        "schemaProjectionReady": false,
+        "performanceBudgetReady": false,
+        "duplicateCheckPassed": false,
+        "manualApprovalComplete": false,
+        "canonicalRouteAligned": true
+      },
+      "expected": {"sitemapEligible": false}
+    },
+    {
+      "id": "area-missing-area-eligibility",
+      "pageClass": "area_landing",
+      "dependencies": {
+        "visibilityPublic": true,
+        "indexPolicyIndex": true,
+        "sitemapPolicyIncluded": true,
+        "publishReady": true,
+        "seoProfileReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "areaLandingEligible": false,
+        "publicProjectionReady": true,
+        "schemaProjectionReady": true,
+        "performanceBudgetReady": true,
+        "duplicateCheckPassed": true,
+        "manualApprovalComplete": true,
+        "canonicalRouteAligned": true
+      },
+      "expected": {"sitemapEligible": false}
+    },
+    {
+      "id": "canonical-mismatch",
+      "pageClass": "entity_profile",
+      "dependencies": {
+        "visibilityPublic": true,
+        "indexPolicyIndex": true,
+        "sitemapPolicyIncluded": true,
+        "publishReady": true,
+        "seoProfileReady": true,
+        "pageValueReady": true,
+        "internalLinksReady": true,
+        "areaLandingEligible": true,
+        "publicProjectionReady": true,
+        "schemaProjectionReady": true,
+        "performanceBudgetReady": true,
+        "duplicateCheckPassed": true,
+        "manualApprovalComplete": true,
+        "canonicalRouteAligned": false
+      },
+      "expected": {"sitemapEligible": false}
+    }
+  ]
+}
