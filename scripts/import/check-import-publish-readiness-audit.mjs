@@ -4,6 +4,7 @@ import './check-import-domain-entity-contract.mjs';
 import './check-import-canonical-geo-contract.mjs';
 import './check-import-unified-draft-entity.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
+import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
 import './check-import-public-projection-layer.mjs';
 import './check-import-seo-profile-contract.mjs';

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "drkhaleej.import.omanGeoAuthoritySeed.v1",
+  "country": {"id":"om","slug":"oman","nameEn":"Oman","nameAr":"عمان","sourceEvidence":["oman-national-geo-authority"]},
+  "governorates": [
+    {"slug":"muscat","nameEn":"Muscat","nameAr":"مسقط","wilayats":[["muscat","Muscat","مسقط"],["muttrah","Muttrah","مطرح"],["bausher","Bausher","بوشر"],["seeb","Seeb","السيب"],["al-amerat","Al Amerat","العامرات"],["qurayyat","Qurayyat","قريات"]]},
+    {"slug":"dhofar","nameEn":"Dhofar","nameAr":"ظفار","wilayats":[["salalah","Salalah","صلالة"],["taqah","Taqah","طاقة"],["mirbat","Mirbat","مرباط"],["sadah","Sadah","سدح"],["rakhyut","Rakhyut","رخيوت"],["dhalkut","Dhalkut","ضلكوت"],["thumrait","Thumrait","ثمريت"],["muqshin","Muqshin","مقشن"],["al-mazyona","Al Mazyona","المزيونة"],["shalim-and-the-hallaniyat-islands","Shalim and the Hallaniyat Islands","شليم وجزر الحلانيات"]]},
+    {"slug":"musandam","nameEn":"Musandam","nameAr":"مسندم","wilayats":[["khasab","Khasab","خصب"],["bukha","Bukha","بخاء"],["dibba","Dibba","دبا"],["madha","Madha","مدحاء"]]},
+    {"slug":"al-buraimi","nameEn":"Al Buraimi","nameAr":"البريمي","wilayats":[["al-buraimi","Al Buraimi","البريمي"],["mahdah","Mahdah","محضة"],["al-sunaynah","Al Sunaynah","السنينة"]]},
+    {"slug":"al-dakhiliyah","nameEn":"Al Dakhiliyah","nameAr":"الداخلية","wilayats":[["nizwa","Nizwa","نزوى"],["samail","Samail","سمائل"],["bahla","Bahla","بهلاء"],["adam","Adam","أدم"],["al-hamra","Al Hamra","الحمراء"],["manah","Manah","منح"],["izki","Izki","إزكي"],["bidbid","Bidbid","بدبد"],["jabal-akhdar","Jabal Akhdar","الجبل الأخضر"]]},
+    {"slug":"al-dhahirah","nameEn":"Al Dhahirah","nameAr":"الظاهرة","wilayats":[["ibri","Ibri","عبري"],["yanqul","Yanqul","ينقل"],["dhank","Dhank","ضنك"]]},
+    {"slug":"north-al-batinah","nameEn":"North Al Batinah","nameAr":"شمال الباطنة","wilayats":[["sohar","Sohar","صحار"],["shinas","Shinas","شناص"],["liwa","Liwa","لوى"],["saham","Saham","صحم"],["al-khaburah","Al Khaburah","الخابورة"],["al-suwaiq","Al Suwaiq","السويق"]]},
+    {"slug":"south-al-batinah","nameEn":"South Al Batinah","nameAr":"جنوب الباطنة","wilayats":[["rustaq","Rustaq","الرستاق"],["al-awabi","Al Awabi","العوابي"],["nakhal","Nakhal","نخل"],["wadi-al-maawil","Wadi Al Maawil","وادي المعاول"],["barka","Barka","بركاء"],["al-musannah","Al Musannah","المصنعة"]]},
+    {"slug":"north-ash-sharqiyah","nameEn":"North Ash Sharqiyah","nameAr":"شمال الشرقية","wilayats":[["ibra","Ibra","إبراء"],["al-mudhaibi","Al Mudhaibi","المضيبي"],["bidiyah","Bidiyah","بدية"],["al-qabil","Al Qabil","القابل"],["wadi-bani-khalid","Wadi Bani Khalid","وادي بني خالد"],["dima-wa-al-taien","Dima Wa Al Taien","دماء والطائيين"],["sinaw","Sinaw","سناو"]]},
+    {"slug":"south-ash-sharqiyah","nameEn":"South Ash Sharqiyah","nameAr":"جنوب الشرقية","wilayats":[["sur","Sur","صور"],["al-kamil-wa-al-wafi","Al Kamil Wa Al Wafi","الكامل والوافي"],["jalan-bani-bu-hassan","Jalan Bani Bu Hassan","جعلان بني بو حسن"],["jalan-bani-bu-ali","Jalan Bani Bu Ali","جعلان بني بو علي"],["masirah","Masirah","مصيرة"]]},
+    {"slug":"al-wusta","nameEn":"Al Wusta","nameAr":"الوسطى","wilayats":[["haima","Haima","هيماء"],["mahout","Mahout","محوت"],["duqm","Duqm","الدقم"],["al-jazir","Al Jazir","الجازر"]]}
+  ],
+  "muscatAreas": [
+    {"id":"area-al-khuwair","slug":"al-khuwair","nameEn":"Al Khuwair","nameAr":"الخوير","parentWilayat":"bausher","aliases":["khuwair","al khuwair"],"nearbyAreaIds":["area-al-ghubrah","area-madinat-sultan-qaboos","area-ghala"]},
+    {"id":"area-al-ghubrah","slug":"al-ghubrah","nameEn":"Al Ghubrah","nameAr":"الغبرة","parentWilayat":"bausher","aliases":["ghubrah","al ghubra","ghubra"],"nearbyAreaIds":["area-al-khuwair","area-azaiba","area-ghala"]},
+    {"id":"area-azaiba","slug":"azaiba","nameEn":"Azaiba","nameAr":"العذيبة","parentWilayat":"bausher","aliases":["al azaiba","al-azaiba","azaiba"],"nearbyAreaIds":["area-al-ghubrah","area-ghala","area-al-ansab"]},
+    {"id":"area-qurum","slug":"qurum","nameEn":"Qurum","nameAr":"القرم","parentWilayat":"muscat","aliases":["al qurum","qurm"],"nearbyAreaIds":["area-madinat-sultan-qaboos","area-al-wattayah"]},
+    {"id":"area-madinat-sultan-qaboos","slug":"madinat-sultan-qaboos","nameEn":"Madinat Sultan Qaboos","nameAr":"مدينة السلطان قابوس","parentWilayat":"bausher","aliases":["msq","madinat qaboos"],"nearbyAreaIds":["area-qurum","area-al-khuwair"]},
+    {"id":"area-ruwi","slug":"ruwi","nameEn":"Ruwi","nameAr":"روي","parentWilayat":"muttrah","aliases":["ruwi muscat"],"nearbyAreaIds":["area-muttrah","area-wadi-kabir"]},
+    {"id":"area-muttrah","slug":"muttrah","nameEn":"Muttrah","nameAr":"مطرح","parentWilayat":"muttrah","aliases":["matrah","mutrah"],"nearbyAreaIds":["area-ruwi","area-wadi-kabir"]},
+    {"id":"area-al-hail","slug":"al-hail","nameEn":"Al Hail","nameAr":"الحيل","parentWilayat":"seeb","aliases":["hail","al hail"],"nearbyAreaIds":["area-mawaleh","area-al-seeb","area-al-khoud"]},
+    {"id":"area-mawaleh","slug":"mawaleh","nameEn":"Mawaleh","nameAr":"الموالح","parentWilayat":"seeb","aliases":["al mawaleh","mawalah"],"nearbyAreaIds":["area-al-hail","area-al-khoud","area-al-seeb"]},
+    {"id":"area-al-khoud","slug":"al-khoud","nameEn":"Al Khoud","nameAr":"الخوض","parentWilayat":"seeb","aliases":["khoud","al khoudh"],"nearbyAreaIds":["area-mawaleh","area-al-hail","area-al-seeb"]},
+    {"id":"area-al-seeb","slug":"al-seeb","nameEn":"Al Seeb","nameAr":"السيب","parentWilayat":"seeb","aliases":["seeb","as seeb"],"nearbyAreaIds":["area-al-hail","area-mawaleh","area-al-khoud"]},
+    {"id":"area-al-amerat","slug":"al-amerat","nameEn":"Al Amerat","nameAr":"العامرات","parentWilayat":"al-amerat","aliases":["amerat","al amirat"],"nearbyAreaIds":[]},
+    {"id":"area-wadi-kabir","slug":"wadi-kabir","nameEn":"Wadi Kabir","nameAr":"وادي الكبير","parentWilayat":"muttrah","aliases":["wadi al kabir"],"nearbyAreaIds":["area-ruwi","area-muttrah"]},
+    {"id":"area-al-wattayah","slug":"al-wattayah","nameEn":"Al Wattayah","nameAr":"الوطية","parentWilayat":"muscat","aliases":["wattayah","al watayah"],"nearbyAreaIds":["area-qurum"]},
+    {"id":"area-ghala","slug":"ghala","nameEn":"Ghala","nameAr":"غلا","parentWilayat":"bausher","aliases":["ghala muscat"],"nearbyAreaIds":["area-al-khuwair","area-al-ghubrah","area-azaiba","area-al-ansab"]},
+    {"id":"area-al-ansab","slug":"al-ansab","nameEn":"Al Ansab","nameAr":"الأنصب","parentWilayat":"bausher","aliases":["ansab","al ansab"],"nearbyAreaIds":["area-ghala","area-azaiba"]}
+  ],
+  "defaults": {"boundaryStatus":"approximate","authorityStatus":"draft","sourceEvidence":["oman-national-geo-authority","drkhaleej-manual-review-required"]}
+}
