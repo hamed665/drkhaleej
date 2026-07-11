@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "drkhaleej.import.nearbyProjectionEngine.v1",
+  "cases": [
+    {
+      "id": "ready-but-private",
+      "input": {
+        "geoRegistryReady": true,
+        "sourceGeoReady": true,
+        "internalLinksReady": true,
+        "entityProjectionReady": true,
+        "candidatePresent": true,
+        "notSelf": true,
+        "sameDomain": true,
+        "authoritativeGeoRelation": true,
+        "distancePrecomputed": true,
+        "distanceInRange": true,
+        "qualityReady": true,
+        "candidateProjectionReady": true,
+        "labelsBilingual": true,
+        "notDuplicate": true,
+        "candidateLimitValid": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "nearbyProjectionReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "geo-not-authoritative",
+      "input": {
+        "geoRegistryReady": true,
+        "sourceGeoReady": true,
+        "internalLinksReady": true,
+        "entityProjectionReady": true,
+        "candidatePresent": true,
+        "notSelf": true,
+        "sameDomain": true,
+        "authoritativeGeoRelation": false,
+        "distancePrecomputed": true,
+        "distanceInRange": true,
+        "qualityReady": true,
+        "candidateProjectionReady": true,
+        "labelsBilingual": true,
+        "notDuplicate": true,
+        "candidateLimitValid": true
+      },
+      "expected": { "nearbyProjectionReady": false }
+    },
+    {
+      "id": "runtime-distance-forbidden",
+      "input": {
+        "geoRegistryReady": true,
+        "sourceGeoReady": true,
+        "internalLinksReady": true,
+        "entityProjectionReady": true,
+        "candidatePresent": true,
+        "notSelf": true,
+        "sameDomain": true,
+        "authoritativeGeoRelation": true,
+        "distancePrecomputed": false,
+        "distanceInRange": false,
+        "qualityReady": true,
+        "candidateProjectionReady": true,
+        "labelsBilingual": true,
+        "notDuplicate": true,
+        "candidateLimitValid": true
+      },
+      "expected": { "nearbyProjectionReady": false }
+    },
+    {
+      "id": "cross-domain-and-self-blocked",
+      "input": {
+        "geoRegistryReady": true,
+        "sourceGeoReady": true,
+        "internalLinksReady": true,
+        "entityProjectionReady": true,
+        "candidatePresent": true,
+        "notSelf": false,
+        "sameDomain": false,
+        "authoritativeGeoRelation": true,
+        "distancePrecomputed": true,
+        "distanceInRange": true,
+        "qualityReady": true,
+        "candidateProjectionReady": true,
+        "labelsBilingual": true,
+        "notDuplicate": true,
+        "candidateLimitValid": true
+      },
+      "expected": { "nearbyProjectionReady": false }
+    },
+    {
+      "id": "candidate-quality-projection-language-blocked",
+      "input": {
+        "geoRegistryReady": true,
+        "sourceGeoReady": true,
+        "internalLinksReady": true,
+        "entityProjectionReady": true,
+        "candidatePresent": true,
+        "notSelf": true,
+        "sameDomain": true,
+        "authoritativeGeoRelation": true,
+        "distancePrecomputed": true,
+        "distanceInRange": true,
+        "qualityReady": false,
+        "candidateProjectionReady": false,
+        "labelsBilingual": false,
+        "notDuplicate": true,
+        "candidateLimitValid": true
+      },
+      "expected": { "nearbyProjectionReady": false }
+    },
+    {
+      "id": "upstream-and-limit-blocked",
+      "input": {
+        "geoRegistryReady": false,
+        "sourceGeoReady": false,
+        "internalLinksReady": false,
+        "entityProjectionReady": false,
+        "candidatePresent": false,
+        "notSelf": true,
+        "sameDomain": true,
+        "authoritativeGeoRelation": false,
+        "distancePrecomputed": true,
+        "distanceInRange": true,
+        "qualityReady": true,
+        "candidateProjectionReady": true,
+        "labelsBilingual": true,
+        "notDuplicate": true,
+        "candidateLimitValid": false
+      },
+      "expected": { "nearbyProjectionReady": false }
+    }
+  ]
+}
