@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "drkhaleej.import.internalLinkIntelligence.v1",
+  "cases": [
+    {
+      "id": "ready-but-private",
+      "input": {
+        "pageValueReady": true,
+        "internalLinksProjectionReady": true,
+        "cacheRowsPresent": true,
+        "cacheFresh": true,
+        "hasSelfLink": false,
+        "hasDuplicateTarget": false,
+        "anchorsBilingual": true,
+        "targetsProjectionReady": true,
+        "targetQualityReady": true,
+        "withinGroupCapacity": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      },
+      "expected": {
+        "internalLinksReady": true,
+        "publishReady": false,
+        "sitemapEligible": false
+      }
+    },
+    {
+      "id": "self-and-duplicate-blocked",
+      "input": {
+        "pageValueReady": true,
+        "internalLinksProjectionReady": true,
+        "cacheRowsPresent": true,
+        "cacheFresh": true,
+        "hasSelfLink": true,
+        "hasDuplicateTarget": true,
+        "anchorsBilingual": true,
+        "targetsProjectionReady": true,
+        "targetQualityReady": true,
+        "withinGroupCapacity": true
+      },
+      "expected": { "internalLinksReady": false }
+    },
+    {
+      "id": "stale-cache-blocked",
+      "input": {
+        "pageValueReady": true,
+        "internalLinksProjectionReady": true,
+        "cacheRowsPresent": true,
+        "cacheFresh": false,
+        "hasSelfLink": false,
+        "hasDuplicateTarget": false,
+        "anchorsBilingual": true,
+        "targetsProjectionReady": true,
+        "targetQualityReady": true,
+        "withinGroupCapacity": true
+      },
+      "expected": { "internalLinksReady": false }
+    },
+    {
+      "id": "target-quality-and-language-blocked",
+      "input": {
+        "pageValueReady": true,
+        "internalLinksProjectionReady": true,
+        "cacheRowsPresent": true,
+        "cacheFresh": true,
+        "hasSelfLink": false,
+        "hasDuplicateTarget": false,
+        "anchorsBilingual": false,
+        "targetsProjectionReady": false,
+        "targetQualityReady": false,
+        "withinGroupCapacity": true
+      },
+      "expected": { "internalLinksReady": false }
+    },
+    {
+      "id": "page-value-and-capacity-blocked",
+      "input": {
+        "pageValueReady": false,
+        "internalLinksProjectionReady": true,
+        "cacheRowsPresent": true,
+        "cacheFresh": true,
+        "hasSelfLink": false,
+        "hasDuplicateTarget": false,
+        "anchorsBilingual": true,
+        "targetsProjectionReady": true,
+        "targetQualityReady": true,
+        "withinGroupCapacity": false
+      },
+      "expected": { "internalLinksReady": false }
+    }
+  ]
+}
