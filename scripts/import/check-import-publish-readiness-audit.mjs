@@ -14,6 +14,7 @@ import './check-import-pharmacy-private-admin-server-action.mjs';
 import './check-import-pharmacy-private-admin-runtime-context.mjs';
 import './check-import-pharmacy-private-admin-runtime-executor.mjs';
 import './check-import-pharmacy-durable-publish-reference.mjs';
+import './check-import-pharmacy-preview-canary-activation.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
