@@ -7,6 +7,7 @@ import type {
 
 export type PharmacyPrivateAdminServerActionBlocker =
   | "action_disabled"
+  | "operation_not_enabled"
   | "invalid_operation"
   | "invalid_entity"
   | "entity_not_allowed"
@@ -29,6 +30,7 @@ export type PharmacyPrivateAdminServerActionExecutor = (input: {
 
 export type PharmacyPrivateAdminServerActionDependencies = {
   executionEnabled: boolean;
+  enabledOperations: readonly PharmacyPrivateAdminOperation[];
   environment: string | undefined;
   allowedEntityIds: readonly string[];
   execute: PharmacyPrivateAdminServerActionExecutor;
@@ -55,6 +57,8 @@ function isOperation(value: string | null): value is PharmacyPrivateAdminOperati
 export function createPharmacyPrivateAdminServerAction(
   dependencies: PharmacyPrivateAdminServerActionDependencies,
 ) {
+  const enabledOperations = new Set(dependencies.enabledOperations);
+
   return async function runPharmacyPrivateAdminServerAction(input: {
     actorId: string;
     formData: FormData;
@@ -67,6 +71,9 @@ export function createPharmacyPrivateAdminServerAction(
 
     if (!dependencies.executionEnabled) blockers.push("action_disabled");
     if (!isOperation(operationValue)) blockers.push("invalid_operation");
+    if (isOperation(operationValue) && !enabledOperations.has(operationValue)) {
+      blockers.push("operation_not_enabled");
+    }
     if (!entityId) blockers.push("invalid_entity");
     if (entityId && !dependencies.allowedEntityIds.includes(entityId)) blockers.push("entity_not_allowed");
 
