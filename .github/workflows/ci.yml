@@ -22,45 +22,31 @@ jobs:
         run: corepack prepare pnpm@10.22.0 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: SEO sequential diagnostic
-        id: seo_diag
-        continue-on-error: true
-        shell: bash
-        run: |
-          node <<'NODE'
-          const { readFileSync, writeFileSync } = require('node:fs');
-          const { spawnSync } = require('node:child_process');
-          const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
-          const commands = pkg.scripts['seo:check'].split(' && ');
-          for (const [index, command] of commands.entries()) {
-            const result = spawnSync(command, {
-              shell: true,
-              encoding: 'utf8',
-              env: process.env,
-            });
-            if (result.status !== 0) {
-              writeFileSync('seo-failure.txt', [
-                `FAILED_INDEX=${index + 1}`,
-                `FAILED_COMMAND=${command}`,
-                `FAILED_STATUS=${result.status}`,
-                '',
-                'STDOUT:',
-                result.stdout || '',
-                '',
-                'STDERR:',
-                result.stderr || '',
-              ].join('\n'));
-              process.exit(result.status || 1);
-            }
-          }
-          writeFileSync('seo-failure.txt', 'NO_FAILURE\n');
-          NODE
-      - name: Upload SEO diagnostic artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: seo-diagnostic
-          path: seo-failure.txt
-      - name: Fail when diagnostic failed
-        if: steps.seo_diag.outcome == 'failure'
-        run: exit 1
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test:unit
+      - name: Build
+        run: pnpm build
+      - name: Routes check
+        run: pnpm routes:check
+      - name: Env check
+        run: pnpm env:check
+      - name: Validate migrations
+        run: pnpm db:validate:migrations
+      - name: Validate seeds
+        run: pnpm db:validate:seeds
+      - name: Validate Iran geo import contract
+        run: pnpm geo:validate:iran-import
+      - name: Validate Oman geo guardrails
+        run: pnpm geo:check:oman
+      - name: Validate SEO market gate
+        run: pnpm seo:market-gate
+      - name: Static RLS tests
+        run: pnpm test:db:rls
+      - name: Static seed tests
+        run: pnpm test:db:seed
+      - name: SEO check
+        run: pnpm seo:check
