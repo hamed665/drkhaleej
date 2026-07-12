@@ -14,13 +14,17 @@ export type ImportPublishPersistenceAdapterBlocker =
   | "terminal_result_write_missing"
   | "adapter_not_enabled";
 
+export type ImportPublishRollbackSnapshot = ImportControlledPublishState & {
+  center?: Readonly<Record<string, unknown>>;
+};
+
 export type ImportPublishPersistenceTransactionRequest = {
   entityId: string;
   actorId: string;
   idempotencyKey: string;
   requestHash: string;
   expectedVersion: string;
-  rollbackSnapshot: ImportControlledPublishState;
+  rollbackSnapshot: ImportPublishRollbackSnapshot;
   auditSchemaVersion: string;
   reservationExpiresAt: string;
   rollbackExpiresAt: string;
@@ -47,36 +51,14 @@ export type ImportPublishPersistenceTerminalWriteRequest = {
 };
 
 export type ImportPublishPersistenceTerminalWriteResult =
-  | {
-      kind: "persisted";
-      reservationId: string;
-      auditEventId: string;
-      outcome: ImportPublishPersistenceTerminalResult["status"];
-    }
-  | {
-      kind: "replayed";
-      terminalResult: ImportPublishPersistenceTerminalResult;
-    }
-  | {
-      kind: "conflict";
-      reason: "terminal_identity_mismatch";
-    }
-  | {
-      kind: "failed";
-      reason: "idempotency_record_not_found" | "rollback_snapshot_not_found" | "rpc_failed";
-    };
+  | { kind: "persisted"; reservationId: string; auditEventId: string; outcome: ImportPublishPersistenceTerminalResult["status"] }
+  | { kind: "replayed"; terminalResult: ImportPublishPersistenceTerminalResult }
+  | { kind: "conflict"; reason: "terminal_identity_mismatch" }
+  | { kind: "failed"; reason: "idempotency_record_not_found" | "rollback_snapshot_not_found" | "rpc_failed" };
 
 export type ImportPublishPersistenceTransactionResult =
-  | {
-      kind: "reserved";
-      reservationId: string;
-      rollbackSnapshotId: string;
-      auditEventId: string;
-    }
-  | {
-      kind: "replayed";
-      terminalResult: ImportPublishPersistenceTerminalResult;
-    }
+  | { kind: "reserved"; reservationId: string; rollbackSnapshotId: string; auditEventId: string }
+  | { kind: "replayed"; terminalResult: ImportPublishPersistenceTerminalResult }
   | {
       kind: "conflict";
       reason:
@@ -85,10 +67,7 @@ export type ImportPublishPersistenceTransactionResult =
         | "request_already_in_progress"
         | "concurrent_idempotency_conflict";
     }
-  | {
-      kind: "failed";
-      reason: "transaction_aborted" | "rpc_failed";
-    };
+  | { kind: "failed"; reason: "transaction_aborted" | "rpc_failed" };
 
 export interface ImportPrivatePublishPersistenceAdapter {
   runReservationSnapshotAuditTransaction(
