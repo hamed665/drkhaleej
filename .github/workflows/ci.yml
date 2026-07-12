@@ -23,10 +23,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: SEO diagnostic
+        id: seo
         shell: bash
         run: |
           set +e
           pnpm seo:check > seo-diagnostic.log 2>&1
-          status=$?
-          tail -n 80 seo-diagnostic.log
-          exit $status
+          echo $? > seo-diagnostic.status
+          exit 0
+      - name: Upload SEO diagnostic artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-diagnostic
+          path: |
+            seo-diagnostic.log
+            seo-diagnostic.status
+      - name: Fail when SEO diagnostic failed
+        shell: bash
+        run: exit "$(cat seo-diagnostic.status)"
