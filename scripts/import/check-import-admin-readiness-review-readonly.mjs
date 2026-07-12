@@ -47,7 +47,8 @@ for (const token of [
 for (const token of [
   'ImportReadinessReviewReadOnlyPanel',
   'getImportAdminReadinessReviewReadOnlyModel',
-  'Read-only boundary',
+  'Controlled boundary',
+  'Readiness data remains read-only.',
 ]) {
   assert(page.includes(token), `${pagePath} must include ${token}.`);
 }
