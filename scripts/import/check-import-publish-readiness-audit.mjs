@@ -8,6 +8,7 @@ import './check-import-pharmacy-private-mutation-adapter.mjs';
 import './check-import-supabase-pharmacy-private-mutation-writer.mjs';
 import './check-import-pharmacy-private-rollback.mjs';
 import './check-import-pharmacy-private-public-exposure.mjs';
+import './check-import-pharmacy-private-admin-workflow.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
