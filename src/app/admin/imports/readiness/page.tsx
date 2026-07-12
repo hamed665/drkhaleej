@@ -3,20 +3,20 @@ import { ImportPharmacyPrivateAdminControlPanel } from "@/components/admin/impor
 import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-readiness-review-readonly-panel";
 import { getImportAdminGeoPerformanceReadOnlyModel } from "@/server/admin/import-admin-geo-performance-readonly";
 import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-admin-readiness-review-readonly";
-import { resolvePharmacyPreviewCanaryActivation } from "@/server/admin/import-pharmacy-preview-canary-activation";
+import { getPharmacyMinimalAdminUiModel } from "@/server/admin/import-pharmacy-minimal-admin-ui-model";
 
 export default function AdminImportReadinessPage() {
   const geoPerformanceModel = getImportAdminGeoPerformanceReadOnlyModel();
   const readinessReviewModel = getImportAdminReadinessReviewReadOnlyModel();
-  const activation = resolvePharmacyPreviewCanaryActivation(process.env);
+  const pharmacyUiModel = getPharmacyMinimalAdminUiModel();
 
   return (
     <div className="space-y-6">
       <ImportGeoPerformanceReadOnlyPanel model={geoPerformanceModel} />
       <ImportReadinessReviewReadOnlyPanel model={readinessReviewModel} />
       <ImportPharmacyPrivateAdminControlPanel
-        entityId={activation.enabled ? activation.entityId : null}
-        activationEnabled={activation.enabled}
+        entityId={pharmacyUiModel.entityId}
+        activationEnabled={pharmacyUiModel.activationEnabled}
       />
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-950">Controlled boundary</h2>
