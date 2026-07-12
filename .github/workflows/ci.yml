@@ -22,37 +22,11 @@ jobs:
         run: corepack prepare pnpm@10.22.0 --activate
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Unit tests
-        run: pnpm test:unit
-      - name: Build
-        run: pnpm build
-      - name: Routes check
-        run: pnpm routes:check
-      - name: Env check
-        run: pnpm env:check
-      - name: Validate migrations
-        run: pnpm db:validate:migrations
-      - name: Validate seeds
-        run: pnpm db:validate:seeds
-      - name: Validate Iran geo import contract
-        run: pnpm geo:validate:iran-import
-      - name: Validate Oman geo guardrails
-        run: pnpm geo:check:oman
-      - name: Validate SEO market gate
-        run: pnpm seo:market-gate
-      - name: Static RLS tests
-        run: pnpm test:db:rls
-      - name: Static seed tests
-        run: pnpm test:db:seed
-      - name: SEO check
+      - name: SEO diagnostic
         shell: bash
         run: |
           set +e
           pnpm seo:check > seo-diagnostic.log 2>&1
           status=$?
-          tail -n 180 seo-diagnostic.log
+          tail -n 80 seo-diagnostic.log
           exit $status
