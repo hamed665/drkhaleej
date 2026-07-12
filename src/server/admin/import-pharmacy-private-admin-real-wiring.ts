@@ -43,6 +43,12 @@ export type PharmacyPrivateAdminRealWiringDependencies = {
   mutationRpcClient: ImportPharmacyMutationRpcClient;
   rollbackRpcClient: ImportPharmacyRollbackRpcClient;
   loadPublishContext(input: { actorId: string; entityId: string }): Promise<PharmacyPrivateAdminPublishContext | null>;
+  verifyPublishReview(input: {
+    actorId: string;
+    entityId: string;
+    expectedSnapshotHash: string;
+    expectedEntityFingerprint: string;
+  }): Promise<boolean>;
   createPublishReference(input: PharmacyPrivateAdminPublishReferenceInput): Promise<string | null>;
   resolveRollbackRequest(input: {
     actorId: string;
@@ -88,6 +94,14 @@ export function createPharmacyPrivateAdminRealPorts(
     async privatePublish({ actorId, entityId }) {
       const context = await dependencies.loadPublishContext({ actorId, entityId });
       if (!context || !identitiesMatch(context, actorId, entityId)) return { ok: false, reference: null };
+
+      const reviewApproved = await dependencies.verifyPublishReview({
+        actorId,
+        entityId,
+        expectedSnapshotHash: context.canaryInput.expectedSnapshotHash,
+        expectedEntityFingerprint: context.canaryInput.expectedEntityFingerprint,
+      });
+      if (!reviewApproved) return { ok: false, reference: null };
 
       const canary = await reservationRunner(
         context.canaryInput,
