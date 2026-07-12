@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createClient } from "@supabase/supabase-js";
+
 import {
   buildPharmacyAdminBoundedReadState,
   isPharmacyAdminBoundedReadStateFresh,
@@ -162,4 +164,21 @@ export function createPharmacyAdminReadStateStore(
       return state && isPharmacyAdminBoundedReadStateFresh(state, input.now) ? state : null;
     },
   };
+}
+
+export function createPharmacyAdminReadStateStoreFromEnvironment(
+  environment: Record<string, string | undefined> = process.env,
+): PharmacyAdminReadStateStore | null {
+  const url = environment.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = environment.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (environment.VERCEL_ENV !== "preview" || !url || !key) return null;
+
+  const client = createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  });
+  return createPharmacyAdminReadStateStore(client as unknown as PharmacyAdminReadStateClient);
 }

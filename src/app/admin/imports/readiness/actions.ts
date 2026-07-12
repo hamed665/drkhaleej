@@ -2,6 +2,13 @@
 
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import {
+  buildPharmacyAdminBoundedReadState,
+  type PharmacyAdminBoundedReadState,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
+} from "@/server/admin/import-pharmacy-admin-bounded-read-state";
+import { createPharmacyAdminReadStateStoreFromEnvironment } from "@/server/admin/import-pharmacy-admin-read-state-store";
+import {
   createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment,
   loadPharmacyPrivateAdminRuntimeContext,
 } from "@/server/admin/import-pharmacy-private-admin-runtime-context";
@@ -11,18 +18,87 @@ import {
 } from "@/server/admin/import-pharmacy-private-admin-server-action";
 
 const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review"] as const;
+const READ_STATE_TTL_MS = 15 * 60 * 1000;
+
+export type PharmacyPrivateAdminActionStateResult = PharmacyPrivateAdminServerActionResult & {
+  readState?: PharmacyAdminBoundedReadState | null;
+};
 
 function parseAllowlist(value: string | undefined): string[] {
   if (!value) return [];
   return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
 }
 
+function readString(record: Readonly<Record<string, unknown>>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" ? value : null;
+}
+
+function readBoolean(record: Readonly<Record<string, unknown>>, key: string): boolean | null {
+  const value = record[key];
+  return typeof value === "boolean" ? value : null;
+}
+
+function buildBoundedRecords(
+  rollbackSnapshot: Readonly<Record<string, unknown>>,
+): {
+  current: Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+  proposed: Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+} | null {
+  const center = rollbackSnapshot.center;
+  if (typeof center !== "object" || center === null || Array.isArray(center)) return null;
+  const centerRecord = center as Readonly<Record<string, unknown>>;
+  const status = readString(centerRecord, "status");
+  const isActive = readBoolean(centerRecord, "isActive");
+  const isFeatured = readBoolean(centerRecord, "isFeatured");
+  const visibility = readString(rollbackSnapshot, "visibility");
+  const indexPolicy = readString(rollbackSnapshot, "indexPolicy");
+  const sitemapPolicy = readString(rollbackSnapshot, "sitemapPolicy");
+  const projectionVersion = readString(rollbackSnapshot, "projectionVersion");
+  const canonicalPath = readString(rollbackSnapshot, "canonicalRoute");
+  if (
+    status === null ||
+    isActive === null ||
+    isFeatured === null ||
+    visibility === null ||
+    indexPolicy === null ||
+    sitemapPolicy === null ||
+    projectionVersion === null ||
+    canonicalPath === null
+  ) return null;
+
+  const current = {
+    status,
+    is_active: isActive,
+    is_featured: isFeatured,
+    visibility,
+    index_policy: indexPolicy,
+    sitemap_policy: sitemapPolicy,
+    projection_version: projectionVersion,
+    canonical_path: canonicalPath,
+  } satisfies Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+
+  return {
+    current,
+    proposed: {
+      ...current,
+      is_active: false,
+      is_featured: false,
+      visibility: "private",
+      index_policy: "noindex",
+      sitemap_policy: "excluded",
+    },
+  };
+}
+
 export async function runPharmacyPrivateAdminAction(
   formData: FormData,
-): Promise<PharmacyPrivateAdminServerActionResult> {
+): Promise<PharmacyPrivateAdminActionStateResult> {
   const admin = await requirePlatformAdmin();
   const allowedActorIds = parseAllowlist(process.env.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
   const allowedEntityIds = parseAllowlist(process.env.IMPORT_PREVIEW_CANARY_ENTITY_IDS);
+  let persistedReadState: PharmacyAdminBoundedReadState | null = null;
+
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: process.env.VERCEL_ENV === "preview",
     enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS,
@@ -44,6 +120,7 @@ export async function runPharmacyPrivateAdminAction(
       }
 
       const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();
+      const store = createPharmacyAdminReadStateStoreFromEnvironment();
       const context = reader
         ? await loadPharmacyPrivateAdminRuntimeContext(
             {
@@ -60,26 +137,90 @@ export async function runPharmacyPrivateAdminAction(
           )
         : null;
 
+      if (!context?.ok || !store) {
+        return {
+          operation,
+          status: "failed",
+          entityId,
+          blockers: ["readiness_blocked"],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: null,
+        };
+      }
+
+      const rollbackSnapshot = context.context.canaryInput.reservationRequest.rollbackSnapshot;
+      const records = buildBoundedRecords(rollbackSnapshot as Readonly<Record<string, unknown>>);
+      if (!records) {
+        return {
+          operation,
+          status: "failed",
+          entityId,
+          blockers: ["readiness_blocked"],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: null,
+        };
+      }
+
+      const now = new Date();
+      const createdAt = now.toISOString();
+      const state = buildPharmacyAdminBoundedReadState({
+        operation,
+        actorId,
+        entityId,
+        snapshotHash: context.snapshotHash,
+        entityFingerprint: context.context.canaryInput.expectedEntityFingerprint,
+        createdAt,
+        expiresAt: new Date(now.getTime() + READ_STATE_TTL_MS).toISOString(),
+        reviewedAt: operation === "review" ? createdAt : null,
+        current: records.current,
+        proposed: records.proposed,
+      });
+      const persisted = await store.persist({ state, current: records.current, proposed: records.proposed });
+      const readback = persisted
+        ? await store.readLatestFresh({ actorId, entityId, operation, now: createdAt })
+        : null;
+      if (!persisted || !readback || readback.snapshotHash !== context.snapshotHash) {
+        return {
+          operation,
+          status: "failed",
+          entityId,
+          blockers: ["readiness_blocked"],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: null,
+        };
+      }
+
+      persistedReadState = readback;
       return {
         operation,
-        status: context?.ok ? "completed" : "failed",
+        status: "completed",
         entityId,
-        blockers: context?.ok ? [] : ["readiness_blocked"],
+        blockers: [],
         publicVisibility: "private",
         indexEligible: false,
         sitemapEligible: false,
         routeEnabled: false,
-        executionReference: context?.ok ? context.snapshotHash : null,
+        executionReference: readback.snapshotHash,
       };
     },
   });
 
-  return action({ actorId: admin.id, formData });
+  const result = await action({ actorId: admin.id, formData });
+  return { ...result, readState: persistedReadState };
 }
 
 export async function runPharmacyPrivateAdminActionState(
-  _previousState: PharmacyPrivateAdminServerActionResult | null,
+  _previousState: PharmacyPrivateAdminActionStateResult | null,
   formData: FormData,
-): Promise<PharmacyPrivateAdminServerActionResult> {
+): Promise<PharmacyPrivateAdminActionStateResult> {
   return runPharmacyPrivateAdminAction(formData);
 }

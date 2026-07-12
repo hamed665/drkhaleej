@@ -13,13 +13,13 @@ const steps = [
   {
     operation: "dry_run",
     title: "Generate dry-run",
-    description: "Build the deterministic plan and proposed field changes without writing to the entity.",
+    description: "Build and persist the bounded private plan without writing to the Pharmacy entity.",
     readOnlyEnabled: true,
   },
   {
     operation: "review",
     title: "Review exact diff",
-    description: "Review blockers, the proposed private state, and the rollback boundary before approval.",
+    description: "Persist the reviewed state and render the verified allowlisted field changes.",
     readOnlyEnabled: true,
   },
   {
@@ -36,6 +36,12 @@ const steps = [
   },
 ] as const;
 
+function renderValue(value: string | boolean | null): string {
+  if (value === null) return "Null";
+  if (typeof value === "boolean") return value ? "True" : "False";
+  return value;
+}
+
 export function ImportPharmacyPrivateAdminControlPanel({
   entityId,
   activationEnabled,
@@ -43,6 +49,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
   const [result, formAction, pending] = useActionState(runPharmacyPrivateAdminActionState, null);
   const controlsEnabled = activationEnabled && entityId !== null;
   const workflow = result && "workflow" in result ? result.workflow : null;
+  const readState = result?.readState ?? null;
   const blockers = result && !result.ok ? result.blockers : [];
 
   return (
@@ -59,8 +66,8 @@ export function ImportPharmacyPrivateAdminControlPanel({
             Controlled Pharmacy workflow
           </h2>
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-            Dry-run and review are available only for the allowlisted Preview canary. Private publish, rollback,
-            public routing, indexing, sitemap inclusion, and bulk execution remain unavailable.
+            Dry-run and review persist a bounded server-side state for the allowlisted Preview canary. Private publish,
+            rollback, public routing, indexing, sitemap inclusion, and bulk execution remain unavailable.
           </p>
         </div>
         <span
@@ -132,12 +139,55 @@ export function ImportPharmacyPrivateAdminControlPanel({
         })}
       </ol>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-sky-200 bg-white/80 p-5" aria-labelledby="pharmacy-diff-title">
-          <h3 id="pharmacy-diff-title" className="font-bold text-slate-950">Read-only result</h3>
+      <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
+        <section className="overflow-hidden rounded-2xl border border-sky-200 bg-white/80" aria-labelledby="pharmacy-diff-title">
+          <div className="border-b border-sky-100 p-5">
+            <h3 id="pharmacy-diff-title" className="font-bold text-slate-950">Persisted exact diff</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-700">
+              Only the eight allowlisted fields can appear. Stored diff JSON is not trusted; the server rebuilds this view from persisted current and proposed state.
+            </p>
+          </div>
+          {readState ? (
+            <div>
+              <dl className="grid gap-2 border-b border-sky-100 p-5 text-sm text-slate-700 sm:grid-cols-2">
+                <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Operation</dt><dd className="mt-1 font-semibold text-slate-950">{readState.operation}</dd></div>
+                <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Expires</dt><dd className="mt-1 font-semibold text-slate-950">{readState.expiresAt}</dd></div>
+              </dl>
+              {readState.diff.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-sky-100 text-left text-sm">
+                    <thead className="bg-sky-50/80 text-xs uppercase tracking-wide text-slate-600">
+                      <tr><th className="px-5 py-3 font-semibold">Field</th><th className="px-5 py-3 font-semibold">Before</th><th className="px-5 py-3 font-semibold">After</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-sky-100 text-slate-700">
+                      {readState.diff.map((entry) => (
+                        <tr key={entry.field}>
+                          <th scope="row" className="whitespace-nowrap px-5 py-3 font-semibold text-slate-950">{entry.field}</th>
+                          <td className="px-5 py-3 font-mono text-xs">{renderValue(entry.before)}</td>
+                          <td className="px-5 py-3 font-mono text-xs">{renderValue(entry.after)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="p-5 text-sm leading-6 text-slate-700">No allowlisted field changes were proposed.</p>
+              )}
+            </div>
+          ) : (
+            <p className="p-5 text-sm leading-6 text-slate-700">
+              No persisted read-only state has been verified. Raw snapshots and unrestricted payloads are never rendered here.
+            </p>
+          )}
+          {blockers.length > 0 ? (
+            <p className="border-t border-rose-100 bg-rose-50 p-4 text-sm font-semibold text-rose-800">Blocked: {blockers.join(", ")}</p>
+          ) : null}
+        </section>
+
+        <section className="rounded-2xl border border-sky-200 bg-white/80 p-5" aria-labelledby="pharmacy-audit-title">
+          <h3 id="pharmacy-audit-title" className="font-bold text-slate-950">Read-state verification</h3>
           {workflow ? (
-            <dl className="mt-3 grid gap-2 text-sm text-slate-700">
-              <div className="flex justify-between gap-4"><dt>Operation</dt><dd className="font-semibold text-slate-950">{workflow.operation}</dd></div>
+            <dl className="mt-3 grid gap-3 text-sm text-slate-700">
               <div className="flex justify-between gap-4"><dt>Status</dt><dd className="font-semibold text-slate-950">{workflow.status}</dd></div>
               <div className="flex justify-between gap-4"><dt>Visibility</dt><dd className="font-semibold text-slate-950">{workflow.publicVisibility}</dd></div>
               <div className="flex justify-between gap-4"><dt>Index eligible</dt><dd className="font-semibold text-slate-950">No</dd></div>
@@ -145,21 +195,15 @@ export function ImportPharmacyPrivateAdminControlPanel({
               <div className="flex justify-between gap-4"><dt>Route enabled</dt><dd className="font-semibold text-slate-950">No</dd></div>
             </dl>
           ) : (
-            <p className="mt-2 text-sm leading-6 text-slate-700">
-              No verified read-only action has run. Raw snapshots and unrestricted payloads are never rendered here.
-            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">No verified read-only action has run.</p>
           )}
-          {blockers.length > 0 ? (
-            <p className="mt-3 text-sm font-semibold text-rose-800">Blocked: {blockers.join(", ")}</p>
-          ) : null}
-        </section>
-        <section className="rounded-2xl border border-sky-200 bg-white/80 p-5" aria-labelledby="pharmacy-audit-title">
-          <h3 id="pharmacy-audit-title" className="font-bold text-slate-950">Audit timeline</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            Read-only actions return state through the authenticated Server Action. No mutation audit is created until publish is separately enabled.
-          </p>
-          {workflow?.executionReference ? (
-            <p className="mt-3 font-mono text-xs text-slate-600">Verification: {workflow.executionReference.slice(0, 12)}…</p>
+          {readState ? (
+            <div className="mt-4 space-y-2 border-t border-sky-100 pt-4 font-mono text-xs text-slate-600">
+              <p>Snapshot: {readState.snapshotHash.slice(0, 12)}…</p>
+              <p>Fingerprint: {readState.entityFingerprint.slice(0, 12)}…</p>
+              <p>Created: {readState.createdAt}</p>
+              {readState.reviewedAt ? <p>Reviewed: {readState.reviewedAt}</p> : null}
+            </div>
           ) : null}
         </section>
       </div>
