@@ -15,6 +15,7 @@ const publishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-p
 const pharmacyPublishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-pharmacy-private-publish-rpc.mjs');
 const pharmacyRollbackValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-private-rollback.mjs');
 const durableReferenceValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-durable-publish-reference.mjs');
+const pharmacyReadStateValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-admin-read-state-persistence.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
@@ -23,6 +24,7 @@ const publishRpcMigrationName = '0069_import_publish_transaction_rpcs.sql';
 const pharmacyPublishRpcMigrationName = '0070_import_pharmacy_private_publish_rpc.sql';
 const pharmacyRollbackMigrationName = '0071_import_pharmacy_private_rollback_rpc.sql';
 const durableReferenceMigrationName = '0072_import_pharmacy_publish_references.sql';
+const pharmacyReadStateMigrationName = '0073_import_pharmacy_admin_read_states.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -31,6 +33,7 @@ const publishRpcMigrationPath = path.join(migrationsDir, publishRpcMigrationName
 const pharmacyPublishRpcMigrationPath = path.join(migrationsDir, pharmacyPublishRpcMigrationName);
 const pharmacyRollbackMigrationPath = path.join(migrationsDir, pharmacyRollbackMigrationName);
 const durableReferenceMigrationPath = path.join(migrationsDir, durableReferenceMigrationName);
+const pharmacyReadStateMigrationPath = path.join(migrationsDir, pharmacyReadStateMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -39,6 +42,7 @@ const hiddenPublishRpcMigrationPath = path.join(migrationsDir, `.publish-rpc-${p
 const hiddenPharmacyPublishRpcMigrationPath = path.join(migrationsDir, `.pharmacy-publish-rpc-${pharmacyPublishRpcMigrationName}.hidden`);
 const hiddenPharmacyRollbackMigrationPath = path.join(migrationsDir, `.pharmacy-rollback-${pharmacyRollbackMigrationName}.hidden`);
 const hiddenDurableReferenceMigrationPath = path.join(migrationsDir, `.durable-reference-${durableReferenceMigrationName}.hidden`);
+const hiddenPharmacyReadStateMigrationPath = path.join(migrationsDir, `.pharmacy-read-state-${pharmacyReadStateMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -49,6 +53,7 @@ const currentOnlyMigrations = [
   [pharmacyPublishRpcMigrationName, pharmacyPublishRpcMigrationPath, hiddenPharmacyPublishRpcMigrationPath],
   [pharmacyRollbackMigrationName, pharmacyRollbackMigrationPath, hiddenPharmacyRollbackMigrationPath],
   [durableReferenceMigrationName, durableReferenceMigrationPath, hiddenDurableReferenceMigrationPath],
+  [pharmacyReadStateMigrationName, pharmacyReadStateMigrationPath, hiddenPharmacyReadStateMigrationPath],
 ];
 
 function fail(message) {
@@ -143,6 +148,11 @@ function validateDurableReferenceMigration() {
   execFileSync(process.execPath, [durableReferenceValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
+function validatePharmacyReadStateMigration() {
+  requireCondition(existsSync(pharmacyReadStateMigrationPath), `${pharmacyReadStateMigrationName} is missing.`);
+  execFileSync(process.execPath, [pharmacyReadStateValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -171,5 +181,6 @@ validatePublishRpcMigration();
 validatePharmacyPublishRpcMigration();
 validatePharmacyRollbackMigration();
 validateDurableReferenceMigration();
+validatePharmacyReadStateMigration();
 
 console.log('Current migration validation passed.');

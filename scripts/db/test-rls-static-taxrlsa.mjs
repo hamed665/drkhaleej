@@ -1,11 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import {
-  existsSync,
-  readFileSync,
-  renameSync,
-  statSync,
-} from 'node:fs';
+import { existsSync, readFileSync, renameSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,20 +25,14 @@ const migrations = {
   publishPersistence: '0068_import_publish_persistence_schema.sql',
   publishRpcs: '0069_import_publish_transaction_rpcs.sql',
   durableReference: '0072_import_pharmacy_publish_references.sql',
+  pharmacyAdminReadState: '0073_import_pharmacy_admin_read_states.sql',
 };
 
 const migrationPaths = Object.fromEntries(
-  Object.entries(migrations).map(([key, fileName]) => [
-    key,
-    path.join(migrationsDir, fileName),
-  ]),
+  Object.entries(migrations).map(([key, fileName]) => [key, path.join(migrationsDir, fileName)]),
 );
-
 const hiddenMigrationPaths = Object.fromEntries(
-  Object.entries(migrations).map(([key, fileName]) => [
-    key,
-    path.join(migrationsDir, `.rls-static-${key}-${fileName}.hidden`),
-  ]),
+  Object.entries(migrations).map(([key, fileName]) => [key, path.join(migrationsDir, `.rls-static-${key}-${fileName}.hidden`)]),
 );
 
 function fail(message) {
@@ -80,9 +69,7 @@ function validateNoAdminPolicies(content, label) {
     [/\bfor\s+delete\b/i, `${label} must not add DELETE policies.`],
     [/\bto\s+anon\b/i, `${label} must not expose anon access.`],
     [/\bto\s+authenticated\b/i, `${label} must not expose authenticated access.`],
-  ]) {
-    forbidPattern(content, pattern, message);
-  }
+  ]) forbidPattern(content, pattern, message);
 }
 
 function validateTaxonomyRlsMigration() {
@@ -100,9 +87,9 @@ function validateTaxonomyRlsMigration() {
     [/alter\s+table\s+public\.healthcare_verticals\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on healthcare_verticals.'],
     [/alter\s+table\s+public\.center_categories\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on center_categories.'],
     [/alter\s+table\s+public\.center_category_assignments\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on center_category_assignments.'],
-    [/create\s+policy\s+healthcare_verticals_select_public_active[\s\S]*on\s+public\.healthcare_verticals[\s\S]*for\s+select[\s\S]*to\s+anon\s*,\s*authenticated[\s\S]*deleted_at\s+is\s+null[\s\S]*is_active\s*=\s*true/i, 'healthcare_verticals policy must be public active SELECT only.'],
-    [/create\s+policy\s+center_categories_select_public_active[\s\S]*on\s+public\.center_categories[\s\S]*for\s+select[\s\S]*to\s+anon\s*,\s*authenticated[\s\S]*deleted_at\s+is\s+null[\s\S]*is_active\s*=\s*true/i, 'center_categories policy must be public active SELECT only.'],
-    [/create\s+policy\s+center_category_assignments_select_public_approved[\s\S]*on\s+public\.center_category_assignments[\s\S]*for\s+select[\s\S]*to\s+anon\s*,\s*authenticated[\s\S]*deleted_at\s+is\s+null[\s\S]*is_public\s*=\s*true[\s\S]*review_status\s*=\s*'approved'/i, 'center_category_assignments policy must be approved public SELECT only.'],
+    [/create\s+policy\s+healthcare_verticals_select_public_active[\s\S]*deleted_at\s+is\s+null[\s\S]*is_active\s*=\s*true/i, 'healthcare_verticals policy must be public active SELECT only.'],
+    [/create\s+policy\s+center_categories_select_public_active[\s\S]*deleted_at\s+is\s+null[\s\S]*is_active\s*=\s*true/i, 'center_categories policy must be public active SELECT only.'],
+    [/create\s+policy\s+center_category_assignments_select_public_approved[\s\S]*is_public\s*=\s*true[\s\S]*review_status\s*=\s*'approved'/i, 'center_category_assignments policy must be approved public SELECT only.'],
   ]) requirePattern(content, pattern, message);
 }
 
@@ -117,109 +104,62 @@ function validateSpecialtyAliasRlsMigration() {
     [/\bto\s+service_role\b/i, '0057 must not grant to service_role.'],
     [/\busing\s*\(\s*true\s*\)/i, '0057 must not use broad TRUE policy predicates.'],
   ]) forbidPattern(content, pattern, message);
-  for (const [pattern, message] of [
-    [/create\s+table\s+if\s+not\s+exists\s+public\.specialty_aliases/i, '0057 must create specialty_aliases.'],
-    [/alter\s+table\s+public\.specialty_aliases\s+enable\s+row\s+level\s+security/i, '0057 must enable RLS on specialty_aliases.'],
-    [/create\s+policy\s+specialty_aliases_select_public_active[\s\S]*on\s+public\.specialty_aliases[\s\S]*for\s+select[\s\S]*to\s+anon\s*,\s*authenticated/i, 'specialty_aliases policy must be public SELECT only.'],
-    [/from\s+public\.specialties\s+specialty/i, 'specialty_aliases policy must check parent specialties.'],
-  ]) requirePattern(content, pattern, message);
+  requirePattern(content, /create\s+table\s+if\s+not\s+exists\s+public\.specialty_aliases/i, '0057 must create specialty_aliases.');
+  requirePattern(content, /alter\s+table\s+public\.specialty_aliases\s+enable\s+row\s+level\s+security/i, '0057 must enable RLS on specialty_aliases.');
+  requirePattern(content, /create\s+policy\s+specialty_aliases_select_public_active[\s\S]*to\s+anon\s*,\s*authenticated/i, 'specialty_aliases policy must be public SELECT only.');
+  requirePattern(content, /from\s+public\.specialties\s+specialty/i, 'specialty_aliases policy must check parent specialties.');
 }
 
-function validateAdminAuditEventsRlsMigration() {
-  const content = readMigration('adminAudit');
-  validateNoAdminPolicies(content, '0058');
-  requirePattern(content, /alter\s+table\s+public\.admin_audit_events\s+enable\s+row\s+level\s+security/i, '0058 must enable RLS on admin_audit_events.');
-}
-
-function validateAdminMediaLibraryRlsMigration() {
-  const content = readMigration('adminMedia');
-  validateNoAdminPolicies(content, '0059');
-}
-
-function validateAdminCmsRlsMigration() {
-  const content = readMigration('adminCms');
-  validateNoAdminPolicies(content, '0060');
-  requirePattern(content, /alter\s+table\s+public\.cms_content_entries\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_entries.');
-  requirePattern(content, /alter\s+table\s+public\.cms_content_revisions\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_revisions.');
-}
-
-function validateImportStagingRlsMigration() {
-  const content = readMigration('importStaging');
-  validateNoAdminPolicies(content, '0061');
-  for (const tableName of [
-    'import_batches',
-    'import_files',
-    'import_raw_rows',
-    'import_validation_issues',
-    'import_entity_candidates',
-    'import_duplicate_candidates',
-    'import_mapping_results',
-    'import_publish_queue',
-  ]) {
-    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0061 must enable RLS on ${tableName}.`);
+function validateClosedMigration(key, label, requiredTables = []) {
+  const content = readMigration(key);
+  validateNoAdminPolicies(content, label);
+  forbidPattern(content, /\bto\s+service_role\b/i, `${label} must not add explicit service_role grants.`);
+  for (const tableName of requiredTables) {
+    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `${label} must enable RLS on ${tableName}.`);
   }
+  return content;
 }
 
-function validateDoctorPracticeHardeningRlsMigration() {
-  const content = readMigration('doctorPracticeHardening');
-  validateNoAdminPolicies(content, '0062');
-  requirePattern(content, /alter\s+table\s+public\.doctor_practice_locations/i, '0062 must alter doctor_practice_locations.');
-  requirePattern(content, /public_relation_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0062 must keep public relation visibility false by default.');
-}
+function validateLaterMigrations() {
+  validateClosedMigration('adminAudit', '0058', ['admin_audit_events']);
+  validateClosedMigration('adminMedia', '0059');
+  validateClosedMigration('adminCms', '0060', ['cms_content_entries', 'cms_content_revisions']);
+  validateClosedMigration('importStaging', '0061', [
+    'import_batches', 'import_files', 'import_raw_rows', 'import_validation_issues',
+    'import_entity_candidates', 'import_duplicate_candidates', 'import_mapping_results', 'import_publish_queue',
+  ]);
 
-function validateFacilityDepartmentRlsMigration() {
-  const content = readMigration('facilityDepartment');
-  validateNoAdminPolicies(content, '0063');
-  for (const tableName of ['facility_departments', 'doctor_department_assignments', 'department_services']) {
-    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0063 must enable RLS on ${tableName}.`);
-  }
-  requirePattern(content, /public_department_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department visibility false by default.');
-  requirePattern(content, /public_assignment_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep assignment visibility false by default.');
-  requirePattern(content, /public_service_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department service visibility false by default.');
-}
+  const doctorPractice = validateClosedMigration('doctorPracticeHardening', '0062');
+  requirePattern(doctorPractice, /public_relation_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0062 must keep public relation visibility false by default.');
 
-function validateImportRelationCandidatesRlsMigration() {
-  const content = readMigration('importRelationCandidates');
-  validateNoAdminPolicies(content, '0064');
-  requirePattern(content, /create\s+table\s+if\s+not\s+exists\s+public\.import_relation_candidates/i, '0064 must create import_relation_candidates.');
-  requirePattern(content, /alter\s+table\s+public\.import_relation_candidates\s+enable\s+row\s+level\s+security/i, '0064 must enable RLS on import_relation_candidates.');
-}
+  const departments = validateClosedMigration('facilityDepartment', '0063', [
+    'facility_departments', 'doctor_department_assignments', 'department_services',
+  ]);
+  for (const pattern of [
+    /public_department_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+    /public_assignment_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+    /public_service_visible\s+boolean\s+not\s+null\s+default\s+false/i,
+  ]) requirePattern(departments, pattern, '0063 must keep public visibility false by default.');
 
-function validateScheduleRlsHardeningMigration() {
-  const content = readMigration('scheduleRlsHardening');
-  validateNoAdminPolicies(content, '0065');
-  for (const tableName of ['doctor_schedules', 'doctor_schedule_exceptions', 'appointment_slots']) {
-    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0065 must enable RLS on ${tableName}.`);
-  }
-}
+  validateClosedMigration('importRelationCandidates', '0064', ['import_relation_candidates']);
+  validateClosedMigration('scheduleRlsHardening', '0065', [
+    'doctor_schedules', 'doctor_schedule_exceptions', 'appointment_slots',
+  ]);
+  validateClosedMigration('publishPersistence', '0068', [
+    'import_publish_idempotency_records', 'import_publish_rollback_snapshots', 'import_publish_audit_events',
+  ]);
 
-function validatePublishPersistenceRlsMigration() {
-  const content = readMigration('publishPersistence');
-  validateNoAdminPolicies(content, '0068');
-  for (const tableName of ['import_publish_idempotency_records', 'import_publish_rollback_snapshots', 'import_publish_audit_events']) {
-    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0068 must enable RLS on ${tableName}.`);
-  }
-}
-
-function validatePublishRpcSecurityMigration() {
   readMigration('publishRpcs');
   execFileSync(process.execPath, [publishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
-}
-
-function validateDurableReferenceRlsMigration() {
-  const content = readMigration('durableReference');
-  validateNoAdminPolicies(content, '0072');
-  requirePattern(content, /alter\s+table\s+public\.import_pharmacy_publish_references\s+enable\s+row\s+level\s+security/i, '0072 must enable RLS on import_pharmacy_publish_references.');
-  forbidPattern(content, /\bto\s+service_role\b/i, '0072 must not add explicit service_role grants.');
+  validateClosedMigration('durableReference', '0072', ['import_pharmacy_publish_references']);
+  validateClosedMigration('pharmacyAdminReadState', '0073', ['import_pharmacy_admin_read_states']);
 }
 
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
   }
-  for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
-    renameSync(migrationPaths[key], hiddenPath);
-  }
+  for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) renameSync(migrationPaths[key], hiddenPath);
   try {
     execFileSync(process.execPath, [legacyRlsStaticTest], { cwd: repoRoot, stdio: 'inherit' });
   } finally {
@@ -231,17 +171,7 @@ function runLegacyStaticRlsTestWithoutLaterMigrations() {
 
 validateTaxonomyRlsMigration();
 validateSpecialtyAliasRlsMigration();
-validateAdminAuditEventsRlsMigration();
-validateAdminMediaLibraryRlsMigration();
-validateAdminCmsRlsMigration();
-validateImportStagingRlsMigration();
-validateDoctorPracticeHardeningRlsMigration();
-validateFacilityDepartmentRlsMigration();
-validateImportRelationCandidatesRlsMigration();
-validateScheduleRlsHardeningMigration();
-validatePublishPersistenceRlsMigration();
-validatePublishRpcSecurityMigration();
-validateDurableReferenceRlsMigration();
+validateLaterMigrations();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');
