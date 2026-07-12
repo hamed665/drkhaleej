@@ -28,5 +28,5 @@ jobs:
           set +e
           pnpm seo:check > seo-diagnostic.log 2>&1
           status=$?
-          tail -n 260 seo-diagnostic.log
+          tail -n 35 seo-diagnostic.log
           exit $status
