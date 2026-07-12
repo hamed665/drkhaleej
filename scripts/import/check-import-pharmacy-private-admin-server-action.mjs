@@ -38,9 +38,11 @@ for (const token of [
 for (const token of [
   '"use server"',
   'requirePlatformAdmin()',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ACTION_ENABLED = false as const',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = [] as const',
+  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review"] as const',
+  'executionEnabled: process.env.VERCEL_ENV === "preview"',
   'enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS',
+  'operation !== "dry_run" && operation !== "review"',
+  'runPharmacyPrivateAdminActionState',
   'process.env.VERCEL_ENV',
   'IMPORT_PREVIEW_CANARY_ENTITY_IDS',
   'IMPORT_PREVIEW_ALLOWED_ACTOR_IDS',
@@ -60,6 +62,8 @@ for (const forbidden of [
   'sitemapEligible: true',
   'routeEnabled: true',
   'Promise.all(',
+  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["private_publish"',
+  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["rollback"',
 ]) {
   assert(!boundary.includes(forbidden), `${boundaryPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);

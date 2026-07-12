@@ -1,3 +1,9 @@
+"use client";
+
+import { useActionState } from "react";
+
+import { runPharmacyPrivateAdminActionState } from "@/app/admin/imports/readiness/actions";
+
 type PharmacyAdminControlPanelProps = {
   entityId: string | null;
   activationEnabled: boolean;
@@ -8,21 +14,25 @@ const steps = [
     operation: "dry_run",
     title: "Generate dry-run",
     description: "Build the deterministic plan and proposed field changes without writing to the entity.",
+    readOnlyEnabled: true,
   },
   {
     operation: "review",
     title: "Review exact diff",
     description: "Review blockers, the proposed private state, and the rollback boundary before approval.",
+    readOnlyEnabled: true,
   },
   {
     operation: "private_publish",
     title: "Private publish",
     description: "Apply the guarded single-Pharmacy mutation while keeping the record private and noindex.",
+    readOnlyEnabled: false,
   },
   {
     operation: "rollback",
     title: "Rollback",
     description: "Restore the protected snapshot through the durable opaque publish reference.",
+    readOnlyEnabled: false,
   },
 ] as const;
 
@@ -30,7 +40,10 @@ export function ImportPharmacyPrivateAdminControlPanel({
   entityId,
   activationEnabled,
 }: PharmacyAdminControlPanelProps) {
+  const [result, formAction, pending] = useActionState(runPharmacyPrivateAdminActionState, null);
   const controlsEnabled = activationEnabled && entityId !== null;
+  const workflow = result && "workflow" in result ? result.workflow : null;
+  const blockers = result && !result.ok ? result.blockers : [];
 
   return (
     <section
@@ -46,8 +59,8 @@ export function ImportPharmacyPrivateAdminControlPanel({
             Controlled Pharmacy workflow
           </h2>
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-            Single-entity Preview workflow for dry-run, review, private publish, and rollback. Public routing,
-            indexing, sitemap inclusion, and bulk execution remain unavailable.
+            Dry-run and review are available only for the allowlisted Preview canary. Private publish, rollback,
+            public routing, indexing, sitemap inclusion, and bulk execution remain unavailable.
           </p>
         </div>
         <span
@@ -57,7 +70,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
               : "border-slate-200 bg-white/80 text-slate-700"
           }`}
         >
-          {controlsEnabled ? "Preview canary enabled" : "Execution locked"}
+          {controlsEnabled ? "Preview read-only actions enabled" : "Execution locked"}
         </span>
       </div>
 
@@ -77,42 +90,77 @@ export function ImportPharmacyPrivateAdminControlPanel({
       </div>
 
       <ol className="mt-5 grid gap-4 lg:grid-cols-2" aria-label="Controlled Pharmacy operations">
-        {steps.map((step, index) => (
-          <li key={step.operation} className="rounded-2xl border border-sky-200 bg-white/80 p-5">
-            <div className="flex items-start gap-3">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sm font-bold text-sky-900">
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-slate-950">{step.title}</h3>
-                <p className="mt-1 text-sm leading-6 text-slate-700">{step.description}</p>
-                <button
-                  type="button"
-                  disabled
-                  aria-disabled="true"
-                  title="Server execution remains fail-closed until the final action runtime is enabled."
-                  className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500 opacity-80"
-                >
-                  {controlsEnabled ? "Runtime connection pending" : "Locked"}
-                </button>
+        {steps.map((step, index) => {
+          const actionEnabled = controlsEnabled && step.readOnlyEnabled;
+          return (
+            <li key={step.operation} className="rounded-2xl border border-sky-200 bg-white/80 p-5">
+              <div className="flex items-start gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sm font-bold text-sky-900">
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-slate-950">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-700">{step.description}</p>
+                  {step.readOnlyEnabled ? (
+                    <form action={formAction} className="mt-4">
+                      <input type="hidden" name="operation" value={step.operation} />
+                      <input type="hidden" name="entityId" value={entityId ?? ""} />
+                      <button
+                        type="submit"
+                        disabled={!actionEnabled || pending}
+                        aria-disabled={!actionEnabled || pending}
+                        className="inline-flex min-h-10 items-center justify-center rounded-xl border border-sky-300 bg-white px-4 py-2 text-sm font-semibold text-sky-900 disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-500"
+                      >
+                        {pending ? "Running…" : step.title}
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-disabled="true"
+                      title="Mutation controls remain locked."
+                      className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500 opacity-80"
+                    >
+                      Locked
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ol>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <section className="rounded-2xl border border-sky-200 bg-white/80 p-5" aria-labelledby="pharmacy-diff-title">
-          <h3 id="pharmacy-diff-title" className="font-bold text-slate-950">Exact diff</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            No reviewed dry-run is loaded. Raw snapshots and unrestricted payloads are never rendered in this panel.
-          </p>
+          <h3 id="pharmacy-diff-title" className="font-bold text-slate-950">Read-only result</h3>
+          {workflow ? (
+            <dl className="mt-3 grid gap-2 text-sm text-slate-700">
+              <div className="flex justify-between gap-4"><dt>Operation</dt><dd className="font-semibold text-slate-950">{workflow.operation}</dd></div>
+              <div className="flex justify-between gap-4"><dt>Status</dt><dd className="font-semibold text-slate-950">{workflow.status}</dd></div>
+              <div className="flex justify-between gap-4"><dt>Visibility</dt><dd className="font-semibold text-slate-950">{workflow.publicVisibility}</dd></div>
+              <div className="flex justify-between gap-4"><dt>Index eligible</dt><dd className="font-semibold text-slate-950">No</dd></div>
+              <div className="flex justify-between gap-4"><dt>Sitemap eligible</dt><dd className="font-semibold text-slate-950">No</dd></div>
+              <div className="flex justify-between gap-4"><dt>Route enabled</dt><dd className="font-semibold text-slate-950">No</dd></div>
+            </dl>
+          ) : (
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              No verified read-only action has run. Raw snapshots and unrestricted payloads are never rendered here.
+            </p>
+          )}
+          {blockers.length > 0 ? (
+            <p className="mt-3 text-sm font-semibold text-rose-800">Blocked: {blockers.join(", ")}</p>
+          ) : null}
         </section>
         <section className="rounded-2xl border border-sky-200 bg-white/80 p-5" aria-labelledby="pharmacy-audit-title">
           <h3 id="pharmacy-audit-title" className="font-bold text-slate-950">Audit timeline</h3>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            No verified operation is selected. The timeline will expose event state and timestamps, not secrets or snapshot bodies.
+            Read-only actions return state through the authenticated Server Action. No mutation audit is created until publish is separately enabled.
           </p>
+          {workflow?.executionReference ? (
+            <p className="mt-3 font-mono text-xs text-slate-600">Verification: {workflow.executionReference.slice(0, 12)}…</p>
+          ) : null}
         </section>
       </div>
 

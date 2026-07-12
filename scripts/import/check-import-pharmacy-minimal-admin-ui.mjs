@@ -22,28 +22,33 @@ const model = readFileSync(
 
 function requirePattern(source, pattern, message) {
   if (!pattern.test(source)) {
-    console.error(`❌ IMPORT-ADMIN-C Pharmacy minimal UI: ${message}`);
+    console.error(`❌ IMPORT-ADMIN-E Pharmacy read-only UI: ${message}`);
     process.exit(1);
   }
 }
 
 for (const [pattern, message] of [
+  [/"use client"/, "must use client action state for authenticated submissions"],
   [/rounded-3xl/, "must follow the existing rounded Admin card language"],
   [/bg-sky-50\/70/, "must use the existing restrained tinted panel language"],
+  [/runPharmacyPrivateAdminActionState/, "must call the guarded Server Action adapter"],
+  [/name="operation" value={step\.operation}/, "must submit one explicit operation"],
+  [/name="entityId" value={entityId \?\? ""}/, "must submit only the selected canary entity"],
   [/Generate dry-run/, "must show the dry-run stage"],
   [/Review exact diff/, "must show the review stage"],
   [/Private publish/, "must show the private publish stage"],
   [/Rollback/, "must show the rollback stage"],
-  [/Audit timeline/, "must show the audit timeline boundary"],
+  [/readOnlyEnabled: false/, "must keep mutation stages disabled"],
+  [/Mutation controls remain locked/, "must state the mutation lock"],
   [/No bulk/, "must state the no-bulk boundary"],
   [/aria-labelledby/, "must include accessible section labelling"],
-  [/disabled/, "must keep operation controls disabled"],
 ]) requirePattern(panel, pattern, message);
 
 for (const [pattern, message] of [
   [/ImportPharmacyPrivateAdminControlPanel/, "must mount on the existing readiness page"],
   [/getPharmacyMinimalAdminUiModel/, "must consume the server-side UI model"],
-  [/Controlled boundary/, "must replace the obsolete read-only boundary copy truthfully"],
+  [/dry-run and review may execute/, "must describe the read-only capability truthfully"],
+  [/Private publish, rollback.*remain locked/s, "must preserve the mutation boundary"],
 ]) requirePattern(page, pattern, message);
 
 for (const [pattern, message] of [
@@ -55,16 +60,15 @@ for (const [pattern, message] of [
 ]) requirePattern(model, pattern, message);
 
 for (const [source, pattern, message] of [
-  [panel, /<form\b/, "must not submit a form before runtime connection"],
-  [panel, /runPharmacyPrivateAdminAction/, "must not call the Server Action before runtime connection"],
   [panel, /dangerouslySetInnerHTML/, "must not render unrestricted payload HTML"],
   [panel, /process\.env/, "panel must not read environment variables"],
+  [panel, /PUBLISH PRIVATE PHARMACY|ROLLBACK PRIVATE PHARMACY/, "panel must not expose mutation confirmations yet"],
   [page, /process\.env/, "route must not interpret runtime environment directly"],
 ]) {
   if (pattern.test(source)) {
-    console.error(`❌ IMPORT-ADMIN-C Pharmacy minimal UI: ${message}`);
+    console.error(`❌ IMPORT-ADMIN-E Pharmacy read-only UI: ${message}`);
     process.exit(1);
   }
 }
 
-console.log("IMPORT-ADMIN-C Pharmacy minimal Admin UI check passed.");
+console.log("IMPORT-ADMIN-E Pharmacy read-only Admin UI check passed.");

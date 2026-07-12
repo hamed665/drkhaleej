@@ -21,7 +21,7 @@ export default function AdminImportReadinessPage() {
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-950">Controlled boundary</h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          Readiness data remains read-only. The Pharmacy operation surface is visible on this existing route, but its controls remain disabled until the final server action runtime is explicitly connected and verified in Preview.
+          Readiness data remains read-only. For the single allowlisted Preview Pharmacy, dry-run and review may execute through the authenticated Server Action. Private publish, rollback, public routing, indexing, sitemap inclusion, and bulk execution remain locked.
         </p>
       </section>
     </div>
