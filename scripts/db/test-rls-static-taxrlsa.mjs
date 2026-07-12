@@ -29,6 +29,7 @@ const migrations = {
   scheduleRlsHardening: '0065_schedule_appointment_rls_hardening.sql',
   publishPersistence: '0068_import_publish_persistence_schema.sql',
   publishRpcs: '0069_import_publish_transaction_rpcs.sql',
+  durableReference: '0072_import_pharmacy_publish_references.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -86,7 +87,6 @@ function validateNoAdminPolicies(content, label) {
 
 function validateTaxonomyRlsMigration() {
   const content = readMigration('taxRls');
-
   for (const [pattern, message] of [
     [/\binsert\s+into\b/i, '0055 must not contain INSERT INTO.'],
     [/\bdrop\b/i, '0055 must not contain DROP.'],
@@ -96,7 +96,6 @@ function validateTaxonomyRlsMigration() {
     [/\bto\s+service_role\b/i, '0055 must not grant to service_role.'],
     [/\busing\s*\(\s*true\s*\)/i, '0055 must not use broad TRUE policy predicates.'],
   ]) forbidPattern(content, pattern, message);
-
   for (const [pattern, message] of [
     [/alter\s+table\s+public\.healthcare_verticals\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on healthcare_verticals.'],
     [/alter\s+table\s+public\.center_categories\s+enable\s+row\s+level\s+security/i, '0055 must enable RLS on center_categories.'],
@@ -118,7 +117,6 @@ function validateSpecialtyAliasRlsMigration() {
     [/\bto\s+service_role\b/i, '0057 must not grant to service_role.'],
     [/\busing\s*\(\s*true\s*\)/i, '0057 must not use broad TRUE policy predicates.'],
   ]) forbidPattern(content, pattern, message);
-
   for (const [pattern, message] of [
     [/create\s+table\s+if\s+not\s+exists\s+public\.specialty_aliases/i, '0057 must create specialty_aliases.'],
     [/alter\s+table\s+public\.specialty_aliases\s+enable\s+row\s+level\s+security/i, '0057 must enable RLS on specialty_aliases.'],
@@ -158,11 +156,7 @@ function validateImportStagingRlsMigration() {
     'import_mapping_results',
     'import_publish_queue',
   ]) {
-    requirePattern(
-      content,
-      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
-      `0061 must enable RLS on ${tableName}.`,
-    );
+    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0061 must enable RLS on ${tableName}.`);
   }
 }
 
@@ -176,16 +170,8 @@ function validateDoctorPracticeHardeningRlsMigration() {
 function validateFacilityDepartmentRlsMigration() {
   const content = readMigration('facilityDepartment');
   validateNoAdminPolicies(content, '0063');
-  for (const tableName of [
-    'facility_departments',
-    'doctor_department_assignments',
-    'department_services',
-  ]) {
-    requirePattern(
-      content,
-      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
-      `0063 must enable RLS on ${tableName}.`,
-    );
+  for (const tableName of ['facility_departments', 'doctor_department_assignments', 'department_services']) {
+    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0063 must enable RLS on ${tableName}.`);
   }
   requirePattern(content, /public_department_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep department visibility false by default.');
   requirePattern(content, /public_assignment_visible\s+boolean\s+not\s+null\s+default\s+false/i, '0063 must keep assignment visibility false by default.');
@@ -202,62 +188,43 @@ function validateImportRelationCandidatesRlsMigration() {
 function validateScheduleRlsHardeningMigration() {
   const content = readMigration('scheduleRlsHardening');
   validateNoAdminPolicies(content, '0065');
-  for (const tableName of [
-    'doctor_schedules',
-    'doctor_schedule_exceptions',
-    'appointment_slots',
-  ]) {
-    requirePattern(
-      content,
-      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
-      `0065 must enable RLS on ${tableName}.`,
-    );
+  for (const tableName of ['doctor_schedules', 'doctor_schedule_exceptions', 'appointment_slots']) {
+    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0065 must enable RLS on ${tableName}.`);
   }
 }
 
 function validatePublishPersistenceRlsMigration() {
   const content = readMigration('publishPersistence');
   validateNoAdminPolicies(content, '0068');
-  for (const tableName of [
-    'import_publish_idempotency_records',
-    'import_publish_rollback_snapshots',
-    'import_publish_audit_events',
-  ]) {
-    requirePattern(
-      content,
-      new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'),
-      `0068 must enable RLS on ${tableName}.`,
-    );
+  for (const tableName of ['import_publish_idempotency_records', 'import_publish_rollback_snapshots', 'import_publish_audit_events']) {
+    requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `0068 must enable RLS on ${tableName}.`);
   }
 }
 
 function validatePublishRpcSecurityMigration() {
   readMigration('publishRpcs');
-  execFileSync(process.execPath, [publishRpcValidator], {
-    cwd: repoRoot,
-    stdio: 'inherit',
-  });
+  execFileSync(process.execPath, [publishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+
+function validateDurableReferenceRlsMigration() {
+  const content = readMigration('durableReference');
+  validateNoAdminPolicies(content, '0072');
+  requirePattern(content, /alter\s+table\s+public\.import_pharmacy_publish_references\s+enable\s+row\s+level\s+security/i, '0072 must enable RLS on import_pharmacy_publish_references.');
+  forbidPattern(content, /\bto\s+service_role\b/i, '0072 must not add explicit service_role grants.');
 }
 
 function runLegacyStaticRlsTestWithoutLaterMigrations() {
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     assert(!existsSync(hiddenPath), `Hidden migration file already exists for ${key}.`);
   }
-
   for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths)) {
     renameSync(migrationPaths[key], hiddenPath);
   }
-
   try {
-    execFileSync(process.execPath, [legacyRlsStaticTest], {
-      cwd: repoRoot,
-      stdio: 'inherit',
-    });
+    execFileSync(process.execPath, [legacyRlsStaticTest], { cwd: repoRoot, stdio: 'inherit' });
   } finally {
     for (const [key, hiddenPath] of Object.entries(hiddenMigrationPaths).reverse()) {
-      if (existsSync(hiddenPath)) {
-        renameSync(hiddenPath, migrationPaths[key]);
-      }
+      if (existsSync(hiddenPath)) renameSync(hiddenPath, migrationPaths[key]);
     }
   }
 }
@@ -274,6 +241,7 @@ validateImportRelationCandidatesRlsMigration();
 validateScheduleRlsHardeningMigration();
 validatePublishPersistenceRlsMigration();
 validatePublishRpcSecurityMigration();
+validateDurableReferenceRlsMigration();
 runLegacyStaticRlsTestWithoutLaterMigrations();
 
 console.log('ADM-IMPORT-A static RLS validation passed.');

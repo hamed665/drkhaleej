@@ -34,6 +34,7 @@ export type PharmacyPrivateAdminPublishReferenceInput = {
   reservationId: string;
   rollbackSnapshotId: string;
   actualVersion: string;
+  expectedSnapshotHash: string;
 };
 
 export type PharmacyPrivateAdminRealWiringDependencies = {
@@ -111,6 +112,7 @@ export function createPharmacyPrivateAdminRealPorts(
         reservationId: canary.reservationResult.reservationId,
         rollbackSnapshotId: canary.reservationResult.rollbackSnapshotId,
         actualVersion: mutation.actualVersion,
+        expectedSnapshotHash: context.canaryInput.expectedSnapshotHash,
       });
       return { ok: reference !== null, reference };
     },
