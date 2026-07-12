@@ -23,29 +23,44 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: SEO sequential diagnostic
+        id: seo_diag
+        continue-on-error: true
         shell: bash
         run: |
-          node <<'NODE' > seo-sequential.log 2>&1
-          const { readFileSync } = require('node:fs');
+          node <<'NODE'
+          const { readFileSync, writeFileSync } = require('node:fs');
           const { spawnSync } = require('node:child_process');
           const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
           const commands = pkg.scripts['seo:check'].split(' && ');
           for (const [index, command] of commands.entries()) {
-            console.log(`RUN ${index + 1}/${commands.length}: ${command}`);
             const result = spawnSync(command, {
               shell: true,
               encoding: 'utf8',
               env: process.env,
             });
-            if (result.stdout) process.stdout.write(result.stdout);
-            if (result.stderr) process.stderr.write(result.stderr);
             if (result.status !== 0) {
-              console.error(`FAILED_COMMAND=${command}`);
-              console.error(`FAILED_STATUS=${result.status}`);
+              writeFileSync('seo-failure.txt', [
+                `FAILED_INDEX=${index + 1}`,
+                `FAILED_COMMAND=${command}`,
+                `FAILED_STATUS=${result.status}`,
+                '',
+                'STDOUT:',
+                result.stdout || '',
+                '',
+                'STDERR:',
+                result.stderr || '',
+              ].join('\n'));
               process.exit(result.status || 1);
             }
           }
+          writeFileSync('seo-failure.txt', 'NO_FAILURE\n');
           NODE
-          status=$?
-          tail -n 45 seo-sequential.log
-          exit $status
+      - name: Upload SEO diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-diagnostic
+          path: seo-failure.txt
+      - name: Fail when diagnostic failed
+        if: steps.seo_diag.outcome == 'failure'
+        run: exit 1
