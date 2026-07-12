@@ -10,6 +10,7 @@ import './check-import-pharmacy-private-rollback.mjs';
 import './check-import-pharmacy-private-public-exposure.mjs';
 import './check-import-pharmacy-private-admin-workflow.mjs';
 import './check-import-pharmacy-private-admin-real-wiring.mjs';
+import './check-import-pharmacy-private-admin-server-action.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
