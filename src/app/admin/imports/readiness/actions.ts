@@ -11,6 +11,7 @@ import {
 } from "@/server/admin/import-pharmacy-private-admin-server-action";
 
 const IMPORT_PHARMACY_PRIVATE_ADMIN_ACTION_ENABLED = false as const;
+const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = [] as const;
 
 function parseAllowlist(value: string | undefined): string[] {
   if (!value) return [];
@@ -25,6 +26,7 @@ export async function runPharmacyPrivateAdminAction(
   const allowedEntityIds = parseAllowlist(process.env.IMPORT_PREVIEW_CANARY_ENTITY_IDS);
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: IMPORT_PHARMACY_PRIVATE_ADMIN_ACTION_ENABLED,
+    enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS,
     environment: process.env.VERCEL_ENV,
     allowedEntityIds,
     execute: async ({ operation, actorId, entityId }) => {
