@@ -20,6 +20,9 @@ const tests = await readText(testPath);
 
 for (const token of [
   'executionEnabled: boolean',
+  'enabledOperations: readonly PharmacyPrivateAdminOperation[]',
+  'operation_not_enabled',
+  'new Set(dependencies.enabledOperations)',
   'allowedEntityIds: readonly string[]',
   'formData.getAll(key)',
   'entity_not_allowed',
@@ -36,6 +39,8 @@ for (const token of [
   '"use server"',
   'requirePlatformAdmin()',
   'IMPORT_PHARMACY_PRIVATE_ADMIN_ACTION_ENABLED = false as const',
+  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = [] as const',
+  'enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS',
   'process.env.VERCEL_ENV',
   'IMPORT_PREVIEW_CANARY_ENTITY_IDS',
   'IMPORT_PREVIEW_ALLOWED_ACTOR_IDS',
@@ -62,6 +67,7 @@ for (const forbidden of [
 
 for (const token of [
   'fails closed while the production action switch is disabled',
+  'allows only explicitly enabled read operations',
   'rejects duplicate fields, non-allowlisted entities, and production mutation',
   'requires exact confirmation before one private publish',
   'requires an opaque publish reference before rollback',
