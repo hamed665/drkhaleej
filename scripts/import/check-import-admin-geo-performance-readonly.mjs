@@ -50,7 +50,8 @@ for (const token of [
 for (const token of [
   'ImportGeoPerformanceReadOnlyPanel',
   'getImportAdminGeoPerformanceReadOnlyModel',
-  'Read-only boundary',
+  'Controlled boundary',
+  'Readiness data remains read-only.',
 ]) {
   assert(page.includes(token), `${pagePath} must include ${token}.`);
 }
