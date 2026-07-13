@@ -1,7 +1,10 @@
 import "server-only";
 
 import { PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS } from "./import-pharmacy-canonical-mutation-patch";
-import type { PharmacyStableOperationIdentity } from "./import-pharmacy-operation-identity";
+import {
+  buildPharmacyStableOperationIdentity,
+  type PharmacyStableOperationIdentity,
+} from "./import-pharmacy-operation-identity";
 
 export const PHARMACY_ADMIN_DIFF_FIELDS = [
   "status",
@@ -42,12 +45,13 @@ export type PharmacyAdminBoundedReadState = PharmacyStableOperationIdentity & {
   routeEnabled: false;
 };
 
-export type BuildPharmacyAdminBoundedReadStateInput = PharmacyStableOperationIdentity & {
+export type BuildPharmacyAdminBoundedReadStateInput = {
   operation: "dry_run" | "review";
   actorId: string;
   entityId: string;
   snapshotHash: string;
   entityFingerprint: string;
+  expectedEntityVersion: string;
   createdAt: string;
   expiresAt: string;
   reviewedAt?: string | null;
@@ -58,16 +62,6 @@ export type BuildPharmacyAdminBoundedReadStateInput = PharmacyStableOperationIde
 
 function assertNonEmpty(value: string, name: string): void {
   if (value.trim().length === 0) throw new Error(`${name}_required`);
-}
-
-function assertSha256(value: string, name: string): void {
-  if (!/^[a-f0-9]{64}$/.test(value)) throw new Error(`${name}_invalid`);
-}
-
-function assertUuid(value: string, name: string): void {
-  if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value)) {
-    throw new Error(`${name}_invalid`);
-  }
 }
 
 function assertIsoDate(value: string, name: string): number {
@@ -81,15 +75,7 @@ export function buildPharmacyAdminBoundedReadState(
 ): PharmacyAdminBoundedReadState {
   assertNonEmpty(input.actorId, "actor_id");
   assertNonEmpty(input.entityId, "entity_id");
-  assertNonEmpty(input.idempotencyKey, "idempotency_key");
   assertNonEmpty(input.expectedEntityVersion, "expected_entity_version");
-  assertUuid(input.operationAttemptId, "operation_attempt_id");
-  assertSha256(input.snapshotHash, "snapshot_hash");
-  assertSha256(input.entityFingerprint, "entity_fingerprint");
-  assertSha256(input.patchHash, "patch_hash");
-  assertSha256(input.requestHash, "request_hash");
-  if (input.entityFamily !== "pharmacy") throw new Error("entity_family_invalid");
-  if (input.operationScope !== "reserve_private_publish") throw new Error("operation_scope_invalid");
 
   const createdAt = assertIsoDate(input.createdAt, "created_at");
   const expiresAt = assertIsoDate(input.expiresAt, "expires_at");
@@ -101,6 +87,14 @@ export function buildPharmacyAdminBoundedReadState(
     if (reviewedAt < createdAt || reviewedAt > expiresAt) throw new Error("reviewed_at_out_of_range");
   }
 
+  const identity = buildPharmacyStableOperationIdentity({
+    actorId: input.actorId,
+    entityId: input.entityId,
+    snapshotHash: input.snapshotHash,
+    entityFingerprint: input.entityFingerprint,
+    expectedEntityVersion: input.expectedEntityVersion,
+    patch: input.proposed,
+  });
   const diff = PHARMACY_ADMIN_DIFF_FIELDS.flatMap((field) => {
     const before = input.current[field];
     const after = input.proposed[field];
@@ -117,13 +111,7 @@ export function buildPharmacyAdminBoundedReadState(
     entityId: input.entityId,
     snapshotHash: input.snapshotHash,
     entityFingerprint: input.entityFingerprint,
-    operationAttemptId: input.operationAttemptId,
-    idempotencyKey: input.idempotencyKey,
-    requestHash: input.requestHash,
-    patchHash: input.patchHash,
-    operationScope: input.operationScope,
-    entityFamily: input.entityFamily,
-    expectedEntityVersion: input.expectedEntityVersion,
+    ...identity,
     createdAt: input.createdAt,
     expiresAt: input.expiresAt,
     reviewedAt: input.reviewedAt ?? null,
