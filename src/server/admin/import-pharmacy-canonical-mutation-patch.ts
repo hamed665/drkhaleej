@@ -63,7 +63,7 @@ function canonicalize(value: unknown): unknown {
 }
 
 export function serializePharmacyMutationReviewValue(value: unknown): string {
-  return JSON.stringify(canonicalize(value));
+  return JSON.stringify(canonicalize(value)) ?? "null";
 }
 
 export function buildPharmacyCanonicalMutationPatch(
