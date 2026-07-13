@@ -8,11 +8,9 @@ import {
   type PharmacyAdminDiffField,
 } from "@/server/admin/import-pharmacy-admin-bounded-read-state";
 import { createPharmacyAdminReadStateStoreFromEnvironment } from "@/server/admin/import-pharmacy-admin-read-state-store";
-import {
-  createPharmacyPublishAuthorizationEnvelopeService,
-  type PharmacyPublishAuthorizationEnvelope,
-} from "@/server/admin/import-pharmacy-publish-authorization-envelope";
+import type { PharmacyPublishAuthorizationEnvelope } from "@/server/admin/import-pharmacy-publish-authorization-envelope";
 import { createPharmacyPublishAuthorizationStoreFromEnvironment } from "@/server/admin/import-pharmacy-publish-authorization-store";
+import { issuePharmacyPreviewPublishAuthorization } from "@/server/admin/import-pharmacy-preview-publish-authorization-issue";
 import {
   buildPharmacyPreviewPublishConfirmation,
   resolvePharmacyPreviewPublishCapability,
@@ -100,17 +98,6 @@ function buildBoundedRecords(
       index_policy: "noindex",
       sitemap_policy: "excluded",
     },
-  };
-}
-
-function lockCapabilityAfterAuthorizationFailure(
-  capability: PharmacyPreviewPublishCapability,
-): PharmacyPreviewPublishCapability {
-  return {
-    ...capability,
-    visible: false,
-    mode: "locked",
-    blockers: [...new Set([...capability.blockers, "authorization_issue_failed"])],
   };
 }
 
@@ -241,19 +228,15 @@ export async function runPharmacyPrivateAdminAction(
         });
 
         if (publishCapability.visible) {
-          const authorizationStore = createPharmacyPublishAuthorizationStoreFromEnvironment();
-          publishAuthorization = authorizationStore
-            ? await createPharmacyPublishAuthorizationEnvelopeService(authorizationStore).issue({
-                actorId,
-                entityId,
-                reviewSnapshotHash: readback.snapshotHash,
-                entityFingerprint: readback.entityFingerprint,
-              })
-            : null;
-
-          if (!publishAuthorization) {
-            publishCapability = lockCapabilityAfterAuthorizationFailure(publishCapability);
-          }
+          const issuance = await issuePharmacyPreviewPublishAuthorization({
+            capability: publishCapability,
+            actorId,
+            entityId,
+            reviewState: readback,
+            store: createPharmacyPublishAuthorizationStoreFromEnvironment(),
+          });
+          publishCapability = issuance.capability;
+          publishAuthorization = issuance.authorization;
         }
       }
       return {
