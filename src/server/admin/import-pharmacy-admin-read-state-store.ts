@@ -91,18 +91,12 @@ function readRow(row: Record<string, unknown>): PharmacyAdminBoundedReadState | 
   ) return null;
 
   try {
-    return buildPharmacyAdminBoundedReadState({
+    const state = buildPharmacyAdminBoundedReadState({
       operation: row.operation,
       actorId: row.actor_profile_id,
       entityId: row.entity_id,
       snapshotHash: row.snapshot_hash,
       entityFingerprint: row.entity_fingerprint,
-      operationAttemptId: row.operation_attempt_id,
-      idempotencyKey: row.idempotency_key,
-      requestHash: row.request_hash,
-      patchHash: row.patch_hash,
-      operationScope: "reserve_private_publish",
-      entityFamily: "pharmacy",
       expectedEntityVersion: row.expected_entity_version,
       createdAt: row.created_at,
       expiresAt: row.expires_at,
@@ -113,6 +107,13 @@ function readRow(row: Record<string, unknown>): PharmacyAdminBoundedReadState | 
         ? row.blocker_codes.filter((value): value is string => typeof value === "string")
         : [],
     });
+    if (
+      state.operationAttemptId !== row.operation_attempt_id ||
+      state.idempotencyKey !== row.idempotency_key ||
+      state.requestHash !== row.request_hash ||
+      state.patchHash !== row.patch_hash
+    ) return null;
+    return state;
   } catch {
     return null;
   }
