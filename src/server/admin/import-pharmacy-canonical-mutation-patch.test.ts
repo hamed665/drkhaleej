@@ -53,18 +53,23 @@ const draft = {
 } satisfies ImportUnifiedDraftEntity;
 
 describe("canonical Pharmacy mutation patch", () => {
-  it("builds the exact RPC patch and deterministic review projection from one authority", () => {
+  it("builds one bounded metadata patch without mutating locale or country", () => {
     const patch = buildPharmacyCanonicalMutationPatch(draft);
     const review = projectPharmacyCanonicalMutationPatchForReview(patch);
 
     expect(patch.name_en).toBe("Reviewed Pharmacy");
-    expect(patch.default_country).toBe("om");
-    expect(patch.default_locale).toBe("en");
-    expect(patch.metadata.visibility).toBe("private");
+    expect(patch).not.toHaveProperty("default_country");
+    expect(patch).not.toHaveProperty("default_locale");
+    expect(patch).not.toHaveProperty("metadata");
+    expect(patch.metadata_patch.visibility).toBe("private");
+    expect(patch.metadata_patch).not.toHaveProperty("canonicalGeo");
+    expect(patch.metadata_patch).not.toHaveProperty("projectionVersion");
     expect(review.name_en).toBe(patch.name_en);
-    expect(review.metadata_source).toBe(patch.metadata.source);
+    expect(review.metadata_source).toBe(patch.metadata_patch.source);
     expect(review.metadata_source_evidence).toContain('"source":"excel"');
     expect(review.metadata_public_route_enabled).toBe(false);
+    expect(review).not.toHaveProperty("default_locale");
+    expect(review).not.toHaveProperty("default_country");
   });
 
   it("canonicalizes nested evidence independently of key insertion order", () => {
@@ -73,7 +78,7 @@ describe("canonical Pharmacy mutation patch", () => {
     );
   });
 
-  it("projects the current rollback snapshot with the same review field contract", () => {
+  it("projects current metadata without treating locale as a mutation field", () => {
     const current = projectPharmacyRollbackSnapshotForMutationReview({
       center: {
         nameEn: "Old Pharmacy",
@@ -100,7 +105,8 @@ describe("canonical Pharmacy mutation patch", () => {
 
     expect(current).not.toBeNull();
     expect(current?.name_en).toBe("Old Pharmacy");
-    expect(current?.default_locale).toBe("ar");
+    expect(current).not.toHaveProperty("default_locale");
+    expect(current).not.toHaveProperty("default_country");
     expect(current?.metadata_source_evidence).toBe('{"source":"old"}');
   });
 });

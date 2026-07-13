@@ -17,6 +17,7 @@ const pharmacyRollbackValidator = path.join(repoRoot, 'scripts', 'import', 'chec
 const durableReferenceValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-durable-publish-reference.mjs');
 const pharmacyReadStateValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-admin-read-state-persistence.mjs');
 const pharmacyAuthorizationValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-publish-authorization-persistence.mjs');
+const pharmacyMetadataLocaleValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-metadata-locale-preservation.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
@@ -27,6 +28,7 @@ const pharmacyRollbackMigrationName = '0071_import_pharmacy_private_rollback_rpc
 const durableReferenceMigrationName = '0072_import_pharmacy_publish_references.sql';
 const pharmacyReadStateMigrationName = '0073_import_pharmacy_admin_read_states.sql';
 const pharmacyAuthorizationMigrationName = '0074_import_pharmacy_publish_authorizations.sql';
+const pharmacyMetadataLocaleMigrationName = '0075_import_pharmacy_metadata_locale_preservation.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -37,6 +39,7 @@ const pharmacyRollbackMigrationPath = path.join(migrationsDir, pharmacyRollbackM
 const durableReferenceMigrationPath = path.join(migrationsDir, durableReferenceMigrationName);
 const pharmacyReadStateMigrationPath = path.join(migrationsDir, pharmacyReadStateMigrationName);
 const pharmacyAuthorizationMigrationPath = path.join(migrationsDir, pharmacyAuthorizationMigrationName);
+const pharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, pharmacyMetadataLocaleMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -47,6 +50,7 @@ const hiddenPharmacyRollbackMigrationPath = path.join(migrationsDir, `.pharmacy-
 const hiddenDurableReferenceMigrationPath = path.join(migrationsDir, `.durable-reference-${durableReferenceMigrationName}.hidden`);
 const hiddenPharmacyReadStateMigrationPath = path.join(migrationsDir, `.pharmacy-read-state-${pharmacyReadStateMigrationName}.hidden`);
 const hiddenPharmacyAuthorizationMigrationPath = path.join(migrationsDir, `.pharmacy-authorization-${pharmacyAuthorizationMigrationName}.hidden`);
+const hiddenPharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, `.pharmacy-metadata-locale-${pharmacyMetadataLocaleMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -59,6 +63,7 @@ const currentOnlyMigrations = [
   [durableReferenceMigrationName, durableReferenceMigrationPath, hiddenDurableReferenceMigrationPath],
   [pharmacyReadStateMigrationName, pharmacyReadStateMigrationPath, hiddenPharmacyReadStateMigrationPath],
   [pharmacyAuthorizationMigrationName, pharmacyAuthorizationMigrationPath, hiddenPharmacyAuthorizationMigrationPath],
+  [pharmacyMetadataLocaleMigrationName, pharmacyMetadataLocaleMigrationPath, hiddenPharmacyMetadataLocaleMigrationPath],
 ];
 
 function fail(message) {
@@ -163,6 +168,11 @@ function validatePharmacyAuthorizationMigration() {
   execFileSync(process.execPath, [pharmacyAuthorizationValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
+function validatePharmacyMetadataLocaleMigration() {
+  requireCondition(existsSync(pharmacyMetadataLocaleMigrationPath), `${pharmacyMetadataLocaleMigrationName} is missing.`);
+  execFileSync(process.execPath, [pharmacyMetadataLocaleValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -193,5 +203,6 @@ validatePharmacyRollbackMigration();
 validateDurableReferenceMigration();
 validatePharmacyReadStateMigration();
 validatePharmacyAuthorizationMigration();
+validatePharmacyMetadataLocaleMigration();
 
 console.log('Current migration validation passed.');

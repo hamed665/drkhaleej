@@ -23,9 +23,13 @@ for (const token of [
   "buildPharmacyCanonicalMutationPatch",
   "projectPharmacyCanonicalMutationPatchForReview",
   "projectPharmacyRollbackSnapshotForMutationReview",
+  "metadata_patch",
   "metadata_source_evidence",
-  "default_locale",
 ]) assert(canonical.includes(token), `${canonicalPath} must include ${token}`);
+
+for (const forbidden of ["default_locale:", "default_country:", "canonicalGeo:", "projectionVersion:"]) {
+  assert(!canonical.includes(forbidden), `${canonicalPath} must not mutate protected field ${forbidden}`);
+}
 
 assert(
   writer.includes("p_patch: buildPharmacyCanonicalMutationPatch(payload.draft)"),

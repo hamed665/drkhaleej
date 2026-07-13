@@ -15,8 +15,6 @@ export const PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS = [
   "whatsapp_phone",
   "email",
   "website_url",
-  "default_country",
-  "default_locale",
   "metadata_source",
   "metadata_source_evidence",
   "metadata_raw_payload_hash",
@@ -29,6 +27,10 @@ export const PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS = [
 export type PharmacyCanonicalMutationReviewField =
   (typeof PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS)[number];
 export type PharmacyCanonicalMutationReviewValue = string | boolean | null;
+export type PharmacyCanonicalMutationReviewProjection = Record<
+  PharmacyCanonicalMutationReviewField,
+  PharmacyCanonicalMutationReviewValue
+>;
 
 export type PharmacyCanonicalMutationPatch = {
   name_en: string | null;
@@ -39,9 +41,7 @@ export type PharmacyCanonicalMutationPatch = {
   whatsapp_phone: string | null;
   email: string | null;
   website_url: string | null;
-  default_country: "om";
-  default_locale: "en";
-  metadata: {
+  metadata_patch: {
     source: string;
     sourceEvidence: unknown;
     rawPayloadHash: string | null;
@@ -95,9 +95,7 @@ export function buildPharmacyCanonicalMutationPatch(
     whatsapp_phone: draft.contact.whatsapp,
     email: draft.contact.email,
     website_url: draft.contact.website,
-    default_country: "om",
-    default_locale: "en",
-    metadata: {
+    metadata_patch: {
       source: draft.source,
       sourceEvidence: draft.sourceEvidence,
       rawPayloadHash: draft.rawPayloadHash,
@@ -111,7 +109,7 @@ export function buildPharmacyCanonicalMutationPatch(
 
 export function projectPharmacyCanonicalMutationPatchForReview(
   patch: PharmacyCanonicalMutationPatch,
-): Record<PharmacyCanonicalMutationReviewField, PharmacyCanonicalMutationReviewValue> {
+): PharmacyCanonicalMutationReviewProjection {
   return {
     name_en: patch.name_en,
     legal_name: patch.legal_name,
@@ -121,21 +119,19 @@ export function projectPharmacyCanonicalMutationPatchForReview(
     whatsapp_phone: patch.whatsapp_phone,
     email: patch.email,
     website_url: patch.website_url,
-    default_country: patch.default_country,
-    default_locale: patch.default_locale,
-    metadata_source: patch.metadata.source,
-    metadata_source_evidence: serializePharmacyMutationReviewValue(patch.metadata.sourceEvidence),
-    metadata_raw_payload_hash: patch.metadata.rawPayloadHash,
-    metadata_visibility: patch.metadata.visibility,
-    metadata_public_route_enabled: patch.metadata.publicRouteEnabled,
-    metadata_indexable: patch.metadata.indexable,
-    metadata_sitemap_eligible: patch.metadata.sitemapEligible,
+    metadata_source: patch.metadata_patch.source,
+    metadata_source_evidence: serializePharmacyMutationReviewValue(patch.metadata_patch.sourceEvidence),
+    metadata_raw_payload_hash: patch.metadata_patch.rawPayloadHash,
+    metadata_visibility: patch.metadata_patch.visibility,
+    metadata_public_route_enabled: patch.metadata_patch.publicRouteEnabled,
+    metadata_indexable: patch.metadata_patch.indexable,
+    metadata_sitemap_eligible: patch.metadata_patch.sitemapEligible,
   };
 }
 
 export function projectPharmacyRollbackSnapshotForMutationReview(
   rollbackSnapshot: Readonly<Record<string, unknown>>,
-): Record<PharmacyCanonicalMutationReviewField, PharmacyCanonicalMutationReviewValue> | null {
+): PharmacyCanonicalMutationReviewProjection | null {
   const center = rollbackSnapshot.center;
   if (!isRecord(center)) return null;
   const metadata = isRecord(center.metadata) ? center.metadata : {};
@@ -158,8 +154,6 @@ export function projectPharmacyRollbackSnapshotForMutationReview(
     whatsapp_phone: readNullableString(center, "whatsappPhone"),
     email: readNullableString(center, "email"),
     website_url: readNullableString(center, "websiteUrl"),
-    default_country: readNullableString(center, "defaultCountry"),
-    default_locale: readNullableString(center, "defaultLocale"),
     metadata_source: readNullableString(metadata, "source"),
     metadata_source_evidence: serializePharmacyMutationReviewValue(metadata.sourceEvidence ?? null),
     metadata_raw_payload_hash: readNullableString(metadata, "rawPayloadHash"),
