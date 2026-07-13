@@ -16,6 +16,8 @@ import type {
 } from "./import-pharmacy-private-mutation-adapter";
 import type { ImportPharmacyPrivateRollbackResult } from "./import-supabase-pharmacy-private-rollback-writer";
 
+const SNAPSHOT_HASH = "a".repeat(64);
+const FINGERPRINT = "b".repeat(64);
 type ReservationRunner = NonNullable<PharmacyPrivateAdminRealWiringDependencies["reservationRunner"]>;
 type MutationRunner = NonNullable<PharmacyPrivateAdminRealWiringDependencies["mutationRunner"]>;
 type RollbackWriter = NonNullable<PharmacyPrivateAdminRealWiringDependencies["rollbackWriter"]>;
@@ -73,9 +75,12 @@ function harness() {
   const canaryInput = {
     actorId: "admin-1",
     entityId: "pharmacy-1",
+    expectedSnapshotHash: SNAPSHOT_HASH,
+    expectedEntityFingerprint: FINGERPRINT,
   } as unknown as ImportRealReservationCanaryInput;
 
   const loadPublishContext = vi.fn(async () => ({ canaryInput, mutationRequest }));
+  const verifyPublishReview = vi.fn(async () => true);
   const createPublishReference = vi.fn(async () => "publish-reference-1");
 
   const dependencies: PharmacyPrivateAdminRealWiringDependencies = {
@@ -84,6 +89,7 @@ function harness() {
     mutationRpcClient: {} as never,
     rollbackRpcClient: {} as never,
     loadPublishContext,
+    verifyPublishReview,
     createPublishReference,
     resolveRollbackRequest: vi.fn(async () => ({
       reservationId: "reservation-1",
@@ -91,7 +97,7 @@ function harness() {
       entityId: "pharmacy-1",
       actorId: "admin-1",
       expectedCurrentVersion: "version-2",
-      expectedSnapshotHash: "a".repeat(64),
+      expectedSnapshotHash: SNAPSHOT_HASH,
     })),
     dryRun: vi.fn(async () => ({ ok: true, reference: "dry-1" })),
     review: vi.fn(async () => ({ ok: true, reference: "review-1" })),
@@ -108,17 +114,26 @@ function harness() {
     mutationRunner,
     rollbackWriter,
     loadPublishContext,
+    verifyPublishReview,
     createPublishReference,
   };
 }
 
 describe("pharmacy private admin real wiring", () => {
-  it("reserves, verifies, mutates one pharmacy, and creates an opaque publish reference", async () => {
+  it("requires review, reserves, mutates one pharmacy, and creates an opaque publish reference", async () => {
     const test = harness();
-    const ports = createPharmacyPrivateAdminRealPorts(test.dependencies);
-    const result = await ports.privatePublish({ actorId: "admin-1", entityId: "pharmacy-1" });
+    const result = await createPharmacyPrivateAdminRealPorts(test.dependencies).privatePublish({
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+    });
 
     expect(result).toEqual({ ok: true, reference: "publish-reference-1" });
+    expect(test.verifyPublishReview).toHaveBeenCalledWith({
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+      expectedSnapshotHash: SNAPSHOT_HASH,
+      expectedEntityFingerprint: FINGERPRINT,
+    });
     expect(test.reservationRunner).toHaveBeenCalledTimes(1);
     expect(test.mutationRunner).toHaveBeenCalledTimes(1);
     expect(test.createPublishReference).toHaveBeenCalledWith({
@@ -127,7 +142,22 @@ describe("pharmacy private admin real wiring", () => {
       reservationId: "reservation-1",
       rollbackSnapshotId: "snapshot-1",
       actualVersion: "version-2",
+      expectedSnapshotHash: SNAPSHOT_HASH,
     });
+  });
+
+  it("fails closed before reservation when persisted review is not approved", async () => {
+    const test = harness();
+    test.verifyPublishReview.mockResolvedValueOnce(false);
+
+    const result = await createPharmacyPrivateAdminRealPorts(test.dependencies).privatePublish({
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+    });
+
+    expect(result).toEqual({ ok: false, reference: null });
+    expect(test.reservationRunner).not.toHaveBeenCalled();
+    expect(test.mutationRunner).not.toHaveBeenCalled();
   });
 
   it("fails closed before mutation when reservation readback is not verified", async () => {
@@ -160,7 +190,7 @@ describe("pharmacy private admin real wiring", () => {
     expect(test.mutationRunner).not.toHaveBeenCalled();
   });
 
-  it("rejects mismatched publish context before reservation", async () => {
+  it("rejects mismatched publish context before review or reservation", async () => {
     const test = harness();
     const context = await test.loadPublishContext();
     test.loadPublishContext.mockResolvedValueOnce({
@@ -173,6 +203,7 @@ describe("pharmacy private admin real wiring", () => {
       entityId: "pharmacy-1",
     });
     expect(result).toEqual({ ok: false, reference: null });
+    expect(test.verifyPublishReview).not.toHaveBeenCalled();
     expect(test.reservationRunner).not.toHaveBeenCalled();
   });
 
