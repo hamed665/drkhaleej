@@ -8,7 +8,6 @@ import {
   type PharmacyAdminDiffField,
 } from "@/server/admin/import-pharmacy-admin-bounded-read-state";
 import { createPharmacyAdminReadStateStoreFromEnvironment } from "@/server/admin/import-pharmacy-admin-read-state-store";
-import type { PharmacyPublishAuthorizationEnvelope } from "@/server/admin/import-pharmacy-publish-authorization-envelope";
 import { createPharmacyPublishAuthorizationStoreFromEnvironment } from "@/server/admin/import-pharmacy-publish-authorization-store";
 import { issuePharmacyPreviewPublishAuthorization } from "@/server/admin/import-pharmacy-preview-publish-authorization-issue";
 import {
@@ -28,10 +27,16 @@ import {
 const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review"] as const;
 const READ_STATE_TTL_MS = 15 * 60 * 1000;
 
+export type PharmacyPublishAuthorizationUiState = {
+  authorizationReady: boolean;
+  expiresAt: string | null;
+  authorizationStatus: "unavailable" | "ready" | "expired" | "invalidated" | "consumed";
+};
+
 export type PharmacyPrivateAdminActionStateResult = PharmacyPrivateAdminServerActionResult & {
   readState?: PharmacyAdminBoundedReadState | null;
   publishCapability?: PharmacyPreviewPublishCapability | null;
-  publishAuthorization?: PharmacyPublishAuthorizationEnvelope | null;
+  authorizationState?: PharmacyPublishAuthorizationUiState | null;
 };
 
 function parseAllowlist(value: string | undefined): string[] {
@@ -110,7 +115,7 @@ export async function runPharmacyPrivateAdminAction(
   const confirmation = String(formData.get("publishConfirmation") ?? "");
   let persistedReadState: PharmacyAdminBoundedReadState | null = null;
   let publishCapability: PharmacyPreviewPublishCapability | null = null;
-  let publishAuthorization: PharmacyPublishAuthorizationEnvelope | null = null;
+  let authorizationUiState: PharmacyPublishAuthorizationUiState | null = null;
 
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: process.env.VERCEL_ENV === "preview",
@@ -236,7 +241,11 @@ export async function runPharmacyPrivateAdminAction(
             store: createPharmacyPublishAuthorizationStoreFromEnvironment(),
           });
           publishCapability = issuance.capability;
-          publishAuthorization = issuance.authorization;
+          authorizationUiState = {
+            authorizationReady: issuance.authorization !== null,
+            authorizationStatus: issuance.authorization ? "ready" : "unavailable",
+            expiresAt: issuance.authorization?.expiresAt ?? null,
+          };
         }
       }
       return {
@@ -270,7 +279,7 @@ export async function runPharmacyPrivateAdminAction(
       routeEnabled: false,
       bulkAllowed: false,
     },
-    publishAuthorization,
+    authorizationState: authorizationUiState,
   };
 }
 

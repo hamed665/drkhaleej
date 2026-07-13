@@ -39,9 +39,23 @@ for (const token of [
 for (const token of [
   "issuePharmacyPreviewPublishAuthorization",
   "createPharmacyPublishAuthorizationStoreFromEnvironment()",
-  "publishAuthorization = issuance.authorization",
   "publishCapability = issuance.capability",
+  "authorizationReady: issuance.authorization !== null",
+  "authorizationStatus: issuance.authorization ? \"ready\" : \"unavailable\"",
+  "expiresAt: issuance.authorization?.expiresAt ?? null",
 ]) assert(action.includes(token), `${actionPath} must include ${token}`);
+
+for (const forbidden of [
+  "PharmacyPublishAuthorizationEnvelope",
+  "publishAuthorization?:",
+  "let publishAuthorization",
+  "publishAuthorization = issuance.authorization",
+  "publishAuthorization,",
+  ".token",
+  ".nonce",
+  "authorization.token",
+  "authorization.nonce",
+]) assert(!action.includes(forbidden), `${actionPath} must not expose authorization material through the Server Action result: ${forbidden}`);
 
 for (const token of [
   "createPharmacyPublishAuthorizationStoreFromEnvironment",
