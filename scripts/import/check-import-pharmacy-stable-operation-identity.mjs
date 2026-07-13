@@ -25,7 +25,14 @@ for (const token of [
   'expectedEntityVersion',
 ]) {
   if (!source.identity.includes(token)) throw new Error(`operation identity builder missing ${token}`);
-  if (!source.state.includes(token)) throw new Error(`bounded read state missing ${token}`);
+}
+for (const token of [
+  'PharmacyStableOperationIdentity',
+  'buildPharmacyStableOperationIdentity',
+  '...identity',
+  'pharmacy_admin_read_state_v3',
+]) {
+  if (!source.state.includes(token)) throw new Error(`bounded read state missing composed identity contract ${token}`);
 }
 if (/randomUUID|randomBytes/.test(source.identity)) {
   throw new Error('stable operation identity must not use random material');
