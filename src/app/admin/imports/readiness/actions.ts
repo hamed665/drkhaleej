@@ -36,7 +36,7 @@ export type PharmacyPublishAuthorizationUiState = {
 export type PharmacyPrivateAdminActionStateResult = PharmacyPrivateAdminServerActionResult & {
   readState?: PharmacyAdminBoundedReadState | null;
   publishCapability?: PharmacyPreviewPublishCapability | null;
-  publishAuthorizationState?: PharmacyPublishAuthorizationUiState | null;
+  authorizationState?: PharmacyPublishAuthorizationUiState | null;
 };
 
 function parseAllowlist(value: string | undefined): string[] {
@@ -115,7 +115,7 @@ export async function runPharmacyPrivateAdminAction(
   const confirmation = String(formData.get("publishConfirmation") ?? "");
   let persistedReadState: PharmacyAdminBoundedReadState | null = null;
   let publishCapability: PharmacyPreviewPublishCapability | null = null;
-  let publishAuthorizationState: PharmacyPublishAuthorizationUiState | null = null;
+  let authorizationUiState: PharmacyPublishAuthorizationUiState | null = null;
 
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: process.env.VERCEL_ENV === "preview",
@@ -241,7 +241,7 @@ export async function runPharmacyPrivateAdminAction(
             store: createPharmacyPublishAuthorizationStoreFromEnvironment(),
           });
           publishCapability = issuance.capability;
-          publishAuthorizationState = {
+          authorizationUiState = {
             authorizationReady: issuance.authorization !== null,
             authorizationStatus: issuance.authorization ? "ready" : "unavailable",
             expiresAt: issuance.authorization?.expiresAt ?? null,
@@ -279,7 +279,7 @@ export async function runPharmacyPrivateAdminAction(
       routeEnabled: false,
       bulkAllowed: false,
     },
-    publishAuthorizationState,
+    authorizationState: authorizationUiState,
   };
 }
 
