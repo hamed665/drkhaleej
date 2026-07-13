@@ -38,6 +38,7 @@ export type PharmacyPublishAuthorizationCreateRecord = Omit<
 >;
 
 export type PharmacyPublishAuthorizationEnvelopeStore = {
+  resolveReviewStateId(operationAttemptId: string): Promise<string | null>;
   create(record: PharmacyPublishAuthorizationCreateRecord): Promise<string | null>;
   readByAuthorizationId(authorizationId: string): Promise<PharmacyPublishAuthorizationEnvelopeRecord | null>;
   readByTokenHash(tokenHash: string): Promise<PharmacyPublishAuthorizationEnvelopeRecord | null>;
@@ -76,7 +77,6 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
     async issue(input: {
       actorId: string;
       entityId: string;
-      reviewStateId: string;
       reviewSnapshotHash: string;
       entityFingerprint: string;
       operationAttemptId: string;
@@ -90,7 +90,6 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
       if (
         !isNonEmpty(input.actorId) ||
         !isNonEmpty(input.entityId) ||
-        !isUuid(input.reviewStateId) ||
         !isUuid(input.operationAttemptId) ||
         !isNonEmpty(input.idempotencyKey) ||
         !isSha256(input.reviewSnapshotHash) ||
@@ -102,6 +101,9 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
         input.operationScope !== "reserve_private_publish"
       ) return null;
 
+      const reviewStateId = await store.resolveReviewStateId(input.operationAttemptId);
+      if (!reviewStateId || !isUuid(reviewStateId)) return null;
+
       // Legacy hashes remain internal until the atomic reservation RPC replaces the old consume signature.
       const token = randomBytes(32).toString("base64url");
       const nonce = randomBytes(24).toString("base64url");
@@ -112,7 +114,7 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
         nonceHash: sha256(nonce),
         actorId: input.actorId,
         entityId: input.entityId,
-        reviewStateId: input.reviewStateId,
+        reviewStateId,
         reviewSnapshotHash: input.reviewSnapshotHash,
         entityFingerprint: input.entityFingerprint,
         operationAttemptId: input.operationAttemptId,
