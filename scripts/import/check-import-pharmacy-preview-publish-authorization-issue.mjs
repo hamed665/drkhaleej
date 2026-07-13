@@ -56,7 +56,9 @@ for (const forbidden of [
   "authorization.token",
   "authorization.nonce",
   "Preview publish now",
-  'operation: "private_publish"',
+  'name="operation" value="private_publish"',
+  'name="publishToken"',
+  'name="publishNonce"',
 ]) assert(!panel.includes(forbidden), `${panelPath} must not render or submit authorization material: ${forbidden}`);
 
 for (const forbidden of [
