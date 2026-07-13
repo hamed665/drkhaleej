@@ -18,6 +18,10 @@ for (const token of [
   'runImportPharmacyPrivateMutation',
   'createSupabasePharmacyPrivateMutationWriter',
   'createSupabasePharmacyPrivateRollbackWriter',
+  'verifyPublishReview',
+  'expectedSnapshotHash: context.canaryInput.expectedSnapshotHash',
+  'expectedEntityFingerprint: context.canaryInput.expectedEntityFingerprint',
+  'if (!reviewApproved) return { ok: false, reference: null }',
   'canary.reservationResult?.kind !== "reserved"',
   '!canary.verified',
   'context.mutationRequest.family === "pharmacy"',
@@ -46,9 +50,10 @@ for (const forbidden of [
 }
 
 for (const token of [
-  'reserves, verifies, mutates one pharmacy, and creates an opaque publish reference',
+  'requires review, reserves, mutates one pharmacy, and creates an opaque publish reference',
+  'fails closed before reservation when persisted review is not approved',
   'fails closed before mutation when reservation readback is not verified',
-  'rejects mismatched publish context before reservation',
+  'rejects mismatched publish context before review or reservation',
   'resolves an opaque reference and runs the real rollback boundary once',
 ]) {
   assert(tests.includes(token), `${testPath} must cover ${token}`);
