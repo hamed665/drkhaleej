@@ -3,7 +3,9 @@ import "server-only";
 import type { ImportPublishFamily } from "./import-intake-convergence";
 import type { ImportPublishPersistenceTransactionResult } from "./import-private-persistence-adapter";
 import {
+  buildUnifiedDraftEntity,
   getUnifiedDraftEntityBlockers,
+  type ImportUnifiedDraftEntity,
   type ImportUnifiedDraftEntityInput,
 } from "./import-unified-draft-entity";
 
@@ -40,7 +42,7 @@ export type ImportPharmacyPrivateMutationPayload = {
   reservationId: string;
   rollbackSnapshotId: string;
   auditEventId: string;
-  draft: ImportUnifiedDraftEntityInput;
+  draft: ImportUnifiedDraftEntity;
   visibility: "private";
   publicRouteEnabled: false;
   indexable: false;
@@ -125,7 +127,7 @@ function toPayload(request: ImportPharmacyPrivateMutationRequest): ImportPharmac
     reservationId: request.reservationResult.reservationId,
     rollbackSnapshotId: request.reservationResult.rollbackSnapshotId,
     auditEventId: request.reservationResult.auditEventId,
-    draft: request.draft,
+    draft: buildUnifiedDraftEntity(request.draft),
     visibility: "private",
     publicRouteEnabled: false,
     indexable: false,

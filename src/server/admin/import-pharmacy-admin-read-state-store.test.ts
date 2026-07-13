@@ -2,13 +2,21 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { buildPharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
+import {
+  buildPharmacyAdminBoundedReadState,
+  PHARMACY_ADMIN_DIFF_FIELDS,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
+} from "./import-pharmacy-admin-bounded-read-state";
 import {
   createPharmacyAdminReadStateStore,
   type PharmacyAdminReadStateClient,
 } from "./import-pharmacy-admin-read-state-store";
 
-const current = {
+const current = Object.fromEntries(
+  PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
+) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+Object.assign(current, {
   status: "draft",
   is_active: false,
   is_featured: false,
@@ -17,9 +25,16 @@ const current = {
   sitemap_policy: "excluded",
   projection_version: "12",
   canonical_path: "/en/om/pharmacies/example",
-} as const;
+  name_en: "Example Pharmacy",
+  default_country: "om",
+  default_locale: "en",
+  metadata_source_evidence: "null",
+});
 
-const proposed = { ...current, projection_version: "13" } as const;
+const proposed: Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue> = {
+  ...current,
+  projection_version: "13",
+};
 
 function makeState(operation: "dry_run" | "review" = "dry_run") {
   return buildPharmacyAdminBoundedReadState({

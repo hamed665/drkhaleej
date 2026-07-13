@@ -6,9 +6,14 @@ import {
   buildPharmacyAdminBoundedReadState,
   isPharmacyAdminBoundedReadStateFresh,
   PHARMACY_ADMIN_DIFF_FIELDS,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
 } from "./import-pharmacy-admin-bounded-read-state";
 
-const current = {
+const current = Object.fromEntries(
+  PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
+) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+Object.assign(current, {
   status: "draft",
   is_active: false,
   is_featured: false,
@@ -17,12 +22,17 @@ const current = {
   sitemap_policy: "excluded",
   projection_version: "12",
   canonical_path: "/en/om/pharmacies/example",
-} as const;
+  name_en: "Old Pharmacy",
+  default_country: "om",
+  default_locale: "en",
+  metadata_source_evidence: "null",
+});
 
 const proposed = {
   ...current,
   projection_version: "13",
-} as const;
+  name_en: "Reviewed Pharmacy",
+};
 
 describe("bounded Pharmacy Admin read state", () => {
   it("emits only allowlisted changed fields and fixed private boundaries", () => {
@@ -39,8 +49,10 @@ describe("bounded Pharmacy Admin read state", () => {
       blockerCodes: ["zeta", "alpha", "alpha", ""],
     });
 
+    expect(state.schemaVersion).toBe("pharmacy_admin_read_state_v2");
     expect(state.diff).toEqual([
       { field: "projection_version", before: "12", after: "13" },
+      { field: "name_en", before: "Old Pharmacy", after: "Reviewed Pharmacy" },
     ]);
     expect(state.blockerCodes).toEqual(["alpha", "zeta"]);
     expect(state.publicVisibility).toBe("private");

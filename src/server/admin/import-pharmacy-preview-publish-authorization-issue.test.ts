@@ -24,7 +24,7 @@ const capability: PharmacyPreviewPublishCapability = {
 };
 
 const reviewState = {
-  schemaVersion: "pharmacy_admin_read_state_v1",
+  schemaVersion: "pharmacy_admin_read_state_v2",
   operation: "review",
   actorId: "admin-1",
   entityId: "pharmacy-1",

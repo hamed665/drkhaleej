@@ -1,5 +1,6 @@
 import "server-only";
 
+import { buildPharmacyCanonicalMutationPatch } from "./import-pharmacy-canonical-mutation-patch";
 import type {
   ImportPharmacyPrivateMutationPayload,
   ImportPharmacyPrivateMutationWriter,
@@ -18,30 +19,6 @@ type RpcPayload = {
   actualVersion?: unknown;
   reason?: unknown;
 };
-
-function buildPatch(payload: ImportPharmacyPrivateMutationPayload): Readonly<Record<string, unknown>> {
-  return {
-    name_en: payload.draft.name,
-    legal_name: payload.draft.legalName,
-    slug: payload.draft.slugCandidate,
-    description_en: payload.draft.description,
-    primary_phone: payload.draft.contact?.phone ?? null,
-    whatsapp_phone: payload.draft.contact?.whatsapp ?? null,
-    email: payload.draft.contact?.email ?? null,
-    website_url: payload.draft.contact?.website ?? null,
-    default_country: "om",
-    default_locale: "en",
-    metadata: {
-      source: payload.draft.source,
-      sourceEvidence: payload.draft.sourceEvidence,
-      rawPayloadHash: payload.draft.rawPayloadHash,
-      visibility: "private",
-      publicRouteEnabled: false,
-      indexable: false,
-      sitemapEligible: false,
-    },
-  };
-}
 
 function normalizeRpcResult(data: unknown): Awaited<ReturnType<ImportPharmacyPrivateMutationWriter["mutateOne"]>> {
   if (!data || typeof data !== "object") return { kind: "failed" };
@@ -83,7 +60,7 @@ export function createSupabasePharmacyPrivateMutationWriter(
         p_entity_id: payload.draft.draftId,
         p_actor_profile_id: payload.actorId,
         p_expected_version: payload.expectedVersion,
-        p_patch: buildPatch(payload),
+        p_patch: buildPharmacyCanonicalMutationPatch(payload.draft),
         p_audit_schema_version: "1",
       });
 

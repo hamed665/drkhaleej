@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import {
   buildPharmacyAdminBoundedReadState,
   isPharmacyAdminBoundedReadStateFresh,
+  PHARMACY_ADMIN_DIFF_FIELDS,
   type PharmacyAdminBoundedReadState,
   type PharmacyAdminBoundedValue,
   type PharmacyAdminDiffField,
@@ -57,18 +58,8 @@ function isNonEmpty(value: unknown): value is string {
 
 function asBoundedStateRecord(value: unknown): Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue> | null {
   if (!isRecord(value)) return null;
-  const fields: PharmacyAdminDiffField[] = [
-    "status",
-    "is_active",
-    "is_featured",
-    "visibility",
-    "index_policy",
-    "sitemap_policy",
-    "projection_version",
-    "canonical_path",
-  ];
   const result = {} as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
-  for (const field of fields) {
+  for (const field of PHARMACY_ADMIN_DIFF_FIELDS) {
     const fieldValue = value[field];
     if (typeof fieldValue !== "string" && typeof fieldValue !== "boolean" && fieldValue !== null) return null;
     result[field] = fieldValue;

@@ -8,6 +8,11 @@ import {
   type PharmacyAdminDiffField,
 } from "@/server/admin/import-pharmacy-admin-bounded-read-state";
 import { createPharmacyAdminReadStateStoreFromEnvironment } from "@/server/admin/import-pharmacy-admin-read-state-store";
+import {
+  buildPharmacyCanonicalMutationPatch,
+  projectPharmacyCanonicalMutationPatchForReview,
+  projectPharmacyRollbackSnapshotForMutationReview,
+} from "@/server/admin/import-pharmacy-canonical-mutation-patch";
 import { createPharmacyPublishAuthorizationStoreFromEnvironment } from "@/server/admin/import-pharmacy-publish-authorization-store";
 import { issuePharmacyPreviewPublishAuthorization } from "@/server/admin/import-pharmacy-preview-publish-authorization-issue";
 import {
@@ -56,6 +61,7 @@ function readBoolean(record: Readonly<Record<string, unknown>>, key: string): bo
 
 function buildBoundedRecords(
   rollbackSnapshot: Readonly<Record<string, unknown>>,
+  draft: Parameters<typeof buildPharmacyCanonicalMutationPatch>[0],
 ): {
   current: Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
   proposed: Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
@@ -71,6 +77,10 @@ function buildBoundedRecords(
   const sitemapPolicy = readString(rollbackSnapshot, "sitemapPolicy");
   const projectionVersion = readString(rollbackSnapshot, "projectionVersion");
   const canonicalPath = readString(rollbackSnapshot, "canonicalRoute");
+  const currentMutation = projectPharmacyRollbackSnapshotForMutationReview(rollbackSnapshot);
+  const proposedMutation = projectPharmacyCanonicalMutationPatchForReview(
+    buildPharmacyCanonicalMutationPatch(draft),
+  );
   if (
     status === null ||
     isActive === null ||
@@ -79,7 +89,8 @@ function buildBoundedRecords(
     indexPolicy === null ||
     sitemapPolicy === null ||
     projectionVersion === null ||
-    canonicalPath === null
+    canonicalPath === null ||
+    currentMutation === null
   ) return null;
 
   const current = {
@@ -91,12 +102,14 @@ function buildBoundedRecords(
     sitemap_policy: sitemapPolicy,
     projection_version: projectionVersion,
     canonical_path: canonicalPath,
+    ...currentMutation,
   } satisfies Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
 
   return {
     current,
     proposed: {
       ...current,
+      ...proposedMutation,
       is_active: false,
       is_featured: false,
       visibility: "private",
@@ -170,7 +183,10 @@ export async function runPharmacyPrivateAdminAction(
       }
 
       const rollbackSnapshot = context.context.canaryInput.reservationRequest.rollbackSnapshot;
-      const records = buildBoundedRecords(rollbackSnapshot as Readonly<Record<string, unknown>>);
+      const records = buildBoundedRecords(
+        rollbackSnapshot as Readonly<Record<string, unknown>>,
+        context.context.mutationRequest.draft,
+      );
       if (!records) {
         return {
           operation,

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS } from "./import-pharmacy-canonical-mutation-patch";
+
 export const PHARMACY_ADMIN_DIFF_FIELDS = [
   "status",
   "is_active",
@@ -9,6 +11,7 @@ export const PHARMACY_ADMIN_DIFF_FIELDS = [
   "sitemap_policy",
   "projection_version",
   "canonical_path",
+  ...PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS,
 ] as const;
 
 export type PharmacyAdminDiffField = (typeof PHARMACY_ADMIN_DIFF_FIELDS)[number];
@@ -21,7 +24,7 @@ export type PharmacyAdminBoundedDiffEntry = {
 };
 
 export type PharmacyAdminBoundedReadState = {
-  schemaVersion: "pharmacy_admin_read_state_v1";
+  schemaVersion: "pharmacy_admin_read_state_v2";
   operation: "dry_run" | "review";
   actorId: string;
   entityId: string;
@@ -95,7 +98,7 @@ export function buildPharmacyAdminBoundedReadState(
     .slice(0, 20);
 
   return {
-    schemaVersion: "pharmacy_admin_read_state_v1",
+    schemaVersion: "pharmacy_admin_read_state_v2",
     operation: input.operation,
     actorId: input.actorId,
     entityId: input.entityId,
