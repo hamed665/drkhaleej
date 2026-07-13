@@ -2,13 +2,21 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { buildPharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
+import {
+  buildPharmacyAdminBoundedReadState,
+  PHARMACY_ADMIN_DIFF_FIELDS,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
+} from "./import-pharmacy-admin-bounded-read-state";
 import { verifyPharmacyAdminPublishReview } from "./import-pharmacy-admin-publish-review-gate";
 import type { PharmacyAdminReadStateStore } from "./import-pharmacy-admin-read-state-store";
 
 const SNAPSHOT_HASH = "a".repeat(64);
 const FINGERPRINT = "b".repeat(64);
-const current = {
+const current = Object.fromEntries(
+  PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
+) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+Object.assign(current, {
   status: "draft",
   is_active: false,
   is_featured: false,
@@ -17,7 +25,11 @@ const current = {
   sitemap_policy: "excluded",
   projection_version: "projection-1",
   canonical_path: "/en/om/pharmacies/pharmacy-one",
-} as const;
+  name_en: "Pharmacy One",
+  default_country: "om",
+  default_locale: "en",
+  metadata_source_evidence: "null",
+});
 
 function review(overrides: Partial<ReturnType<typeof buildPharmacyAdminBoundedReadState>> = {}) {
   return {
