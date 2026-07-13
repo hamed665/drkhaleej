@@ -26,6 +26,7 @@ const migrations = {
   publishRpcs: '0069_import_publish_transaction_rpcs.sql',
   durableReference: '0072_import_pharmacy_publish_references.sql',
   pharmacyAdminReadState: '0073_import_pharmacy_admin_read_states.sql',
+  pharmacyPublishAuthorization: '0074_import_pharmacy_publish_authorizations.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -110,10 +111,13 @@ function validateSpecialtyAliasRlsMigration() {
   requirePattern(content, /from\s+public\.specialties\s+specialty/i, 'specialty_aliases policy must check parent specialties.');
 }
 
-function validateClosedMigration(key, label, requiredTables = []) {
+function validateClosedMigration(key, label, requiredTables = [], options = {}) {
   const content = readMigration(key);
   validateNoAdminPolicies(content, label);
-  forbidPattern(content, /\bto\s+service_role\b/i, `${label} must not add explicit service_role grants.`);
+  if (!options.allowServiceRoleGrant) {
+    forbidPattern(content, /\bto\s+service_role\b/i, `${label} must not add explicit service_role grants.`);
+  }
+  forbidPattern(content, /\busing\s*\(\s*true\s*\)/i, `${label} must not use broad TRUE policy predicates.`);
   for (const tableName of requiredTables) {
     requirePattern(content, new RegExp(`alter\\s+table\\s+public\\.${tableName}\\s+enable\\s+row\\s+level\\s+security`, 'i'), `${label} must enable RLS on ${tableName}.`);
   }
@@ -153,6 +157,14 @@ function validateLaterMigrations() {
   execFileSync(process.execPath, [publishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
   validateClosedMigration('durableReference', '0072', ['import_pharmacy_publish_references']);
   validateClosedMigration('pharmacyAdminReadState', '0073', ['import_pharmacy_admin_read_states']);
+  const authorization = validateClosedMigration(
+    'pharmacyPublishAuthorization',
+    '0074',
+    ['import_pharmacy_publish_authorizations'],
+    { allowServiceRoleGrant: true },
+  );
+  requirePattern(authorization, /revoke\s+all\s+on\s+function\s+public\.import_pharmacy_consume_publish_authorization[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0074 must revoke authorization consumption from public roles.');
+  requirePattern(authorization, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_consume_publish_authorization[\s\S]*to\s+service_role/i, '0074 must grant only the consumption RPC to service_role.');
 }
 
 function runLegacyStaticRlsTestWithoutLaterMigrations() {

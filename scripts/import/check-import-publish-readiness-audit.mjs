@@ -22,6 +22,7 @@ import './check-import-pharmacy-minimal-admin-ui.mjs';
 import './check-import-pharmacy-admin-publish-review-gate.mjs';
 import './check-import-pharmacy-preview-publish-capability.mjs';
 import './check-import-pharmacy-publish-authorization-envelope.mjs';
+import './check-import-pharmacy-publish-authorization-persistence.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';
