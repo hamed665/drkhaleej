@@ -20,6 +20,7 @@ import './check-import-pharmacy-real-rollback-canary.mjs';
 import './check-import-pharmacy-canary-integrity-report.mjs';
 import './check-import-pharmacy-minimal-admin-ui.mjs';
 import './check-import-pharmacy-admin-publish-review-gate.mjs';
+import './check-import-pharmacy-preview-publish-capability.mjs';
 import './check-import-oman-geo-authority-registry.mjs';
 import './check-import-oman-geo-seed-validation.mjs';
 import './check-import-geo-alias-duplicate-guard.mjs';

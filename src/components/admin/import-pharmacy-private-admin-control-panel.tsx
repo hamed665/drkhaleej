@@ -19,13 +19,13 @@ const steps = [
   {
     operation: "review",
     title: "Review exact diff",
-    description: "Persist the reviewed state and render the verified allowlisted field changes.",
+    description: "Persist the reviewed state and verify the exact entity-bound confirmation phrase.",
     readOnlyEnabled: true,
   },
   {
     operation: "private_publish",
     title: "Private publish",
-    description: "Apply the guarded single-Pharmacy mutation while keeping the record private and noindex.",
+    description: "Preview eligibility may be revealed after review, but mutation execution remains disabled.",
     readOnlyEnabled: false,
   },
   {
@@ -50,6 +50,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
   const controlsEnabled = activationEnabled && entityId !== null;
   const workflow = result && "workflow" in result ? result.workflow : null;
   const readState = result?.readState ?? null;
+  const publishCapability = result?.publishCapability ?? null;
   const blockers = result && !result.ok ? result.blockers : [];
 
   return (
@@ -66,8 +67,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
             Controlled Pharmacy workflow
           </h2>
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-            Dry-run and review persist a bounded server-side state for the allowlisted Preview canary. Private publish,
-            rollback, public routing, indexing, sitemap inclusion, and bulk execution remain unavailable.
+            Dry-run and review persist a bounded server-side state for the allowlisted Preview canary. A valid review and exact confirmation can reveal publish eligibility, while mutation, rollback, public routing, indexing, sitemap inclusion, and bulk execution remain unavailable.
           </p>
         </div>
         <span
@@ -99,6 +99,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
       <ol className="mt-5 grid gap-4 lg:grid-cols-2" aria-label="Controlled Pharmacy operations">
         {steps.map((step, index) => {
           const actionEnabled = controlsEnabled && step.readOnlyEnabled;
+          const publishPreviewVisible = step.operation === "private_publish" && publishCapability?.visible === true;
           return (
             <li key={step.operation} className="rounded-2xl border border-sky-200 bg-white/80 p-5">
               <div className="flex items-start gap-3">
@@ -109,9 +110,22 @@ export function ImportPharmacyPrivateAdminControlPanel({
                   <h3 className="font-bold text-slate-950">{step.title}</h3>
                   <p className="mt-1 text-sm leading-6 text-slate-700">{step.description}</p>
                   {step.readOnlyEnabled ? (
-                    <form action={formAction} className="mt-4">
+                    <form action={formAction} className="mt-4 space-y-3">
                       <input type="hidden" name="operation" value={step.operation} />
                       <input type="hidden" name="entityId" value={entityId ?? ""} />
+                      {step.operation === "review" ? (
+                        <label className="block text-xs font-semibold text-slate-700">
+                          Exact confirmation
+                          <input
+                            type="text"
+                            name="publishConfirmation"
+                            autoComplete="off"
+                            spellCheck={false}
+                            placeholder={`PRIVATE PUBLISH ${entityId ?? "<entity-id>"}`}
+                            className="mt-2 min-h-10 w-full rounded-xl border border-sky-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400"
+                          />
+                        </label>
+                      ) : null}
                       <button
                         type="submit"
                         disabled={!actionEnabled || pending}
@@ -121,6 +135,19 @@ export function ImportPharmacyPrivateAdminControlPanel({
                         {pending ? "Running…" : step.title}
                       </button>
                     </form>
+                  ) : publishPreviewVisible ? (
+                    <div className="mt-4 space-y-2">
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        title="Eligibility verified in Preview; mutation execution remains disabled."
+                        className="inline-flex min-h-10 items-center justify-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-900"
+                      >
+                        Preview eligible · execution disabled
+                      </button>
+                      <p className="font-mono text-xs text-slate-600">{publishCapability.confirmationPhrase}</p>
+                    </div>
                   ) : (
                     <button
                       type="button"
@@ -138,6 +165,12 @@ export function ImportPharmacyPrivateAdminControlPanel({
           );
         })}
       </ol>
+
+      {publishCapability && !publishCapability.visible && publishCapability.blockers.length > 0 ? (
+        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
+          Publish preview locked: {publishCapability.blockers.join(", ")}
+        </p>
+      ) : null}
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.6fr)]">
         <section className="overflow-hidden rounded-2xl border border-sky-200 bg-white/80" aria-labelledby="pharmacy-diff-title">
@@ -209,7 +242,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
       </div>
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-sky-900">
-        No bulk · no public promotion · no manual bypass
+        No bulk · no public promotion · no manual bypass · no mutation execution
       </p>
     </section>
   );

@@ -9,6 +9,11 @@ import {
 } from "@/server/admin/import-pharmacy-admin-bounded-read-state";
 import { createPharmacyAdminReadStateStoreFromEnvironment } from "@/server/admin/import-pharmacy-admin-read-state-store";
 import {
+  buildPharmacyPreviewPublishConfirmation,
+  resolvePharmacyPreviewPublishCapability,
+  type PharmacyPreviewPublishCapability,
+} from "@/server/admin/import-pharmacy-preview-publish-capability";
+import {
   createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment,
   loadPharmacyPrivateAdminRuntimeContext,
 } from "@/server/admin/import-pharmacy-private-admin-runtime-context";
@@ -22,6 +27,7 @@ const READ_STATE_TTL_MS = 15 * 60 * 1000;
 
 export type PharmacyPrivateAdminActionStateResult = PharmacyPrivateAdminServerActionResult & {
   readState?: PharmacyAdminBoundedReadState | null;
+  publishCapability?: PharmacyPreviewPublishCapability | null;
 };
 
 function parseAllowlist(value: string | undefined): string[] {
@@ -97,7 +103,9 @@ export async function runPharmacyPrivateAdminAction(
   const admin = await requirePlatformAdmin();
   const allowedActorIds = parseAllowlist(process.env.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
   const allowedEntityIds = parseAllowlist(process.env.IMPORT_PREVIEW_CANARY_ENTITY_IDS);
+  const confirmation = String(formData.get("publishConfirmation") ?? "");
   let persistedReadState: PharmacyAdminBoundedReadState | null = null;
+  let publishCapability: PharmacyPreviewPublishCapability | null = null;
 
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: process.env.VERCEL_ENV === "preview",
@@ -200,6 +208,20 @@ export async function runPharmacyPrivateAdminAction(
       }
 
       persistedReadState = readback;
+      if (operation === "review") {
+        publishCapability = resolvePharmacyPreviewPublishCapability({
+          environment: process.env.VERCEL_ENV,
+          actorId,
+          entityId,
+          allowedActorIds,
+          allowedEntityIds,
+          confirmation,
+          reviewState: readback,
+          expectedSnapshotHash: context.snapshotHash,
+          expectedEntityFingerprint: context.context.canaryInput.expectedEntityFingerprint,
+          now: createdAt,
+        });
+      }
       return {
         operation,
         status: "completed",
@@ -215,7 +237,23 @@ export async function runPharmacyPrivateAdminAction(
   });
 
   const result = await action({ actorId: admin.id, formData });
-  return { ...result, readState: persistedReadState };
+  const entityId = String(formData.get("entityId") ?? "");
+  return {
+    ...result,
+    readState: persistedReadState,
+    publishCapability: publishCapability ?? {
+      visible: false,
+      executable: false,
+      mode: "locked",
+      confirmationPhrase: buildPharmacyPreviewPublishConfirmation(entityId),
+      blockers: [],
+      publicVisibility: "private",
+      indexEligible: false,
+      sitemapEligible: false,
+      routeEnabled: false,
+      bulkAllowed: false,
+    },
+  };
 }
 
 export async function runPharmacyPrivateAdminActionState(
