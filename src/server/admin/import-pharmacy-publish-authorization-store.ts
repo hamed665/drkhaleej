@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createClient } from "@supabase/supabase-js";
+
 import type {
   PharmacyPublishAuthorizationEnvelopeRecord,
   PharmacyPublishAuthorizationEnvelopeStore,
@@ -111,4 +113,22 @@ export function createPharmacyPublishAuthorizationStore(
       return !response.error && response.data === true;
     },
   };
+}
+
+export function createPharmacyPublishAuthorizationStoreFromEnvironment(
+  environment: Record<string, string | undefined> = process.env,
+): PharmacyPublishAuthorizationEnvelopeStore | null {
+  const url = environment.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = environment.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (environment.VERCEL_ENV !== "preview" || !url || !key) return null;
+
+  const client = createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  });
+
+  return createPharmacyPublishAuthorizationStore(client as unknown as PharmacyPublishAuthorizationClient);
 }
