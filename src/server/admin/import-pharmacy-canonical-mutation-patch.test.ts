@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import type { ImportUnifiedDraftEntityInput } from "./import-unified-draft-entity";
+import type { ImportUnifiedDraftEntity } from "./import-unified-draft-entity";
 import {
   buildPharmacyCanonicalMutationPatch,
   projectPharmacyCanonicalMutationPatchForReview,
@@ -13,7 +13,9 @@ import {
 const draft = {
   draftId: "pharmacy-1",
   source: "excel",
+  status: "draft",
   entityType: "pharmacy",
+  entityDomain: "human_healthcare",
   name: "Reviewed Pharmacy",
   legalName: "Reviewed Pharmacy LLC",
   slugCandidate: "reviewed-pharmacy",
@@ -48,7 +50,7 @@ const draft = {
   rawPayloadHash: "raw-hash",
   duplicateCandidateIds: [],
   requiresManualReview: false,
-} satisfies ImportUnifiedDraftEntityInput;
+} satisfies ImportUnifiedDraftEntity;
 
 describe("canonical Pharmacy mutation patch", () => {
   it("builds the exact RPC patch and deterministic review projection from one authority", () => {
