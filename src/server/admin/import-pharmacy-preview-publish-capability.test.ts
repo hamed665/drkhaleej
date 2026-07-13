@@ -2,29 +2,49 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import type { PharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
+import {
+  buildPharmacyAdminBoundedReadState,
+  PHARMACY_ADMIN_DIFF_FIELDS,
+  type PharmacyAdminBoundedReadState,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
+} from "./import-pharmacy-admin-bounded-read-state";
 import {
   buildPharmacyPreviewPublishConfirmation,
   resolvePharmacyPreviewPublishCapability,
 } from "./import-pharmacy-preview-publish-capability";
 
+const current = Object.fromEntries(
+  PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
+) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+Object.assign(current, {
+  status: "draft",
+  is_active: false,
+  is_featured: false,
+  visibility: "private",
+  index_policy: "noindex",
+  sitemap_policy: "excluded",
+  projection_version: "projection-1",
+  canonical_path: "/en/om/pharmacies/pharmacy-one",
+  name_en: "Pharmacy One",
+  metadata_source_evidence: "null",
+});
+
 function reviewState(overrides: Partial<PharmacyAdminBoundedReadState> = {}): PharmacyAdminBoundedReadState {
   return {
-    schemaVersion: "pharmacy_admin_read_state_v2",
-    operation: "review",
-    actorId: "admin-1",
-    entityId: "pharmacy-1",
-    snapshotHash: "snapshot-1",
-    entityFingerprint: "fingerprint-1",
-    createdAt: "2026-07-13T00:00:00.000Z",
-    expiresAt: "2026-07-13T00:15:00.000Z",
-    reviewedAt: "2026-07-13T00:00:00.000Z",
-    diff: [],
-    blockerCodes: [],
-    publicVisibility: "private",
-    indexEligible: false,
-    sitemapEligible: false,
-    routeEnabled: false,
+    ...buildPharmacyAdminBoundedReadState({
+      operation: "review",
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+      snapshotHash: "a".repeat(64),
+      entityFingerprint: "b".repeat(64),
+      expectedEntityVersion: "2026-07-13T00:00:00.000Z",
+      createdAt: "2026-07-13T00:00:00.000Z",
+      expiresAt: "2026-07-13T00:15:00.000Z",
+      reviewedAt: "2026-07-13T00:00:00.000Z",
+      current,
+      proposed: current,
+    }),
     ...overrides,
   };
 }
@@ -38,8 +58,8 @@ function input(overrides: Record<string, unknown> = {}) {
     allowedEntityIds: ["pharmacy-1"],
     confirmation: buildPharmacyPreviewPublishConfirmation("pharmacy-1"),
     reviewState: reviewState(),
-    expectedSnapshotHash: "snapshot-1",
-    expectedEntityFingerprint: "fingerprint-1",
+    expectedSnapshotHash: "a".repeat(64),
+    expectedEntityFingerprint: "b".repeat(64),
     now: "2026-07-13T00:05:00.000Z",
     ...overrides,
   } as Parameters<typeof resolvePharmacyPreviewPublishCapability>[0];
