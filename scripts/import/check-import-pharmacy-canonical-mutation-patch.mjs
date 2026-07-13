@@ -48,8 +48,12 @@ assert(
   `${readStatePath} must expose every canonical mutation field in exact diff`,
 );
 assert(
-  readState.includes('schemaVersion: "pharmacy_admin_read_state_v2"'),
-  `${readStatePath} must version the expanded exact review contract`,
+  readState.includes('schemaVersion: "pharmacy_admin_read_state_v3"'),
+  `${readStatePath} must version the expanded exact review and stable identity contract`,
+);
+assert(
+  readState.includes("PharmacyStableOperationIdentity"),
+  `${readStatePath} must retain the stable operation identity contract`,
 );
 
 console.log("Pharmacy canonical mutation patch check passed.");

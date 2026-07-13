@@ -13,6 +13,7 @@ import type { PharmacyAdminReadStateStore } from "./import-pharmacy-admin-read-s
 
 const SNAPSHOT_HASH = "a".repeat(64);
 const FINGERPRINT = "b".repeat(64);
+const EXPECTED_VERSION = "2026-07-13T00:00:00.000Z";
 const current = Object.fromEntries(
   PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
 ) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
@@ -26,8 +27,6 @@ Object.assign(current, {
   projection_version: "projection-1",
   canonical_path: "/en/om/pharmacies/pharmacy-one",
   name_en: "Pharmacy One",
-  default_country: "om",
-  default_locale: "en",
   metadata_source_evidence: "null",
 });
 
@@ -39,6 +38,7 @@ function review(overrides: Partial<ReturnType<typeof buildPharmacyAdminBoundedRe
       entityId: "pharmacy-1",
       snapshotHash: SNAPSHOT_HASH,
       entityFingerprint: FINGERPRINT,
+      expectedEntityVersion: EXPECTED_VERSION,
       createdAt: "2026-07-13T00:00:00.000Z",
       expiresAt: "2026-07-13T00:15:00.000Z",
       reviewedAt: "2026-07-13T00:05:00.000Z",

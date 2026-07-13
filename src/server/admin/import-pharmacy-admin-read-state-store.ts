@@ -78,18 +78,26 @@ function readRow(row: Record<string, unknown>): PharmacyAdminBoundedReadState | 
     !isNonEmpty(row.entity_id) ||
     !isNonEmpty(row.snapshot_hash) ||
     !isNonEmpty(row.entity_fingerprint) ||
+    !isNonEmpty(row.operation_attempt_id) ||
+    !isNonEmpty(row.idempotency_key) ||
+    !isNonEmpty(row.request_hash) ||
+    !isNonEmpty(row.patch_hash) ||
+    row.operation_scope !== "reserve_private_publish" ||
+    row.entity_family !== "pharmacy" ||
+    !isNonEmpty(row.expected_entity_version) ||
     !isNonEmpty(row.created_at) ||
     !isNonEmpty(row.expires_at) ||
     (row.reviewed_at !== null && !isNonEmpty(row.reviewed_at))
   ) return null;
 
   try {
-    return buildPharmacyAdminBoundedReadState({
+    const state = buildPharmacyAdminBoundedReadState({
       operation: row.operation,
       actorId: row.actor_profile_id,
       entityId: row.entity_id,
       snapshotHash: row.snapshot_hash,
       entityFingerprint: row.entity_fingerprint,
+      expectedEntityVersion: row.expected_entity_version,
       createdAt: row.created_at,
       expiresAt: row.expires_at,
       reviewedAt: row.reviewed_at as string | null,
@@ -99,6 +107,13 @@ function readRow(row: Record<string, unknown>): PharmacyAdminBoundedReadState | 
         ? row.blocker_codes.filter((value): value is string => typeof value === "string")
         : [],
     });
+    if (
+      state.operationAttemptId !== row.operation_attempt_id ||
+      state.idempotencyKey !== row.idempotency_key ||
+      state.requestHash !== row.request_hash ||
+      state.patchHash !== row.patch_hash
+    ) return null;
+    return state;
   } catch {
     return null;
   }
@@ -107,7 +122,7 @@ function readRow(row: Record<string, unknown>): PharmacyAdminBoundedReadState | 
 export function createPharmacyAdminReadStateStore(
   client: PharmacyAdminReadStateClient,
 ): PharmacyAdminReadStateStore {
-  const columns = "id,actor_profile_id,entity_id,operation,snapshot_hash,entity_fingerprint,current_state,proposed_state,blocker_codes,reviewed_at,expires_at,created_at";
+  const columns = "id,actor_profile_id,entity_id,operation,snapshot_hash,entity_fingerprint,operation_attempt_id,idempotency_key,request_hash,patch_hash,operation_scope,entity_family,expected_entity_version,current_state,proposed_state,blocker_codes,reviewed_at,expires_at,created_at";
 
   return {
     async persist(input) {
@@ -121,6 +136,13 @@ export function createPharmacyAdminReadStateStore(
             operation: input.state.operation,
             snapshot_hash: input.state.snapshotHash,
             entity_fingerprint: input.state.entityFingerprint,
+            operation_attempt_id: input.state.operationAttemptId,
+            idempotency_key: input.state.idempotencyKey,
+            request_hash: input.state.requestHash,
+            patch_hash: input.state.patchHash,
+            operation_scope: input.state.operationScope,
+            entity_family: input.state.entityFamily,
+            expected_entity_version: input.state.expectedEntityVersion,
             current_state: input.current,
             proposed_state: input.proposed,
             exact_diff: input.state.diff,
@@ -129,7 +151,7 @@ export function createPharmacyAdminReadStateStore(
             expires_at: input.state.expiresAt,
             created_at: input.state.createdAt,
           },
-          { onConflict: "actor_profile_id,entity_id,operation,snapshot_hash,entity_fingerprint" },
+          { onConflict: "operation_attempt_id,operation" },
         )
         .select(columns)
         .maybeSingle();

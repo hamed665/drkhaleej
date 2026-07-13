@@ -1,6 +1,10 @@
 import "server-only";
 
 import { PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS } from "./import-pharmacy-canonical-mutation-patch";
+import {
+  buildPharmacyStableOperationIdentity,
+  type PharmacyStableOperationIdentity,
+} from "./import-pharmacy-operation-identity";
 
 export const PHARMACY_ADMIN_DIFF_FIELDS = [
   "status",
@@ -23,8 +27,8 @@ export type PharmacyAdminBoundedDiffEntry = {
   after: PharmacyAdminBoundedValue;
 };
 
-export type PharmacyAdminBoundedReadState = {
-  schemaVersion: "pharmacy_admin_read_state_v2";
+export type PharmacyAdminBoundedReadState = PharmacyStableOperationIdentity & {
+  schemaVersion: "pharmacy_admin_read_state_v3";
   operation: "dry_run" | "review";
   actorId: string;
   entityId: string;
@@ -47,6 +51,7 @@ export type BuildPharmacyAdminBoundedReadStateInput = {
   entityId: string;
   snapshotHash: string;
   entityFingerprint: string;
+  expectedEntityVersion: string;
   createdAt: string;
   expiresAt: string;
   reviewedAt?: string | null;
@@ -70,40 +75,43 @@ export function buildPharmacyAdminBoundedReadState(
 ): PharmacyAdminBoundedReadState {
   assertNonEmpty(input.actorId, "actor_id");
   assertNonEmpty(input.entityId, "entity_id");
-  assertNonEmpty(input.snapshotHash, "snapshot_hash");
-  assertNonEmpty(input.entityFingerprint, "entity_fingerprint");
+  assertNonEmpty(input.expectedEntityVersion, "expected_entity_version");
 
   const createdAt = assertIsoDate(input.createdAt, "created_at");
   const expiresAt = assertIsoDate(input.expiresAt, "expires_at");
   if (expiresAt <= createdAt) throw new Error("expiry_not_after_creation");
 
-  if (input.operation === "review" && !input.reviewedAt) {
-    throw new Error("reviewed_at_required");
-  }
+  if (input.operation === "review" && !input.reviewedAt) throw new Error("reviewed_at_required");
   if (input.reviewedAt) {
     const reviewedAt = assertIsoDate(input.reviewedAt, "reviewed_at");
-    if (reviewedAt < createdAt || reviewedAt > expiresAt) {
-      throw new Error("reviewed_at_out_of_range");
-    }
+    if (reviewedAt < createdAt || reviewedAt > expiresAt) throw new Error("reviewed_at_out_of_range");
   }
 
+  const identity = buildPharmacyStableOperationIdentity({
+    actorId: input.actorId,
+    entityId: input.entityId,
+    snapshotHash: input.snapshotHash,
+    entityFingerprint: input.entityFingerprint,
+    expectedEntityVersion: input.expectedEntityVersion,
+    patch: input.proposed,
+  });
   const diff = PHARMACY_ADMIN_DIFF_FIELDS.flatMap((field) => {
     const before = input.current[field];
     const after = input.proposed[field];
     return Object.is(before, after) ? [] : [{ field, before, after }];
   });
-
   const blockerCodes = [...new Set((input.blockerCodes ?? []).map((value) => value.trim()).filter(Boolean))]
     .sort()
     .slice(0, 20);
 
   return {
-    schemaVersion: "pharmacy_admin_read_state_v2",
+    schemaVersion: "pharmacy_admin_read_state_v3",
     operation: input.operation,
     actorId: input.actorId,
     entityId: input.entityId,
     snapshotHash: input.snapshotHash,
     entityFingerprint: input.entityFingerprint,
+    ...identity,
     createdAt: input.createdAt,
     expiresAt: input.expiresAt,
     reviewedAt: input.reviewedAt ?? null,

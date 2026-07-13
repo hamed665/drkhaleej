@@ -209,6 +209,7 @@ export async function runPharmacyPrivateAdminAction(
         entityId,
         snapshotHash: context.snapshotHash,
         entityFingerprint: context.context.canaryInput.expectedEntityFingerprint,
+        expectedEntityVersion: context.context.canaryInput.reservationRequest.expectedVersion,
         createdAt,
         expiresAt: new Date(now.getTime() + READ_STATE_TTL_MS).toISOString(),
         reviewedAt: operation === "review" ? createdAt : null,

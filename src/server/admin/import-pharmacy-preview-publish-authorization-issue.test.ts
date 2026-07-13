@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import type { PharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
+import {
+  buildPharmacyAdminBoundedReadState,
+  PHARMACY_ADMIN_DIFF_FIELDS,
+  type PharmacyAdminBoundedValue,
+  type PharmacyAdminDiffField,
+} from "./import-pharmacy-admin-bounded-read-state";
 import type {
   PharmacyPublishAuthorizationEnvelopeRecord,
   PharmacyPublishAuthorizationEnvelopeStore,
@@ -23,23 +28,35 @@ const capability: PharmacyPreviewPublishCapability = {
   bulkAllowed: false,
 };
 
-const reviewState = {
-  schemaVersion: "pharmacy_admin_read_state_v2",
+const current = Object.fromEntries(
+  PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null]),
+) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
+Object.assign(current, {
+  status: "draft",
+  is_active: false,
+  is_featured: false,
+  visibility: "private",
+  index_policy: "noindex",
+  sitemap_policy: "excluded",
+  projection_version: "projection-1",
+  canonical_path: "/en/om/pharmacies/pharmacy-one",
+  name_en: "Pharmacy One",
+  metadata_source_evidence: "null",
+});
+
+const reviewState = buildPharmacyAdminBoundedReadState({
   operation: "review",
   actorId: "admin-1",
   entityId: "pharmacy-1",
   snapshotHash: "a".repeat(64),
   entityFingerprint: "b".repeat(64),
+  expectedEntityVersion: "2026-07-13T00:00:00.000Z",
   createdAt: "2026-07-13T00:00:00.000Z",
   expiresAt: "2026-07-13T00:15:00.000Z",
   reviewedAt: "2026-07-13T00:00:00.000Z",
-  diff: [],
-  blockerCodes: [],
-  publicVisibility: "private",
-  indexEligible: false,
-  sitemapEligible: false,
-  routeEnabled: false,
-} satisfies PharmacyAdminBoundedReadState;
+  current,
+  proposed: current,
+});
 
 function store(createResult = true): PharmacyPublishAuthorizationEnvelopeStore {
   let record: PharmacyPublishAuthorizationEnvelopeRecord | null = null;
