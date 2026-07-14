@@ -25,18 +25,26 @@ for (const token of [
   "nonceHash",
   "reviewSnapshotHash",
   "entityFingerprint",
-  "consumedAt",
-  "verifyAndConsume",
-  "Date.parse(record.expiresAt)",
-  "record.actorId !== input.actorId",
-  "record.entityId !== input.entityId",
+  "operationAttemptId",
+  "requestHash",
+  "patchHash",
+  "resolveReviewStateId",
+  "authorizationId: string",
+  "expiresAt: string",
 ]) assert(source.includes(token), `${sourcePath} must include ${token}`);
 
+for (const forbidden of ["token: string;", "nonce: string;"]) {
+  const envelopeType = source.slice(
+    source.indexOf("export type PharmacyPublishAuthorizationEnvelope ="),
+    source.indexOf("function sha256"),
+  );
+  assert(!envelopeType.includes(forbidden), `${sourcePath} must not expose ${forbidden}`);
+}
+
 for (const token of [
-  "issues only opaque token and nonce while storing hashes and bounded identity",
-  "verifies and consumes exactly once",
-  "rejects expired, mismatched actor, entity, snapshot, fingerprint, token, and nonce",
-  "fails closed for malformed hashes and storage failures",
+  "returns only a server-owned handle while persisting the full bounded identity",
+  "fails closed when the persisted Review cannot be resolved",
+  "fails closed for malformed identity or persistence failure",
 ]) assert(tests.includes(token), `${testPath} must cover ${token}`);
 
 for (const forbidden of [
@@ -44,9 +52,11 @@ for (const forbidden of [
   'readOnlyEnabled: true,\n    operation: "private_publish"',
   "verifyAndConsume(",
   "createPharmacyPublishAuthorizationEnvelopeService(",
+  "authorization.token",
+  "authorization.nonce",
 ]) {
-  assert(!action.includes(forbidden), `${actionPath} must not enable authorization consumption: ${forbidden}`);
-  assert(!panel.includes(forbidden), `${panelPath} must not enable authorization consumption: ${forbidden}`);
+  assert(!action.includes(forbidden), `${actionPath} must not enable or expose authorization consumption: ${forbidden}`);
+  assert(!panel.includes(forbidden), `${panelPath} must not enable or expose authorization consumption: ${forbidden}`);
 }
 
 console.log("Pharmacy publish authorization envelope check passed.");
