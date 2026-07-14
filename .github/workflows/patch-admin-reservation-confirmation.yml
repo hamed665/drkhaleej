@@ -1,0 +1,32 @@
+name: Patch Admin Reservation Confirmation
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.head_ref == 'agent/pharmacy-admin-reservation-operation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Apply confirmation wiring fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/app/admin/imports/readiness/actions.ts')
+          s=p.read_text()
+          s=s.replace('const confirmation = String(formData.get("publishConfirmation") ?? "");', 'const publishConfirmation = String(formData.get("publishConfirmation") ?? "");')
+          s=s.replace('execute: async ({ operation, actorId, entityId }) => {', 'execute: async ({ operation, actorId, entityId, confirmation }) => {')
+          s=s.replace('confirmation: confirmation ?? "", now, reviewState, context: context.context, dependencies,', 'confirmation: confirmation ?? "", now, reviewState, context: context.context, dependencies,')
+          s=s.replace('confirmation,\n          reviewState: readback,', 'confirmation: publishConfirmation,\n          reviewState: readback,')
+          p.write_text(s)
+          PY
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/app/admin/imports/readiness/actions.ts
+          git commit -m "fix: use operation confirmation for reservation"
+          git push
