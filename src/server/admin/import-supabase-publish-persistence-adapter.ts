@@ -7,7 +7,6 @@ import type {
   ImportPublishPersistenceTerminalResult,
   ImportPublishPersistenceTerminalWriteRequest,
   ImportPublishPersistenceTerminalWriteResult,
-  ImportPublishPersistenceTransactionRequest,
   ImportPublishPersistenceTransactionResult,
 } from "./import-private-persistence-adapter";
 
@@ -114,6 +113,7 @@ export function createImportSupabasePublishPersistenceAdapter(client: ImportSupa
       const rollbackRetentionDays = durationUnits(request.rollbackExpiresAt, 24 * 60 * 60 * 1000, 30, 365);
       if (reservationTtlHours === null || rollbackRetentionDays === null) return { kind: "failed", reason: "transaction_aborted" };
 
+      const authorization = request.authorization;
       const response = await client.rpc(RESERVE_RPC, {
         p_entity_id: request.entityId,
         p_actor_profile_id: request.actorId,
@@ -123,13 +123,13 @@ export function createImportSupabasePublishPersistenceAdapter(client: ImportSupa
         p_snapshot_payload: request.rollbackSnapshot,
         p_snapshot_hash: sha256Json(request.rollbackSnapshot),
         p_audit_schema_version: request.auditSchemaVersion,
-        p_authorization_id: request.authorizationId,
-        p_review_snapshot_hash: request.reviewSnapshotHash,
-        p_entity_fingerprint: request.entityFingerprint,
-        p_operation_attempt_id: request.operationAttemptId,
-        p_patch_hash: request.patchHash,
-        p_entity_family: request.entityFamily,
-        p_operation_scope: request.operationScope,
+        p_authorization_id: authorization?.authorizationId ?? null,
+        p_review_snapshot_hash: authorization?.reviewSnapshotHash ?? null,
+        p_entity_fingerprint: authorization?.entityFingerprint ?? null,
+        p_operation_attempt_id: authorization?.operationAttemptId ?? null,
+        p_patch_hash: authorization?.patchHash ?? null,
+        p_entity_family: authorization?.entityFamily ?? null,
+        p_operation_scope: authorization?.operationScope ?? null,
         p_reservation_ttl_hours: reservationTtlHours,
         p_rollback_retention_days: rollbackRetentionDays,
       });
