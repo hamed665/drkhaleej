@@ -32,10 +32,7 @@ export type PharmacyPublishAuthorizationEnvelopeRecord = {
   consumedByReservationId: string | null;
 };
 
-export type PharmacyPublishAuthorizationCreateRecord = Omit<
-  PharmacyPublishAuthorizationEnvelopeRecord,
-  "authorizationId"
->;
+export type PharmacyPublishAuthorizationCreateRecord = Omit<PharmacyPublishAuthorizationEnvelopeRecord, "authorizationId">;
 
 export type PharmacyPublishAuthorizationEnvelopeStore = {
   resolveReviewStateId(operationAttemptId: string): Promise<string | null>;
@@ -50,18 +47,25 @@ export type PharmacyPublishAuthorizationEnvelope = {
   expiresAt: string;
 };
 
+export type PharmacyPublishAuthorizationLegacySecret = {
+  token: string;
+  nonce: string;
+};
+
+export type PharmacyPublishAuthorizationIssued = {
+  authorization: PharmacyPublishAuthorizationEnvelope;
+  legacySecret: PharmacyPublishAuthorizationLegacySecret;
+};
+
 function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
-
 function isSha256(value: string): boolean {
   return /^[a-f0-9]{64}$/.test(value);
 }
-
 function isNonEmpty(value: string): boolean {
   return value.trim().length > 0;
 }
-
 function isUuid(value: string): boolean {
   return /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(value);
 }
@@ -86,89 +90,57 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
       expectedEntityVersion: string;
       entityFamily: "pharmacy";
       operationScope: "reserve_private_publish";
-    }): Promise<PharmacyPublishAuthorizationEnvelope | null> {
+    }): Promise<PharmacyPublishAuthorizationIssued | null> {
       if (
-        !isNonEmpty(input.actorId) ||
-        !isNonEmpty(input.entityId) ||
-        !isUuid(input.operationAttemptId) ||
-        !isNonEmpty(input.idempotencyKey) ||
-        !isSha256(input.reviewSnapshotHash) ||
-        !isSha256(input.entityFingerprint) ||
-        !isSha256(input.requestHash) ||
-        !isSha256(input.patchHash) ||
-        !isNonEmpty(input.expectedEntityVersion) ||
-        input.entityFamily !== "pharmacy" ||
+        !isNonEmpty(input.actorId) || !isNonEmpty(input.entityId) || !isUuid(input.operationAttemptId) ||
+        !isNonEmpty(input.idempotencyKey) || !isSha256(input.reviewSnapshotHash) ||
+        !isSha256(input.entityFingerprint) || !isSha256(input.requestHash) || !isSha256(input.patchHash) ||
+        !isNonEmpty(input.expectedEntityVersion) || input.entityFamily !== "pharmacy" ||
         input.operationScope !== "reserve_private_publish"
       ) return null;
 
       const reviewStateId = await store.resolveReviewStateId(input.operationAttemptId);
       if (!reviewStateId || !isUuid(reviewStateId)) return null;
 
-      // Legacy hashes remain internal until atomic reservation replaces the old consume signature.
       const token = randomBytes(32).toString("base64url");
       const nonce = randomBytes(24).toString("base64url");
       const issuedAt = now();
       const expiresAt = new Date(issuedAt.getTime() + ttlMs);
       const authorizationId = await store.create({
-        tokenHash: sha256(token),
-        nonceHash: sha256(nonce),
-        actorId: input.actorId,
-        entityId: input.entityId,
-        reviewStateId,
-        reviewSnapshotHash: input.reviewSnapshotHash,
-        entityFingerprint: input.entityFingerprint,
-        operationAttemptId: input.operationAttemptId,
-        idempotencyKey: input.idempotencyKey,
-        requestHash: input.requestHash,
-        patchHash: input.patchHash,
-        expectedEntityVersion: input.expectedEntityVersion,
-        entityFamily: "pharmacy",
-        operationScope: "reserve_private_publish",
-        status: "issued",
-        issuedAt: issuedAt.toISOString(),
-        expiresAt: expiresAt.toISOString(),
-        consumedAt: null,
-        invalidatedAt: null,
-        invalidationReason: null,
-        consumedByReservationId: null,
+        tokenHash: sha256(token), nonceHash: sha256(nonce), actorId: input.actorId, entityId: input.entityId,
+        reviewStateId, reviewSnapshotHash: input.reviewSnapshotHash, entityFingerprint: input.entityFingerprint,
+        operationAttemptId: input.operationAttemptId, idempotencyKey: input.idempotencyKey,
+        requestHash: input.requestHash, patchHash: input.patchHash, expectedEntityVersion: input.expectedEntityVersion,
+        entityFamily: "pharmacy", operationScope: "reserve_private_publish", status: "issued",
+        issuedAt: issuedAt.toISOString(), expiresAt: expiresAt.toISOString(), consumedAt: null,
+        invalidatedAt: null, invalidationReason: null, consumedByReservationId: null,
       });
-      return authorizationId ? { authorizationId, expiresAt: expiresAt.toISOString() } : null;
+      if (!authorizationId) return null;
+      return {
+        authorization: { authorizationId, expiresAt: expiresAt.toISOString() },
+        legacySecret: { token, nonce },
+      };
     },
 
-    async verifyAndConsume(input: {
-      token: string;
-      nonce: string;
+    async verifyAndConsume(input: PharmacyPublishAuthorizationLegacySecret & {
       actorId: string;
       entityId: string;
       reviewSnapshotHash: string;
       entityFingerprint: string;
     }): Promise<boolean> {
-      if (
-        !isNonEmpty(input.token) ||
-        !isNonEmpty(input.nonce) ||
-        !isNonEmpty(input.actorId) ||
-        !isNonEmpty(input.entityId) ||
-        !isSha256(input.reviewSnapshotHash) ||
-        !isSha256(input.entityFingerprint)
-      ) return false;
-
+      if (!isNonEmpty(input.token) || !isNonEmpty(input.nonce) || !isNonEmpty(input.actorId) ||
+          !isNonEmpty(input.entityId) || !isSha256(input.reviewSnapshotHash) || !isSha256(input.entityFingerprint)) {
+        return false;
+      }
       const tokenHash = sha256(input.token);
       const nonceHash = sha256(input.nonce);
       const record = await store.readByTokenHash(tokenHash);
       if (!record) return false;
       const nowDate = now();
-      if (
-        record.tokenHash !== tokenHash ||
-        record.nonceHash !== nonceHash ||
-        record.actorId !== input.actorId ||
-        record.entityId !== input.entityId ||
-        record.reviewSnapshotHash !== input.reviewSnapshotHash ||
-        record.entityFingerprint !== input.entityFingerprint ||
-        record.status !== "issued" ||
-        record.consumedAt !== null ||
-        Date.parse(record.expiresAt) <= nowDate.getTime()
-      ) return false;
-
+      if (record.tokenHash !== tokenHash || record.nonceHash !== nonceHash || record.actorId !== input.actorId ||
+          record.entityId !== input.entityId || record.reviewSnapshotHash !== input.reviewSnapshotHash ||
+          record.entityFingerprint !== input.entityFingerprint || record.status !== "issued" ||
+          record.consumedAt !== null || Date.parse(record.expiresAt) <= nowDate.getTime()) return false;
       return store.consume({ tokenHash, nonceHash, consumedAt: nowDate.toISOString() });
     },
   };
