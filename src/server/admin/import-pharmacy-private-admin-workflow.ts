@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ImportAdminCapabilityPermission } from "./import-admin-capability-audit";
 
-export type PharmacyPrivateAdminOperation = "dry_run" | "review" | "private_publish" | "rollback";
+export type PharmacyPrivateAdminOperation = "dry_run" | "review" | "reserve_private_publish" | "private_publish" | "rollback";
 export type PharmacyPrivateAdminEnvironment = "preview" | "production" | "development";
 export type PharmacyPrivateAdminWorkflowStatus = "ready" | "blocked" | "completed" | "failed";
 export type PharmacyPrivateAdminWorkflowBlocker =
@@ -47,6 +47,7 @@ export type PharmacyPrivateAdminWorkflowResult = {
 export type PharmacyPrivateAdminWorkflowPorts = {
   dryRun(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   review(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
+  reservePrivatePublish(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   privatePublish(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   rollback(input: { actorId: string; entityId: string; publishReference: string }): Promise<{ ok: boolean; reference: string | null }>;
   audit(input: { actorId: string; entityId: string; operation: PharmacyPrivateAdminOperation; reference: string | null }): Promise<boolean>;
@@ -55,6 +56,7 @@ export type PharmacyPrivateAdminWorkflowPorts = {
 const permissionByOperation: Record<PharmacyPrivateAdminOperation, ImportAdminCapabilityPermission> = {
   dry_run: "imports.validate",
   review: "imports.approve",
+  reserve_private_publish: "imports.publish",
   private_publish: "imports.publish",
   rollback: "imports.publish",
 };
@@ -74,8 +76,8 @@ export function getPharmacyPrivateAdminBlockers(input: PharmacyPrivateAdminReque
   if (!input.auditAvailable) blockers.push("audit_unavailable");
 
   if (input.operation !== "dry_run" && !input.readinessPassed) blockers.push("readiness_blocked");
-  if ((input.operation === "private_publish" || input.operation === "rollback") && input.environment !== "preview") blockers.push("preview_required");
-  if (input.operation === "private_publish" && !input.reviewApproved) blockers.push("review_required");
+  if (["reserve_private_publish", "private_publish", "rollback"].includes(input.operation) && input.environment !== "preview") blockers.push("preview_required");
+  if ((input.operation === "reserve_private_publish" || input.operation === "private_publish") && !input.reviewApproved) blockers.push("review_required");
   if (input.operation === "rollback" && !input.publishReference) blockers.push("publish_reference_required");
 
   const requiredConfirmation = confirmationByOperation[input.operation];
@@ -100,11 +102,12 @@ export async function executePharmacyPrivateAdminWorkflow(
   if (blockers.length > 0 || entityId === null) return { ...base, status: "blocked", blockers, executionReference: null };
 
   try {
-    const result =
-      input.operation === "dry_run"
-        ? await ports.dryRun({ actorId: input.actorId, entityId })
-        : input.operation === "review"
-          ? await ports.review({ actorId: input.actorId, entityId })
+    const result = input.operation === "dry_run"
+      ? await ports.dryRun({ actorId: input.actorId, entityId })
+      : input.operation === "review"
+        ? await ports.review({ actorId: input.actorId, entityId })
+        : input.operation === "reserve_private_publish"
+          ? await ports.reservePrivatePublish({ actorId: input.actorId, entityId })
           : input.operation === "private_publish"
             ? await ports.privatePublish({ actorId: input.actorId, entityId })
             : await ports.rollback({ actorId: input.actorId, entityId, publishReference: input.publishReference! });
