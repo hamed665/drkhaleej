@@ -8,6 +8,7 @@ import './check-import-pharmacy-private-mutation-adapter.mjs';
 import './check-import-pharmacy-canonical-mutation-patch.mjs';
 import './check-import-pharmacy-metadata-locale-preservation.mjs';
 import './check-import-pharmacy-stable-operation-identity.mjs';
+import './check-import-pharmacy-authorization-persistence-v2.mjs';
 import './check-import-supabase-pharmacy-private-mutation-writer.mjs';
 import './check-import-pharmacy-private-rollback.mjs';
 import './check-import-pharmacy-private-public-exposure.mjs';
