@@ -23,6 +23,12 @@ const steps = [
     readOnlyEnabled: true,
   },
   {
+    operation: "reserve_private_publish",
+    title: "Reserve private publish",
+    description: "Atomically reserve, snapshot, audit, and consume the exact server-side authorization without mutating the Pharmacy.",
+    readOnlyEnabled: true,
+  },
+  {
     operation: "private_publish",
     title: "Private publish",
     description: "Preview eligibility may be revealed after review, but mutation execution remains disabled.",
@@ -52,6 +58,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
   const readState = result?.readState ?? null;
   const publishCapability = result?.publishCapability ?? null;
   const blockers = result && !result.ok ? result.blockers : [];
+  const reservationState = result?.reservationState ?? null;
 
   return (
     <section
@@ -98,7 +105,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
 
       <ol className="mt-5 grid gap-4 lg:grid-cols-2" aria-label="Controlled Pharmacy operations">
         {steps.map((step, index) => {
-          const actionEnabled = controlsEnabled && step.readOnlyEnabled;
+          const actionEnabled = controlsEnabled && step.readOnlyEnabled && (step.operation !== "reserve_private_publish" || result?.authorizationState?.authorizationReady === true);
           const publishPreviewVisible = step.operation === "private_publish" && publishCapability?.visible === true;
           return (
             <li key={step.operation} className="rounded-2xl border border-sky-200 bg-white/80 p-5">
@@ -113,15 +120,15 @@ export function ImportPharmacyPrivateAdminControlPanel({
                     <form action={formAction} className="mt-4 space-y-3">
                       <input type="hidden" name="operation" value={step.operation} />
                       <input type="hidden" name="entityId" value={entityId ?? ""} />
-                      {step.operation === "review" ? (
+                      {step.operation === "review" || step.operation === "reserve_private_publish" ? (
                         <label className="block text-xs font-semibold text-slate-700">
                           Exact confirmation
                           <input
                             type="text"
-                            name="publishConfirmation"
+                            name={step.operation === "review" ? "publishConfirmation" : "confirmation"}
                             autoComplete="off"
                             spellCheck={false}
-                            placeholder={`PRIVATE PUBLISH ${entityId ?? "<entity-id>"}`}
+                            placeholder={step.operation === "review" ? `PRIVATE PUBLISH ${entityId ?? "<entity-id>"}` : `RESERVE PRIVATE PUBLISH ${entityId ?? "<entity-id>"}`}
                             className="mt-2 min-h-10 w-full rounded-xl border border-sky-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400"
                           />
                         </label>
@@ -165,6 +172,12 @@ export function ImportPharmacyPrivateAdminControlPanel({
           );
         })}
       </ol>
+
+      {reservationState ? (
+        <p className={`mt-4 rounded-xl border p-4 text-sm font-semibold ${reservationState.reserved ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}>
+          Reservation {reservationState.reserved ? (reservationState.replayed ? "replayed safely" : "created") : `blocked: ${reservationState.blocker ?? "unknown"}`} · Entity mutated: No · Route/index/sitemap: Disabled
+        </p>
+      ) : null}
 
       {publishCapability && !publishCapability.visible && publishCapability.blockers.length > 0 ? (
         <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
@@ -242,7 +255,7 @@ export function ImportPharmacyPrivateAdminControlPanel({
       </div>
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-sky-900">
-        No bulk · no public promotion · no manual bypass · no mutation execution
+        No bulk · no public promotion · no manual bypass · reservation does not mutate the entity
       </p>
     </section>
   );

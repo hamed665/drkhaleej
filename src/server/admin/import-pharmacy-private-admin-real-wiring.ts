@@ -90,6 +90,9 @@ export function createPharmacyPrivateAdminRealPorts(
   return {
     dryRun: dependencies.dryRun,
     review: dependencies.review,
+    async reservePrivatePublish() {
+      return { ok: false, reference: null };
+    },
 
     async privatePublish({ actorId, entityId }) {
       const context = await dependencies.loadPublishContext({ actorId, entityId });
