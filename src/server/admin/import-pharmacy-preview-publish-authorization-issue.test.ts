@@ -15,6 +15,9 @@ import type {
 import { issuePharmacyPreviewPublishAuthorization } from "./import-pharmacy-preview-publish-authorization-issue";
 import type { PharmacyPreviewPublishCapability } from "./import-pharmacy-preview-publish-capability";
 
+const AUTHORIZATION_ID = "11111111-1111-4111-8111-111111111111";
+const REVIEW_STATE_ID = "22222222-2222-4222-8222-222222222222";
+
 const capability: PharmacyPreviewPublishCapability = {
   visible: true,
   executable: false,
@@ -58,20 +61,23 @@ const reviewState = buildPharmacyAdminBoundedReadState({
   proposed: current,
 });
 
-function store(createResult = true): PharmacyPublishAuthorizationEnvelopeStore {
+function store(createResult: string | null = AUTHORIZATION_ID): PharmacyPublishAuthorizationEnvelopeStore {
   let record: PharmacyPublishAuthorizationEnvelopeRecord | null = null;
   return {
+    resolveReviewStateId: vi.fn(async () => REVIEW_STATE_ID),
     create: vi.fn(async (value) => {
-      record = value;
+      if (!createResult) return null;
+      record = { authorizationId: createResult, ...value };
       return createResult;
     }),
+    readByAuthorizationId: vi.fn(async () => record),
     readByTokenHash: vi.fn(async () => record),
     consume: vi.fn(async () => false),
   };
 }
 
 describe("Preview Pharmacy publish authorization issuance", () => {
-  it("issues one opaque authorization only after a visible non-executable capability", async () => {
+  it("issues only a bounded server-owned authorization handle", async () => {
     const result = await issuePharmacyPreviewPublishAuthorization({
       capability,
       actorId: "admin-1",
@@ -81,10 +87,13 @@ describe("Preview Pharmacy publish authorization issuance", () => {
     });
 
     expect(result.capability).toEqual(capability);
-    expect(result.authorization?.token).toMatch(/^[A-Za-z0-9_-]+$/);
-    expect(result.authorization?.nonce).toMatch(/^[A-Za-z0-9_-]+$/);
-    expect(result.authorization?.token).not.toContain("admin-1");
-    expect(result.authorization?.nonce).not.toContain("pharmacy-1");
+    expect(result.authorization).toEqual(expect.objectContaining({
+      authorizationId: AUTHORIZATION_ID,
+      expiresAt: expect.any(String),
+    }));
+    expect(Date.parse(result.authorization!.expiresAt)).toBeGreaterThan(Date.now());
+    expect(result.authorization).not.toHaveProperty("token");
+    expect(result.authorization).not.toHaveProperty("nonce");
   });
 
   it("does not issue when capability is locked", async () => {
@@ -117,7 +126,7 @@ describe("Preview Pharmacy publish authorization issuance", () => {
       actorId: "admin-1",
       entityId: "pharmacy-1",
       reviewState,
-      store: store(false),
+      store: store(null),
     });
     expect(failed.authorization).toBeNull();
     expect(failed.capability.blockers).toContain("authorization_issue_failed");

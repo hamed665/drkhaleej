@@ -42,15 +42,22 @@ export async function issuePharmacyPreviewPublishAuthorization(input: {
     };
   }
 
-  const authorization = await createPharmacyPublishAuthorizationEnvelopeService(input.store).issue({
+  const issued = await createPharmacyPublishAuthorizationEnvelopeService(input.store).issue({
     actorId: input.actorId,
     entityId: input.entityId,
     reviewSnapshotHash: input.reviewState.snapshotHash,
     entityFingerprint: input.reviewState.entityFingerprint,
+    operationAttemptId: input.reviewState.operationAttemptId,
+    idempotencyKey: input.reviewState.idempotencyKey,
+    requestHash: input.reviewState.requestHash,
+    patchHash: input.reviewState.patchHash,
+    expectedEntityVersion: input.reviewState.expectedEntityVersion,
+    entityFamily: input.reviewState.entityFamily,
+    operationScope: input.reviewState.operationScope,
   });
 
-  return authorization
-    ? { capability: input.capability, authorization }
+  return issued
+    ? { capability: input.capability, authorization: issued.authorization }
     : {
         capability: lockCapability(input.capability, "authorization_issue_failed"),
         authorization: null,

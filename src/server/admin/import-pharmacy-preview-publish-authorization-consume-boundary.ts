@@ -2,8 +2,8 @@ import "server-only";
 
 import {
   createPharmacyPublishAuthorizationEnvelopeService,
-  type PharmacyPublishAuthorizationEnvelope,
   type PharmacyPublishAuthorizationEnvelopeStore,
+  type PharmacyPublishAuthorizationLegacySecret,
 } from "./import-pharmacy-publish-authorization-envelope";
 
 export type PharmacyPreviewPublishAuthorizationConsumeBlocker =
@@ -40,7 +40,7 @@ export async function consumePharmacyPreviewPublishAuthorization(input: {
   allowedEntityIds: readonly string[];
   reviewSnapshotHash: string;
   entityFingerprint: string;
-  authorization: PharmacyPublishAuthorizationEnvelope | null;
+  authorization: PharmacyPublishAuthorizationLegacySecret | null;
   store: PharmacyPublishAuthorizationEnvelopeStore | null;
 }): Promise<PharmacyPreviewPublishAuthorizationConsumeResult> {
   const blockers: PharmacyPreviewPublishAuthorizationConsumeBlocker[] = [];

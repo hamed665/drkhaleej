@@ -19,6 +19,7 @@ const pharmacyReadStateValidator = path.join(repoRoot, 'scripts', 'import', 'che
 const pharmacyAuthorizationValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-publish-authorization-persistence.mjs');
 const pharmacyMetadataLocaleValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-metadata-locale-preservation.mjs');
 const pharmacyStableOperationIdentityValidator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-stable-operation-identity.mjs');
+const pharmacyAuthorizationV2Validator = path.join(repoRoot, 'scripts', 'import', 'check-import-pharmacy-authorization-persistence-v2.mjs');
 const scheduleRlsMigrationName = '0065_schedule_appointment_rls_hardening.sql';
 const functionSearchPathMigrationName = '0066_function_search_path_hardening.sql';
 const helperSearchPathMigrationName = '0067_sensitive_helper_search_path_hardening.sql';
@@ -31,6 +32,7 @@ const pharmacyReadStateMigrationName = '0073_import_pharmacy_admin_read_states.s
 const pharmacyAuthorizationMigrationName = '0074_import_pharmacy_publish_authorizations.sql';
 const pharmacyMetadataLocaleMigrationName = '0075_import_pharmacy_metadata_locale_preservation.sql';
 const pharmacyStableOperationIdentityMigrationName = '0076_import_pharmacy_stable_operation_identity.sql';
+const pharmacyAuthorizationV2MigrationName = '0077_import_pharmacy_authorization_persistence_v2.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -43,6 +45,7 @@ const pharmacyReadStateMigrationPath = path.join(migrationsDir, pharmacyReadStat
 const pharmacyAuthorizationMigrationPath = path.join(migrationsDir, pharmacyAuthorizationMigrationName);
 const pharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, pharmacyMetadataLocaleMigrationName);
 const pharmacyStableOperationIdentityMigrationPath = path.join(migrationsDir, pharmacyStableOperationIdentityMigrationName);
+const pharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, pharmacyAuthorizationV2MigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -55,6 +58,7 @@ const hiddenPharmacyReadStateMigrationPath = path.join(migrationsDir, `.pharmacy
 const hiddenPharmacyAuthorizationMigrationPath = path.join(migrationsDir, `.pharmacy-authorization-${pharmacyAuthorizationMigrationName}.hidden`);
 const hiddenPharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, `.pharmacy-metadata-locale-${pharmacyMetadataLocaleMigrationName}.hidden`);
 const hiddenPharmacyStableOperationIdentityMigrationPath = path.join(migrationsDir, `.pharmacy-stable-operation-${pharmacyStableOperationIdentityMigrationName}.hidden`);
+const hiddenPharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, `.pharmacy-authorization-v2-${pharmacyAuthorizationV2MigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -69,21 +73,19 @@ const currentOnlyMigrations = [
   [pharmacyAuthorizationMigrationName, pharmacyAuthorizationMigrationPath, hiddenPharmacyAuthorizationMigrationPath],
   [pharmacyMetadataLocaleMigrationName, pharmacyMetadataLocaleMigrationPath, hiddenPharmacyMetadataLocaleMigrationPath],
   [pharmacyStableOperationIdentityMigrationName, pharmacyStableOperationIdentityMigrationPath, hiddenPharmacyStableOperationIdentityMigrationPath],
+  [pharmacyAuthorizationV2MigrationName, pharmacyAuthorizationV2MigrationPath, hiddenPharmacyAuthorizationV2MigrationPath],
 ];
 
 function fail(message) {
   console.error(`ERROR: SEC-SCHEDULE-RLS-A: ${message}`);
   process.exit(1);
 }
-
 function requireCondition(condition, message) {
   if (!condition) fail(message);
 }
-
 function requirePattern(content, pattern, message) {
   requireCondition(pattern.test(content), message);
 }
-
 function forbidPattern(content, pattern, message) {
   requireCondition(!pattern.test(content), message);
 }
@@ -108,15 +110,12 @@ function validateScheduleRlsMigration() {
     [/alter\s+table\s+public\.appointment_slots\s+enable\s+row\s+level\s+security/i, '0065 must enable RLS on appointment_slots.'],
   ]) requirePattern(content, pattern, message);
 }
-
 function validateFunctionSearchPathMigration() {
   execFileSync(process.execPath, [functionSearchPathValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
-
 function validateHelperSearchPathMigration() {
   execFileSync(process.execPath, [helperSearchPathValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
-
 function validatePublishPersistenceMigration() {
   requireCondition(existsSync(publishPersistenceMigrationPath), `${publishPersistenceMigrationName} is missing.`);
   const content = readFileSync(publishPersistenceMigrationPath, 'utf8');
@@ -142,7 +141,6 @@ function validatePublishPersistenceMigration() {
     [/alter\s+table\s+public\.import_publish_audit_events\s+enable\s+row\s+level\s+security/i, '0068 must enable RLS on audit events.'],
   ]) requirePattern(content, pattern, message);
 }
-
 function validatePublishRpcMigration() {
   requireCondition(existsSync(publishRpcMigrationPath), `${publishRpcMigrationName} is missing.`);
   execFileSync(process.execPath, [publishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
@@ -174,6 +172,10 @@ function validatePharmacyMetadataLocaleMigration() {
 function validatePharmacyStableOperationIdentityMigration() {
   requireCondition(existsSync(pharmacyStableOperationIdentityMigrationPath), `${pharmacyStableOperationIdentityMigrationName} is missing.`);
   execFileSync(process.execPath, [pharmacyStableOperationIdentityValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+function validatePharmacyAuthorizationV2Migration() {
+  requireCondition(existsSync(pharmacyAuthorizationV2MigrationPath), `${pharmacyAuthorizationV2MigrationName} is missing.`);
+  execFileSync(process.execPath, [pharmacyAuthorizationV2Validator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
@@ -208,5 +210,6 @@ validatePharmacyReadStateMigration();
 validatePharmacyAuthorizationMigration();
 validatePharmacyMetadataLocaleMigration();
 validatePharmacyStableOperationIdentityMigration();
+validatePharmacyAuthorizationV2Migration();
 
 console.log('Current migration validation passed.');
