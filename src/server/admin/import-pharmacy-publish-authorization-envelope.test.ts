@@ -27,7 +27,7 @@ function harness(now = new Date("2026-07-13T00:00:00.000Z")) {
     now: () => now,
     ttlMs: 5 * 60 * 1000,
   });
-  return { service, store, getRecord: () => record, setNow: (value: Date) => { now = value; } };
+  return { service, store, getRecord: () => record };
 }
 
 const input = {
@@ -45,16 +45,18 @@ const input = {
 };
 
 describe("Pharmacy publish authorization envelope", () => {
-  it("returns only a server-owned handle while persisting the full bounded identity", async () => {
+  it("returns a bounded handle plus an internal legacy secret while persisting the full identity", async () => {
     const test = harness();
-    const envelope = await test.service.issue(input);
+    const issued = await test.service.issue(input);
 
-    expect(envelope).toEqual({
+    expect(issued?.authorization).toEqual({
       authorizationId: AUTHORIZATION_ID,
       expiresAt: "2026-07-13T00:05:00.000Z",
     });
-    expect(envelope).not.toHaveProperty("token");
-    expect(envelope).not.toHaveProperty("nonce");
+    expect(issued?.authorization).not.toHaveProperty("token");
+    expect(issued?.authorization).not.toHaveProperty("nonce");
+    expect(issued?.legacySecret.token).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(issued?.legacySecret.nonce).toMatch(/^[A-Za-z0-9_-]+$/);
     expect(test.store.resolveReviewStateId).toHaveBeenCalledWith(input.operationAttemptId);
 
     const record = test.getRecord();
