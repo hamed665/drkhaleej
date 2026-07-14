@@ -38,6 +38,9 @@ function harness() {
     }),
     readByAuthorizationId: vi.fn(async () => record),
     readByTokenHash: vi.fn(async () => record),
+    readByReviewStateId: vi.fn(async () => record),
+    invalidateActive: vi.fn(async () => 0),
+    transition: vi.fn(async () => true),
     consume: vi.fn(async ({ tokenHash, nonceHash, consumedAt }) => {
       if (!record || record.tokenHash !== tokenHash || record.nonceHash !== nonceHash || record.consumedAt !== null) {
         return false;
@@ -68,9 +71,10 @@ describe("Pharmacy Preview publish authorization consume boundary", () => {
   it("consumes one exact server-only legacy secret while keeping execution disabled", async () => {
     const test = harness();
     const issued = await createPharmacyPublishAuthorizationEnvelopeService(test.store).issue(issueInput);
+    expect(issued?.legacySecret).not.toBeNull();
 
     const result = await consumePharmacyPreviewPublishAuthorization(input({
-      authorization: issued!.legacySecret,
+      authorization: issued!.legacySecret!,
       store: test.store,
     }));
 
@@ -91,7 +95,8 @@ describe("Pharmacy Preview publish authorization consume boundary", () => {
   it("rejects replay after the first atomic consumption", async () => {
     const test = harness();
     const issued = await createPharmacyPublishAuthorizationEnvelopeService(test.store).issue(issueInput);
-    const request = input({ authorization: issued!.legacySecret, store: test.store });
+    expect(issued?.legacySecret).not.toBeNull();
+    const request = input({ authorization: issued!.legacySecret!, store: test.store });
 
     await expect(consumePharmacyPreviewPublishAuthorization(request)).resolves.toMatchObject({ authorized: true });
     await expect(consumePharmacyPreviewPublishAuthorization(request)).resolves.toMatchObject({
