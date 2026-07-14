@@ -39,6 +39,7 @@ export type PharmacyPrivateAdminServerActionDependencies = {
 const operations = new Set<PharmacyPrivateAdminOperation>([
   "dry_run",
   "review",
+  "reserve_private_publish",
   "private_publish",
   "rollback",
 ]);
@@ -71,35 +72,25 @@ export function createPharmacyPrivateAdminServerAction(
 
     if (!dependencies.executionEnabled) blockers.push("action_disabled");
     if (!isOperation(operationValue)) blockers.push("invalid_operation");
-    if (isOperation(operationValue) && !enabledOperations.has(operationValue)) {
-      blockers.push("operation_not_enabled");
-    }
+    if (isOperation(operationValue) && !enabledOperations.has(operationValue)) blockers.push("operation_not_enabled");
     if (!entityId) blockers.push("invalid_entity");
     if (entityId && !dependencies.allowedEntityIds.includes(entityId)) blockers.push("entity_not_allowed");
 
-    const mutationRequested = operationValue === "private_publish" || operationValue === "rollback";
-    if (mutationRequested && dependencies.environment !== "preview") blockers.push("environment_not_preview");
-    if (operationValue === "private_publish" && confirmation !== "PUBLISH PRIVATE PHARMACY") {
+    const previewOperation = operationValue === "reserve_private_publish" || operationValue === "private_publish" || operationValue === "rollback";
+    if (previewOperation && dependencies.environment !== "preview") blockers.push("environment_not_preview");
+    if (operationValue === "reserve_private_publish" && entityId && confirmation !== `RESERVE PRIVATE PUBLISH ${entityId}`) {
       blockers.push("invalid_confirmation");
     }
+    if (operationValue === "private_publish" && confirmation !== "PUBLISH PRIVATE PHARMACY") blockers.push("invalid_confirmation");
     if (operationValue === "rollback") {
       if (confirmation !== "ROLLBACK PRIVATE PHARMACY") blockers.push("invalid_confirmation");
       if (!publishReference) blockers.push("invalid_publish_reference");
     }
 
     const uniqueBlockers = [...new Set(blockers)];
-    if (uniqueBlockers.length > 0 || !isOperation(operationValue) || !entityId) {
-      return { ok: false, blockers: uniqueBlockers };
-    }
+    if (uniqueBlockers.length > 0 || !isOperation(operationValue) || !entityId) return { ok: false, blockers: uniqueBlockers };
 
-    const workflow = await dependencies.execute({
-      operation: operationValue,
-      actorId: input.actorId,
-      entityId,
-      confirmation,
-      publishReference,
-    });
-
+    const workflow = await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation, publishReference });
     if (workflow.status !== "completed") return { ok: false, blockers: [], workflow };
     return { ok: true, workflow };
   };
