@@ -28,10 +28,13 @@ for (const token of [
   "!input.capability.visible",
   "reviewSnapshotHash: input.reviewState.snapshotHash",
   "entityFingerprint: input.reviewState.entityFingerprint",
+  "operationAttemptId: input.reviewState.operationAttemptId",
+  "requestHash: input.reviewState.requestHash",
+  "patchHash: input.reviewState.patchHash",
 ]) assert(issuer.includes(token), `${issuerPath} must include ${token}`);
 
 for (const token of [
-  "issues one opaque authorization only after a visible non-executable capability",
+  "issues only a bounded server-owned authorization handle",
   "does not issue when capability is locked",
   "locks capability when store is unavailable or persistence fails",
 ]) assert(tests.includes(token), `${issuerTestPath} must cover ${token}`);
@@ -55,12 +58,15 @@ for (const forbidden of [
   ".nonce",
   "authorization.token",
   "authorization.nonce",
+  "authorizationId: issuance.authorization",
 ]) assert(!action.includes(forbidden), `${actionPath} must not expose authorization material through the Server Action result: ${forbidden}`);
 
 for (const token of [
   "createPharmacyPublishAuthorizationStoreFromEnvironment",
   'environment.VERCEL_ENV !== "preview"',
   "SUPABASE_SERVICE_ROLE_KEY",
+  'from("import_pharmacy_admin_read_states")',
+  '.eq("operation_attempt_id", operationAttemptId)',
 ]) assert(store.includes(token), `${storePath} must include ${token}`);
 
 for (const forbidden of [
