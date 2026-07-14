@@ -44,9 +44,8 @@ for (const token of [
   "issuePharmacyPreviewPublishAuthorization",
   "createPharmacyPublishAuthorizationStoreFromEnvironment()",
   "publishCapability = issuance.capability",
-  "authorizationReady: issuance.authorizationState.authorizationReady",
-  "authorizationStatus: issuance.authorizationState.authorizationStatus",
-  "expiresAt: issuance.authorizationState.expiresAt",
+  "authorizationUiState = issuance.authorizationState",
+  "authorizationState: authorizationUiState",
 ]) assert(action.includes(token), `${actionPath} must include ${token}`);
 
 for (const forbidden of [
