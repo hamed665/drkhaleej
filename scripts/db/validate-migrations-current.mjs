@@ -194,8 +194,8 @@ function validatePharmacyAtomicAuthorizationMigration() {
   requireCondition(existsSync(pharmacyAtomicAuthorizationMigrationPath), `${pharmacyAtomicAuthorizationMigrationName} is missing.`);
   const content = readFileSync(pharmacyAtomicAuthorizationMigrationPath, 'utf8');
   for (const [pattern, message] of [
-    [/IMPORT-ADMIN-AE: atomic Pharmacy authorization and reservation/i, '0079 must include its migration marker.'],
-    [/add\s+column\s+if\s+not\s+exists\s+authorization_id\s+uuid/i, '0079 must bind reservations to authorization IDs.'],
+    [/IMPORT-ADMIN-AE: atomically verify and consume one Pharmacy authorization/i, '0079 must include its migration marker.'],
+    [/add\s+column\s+if\s+not\s+exists\s+pharmacy_authorization_id\s+uuid/i, '0079 must bind reservations to Pharmacy authorization IDs.'],
     [/from\s+public\.import_pharmacy_publish_authorizations[\s\S]*for\s+update/i, '0079 must lock the authorization row before reservation writes.'],
     [/status\s*=\s*'consumed'/i, '0079 must consume authorization in the transaction.'],
     [/consumed_by_reservation_id\s*=\s*v_idempotency_id/i, '0079 must bind consumption to the reservation.'],
