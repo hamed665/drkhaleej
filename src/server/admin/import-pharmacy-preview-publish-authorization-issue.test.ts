@@ -72,12 +72,15 @@ function store(createResult: string | null = AUTHORIZATION_ID): PharmacyPublishA
     }),
     readByAuthorizationId: vi.fn(async () => record),
     readByTokenHash: vi.fn(async () => record),
+    readByReviewStateId: vi.fn(async () => record),
+    invalidateActive: vi.fn(async () => 0),
+    transition: vi.fn(async () => true),
     consume: vi.fn(async () => false),
   };
 }
 
 describe("Preview Pharmacy publish authorization issuance", () => {
-  it("issues only a bounded server-owned authorization handle", async () => {
+  it("issues and verifies only a bounded server-owned authorization handle", async () => {
     const result = await issuePharmacyPreviewPublishAuthorization({
       capability,
       actorId: "admin-1",
@@ -94,6 +97,11 @@ describe("Preview Pharmacy publish authorization issuance", () => {
     expect(Date.parse(result.authorization!.expiresAt)).toBeGreaterThan(Date.now());
     expect(result.authorization).not.toHaveProperty("token");
     expect(result.authorization).not.toHaveProperty("nonce");
+    expect(result.authorizationState).toEqual({
+      authorizationReady: true,
+      authorizationStatus: "ready",
+      expiresAt: result.authorization!.expiresAt,
+    });
   });
 
   it("does not issue when capability is locked", async () => {
@@ -107,6 +115,7 @@ describe("Preview Pharmacy publish authorization issuance", () => {
     });
 
     expect(result.authorization).toBeNull();
+    expect(result.authorizationState.authorizationStatus).toBe("unavailable");
     expect(authorizationStore.create).not.toHaveBeenCalled();
   });
 
@@ -119,6 +128,7 @@ describe("Preview Pharmacy publish authorization issuance", () => {
       store: null,
     });
     expect(unavailable.authorization).toBeNull();
+    expect(unavailable.authorizationState.authorizationStatus).toBe("unavailable");
     expect(unavailable.capability.blockers).toContain("authorization_store_unavailable");
 
     const failed = await issuePharmacyPreviewPublishAuthorization({
@@ -129,6 +139,7 @@ describe("Preview Pharmacy publish authorization issuance", () => {
       store: store(null),
     });
     expect(failed.authorization).toBeNull();
+    expect(failed.authorizationState.authorizationStatus).toBe("unavailable");
     expect(failed.capability.blockers).toContain("authorization_issue_failed");
   });
 });
