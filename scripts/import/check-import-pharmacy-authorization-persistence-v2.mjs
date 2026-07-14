@@ -52,13 +52,19 @@ if (!source.store.includes('from("import_pharmacy_admin_read_states")')) {
 if (!source.store.includes('.eq("operation_attempt_id", operationAttemptId)')) {
   throw new Error('authorization store must resolve Review by stable operation identity');
 }
-if (!source.envelope.includes('authorizationId: string') || !source.envelope.includes('expiresAt: string')) {
+const envelopeTypeStart = source.envelope.indexOf('export type PharmacyPublishAuthorizationEnvelope =');
+const envelopeTypeEnd = source.envelope.indexOf('export type PharmacyPublishAuthorizationSecret =', envelopeTypeStart);
+if (envelopeTypeStart < 0 || envelopeTypeEnd < 0) {
+  throw new Error('authorization envelope and internal secret types must be explicit');
+}
+const publicEnvelopeType = source.envelope.slice(envelopeTypeStart, envelopeTypeEnd);
+if (!publicEnvelopeType.includes('authorizationId: string') || !publicEnvelopeType.includes('expiresAt: string')) {
   throw new Error('authorization issuance must return only a bounded server-owned handle');
 }
-if (/type\s+PharmacyPublishAuthorizationEnvelope\s*=\s*\{[\s\S]*\btoken\s*:/m.test(source.envelope)) {
+if (/\btoken\s*:/.test(publicEnvelopeType)) {
   throw new Error('authorization envelope must not expose raw token');
 }
-if (/type\s+PharmacyPublishAuthorizationEnvelope\s*=\s*\{[\s\S]*\bnonce\s*:/m.test(source.envelope)) {
+if (/\bnonce\s*:/.test(publicEnvelopeType)) {
   throw new Error('authorization envelope must not expose raw nonce');
 }
 for (const forbidden of ['authorization?.token', 'authorization?.nonce', 'authorization.token', 'authorization.nonce']) {
