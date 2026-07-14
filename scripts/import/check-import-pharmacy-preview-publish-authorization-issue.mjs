@@ -31,10 +31,11 @@ for (const token of [
   "operationAttemptId: input.reviewState.operationAttemptId",
   "requestHash: input.reviewState.requestHash",
   "patchHash: input.reviewState.patchHash",
+  "service.readback({",
 ]) assert(issuer.includes(token), `${issuerPath} must include ${token}`);
 
 for (const token of [
-  "issues only a bounded server-owned authorization handle",
+  "issues and verifies only a bounded server-owned authorization handle",
   "does not issue when capability is locked",
   "locks capability when store is unavailable or persistence fails",
 ]) assert(tests.includes(token), `${issuerTestPath} must cover ${token}`);
@@ -43,9 +44,8 @@ for (const token of [
   "issuePharmacyPreviewPublishAuthorization",
   "createPharmacyPublishAuthorizationStoreFromEnvironment()",
   "publishCapability = issuance.capability",
-  "authorizationReady: issuance.authorization !== null",
-  "authorizationStatus: issuance.authorization ? \"ready\" : \"unavailable\"",
-  "expiresAt: issuance.authorization?.expiresAt ?? null",
+  "authorizationUiState = issuance.authorizationState",
+  "authorizationState: authorizationUiState",
 ]) assert(action.includes(token), `${actionPath} must include ${token}`);
 
 for (const forbidden of [

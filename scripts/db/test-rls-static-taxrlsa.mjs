@@ -27,6 +27,7 @@ const migrations = {
   durableReference: '0072_import_pharmacy_publish_references.sql',
   pharmacyAdminReadState: '0073_import_pharmacy_admin_read_states.sql',
   pharmacyPublishAuthorization: '0074_import_pharmacy_publish_authorizations.sql',
+  pharmacyAuthorizationLifecycle: '0078_import_pharmacy_authorization_invalidation_readback.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -165,6 +166,17 @@ function validateLaterMigrations() {
   );
   requirePattern(authorization, /revoke\s+all\s+on\s+function\s+public\.import_pharmacy_consume_publish_authorization[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0074 must revoke authorization consumption from public roles.');
   requirePattern(authorization, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_consume_publish_authorization[\s\S]*to\s+service_role/i, '0074 must grant only the consumption RPC to service_role.');
+
+  const lifecycle = validateClosedMigration(
+    'pharmacyAuthorizationLifecycle',
+    '0078',
+    [],
+    { allowServiceRoleGrant: true },
+  );
+  requirePattern(lifecycle, /revoke\s+all\s+on\s+function\s+public\.import_pharmacy_invalidate_publish_authorizations[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0078 must revoke invalidation RPC access from public roles.');
+  requirePattern(lifecycle, /revoke\s+all\s+on\s+function\s+public\.import_pharmacy_transition_publish_authorization[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0078 must revoke transition RPC access from public roles.');
+  requirePattern(lifecycle, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_invalidate_publish_authorizations[\s\S]*to\s+service_role/i, '0078 must grant invalidation RPC only to service_role.');
+  requirePattern(lifecycle, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_transition_publish_authorization[\s\S]*to\s+service_role/i, '0078 must grant transition RPC only to service_role.');
 }
 
 function runLegacyStaticRlsTestWithoutLaterMigrations() {

@@ -258,11 +258,7 @@ export async function runPharmacyPrivateAdminAction(
             store: createPharmacyPublishAuthorizationStoreFromEnvironment(),
           });
           publishCapability = issuance.capability;
-          authorizationUiState = {
-            authorizationReady: issuance.authorization !== null,
-            authorizationStatus: issuance.authorization ? "ready" : "unavailable",
-            expiresAt: issuance.authorization?.expiresAt ?? null,
-          };
+          authorizationUiState = issuance.authorizationState;
         }
       }
       return {

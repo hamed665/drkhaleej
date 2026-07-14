@@ -25,9 +25,12 @@ type TableQuery = {
 export type PharmacyPublishAuthorizationClient = {
   from(table: "import_pharmacy_publish_authorizations" | "import_pharmacy_admin_read_states"): TableQuery;
   rpc(
-    name: "import_pharmacy_consume_publish_authorization",
+    name:
+      | "import_pharmacy_consume_publish_authorization"
+      | "import_pharmacy_invalidate_publish_authorizations"
+      | "import_pharmacy_transition_publish_authorization",
     args: Readonly<Record<string, unknown>>,
-  ): QueryResponse<boolean>;
+  ): QueryResponse<boolean | number>;
 };
 
 const AUTHORIZATION_COLUMNS = [
@@ -144,7 +147,7 @@ function mapRecord(row: Readonly<Record<string, unknown>>): PharmacyPublishAutho
 export function createPharmacyPublishAuthorizationStore(
   client: PharmacyPublishAuthorizationClient,
 ): PharmacyPublishAuthorizationEnvelopeStore {
-  async function readOne(column: "id" | "token_hash", value: string) {
+  async function readOne(column: "id" | "token_hash" | "review_state_id", value: string) {
     const response = await client
       .from("import_pharmacy_publish_authorizations")
       .select(AUTHORIZATION_COLUMNS)
@@ -206,6 +209,33 @@ export function createPharmacyPublishAuthorizationStore(
 
     async readByTokenHash(tokenHash) {
       return readOne("token_hash", tokenHash);
+    },
+
+    async readByReviewStateId(reviewStateId) {
+      return readOne("review_state_id", reviewStateId);
+    },
+
+    async invalidateActive(input) {
+      const response = await client.rpc("import_pharmacy_invalidate_publish_authorizations", {
+        p_actor_profile_id: input.actorId,
+        p_entity_id: input.entityId,
+        p_operation_scope: input.operationScope,
+        p_except_review_state_id: input.exceptReviewStateId,
+        p_invalidated_at: input.invalidatedAt,
+        p_reason: input.reason,
+      });
+      return !response.error && typeof response.data === "number" ? response.data : null;
+    },
+
+    async transition(input) {
+      const response = await client.rpc("import_pharmacy_transition_publish_authorization", {
+        p_authorization_id: input.authorizationId,
+        p_from_status: input.fromStatus,
+        p_to_status: input.toStatus,
+        p_transitioned_at: input.transitionedAt,
+        p_reason: input.reason,
+      });
+      return !response.error && response.data === true;
     },
 
     async consume(input) {

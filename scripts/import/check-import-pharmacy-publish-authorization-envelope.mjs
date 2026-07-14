@@ -43,9 +43,12 @@ for (const forbidden of ["token: string;", "nonce: string;"]) {
 }
 
 for (const token of [
-  "returns a bounded handle plus an internal legacy secret while persisting the full identity",
+  "invalidates older active authorizations before persisting one bounded handle",
+  "replays one fresh authorization for the same persisted Review without creating a duplicate",
+  "marks an issued authorization expired during server readback",
+  "invalidates an issued authorization when bounded identity no longer matches",
   "fails closed when the persisted Review cannot be resolved",
-  "fails closed for malformed identity or persistence failure",
+  "fails closed for malformed identity, invalidation failure, or persistence failure",
 ]) assert(tests.includes(token), `${testPath} must cover ${token}`);
 
 for (const forbidden of [
