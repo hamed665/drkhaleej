@@ -1,0 +1,52 @@
+name: Patch RLS Validator
+
+on:
+  push:
+    branches:
+      - agent/pharmacy-authorization-invalidation-readback
+
+permissions:
+  contents: write
+
+jobs:
+  patch-rls-validator:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/pharmacy-authorization-invalidation-readback
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Register lifecycle migration in static RLS validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/db/test-rls-static-taxrlsa.mjs')
+          s = p.read_text()
+          anchors = [
+            (
+              "  pharmacyPublishAuthorization: '0074_import_pharmacy_publish_authorizations.sql',",
+              "  pharmacyPublishAuthorization: '0074_import_pharmacy_publish_authorizations.sql',\n  pharmacyAuthorizationLifecycle: '0078_import_pharmacy_authorization_invalidation_readback.sql',",
+            ),
+            (
+              "  requirePattern(authorization, /grant\\s+execute\\s+on\\s+function\\s+public\\.import_pharmacy_consume_publish_authorization[\\s\\S]*to\\s+service_role/i, '0074 must grant only the consumption RPC to service_role.');",
+              "  requirePattern(authorization, /grant\\s+execute\\s+on\\s+function\\s+public\\.import_pharmacy_consume_publish_authorization[\\s\\S]*to\\s+service_role/i, '0074 must grant only the consumption RPC to service_role.');\n\n  const lifecycle = validateClosedMigration(\n    'pharmacyAuthorizationLifecycle',\n    '0078',\n    [],\n    { allowServiceRoleGrant: true },\n  );\n  requirePattern(lifecycle, /revoke\\s+all\\s+on\\s+function\\s+public\\.import_pharmacy_invalidate_publish_authorizations[\\s\\S]*from\\s+public\\s*,\\s*anon\\s*,\\s*authenticated/i, '0078 must revoke invalidation RPC access from public roles.');\n  requirePattern(lifecycle, /revoke\\s+all\\s+on\\s+function\\s+public\\.import_pharmacy_transition_publish_authorization[\\s\\S]*from\\s+public\\s*,\\s*anon\\s*,\\s*authenticated/i, '0078 must revoke transition RPC access from public roles.');\n  requirePattern(lifecycle, /grant\\s+execute\\s+on\\s+function\\s+public\\.import_pharmacy_invalidate_publish_authorizations[\\s\\S]*to\\s+service_role/i, '0078 must grant invalidation RPC only to service_role.');\n  requirePattern(lifecycle, /grant\\s+execute\\s+on\\s+function\\s+public\\.import_pharmacy_transition_publish_authorization[\\s\\S]*to\\s+service_role/i, '0078 must grant transition RPC only to service_role.');",
+            ),
+          ]
+          for old, new in anchors:
+            if old not in s:
+              raise SystemExit(f'missing anchor: {old}')
+            s = s.replace(old, new, 1)
+          p.write_text(s)
+          PY
+      - name: Commit RLS registration
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add scripts/db/test-rls-static-taxrlsa.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "test: register lifecycle migration in static RLS checks"
+          git push origin HEAD:agent/pharmacy-authorization-invalidation-readback
