@@ -27,6 +27,7 @@ function ports(): PharmacyPrivateAdminWorkflowPorts {
   return {
     dryRun: vi.fn(async () => ({ ok: true, reference: "dry-1" })),
     review: vi.fn(async () => ({ ok: true, reference: "review-1" })),
+    reservePrivatePublish: vi.fn(async () => ({ ok: true, reference: "attempt-1" })),
     privatePublish: vi.fn(async () => ({ ok: true, reference: "publish-1" })),
     rollback: vi.fn(async () => ({ ok: true, reference: "rollback-1" })),
     audit: vi.fn(async () => true),
@@ -44,6 +45,17 @@ describe("pharmacy private admin workflow", () => {
       confirmation: null,
     });
     expect(blockers).toEqual(expect.arrayContaining(["wrong_family", "bulk_not_allowed", "preview_required", "review_required", "missing_confirmation"]));
+  });
+
+  it("dispatches one reviewed Preview reservation without mutation", async () => {
+    const workflowPorts = ports();
+    const result = await executePharmacyPrivateAdminWorkflow(
+      { ...baseRequest, operation: "reserve_private_publish", confirmation: "RESERVE PRIVATE PUBLISH pharmacy-1" },
+      workflowPorts,
+    );
+    expect(result).toMatchObject({ status: "completed", executionReference: "attempt-1", publicVisibility: "private", indexEligible: false, sitemapEligible: false, routeEnabled: false });
+    expect(workflowPorts.reservePrivatePublish).toHaveBeenCalledWith({ actorId: "admin-1", entityId: "pharmacy-1" });
+    expect(workflowPorts.privatePublish).not.toHaveBeenCalled();
   });
 
   it("executes exactly one private publish and preserves zero public exposure", async () => {
