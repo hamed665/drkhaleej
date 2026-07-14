@@ -46,8 +46,8 @@ for (const token of [
 
 for (const token of [
   'executionEnabled: process.env.VERCEL_ENV === "preview"',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review"] as const',
-  'operation !== "dry_run" && operation !== "review"',
+  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const',
+  'operation !== "dry_run" && operation !== "review" && operation !== "reserve_private_publish"',
   'createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()',
   'loadPharmacyPrivateAdminRuntimeContext(',
 ]) {
