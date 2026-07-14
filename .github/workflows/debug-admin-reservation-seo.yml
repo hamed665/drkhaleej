@@ -1,0 +1,31 @@
+name: Debug Admin Reservation SEO
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  seo:
+    if: github.head_ref == 'agent/pharmacy-admin-reservation-operation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - run: corepack prepare pnpm@10.22.0 --activate
+      - run: pnpm install --frozen-lockfile
+      - name: Capture SEO check
+        shell: bash
+        run: |
+          set +e
+          pnpm seo:check > seo.log 2>&1
+          code=$?
+          cat seo.log
+          exit $code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-reservation-seo
+          path: seo.log
