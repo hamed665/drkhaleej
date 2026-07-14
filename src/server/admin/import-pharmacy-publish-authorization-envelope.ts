@@ -104,7 +104,7 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
       const reviewStateId = await store.resolveReviewStateId(input.operationAttemptId);
       if (!reviewStateId || !isUuid(reviewStateId)) return null;
 
-      // Legacy hashes remain internal until the atomic reservation RPC replaces the old consume signature.
+      // Legacy hashes remain internal until atomic reservation replaces the old consume signature.
       const token = randomBytes(32).toString("base64url");
       const nonce = randomBytes(24).toString("base64url");
       const issuedAt = now();
