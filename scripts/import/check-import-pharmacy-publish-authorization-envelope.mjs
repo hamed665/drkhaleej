@@ -31,18 +31,19 @@ for (const token of [
   "resolveReviewStateId",
   "authorizationId: string",
   "expiresAt: string",
+  "PharmacyPublishAuthorizationLegacySecret",
 ]) assert(source.includes(token), `${sourcePath} must include ${token}`);
 
+const envelopeType = source.slice(
+  source.indexOf("export type PharmacyPublishAuthorizationEnvelope ="),
+  source.indexOf("export type PharmacyPublishAuthorizationLegacySecret ="),
+);
 for (const forbidden of ["token: string;", "nonce: string;"]) {
-  const envelopeType = source.slice(
-    source.indexOf("export type PharmacyPublishAuthorizationEnvelope ="),
-    source.indexOf("function sha256"),
-  );
-  assert(!envelopeType.includes(forbidden), `${sourcePath} must not expose ${forbidden}`);
+  assert(!envelopeType.includes(forbidden), `${sourcePath} bounded handle must not expose ${forbidden}`);
 }
 
 for (const token of [
-  "returns only a server-owned handle while persisting the full bounded identity",
+  "returns a bounded handle plus an internal legacy secret while persisting the full identity",
   "fails closed when the persisted Review cannot be resolved",
   "fails closed for malformed identity or persistence failure",
 ]) assert(tests.includes(token), `${testPath} must cover ${token}`);
@@ -54,6 +55,7 @@ for (const forbidden of [
   "createPharmacyPublishAuthorizationEnvelopeService(",
   "authorization.token",
   "authorization.nonce",
+  "legacySecret",
 ]) {
   assert(!action.includes(forbidden), `${actionPath} must not enable or expose authorization consumption: ${forbidden}`);
   assert(!panel.includes(forbidden), `${panelPath} must not enable or expose authorization consumption: ${forbidden}`);
