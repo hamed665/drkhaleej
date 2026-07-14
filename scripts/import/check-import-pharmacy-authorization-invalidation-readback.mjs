@@ -23,7 +23,7 @@ for (const token of [
   'invalidateActive',
   'transition',
 ]) {
-  if (!source.envelope.includes(token) && !source.store.includes(token) && !source.migration.includes(token)) {
+  if (!source.envelope.includes(token) && !source.store.includes(token) && !source.issue.includes(token) && !source.migration.includes(token)) {
     throw new Error(`authorization lifecycle missing ${token}`);
   }
 }
