@@ -76,7 +76,8 @@ function dependencies(result: { kind: "reserved"; reservationId: string; rollbac
     authorizationStore: {
       resolveReviewStateId: vi.fn(async () => authorization.reviewStateId),
       create: vi.fn(), readByAuthorizationId: vi.fn(), readByTokenHash: vi.fn(),
-      readByReviewStateId: vi.fn(async () => authorization), invalidateActive: vi.fn(), transition: vi.fn(), consume: vi.fn(),
+      readByReviewStateId: vi.fn(async (): Promise<typeof authorization | null> => authorization),
+      invalidateActive: vi.fn(), transition: vi.fn(), consume: vi.fn(),
     },
   };
 }
