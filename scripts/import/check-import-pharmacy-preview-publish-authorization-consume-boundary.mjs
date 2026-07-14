@@ -39,7 +39,7 @@ for (const token of [
 ]) assert(boundary.includes(token), `${boundaryPath} must include ${token}`);
 
 for (const token of [
-  "consumes one exact authorization while keeping execution, reservation, and mutation disabled",
+  "consumes one exact server-only legacy secret while keeping execution disabled",
   "rejects replay after the first atomic consumption",
   "fails closed outside Preview and without exact actor or entity allowlists",
   "rejects missing authorization, missing store, and invalid bounded identity",
