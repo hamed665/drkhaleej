@@ -79,6 +79,38 @@ describe("pharmacy private Admin server action", () => {
     expect(execute).toHaveBeenCalledTimes(1);
   });
 
+  it("requires exact entity-bound confirmation before one reservation", async () => {
+    const execute = vi.fn(async () => completed("reserve_private_publish"));
+    const action = createPharmacyPrivateAdminServerAction({
+      executionEnabled: true,
+      enabledOperations: ["reserve_private_publish"],
+      environment: "preview",
+      allowedEntityIds: ["pharmacy-1"],
+      execute,
+    });
+
+    const blocked = await action({
+      actorId: "admin-1",
+      formData: form({
+        operation: "reserve_private_publish",
+        entityId: "pharmacy-1",
+        confirmation: "RESERVE PRIVATE PUBLISH pharmacy-2",
+      }),
+    });
+    expect(blocked).toEqual({ ok: false, blockers: ["invalid_confirmation"] });
+
+    const result = await action({
+      actorId: "admin-1",
+      formData: form({
+        operation: "reserve_private_publish",
+        entityId: "pharmacy-1",
+        confirmation: "RESERVE PRIVATE PUBLISH pharmacy-1",
+      }),
+    });
+    expect(result).toEqual({ ok: true, workflow: completed("reserve_private_publish") });
+    expect(execute).toHaveBeenCalledTimes(1);
+  });
+
   it("rejects duplicate fields, non-allowlisted entities, and production mutation", async () => {
     const execute = vi.fn(async () => completed("private_publish"));
     const action = createPharmacyPrivateAdminServerAction({
