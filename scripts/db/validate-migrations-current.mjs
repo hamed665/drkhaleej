@@ -35,6 +35,7 @@ const pharmacyMetadataLocaleMigrationName = '0075_import_pharmacy_metadata_local
 const pharmacyStableOperationIdentityMigrationName = '0076_import_pharmacy_stable_operation_identity.sql';
 const pharmacyAuthorizationV2MigrationName = '0077_import_pharmacy_authorization_persistence_v2.sql';
 const pharmacyAuthorizationLifecycleMigrationName = '0078_import_pharmacy_authorization_invalidation_readback.sql';
+const pharmacyAtomicAuthorizationMigrationName = '0079_import_pharmacy_atomic_authorization_reservation.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -49,6 +50,7 @@ const pharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, pharmacyMet
 const pharmacyStableOperationIdentityMigrationPath = path.join(migrationsDir, pharmacyStableOperationIdentityMigrationName);
 const pharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, pharmacyAuthorizationV2MigrationName);
 const pharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, pharmacyAuthorizationLifecycleMigrationName);
+const pharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, pharmacyAtomicAuthorizationMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -63,6 +65,7 @@ const hiddenPharmacyMetadataLocaleMigrationPath = path.join(migrationsDir, `.pha
 const hiddenPharmacyStableOperationIdentityMigrationPath = path.join(migrationsDir, `.pharmacy-stable-operation-${pharmacyStableOperationIdentityMigrationName}.hidden`);
 const hiddenPharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, `.pharmacy-authorization-v2-${pharmacyAuthorizationV2MigrationName}.hidden`);
 const hiddenPharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, `.pharmacy-authorization-lifecycle-${pharmacyAuthorizationLifecycleMigrationName}.hidden`);
+const hiddenPharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, `.pharmacy-atomic-authorization-${pharmacyAtomicAuthorizationMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -79,6 +82,7 @@ const currentOnlyMigrations = [
   [pharmacyStableOperationIdentityMigrationName, pharmacyStableOperationIdentityMigrationPath, hiddenPharmacyStableOperationIdentityMigrationPath],
   [pharmacyAuthorizationV2MigrationName, pharmacyAuthorizationV2MigrationPath, hiddenPharmacyAuthorizationV2MigrationPath],
   [pharmacyAuthorizationLifecycleMigrationName, pharmacyAuthorizationLifecycleMigrationPath, hiddenPharmacyAuthorizationLifecycleMigrationPath],
+  [pharmacyAtomicAuthorizationMigrationName, pharmacyAtomicAuthorizationMigrationPath, hiddenPharmacyAtomicAuthorizationMigrationPath],
 ];
 
 function fail(message) {
@@ -186,6 +190,24 @@ function validatePharmacyAuthorizationLifecycleMigration() {
   requireCondition(existsSync(pharmacyAuthorizationLifecycleMigrationPath), `${pharmacyAuthorizationLifecycleMigrationName} is missing.`);
   execFileSync(process.execPath, [pharmacyAuthorizationLifecycleValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
+function validatePharmacyAtomicAuthorizationMigration() {
+  requireCondition(existsSync(pharmacyAtomicAuthorizationMigrationPath), `${pharmacyAtomicAuthorizationMigrationName} is missing.`);
+  const content = readFileSync(pharmacyAtomicAuthorizationMigrationPath, 'utf8');
+  for (const [pattern, message] of [
+    [/IMPORT-ADMIN-AE: atomically verify and consume one Pharmacy authorization/i, '0079 must include its migration marker.'],
+    [/add\s+column\s+if\s+not\s+exists\s+pharmacy_authorization_id\s+uuid/i, '0079 must bind reservations to Pharmacy authorization IDs.'],
+    [/from\s+public\.import_pharmacy_publish_authorizations[\s\S]*for\s+update/i, '0079 must lock the authorization row before reservation writes.'],
+    [/status\s*=\s*'consumed'/i, '0079 must consume authorization in the transaction.'],
+    [/consumed_by_reservation_id\s*=\s*v_idempotency_id/i, '0079 must bind consumption to the reservation.'],
+    [/security\s+invoker/i, '0079 RPC must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog,\s*public/i, '0079 RPC must pin search_path.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0079 RPC must be service-role-only.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0079 must not add public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0079 must not grant public execution.'],
+  ]) forbidPattern(content, pattern, message);
+}
 
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
@@ -221,5 +243,6 @@ validatePharmacyMetadataLocaleMigration();
 validatePharmacyStableOperationIdentityMigration();
 validatePharmacyAuthorizationV2Migration();
 validatePharmacyAuthorizationLifecycleMigration();
+validatePharmacyAtomicAuthorizationMigration();
 
 console.log('Current migration validation passed.');

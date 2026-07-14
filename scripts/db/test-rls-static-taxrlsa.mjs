@@ -28,6 +28,7 @@ const migrations = {
   pharmacyAdminReadState: '0073_import_pharmacy_admin_read_states.sql',
   pharmacyPublishAuthorization: '0074_import_pharmacy_publish_authorizations.sql',
   pharmacyAuthorizationLifecycle: '0078_import_pharmacy_authorization_invalidation_readback.sql',
+  pharmacyAtomicAuthorizationReservation: '0079_import_pharmacy_atomic_authorization_reservation.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -62,16 +63,18 @@ function readMigration(key) {
   return readFileSync(migrationPath, 'utf8');
 }
 
-function validateNoAdminPolicies(content, label) {
+function validateNoAdminPolicies(content, label, options = {}) {
   for (const [pattern, message] of [
     [/\bcreate\s+policy\b/i, `${label} must not create RLS policies.`],
     [/\bfor\s+select\b/i, `${label} must not add SELECT policies.`],
     [/\bfor\s+insert\b/i, `${label} must not add INSERT policies.`],
-    [/\bfor\s+update\b/i, `${label} must not add UPDATE policies.`],
     [/\bfor\s+delete\b/i, `${label} must not add DELETE policies.`],
     [/\bto\s+anon\b/i, `${label} must not expose anon access.`],
     [/\bto\s+authenticated\b/i, `${label} must not expose authenticated access.`],
   ]) forbidPattern(content, pattern, message);
+  if (!options.allowRowLocks) {
+    forbidPattern(content, /\bfor\s+update\b/i, `${label} must not add UPDATE policies.`);
+  }
 }
 
 function validateTaxonomyRlsMigration() {
@@ -114,7 +117,7 @@ function validateSpecialtyAliasRlsMigration() {
 
 function validateClosedMigration(key, label, requiredTables = [], options = {}) {
   const content = readMigration(key);
-  validateNoAdminPolicies(content, label);
+  validateNoAdminPolicies(content, label, { allowRowLocks: options.allowRowLocks === true });
   if (!options.allowServiceRoleGrant) {
     forbidPattern(content, /\bto\s+service_role\b/i, `${label} must not add explicit service_role grants.`);
   }
@@ -177,6 +180,17 @@ function validateLaterMigrations() {
   requirePattern(lifecycle, /revoke\s+all\s+on\s+function\s+public\.import_pharmacy_transition_publish_authorization[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0078 must revoke transition RPC access from public roles.');
   requirePattern(lifecycle, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_invalidate_publish_authorizations[\s\S]*to\s+service_role/i, '0078 must grant invalidation RPC only to service_role.');
   requirePattern(lifecycle, /grant\s+execute\s+on\s+function\s+public\.import_pharmacy_transition_publish_authorization[\s\S]*to\s+service_role/i, '0078 must grant transition RPC only to service_role.');
+
+  const atomicReservation = validateClosedMigration(
+    'pharmacyAtomicAuthorizationReservation',
+    '0079',
+    [],
+    { allowServiceRoleGrant: true, allowRowLocks: true },
+  );
+  requirePattern(atomicReservation, /revoke\s+all\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0079 must revoke atomic reservation RPC access from public roles.');
+  requirePattern(atomicReservation, /grant\s+execute\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*to\s+service_role/i, '0079 must grant atomic reservation RPC only to service_role.');
+  requirePattern(atomicReservation, /security\s+invoker/i, '0079 must keep the atomic reservation RPC security invoker.');
+  requirePattern(atomicReservation, /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0079 must pin the atomic reservation RPC search_path.');
 }
 
 function runLegacyStaticRlsTestWithoutLaterMigrations() {

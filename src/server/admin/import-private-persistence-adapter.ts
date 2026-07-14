@@ -18,6 +18,16 @@ export type ImportPublishRollbackSnapshot = ImportControlledPublishState & {
   center?: Readonly<Record<string, unknown>>;
 };
 
+export type ImportPharmacyReservationAuthorization = {
+  authorizationId: string;
+  reviewSnapshotHash: string;
+  entityFingerprint: string;
+  operationAttemptId: string;
+  patchHash: string;
+  entityFamily: "pharmacy";
+  operationScope: "reserve_private_publish";
+};
+
 export type ImportPublishPersistenceTransactionRequest = {
   entityId: string;
   actorId: string;
@@ -28,6 +38,7 @@ export type ImportPublishPersistenceTransactionRequest = {
   auditSchemaVersion: string;
   reservationExpiresAt: string;
   rollbackExpiresAt: string;
+  authorization?: ImportPharmacyReservationAuthorization;
 };
 
 export type ImportPublishPersistenceTerminalResult = {
@@ -57,7 +68,7 @@ export type ImportPublishPersistenceTerminalWriteResult =
   | { kind: "failed"; reason: "idempotency_record_not_found" | "rollback_snapshot_not_found" | "rpc_failed" };
 
 export type ImportPublishPersistenceTransactionResult =
-  | { kind: "reserved"; reservationId: string; rollbackSnapshotId: string; auditEventId: string }
+  | { kind: "reserved"; reservationId: string; rollbackSnapshotId: string; auditEventId: string; replayed?: boolean }
   | { kind: "replayed"; terminalResult: ImportPublishPersistenceTerminalResult }
   | {
       kind: "conflict";
@@ -65,7 +76,12 @@ export type ImportPublishPersistenceTransactionResult =
         | "idempotency_key_request_hash_mismatch"
         | "expected_version_mismatch"
         | "request_already_in_progress"
-        | "concurrent_idempotency_conflict";
+        | "concurrent_idempotency_conflict"
+        | "authorization_not_found"
+        | "authorization_identity_mismatch"
+        | "authorization_not_issued"
+        | "authorization_expired"
+        | "reservation_replay_incomplete";
     }
   | { kind: "failed"; reason: "transaction_aborted" | "rpc_failed" };
 
