@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.2.2",
+  "policy_version": "content-policy-2026-01",
+  "article_id": "33333333-3333-4333-8333-333333333333",
+  "revision_id": "44444444-4444-4444-8444-444444444444",
+  "locale": "en",
+  "state": "medical_review",
+  "medical_sensitivity": "high",
+  "intent": "Explain a medical topic",
+  "title": "Example medical article",
+  "body_markdown": "A draft medical statement.",
+  "sources": [
+    {
+      "source_id": "55555555-5555-4555-8555-555555555555",
+      "url": "https://example.org/medical-source",
+      "trust_tier": "T1",
+      "locale": "en",
+      "citation_scope": "medical",
+      "medical_sensitivity": "high",
+      "supported_claim_ids": ["66666666-6666-4666-8666-666666666666"],
+      "conflicts": [],
+      "retrieved_at": "2026-07-15T08:00:00Z",
+      "terms_policy_id": "source-policy-example"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "66666666-6666-4666-8666-666666666666",
+      "claim": "A medical claim requiring qualified review.",
+      "source_ids": ["55555555-5555-4555-8555-555555555555"],
+      "medical": true,
+      "review_requirement": "medical"
+    }
+  ],
+  "quality_gates": {
+    "seo": "pass",
+    "editorial": "pending",
+    "medical": "pending",
+    "citations": "pass",
+    "bilingual_parity": "not_required",
+    "duplication": "pass"
+  },
+  "generated_by": {
+    "actor_type": "agent",
+    "actor_id": "content-agent",
+    "prompt_version": "content-prompt-1"
+  },
+  "created_at": "2026-07-15T08:00:00Z"
+}

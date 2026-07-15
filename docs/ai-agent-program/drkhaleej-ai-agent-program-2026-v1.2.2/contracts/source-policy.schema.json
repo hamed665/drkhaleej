@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:source-policy:1.2.2",
+  "title": "DrKhaleej Source Collection Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "source_policy_id", "policy_version", "source_id",
+    "domain_pattern", "purpose", "allowed_operations", "allowed_families",
+    "allowed_fields", "allowed_content_types", "terms_status", "robots_status",
+    "licensing_status", "copyright_status", "privacy_classification", "pii_allowed",
+    "request_interval_seconds", "raw_retention_days", "excerpt_limit",
+    "raw_content_policy", "ai_vendor_allowed", "redistribution_scope",
+    "reviewed_by", "reviewed_at", "expires_at", "decision", "reason"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "source_policy_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "source_id": { "type": "string", "format": "uuid" },
+    "domain_pattern": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 253,
+      "pattern": "^(?:\\*\\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "allowed_operations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["fetch", "extract", "cite", "refresh", "archive_private"] }
+    },
+    "allowed_families": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+    },
+    "allowed_fields": {
+      "type": "array",
+      "maxItems": 200,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "allowed_content_types": {
+      "type": "array",
+      "maxItems": 30,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+    },
+    "terms_status": { "type": "string", "enum": ["approved", "restricted", "blocked", "unknown"] },
+    "robots_status": { "type": "string", "enum": ["allowed", "disallowed", "not_applicable", "unknown"] },
+    "licensing_status": { "type": "string", "enum": ["approved", "restricted", "blocked", "unknown"] },
+    "copyright_status": { "type": "string", "enum": ["approved", "restricted", "blocked", "unknown"] },
+    "privacy_classification": { "type": "string", "enum": ["public", "personal", "sensitive", "prohibited"] },
+    "pii_allowed": { "type": "boolean" },
+    "purpose": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "request_interval_seconds": { "type": "integer", "minimum": 1, "maximum": 86400 },
+    "raw_retention_days": { "type": "integer", "minimum": 0, "maximum": 3650 },
+    "excerpt_limit": { "type": "integer", "minimum": 0, "maximum": 4000 },
+    "raw_content_policy": { "type": "string", "enum": ["private_encrypted", "ephemeral_only", "prohibited"] },
+    "ai_vendor_allowed": { "type": "boolean" },
+    "redistribution_scope": { "type": "string", "enum": ["none", "citation_only", "bounded_excerpt", "licensed"] },
+    "jurisdictions": {
+      "type": "array",
+      "maxItems": 30,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Z]{2}$" }
+    },
+    "reviewed_by": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "legal_approval_reference": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 200 },
+        { "type": "null" }
+      ]
+    },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "decision": { "type": "string", "enum": ["approved", "restricted", "blocked", "expired"] },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "decision": { "const": "approved" } },
+        "required": ["decision"]
+      },
+      "then": {
+        "properties": {
+          "terms_status": { "const": "approved" },
+          "robots_status": { "enum": ["allowed", "not_applicable"] },
+          "licensing_status": { "const": "approved" },
+          "copyright_status": { "const": "approved" },
+          "privacy_classification": { "enum": ["public", "personal", "sensitive"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "privacy_classification": { "const": "prohibited" } },
+        "required": ["privacy_classification"]
+      },
+      "then": {
+        "properties": {
+          "pii_allowed": { "const": false },
+          "raw_retention_days": { "const": 0 },
+          "excerpt_limit": { "const": 0 },
+          "raw_content_policy": { "const": "prohibited" },
+          "ai_vendor_allowed": { "const": false },
+          "redistribution_scope": { "const": "none" },
+          "decision": { "enum": ["blocked", "expired"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "raw_content_policy": { "const": "prohibited" } },
+        "required": ["raw_content_policy"]
+      },
+      "then": {
+        "properties": {
+          "raw_retention_days": { "const": 0 },
+          "excerpt_limit": { "const": 0 }
+        }
+      }
+    }
+  ]
+}

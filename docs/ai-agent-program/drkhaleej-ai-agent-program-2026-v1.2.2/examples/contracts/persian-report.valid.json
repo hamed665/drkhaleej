@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.2.2",
+  "report_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "period": "daily",
+  "severity": "info",
+  "metrics": [
+    {
+      "metric_key": "jobs.succeeded",
+      "value": 5,
+      "unit": "count",
+      "source_kind": "sql",
+      "source_reference": "reporting.jobs.daily",
+      "captured_at": "2026-07-15T23:59:00Z"
+    }
+  ],
+  "highlights_fa": ["پنج کار با موفقیت تکمیل شد."],
+  "actions": [],
+  "generated_at": "2026-07-16T00:00:00Z"
+}

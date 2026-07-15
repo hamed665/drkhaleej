@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:entity-draft:1.2.2",
+  "title": "DrKhaleej Proposed Entity Candidate Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_version",
+    "draft_id",
+    "entity_family",
+    "status",
+    "locales",
+    "fields",
+    "duplicate_candidates",
+    "evidence_coverage",
+    "created_by",
+    "version",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "draft_id": { "type": "string", "format": "uuid" },
+    "entity_family": {
+      "type": "string",
+      "enum": [
+        "doctor", "hospital", "clinic", "pharmacy", "lab", "imaging_center",
+        "dental_clinic", "dentist", "dermatologist", "gynecologist",
+        "fertility_clinic", "ivf_center", "reproductive_medicine_doctor",
+        "embryology_lab", "andrology_lab", "hair_transplant_clinic",
+        "hair_transplant_doctor", "plastic_surgeon", "aesthetic_doctor",
+        "medical_beauty_clinic", "salon", "spa", "gym", "fitness_center",
+        "personal_trainer", "yoga_studio", "pilates_studio",
+        "sports_medicine_doctor", "physiotherapy", "wellness_center",
+        "vet_doctor", "pet_clinic", "pet_pharmacy", "pet_shop",
+        "pet_grooming", "pet_boarding"
+      ]
+    },
+    "candidate_entity_id": {
+      "oneOf": [
+        { "type": "string", "format": "uuid" },
+        { "type": "null" }
+      ]
+    },
+    "operator_type": {
+      "type": "string",
+      "enum": ["private", "government", "charity", "nonprofit", "public_private", "unknown"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["collecting", "needs_review"]
+    },
+    "locales": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en", "ar"],
+      "properties": {
+        "en": { "$ref": "#/$defs/localizedIdentity" },
+        "ar": { "$ref": "#/$defs/localizedIdentity" }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/evidencedField" }
+    },
+    "duplicate_candidates": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/duplicateCandidate" }
+    },
+    "evidence_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+    "created_by": { "$ref": "#/$defs/actorReference" },
+    "version": { "type": "integer", "minimum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "actorReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_type", "actor_id"],
+      "properties": {
+        "actor_type": { "type": "string", "enum": ["admin", "agent", "manual_import", "api_import"] },
+        "actor_id": { "type": "string", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "localizedIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["official_name"],
+      "properties": {
+        "official_name": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 240 },
+            { "type": "null" }
+          ]
+        },
+        "short_description": {
+          "oneOf": [
+            { "type": "string", "maxLength": 1200 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "boundedScalar": {
+      "oneOf": [
+        { "type": "string", "maxLength": 4000 },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" }
+      ]
+    },
+    "boundedValue": {
+      "oneOf": [
+        { "$ref": "#/$defs/boundedScalar" },
+        {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/boundedScalar" }
+        },
+        {
+          "type": "object",
+          "maxProperties": 50,
+          "propertyNames": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "additionalProperties": { "$ref": "#/$defs/boundedScalar" }
+        }
+      ]
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observation_id", "reason", "status"],
+      "properties": {
+        "observation_id": { "type": "string", "format": "uuid" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "status": { "type": "string", "enum": ["open", "requires_review"] },
+        "value": { "$ref": "#/$defs/boundedValue" }
+      }
+    },
+    "evidencedField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path", "value", "normalized_value", "observation_id", "source_tier",
+        "confidence", "extraction_method", "evidence_excerpt", "conflicts",
+        "observed_at", "review_status"
+      ],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^[a-zA-Z0-9_.-]+$" },
+        "value": { "$ref": "#/$defs/boundedValue" },
+        "normalized_value": { "$ref": "#/$defs/boundedValue" },
+        "observation_id": { "type": "string", "format": "uuid" },
+        "source_tier": { "type": "string", "enum": ["T1", "T2", "T3", "T4", "T5"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "extraction_method": {
+          "type": "string",
+          "enum": ["structured_data", "selector", "regex", "small_model", "strong_model", "manual"]
+        },
+        "evidence_excerpt": { "type": "string", "maxLength": 1000 },
+        "conflicts": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/conflict" } },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "review_status": { "type": "string", "const": "pending" }
+      }
+    },
+    "duplicateCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "score", "reasons", "decision"],
+      "properties": {
+        "entity_id": { "type": "string", "format": "uuid" },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "type": "string", "minLength": 1, "maxLength": 300 }
+        },
+        "decision": { "type": "string", "enum": ["candidate", "not_duplicate_candidate", "requires_review"] }
+      }
+    }
+  }
+}
