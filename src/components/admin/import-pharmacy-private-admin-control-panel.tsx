@@ -174,13 +174,30 @@ export function ImportPharmacyPrivateAdminControlPanel({
       </ol>
 
       {reservationState ? (
-        <p className={`mt-4 rounded-xl border p-4 text-sm font-semibold ${reservationState.reserved && reservationState.integrityVerified ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}>
-          {reservationState.reserved && reservationState.integrityVerified
-            ? `Reservation ${reservationState.replayed ? "replayed safely" : "created"}; integrity verified`
-            : reservationState.reserved
-              ? `Reservation persisted; integrity blocked: ${reservationState.blocker ?? "unknown"}`
-              : `Reservation blocked: ${reservationState.blocker ?? "unknown"}`} · Entity mutated: No · Route/index/sitemap: Disabled
-        </p>
+        <div className={`mt-4 rounded-xl border p-4 ${reservationState.reserved && reservationState.integrityVerified ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}>
+          <p className="text-sm font-semibold">
+            {reservationState.reserved && reservationState.integrityVerified
+              ? `Reservation ${reservationState.replayed ? "replayed safely" : "created"}; integrity verified`
+              : reservationState.reserved
+                ? `Reservation persisted; integrity blocked: ${reservationState.blocker ?? "unknown"}`
+                : `Reservation blocked: ${reservationState.blocker ?? "unknown"}`} · Entity mutated: No · Route/index/sitemap: Disabled
+          </p>
+          {reservationState.integrityCounts && reservationState.integrityFindings ? (
+            <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4" aria-label="Integrity readback evidence">
+              <div><dt className="font-semibold">Authorization rows</dt><dd>{reservationState.integrityCounts.authorization}</dd></div>
+              <div><dt className="font-semibold">Reservation rows</dt><dd>{reservationState.integrityCounts.idempotency}</dd></div>
+              <div><dt className="font-semibold">Snapshot rows</dt><dd>{reservationState.integrityCounts.rollbackSnapshot}</dd></div>
+              <div><dt className="font-semibold">Reservation audit rows</dt><dd>{reservationState.integrityCounts.reservationAudit}</dd></div>
+              <div><dt className="font-semibold">Current audit rows</dt><dd>{reservationState.integrityCounts.executionStartedAudit}</dd></div>
+              <div><dt className="font-semibold">Future audit rows</dt><dd>{reservationState.integrityCounts.reservationCreatedAudit}</dd></div>
+              <div><dt className="font-semibold">Entity rows</dt><dd>{reservationState.integrityCounts.entityFingerprint}</dd></div>
+              <div><dt className="font-semibold">Audit signature</dt><dd>{reservationState.auditSignature ?? "none"}</dd></div>
+              <div><dt className="font-semibold">Duplicates</dt><dd>{reservationState.integrityFindings.duplicateCount}</dd></div>
+              <div><dt className="font-semibold">Orphans</dt><dd>{reservationState.integrityFindings.orphanCount}</dd></div>
+              <div><dt className="font-semibold">Audit gaps</dt><dd>{reservationState.integrityFindings.auditGapCount}</dd></div>
+            </dl>
+          ) : null}
+        </div>
       ) : null}
 
       {publishCapability && !publishCapability.visible && publishCapability.blockers.length > 0 ? (
