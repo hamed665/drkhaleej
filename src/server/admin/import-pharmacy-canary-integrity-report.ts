@@ -4,9 +4,12 @@ import type { PharmacyRealPreviewCanaryResult } from "./import-pharmacy-real-pre
 import type { PharmacyRealRollbackCanaryResult } from "./import-pharmacy-real-rollback-canary";
 
 export type PharmacyCanaryIntegrityReadback = {
+  orphanAuthorizationCount: number;
   orphanReservationCount: number;
   orphanSnapshotCount: number;
+  authorizationReservationMismatchCount: number;
   auditGapCount: number;
+  duplicateReservationCount: number;
   duplicateExecutionCount: number;
   duplicateRollbackCount: number;
   publicRouteCount: number;
@@ -33,9 +36,12 @@ export type PharmacyCanaryIntegrityBlocker =
   | "canary_identity_mismatch"
   | "publish_reference_mismatch"
   | "integrity_readback_failed"
+  | "orphan_authorization_detected"
   | "orphan_reservation_detected"
   | "orphan_snapshot_detected"
+  | "authorization_reservation_mismatch_detected"
   | "audit_gap_detected"
+  | "duplicate_reservation_detected"
   | "duplicate_execution_detected"
   | "duplicate_rollback_detected"
   | "public_route_leak_detected"
@@ -150,9 +156,14 @@ export async function buildPharmacyCanaryIntegrityReport(input: {
 
   const data = read.data;
   const blockers: PharmacyCanaryIntegrityBlocker[] = [];
+  if (data.orphanAuthorizationCount !== 0) blockers.push("orphan_authorization_detected");
   if (data.orphanReservationCount !== 0) blockers.push("orphan_reservation_detected");
   if (data.orphanSnapshotCount !== 0) blockers.push("orphan_snapshot_detected");
+  if (data.authorizationReservationMismatchCount !== 0) {
+    blockers.push("authorization_reservation_mismatch_detected");
+  }
   if (data.auditGapCount !== 0) blockers.push("audit_gap_detected");
+  if (data.duplicateReservationCount !== 0) blockers.push("duplicate_reservation_detected");
   if (data.duplicateExecutionCount !== 0) blockers.push("duplicate_execution_detected");
   if (data.duplicateRollbackCount !== 0) blockers.push("duplicate_rollback_detected");
   if (data.publicRouteCount !== 0) blockers.push("public_route_leak_detected");

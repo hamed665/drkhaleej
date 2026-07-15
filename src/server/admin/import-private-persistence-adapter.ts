@@ -20,6 +20,7 @@ export type ImportPublishRollbackSnapshot = ImportControlledPublishState & {
 
 export type ImportPharmacyReservationAuthorization = {
   authorizationId: string;
+  reviewStateId: string;
   reviewSnapshotHash: string;
   entityFingerprint: string;
   operationAttemptId: string;

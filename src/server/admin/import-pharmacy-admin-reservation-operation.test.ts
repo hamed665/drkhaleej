@@ -79,6 +79,42 @@ function dependencies(result: { kind: "reserved"; reservationId: string; rollbac
       readByReviewStateId: vi.fn(async (): Promise<typeof authorization | null> => authorization),
       invalidateActive: vi.fn(), transition: vi.fn(), consume: vi.fn(),
     },
+    readbackClient: {
+      readAuthorizationRows: vi.fn(async () => ({ data: [{
+        id: authorization.authorizationId, review_state_id: authorization.reviewStateId,
+        actor_profile_id: review.actorId, entity_id: review.entityId,
+        review_snapshot_hash: review.snapshotHash, entity_fingerprint: review.entityFingerprint,
+        operation_attempt_id: review.operationAttemptId, idempotency_key: review.idempotencyKey,
+        request_hash: review.requestHash, patch_hash: review.patchHash,
+        expected_entity_version: review.expectedEntityVersion, entity_family: "pharmacy",
+        operation_scope: "reserve_private_publish", status: "consumed",
+        consumed_by_reservation_id: result.reservationId,
+      }], error: null })),
+      readIdempotencyRows: vi.fn(async () => ({ data: [{
+        id: result.reservationId, entity_id: review.entityId, actor_profile_id: review.actorId,
+        idempotency_key: review.idempotencyKey, expected_version: review.expectedEntityVersion,
+        request_hash: review.requestHash, status: "reserved",
+        pharmacy_authorization_id: authorization.authorizationId,
+      }], error: null })),
+      readRollbackRows: vi.fn(async () => ({ data: [{
+        id: result.rollbackSnapshotId, entity_id: review.entityId, actor_profile_id: review.actorId,
+        idempotency_record_id: result.reservationId, expected_version: review.expectedEntityVersion,
+        snapshot_hash: review.snapshotHash,
+      }], error: null })),
+      readAuditRows: vi.fn(async () => ({ data: [{
+        id: result.auditEventId, entity_id: review.entityId, actor_profile_id: review.actorId,
+        idempotency_record_id: result.reservationId, rollback_snapshot_id: result.rollbackSnapshotId,
+        event_type: "execution_started" as const, outcome: "pending", expected_version: review.expectedEntityVersion,
+        phase: "reservation", request_hash: review.requestHash, authorization_id: authorization.authorizationId,
+        review_snapshot_hash: review.snapshotHash, entity_fingerprint: review.entityFingerprint,
+        operation_attempt_id: review.operationAttemptId, patch_hash: review.patchHash,
+        entity_family: "pharmacy", operation_scope: "reserve_private_publish",
+      }], error: null })),
+      readEntityFingerprint: vi.fn(async () => ({
+        data: [{ fingerprint: review.entityFingerprint, version: review.expectedEntityVersion }],
+        error: null,
+      })),
+    },
   };
 }
 
@@ -91,11 +127,38 @@ describe("Pharmacy Admin reservation operation", () => {
       confirmation: `RESERVE PRIVATE PUBLISH ${review.entityId}`,
       now: "2026-07-14T00:05:00.000Z", reviewState: review, context, dependencies: deps,
     });
-    expect(result).toEqual({ reserved: true, replayed: false, entityMutated: false, publicVisibility: "private", indexEligible: false, sitemapEligible: false, routeEnabled: false, blocker: null });
+    expect(result).toEqual({
+      reserved: true, replayed: false, integrityVerified: true,
+      integrityCounts: { authorization: 1, idempotency: 1, rollbackSnapshot: 1, reservationAudit: 1, executionStartedAudit: 1, reservationCreatedAudit: 0, entityFingerprint: 1 },
+      integrityFindings: { duplicateCount: 0, orphanCount: 0, auditGapCount: 0 },
+      auditSignature: "execution_started", entityMutated: false, publicVisibility: "private",
+      indexEligible: false, sitemapEligible: false, routeEnabled: false, blocker: null,
+    });
     expect(deps.persistenceAdapter.runReservationSnapshotAuditTransaction).toHaveBeenCalledWith(expect.objectContaining({
       idempotencyKey: review.idempotencyKey, requestHash: review.requestHash,
       authorization: expect.objectContaining({ operationAttemptId: review.operationAttemptId, patchHash: review.patchHash }),
     }));
+  });
+
+  it("reports a persisted reservation but fails the operation closed when readback integrity fails", async () => {
+    const deps = dependencies();
+    vi.mocked(deps.readbackClient.readAuditRows).mockResolvedValueOnce({ data: [], error: null });
+
+    const result = await runPharmacyAdminReservationOperation({
+      environment: "preview", actorId: review.actorId, entityId: review.entityId,
+      allowedActorIds: [review.actorId], allowedEntityIds: [review.entityId],
+      confirmation: `RESERVE PRIVATE PUBLISH ${review.entityId}`,
+      now: "2026-07-14T00:05:00.000Z", reviewState: review, context, dependencies: deps,
+    });
+
+    expect(result).toMatchObject({
+      reserved: true,
+      integrityVerified: false,
+      blocker: "reservation_integrity_failed",
+      integrityFindings: { auditGapCount: 1 },
+      entityMutated: false,
+      publicVisibility: "private",
+    });
   });
 
   it("fails closed for wrong confirmation and unavailable authorization", async () => {

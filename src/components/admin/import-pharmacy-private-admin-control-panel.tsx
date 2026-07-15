@@ -174,8 +174,12 @@ export function ImportPharmacyPrivateAdminControlPanel({
       </ol>
 
       {reservationState ? (
-        <p className={`mt-4 rounded-xl border p-4 text-sm font-semibold ${reservationState.reserved ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}>
-          Reservation {reservationState.reserved ? (reservationState.replayed ? "replayed safely" : "created") : `blocked: ${reservationState.blocker ?? "unknown"}`} · Entity mutated: No · Route/index/sitemap: Disabled
+        <p className={`mt-4 rounded-xl border p-4 text-sm font-semibold ${reservationState.reserved && reservationState.integrityVerified ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}>
+          {reservationState.reserved && reservationState.integrityVerified
+            ? `Reservation ${reservationState.replayed ? "replayed safely" : "created"}; integrity verified`
+            : reservationState.reserved
+              ? `Reservation persisted; integrity blocked: ${reservationState.blocker ?? "unknown"}`
+              : `Reservation blocked: ${reservationState.blocker ?? "unknown"}`} · Entity mutated: No · Route/index/sitemap: Disabled
         </p>
       ) : null}
 

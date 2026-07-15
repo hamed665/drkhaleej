@@ -12,6 +12,12 @@ import {
   type ImportSupabaseRpcClient,
 } from "./import-supabase-publish-persistence-adapter";
 import type { ImportPrivatePublishPersistenceAdapter } from "./import-private-persistence-adapter";
+import {
+  verifyImportPersistenceReadback,
+  type ImportPersistenceReadbackClient,
+  type ImportPersistenceReadbackVerificationResult,
+  type ImportReservationAuditSignature,
+} from "./import-persistence-readback-verifier";
 import type {
   PharmacyPublishAuthorizationEnvelopeRecord,
   PharmacyPublishAuthorizationEnvelopeStore,
@@ -20,10 +26,18 @@ import {
   createPharmacyPublishAuthorizationStore,
   type PharmacyPublishAuthorizationClient,
 } from "./import-pharmacy-publish-authorization-store";
+import {
+  createImportSupabasePersistenceReadbackClient,
+  type ImportSupabasePersistenceReadClient,
+} from "./import-supabase-persistence-readback-client";
 
 export type PharmacyAdminReservationResult = {
   reserved: boolean;
   replayed: boolean;
+  integrityVerified: boolean;
+  integrityCounts: ImportPersistenceReadbackVerificationResult["counts"] | null;
+  integrityFindings: ImportPersistenceReadbackVerificationResult["findings"] | null;
+  auditSignature: ImportReservationAuditSignature | null;
   entityMutated: false;
   publicVisibility: "private";
   indexEligible: false;
@@ -37,17 +51,23 @@ export type PharmacyAdminReservationResult = {
     | "authorization_unavailable"
     | "authorization_identity_mismatch"
     | "reservation_conflict"
-    | "reservation_failed";
+    | "reservation_failed"
+    | "reservation_integrity_failed";
 };
 
 export type PharmacyAdminReservationDependencies = {
   persistenceAdapter: ImportPrivatePublishPersistenceAdapter;
   authorizationStore: PharmacyPublishAuthorizationEnvelopeStore;
+  readbackClient: ImportPersistenceReadbackClient;
 };
 
 const blocked = (blocker: Exclude<PharmacyAdminReservationResult["blocker"], null>): PharmacyAdminReservationResult => ({
   reserved: false,
   replayed: false,
+  integrityVerified: false,
+  integrityCounts: null,
+  integrityFindings: null,
+  auditSignature: null,
   entityMutated: false,
   publicVisibility: "private",
   indexEligible: false,
@@ -123,6 +143,7 @@ export async function runPharmacyAdminReservationOperation(input: {
     expectedVersion: review.expectedEntityVersion,
     authorization: {
       authorizationId: authorization.authorizationId,
+      reviewStateId: authorization.reviewStateId,
       reviewSnapshotHash: review.snapshotHash,
       entityFingerprint: review.entityFingerprint,
       operationAttemptId: review.operationAttemptId,
@@ -134,15 +155,48 @@ export async function runPharmacyAdminReservationOperation(input: {
 
   if (reservation.kind === "conflict") return blocked("reservation_conflict");
   if (reservation.kind !== "reserved") return blocked("reservation_failed");
+
+  let readback: ImportPersistenceReadbackVerificationResult;
+  try {
+    readback = await verifyImportPersistenceReadback(input.dependencies.readbackClient, {
+      entityId: input.entityId,
+      actorId: input.actorId,
+      authorizationId: authorization.authorizationId,
+      reviewStateId: authorization.reviewStateId,
+      operationAttemptId: review.operationAttemptId,
+      idempotencyKey: review.idempotencyKey,
+      requestHash: review.requestHash,
+      patchHash: review.patchHash,
+      expectedVersion: review.expectedEntityVersion,
+      expectedSnapshotHash: review.snapshotHash,
+      expectedEntityFingerprint: review.entityFingerprint,
+      expectedReservationId: reservation.reservationId,
+      expectedRollbackSnapshotId: reservation.rollbackSnapshotId,
+      expectedAuditEventId: reservation.auditEventId,
+      entityFamily: "pharmacy",
+      operationScope: "reserve_private_publish",
+    });
+  } catch {
+    return {
+      ...blocked("reservation_integrity_failed"),
+      reserved: true,
+      replayed: reservation.replayed === true,
+    };
+  }
+
   return {
     reserved: true,
     replayed: reservation.replayed === true,
+    integrityVerified: readback.verified,
+    integrityCounts: readback.counts,
+    integrityFindings: readback.findings,
+    auditSignature: readback.auditSignature,
     entityMutated: false,
     publicVisibility: "private",
     indexEligible: false,
     sitemapEligible: false,
     routeEnabled: false,
-    blocker: null,
+    blocker: readback.verified ? null : "reservation_integrity_failed",
   };
 }
 
@@ -158,5 +212,8 @@ export function createPharmacyAdminReservationDependenciesFromEnvironment(
   return {
     persistenceAdapter: createImportSupabasePublishPersistenceAdapter(client as unknown as ImportSupabaseRpcClient),
     authorizationStore: createPharmacyPublishAuthorizationStore(client as unknown as PharmacyPublishAuthorizationClient),
+    readbackClient: createImportSupabasePersistenceReadbackClient(
+      client as unknown as ImportSupabasePersistenceReadClient,
+    ),
   };
 }

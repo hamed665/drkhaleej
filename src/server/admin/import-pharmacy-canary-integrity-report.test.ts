@@ -40,9 +40,12 @@ function rollbackCanary(overrides: Partial<PharmacyRealRollbackCanaryResult> = {
 
 function healthyReadback() {
   return {
+    orphanAuthorizationCount: 0,
     orphanReservationCount: 0,
     orphanSnapshotCount: 0,
+    authorizationReservationMismatchCount: 0,
     auditGapCount: 0,
+    duplicateReservationCount: 0,
     duplicateExecutionCount: 0,
     duplicateRollbackCount: 0,
     publicRouteCount: 0,
@@ -94,9 +97,12 @@ describe("buildPharmacyCanaryIntegrityReport", () => {
   it("reports every integrity leak and invalid timing", async () => {
     const data = {
       ...healthyReadback(),
+      orphanAuthorizationCount: 1,
       orphanReservationCount: 1,
       orphanSnapshotCount: 1,
+      authorizationReservationMismatchCount: 1,
       auditGapCount: 1,
+      duplicateReservationCount: 1,
       duplicateExecutionCount: 1,
       duplicateRollbackCount: 1,
       publicRouteCount: 1,
@@ -116,9 +122,12 @@ describe("buildPharmacyCanaryIntegrityReport", () => {
 
     expect(report.verified).toBe(false);
     expect(report.blockers).toEqual(expect.arrayContaining([
+      "orphan_authorization_detected",
       "orphan_reservation_detected",
       "orphan_snapshot_detected",
+      "authorization_reservation_mismatch_detected",
       "audit_gap_detected",
+      "duplicate_reservation_detected",
       "duplicate_execution_detected",
       "duplicate_rollback_detected",
       "public_route_leak_detected",

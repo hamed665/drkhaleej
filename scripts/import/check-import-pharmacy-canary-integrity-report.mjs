@@ -20,9 +20,12 @@ function requirePattern(pattern, message) {
 }
 
 for (const [pattern, message] of [
+  [/orphan_authorization_detected/, "must detect orphan authorizations"],
   [/orphan_reservation_detected/, "must detect orphan reservations"],
   [/orphan_snapshot_detected/, "must detect orphan snapshots"],
+  [/authorization_reservation_mismatch_detected/, "must detect authorization/reservation mismatches"],
   [/audit_gap_detected/, "must detect audit gaps"],
+  [/duplicate_reservation_detected/, "must detect duplicate reservations"],
   [/duplicate_execution_detected/, "must detect duplicate execution"],
   [/duplicate_rollback_detected/, "must detect duplicate rollback"],
   [/public_route_leak_detected/, "must detect public route leakage"],

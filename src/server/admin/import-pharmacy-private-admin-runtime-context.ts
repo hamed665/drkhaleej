@@ -8,7 +8,7 @@ import type { ImportControlledPublishState } from "./import-controlled-publish-d
 import type { PharmacyPrivateAdminPublishContext } from "./import-pharmacy-private-admin-real-wiring";
 import type { ImportPublishRollbackSnapshot } from "./import-private-persistence-adapter";
 
-const CENTER_SELECT = "id,center_type,slug,name_en,name_ar,legal_name,status,verification_status,primary_phone,secondary_phone,whatsapp_phone,email,website_url,logo_url,cover_image_url,short_description_en,short_description_ar,description_en,description_ar,default_locale,default_country,is_active,is_claimable,is_featured,sort_order,metadata,deleted_at,updated_at";
+export const PHARMACY_PRIVATE_ADMIN_CENTER_SELECT = "id,center_type,slug,name_en,name_ar,legal_name,status,verification_status,primary_phone,secondary_phone,whatsapp_phone,email,website_url,logo_url,cover_image_url,short_description_en,short_description_ar,description_en,description_ar,default_locale,default_country,is_active,is_claimable,is_featured,sort_order,metadata,deleted_at,updated_at";
 
 export type PharmacyPrivateAdminRuntimeCenter = {
   id: string;
@@ -112,7 +112,9 @@ function readCanonicalGeo(metadata: Record<string, unknown>): ImportCanonicalGeo
   return value as ImportCanonicalGeo;
 }
 
-function buildCenterSnapshot(center: PharmacyPrivateAdminRuntimeCenter): Record<string, unknown> {
+export function buildPharmacyPrivateAdminCenterSnapshot(
+  center: PharmacyPrivateAdminRuntimeCenter,
+): Record<string, unknown> {
   return {
     id: center.id,
     centerType: center.center_type,
@@ -144,12 +146,18 @@ function buildCenterSnapshot(center: PharmacyPrivateAdminRuntimeCenter): Record<
   };
 }
 
+export function buildPharmacyPrivateAdminEntityFingerprint(
+  center: PharmacyPrivateAdminRuntimeCenter,
+): string {
+  return sha256(buildPharmacyPrivateAdminCenterSnapshot(center));
+}
+
 export function createSupabasePharmacyPrivateAdminContextReader(
   client: SupabaseClient,
 ): PharmacyPrivateAdminRuntimeContextReader {
   return {
     async readPharmacy(entityId) {
-      const response = await client.from("centers").select(CENTER_SELECT).eq("id", entityId).maybeSingle();
+      const response = await client.from("centers").select(PHARMACY_PRIVATE_ADMIN_CENTER_SELECT).eq("id", entityId).maybeSingle();
       return {
         data: response.data as PharmacyPrivateAdminRuntimeCenter | null,
         error: response.error ? { message: response.error.message } : null,
@@ -211,7 +219,7 @@ export async function loadPharmacyPrivateAdminRuntimeContext(
   };
   const rollbackSnapshot: ImportPublishRollbackSnapshot = {
     ...currentState,
-    center: buildCenterSnapshot(center),
+    center: buildPharmacyPrivateAdminCenterSnapshot(center),
   };
   const draft = {
     draftId: center.id,
@@ -245,7 +253,7 @@ export async function loadPharmacyPrivateAdminRuntimeContext(
     draft,
   });
   const snapshotHash = sha256(rollbackSnapshot);
-  const fingerprint = sha256(buildCenterSnapshot(center));
+  const fingerprint = buildPharmacyPrivateAdminEntityFingerprint(center);
 
   return {
     ok: true,

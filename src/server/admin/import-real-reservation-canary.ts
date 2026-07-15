@@ -69,7 +69,7 @@ export async function runImportRealReservationCanary(
   if (!input.approvalToken || input.approvalToken !== input.expectedApprovalToken) {
     blockers.push("approval_token_invalid");
   }
-  if (request.actorId !== input.actorId || request.entityId !== input.entityId) {
+  if (request.actorId !== input.actorId || request.entityId !== input.entityId || !request.authorization) {
     blockers.push("request_identity_mismatch");
   }
 
@@ -112,11 +112,20 @@ export async function runImportRealReservationCanary(
   const readbackResult = await verifyImportPersistenceReadback(readbackClient, {
     entityId: input.entityId,
     actorId: input.actorId,
+    authorizationId: request.authorization!.authorizationId,
+    reviewStateId: request.authorization!.reviewStateId,
+    operationAttemptId: request.authorization!.operationAttemptId,
     idempotencyKey: request.idempotencyKey,
     requestHash: request.requestHash,
+    patchHash: request.authorization!.patchHash,
     expectedVersion: request.expectedVersion,
     expectedSnapshotHash: input.expectedSnapshotHash,
     expectedEntityFingerprint: input.expectedEntityFingerprint,
+    expectedReservationId: reservationResult.reservationId,
+    expectedRollbackSnapshotId: reservationResult.rollbackSnapshotId,
+    expectedAuditEventId: reservationResult.auditEventId,
+    entityFamily: request.authorization!.entityFamily,
+    operationScope: request.authorization!.operationScope,
   });
 
   const verified = readbackResult.verified;

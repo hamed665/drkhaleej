@@ -16,9 +16,13 @@ const actorId = "22222222-2222-4222-8222-222222222222";
 const reservationId = "33333333-3333-4333-8333-333333333333";
 const snapshotId = "44444444-4444-4444-8444-444444444444";
 const auditId = "55555555-5555-4555-8555-555555555555";
+const authorizationId = "66666666-6666-4666-8666-666666666666";
+const reviewStateId = "77777777-7777-4777-8777-777777777777";
+const operationAttemptId = "88888888-8888-4888-8888-888888888888";
 const requestHash = "a".repeat(64);
 const snapshotHash = "b".repeat(64);
 const fingerprint = "c".repeat(64);
+const patchHash = "d".repeat(64);
 
 const input: ImportRealReservationCanaryInput = {
   executionEnabled: true,
@@ -49,6 +53,16 @@ const input: ImportRealReservationCanaryInput = {
     auditSchemaVersion: "v1",
     reservationExpiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
     rollbackExpiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+    authorization: {
+      authorizationId,
+      reviewStateId,
+      reviewSnapshotHash: snapshotHash,
+      entityFingerprint: fingerprint,
+      operationAttemptId,
+      patchHash,
+      entityFamily: "pharmacy",
+      operationScope: "reserve_private_publish",
+    },
   },
 };
 
@@ -66,6 +80,26 @@ function createAdapter(): ImportPrivatePublishPersistenceAdapter {
 
 function createReadbackClient(): ImportPersistenceReadbackClient {
   return {
+    readAuthorizationRows: vi.fn(async () => ({
+      data: [{
+        id: authorizationId,
+        review_state_id: reviewStateId,
+        actor_profile_id: actorId,
+        entity_id: entityId,
+        review_snapshot_hash: snapshotHash,
+        entity_fingerprint: fingerprint,
+        operation_attempt_id: operationAttemptId,
+        idempotency_key: input.reservationRequest.idempotencyKey,
+        request_hash: requestHash,
+        patch_hash: patchHash,
+        expected_entity_version: input.reservationRequest.expectedVersion,
+        entity_family: "pharmacy",
+        operation_scope: "reserve_private_publish",
+        status: "consumed",
+        consumed_by_reservation_id: reservationId,
+      }],
+      error: null,
+    })),
     readIdempotencyRows: vi.fn(async () => ({
       data: [{
         id: reservationId,
@@ -75,6 +109,7 @@ function createReadbackClient(): ImportPersistenceReadbackClient {
         expected_version: input.reservationRequest.expectedVersion,
         request_hash: requestHash,
         status: "reserved",
+        pharmacy_authorization_id: authorizationId,
       }],
       error: null,
     })),
@@ -96,13 +131,25 @@ function createReadbackClient(): ImportPersistenceReadbackClient {
         actor_profile_id: actorId,
         idempotency_record_id: reservationId,
         rollback_snapshot_id: snapshotId,
-        event_type: "execution_started",
+        event_type: "execution_started" as const,
         outcome: "pending",
         expected_version: input.reservationRequest.expectedVersion,
+        phase: "reservation",
+        request_hash: requestHash,
+        authorization_id: authorizationId,
+        review_snapshot_hash: snapshotHash,
+        entity_fingerprint: fingerprint,
+        operation_attempt_id: operationAttemptId,
+        patch_hash: patchHash,
+        entity_family: "pharmacy",
+        operation_scope: "reserve_private_publish",
       }],
       error: null,
     })),
-    readEntityFingerprint: vi.fn(async () => ({ data: [{ fingerprint }], error: null })),
+    readEntityFingerprint: vi.fn(async () => ({
+      data: [{ fingerprint, version: input.reservationRequest.expectedVersion }],
+      error: null,
+    })),
   };
 }
 

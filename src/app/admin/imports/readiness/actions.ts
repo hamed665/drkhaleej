@@ -190,9 +190,11 @@ export async function runPharmacyPrivateAdminAction(
             })
           : null;
         return {
-          operation, status: reservationState?.reserved ? "completed" : "failed", entityId, blockers: [],
+          operation, status: reservationState?.reserved && reservationState.integrityVerified ? "completed" : "failed", entityId, blockers: [],
           publicVisibility: "private", indexEligible: false, sitemapEligible: false, routeEnabled: false,
-          executionReference: reservationState?.reserved ? reviewState?.operationAttemptId ?? null : null,
+          executionReference: reservationState?.reserved && reservationState.integrityVerified
+            ? reviewState?.operationAttemptId ?? null
+            : null,
         };
       }
 
