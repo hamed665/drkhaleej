@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:automation-job:1.2.2",
+  "title": "DrKhaleej Proposed Automation Job",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "policy_version", "job_id", "job_type", "priority", "status", "scope",
+    "idempotency_key", "requested_by", "attempt_count", "max_attempts",
+    "budget", "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "job_id": { "type": "string", "format": "uuid" },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "entity_discovery", "entity_fetch", "entity_extract", "entity_monitor",
+        "content_opportunity", "content_research", "content_draft",
+        "content_monitor", "report"
+      ]
+    },
+    "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued", "leased", "running", "waiting_review", "succeeded",
+        "failed_retryable", "failed_terminal", "deferred_budget", "cancelled"
+      ]
+    },
+    "scope": { "$ref": "#/$defs/scope" },
+    "idempotency_key": { "type": "string", "minLength": 16, "maxLength": 240 },
+    "requested_by": { "$ref": "#/$defs/actor" },
+    "attempt_count": { "type": "integer", "minimum": 0, "maximum": 10 },
+    "max_attempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "lease": {
+      "oneOf": [
+        { "$ref": "#/$defs/lease" },
+        { "type": "null" }
+      ]
+    },
+    "budget": { "$ref": "#/$defs/budget" },
+    "parent_job_id": {
+      "oneOf": [
+        { "type": "string", "format": "uuid" },
+        { "type": "null" }
+      ]
+    },
+    "scheduled_for": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "started_at": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "finished_at": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "enum": ["leased", "running"] } } },
+      "then": { "required": ["lease"], "properties": { "lease": { "$ref": "#/$defs/lease" } } }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["succeeded", "failed_terminal", "cancelled"] }
+        }
+      },
+      "then": {
+        "required": ["finished_at"],
+        "properties": { "finished_at": { "type": "string", "format": "date-time" } }
+      }
+    }
+  ],
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor_type", "actor_id"],
+      "properties": {
+        "actor_type": { "type": "string", "enum": ["admin", "scheduler", "system"] },
+        "actor_id": { "type": "string", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "entity_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uuid" }
+        },
+        "family": { "type": "string", "maxLength": 80 },
+        "source_ids": {
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uuid" }
+        },
+        "locales": {
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["en", "ar"] }
+        },
+        "country": { "type": "string", "const": "om" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "token_hash", "lease_epoch", "expires_at", "heartbeat_at"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "token_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "lease_epoch": { "type": "integer", "minimum": 1 },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "heartbeat_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency", "price_version", "estimated", "reserved", "hard_limit", "actual", "enforcement"],
+      "properties": {
+        "currency": { "type": "string", "const": "USD" },
+        "price_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "estimated": { "type": "number", "minimum": 0, "maximum": 10000 },
+        "reserved": { "type": "number", "minimum": 0, "maximum": 10000 },
+        "hard_limit": { "type": "number", "minimum": 0, "maximum": 10000 },
+        "actual": { "type": "number", "minimum": 0, "maximum": 10000 },
+        "enforcement": { "type": "string", "enum": ["allowed", "deferred", "blocked"] }
+      }
+    }
+  }
+}

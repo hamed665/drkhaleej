@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.2.2",
+  "policy_version": "content-policy-2026-01",
+  "decision_id": "77777777-7777-4777-8777-777777777777",
+  "article_id": "33333333-3333-4333-8333-333333333333",
+  "revision_id": "44444444-4444-4444-8444-444444444444",
+  "revision_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "review_type": "medical",
+  "decision": "approve",
+  "reviewer": {
+    "reviewer_id": "editor-1",
+    "role": "editor",
+    "session_id": "review-session-0001"
+  },
+  "reason": "Invalid role test.",
+  "source_ids": ["55555555-5555-4555-8555-555555555555"],
+  "claim_ids": ["66666666-6666-4666-8666-666666666666"],
+  "decided_at": "2026-07-15T09:00:00Z"
+}

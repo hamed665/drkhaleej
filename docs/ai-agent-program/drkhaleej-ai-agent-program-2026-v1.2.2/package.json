@@ -1,0 +1,15 @@
+{
+  "name": "drkhaleej-ai-agent-program-validator",
+  "version": "1.2.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run validate",
+    "validate": "node scripts/validate-package.mjs",
+    "audit:prod": "npm audit --omit=dev"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  }
+}

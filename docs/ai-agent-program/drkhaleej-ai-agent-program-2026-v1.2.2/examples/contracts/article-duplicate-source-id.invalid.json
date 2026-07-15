@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.2.2",
+  "policy_version": "content-policy-2026-01",
+  "article_id": "33333333-3333-4333-8333-333333333333",
+  "revision_id": "44444444-4444-4444-8444-444444444444",
+  "locale": "en",
+  "state": "researched",
+  "medical_sensitivity": "low",
+  "intent": "Explain a factual topic",
+  "title": "Example article",
+  "body_markdown": "A sourced factual statement.",
+  "sources": [
+    {
+      "source_id": "55555555-5555-4555-8555-555555555555",
+      "url": "https://example.org/source-one",
+      "trust_tier": "T1",
+      "locale": "en",
+      "citation_scope": "factual",
+      "medical_sensitivity": "low",
+      "supported_claim_ids": ["66666666-6666-4666-8666-666666666666"],
+      "conflicts": [],
+      "retrieved_at": "2026-07-16T08:00:00Z",
+      "terms_policy_id": "source-policy-one"
+    },
+    {
+      "source_id": "55555555-5555-4555-8555-555555555555",
+      "url": "https://example.net/source-two",
+      "trust_tier": "T2",
+      "locale": "en",
+      "citation_scope": "factual",
+      "medical_sensitivity": "low",
+      "supported_claim_ids": ["66666666-6666-4666-8666-666666666666"],
+      "conflicts": ["Duplicate source identity"],
+      "retrieved_at": "2026-07-16T08:01:00Z",
+      "terms_policy_id": "source-policy-two"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "66666666-6666-4666-8666-666666666666",
+      "claim": "A claim with a duplicated source identity.",
+      "source_ids": ["55555555-5555-4555-8555-555555555555"],
+      "medical": false,
+      "review_requirement": "editorial"
+    }
+  ],
+  "quality_gates": {
+    "seo": "pending",
+    "editorial": "pending",
+    "medical": "not_required",
+    "citations": "pending",
+    "bilingual_parity": "not_required",
+    "duplication": "pending"
+  },
+  "generated_by": { "actor_type": "agent", "actor_id": "content-agent", "prompt_version": "content-prompt-1" },
+  "created_at": "2026-07-16T08:00:00Z"
+}

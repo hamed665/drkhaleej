@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:entity-review-decision:1.2.2",
+  "title": "DrKhaleej Proposed Human Entity Review Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "policy_version", "decision_id", "draft_id",
+    "draft_version", "draft_hash", "decision", "reviewer", "reason",
+    "evidence_ids", "decided_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "decision_id": { "type": "string", "format": "uuid" },
+    "draft_id": { "type": "string", "format": "uuid" },
+    "draft_version": { "type": "integer", "minimum": 1 },
+    "draft_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "approve_for_exact_review", "edit", "reject", "request_refetch",
+        "confirmed_duplicate", "not_duplicate", "defer"
+      ]
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer_id", "role", "session_id"],
+      "properties": {
+        "reviewer_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "role": {
+          "type": "string",
+          "enum": ["platform_admin", "entity_reviewer", "medical_reviewer"]
+        },
+        "session_id": { "type": "string", "minLength": 16, "maxLength": 240 }
+      }
+    },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "evidence_ids": {
+      "type": "array",
+      "maxItems": 200,
+      "uniqueItems": true,
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "duplicate_entity_id": {
+      "oneOf": [
+        { "type": "string", "format": "uuid" },
+        { "type": "null" }
+      ]
+    },
+    "field_edits": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "expected_value_hash", "replacement_value", "reason"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^[a-zA-Z0-9_.-]+$" },
+          "expected_value_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "replacement_value": {
+            "oneOf": [
+              { "type": "string", "maxLength": 4000 },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" }
+            ]
+          },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    },
+    "decided_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["decision"],
+        "properties": { "decision": { "const": "confirmed_duplicate" } }
+      },
+      "then": {
+        "required": ["duplicate_entity_id", "evidence_ids"],
+        "properties": {
+          "duplicate_entity_id": { "type": "string", "format": "uuid" },
+          "evidence_ids": { "type": "array", "minItems": 1 }
+        }
+      },
+      "else": {
+        "not": { "required": ["duplicate_entity_id"] }
+      }
+    },
+    {
+      "if": {
+        "required": ["decision"],
+        "properties": { "decision": { "const": "edit" } }
+      },
+      "then": {
+        "required": ["field_edits"],
+        "properties": { "field_edits": true }
+      },
+      "else": {
+        "not": { "required": ["field_edits"] }
+      }
+    },
+    {
+      "if": {
+        "required": ["decision"],
+        "properties": { "decision": { "const": "approve_for_exact_review" } }
+      },
+      "then": {
+        "properties": {
+          "evidence_ids": { "type": "array", "minItems": 1 }
+        }
+      }
+    }
+  ]
+}

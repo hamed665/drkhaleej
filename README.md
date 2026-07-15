@@ -18,6 +18,7 @@ Canonical specification path:
 - `docs/platform/DRMUSCAT_EXISTING_REVIEW_SCHEMA_RECONCILIATION_SPEC_V1.md` — documentation-only reconciliation of existing review tables, policies, migration numbering, conflicts, and safe future review implementation paths.
 - `docs/platform/DRMUSCAT_IMPORT_READINESS_CONTROLLED_PUBLISHING_ARCHITECTURE_V1.md` — documentation-only import readiness, controlled publishing, domain separation, canonical geo, internal linking, sitemap eligibility, schema validation, admin readiness, and performance guardrail architecture.
 - `docs/master-spec/82_COMMERCIAL_CONTENT_PLACEMENT_AI_OPERATING_MODEL.md` — documentation-only commercial content, placement, article, media, and AI operating model.
+- `docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/README_FA.md` — approved staged AI Agent execution program; canonical guardrails and its explicit gates remain binding.
 
 Build mode:
 

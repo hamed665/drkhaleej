@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.2.2",
+  "policy_version": "source-policy-2026-01",
+  "observation_id": "22222222-2222-4222-8222-222222222222",
+  "source_url": "http://example.org/source",
+  "final_url": "http://example.org/source",
+  "captured_at": "2026-07-16T08:00:00Z",
+  "expires_at": "2026-08-15T08:00:00Z",
+  "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "locale": "en",
+  "trust_tier": "T1",
+  "terms_policy_id": "source-policy-example",
+  "robots_decision": "allowed",
+  "collection_decision": "allowed",
+  "raw_storage_class": "ephemeral_discarded",
+  "private_raw_reference": null
+}

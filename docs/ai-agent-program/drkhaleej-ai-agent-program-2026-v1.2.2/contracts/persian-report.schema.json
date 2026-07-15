@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:persian-operations-report:1.2.2",
+  "title": "DrKhaleej Proposed Persian Operations Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "report_id", "period", "severity", "metrics",
+    "highlights_fa", "actions", "generated_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "report_id": { "type": "string", "format": "uuid" },
+    "period": { "type": "string", "enum": ["immediate", "daily", "weekly", "monthly"] },
+    "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/metric" }
+    },
+    "highlights_fa": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 30,
+      "items": { "$ref": "#/$defs/action" }
+    },
+    "generated_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_key", "value", "unit", "source_kind", "source_reference", "captured_at"],
+      "properties": {
+        "metric_key": { "type": "string", "pattern": "^[a-z0-9_.-]+$", "maxLength": 120 },
+        "value": { "type": "number" },
+        "unit": {
+          "type": "string",
+          "enum": ["count", "seconds", "milliseconds", "percent", "ratio", "USD"]
+        },
+        "source_kind": { "type": "string", "enum": ["sql", "metrics", "integrity_readback"] },
+        "source_reference": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "captured_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title_fa", "priority", "admin_path", "reason_metric_keys"],
+      "properties": {
+        "title_fa": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "admin_path": { "type": "string", "pattern": "^/admin/", "maxLength": 500 },
+        "reason_metric_keys": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9_.-]+$", "maxLength": 120 }
+        }
+      }
+    }
+  }
+}

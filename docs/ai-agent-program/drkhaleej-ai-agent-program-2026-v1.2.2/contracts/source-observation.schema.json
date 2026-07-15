@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:source-observation:1.2.2",
+  "title": "DrKhaleej Untrusted Source Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "policy_version", "observation_id", "source_url",
+    "final_url", "captured_at", "content_sha256", "locale", "trust_tier",
+    "terms_policy_id", "robots_decision", "collection_decision",
+    "raw_storage_class", "expires_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "observation_id": { "type": "string", "format": "uuid" },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2000
+    },
+    "final_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2000
+    },
+    "http_status": { "type": "integer", "minimum": 100, "maximum": 599 },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "locale": { "type": "string", "enum": ["en", "ar", "unknown"] },
+    "trust_tier": { "type": "string", "enum": ["T1", "T2", "T3", "T4", "T5"] },
+    "terms_policy_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "robots_decision": { "type": "string", "enum": ["allowed", "disallowed", "not_applicable", "needs_review"] },
+    "collection_decision": { "type": "string", "enum": ["allowed", "denied", "needs_review"] },
+    "raw_storage_class": { "type": "string", "enum": ["private_encrypted", "ephemeral_discarded"] },
+    "private_raw_reference": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 500 },
+        { "type": "null" }
+      ]
+    },
+    "normalized_excerpt": { "type": "string", "maxLength": 4000 },
+    "extraction_warnings": {
+      "type": "array",
+      "maxItems": 50,
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "raw_storage_class": { "const": "private_encrypted" } },
+        "required": ["raw_storage_class"]
+      },
+      "then": {
+        "required": ["private_raw_reference"],
+        "properties": {
+          "private_raw_reference": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "collection_decision": { "const": "allowed" },
+          "robots_decision": { "enum": ["allowed", "not_applicable"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "raw_storage_class": { "const": "ephemeral_discarded" } },
+        "required": ["raw_storage_class"]
+      },
+      "then": {
+        "properties": { "private_raw_reference": { "type": "null" } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "collection_decision": { "enum": ["denied", "needs_review"] } },
+        "required": ["collection_decision"]
+      },
+      "then": {
+        "properties": {
+          "raw_storage_class": { "const": "ephemeral_discarded" },
+          "private_raw_reference": { "type": "null" }
+        },
+        "not": {
+          "properties": { "normalized_excerpt": true },
+          "required": ["normalized_excerpt"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "robots_decision": { "const": "disallowed" } },
+        "required": ["robots_decision"]
+      },
+      "then": {
+        "properties": {
+          "collection_decision": { "enum": ["denied", "needs_review"] }
+        }
+      }
+    }
+  ]
+}

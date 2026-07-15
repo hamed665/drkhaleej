@@ -53,6 +53,12 @@ Before planning or implementing any future task, agents must read the following 
 29. `docs/addendums/V10_5_SEO_AI_SEARCH_EXPANSION_ADDENDUM.md`
 30. `docs/addendums/V10_5_MONETIZATION_SALES_REFERRAL_ADDENDUM.md`
 
+### F. Approved staged AI Agent program
+
+31. `docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/README_FA.md`
+
+The AI Agent program is an approved staged execution plan, not permission to bypass the canonical V10.4 guardrails. The stricter rule always wins. Immediate execution is limited to the program's ordered `P01` through `P09` work and their explicit gates. `P10+`, Agent runtime, Content runtime, and Bulk remain blocked until the program's required Go/No-Go decisions are recorded.
+
 Future tasks must still use the four-axis mapping model:
 
 - Execution Phase

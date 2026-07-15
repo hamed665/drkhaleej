@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drkhaleej:schema:article-review-decision:1.2.2",
+  "title": "DrKhaleej Proposed Human Article Review Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "policy_version", "decision_id", "article_id",
+    "revision_id", "revision_hash", "review_type", "decision",
+    "reviewer", "reason", "source_ids", "claim_ids", "decided_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.2.2" },
+    "policy_version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "decision_id": { "type": "string", "format": "uuid" },
+    "article_id": { "type": "string", "format": "uuid" },
+    "revision_id": { "type": "string", "format": "uuid" },
+    "revision_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "review_type": { "type": "string", "enum": ["editorial", "medical"] },
+    "decision": { "type": "string", "enum": ["approve", "request_changes", "reject"] },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer_id", "role", "session_id"],
+      "properties": {
+        "reviewer_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "role": {
+          "type": "string",
+          "enum": ["platform_admin", "editor", "medical_reviewer"]
+        },
+        "session_id": { "type": "string", "minLength": 16, "maxLength": 240 }
+      }
+    },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "source_ids": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "claim_ids": {
+      "type": "array",
+      "maxItems": 200,
+      "uniqueItems": true,
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "decided_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "review_type": { "const": "medical" } },
+        "required": ["review_type"]
+      },
+      "then": {
+        "properties": {
+          "reviewer": {
+            "type": "object",
+            "properties": { "role": { "const": "medical_reviewer" } },
+            "required": ["role"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "review_type": { "const": "editorial" } },
+        "required": ["review_type"]
+      },
+      "then": {
+        "properties": {
+          "reviewer": {
+            "type": "object",
+            "properties": { "role": { "enum": ["editor", "platform_admin"] } },
+            "required": ["role"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "decision": { "const": "approve" } },
+        "required": ["decision"]
+      },
+      "then": {
+        "properties": {
+          "source_ids": { "type": "array", "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": { "const": "approve" },
+          "review_type": { "const": "medical" }
+        },
+        "required": ["decision", "review_type"]
+      },
+      "then": {
+        "properties": {
+          "claim_ids": { "type": "array", "minItems": 1 }
+        }
+      }
+    }
+  ]
+}
