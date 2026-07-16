@@ -82,9 +82,14 @@ BEGIN
 END
 $$;
 
+-- PostgreSQL does not treat enum-to-text casts as immutable. Split the nullable
+-- locale case so both active localized and global entries stay unique.
 CREATE UNIQUE INDEX IF NOT EXISTS cms_content_entries_active_key_locale_country_idx
-  ON public.cms_content_entries(content_key, COALESCE(locale::text, 'global'), country)
-  WHERE deleted_at IS NULL;
+  ON public.cms_content_entries(content_key, locale, country)
+  WHERE deleted_at IS NULL AND locale IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS cms_content_entries_active_key_global_country_idx
+  ON public.cms_content_entries(content_key, country)
+  WHERE deleted_at IS NULL AND locale IS NULL;
 CREATE INDEX IF NOT EXISTS cms_content_entries_created_at_desc_idx ON public.cms_content_entries(created_at DESC);
 CREATE INDEX IF NOT EXISTS cms_content_entries_content_type_idx ON public.cms_content_entries(content_type);
 CREATE INDEX IF NOT EXISTS cms_content_entries_status_idx ON public.cms_content_entries(status);

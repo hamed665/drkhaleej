@@ -239,7 +239,14 @@ function validateAdminCmsMigration() {
     [/create\s+table\s+if\s+not\s+exists\s+public\.cms_content_revisions/i, '0060 must create cms_content_revisions.'],
     [/alter\s+table\s+public\.cms_content_entries\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_entries.'],
     [/alter\s+table\s+public\.cms_content_revisions\s+enable\s+row\s+level\s+security/i, '0060 must enable RLS on cms_content_revisions.'],
+    [/create\s+unique\s+index\s+if\s+not\s+exists\s+cms_content_entries_active_key_locale_country_idx\s+on\s+public\.cms_content_entries\s*\(\s*content_key\s*,\s*locale\s*,\s*country\s*\)\s+where\s+deleted_at\s+is\s+null\s+and\s+locale\s+is\s+not\s+null/i, '0060 must enforce active localized content uniqueness without casting the locale enum.'],
+    [/create\s+unique\s+index\s+if\s+not\s+exists\s+cms_content_entries_active_key_global_country_idx\s+on\s+public\.cms_content_entries\s*\(\s*content_key\s*,\s*country\s*\)\s+where\s+deleted_at\s+is\s+null\s+and\s+locale\s+is\s+null/i, '0060 must enforce one active global content entry per key and country.'],
   ]) requirePattern(content, pattern, message);
+  forbidPattern(
+    content,
+    /coalesce\s*\(\s*locale\s*::\s*text/i,
+    '0060 must not cast app_locale to text inside an index expression because enum casts are not immutable.',
+  );
 }
 
 function validateImportStagingMigration() {
