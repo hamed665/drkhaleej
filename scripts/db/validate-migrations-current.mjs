@@ -36,6 +36,7 @@ const pharmacyStableOperationIdentityMigrationName = '0076_import_pharmacy_stabl
 const pharmacyAuthorizationV2MigrationName = '0077_import_pharmacy_authorization_persistence_v2.sql';
 const pharmacyAuthorizationLifecycleMigrationName = '0078_import_pharmacy_authorization_invalidation_readback.sql';
 const pharmacyAtomicAuthorizationMigrationName = '0079_import_pharmacy_atomic_authorization_reservation.sql';
+const pharmacyReadStateUpsertIdentityMigrationName = '0080_import_pharmacy_read_state_upsert_identity.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -51,6 +52,7 @@ const pharmacyStableOperationIdentityMigrationPath = path.join(migrationsDir, ph
 const pharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, pharmacyAuthorizationV2MigrationName);
 const pharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, pharmacyAuthorizationLifecycleMigrationName);
 const pharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, pharmacyAtomicAuthorizationMigrationName);
+const pharmacyReadStateUpsertIdentityMigrationPath = path.join(migrationsDir, pharmacyReadStateUpsertIdentityMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -66,6 +68,7 @@ const hiddenPharmacyStableOperationIdentityMigrationPath = path.join(migrationsD
 const hiddenPharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, `.pharmacy-authorization-v2-${pharmacyAuthorizationV2MigrationName}.hidden`);
 const hiddenPharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, `.pharmacy-authorization-lifecycle-${pharmacyAuthorizationLifecycleMigrationName}.hidden`);
 const hiddenPharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, `.pharmacy-atomic-authorization-${pharmacyAtomicAuthorizationMigrationName}.hidden`);
+const hiddenPharmacyReadStateUpsertIdentityMigrationPath = path.join(migrationsDir, `.pharmacy-read-state-upsert-${pharmacyReadStateUpsertIdentityMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -83,6 +86,7 @@ const currentOnlyMigrations = [
   [pharmacyAuthorizationV2MigrationName, pharmacyAuthorizationV2MigrationPath, hiddenPharmacyAuthorizationV2MigrationPath],
   [pharmacyAuthorizationLifecycleMigrationName, pharmacyAuthorizationLifecycleMigrationPath, hiddenPharmacyAuthorizationLifecycleMigrationPath],
   [pharmacyAtomicAuthorizationMigrationName, pharmacyAtomicAuthorizationMigrationPath, hiddenPharmacyAtomicAuthorizationMigrationPath],
+  [pharmacyReadStateUpsertIdentityMigrationName, pharmacyReadStateUpsertIdentityMigrationPath, hiddenPharmacyReadStateUpsertIdentityMigrationPath],
 ];
 
 function fail(message) {
@@ -209,6 +213,25 @@ function validatePharmacyAtomicAuthorizationMigration() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacyReadStateUpsertIdentityMigration() {
+  requireCondition(existsSync(pharmacyReadStateUpsertIdentityMigrationPath), `${pharmacyReadStateUpsertIdentityMigrationName} is missing.`);
+  const content = readFileSync(pharmacyReadStateUpsertIdentityMigrationPath, 'utf8');
+  for (const [pattern, message] of [
+    [/P02 RES-INTEGRITY-READBACK: make Pharmacy read-state UPSERT identities inferable/i, '0080 must include its migration marker.'],
+    [/drop\s+index\s+if\s+exists\s+public\.import_pharmacy_admin_read_states_attempt_operation_idx/i, '0080 must replace the partial operation-attempt index.'],
+    [/create\s+unique\s+index\s+import_pharmacy_admin_read_states_attempt_operation_idx[\s\S]*\(\s*operation_attempt_id\s*,\s*operation\s*\)\s*;/i, '0080 must create an inferable operation-attempt UPSERT index.'],
+    [/drop\s+index\s+if\s+exists\s+public\.import_pharmacy_admin_read_states_idempotency_operation_idx/i, '0080 must replace the partial idempotency index.'],
+    [/create\s+unique\s+index\s+import_pharmacy_admin_read_states_idempotency_operation_idx[\s\S]*\(\s*idempotency_key\s*,\s*operation\s*\)\s*;/i, '0080 must create an inferable idempotency UPSERT index.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/where\s+(operation_attempt_id|idempotency_key)\s+is\s+not\s+null/i, '0080 UPSERT indexes must not remain partial.'],
+    [/\b(insert\s+into|update\s+public\.|delete\s+from|truncate\s+table)\b/i, '0080 must not mutate table rows.'],
+    [/\bcreate\s+policy\b/i, '0080 must not create policies.'],
+    [/\bgrant\b/i, '0080 must not grant privileges.'],
+    [/\bto\s+(public|anon|authenticated)\b/i, '0080 must not expose public roles.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -244,5 +267,6 @@ validatePharmacyStableOperationIdentityMigration();
 validatePharmacyAuthorizationV2Migration();
 validatePharmacyAuthorizationLifecycleMigration();
 validatePharmacyAtomicAuthorizationMigration();
+validatePharmacyReadStateUpsertIdentityMigration();
 
 console.log('Current migration validation passed.');
