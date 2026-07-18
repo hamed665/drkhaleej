@@ -7,25 +7,25 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #943 at baseline commit `74541b9f32acb201a9bf94d54d0be757842f5b8c` (last aligned 2026-07-15).
+- Import-readiness runtime is aligned through PR #946 at baseline commit `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` (last aligned 2026-07-18).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0079`.
-- Migration validation is expected through `0079_import_pharmacy_atomic_authorization_reservation.sql`.
+- Completed migration set: `0001` through `0080`.
+- Migration validation is expected through `0080_import_pharmacy_read_state_upsert_identity.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Import readiness alignment
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #943 |
-| Runtime baseline | `74541b9f32acb201a9bf94d54d0be757842f5b8c` |
-| Last aligned | `2026-07-15` |
-| Current migration | `0079_import_pharmacy_atomic_authorization_reservation.sql` |
-| Current next | `RES-INTEGRITY-READBACK` |
+| Aligned through | PR #946 |
+| Runtime baseline | `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` |
+| Last aligned | `2026-07-18` |
+| Current migration | `0080_import_pharmacy_read_state_upsert_identity.sql` |
+| Current next | `RES-DB-SAFETY-PROOF` |
 | Reservation audit event | `execution_started` |
 | Reservation audit phase | `reservation` |
 
@@ -34,10 +34,12 @@
 | 0 | COMPLETE | PRs #936–#939 |
 | 1 | COMPLETE | PRs #940–#941 |
 | 2.1 | PARTIAL | PR #942; atomic transaction complete, audit-event separation open |
-| 2.2 | PARTIAL | PR #943; Admin reservation operation merged, integrity readback open |
+| 2.2 | COMPLETE | PRs #943 and #946; Admin reservation operation and authorization-linked integrity readback proven |
 | 3+ | OPEN | Starts only after the ordered reservation gates are green |
 
-The Admin reservation operation is implemented and bounded. Full authorization-linked integrity readback, the existing private-executor handoff, and exact rollback recovery remain open. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. The proof recorded one authorization, reservation, snapshot, reservation audit, current audit and entity row; zero duplicates, orphans and audit gaps; and no entity mutation. The existing private-executor handoff and exact rollback recovery remain open. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+
+Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. PR #946 was approved by an independent reviewer before merge.
 
 The current reservation audit signature is `event_type=execution_started` with `event_payload.phase=reservation`. A distinct `reservation_created` event is not implemented and belongs to the later Reservation-to-Execution handoff.
 
@@ -78,7 +80,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Data/RLS foundations
 
-- Database foundations validate through `0079_import_pharmacy_atomic_authorization_reservation.sql`.
+- Database foundations validate through `0080_import_pharmacy_read_state_upsert_identity.sql`.
 - Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, provider onboarding lead event-history DB foundation, landing content foundations, and review companion table foundations exist.
 - Provider onboarding lead event history supports the currently allowed event types: `status_changed`, `priority_changed`, and `note_added`.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
@@ -132,8 +134,8 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#943 are the current import-readiness runtime baseline.
-- Migration validation passes through `0079_import_pharmacy_atomic_authorization_reservation.sql`.
+- PRs #936–#946 are the current import-readiness runtime baseline.
+- Migration validation passes through `0080_import_pharmacy_read_state_upsert_identity.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build, and lint gates pass in CI.
 
 ## Future phase rules

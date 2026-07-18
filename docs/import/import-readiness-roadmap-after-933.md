@@ -16,16 +16,16 @@ This is the authoritative wave status. It must be updated in the same PR that co
 Wave 0     COMPLETE  (#936–#939) Client-boundary authorization removal, canonical patch, metadata/locale, stable operation identity
 Wave 1     COMPLETE  (#940–#941) Server-owned authorization persistence, invalidation, bounded readback
 Wave 2.1   PARTIAL   (#942)      Atomic authorization/reservation complete; reservation audit-event separation open
-Wave 2.2   PARTIAL   (#943)      Admin reservation operation merged; authorization-linked integrity readback open
+Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-linked integrity readback proven
 Wave 3+    OPEN
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #943
-Baseline commit: 74541b9
-Last aligned: 2026-07-15
+Aligned through: PR #946
+Baseline commit: 6c873b9
+Last aligned: 2026-07-18
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -33,16 +33,16 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 943,
-  "runtimeBaseline": "74541b9f32acb201a9bf94d54d0be757842f5b8c",
-  "lastAligned": "2026-07-15",
-  "currentMigration": "0079_import_pharmacy_atomic_authorization_reservation.sql",
-  "currentNext": "RES-INTEGRITY-READBACK",
+  "alignedThroughPr": 946,
+  "runtimeBaseline": "6c873b9b7cc5ee93e36969feca7d223b16b9bcde",
+  "lastAligned": "2026-07-18",
+  "currentMigration": "0080_import_pharmacy_read_state_upsert_identity.sql",
+  "currentNext": "RES-DB-SAFETY-PROOF",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
     "2.1": "PARTIAL",
-    "2.2": "PARTIAL",
+    "2.2": "COMPLETE",
     "3+": "OPEN"
   },
   "currentReservationAudit": {
@@ -161,7 +161,7 @@ event_payload.phase = reservation
 
 `reservation_created` must be introduced during the Reservation→Execution handoff in Wave 3, with reader compatibility retained.
 
-### 2.2 Admin reservation and readback `PARTIAL (#943)`
+### 2.2 Admin reservation and readback `COMPLETE (#943, #946)`
 
 Operation:
 
@@ -170,7 +170,7 @@ reserve_private_publish
 RESERVE PRIVATE PUBLISH <entity-id>
 ```
 
-The bounded operation is merged. The open `RES-INTEGRITY-READBACK` remainder must prove:
+The bounded operation is merged. `RES-INTEGRITY-READBACK` proved:
 
 - exactly one linked reservation;
 - exactly one snapshot;
@@ -182,7 +182,9 @@ The bounded operation is merged. The open `RES-INTEGRITY-READBACK` remainder mus
 
 The verifier must recognize the current `execution_started + phase=reservation` signature and remain compatible with future `reservation_created`.
 
-This is a read-only runtime proof PR, not a docs-only PR. It requires server-only verifier code, unit/integration tests and Preview DB evidence. Existing verifier/integrity-report code must be extended.
+PR #946 delivered the server-only verifier, focused tests and isolated Preview database evidence without invoking Publish or Rollback. The evidence recorded one authorization, reservation, snapshot, reservation audit, current audit and entity row; zero duplicates, orphans and audit gaps; and an unchanged entity with route, index and sitemap disabled.
+
+PR #947 separately established independent code ownership. The active `main-protected-review` ruleset requires a pull request, one approval, Code Owner review, approval of the most recent reviewable push, resolved conversations, and blocks branch deletion and force pushes.
 
 ## Wave 3 — Existing Pharmacy private executor `OPEN`
 
@@ -333,16 +335,15 @@ Do not add:
 ## Current next implementation
 
 ```text
-RES-INTEGRITY-READBACK
+RES-DB-SAFETY-PROOF
 ```
 
-Repository-state alignment is delivered by this documentation phase. The next runtime implementation is the authorization-linked reservation integrity readback; it requires server-only verifier code, focused tests, and Preview database evidence.
+Repository-state alignment records the completed authorization-linked reservation integrity proof. The next runtime implementation is isolated real-database safety proof for replay, conflict, concurrency, row locks and rollback at every write boundary. It must remain test-only, use no Production database, and introduce no runtime failpoint.
 
-After `RES-INTEGRITY-READBACK` is green:
+After `RES-DB-SAFETY-PROOF` is green:
 
 ```text
-RES-DB-SAFETY-PROOF
-→ PRIVATE-RESERVATION-GATE
+PRIVATE-RESERVATION-GATE
 → PRIVATE-ADMIN-WIRING
 → ROLLBACK-AUTHORITY-HARDENING
 → ROLLBACK-EXACT-RECOVERY

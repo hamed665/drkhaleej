@@ -76,9 +76,9 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #943 at `74541b9f32acb201a9bf94d54d0be757842f5b8c`**. The current next implementation is **`RES-INTEGRITY-READBACK`**.
+Current import-readiness runtime baseline: **PR #946 at `6c873b9b7cc5ee93e36969feca7d223b16b9bcde`**. The current next implementation is **`RES-DB-SAFETY-PROOF`**.
 
-Completed migrations: **`0001` through `0079`**. Migration validation is expected through `0079_import_pharmacy_atomic_authorization_reservation.sql`.
+Completed migrations: **`0001` through `0080`**. Migration validation is expected through `0080_import_pharmacy_read_state_upsert_identity.sql`.
 
 Approved current surfaces include localized public catalog/detail surfaces, static public article shell routes, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, minimal admin login, admin provider onboarding lead list/detail, limited status/priority lead mutation, read-only lead history UI, status/priority lead history writes, draft center creation from provider onboarding lead, admin center subscription view/assignment foundation, base plan catalog initializer, admin quick navigation, admin commercial add-on assignment shell, healthcare vertical/category taxonomy foundation, and public read RLS for approved public taxonomy rows.
 

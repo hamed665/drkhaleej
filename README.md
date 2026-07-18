@@ -26,10 +26,10 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #943** at baseline **`74541b9f32acb201a9bf94d54d0be757842f5b8c`**.
-- Database/migration status: **validates through `0079_import_pharmacy_atomic_authorization_reservation.sql`**.
-- Completed migration set: **`0001` through `0079`**.
-- Current import-readiness implementation: **`RES-INTEGRITY-READBACK`**.
+- Import-readiness runtime is aligned through **PR #946** at baseline **`6c873b9b7cc5ee93e36969feca7d223b16b9bcde`**.
+- Database/migration status: **validates through `0080_import_pharmacy_read_state_upsert_identity.sql`**.
+- Completed migration set: **`0001` through `0080`**.
+- Current import-readiness implementation: **`RES-DB-SAFETY-PROOF`**.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

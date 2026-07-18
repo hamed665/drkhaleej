@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #943 at baseline `74541b9f32acb201a9bf94d54d0be757842f5b8c` (last aligned 2026-07-15).
-- Migrations validate through `0079_import_pharmacy_atomic_authorization_reservation.sql`.
-- The current next implementation is `RES-INTEGRITY-READBACK`.
+- Import-readiness runtime is aligned through PR #946 at baseline `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` (last aligned 2026-07-18).
+- Migrations validate through `0080_import_pharmacy_read_state_upsert_identity.sql`.
+- The current next implementation is `RES-DB-SAFETY-PROOF`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, and admin commercial add-on assignment shell.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
 - Article pages are still static shell pages only.
@@ -89,7 +89,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Draft center creation from lead | Completed admin baseline | Phase 4 / Phase 5 | Phase 5 / Phase 6 | Phase 5 / Phase 6 | Uses `note_added` with `event_kind: draft_center_created`. |
 | Center subscription view/assignment | Completed foundation | Phase 6 | Phase 9 / Phase 5 | Phase 7 / Phase 15 | Admin assignment only. |
 | Commercial add-on assignment shell | Completed draft/internal shell | Phase 6 | Phase 8 / Phase 5 | Phase 15 | Homepage Ads and Special Offer Placement only. |
-| Migrations through `0079` | Completed | Phase 2 | Phase 2 / Phase 3 | Phase 1 / Phase 2 | Existing SQL migrations must not be modified unless approved. |
+| Migrations through `0080` | Completed | Phase 2 | Phase 2 / Phase 3 | Phase 1 / Phase 2 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -103,11 +103,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #943 |
-| Runtime baseline | `74541b9f32acb201a9bf94d54d0be757842f5b8c` |
-| Last aligned | `2026-07-15` |
-| Current migration | `0079_import_pharmacy_atomic_authorization_reservation.sql` |
-| Current next | `RES-INTEGRITY-READBACK` |
+| Aligned through | PR #946 |
+| Runtime baseline | `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` |
+| Last aligned | `2026-07-18` |
+| Current migration | `0080_import_pharmacy_read_state_upsert_identity.sql` |
+| Current next | `RES-DB-SAFETY-PROOF` |
 
 ## Import readiness capability mapping
 
@@ -122,8 +122,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Persisted authorization | Complete | #940 | Lifecycle regression |
 | Invalidation/readback | Complete | #941 | Bounded UI regression |
 | Atomic reservation transaction | Implemented/partial wave | #942 | DB safety proof and audit split |
-| Admin reserve operation | Implemented/partial wave | #943 | Integrity readback |
-| Reservation integrity proof | Open | — | `RES-INTEGRITY-READBACK` |
+| Admin reserve operation | Complete | #943 | Maintain bounded operation regression |
+| Reservation integrity proof | Complete | #946 | `RES-DB-SAFETY-PROOF` |
 | Existing private executor handoff | Open | — | `PRIVATE-RESERVATION-GATE` |
 | Exact rollback recovery | Open | — | Wave 4 |
 | Pharmacy public/index/sitemap | Disabled/Open | — | After Admin canary |
