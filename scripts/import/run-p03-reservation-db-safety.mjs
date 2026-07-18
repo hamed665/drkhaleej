@@ -427,20 +427,20 @@ async function verifyForcedAbort(client, item) {
   return result.rows[0];
 }
 
-async function runFaultProof(faultClient, observer, item, boundary) {
-  const before = await entityState(observer, item);
-  await faultClient.query('begin');
+async function runFaultProof(client, item, boundary) {
+  const before = await entityState(client, item);
+  await client.query('begin');
   let forced = false;
   try {
-    await callFaultWrapper(faultClient, item, boundary);
+    await callFaultWrapper(client, item, boundary);
   } catch (error) {
     forced = error.message === `p03_forced_abort_${boundary}`;
   } finally {
-    await faultClient.query('rollback');
+    await client.query('rollback');
   }
   assert(forced, `Fault boundary ${boundary} did not raise its exact forced exception.`);
-  const state = await verifyForcedAbort(observer, item);
-  const after = await entityState(observer, item);
+  const state = await verifyForcedAbort(client, item);
+  const after = await entityState(client, item);
   assert(state.reservations === 0 && state.snapshots === 0 && state.audits === 0, `${boundary} left partial persistence rows.`);
   assert(state.issued_authorizations === 1, `${boundary} consumed or invalidated the authorization after rollback.`);
   assert(JSON.stringify(before) === JSON.stringify(after), `${boundary} mutated the Pharmacy entity.`);
@@ -560,13 +560,12 @@ async function main() {
     ...requiredFaultBoundaries.map((boundary) => fixture(runId, runRef, `abort-${boundary}`)),
   ];
   const admin = new Client(connectionConfig(databaseUrl, 'p03-db-safety-observer'));
-  const faultClient = new Client(connectionConfig(databaseUrl, 'p03-fault-session'));
   const startedAt = new Date().toISOString();
   let cleanupResult;
   let connected = false;
 
   try {
-    await Promise.all([admin.connect(), faultClient.connect()]);
+    await admin.connect();
     connected = true;
     const migrationLedger = await verifyMigrationLedger(admin);
     const productionRpc = await verifyProductionRpc(admin);
@@ -574,13 +573,17 @@ async function main() {
     for (const item of fixtures) await insertFixture(admin, item, runRef);
 
     const faultSql = await readFile(faultSqlPath, 'utf8');
-    await faultClient.query(faultSql);
+    // Keep the pg_temp fault wrapper and all sequential proof operations on the
+    // same session. Supabase session poolers may retire an otherwise idle client
+    // while a second client compiles this wrapper, which makes the next query
+    // fail with a transport-level `Connection terminated` before the RPC runs.
+    await admin.query(faultSql);
 
     const replay = await runReplayAndConflict(admin, fixtures[0]);
     const concurrency = await runConcurrencyProof(databaseUrl, admin, fixtures[1]);
     const aborts = [];
     for (let index = 0; index < requiredFaultBoundaries.length; index += 1) {
-      aborts.push(await runFaultProof(faultClient, admin, fixtures[index + 2], requiredFaultBoundaries[index]));
+      aborts.push(await runFaultProof(admin, fixtures[index + 2], requiredFaultBoundaries[index]));
     }
     const integrity = await verifyGlobalIntegrity(admin, fixtures);
     await cleanupFixtures(admin, fixtures);
@@ -647,7 +650,7 @@ async function main() {
     if (connected && !cleanupResult) {
       try { await cleanupFixtures(admin, fixtures); } catch {}
     }
-    await Promise.allSettled([admin.end(), faultClient.end()]);
+    await admin.end().catch(() => {});
   }
 }
 
