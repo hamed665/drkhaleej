@@ -50,9 +50,21 @@ function connectionConfig(connectionString, applicationName) {
     connectionString,
     application_name: applicationName,
     ssl: local ? false : { rejectUnauthorized: false },
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 5_000,
     statement_timeout: 30_000,
     query_timeout: 35_000,
   };
+}
+
+async function withFreshClient(connectionString, applicationName, callback) {
+  const client = new Client(connectionConfig(connectionString, applicationName));
+  await client.connect();
+  try {
+    return await callback(client);
+  } finally {
+    await client.end().catch(() => {});
+  }
 }
 
 function verifyPreviewIdentity(connectionString, expectedProjectRef, productionProjectRef) {
@@ -559,36 +571,55 @@ async function main() {
     fixture(runId, runRef, 'concurrency'),
     ...requiredFaultBoundaries.map((boundary) => fixture(runId, runRef, `abort-${boundary}`)),
   ];
-  const admin = new Client(connectionConfig(databaseUrl, 'p03-db-safety-observer'));
   const startedAt = new Date().toISOString();
   let cleanupResult;
-  let connected = false;
 
   try {
-    await admin.connect();
-    connected = true;
-    const migrationLedger = await verifyMigrationLedger(admin);
-    const productionRpc = await verifyProductionRpc(admin);
-    await cleanupFixtures(admin, fixtures);
-    for (const item of fixtures) await insertFixture(admin, item, runRef);
-
     const faultSql = await readFile(faultSqlPath, 'utf8');
-    // Keep the pg_temp fault wrapper and all sequential proof operations on the
-    // same session. Supabase session poolers may retire an otherwise idle client
-    // while a second client compiles this wrapper, which makes the next query
-    // fail with a transport-level `Connection terminated` before the RPC runs.
-    await admin.query(faultSql);
+    const { migrationLedger, productionRpc } = await withFreshClient(
+      databaseUrl,
+      'p03-db-safety-contract',
+      async (client) => ({
+        migrationLedger: await verifyMigrationLedger(client),
+        productionRpc: await verifyProductionRpc(client),
+      }),
+    );
+    await withFreshClient(databaseUrl, 'p03-db-safety-clean-start', (client) => (
+      cleanupFixtures(client, fixtures)
+    ));
+    for (let index = 0; index < fixtures.length; index += 1) {
+      await withFreshClient(databaseUrl, `p03-fixture-${index + 1}`, (client) => (
+        insertFixture(client, fixtures[index], runRef)
+      ));
+    }
 
-    const replay = await runReplayAndConflict(admin, fixtures[0]);
-    const concurrency = await runConcurrencyProof(databaseUrl, admin, fixtures[1]);
+    const replay = await withFreshClient(databaseUrl, 'p03-replay-conflict', (client) => (
+      runReplayAndConflict(client, fixtures[0])
+    ));
+    const concurrency = await withFreshClient(databaseUrl, 'p03-concurrency-observer', (observer) => (
+      runConcurrencyProof(databaseUrl, observer, fixtures[1])
+    ));
     const aborts = [];
     for (let index = 0; index < requiredFaultBoundaries.length; index += 1) {
-      aborts.push(await runFaultProof(admin, fixtures[index + 2], requiredFaultBoundaries[index]));
+      const boundary = requiredFaultBoundaries[index];
+      aborts.push(await withFreshClient(databaseUrl, `p03-fault-${index + 1}`, async (client) => {
+        // The pg_temp wrapper is session-scoped, so compile and exercise it
+        // immediately on the same fresh session. A new session per boundary
+        // also avoids Supabase session-pooler retirement during the full proof.
+        await client.query(faultSql);
+        return runFaultProof(client, fixtures[index + 2], boundary);
+      }));
     }
-    const integrity = await verifyGlobalIntegrity(admin, fixtures);
-    await cleanupFixtures(admin, fixtures);
-    const firstCleanup = await verifyCleanup(admin, fixtures);
-    const rerun = await runDeterministicRerunProof(admin, fixtures[0], runRef);
+    const integrity = await withFreshClient(databaseUrl, 'p03-integrity', (client) => (
+      verifyGlobalIntegrity(client, fixtures)
+    ));
+    const firstCleanup = await withFreshClient(databaseUrl, 'p03-first-cleanup', async (client) => {
+      await cleanupFixtures(client, fixtures);
+      return verifyCleanup(client, fixtures);
+    });
+    const rerun = await withFreshClient(databaseUrl, 'p03-deterministic-rerun', (client) => (
+      runDeterministicRerunProof(client, fixtures[0], runRef)
+    ));
     cleanupResult = {
       remainingRows: rerun.cleanup.remainingRows,
       ttlBounded: true,
@@ -647,10 +678,13 @@ async function main() {
     await writeFile(evidencePath, output, { mode: 0o600 });
     console.log(`P03 reservation DB safety proof passed; redacted evidence written to ${path.relative(root, evidencePath)}.`);
   } finally {
-    if (connected && !cleanupResult) {
-      try { await cleanupFixtures(admin, fixtures); } catch {}
+    if (!cleanupResult) {
+      try {
+        await withFreshClient(databaseUrl, 'p03-failure-cleanup', (client) => (
+          cleanupFixtures(client, fixtures)
+        ));
+      } catch {}
     }
-    await admin.end().catch(() => {});
   }
 }
 
