@@ -61,22 +61,22 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "RES-INTEGRITY-READBACK"',
+      from: '"currentNext": "RES-DB-SAFETY-PROOF"',
       to: '"currentNext": "PRIVATE-RESERVATION-GATE"',
       expectedError: 'manifest.currentNext drifted',
     },
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0079_import_pharmacy_atomic_authorization_reservation.sql` |',
+      from: '| Current migration | `0080_import_pharmacy_read_state_upsert_identity.sql` |',
       to: '| Current migration | `0078_import_pharmacy_authorization_invalidation_readback.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {
       label: 'phase matrix drift',
       file: fixtureFiles[2],
-      from: '| Admin reserve operation | Implemented/partial wave | #943 | Integrity readback |',
-      to: '| Admin reserve operation | Implemented/partial wave | #942 | Integrity readback |',
+      from: '| Admin reserve operation | Complete | #943 | Maintain bounded operation regression |',
+      to: '| Admin reserve operation | Complete | #942 | Maintain bounded operation regression |',
       expectedError: 'Admin reserve operation evidence drifted',
     },
     {
