@@ -69,6 +69,15 @@ for (const token of [
   'runReplayAndConflict',
   'runFaultProof',
   'withFreshClient',
+  'openCheckedClient',
+  'select 1 as p03_connection_ready',
+  'isTransientConnectionError',
+  'callProductionRpcWithRetry',
+  'maxAttempts = 3',
+  'transientRetries',
+  'livenessPreflight: true',
+  "'p03-replay-fixture'",
+  "'p03-concurrency-fixture'",
   'await client.query(faultSql)',
   "'p03-concurrency-observer'",
   "'p03-failure-cleanup'",
@@ -88,6 +97,10 @@ for (const token of [
 assert(
   !runner.includes('const admin = new Client'),
   'P03 must not keep one long-lived administrator session across the hosted proof.',
+);
+assert(
+  !runner.includes('for (let index = 0; index < fixtures.length; index += 1)'),
+  'P03 must create each fixture immediately before its proof instead of churning all sessions up front.',
 );
 
 for (const boundary of [

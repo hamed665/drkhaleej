@@ -20,6 +20,15 @@ const requiredFaultBoundaries = [
   'audit_insert',
   'authorization_update',
 ];
+const transientConnectionCodes = new Set([
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'EPIPE',
+  'ETIMEDOUT',
+  '57P01',
+  '57P02',
+  '57P03',
+]);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -57,13 +66,62 @@ function connectionConfig(connectionString, applicationName) {
   };
 }
 
-async function withFreshClient(connectionString, applicationName, callback) {
+function isTransientConnectionError(error) {
+  const code = typeof error?.code === 'string' ? error.code.toUpperCase() : '';
+  const message = error instanceof Error ? error.message : String(error || '');
+  return code.startsWith('08')
+    || transientConnectionCodes.has(code)
+    || /connection terminated|connection reset|connection timeout|server closed the connection|socket hang up/i.test(message);
+}
+
+async function openCheckedClient(connectionString, applicationName) {
   const client = new Client(connectionConfig(connectionString, applicationName));
-  await client.connect();
+  let idleConnectionError;
+  client.on('error', (error) => {
+    idleConnectionError ||= error;
+  });
   try {
-    return await callback(client);
+    await client.connect();
+    await client.query({
+      text: 'select 1 as p03_connection_ready',
+      query_timeout: 5_000,
+    });
+    if (idleConnectionError) throw idleConnectionError;
+    return {
+      client,
+      getIdleConnectionError: () => idleConnectionError,
+    };
+  } catch (error) {
+    await client.end().catch(() => {});
+    throw error;
+  }
+}
+
+async function withFreshClient(connectionString, applicationName, callback) {
+  const { client, getIdleConnectionError } = await openCheckedClient(
+    connectionString,
+    applicationName,
+  );
+  try {
+    const result = await callback(client);
+    const idleConnectionError = getIdleConnectionError();
+    if (idleConnectionError) throw idleConnectionError;
+    return result;
   } finally {
     await client.end().catch(() => {});
+  }
+}
+
+async function runStage(label, callback) {
+  const started = Date.now();
+  console.log(`P03 stage ${label} started.`);
+  try {
+    const result = await callback();
+    console.log(`P03 stage ${label} passed in ${Date.now() - started}ms.`);
+    return result;
+  } catch (error) {
+    if (error && typeof error === 'object') error.p03Stage = label;
+    throw error;
   }
 }
 
@@ -307,6 +365,33 @@ async function callProductionRpc(client, item, overrides) {
   return result.rows[0].result;
 }
 
+async function callProductionRpcWithRetry(
+  connectionString,
+  item,
+  overrides,
+  label,
+  maxAttempts = 3,
+) {
+  assert(maxAttempts === 3, 'P03 transport recovery must remain bounded to three total attempts.');
+  let transientRetries = 0;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const result = await withFreshClient(
+        connectionString,
+        `${label}-attempt-${attempt}`,
+        (client) => callProductionRpc(client, item, overrides),
+      );
+      return { result, transientRetries };
+    } catch (error) {
+      if (!isTransientConnectionError(error) || attempt === maxAttempts) throw error;
+      transientRetries += 1;
+      console.log(`P03 stage ${label} recovered a transient database connection; retry ${transientRetries} of 2.`);
+      await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+    }
+  }
+  throw new Error('P03 bounded transport recovery exhausted unexpectedly.');
+}
+
 async function persistenceCounts(client, item) {
   const result = await client.query(
     `select
@@ -321,17 +406,41 @@ async function persistenceCounts(client, item) {
   return result.rows[0];
 }
 
-async function runReplayAndConflict(client, item) {
-  const before = await entityState(client, item);
-  const first = await callProductionRpc(client, item);
-  const second = await callProductionRpc(client, item);
-  const conflict = await callProductionRpc(client, item, {
+async function runReplayAndConflict(connectionString, item) {
+  const before = await withFreshClient(connectionString, 'p03-replay-before', (client) => (
+    entityState(client, item)
+  ));
+  const firstCall = await callProductionRpcWithRetry(
+    connectionString,
+    item,
+    undefined,
+    'p03-replay-first',
+  );
+  const secondCall = await callProductionRpcWithRetry(
+    connectionString,
+    item,
+    undefined,
+    'p03-replay-second',
+  );
+  const conflictCall = await callProductionRpcWithRetry(connectionString, item, {
     requestHash: digest(`${item.requestHash}:different-request`),
-  });
-  const after = await entityState(client, item);
-  const counts = await persistenceCounts(client, item);
+  }, 'p03-replay-conflict');
+  const first = firstCall.result;
+  const second = secondCall.result;
+  const conflict = conflictCall.result;
+  const { after, counts } = await withFreshClient(
+    connectionString,
+    'p03-replay-verification',
+    async (client) => ({
+      after: await entityState(client, item),
+      counts: await persistenceCounts(client, item),
+    }),
+  );
 
-  assert(first.status === 'reserved' && first.replayed === false, 'First request must create one reservation.');
+  assert(
+    first.status === 'reserved' && (first.replayed === false || firstCall.transientRetries > 0),
+    'First request must create one reservation or recover its exact idempotent replay after transport loss.',
+  );
   assert(second.status === 'reserved' && second.replayed === true, 'Same request must replay the reservation.');
   assert(first.idempotencyRecordId === second.idempotencyRecordId, 'Replay must return the same reservation reference.');
   assert(first.rollbackSnapshotId === second.rollbackSnapshotId, 'Replay must return the same snapshot reference.');
@@ -350,6 +459,8 @@ async function runReplayAndConflict(client, item) {
     conflictReason: conflict.reason,
     entityUnchanged: true,
     counts,
+    transientRetries:
+      firstCall.transientRetries + secondCall.transientRetries + conflictCall.transientRetries,
   };
 }
 
@@ -368,11 +479,26 @@ async function waitForLockObservation(observer, processIds) {
   return false;
 }
 
-async function runConcurrencyProof(connectionString, observer, item) {
-  const blocker = new Client(connectionConfig(connectionString, 'p03-row-lock-blocker'));
-  const firstClient = new Client(connectionConfig(connectionString, 'p03-concurrent-a'));
-  const secondClient = new Client(connectionConfig(connectionString, 'p03-concurrent-b'));
-  await Promise.all([blocker.connect(), firstClient.connect(), secondClient.connect()]);
+async function runConcurrencyProof(connectionString, item) {
+  const connections = [];
+  try {
+    for (const applicationName of [
+      'p03-row-lock-blocker',
+      'p03-concurrent-a',
+      'p03-concurrent-b',
+      'p03-concurrency-observer',
+    ]) {
+      connections.push(await openCheckedClient(connectionString, applicationName));
+    }
+  } catch (error) {
+    await Promise.allSettled(connections.map(({ client }) => client.end()));
+    throw error;
+  }
+  const [blockerConnection, firstConnection, secondConnection, observerConnection] = connections;
+  const blocker = blockerConnection.client;
+  const firstClient = firstConnection.client;
+  const secondClient = secondConnection.client;
+  const observer = observerConnection.client;
   try {
     const before = await entityState(observer, item);
     await blocker.query('begin');
@@ -386,13 +512,50 @@ async function runConcurrencyProof(connectionString, observer, item) {
     const lockWaitObserved = await waitForLockObservation(observer, [firstClient.processID, secondClient.processID]);
     assert(lockWaitObserved, 'Two-client proof did not observe PostgreSQL row-lock waiting.');
     await blocker.query('commit');
-    const results = await Promise.all([firstPromise, secondPromise]);
-    const after = await entityState(observer, item);
-    const counts = await persistenceCounts(observer, item);
+    await observer.end();
+    const settled = await Promise.allSettled([firstPromise, secondPromise]);
+    const results = [];
+    let transientRetries = 0;
+    for (let index = 0; index < settled.length; index += 1) {
+      const outcome = settled[index];
+      if (outcome.status === 'fulfilled') {
+        results.push(outcome.value);
+        continue;
+      }
+      if (!isTransientConnectionError(outcome.reason)) throw outcome.reason;
+      transientRetries += 1;
+      const recovered = await callProductionRpcWithRetry(
+        connectionString,
+        item,
+        undefined,
+        `p03-concurrent-recovery-${index + 1}`,
+      );
+      transientRetries += recovered.transientRetries;
+      results.push(recovered.result);
+    }
+    const { after, counts } = await withFreshClient(
+      connectionString,
+      'p03-concurrency-verification',
+      async (client) => ({
+        after: await entityState(client, item),
+        counts: await persistenceCounts(client, item),
+      }),
+    );
     const created = results.filter((result) => result.status === 'reserved' && result.replayed === false).length;
     const replayed = results.filter((result) => result.status === 'reserved' && result.replayed === true).length;
 
-    assert(created === 1 && replayed === 1, 'Concurrent clients must produce one reservation and one replay.');
+    assert(results.every((result) => result.status === 'reserved'), 'Concurrent clients must both resolve to the reserved result.');
+    assert(
+      results[0].idempotencyRecordId === results[1].idempotencyRecordId
+        && results[0].rollbackSnapshotId === results[1].rollbackSnapshotId
+        && results[0].auditEventId === results[1].auditEventId,
+      'Concurrent clients must resolve to the same durable reservation, snapshot, and audit references.',
+    );
+    assert(
+      transientRetries > 0 || (created === 1 && replayed === 1),
+      'Without transport recovery, concurrent clients must produce one creation response and one replay response.',
+    );
+    assert(replayed >= 1, 'Concurrent proof must observe at least one replay response.');
     assert(JSON.stringify(before) === JSON.stringify(after), 'Concurrency proof mutated the Pharmacy entity.');
     assert(counts.reservations === 1 && counts.snapshots === 1 && counts.audits === 1, 'Concurrency produced partial or duplicate rows.');
     assert(counts.consumed_authorizations === 1, 'Concurrency did not consume exactly one authorization.');
@@ -402,6 +565,9 @@ async function runConcurrencyProof(connectionString, observer, item) {
       rowLockWaitObserved: true,
       created: 1,
       replayed: 1,
+      responseCreatedCount: created,
+      responseReplayCount: replayed,
+      transientRetries,
       entityUnchanged: true,
       counts,
     };
@@ -409,7 +575,12 @@ async function runConcurrencyProof(connectionString, observer, item) {
     if (!blocker.ended) {
       try { await blocker.query('rollback'); } catch {}
     }
-    await Promise.allSettled([blocker.end(), firstClient.end(), secondClient.end()]);
+    await Promise.allSettled([
+      blocker.end(),
+      firstClient.end(),
+      secondClient.end(),
+      observer.ended ? Promise.resolve() : observer.end(),
+    ]);
   }
 }
 
@@ -527,23 +698,44 @@ async function verifyCleanup(client, fixtures) {
   return { remainingRows: 0, ttlBounded: true, rerunSafe: true };
 }
 
-async function runDeterministicRerunProof(client, item, runRef) {
-  await insertFixture(client, item, runRef);
-  const before = await entityState(client, item);
-  const result = await callProductionRpc(client, item);
-  const after = await entityState(client, item);
-  const counts = await persistenceCounts(client, item);
-  assert(result.status === 'reserved' && result.replayed === false, 'Deterministic rerun did not create one fresh reservation.');
+async function runDeterministicRerunProof(connectionString, item, runRef) {
+  await withFreshClient(connectionString, 'p03-rerun-fixture', (client) => (
+    insertFixture(client, item, runRef)
+  ));
+  const before = await withFreshClient(connectionString, 'p03-rerun-before', (client) => (
+    entityState(client, item)
+  ));
+  const rpc = await callProductionRpcWithRetry(
+    connectionString,
+    item,
+    undefined,
+    'p03-rerun-reservation',
+  );
+  const { after, counts } = await withFreshClient(
+    connectionString,
+    'p03-rerun-verification',
+    async (client) => ({
+      after: await entityState(client, item),
+      counts: await persistenceCounts(client, item),
+    }),
+  );
+  assert(
+    rpc.result.status === 'reserved' && (rpc.result.replayed === false || rpc.transientRetries > 0),
+    'Deterministic rerun did not create or recover one fresh reservation.',
+  );
   assert(counts.reservations === 1 && counts.snapshots === 1 && counts.audits === 1, 'Deterministic rerun did not recreate exact one-row persistence.');
   assert(counts.consumed_authorizations === 1, 'Deterministic rerun did not consume exactly one authorization.');
   assert(JSON.stringify(before) === JSON.stringify(after), 'Deterministic rerun mutated the Pharmacy entity.');
-  await cleanupFixtures(client, [item]);
-  const cleanup = await verifyCleanup(client, [item]);
+  const cleanup = await withFreshClient(connectionString, 'p03-rerun-cleanup', async (client) => {
+    await cleanupFixtures(client, [item]);
+    return verifyCleanup(client, [item]);
+  });
   return {
     sameFixtureRecreated: true,
     freshReservationCreated: true,
     exactOneRowPersistence: true,
     entityUnchanged: true,
+    transientRetries: rpc.transientRetries,
     cleanup,
   };
 }
@@ -576,49 +768,68 @@ async function main() {
 
   try {
     const faultSql = await readFile(faultSqlPath, 'utf8');
-    const { migrationLedger, productionRpc } = await withFreshClient(
-      databaseUrl,
-      'p03-db-safety-contract',
-      async (client) => ({
-        migrationLedger: await verifyMigrationLedger(client),
-        productionRpc: await verifyProductionRpc(client),
-      }),
-    );
-    await withFreshClient(databaseUrl, 'p03-db-safety-clean-start', (client) => (
-      cleanupFixtures(client, fixtures)
+    const { migrationLedger, productionRpc } = await runStage('contract-verification', () => (
+      withFreshClient(
+        databaseUrl,
+        'p03-db-safety-contract',
+        async (client) => ({
+          migrationLedger: await verifyMigrationLedger(client),
+          productionRpc: await verifyProductionRpc(client),
+        }),
+      )
     ));
-    for (let index = 0; index < fixtures.length; index += 1) {
-      await withFreshClient(databaseUrl, `p03-fixture-${index + 1}`, (client) => (
-        insertFixture(client, fixtures[index], runRef)
-      ));
-    }
+    await runStage('clean-start', () => (
+      withFreshClient(databaseUrl, 'p03-db-safety-clean-start', (client) => (
+        cleanupFixtures(client, fixtures)
+      ))
+    ));
 
-    const replay = await withFreshClient(databaseUrl, 'p03-replay-conflict', (client) => (
-      runReplayAndConflict(client, fixtures[0])
+    await runStage('replay-fixture', () => (
+      withFreshClient(databaseUrl, 'p03-replay-fixture', (client) => (
+        insertFixture(client, fixtures[0], runRef)
+      ))
     ));
-    const concurrency = await withFreshClient(databaseUrl, 'p03-concurrency-observer', (observer) => (
-      runConcurrencyProof(databaseUrl, observer, fixtures[1])
+    const replay = await runStage('replay-and-conflict', () => (
+      runReplayAndConflict(databaseUrl, fixtures[0])
+    ));
+
+    await runStage('concurrency-fixture', () => (
+      withFreshClient(databaseUrl, 'p03-concurrency-fixture', (client) => (
+        insertFixture(client, fixtures[1], runRef)
+      ))
+    ));
+    const concurrency = await runStage('concurrency', () => (
+      runConcurrencyProof(databaseUrl, fixtures[1])
     ));
     const aborts = [];
     for (let index = 0; index < requiredFaultBoundaries.length; index += 1) {
       const boundary = requiredFaultBoundaries[index];
-      aborts.push(await withFreshClient(databaseUrl, `p03-fault-${index + 1}`, async (client) => {
-        // The pg_temp wrapper is session-scoped, so compile and exercise it
-        // immediately on the same fresh session. A new session per boundary
-        // also avoids Supabase session-pooler retirement during the full proof.
-        await client.query(faultSql);
-        return runFaultProof(client, fixtures[index + 2], boundary);
+      aborts.push(await runStage(`forced-abort-${index + 1}`, async () => {
+        await withFreshClient(databaseUrl, `p03-fault-fixture-${index + 1}`, (client) => (
+          insertFixture(client, fixtures[index + 2], runRef)
+        ));
+        return withFreshClient(databaseUrl, `p03-fault-${index + 1}`, async (client) => {
+          // The pg_temp wrapper is session-scoped, so compile and exercise it
+          // immediately on the same fresh session. A new session per boundary
+          // also avoids Supabase session-pooler retirement during the full proof.
+          await client.query(faultSql);
+          return runFaultProof(client, fixtures[index + 2], boundary);
+        });
       }));
     }
-    const integrity = await withFreshClient(databaseUrl, 'p03-integrity', (client) => (
-      verifyGlobalIntegrity(client, fixtures)
+    const integrity = await runStage('integrity-verification', () => (
+      withFreshClient(databaseUrl, 'p03-integrity', (client) => (
+        verifyGlobalIntegrity(client, fixtures)
+      ))
     ));
-    const firstCleanup = await withFreshClient(databaseUrl, 'p03-first-cleanup', async (client) => {
-      await cleanupFixtures(client, fixtures);
-      return verifyCleanup(client, fixtures);
-    });
-    const rerun = await withFreshClient(databaseUrl, 'p03-deterministic-rerun', (client) => (
-      runDeterministicRerunProof(client, fixtures[0], runRef)
+    const firstCleanup = await runStage('first-cleanup', () => (
+      withFreshClient(databaseUrl, 'p03-first-cleanup', async (client) => {
+        await cleanupFixtures(client, fixtures);
+        return verifyCleanup(client, fixtures);
+      })
+    ));
+    const rerun = await runStage('deterministic-rerun', () => (
+      runDeterministicRerunProof(databaseUrl, fixtures[0], runRef)
     ));
     cleanupResult = {
       remainingRows: rerun.cleanup.remainingRows,
@@ -641,6 +852,7 @@ async function main() {
         identityVerified: true,
         productionProjectMismatchVerified: true,
         sessionConnectionVerified: true,
+        livenessPreflight: true,
       },
       migrationLedger,
       productionRpc,
@@ -653,6 +865,11 @@ async function main() {
         entityUnchanged: rerun.entityUnchanged,
       },
       forcedAborts: aborts,
+      transportRecovery: {
+        boundedAttemptsPerRequest: 3,
+        transientRetries:
+          replay.transientRetries + concurrency.transientRetries + rerun.transientRetries,
+      },
       integrity: {
         ...integrity,
         entityMutation: false,
@@ -690,6 +907,9 @@ async function main() {
 
 function reportFailure(error) {
   const raw = error instanceof Error ? error.message : String(error);
+  const stage = typeof error?.p03Stage === 'string'
+    ? error.p03Stage.replace(/[^a-z0-9-]/gi, '').slice(0, 80)
+    : 'unclassified';
   let redacted = raw;
   for (const [value, replacement] of [
     [process.env.P03_PREVIEW_DATABASE_URL, '[redacted-database-url]'],
@@ -702,13 +922,14 @@ function reportFailure(error) {
     /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi,
     '[redacted-id]',
   );
-  console.error(`P03 reservation DB safety proof failed: ${redacted}`);
+  console.error(`P03 reservation DB safety proof failed at ${stage}: ${redacted}`);
   process.exitCode = 1;
 }
 
 export {
   deterministicUuid,
   fixture,
+  isTransientConnectionError,
   sanitizeEvidence,
   verifyPreviewIdentity,
 };

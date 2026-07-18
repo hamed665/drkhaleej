@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   deterministicUuid,
   fixture,
+  isTransientConnectionError,
   sanitizeEvidence,
   verifyPreviewIdentity,
 } from './run-p03-reservation-db-safety.mjs';
@@ -51,6 +52,13 @@ assert.throws(
   ),
   /never transaction pooling/,
 );
+
+assert.equal(isTransientConnectionError(new Error('Connection terminated')), true);
+assert.equal(isTransientConnectionError(Object.assign(new Error('socket'), { code: 'ECONNRESET' })), true);
+assert.equal(isTransientConnectionError(Object.assign(new Error('database restart'), { code: '57P01' })), true);
+assert.equal(isTransientConnectionError(Object.assign(new Error('connection exception'), { code: '08006' })), true);
+assert.equal(isTransientConnectionError(Object.assign(new Error('unique violation'), { code: '23505' })), false);
+assert.equal(isTransientConnectionError(new Error('authorization_identity_mismatch')), false);
 
 const firstUuid = deterministicUuid('stable-seed');
 assert.match(firstUuid, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-8[0-9a-f]{3}-[0-9a-f]{12}$/);
