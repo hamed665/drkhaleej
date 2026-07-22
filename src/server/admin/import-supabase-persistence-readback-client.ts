@@ -35,7 +35,7 @@ export type ImportSupabasePersistenceReadClient = {
 const AUTHORIZATION_SELECT = "id,review_state_id,actor_profile_id,entity_id,review_snapshot_hash,entity_fingerprint,operation_attempt_id,idempotency_key,request_hash,patch_hash,expected_entity_version,entity_family,operation_scope,status,consumed_by_reservation_id";
 const IDEMPOTENCY_SELECT = "id,entity_id,actor_profile_id,idempotency_key,expected_version,request_hash,status,pharmacy_authorization_id";
 const ROLLBACK_SELECT = "id,entity_id,actor_profile_id,idempotency_record_id,expected_version,snapshot_hash";
-const AUDIT_SELECT = "id,entity_id,actor_profile_id,idempotency_record_id,rollback_snapshot_id,event_type,outcome,expected_version,event_payload";
+const AUDIT_SELECT = "id,entity_id,actor_profile_id,idempotency_record_id,rollback_snapshot_id,event_type,outcome,schema_version,expected_version,event_payload";
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -107,6 +107,7 @@ function mapAudit(row: JsonRecord): ImportPersistenceAuditRow {
     idempotency_record_id: stringValue(row.idempotency_record_id),
     rollback_snapshot_id: nullableString(row.rollback_snapshot_id),
     event_type: stringValue(row.event_type) as ImportReservationAuditSignature,
+    schema_version: stringValue(row.schema_version),
     outcome: stringValue(row.outcome),
     expected_version: stringValue(row.expected_version),
     phase: nullableString(details.phase),

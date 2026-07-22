@@ -30,6 +30,7 @@ const migrations = {
   pharmacyAuthorizationLifecycle: '0078_import_pharmacy_authorization_invalidation_readback.sql',
   pharmacyAtomicAuthorizationReservation: '0079_import_pharmacy_atomic_authorization_reservation.sql',
   pharmacyReadStateUpsertIdentity: '0080_import_pharmacy_read_state_upsert_identity.sql',
+  pharmacyReservationAuditSplit: '0081_import_pharmacy_reservation_audit_split.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -192,6 +193,19 @@ function validateLaterMigrations() {
   requirePattern(atomicReservation, /grant\s+execute\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*to\s+service_role/i, '0079 must grant atomic reservation RPC only to service_role.');
   requirePattern(atomicReservation, /security\s+invoker/i, '0079 must keep the atomic reservation RPC security invoker.');
   requirePattern(atomicReservation, /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0079 must pin the atomic reservation RPC search_path.');
+
+  const reservationAuditSplit = validateClosedMigration(
+    'pharmacyReservationAuditSplit',
+    '0081',
+    [],
+    { allowServiceRoleGrant: true, allowRowLocks: true },
+  );
+  requirePattern(reservationAuditSplit, /P04-A RESERVATION-AUDIT-SPLIT/i, '0081 must include its phase marker.');
+  requirePattern(reservationAuditSplit, /'reservation_created'/i, '0081 must introduce reservation_created.');
+  requirePattern(reservationAuditSplit, /security\s+invoker/i, '0081 must keep the reservation RPC security invoker.');
+  requirePattern(reservationAuditSplit, /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0081 must pin the reservation RPC search_path.');
+  requirePattern(reservationAuditSplit, /revoke\s+all\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0081 must revoke reservation RPC access from public roles.');
+  requirePattern(reservationAuditSplit, /grant\s+execute\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*to\s+service_role/i, '0081 must grant the reservation RPC only to service_role.');
 }
 
 function validatePharmacyReadStateUpsertIdentityMigration() {

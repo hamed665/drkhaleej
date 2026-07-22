@@ -10,6 +10,7 @@ import {
 } from "./import-real-reservation-canary";
 import type { ImportPrivatePublishPersistenceAdapter } from "./import-private-persistence-adapter";
 import type { ImportPersistenceReadbackClient } from "./import-persistence-readback-verifier";
+import { IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION } from "./import-reservation-audit-contract";
 
 const entityId = "11111111-1111-4111-8111-111111111111";
 const actorId = "22222222-2222-4222-8222-222222222222";
@@ -50,7 +51,7 @@ const input: ImportRealReservationCanaryInput = {
       projectionVersion: "projection-v1",
       canonicalRoute: "/en/hospitals/canary",
     },
-    auditSchemaVersion: "v1",
+    auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
     reservationExpiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
     rollbackExpiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
     authorization: {
@@ -131,7 +132,8 @@ function createReadbackClient(): ImportPersistenceReadbackClient {
         actor_profile_id: actorId,
         idempotency_record_id: reservationId,
         rollback_snapshot_id: snapshotId,
-        event_type: "execution_started" as const,
+        event_type: "reservation_created" as const,
+        schema_version: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
         outcome: "pending",
         expected_version: input.reservationRequest.expectedVersion,
         phase: "reservation",

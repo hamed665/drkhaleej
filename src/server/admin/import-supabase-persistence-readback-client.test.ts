@@ -53,6 +53,7 @@ describe("Supabase persistence readback client", () => {
       import_publish_audit_events: [{
         id: "audit-1",
         event_type: "execution_started",
+        schema_version: "drkhaleej.import.publishAudit.v1",
         event_payload: {
           phase: "reservation",
           requestHash: "request-hash",
@@ -112,6 +113,7 @@ describe("Supabase persistence readback client", () => {
       phase: "reservation",
       request_hash: "request-hash",
       authorization_id: "authorization-1",
+      schema_version: "drkhaleej.import.publishAudit.v1",
     });
     expect(audit.data?.[0]).not.toHaveProperty("event_payload");
     expect(audit.data?.[0]).not.toHaveProperty("unexpectedSecret");
@@ -148,7 +150,8 @@ describe("Supabase persistence readback client", () => {
       import_publish_audit_events: [{
         id: "audit-1", entity_id: center.id, actor_profile_id: "actor-1",
         idempotency_record_id: "reservation-1", rollback_snapshot_id: "snapshot-1",
-        event_type: "execution_started", outcome: "pending", expected_version: center.updated_at,
+        event_type: "execution_started", outcome: "pending",
+        schema_version: "drkhaleej.import.publishAudit.v1", expected_version: center.updated_at,
         event_payload: {
           phase: "reservation", requestHash, authorizationId: "authorization-1",
           reviewSnapshotHash: snapshotHash, entityFingerprint: fingerprint,

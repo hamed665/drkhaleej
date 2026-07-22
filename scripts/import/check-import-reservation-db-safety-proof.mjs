@@ -96,7 +96,10 @@ for (const token of [
   'rawIdsEmitted: false',
   'rawPayloadsEmitted: false',
   'databaseUrlEmitted: false',
-  'reservationCreatedAuditImplemented: false',
+  'reservationCreatedAuditImplemented: true',
+  "const reservationAuditSchemaVersion = 'drkhaleej.import.publishAudit.v2'",
+  "a.event_type = 'reservation_created'",
+  'audit_contract_mismatches',
 ]) {
   assert(runner.includes(token), `${files.runner} must include ${token}.`);
 }
@@ -139,6 +142,8 @@ for (const token of [
   'import_publish_rollback_snapshots',
   'import_publish_audit_events',
   "set status = 'consumed'",
+  "'reservation_created'",
+  'drkhaleej.import.publishAudit.v2',
 ]) {
   assert(faultSql.toLowerCase().includes(token.toLowerCase()), `${files.faultSql} must include ${token}.`);
 }
@@ -148,7 +153,6 @@ for (const forbidden of [
   'grant execute',
   'alter table',
   'create policy',
-  'reservation_created',
 ]) {
   assert(!faultSql.toLowerCase().includes(forbidden), `${files.faultSql} must not include ${forbidden}.`);
 }

@@ -8,6 +8,7 @@ import pg from 'pg';
 
 const { Client } = pg;
 const root = process.cwd();
+const reservationAuditSchemaVersion = 'drkhaleej.import.publishAudit.v2';
 const evidencePath = path.resolve(
   root,
   process.env.P03_EVIDENCE_PATH || 'artifacts/p03/res-db-safety-proof.json',
@@ -236,10 +237,11 @@ async function verifyProductionRpc(client) {
     'import_publish_rollback_snapshots',
     'import_publish_audit_events',
     "'consumed'",
+    "'reservation_created'",
+    reservationAuditSchemaVersion,
   ]) {
     assert(normalizedDefinition.includes(token), `Canonical reservation RPC is missing required transaction token: ${token}.`);
   }
-  assert(!definition.includes('reservation_created'), 'P03 must not introduce the P04-A audit event.');
   return { present: true, definitionSha256: digest(definition) };
 }
 
@@ -350,7 +352,7 @@ function rpcValues(item, overrides = {}) {
     item.expectedVersion,
     JSON.stringify(item.snapshotPayload),
     item.snapshotHash,
-    'p03-v1',
+    reservationAuditSchemaVersion,
     item.authorizationId,
     item.reviewSnapshotHash,
     item.entityFingerprint,
@@ -705,8 +707,14 @@ async function verifyGlobalIntegrity(client, fixtures) {
        (select count(*)::int from selected_idempotency i
           left join selected_snapshots s on s.idempotency_record_id = i.id
           left join selected_audits a on a.idempotency_record_id = i.id
-            and a.rollback_snapshot_id = s.id and a.event_type = 'execution_started'
+            and a.rollback_snapshot_id = s.id
+            and a.event_type = 'reservation_created'
+            and a.schema_version = 'drkhaleej.import.publishAudit.v2'
           where s.id is null or a.id is null) as audit_gaps,
+       (select count(*)::int from selected_audits
+          where event_type <> 'reservation_created'
+            or schema_version <> 'drkhaleej.import.publishAudit.v2'
+            or event_payload ->> 'phase' <> 'reservation') as audit_contract_mismatches,
        (select count(*)::int from selected_idempotency i
           left join public.import_pharmacy_publish_authorizations p
             on p.id = i.pharmacy_authorization_id
@@ -716,7 +724,8 @@ async function verifyGlobalIntegrity(client, fixtures) {
   const integrity = result.rows[0];
   assert(
     integrity.duplicates === 0 && integrity.orphans === 0
-      && integrity.audit_gaps === 0 && integrity.incomplete_rows === 0,
+      && integrity.audit_gaps === 0 && integrity.audit_contract_mismatches === 0
+      && integrity.incomplete_rows === 0,
     'Global P03 integrity check found duplicates, orphans, audit gaps, or incomplete rows.',
   );
   return integrity;
@@ -920,7 +929,8 @@ async function main() {
         sitemapMutation: false,
         publishExecuted: false,
         rollbackExecuted: false,
-        reservationCreatedAuditImplemented: false,
+        reservationCreatedAuditImplemented: true,
+        reservationAuditSchemaVersion,
       },
       cleanup: cleanupResult,
       redaction: {

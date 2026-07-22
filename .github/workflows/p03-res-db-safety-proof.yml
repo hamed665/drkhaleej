@@ -6,9 +6,14 @@ on:
       - "scripts/import/run-p03-reservation-db-safety.mjs"
       - "scripts/import/check-import-reservation-db-safety-proof.mjs"
       - "scripts/import/test-import-reservation-db-safety-proof.mjs"
+      - "scripts/import/check-import-reservation-audit-split.mjs"
       - "scripts/import/check-import-publish-readiness-audit.mjs"
       - "scripts/import/sql/p03-reservation-fault-injection.sql"
       - "docs/import/RES_DB_SAFETY_PROOF.md"
+      - "src/server/admin/import-reservation-audit-contract.ts"
+      - "src/server/admin/import-persistence-readback-verifier.ts"
+      - "src/server/admin/import-supabase-persistence-readback-client.ts"
+      - "src/server/admin/import-pharmacy-private-admin-runtime-context.ts"
       - "supabase/migrations/**"
       - "package.json"
       - "pnpm-lock.yaml"
@@ -56,6 +61,9 @@ jobs:
 
       - name: Validate fail-closed P03 contract
         run: pnpm import:reservation-db-safety:validate
+
+      - name: Validate P04-A reservation audit split
+        run: pnpm import:reservation-audit-split:validate
 
       - name: Run isolated Preview transaction proof
         run: pnpm test:db:reservation-safety

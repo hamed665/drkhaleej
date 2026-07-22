@@ -48,6 +48,7 @@
     "import:alias-coverage:validate": "node scripts/import/check-import-header-alias-coverage.mjs",
     "import:publish-readiness-audit:validate": "node scripts/import/check-import-publish-readiness-audit.mjs",
     "import:reservation-db-safety:validate": "node scripts/import/check-import-reservation-db-safety-proof.mjs",
+    "import:reservation-audit-split:validate": "node scripts/import/check-import-reservation-audit-split.mjs",
     "import:state-alignment:validate": "node scripts/import/check-import-readiness-state-alignment.mjs && node scripts/import/test-import-readiness-state-alignment.mjs",
     "import:sitemap-family-caps:validate": "node scripts/import/check-import-sitemap-family-caps.mjs",
     "import:profile-smoke:validate": "node scripts/import/check-public-import-profile-smoke.mjs",
