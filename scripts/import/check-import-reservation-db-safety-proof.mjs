@@ -158,20 +158,29 @@ for (const forbidden of [
 }
 
 for (const token of [
-  'P03_PREVIEW_DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}',
-  'P03_PREVIEW_PROJECT_REF: ${{ secrets.P03_PREVIEW_PROJECT_REF }}',
-  'P03_PRODUCTION_PROJECT_REF: ${{ secrets.P03_PRODUCTION_PROJECT_REF }}',
+  'P03_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}',
+  'P03_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}',
+  'P03_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}',
   'P03_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}',
   'P03_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}',
   'ref: ${{ github.event.pull_request.head.sha || github.sha }}',
   'pnpm install --frozen-lockfile',
   'pnpm import:reservation-db-safety:validate',
   'pnpm test:db:reservation-safety',
+  'if: always()',
+  'artifacts/p03/hosted-proof.log',
   'if-no-files-found: error',
 ]) {
   assert(workflow.includes(token), `${files.workflow} must include ${token}.`);
 }
-for (const forbidden of ['continue-on-error: true', 'environment: production', 'P03_PREVIEW_DATABASE_URL: postgres']) {
+for (const forbidden of [
+  'continue-on-error: true',
+  'environment: production',
+  'P03_PREVIEW_DATABASE_URL: postgres',
+  'secrets.P03_PREVIEW_DATABASE_URL',
+  'secrets.P03_PREVIEW_PROJECT_REF',
+  'secrets.P03_PRODUCTION_PROJECT_REF',
+]) {
   assert(!workflow.toLowerCase().includes(forbidden.toLowerCase()), `${files.workflow} must not include ${forbidden}.`);
 }
 
