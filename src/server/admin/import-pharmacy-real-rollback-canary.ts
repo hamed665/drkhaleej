@@ -23,7 +23,6 @@ export type PharmacyRealRollbackCanaryReadbackClient = {
   read(input: {
     actorId: string;
     entityId: string;
-    publishReference: string;
   }): Promise<{ data: PharmacyRealRollbackCanaryReadback | null; error: { message?: string } | null }>;
 };
 
@@ -32,7 +31,7 @@ export type PharmacyRealRollbackCanaryBlocker =
   | "publish_reference_missing"
   | "expected_snapshot_hash_missing"
   | "rollback_failed"
-  | "rollback_reference_changed"
+  | "rollback_authority_result_invalid"
   | "rollback_readback_failed"
   | "rolled_back_audit_count_invalid"
   | "rollback_replay_count_invalid"
@@ -53,15 +52,17 @@ export type PharmacyRealRollbackCanaryResult = {
   indexEligible: false;
   sitemapEligible: false;
   routeEnabled: false;
+  rawReferenceExposed: false;
 };
 
-function buildResult(input: Omit<PharmacyRealRollbackCanaryResult, "publicVisibility" | "indexEligible" | "sitemapEligible" | "routeEnabled">): PharmacyRealRollbackCanaryResult {
+function buildResult(input: Omit<PharmacyRealRollbackCanaryResult, "publicVisibility" | "indexEligible" | "sitemapEligible" | "routeEnabled" | "rawReferenceExposed">): PharmacyRealRollbackCanaryResult {
   return {
     ...input,
     publicVisibility: "private",
     indexEligible: false,
     sitemapEligible: false,
     routeEnabled: false,
+    rawReferenceExposed: false,
   };
 }
 
@@ -93,18 +94,20 @@ export async function runPharmacyRealRollbackCanary(input: {
     operation: "rollback",
     actorId,
     entityId,
-    confirmation: "ROLLBACK PRIVATE PHARMACY",
-    publishReference,
+    confirmation: `ROLLBACK PRIVATE PUBLISH ${entityId}`,
   });
 
   if (execution.status !== "completed") {
     return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_failed"] });
   }
-  if (execution.executionReference !== publishReference) {
-    return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_reference_changed"] });
+  if (
+    execution.executionReference !== "rollback-authority-consumed" &&
+    execution.executionReference !== "rollback-authority-replayed"
+  ) {
+    return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_authority_result_invalid"] });
   }
 
-  const read = await input.readbackClient.read({ actorId, entityId, publishReference });
+  const read = await input.readbackClient.read({ actorId, entityId });
   if (read.error || !read.data) {
     return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_readback_failed"] });
   }
