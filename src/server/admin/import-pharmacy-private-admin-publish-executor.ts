@@ -87,10 +87,11 @@ export function createPharmacyPrivateAdminPublishExecutor(
     if (mutation.kind !== "mutated" && mutation.kind !== "replayed") {
       return { ok: false, reference: null, readback: null };
     }
+    const entityId = mutation.entityId;
 
     const reference = await dependencies.publishReferenceStore.create({
       actorId: request.actorId,
-      entityId: request.draft.draftId,
+      entityId,
       reservationId: request.reservationResult.reservationId,
       rollbackSnapshotId: request.reservationResult.rollbackSnapshotId,
       actualVersion: mutation.actualVersion,
@@ -100,7 +101,7 @@ export function createPharmacyPrivateAdminPublishExecutor(
 
     const read = await dependencies.readbackClient.read({
       actorId: request.actorId,
-      entityId: request.draft.draftId,
+      entityId,
       reservationId: request.reservationResult.reservationId,
       rollbackSnapshotId: request.reservationResult.rollbackSnapshotId,
       reservationAuditId: request.reservationResult.auditEventId,
@@ -112,7 +113,7 @@ export function createPharmacyPrivateAdminPublishExecutor(
     const readback = verifyPharmacyPrivatePublishReadback({
       expected: {
         actorId: request.actorId,
-        entityId: request.draft.draftId,
+        entityId,
         reservationId: request.reservationResult.reservationId,
         rollbackSnapshotId: request.reservationResult.rollbackSnapshotId,
         reservationAuditId: request.reservationResult.auditEventId,
