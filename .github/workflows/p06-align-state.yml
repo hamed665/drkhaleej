@@ -1,0 +1,130 @@
+name: P06 state alignment
+
+on:
+  push:
+    branches:
+      - agent/rollback-authority-hardening-p06
+    paths:
+      - .github/workflows/p06-align-state.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p06-align-state
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/rollback-authority-hardening-p06
+          fetch-depth: 1
+      - name: Align P06 factual state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          baseline = 'e32d3e8789df5fb2cb744723cc5acd8e59d4827d'
+
+          def replace_exact(path, replacements):
+              file = Path(path)
+              source = file.read_text()
+              for old, new in replacements:
+                  if source.count(old) != 1:
+                      raise SystemExit(f'{path}: replacement not found exactly once: {old[:100]}')
+                  source = source.replace(old, new)
+              file.write_text(source)
+
+          replace_exact('docs/import/import-readiness-roadmap-after-933.md', [
+              (
+                  'Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven\n',
+                  'Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven\nWave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time consumption and bounded replay proven\nWave 4.2   OPEN      Exact logical recovery verification remains next\n',
+              ),
+              ('Aligned through: PR #954', 'Aligned through: PR #955'),
+              ('Baseline commit: 9d0511b', f'Baseline commit: {baseline[:7]}'),
+              ('"alignedThroughPr": 954', '"alignedThroughPr": 955'),
+              ('"runtimeBaseline": "9d0511ba6b2ff5a53e8fd857cb09273d269d602d"', f'"runtimeBaseline": "{baseline}"'),
+              ('"currentMigration": "0082_import_pharmacy_private_execution_audit.sql"', '"currentMigration": "0084_import_pharmacy_rollback_digest_schema.sql"'),
+              ('"currentNext": "ROLLBACK-AUTHORITY-HARDENING"', '"currentNext": "ROLLBACK-EXACT-RECOVERY"'),
+              ('    "3+": "COMPLETE"\n', '    "3+": "COMPLETE",\n    "4.1": "COMPLETE",\n    "4.2": "OPEN"\n'),
+              (
+                  '## Wave 4 — Existing rollback path `OPEN`\n\n### 4.1 Durable rollback authority\n\nUse and harden the existing durable publish reference. Raw reference remains server-side, is bound to terminal publish identity/current version, and is consumed atomically.\n\n```text\nROLLBACK PRIVATE PUBLISH <entity-id>\n```\n\n### 4.2 Exact recovery\n',
+                  '## Wave 4 — Existing rollback path `PARTIAL`\n\n### 4.1 Durable rollback authority `COMPLETE (#955)`\n\nOperation contract:\n\n```text\nROLLBACK PRIVATE PUBLISH <entity-id>\n```\n\nP06 hardens the existing durable Pharmacy publish reference rather than introducing a second rollback authority. Migrations 0083 and 0084 add bounded consumption state and the service-role-only atomic authority RPC, then apply the forward pgcrypto schema correction proven by isolated Preview.\n\nThe authority path now:\n\n- accepts only allowlisted actor/entity identity and entity-bound confirmation;\n- keeps the random raw reference out of browser, form, workflow and canary inputs/results;\n- binds the eligible authority to successful terminal publish identity, current entity version, rollback snapshot identity/hash, actor, entity and expiry;\n- locks the center, reference, terminal record and snapshot;\n- executes the existing Pharmacy rollback RPC and consumes the authority in one transaction;\n- leaves failed or conflicting authority state unconsumed;\n- returns bounded `rolled_back` or persisted `replayed` evidence;\n- persists a bounded consumed result and SHA-256 integrity hash;\n- preserves private/draft/inactive/noindex/no-route/no-sitemap state.\n\nThe exact-SHA hosted proof produced one fresh rollback and one replay from concurrent clients, exactly one consumed reference, exactly one rollback-success audit, zero duplicate rollback, zero public exposure, an unconsumed failed fixture and deterministic cleanup. Production was not connected or changed.\n\n### 4.2 Exact recovery `OPEN`\n',
+              ),
+              ('```text\nROLLBACK-AUTHORITY-HARDENING\n```\n\nP05 completed the guarded Preview-only Pharmacy private mutation using one already verified Reservation, exact canonical patch, terminal persistence, one durable rollback reference and post-mutation readback. The next implementation is P06 hardening of the existing durable rollback authority. Raw references remain server-only and public/index/sitemap/route promotion stays disabled.\n\nAfter `ROLLBACK-AUTHORITY-HARDENING` is green:',
+               '```text\nROLLBACK-EXACT-RECOVERY\n```\n\nP06 completed atomic server-selected rollback authority consumption and bounded replay using the existing Pharmacy rollback path. The next implementation is P07 exact logical recovery verification. Rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.\n\nAfter `ROLLBACK-EXACT-RECOVERY` is green:'),
+              ('ROLLBACK-EXACT-RECOVERY\n→ ADMIN-STATE-MACHINE', 'ADMIN-STATE-MACHINE'),
+          ])
+
+          replace_exact('docs/project-state/CURRENT_STATE.md', [
+              ('Import-readiness runtime is aligned through PR #954 at baseline commit `9d0511ba6b2ff5a53e8fd857cb09273d269d602d`', f'Import-readiness runtime is aligned through PR #955 at baseline commit `{baseline}`'),
+              ('Completed migration set: `0001` through `0082`.', 'Completed migration set: `0001` through `0084`.'),
+              ('Migration validation is expected through `0082_import_pharmacy_private_execution_audit.sql`.', 'Migration validation is expected through `0084_import_pharmacy_rollback_digest_schema.sql`.'),
+              ('| Aligned through | PR #954 |', '| Aligned through | PR #955 |'),
+              ('| Runtime baseline | `9d0511ba6b2ff5a53e8fd857cb09273d269d602d` |', f'| Runtime baseline | `{baseline}` |'),
+              ('| Current migration | `0082_import_pharmacy_private_execution_audit.sql` |', '| Current migration | `0084_import_pharmacy_rollback_digest_schema.sql` |'),
+              ('| Current next | `ROLLBACK-AUTHORITY-HARDENING` |', '| Current next | `ROLLBACK-EXACT-RECOVERY` |'),
+              ('| 3+ | COMPLETE | PRs #953 and #954; verified Reservation handoff, guarded private mutation, terminal persistence and publish readback proven |\n', '| 3+ | COMPLETE | PRs #953 and #954; verified Reservation handoff, guarded private mutation, terminal persistence and publish readback proven |\n| 4.1 | COMPLETE | PR #955; server-selected atomic rollback authority consumption and bounded replay proven |\n| 4.2 | OPEN | Exact logical recovery verification remains next |\n'),
+              ('Rollback authority hardening and exact recovery remain open.', 'Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. Exact logical recovery remains open.'),
+              ('Database foundations validate through `0082_import_pharmacy_private_execution_audit.sql`.', 'Database foundations validate through `0084_import_pharmacy_rollback_digest_schema.sql`.'),
+              ('A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger and runs the isolated P05 private publish/readback proof.', 'A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression and runs the exact-SHA P06 atomic rollback authority proof.'),
+              ('PRs #936–#954 are the current import-readiness runtime baseline.', 'PRs #936–#955 are the current import-readiness runtime baseline.'),
+              ('Migration validation passes through `0082_import_pharmacy_private_execution_audit.sql`.', 'Migration validation passes through `0084_import_pharmacy_rollback_digest_schema.sql`.'),
+              ('Preview Migration Sync and the isolated P05 private publish/readback proof pass with Production disconnected.', 'Preview Migration Sync, the isolated P05 regression proof and the P06 concurrent rollback authority proof pass with Production disconnected.'),
+          ])
+
+          replace_exact('docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md', [
+              ('Import-readiness runtime is aligned through PR #954 at baseline `9d0511ba6b2ff5a53e8fd857cb09273d269d602d`', f'Import-readiness runtime is aligned through PR #955 at baseline `{baseline}`'),
+              ('Migrations validate through `0082_import_pharmacy_private_execution_audit.sql`.', 'Migrations validate through `0084_import_pharmacy_rollback_digest_schema.sql`.'),
+              ('The current next implementation is `ROLLBACK-AUTHORITY-HARDENING`.', 'The current next implementation is `ROLLBACK-EXACT-RECOVERY`.'),
+              ('| Pharmacy private publish/readback | Completed Preview authority | Phase 4 / Phase 9 | Phase 10 / Phase 11 | Phase 6 / Phase 18 | Single entity, verified Reservation, exact patch, terminal persistence, durable reference and hosted readback; Production and public promotion remain disabled. |\n', '| Pharmacy private publish/readback | Completed Preview authority | Phase 4 / Phase 9 | Phase 10 / Phase 11 | Phase 6 / Phase 18 | Single entity, verified Reservation, exact patch, terminal persistence, durable reference and hosted readback; Production and public promotion remain disabled. |\n| Pharmacy rollback authority | Completed Preview authority | Phase 9 | Phase 11 | Phase 6 / Phase 18 | Server-selected actor/entity/version/snapshot-bound authority, atomic consume-or-abort, bounded replay, zero raw-reference browser custody; exact recovery and UI activation remain gated. |\n'),
+              ('| Migrations through `0082` | Completed', '| Migrations through `0084` | Completed'),
+              ('| Aligned through | PR #954 |', '| Aligned through | PR #955 |'),
+              ('| Runtime baseline | `9d0511ba6b2ff5a53e8fd857cb09273d269d602d` |', f'| Runtime baseline | `{baseline}` |'),
+              ('| Current migration | `0082_import_pharmacy_private_execution_audit.sql` |', '| Current migration | `0084_import_pharmacy_rollback_digest_schema.sql` |'),
+              ('| Current next | `ROLLBACK-AUTHORITY-HARDENING` |', '| Current next | `ROLLBACK-EXACT-RECOVERY` |'),
+              ('| Private Admin wiring and publish readback | Complete | #954 | `ROLLBACK-AUTHORITY-HARDENING` |\n| Exact rollback recovery | Open | — | Wave 4 |', '| Private Admin wiring and publish readback | Complete | #954 | Maintain publish regression |\n| Durable rollback authority | Complete | #955 | `ROLLBACK-EXACT-RECOVERY` |\n| Exact rollback recovery | Open | — | Wave 4.2 |'),
+          ])
+
+          replace_exact('README.md', [
+              ('Import-readiness runtime is aligned through **PR #954** at baseline **`9d0511ba6b2ff5a53e8fd857cb09273d269d602d`**.', f'Import-readiness runtime is aligned through **PR #955** at baseline **`{baseline}`**.'),
+              ('Database/migration status: **validates through `0082_import_pharmacy_private_execution_audit.sql`**.', 'Database/migration status: **validates through `0084_import_pharmacy_rollback_digest_schema.sql`**.'),
+              ('Completed migration set: **`0001` through `0082`**.', 'Completed migration set: **`0001` through `0084`**.'),
+              ('Current import-readiness implementation: **`ROLLBACK-AUTHORITY-HARDENING`**.', 'Current import-readiness implementation: **`ROLLBACK-EXACT-RECOVERY`**.'),
+              ('P05 enables only the guarded Preview Pharmacy `private_publish` path after verified Reservation handoff, exact mutation, terminal persistence, durable-reference creation, and post-mutation readback. Public/index/sitemap/route promotion and Production execution remain disabled.', 'P06 hardens the existing Preview Pharmacy rollback authority with server-selected actor/entity/version/snapshot binding, atomic consume-or-abort, bounded replay and no raw-reference browser custody. Exact recovery, rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.'),
+          ])
+
+          replace_exact('AGENTS.md', [
+              ('Current import-readiness runtime baseline: **PR #954 at `9d0511ba6b2ff5a53e8fd857cb09273d269d602d`**. The current next implementation is **`ROLLBACK-AUTHORITY-HARDENING`**.', f'Current import-readiness runtime baseline: **PR #955 at `{baseline}`**. The current next implementation is **`ROLLBACK-EXACT-RECOVERY`**.'),
+              ('Completed migrations: **`0001` through `0082`**. Migration validation is expected through `0082_import_pharmacy_private_execution_audit.sql`.', 'Completed migrations: **`0001` through `0084`**. Migration validation is expected through `0084_import_pharmacy_rollback_digest_schema.sql`.'),
+              ('and the Preview-only guarded Pharmacy private publish/readback authority.', 'and the Preview-only guarded Pharmacy private publish/readback and atomic rollback-authority foundations.'),
+          ])
+
+          replace_exact('scripts/import/check-import-readiness-state-alignment.mjs', [
+              ('alignedThroughPr: 954', 'alignedThroughPr: 955'),
+              ("runtimeBaseline: '9d0511ba6b2ff5a53e8fd857cb09273d269d602d'", f"runtimeBaseline: '{baseline}'"),
+              ("currentMigration: '0082_import_pharmacy_private_execution_audit.sql'", "currentMigration: '0084_import_pharmacy_rollback_digest_schema.sql'"),
+              ("currentNext: 'ROLLBACK-AUTHORITY-HARDENING'", "currentNext: 'ROLLBACK-EXACT-RECOVERY'"),
+              ("    '3+': 'COMPLETE',\n", "    '3+': 'COMPLETE',\n    '4.1': 'COMPLETE',\n    '4.2': 'OPEN',\n"),
+              ("const wavePattern = /^Wave\\s+(0|1|2\\.1|2\\.2|3\\+)\\s+(COMPLETE|PARTIAL|OPEN)\\b/gm;", "const wavePattern = /^Wave\\s+(0|1|2\\.1|2\\.2|3\\+|4\\.1|4\\.2)\\s+(COMPLETE|PARTIAL|OPEN)\\b/gm;"),
+              ("    'Private Admin wiring and publish readback': ['Complete', '#954'],\n    'Exact rollback recovery': ['Open', '—'],", "    'Private Admin wiring and publish readback': ['Complete', '#954'],\n    'Durable rollback authority': ['Complete', '#955'],\n    'Exact rollback recovery': ['Open', '—'],"),
+              ("    '`0001` through `0082`',", "    '`0001` through `0084`',"),
+          ])
+          PY
+          node scripts/import/check-import-readiness-state-alignment.mjs
+      - name: Commit state alignment and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/p06-align-state.yml
+          git add AGENTS.md README.md docs/import/import-readiness-roadmap-after-933.md docs/project-state/CURRENT_STATE.md docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md scripts/import/check-import-readiness-state-alignment.mjs
+          git commit -m "docs(p06): align rollback authority completion"
+          git push origin HEAD:agent/rollback-authority-hardening-p06
