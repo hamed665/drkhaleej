@@ -22,7 +22,7 @@ for (const token of [
   'input.entityIds.length !== 1',
   'input.family !== "pharmacy"',
   'input.environment !== "preview"',
-  '"PUBLISH PRIVATE PHARMACY"',
+  'input.confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`',
   '"ROLLBACK PRIVATE PHARMACY"',
   'review_required',
   'publish_reference_required',
@@ -50,6 +50,7 @@ for (const forbidden of [
   'sitemapEligible: true',
   'routeEnabled: true',
   'Promise.all(input.entityIds',
+  '"PUBLISH PRIVATE PHARMACY"',
 ]) {
   assert(!workflow.includes(forbidden), `${workflowPath} must not include ${forbidden}`);
 }
