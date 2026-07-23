@@ -96,7 +96,11 @@ for (const token of [
   'rawIdsEmitted: false',
   'rawPayloadsEmitted: false',
   'databaseUrlEmitted: false',
-  'reservationCreatedAuditImplemented: false',
+  'reservationCreatedAuditImplemented: true',
+  "const reservationAuditSchemaVersion = 'drkhaleej.import.publishAudit.v2'",
+  'normalizedDefinition.includes(token.toLowerCase())',
+  "a.event_type = 'reservation_created'",
+  'audit_contract_mismatches',
 ]) {
   assert(runner.includes(token), `${files.runner} must include ${token}.`);
 }
@@ -139,6 +143,8 @@ for (const token of [
   'import_publish_rollback_snapshots',
   'import_publish_audit_events',
   "set status = 'consumed'",
+  "'reservation_created'",
+  'drkhaleej.import.publishAudit.v2',
 ]) {
   assert(faultSql.toLowerCase().includes(token.toLowerCase()), `${files.faultSql} must include ${token}.`);
 }
@@ -148,26 +154,34 @@ for (const forbidden of [
   'grant execute',
   'alter table',
   'create policy',
-  'reservation_created',
 ]) {
   assert(!faultSql.toLowerCase().includes(forbidden), `${files.faultSql} must not include ${forbidden}.`);
 }
 
 for (const token of [
-  'P03_PREVIEW_DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}',
-  'P03_PREVIEW_PROJECT_REF: ${{ secrets.P03_PREVIEW_PROJECT_REF }}',
-  'P03_PRODUCTION_PROJECT_REF: ${{ secrets.P03_PRODUCTION_PROJECT_REF }}',
+  'P03_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}',
+  'P03_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}',
+  'P03_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}',
   'P03_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}',
   'P03_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}',
   'ref: ${{ github.event.pull_request.head.sha || github.sha }}',
   'pnpm install --frozen-lockfile',
   'pnpm import:reservation-db-safety:validate',
   'pnpm test:db:reservation-safety',
+  'if: always()',
+  'artifacts/p03/hosted-proof.log',
   'if-no-files-found: error',
 ]) {
   assert(workflow.includes(token), `${files.workflow} must include ${token}.`);
 }
-for (const forbidden of ['continue-on-error: true', 'environment: production', 'P03_PREVIEW_DATABASE_URL: postgres']) {
+for (const forbidden of [
+  'continue-on-error: true',
+  'environment: production',
+  'P03_PREVIEW_DATABASE_URL: postgres',
+  'secrets.P03_PREVIEW_DATABASE_URL',
+  'secrets.P03_PREVIEW_PROJECT_REF',
+  'secrets.P03_PRODUCTION_PROJECT_REF',
+]) {
   assert(!workflow.toLowerCase().includes(forbidden.toLowerCase()), `${files.workflow} must not include ${forbidden}.`);
 }
 

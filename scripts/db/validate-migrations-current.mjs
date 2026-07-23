@@ -37,6 +37,7 @@ const pharmacyAuthorizationV2MigrationName = '0077_import_pharmacy_authorization
 const pharmacyAuthorizationLifecycleMigrationName = '0078_import_pharmacy_authorization_invalidation_readback.sql';
 const pharmacyAtomicAuthorizationMigrationName = '0079_import_pharmacy_atomic_authorization_reservation.sql';
 const pharmacyReadStateUpsertIdentityMigrationName = '0080_import_pharmacy_read_state_upsert_identity.sql';
+const pharmacyReservationAuditSplitMigrationName = '0081_import_pharmacy_reservation_audit_split.sql';
 const scheduleRlsMigrationPath = path.join(migrationsDir, scheduleRlsMigrationName);
 const functionSearchPathMigrationPath = path.join(migrationsDir, functionSearchPathMigrationName);
 const helperSearchPathMigrationPath = path.join(migrationsDir, helperSearchPathMigrationName);
@@ -53,6 +54,7 @@ const pharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, pharmacyAu
 const pharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, pharmacyAuthorizationLifecycleMigrationName);
 const pharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, pharmacyAtomicAuthorizationMigrationName);
 const pharmacyReadStateUpsertIdentityMigrationPath = path.join(migrationsDir, pharmacyReadStateUpsertIdentityMigrationName);
+const pharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, pharmacyReservationAuditSplitMigrationName);
 const hiddenScheduleRlsMigrationPath = path.join(migrationsDir, `.schedule-rls-${scheduleRlsMigrationName}.hidden`);
 const hiddenFunctionSearchPathMigrationPath = path.join(migrationsDir, `.function-search-path-${functionSearchPathMigrationName}.hidden`);
 const hiddenHelperSearchPathMigrationPath = path.join(migrationsDir, `.helper-search-path-${helperSearchPathMigrationName}.hidden`);
@@ -69,6 +71,7 @@ const hiddenPharmacyAuthorizationV2MigrationPath = path.join(migrationsDir, `.ph
 const hiddenPharmacyAuthorizationLifecycleMigrationPath = path.join(migrationsDir, `.pharmacy-authorization-lifecycle-${pharmacyAuthorizationLifecycleMigrationName}.hidden`);
 const hiddenPharmacyAtomicAuthorizationMigrationPath = path.join(migrationsDir, `.pharmacy-atomic-authorization-${pharmacyAtomicAuthorizationMigrationName}.hidden`);
 const hiddenPharmacyReadStateUpsertIdentityMigrationPath = path.join(migrationsDir, `.pharmacy-read-state-upsert-${pharmacyReadStateUpsertIdentityMigrationName}.hidden`);
+const hiddenPharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, `.pharmacy-reservation-audit-split-${pharmacyReservationAuditSplitMigrationName}.hidden`);
 
 const currentOnlyMigrations = [
   [scheduleRlsMigrationName, scheduleRlsMigrationPath, hiddenScheduleRlsMigrationPath],
@@ -87,6 +90,7 @@ const currentOnlyMigrations = [
   [pharmacyAuthorizationLifecycleMigrationName, pharmacyAuthorizationLifecycleMigrationPath, hiddenPharmacyAuthorizationLifecycleMigrationPath],
   [pharmacyAtomicAuthorizationMigrationName, pharmacyAtomicAuthorizationMigrationPath, hiddenPharmacyAtomicAuthorizationMigrationPath],
   [pharmacyReadStateUpsertIdentityMigrationName, pharmacyReadStateUpsertIdentityMigrationPath, hiddenPharmacyReadStateUpsertIdentityMigrationPath],
+  [pharmacyReservationAuditSplitMigrationName, pharmacyReservationAuditSplitMigrationPath, hiddenPharmacyReservationAuditSplitMigrationPath],
 ];
 
 function fail(message) {
@@ -232,6 +236,30 @@ function validatePharmacyReadStateUpsertIdentityMigration() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacyReservationAuditSplitMigration() {
+  requireCondition(existsSync(pharmacyReservationAuditSplitMigrationPath), `${pharmacyReservationAuditSplitMigrationName} is missing.`);
+  const content = readFileSync(pharmacyReservationAuditSplitMigrationPath, 'utf8');
+  for (const [pattern, message] of [
+    [/P04-A RESERVATION-AUDIT-SPLIT/i, '0081 must include its phase marker.'],
+    [/add\s+constraint\s+import_publish_audit_event_type_check[\s\S]*'reservation_created'/i, '0081 must admit reservation_created in the audit event constraint.'],
+    [/validate\s+constraint\s+import_publish_audit_event_type_check/i, '0081 must validate the replacement audit event constraint.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_publish_reserve_snapshot_audit/i, '0081 must replace the canonical reservation RPC.'],
+    [/p_audit_schema_version\s+is\s+distinct\s+from\s+'drkhaleej\.import\.publishAudit\.v2'/i, '0081 must require the exact v2 reservation audit schema.'],
+    [/'reservation_created'\s*,\s*'pending'\s*,\s*p_audit_schema_version/i, '0081 must write reservation_created for new reservations.'],
+    [/event_type\s*=\s*'execution_started'[\s\S]*schema_version\s*<>\s*'drkhaleej\.import\.publishAudit\.v2'/i, '0081 must keep legacy reservation replay compatibility without admitting the v2/legacy pairing.'],
+    [/event_payload\s*->>\s*'phase'\s*=\s*'reservation'/i, '0081 legacy replay must remain reservation-phase bounded.'],
+    [/security\s+invoker/i, '0081 RPC must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0081 RPC must pin search_path.'],
+    [/revoke\s+all\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0081 must revoke RPC access from public roles.'],
+    [/grant\s+execute\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*to\s+service_role/i, '0081 must grant the RPC only to service_role.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0081 must not add public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0081 must not grant public execution.'],
+    [/'execution_started'\s*,\s*'pending'\s*,\s*p_audit_schema_version/i, '0081 must not write the legacy execution_started reservation event.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [migrationName, migrationPath, hiddenMigrationPath] of currentOnlyMigrations) {
     requireCondition(existsSync(migrationPath), `${migrationName} is missing before legacy validation.`);
@@ -268,5 +296,6 @@ validatePharmacyAuthorizationV2Migration();
 validatePharmacyAuthorizationLifecycleMigration();
 validatePharmacyAtomicAuthorizationMigration();
 validatePharmacyReadStateUpsertIdentityMigration();
+validatePharmacyReservationAuditSplitMigration();
 
 console.log('Current migration validation passed.');

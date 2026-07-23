@@ -5,6 +5,7 @@ vi.mock("server-only", () => ({}));
 import { buildPharmacyAdminBoundedReadState, PHARMACY_ADMIN_DIFF_FIELDS, type PharmacyAdminBoundedValue, type PharmacyAdminDiffField } from "./import-pharmacy-admin-bounded-read-state";
 import { runPharmacyAdminReservationOperation } from "./import-pharmacy-admin-reservation-operation";
 import type { PharmacyPrivateAdminPublishContext } from "./import-pharmacy-private-admin-real-wiring";
+import { IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION } from "./import-reservation-audit-contract";
 
 const current = Object.fromEntries(PHARMACY_ADMIN_DIFF_FIELDS.map((field) => [field, null])) as Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>;
 Object.assign(current, {
@@ -42,7 +43,7 @@ const context = {
       requestHash: "c".repeat(64),
       expectedVersion: review.expectedEntityVersion,
       rollbackSnapshot: { visibility: "private", indexPolicy: "noindex", sitemapPolicy: "excluded", publishStatus: "private_published", publicReady: false, projectionVersion: "1", canonicalRoute: "/en/om/pharmacies/pharmacy-1" },
-      auditSchemaVersion: "1",
+      auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
       reservationExpiresAt: "2026-07-15T00:00:00.000Z",
       rollbackExpiresAt: "2026-08-13T00:00:00.000Z",
     },
@@ -104,7 +105,9 @@ function dependencies(result: { kind: "reserved"; reservationId: string; rollbac
       readAuditRows: vi.fn(async () => ({ data: [{
         id: result.auditEventId, entity_id: review.entityId, actor_profile_id: review.actorId,
         idempotency_record_id: result.reservationId, rollback_snapshot_id: result.rollbackSnapshotId,
-        event_type: "execution_started" as const, outcome: "pending", expected_version: review.expectedEntityVersion,
+        event_type: "reservation_created" as const, outcome: "pending",
+        schema_version: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
+        expected_version: review.expectedEntityVersion,
         phase: "reservation", request_hash: review.requestHash, authorization_id: authorization.authorizationId,
         review_snapshot_hash: review.snapshotHash, entity_fingerprint: review.entityFingerprint,
         operation_attempt_id: review.operationAttemptId, patch_hash: review.patchHash,
@@ -129,9 +132,9 @@ describe("Pharmacy Admin reservation operation", () => {
     });
     expect(result).toEqual({
       reserved: true, replayed: false, integrityVerified: true,
-      integrityCounts: { authorization: 1, idempotency: 1, rollbackSnapshot: 1, reservationAudit: 1, executionStartedAudit: 1, reservationCreatedAudit: 0, entityFingerprint: 1 },
+      integrityCounts: { authorization: 1, idempotency: 1, rollbackSnapshot: 1, reservationAudit: 1, executionStartedAudit: 0, reservationCreatedAudit: 1, entityFingerprint: 1 },
       integrityFindings: { duplicateCount: 0, orphanCount: 0, auditGapCount: 0 },
-      auditSignature: "execution_started", entityMutated: false, publicVisibility: "private",
+      auditSignature: "reservation_created", entityMutated: false, publicVisibility: "private",
       indexEligible: false, sitemapEligible: false, routeEnabled: false, blocker: null,
     });
     expect(deps.persistenceAdapter.runReservationSnapshotAuditTransaction).toHaveBeenCalledWith(expect.objectContaining({

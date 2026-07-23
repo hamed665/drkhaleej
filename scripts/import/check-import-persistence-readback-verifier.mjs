@@ -48,6 +48,7 @@ for (const blocker of [
   'idempotency_identity_mismatch',
   'rollback_linkage_mismatch',
   'audit_linkage_mismatch',
+  'audit_schema_version_mismatch',
   'entity_changed',
 ]) {
   assert(source.includes(blocker), `${sourcePath} must include blocker ${blocker}.`);
@@ -90,7 +91,8 @@ for (const token of [
   'exactly one linked row in each persistence table',
   'duplicate idempotency rows',
   'entity fingerprint changed',
-  'future reservation audit signature',
+  'current reservation audit signature with the bumped schema version',
+  'incompatible event and schema pairing',
   'authorization orphan',
 ]) {
   assert(test.includes(token), `${testPath} must include ${token}.`);

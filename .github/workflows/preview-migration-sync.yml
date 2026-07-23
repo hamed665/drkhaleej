@@ -8,6 +8,7 @@ on:
       - 'supabase/migrations/**'
       - 'scripts/db/preview-migration-sync.mjs'
       - 'scripts/db/run-preview-migration-sync.mjs'
+      - 'scripts/import/check-preview-database-url.mjs'
       - '.github/workflows/preview-migration-sync.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'

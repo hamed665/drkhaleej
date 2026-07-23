@@ -2,9 +2,9 @@
 
 Program `v1.2.2` · phase `P03` · execution phase `2` · lock scope `3` · product module `2`.
 
-This phase proves the existing Pharmacy reservation transaction against an isolated real Supabase Preview database. It adds test infrastructure only. It does not add a runtime failpoint, change the canonical RPC, mutate a Pharmacy, publish or roll back an entity, or enable a route, index, sitemap, bulk, or public capability.
+P03 established test infrastructure only for proving the Pharmacy reservation transaction against an isolated real Supabase Preview database. P04-A retains that harness and requires it to prove the updated canonical RPC. The harness does not add a runtime failpoint, mutate a Pharmacy, publish or roll back an entity, or enable a route, index, sitemap, bulk, or public capability.
 
-`reservation_created` belongs to P04-A and is deliberately not implemented or claimed here. The current reservation audit remains `execution_started` with reservation phase.
+P04-A introduces `reservation_created` for new reservation writes with schema `drkhaleej.import.publishAudit.v2`. Legacy `execution_started` records with reservation phase remain reader-compatible; new reservation writes must not use that legacy event.
 
 ## Fail-closed prerequisites
 
@@ -70,7 +70,8 @@ The hosted artifact must be anchored to the exact reviewed commit and show:
 - replay, conflict, two-client lock wait, and one-created/one-replayed results;
 - all four forced aborts rolled back with authorization still issued;
 - duplicates, orphans, audit gaps, incomplete rows, and entity mutation equal to zero;
-- route, index, sitemap, publish, rollback, and `reservation_created` implementation equal to false;
+- route, index, sitemap, publish, and rollback implementation equal to false;
+- `reservation_created` implementation equal to true with the exact v2 audit schema;
 - cleanup remaining rows equal to zero;
 - secret, raw ID, raw payload, and database URL redaction equal to true.
 

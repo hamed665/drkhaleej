@@ -10,23 +10,23 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 946,
-  runtimeBaseline: '6c873b9b7cc5ee93e36969feca7d223b16b9bcde',
-  lastAligned: '2026-07-18',
-  currentMigration: '0080_import_pharmacy_read_state_upsert_identity.sql',
-  currentNext: 'RES-DB-SAFETY-PROOF',
+  alignedThroughPr: 950,
+  runtimeBaseline: '23198c95295f72d97c650832ee4755e33b80f2dd',
+  lastAligned: '2026-07-22',
+  currentMigration: '0081_import_pharmacy_reservation_audit_split.sql',
+  currentNext: 'VERIFIED-RESERVATION-HANDOFF',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
-    '2.1': 'PARTIAL',
+    '2.1': 'COMPLETE',
     '2.2': 'COMPLETE',
     '3+': 'OPEN',
   },
   currentReservationAudit: {
-    eventType: 'execution_started',
+    eventType: 'reservation_created',
     phase: 'reservation',
   },
-  reservationCreatedImplemented: false,
+  reservationCreatedImplemented: true,
 };
 
 function parseRootArgument(argv) {
@@ -220,9 +220,11 @@ function validateMatrix(source, manifest) {
     'Stable operation identity': ['Complete', '#939'],
     'Persisted authorization': ['Complete', '#940'],
     'Invalidation/readback': ['Complete', '#941'],
-    'Atomic reservation transaction': ['Implemented/partial wave', '#942'],
+    'Atomic reservation transaction': ['Complete', '#942, #949'],
     'Admin reserve operation': ['Complete', '#943'],
     'Reservation integrity proof': ['Complete', '#946'],
+    'Reservation DB safety proof': ['Complete', '#949'],
+    'Reservation audit split': ['Complete', '#950'],
     'Existing private executor handoff': ['Open', '—'],
     'Exact rollback recovery': ['Open', '—'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
@@ -243,7 +245,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    `\`0001\` through \`0080\``,
+    `\`0001\` through \`0081\``,
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

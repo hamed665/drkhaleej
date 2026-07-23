@@ -15,7 +15,7 @@ This is the authoritative wave status. It must be updated in the same PR that co
 ```text
 Wave 0     COMPLETE  (#936–#939) Client-boundary authorization removal, canonical patch, metadata/locale, stable operation identity
 Wave 1     COMPLETE  (#940–#941) Server-owned authorization persistence, invalidation, bounded readback
-Wave 2.1   PARTIAL   (#942)      Atomic authorization/reservation complete; reservation audit-event separation open
+Wave 2.1   COMPLETE  (#942, #949, #950) Atomic reservation, hosted DB safety, and reservation audit-event separation complete
 Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-linked integrity readback proven
 Wave 3+    OPEN
 ```
@@ -23,9 +23,9 @@ Wave 3+    OPEN
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #946
-Baseline commit: 6c873b9
-Last aligned: 2026-07-18
+Aligned through: PR #950
+Baseline commit: 23198c9
+Last aligned: 2026-07-22
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -33,23 +33,23 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 946,
-  "runtimeBaseline": "6c873b9b7cc5ee93e36969feca7d223b16b9bcde",
-  "lastAligned": "2026-07-18",
-  "currentMigration": "0080_import_pharmacy_read_state_upsert_identity.sql",
-  "currentNext": "RES-DB-SAFETY-PROOF",
+  "alignedThroughPr": 950,
+  "runtimeBaseline": "23198c95295f72d97c650832ee4755e33b80f2dd",
+  "lastAligned": "2026-07-22",
+  "currentMigration": "0081_import_pharmacy_reservation_audit_split.sql",
+  "currentNext": "VERIFIED-RESERVATION-HANDOFF",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
-    "2.1": "PARTIAL",
+    "2.1": "COMPLETE",
     "2.2": "COMPLETE",
     "3+": "OPEN"
   },
   "currentReservationAudit": {
-    "eventType": "execution_started",
+    "eventType": "reservation_created",
     "phase": "reservation"
   },
-  "reservationCreatedImplemented": false
+  "reservationCreatedImplemented": true
 }
 ```
 
@@ -135,9 +135,9 @@ No persisted claimed state is introduced.
 - Fingerprint/version/hash/expiry/scope changes invalidate old authorization.
 - UI receives bounded status only.
 
-## Wave 2 — Atomic reservation `PARTIAL`
+## Wave 2 — Atomic reservation `COMPLETE`
 
-### 2.1 Atomic authorization/reservation `PARTIAL (#942)`
+### 2.1 Atomic authorization/reservation `COMPLETE (#942, #949, #950)`
 
 Migration 0079 atomically:
 
@@ -152,14 +152,17 @@ Migration 0079 atomically:
 
 Any failure must leave zero reservation, snapshot and audit writes, an unconsumed authorization, and an unchanged entity.
 
-The atomic transaction is implemented. Audit-event separation is not complete: migration 0079 currently writes the backward-compatible signature:
+Migration 0079 established the transaction. PR #949 then proved replay, conflict, two-client locking, four forced-abort boundaries, cleanup, and zero partial writes against an isolated Preview database.
+
+Migration 0081 completes audit-event separation. New reservation writes now use:
 
 ```text
-event_type = execution_started
+event_type = reservation_created
 event_payload.phase = reservation
+schema_version = drkhaleej.import.publishAudit.v2
 ```
 
-`reservation_created` must be introduced during the Reservation→Execution handoff in Wave 3, with reader compatibility retained.
+Legacy `execution_started + phase=reservation` rows remain replay/readback-compatible with their prior schema versions. New reservations reject an incompatible event/schema pairing. `execution_started` is reserved for the real mutation boundary; the runtime handoff remains independently gated in P04-B.
 
 ### 2.2 Admin reservation and readback `COMPLETE (#943, #946)`
 
@@ -180,7 +183,7 @@ The bounded operation is merged. `RES-INTEGRITY-READBACK` proved:
 - no duplicate, orphan or audit gap;
 - no entity mutation.
 
-The verifier must recognize the current `execution_started + phase=reservation` signature and remain compatible with future `reservation_created`.
+The verifier recognizes both legacy `execution_started + phase=reservation` rows and current `reservation_created + v2` rows, and fails closed on incompatible pairings.
 
 PR #946 delivered the server-only verifier, focused tests and isolated Preview database evidence without invoking Publish or Rollback. The evidence recorded one authorization, reservation, snapshot, reservation audit, current audit and entity row; zero duplicates, orphans and audit gaps; and an unchanged entity with route, index and sitemap disabled.
 
@@ -190,9 +193,9 @@ PR #947 separately established independent code ownership. The active `main-prot
 
 ### 3.1 Reservation→Execution gate
 
-- Introduce `reservation_created` for new reservation writes.
-- Keep old audit readers compatible.
-- Reserve `execution_started` for real mutation time.
+- Consume the already-implemented `reservation_created` reservation audit contract.
+- Preserve old audit reader compatibility.
+- Append `execution_started` only at real mutation time.
 - Resolve and consume the already-verified Admin Reservation.
 - Do not create a second Reservation inside private publish.
 
@@ -335,16 +338,15 @@ Do not add:
 ## Current next implementation
 
 ```text
-RES-DB-SAFETY-PROOF
+VERIFIED-RESERVATION-HANDOFF
 ```
 
-Repository-state alignment records the completed authorization-linked reservation integrity proof. The next runtime implementation is isolated real-database safety proof for replay, conflict, concurrency, row locks and rollback at every write boundary. It must remain test-only, use no Production database, and introduce no runtime failpoint.
+P03 proved the atomic reservation transaction on an isolated Preview database. P04-A then introduced the v2 `reservation_created` audit contract without activating mutation. The next implementation is the independent P04-B server-only handoff from the already-verified Reservation to the existing private executor. It must not create a second Reservation.
 
-After `RES-DB-SAFETY-PROOF` is green:
+After `VERIFIED-RESERVATION-HANDOFF` is green:
 
 ```text
-PRIVATE-RESERVATION-GATE
-→ PRIVATE-ADMIN-WIRING
+PRIVATE-ADMIN-WIRING
 → ROLLBACK-AUTHORITY-HARDENING
 → ROLLBACK-EXACT-RECOVERY
 → ADMIN-STATE-MACHINE

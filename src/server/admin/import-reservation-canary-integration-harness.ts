@@ -1,5 +1,7 @@
 import "server-only";
 
+import { IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION } from "./import-reservation-audit-contract";
+
 import {
   createImportSupabasePublishPersistenceAdapter,
   type ImportSupabaseRpcClient,
@@ -42,7 +44,7 @@ const BASE_REQUEST: ImportPublishPersistenceTransactionRequest = {
     projectionVersion: "projection-001",
     canonicalRoute: "/en/doctors/canary-provider",
   },
-  auditSchemaVersion: "drkhaleej.import.publishAudit.v1",
+  auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
   reservationExpiresAt: "2099-01-02T00:00:00.000Z",
   rollbackExpiresAt: "2099-03-01T00:00:00.000Z",
 };

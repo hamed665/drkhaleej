@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #946 at baseline `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` (last aligned 2026-07-18).
-- Migrations validate through `0080_import_pharmacy_read_state_upsert_identity.sql`.
-- The current next implementation is `RES-DB-SAFETY-PROOF`.
+- Import-readiness runtime is aligned through PR #950 at baseline `23198c95295f72d97c650832ee4755e33b80f2dd` (last aligned 2026-07-22).
+- Migrations validate through `0081_import_pharmacy_reservation_audit_split.sql`.
+- The current next implementation is `VERIFIED-RESERVATION-HANDOFF`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, and admin commercial add-on assignment shell.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
 - Article pages are still static shell pages only.
@@ -89,7 +89,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Draft center creation from lead | Completed admin baseline | Phase 4 / Phase 5 | Phase 5 / Phase 6 | Phase 5 / Phase 6 | Uses `note_added` with `event_kind: draft_center_created`. |
 | Center subscription view/assignment | Completed foundation | Phase 6 | Phase 9 / Phase 5 | Phase 7 / Phase 15 | Admin assignment only. |
 | Commercial add-on assignment shell | Completed draft/internal shell | Phase 6 | Phase 8 / Phase 5 | Phase 15 | Homepage Ads and Special Offer Placement only. |
-| Migrations through `0080` | Completed | Phase 2 | Phase 2 / Phase 3 | Phase 1 / Phase 2 | Existing SQL migrations must not be modified unless approved. |
+| Migrations through `0081` | Completed | Phase 2 | Phase 2 / Phase 3 | Phase 1 / Phase 2 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -103,11 +103,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #946 |
-| Runtime baseline | `6c873b9b7cc5ee93e36969feca7d223b16b9bcde` |
-| Last aligned | `2026-07-18` |
-| Current migration | `0080_import_pharmacy_read_state_upsert_identity.sql` |
-| Current next | `RES-DB-SAFETY-PROOF` |
+| Aligned through | PR #950 |
+| Runtime baseline | `23198c95295f72d97c650832ee4755e33b80f2dd` |
+| Last aligned | `2026-07-22` |
+| Current migration | `0081_import_pharmacy_reservation_audit_split.sql` |
+| Current next | `VERIFIED-RESERVATION-HANDOFF` |
 
 ## Import readiness capability mapping
 
@@ -121,16 +121,18 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Stable operation identity | Complete | #939 | Replay proof |
 | Persisted authorization | Complete | #940 | Lifecycle regression |
 | Invalidation/readback | Complete | #941 | Bounded UI regression |
-| Atomic reservation transaction | Implemented/partial wave | #942 | DB safety proof and audit split |
+| Atomic reservation transaction | Complete | #942, #949 | Maintain transaction regression |
 | Admin reserve operation | Complete | #943 | Maintain bounded operation regression |
-| Reservation integrity proof | Complete | #946 | `RES-DB-SAFETY-PROOF` |
-| Existing private executor handoff | Open | — | `PRIVATE-RESERVATION-GATE` |
+| Reservation integrity proof | Complete | #946 | Maintain readback regression |
+| Reservation DB safety proof | Complete | #949 | Maintain hosted proof |
+| Reservation audit split | Complete | #950 | `VERIFIED-RESERVATION-HANDOFF` |
+| Existing private executor handoff | Open | — | `VERIFIED-RESERVATION-HANDOFF` |
 | Exact rollback recovery | Open | — | Wave 4 |
 | Pharmacy public/index/sitemap | Disabled/Open | — | After Admin canary |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
-The current reservation audit signature is `event_type=execution_started` with `event_payload.phase=reservation`; `reservation_created` is not implemented.
+The current reservation audit signature is `event_type=reservation_created`, `event_payload.phase=reservation`, and `schema_version=drkhaleej.import.publishAudit.v2`; legacy reservation-phase `execution_started` rows remain compatible only with prior schema versions.
 
 ## Immediate task mapping
 
@@ -139,7 +141,8 @@ The current reservation audit signature is `event_type=execution_started` with `
 | `ALIGN-CURRENT-STATE` | Phase 9 | Phase 10 | Phase 6 |
 | `RES-INTEGRITY-READBACK` | Phase 9 | Phase 10 | Phase 6 |
 | `RES-DB-SAFETY-PROOF` | Phase 2 | Phase 3 | Phase 2 |
-| `PRIVATE-RESERVATION-GATE` | Phase 2 | Phase 10 | Phase 6 |
+| `RESERVATION-AUDIT-SPLIT` | Phase 2 | Phase 3 | Phase 2 |
+| `VERIFIED-RESERVATION-HANDOFF` | Phase 2 | Phase 10 | Phase 6 |
 | `PRIVATE-ADMIN-WIRING` | Phase 4 | Phase 10 | Phase 6 |
 | `ROLLBACK-AUTHORITY-HARDENING` | Phase 9 | Phase 11 | Phase 6 |
 | `ROLLBACK-EXACT-RECOVERY` | Phase 9 | Phase 11 | Phase 18 |

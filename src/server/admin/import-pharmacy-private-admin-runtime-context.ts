@@ -1,5 +1,7 @@
 import "server-only";
 
+import { IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION } from "./import-reservation-audit-contract";
+
 import { createHash, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
@@ -275,7 +277,7 @@ export async function loadPharmacyPrivateAdminRuntimeContext(
           requestHash,
           expectedVersion: center.updated_at,
           rollbackSnapshot,
-          auditSchemaVersion: "1",
+          auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION,
           reservationExpiresAt: addMilliseconds(now, 24 * 60 * 60 * 1000),
           rollbackExpiresAt: addMilliseconds(now, 30 * 24 * 60 * 60 * 1000),
         },

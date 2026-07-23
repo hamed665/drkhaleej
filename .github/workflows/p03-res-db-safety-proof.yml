@@ -6,13 +6,20 @@ on:
       - "scripts/import/run-p03-reservation-db-safety.mjs"
       - "scripts/import/check-import-reservation-db-safety-proof.mjs"
       - "scripts/import/test-import-reservation-db-safety-proof.mjs"
+      - "scripts/import/check-preview-database-url.mjs"
+      - "scripts/import/check-import-reservation-audit-split.mjs"
       - "scripts/import/check-import-publish-readiness-audit.mjs"
       - "scripts/import/sql/p03-reservation-fault-injection.sql"
       - "docs/import/RES_DB_SAFETY_PROOF.md"
+      - "src/server/admin/import-reservation-audit-contract.ts"
+      - "src/server/admin/import-persistence-readback-verifier.ts"
+      - "src/server/admin/import-supabase-persistence-readback-client.ts"
+      - "src/server/admin/import-pharmacy-private-admin-runtime-context.ts"
       - "supabase/migrations/**"
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/p03-res-db-safety-proof.yml"
+      - ".github/workflows/preview-migration-sync.yml"
   workflow_dispatch:
 
 permissions:
@@ -27,9 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      P03_PREVIEW_DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}
-      P03_PREVIEW_PROJECT_REF: ${{ secrets.P03_PREVIEW_PROJECT_REF }}
-      P03_PRODUCTION_PROJECT_REF: ${{ secrets.P03_PRODUCTION_PROJECT_REF }}
+      P03_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+      P03_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+      P03_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
       P03_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       P03_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
       P03_EVIDENCE_PATH: artifacts/p03/res-db-safety-proof.json
@@ -54,16 +61,35 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate isolated Preview connection contract
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p03
+          {
+            node scripts/import/check-preview-database-url.mjs --self-test
+            node scripts/import/check-preview-database-url.mjs
+          } 2>&1 | tee artifacts/p03/hosted-proof.log
+
       - name: Validate fail-closed P03 contract
         run: pnpm import:reservation-db-safety:validate
 
-      - name: Run isolated Preview transaction proof
-        run: pnpm test:db:reservation-safety
+      - name: Validate P04-A reservation audit split
+        run: pnpm import:reservation-audit-split:validate
 
-      - name: Upload redacted P03 evidence
+      - name: Run isolated Preview transaction proof
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm test:db:reservation-safety 2>&1 | tee -a artifacts/p03/hosted-proof.log
+
+      - name: Upload redacted P03 evidence and diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: p03-res-db-safety-${{ github.event.pull_request.head.sha || github.sha }}
-          path: artifacts/p03/res-db-safety-proof.json
+          path: |
+            artifacts/p03/res-db-safety-proof.json
+            artifacts/p03/hosted-proof.log
           if-no-files-found: error
           retention-days: 14

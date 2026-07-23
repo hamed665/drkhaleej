@@ -1,8 +1,19 @@
--- P03 RES-DB-SAFETY-PROOF
--- Test-only, session-local fault wrapper. pg_temp guarantees that this function
--- disappears when the database client disconnects. It must never be migrated.
+-- P04-A RESERVATION-AUDIT-SPLIT: separate durable reservation creation from mutation start.
+-- No runtime handoff, entity mutation, route, index, sitemap, or public capability is enabled here.
 
-create or replace function pg_temp.p03_import_publish_reserve_snapshot_audit_fault(
+alter table public.import_publish_audit_events
+  drop constraint if exists import_publish_audit_event_type_check;
+
+alter table public.import_publish_audit_events
+  add constraint import_publish_audit_event_type_check check (event_type in (
+    'dry_run_reviewed','reservation_created','execution_started','execution_succeeded','execution_failed',
+    'rollback_started','rollback_succeeded','rollback_failed'
+  )) not valid;
+
+alter table public.import_publish_audit_events
+  validate constraint import_publish_audit_event_type_check;
+
+create or replace function public.import_publish_reserve_snapshot_audit(
   p_entity_id uuid,
   p_actor_profile_id uuid,
   p_idempotency_key text,
@@ -18,7 +29,6 @@ create or replace function pg_temp.p03_import_publish_reserve_snapshot_audit_fau
   p_patch_hash text,
   p_entity_family text,
   p_operation_scope text,
-  p_fail_after text,
   p_reservation_ttl_hours integer default 168,
   p_rollback_retention_days integer default 365
 )
@@ -29,21 +39,13 @@ set search_path = pg_catalog, public
 as $$
 declare
   v_authorization public.import_pharmacy_publish_authorizations%rowtype;
+  v_existing public.import_publish_idempotency_records%rowtype;
   v_idempotency_id uuid;
   v_snapshot_id uuid;
   v_audit_id uuid;
   v_created_at timestamptz := clock_timestamp();
   v_updated_count integer;
 begin
-  if p_fail_after not in (
-    'reservation_insert',
-    'snapshot_insert',
-    'audit_insert',
-    'authorization_update'
-  ) then
-    raise exception 'p03_fault_boundary_invalid' using errcode = '22023';
-  end if;
-
   if p_entity_id is null or p_actor_profile_id is null or p_authorization_id is null then
     raise exception 'reservation_identity_missing' using errcode = '22023';
   end if;
@@ -85,8 +87,9 @@ begin
   for update;
 
   if not found then
-    raise exception 'authorization_not_found' using errcode = 'P0001';
+    return jsonb_build_object('status', 'conflict', 'reason', 'authorization_not_found');
   end if;
+
   if v_authorization.actor_profile_id <> p_actor_profile_id
     or v_authorization.entity_id <> p_entity_id
     or v_authorization.review_snapshot_hash <> p_review_snapshot_hash
@@ -98,28 +101,97 @@ begin
     or v_authorization.expected_entity_version <> p_expected_version
     or v_authorization.entity_family <> p_entity_family
     or v_authorization.operation_scope <> p_operation_scope then
-    raise exception 'authorization_identity_mismatch' using errcode = 'P0001';
+    return jsonb_build_object('status', 'conflict', 'reason', 'authorization_identity_mismatch');
   end if;
+
+  select * into v_existing
+  from public.import_publish_idempotency_records
+  where idempotency_key = p_idempotency_key
+  for update;
+
+  if found then
+    if v_existing.entity_id <> p_entity_id
+      or v_existing.actor_profile_id <> p_actor_profile_id
+      or v_existing.request_hash <> p_request_hash
+      or v_existing.expected_version <> p_expected_version
+      or v_existing.pharmacy_authorization_id <> p_authorization_id then
+      return jsonb_build_object(
+        'status', 'conflict',
+        'reason', 'idempotency_request_mismatch',
+        'idempotencyRecordId', v_existing.id
+      );
+    end if;
+
+    if v_existing.terminal_result is not null then
+      return jsonb_build_object(
+        'status', 'replayed',
+        'idempotencyRecordId', v_existing.id,
+        'terminalResult', v_existing.terminal_result
+      );
+    end if;
+
+    if v_authorization.status = 'consumed'
+      and v_authorization.consumed_by_reservation_id = v_existing.id then
+      select id into v_snapshot_id
+      from public.import_publish_rollback_snapshots
+      where idempotency_record_id = v_existing.id;
+
+      select id into v_audit_id
+      from public.import_publish_audit_events
+      where idempotency_record_id = v_existing.id
+        and rollback_snapshot_id = v_snapshot_id
+        and outcome = 'pending'
+        and event_payload ->> 'phase' = 'reservation'
+        and (
+          (event_type = 'reservation_created'
+            and schema_version = 'drkhaleej.import.publishAudit.v2')
+          or (event_type = 'execution_started'
+            and schema_version <> 'drkhaleej.import.publishAudit.v2')
+        )
+      order by created_at asc
+      limit 1;
+
+      if v_snapshot_id is null or v_audit_id is null then
+        return jsonb_build_object('status', 'conflict', 'reason', 'reservation_replay_incomplete');
+      end if;
+
+      return jsonb_build_object(
+        'status', 'reserved',
+        'replayed', true,
+        'idempotencyRecordId', v_existing.id,
+        'rollbackSnapshotId', v_snapshot_id,
+        'auditEventId', v_audit_id
+      );
+    end if;
+
+    return jsonb_build_object(
+      'status', 'conflict',
+      'reason', 'request_already_in_progress',
+      'idempotencyRecordId', v_existing.id
+    );
+  end if;
+
   if v_authorization.status <> 'issued'
     or v_authorization.consumed_at is not null
-    or v_authorization.invalidated_at is not null
-    or v_authorization.issued_at > v_created_at
-    or v_authorization.expires_at <= v_created_at then
-    raise exception 'authorization_not_issued' using errcode = 'P0001';
+    or v_authorization.invalidated_at is not null then
+    return jsonb_build_object('status', 'conflict', 'reason', 'authorization_not_issued');
+  end if;
+  if v_authorization.issued_at > v_created_at or v_authorization.expires_at <= v_created_at then
+    return jsonb_build_object('status', 'conflict', 'reason', 'authorization_expired');
   end if;
 
-  insert into public.import_publish_idempotency_records (
-    idempotency_key, entity_id, actor_profile_id, expected_version, request_hash,
-    status, created_at, updated_at, expires_at, pharmacy_authorization_id
-  ) values (
-    p_idempotency_key, p_entity_id, p_actor_profile_id, p_expected_version, p_request_hash,
-    'reserved', v_created_at, v_created_at,
-    v_created_at + make_interval(hours => p_reservation_ttl_hours), p_authorization_id
-  ) returning id into v_idempotency_id;
-
-  if p_fail_after = 'reservation_insert' then
-    raise exception 'p03_forced_abort_reservation_insert' using errcode = 'P0001';
-  end if;
+  begin
+    insert into public.import_publish_idempotency_records (
+      idempotency_key, entity_id, actor_profile_id, expected_version, request_hash,
+      status, created_at, updated_at, expires_at, pharmacy_authorization_id
+    ) values (
+      p_idempotency_key, p_entity_id, p_actor_profile_id, p_expected_version, p_request_hash,
+      'reserved', v_created_at, v_created_at,
+      v_created_at + make_interval(hours => p_reservation_ttl_hours), p_authorization_id
+    ) returning id into v_idempotency_id;
+  exception when unique_violation then
+    return jsonb_build_object('status', 'conflict', 'reason', 'concurrent_idempotency_conflict');
+  end;
 
   insert into public.import_publish_rollback_snapshots (
     entity_id, actor_profile_id, idempotency_record_id, expected_version,
@@ -129,10 +201,6 @@ begin
     p_snapshot_payload, p_snapshot_hash, v_created_at,
     v_created_at + make_interval(days => p_rollback_retention_days)
   ) returning id into v_snapshot_id;
-
-  if p_fail_after = 'snapshot_insert' then
-    raise exception 'p03_forced_abort_snapshot_insert' using errcode = 'P0001';
-  end if;
 
   insert into public.import_publish_audit_events (
     entity_id, actor_profile_id, idempotency_record_id, rollback_snapshot_id,
@@ -154,10 +222,6 @@ begin
     v_created_at
   ) returning id into v_audit_id;
 
-  if p_fail_after = 'audit_insert' then
-    raise exception 'p03_forced_abort_audit_insert' using errcode = 'P0001';
-  end if;
-
   update public.import_pharmacy_publish_authorizations
   set status = 'consumed',
       consumed_at = v_created_at,
@@ -173,15 +237,27 @@ begin
     raise exception 'authorization_consume_failed' using errcode = 'P0001';
   end if;
 
-  if p_fail_after = 'authorization_update' then
-    raise exception 'p03_forced_abort_authorization_update' using errcode = 'P0001';
-  end if;
-
   return jsonb_build_object(
     'status', 'reserved',
+    'replayed', false,
     'idempotencyRecordId', v_idempotency_id,
     'rollbackSnapshotId', v_snapshot_id,
     'auditEventId', v_audit_id
   );
 end;
 $$;
+
+revoke all on function public.import_publish_reserve_snapshot_audit(
+  uuid, uuid, text, text, text, jsonb, text, text,
+  uuid, text, text, uuid, text, text, text, integer, integer
+) from public, anon, authenticated;
+
+grant execute on function public.import_publish_reserve_snapshot_audit(
+  uuid, uuid, text, text, text, jsonb, text, text,
+  uuid, text, text, uuid, text, text, text, integer, integer
+) to service_role;
+
+comment on function public.import_publish_reserve_snapshot_audit(
+  uuid, uuid, text, text, text, jsonb, text, text,
+  uuid, text, text, uuid, text, text, text, integer, integer
+) is 'Atomically reserves authorized Pharmacy persistence and appends reservation_created v2; legacy reservation audits remain replay-readable.';

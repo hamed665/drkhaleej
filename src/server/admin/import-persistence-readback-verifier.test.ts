@@ -8,6 +8,7 @@ import {
   type ImportPersistenceReadbackClient,
   type ImportPersistenceReadbackVerificationInput,
 } from "./import-persistence-readback-verifier";
+import { IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION } from "./import-reservation-audit-contract";
 
 const reservationId = "33333333-3333-4333-8333-333333333333";
 const snapshotId = "44444444-4444-4444-8444-444444444444";
@@ -39,7 +40,10 @@ const input: ImportPersistenceReadbackVerificationInput = {
   operationScope: "reserve_private_publish",
 };
 
-function auditRow(eventType: ImportPersistenceAuditRow["event_type"] = "execution_started"): ImportPersistenceAuditRow {
+function auditRow(
+  eventType: ImportPersistenceAuditRow["event_type"] = "execution_started",
+  schemaVersion = "drkhaleej.import.publishAudit.v1",
+): ImportPersistenceAuditRow {
   return {
     id: auditId,
     entity_id: input.entityId,
@@ -47,6 +51,7 @@ function auditRow(eventType: ImportPersistenceAuditRow["event_type"] = "executio
     idempotency_record_id: reservationId,
     rollback_snapshot_id: snapshotId,
     event_type: eventType,
+    schema_version: schemaVersion,
     outcome: "pending",
     expected_version: input.expectedVersion,
     phase: "reservation",
@@ -154,15 +159,36 @@ describe("verifyImportPersistenceReadback", () => {
     expect(result.writeAllowed).toBe(false);
   });
 
-  it("accepts the future reservation audit signature without renaming the current event", async () => {
+  it("accepts the current reservation audit signature with the bumped schema version", async () => {
     const result = await verifyImportPersistenceReadback(
-      createClient({ readAuditRows: async () => ({ data: [auditRow("reservation_created")], error: null }) }),
+      createClient({
+        readAuditRows: async () => ({
+          data: [auditRow("reservation_created", IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION)],
+          error: null,
+        }),
+      }),
       input,
     );
 
     expect(result.verified).toBe(true);
     expect(result.auditSignature).toBe("reservation_created");
+    expect(result.auditSchemaVersion).toBe(IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION);
     expect(result.counts).toMatchObject({ executionStartedAudit: 0, reservationCreatedAudit: 1 });
+  });
+
+  it("fails closed when a reservation audit uses an incompatible event and schema pairing", async () => {
+    const result = await verifyImportPersistenceReadback(
+      createClient({
+        readAuditRows: async () => ({
+          data: [auditRow("execution_started", IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION)],
+          error: null,
+        }),
+      }),
+      input,
+    );
+
+    expect(result.verified).toBe(false);
+    expect(result.blockers).toContain("audit_schema_version_mismatch");
   });
 
   it("fails closed when duplicate idempotency rows are returned", async () => {

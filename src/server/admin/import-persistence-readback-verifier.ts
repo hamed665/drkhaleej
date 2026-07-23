@@ -1,8 +1,13 @@
 import "server-only";
 
+import {
+  isCompatibleReservationAudit,
+  type ImportReservationAuditEvent,
+} from "./import-reservation-audit-contract";
+
 const MAX_ROWS_PER_READ = 2;
 
-export type ImportReservationAuditSignature = "execution_started" | "reservation_created";
+export type ImportReservationAuditSignature = ImportReservationAuditEvent;
 
 type ReadbackResponse<T> = {
   data: readonly T[] | null;
@@ -54,6 +59,7 @@ export type ImportPersistenceAuditRow = {
   idempotency_record_id: string;
   rollback_snapshot_id: string | null;
   event_type: ImportReservationAuditSignature;
+  schema_version: string;
   outcome: string;
   expected_version: string;
   phase: string | null;
@@ -127,6 +133,7 @@ export type ImportPersistenceReadbackBlocker =
   | "audit_row_count_invalid"
   | "audit_linkage_mismatch"
   | "audit_identity_mismatch"
+  | "audit_schema_version_mismatch"
   | "entity_read_failed"
   | "entity_fingerprint_row_count_invalid"
   | "entity_changed";
@@ -149,6 +156,7 @@ export type ImportPersistenceReadbackVerificationResult = {
     auditGapCount: number;
   };
   auditSignature: ImportReservationAuditSignature | null;
+  auditSchemaVersion: string | null;
   blockers: readonly ImportPersistenceReadbackBlocker[];
   rawPayloadExposed: false;
   writeAllowed: false;
@@ -208,6 +216,7 @@ export async function verifyImportPersistenceReadback(
       },
       findings: { duplicateCount: 0, orphanCount: 0, auditGapCount: 0 },
       auditSignature: null,
+      auditSchemaVersion: null,
       blockers: ["invalid_verification_input"],
       rawPayloadExposed: false,
       writeAllowed: false,
@@ -314,6 +323,11 @@ export async function verifyImportPersistenceReadback(
     audit.entity_family !== input.entityFamily ||
     audit.operation_scope !== input.operationScope
   )) blockers.push("audit_identity_mismatch");
+  if (audit && !isCompatibleReservationAudit({
+    eventType: audit.event_type,
+    schemaVersion: audit.schema_version,
+    phase: audit.phase,
+  })) blockers.push("audit_schema_version_mismatch");
 
   const entityUnchanged = entityCount === 1 &&
     entity?.fingerprint === input.expectedEntityFingerprint &&
@@ -353,6 +367,7 @@ export async function verifyImportPersistenceReadback(
       auditGapCount: auditCount === 1 ? 0 : 1,
     },
     auditSignature: auditCount === 1 ? audit?.event_type ?? null : null,
+    auditSchemaVersion: auditCount === 1 ? audit?.schema_version ?? null : null,
     blockers: resultBlockers,
     rawPayloadExposed: false,
     writeAllowed: false,
