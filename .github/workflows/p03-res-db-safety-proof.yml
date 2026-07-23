@@ -19,6 +19,7 @@ on:
       - "package.json"
       - "pnpm-lock.yaml"
       - ".github/workflows/p03-res-db-safety-proof.yml"
+      - ".github/workflows/preview-migration-sync.yml"
   workflow_dispatch:
 
 permissions:
