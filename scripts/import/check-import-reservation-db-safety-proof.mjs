@@ -98,6 +98,7 @@ for (const token of [
   'databaseUrlEmitted: false',
   'reservationCreatedAuditImplemented: true',
   "const reservationAuditSchemaVersion = 'drkhaleej.import.publishAudit.v2'",
+  'normalizedDefinition.includes(token.toLowerCase())',
   "a.event_type = 'reservation_created'",
   'audit_contract_mismatches',
 ]) {

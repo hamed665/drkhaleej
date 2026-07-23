@@ -240,7 +240,7 @@ async function verifyProductionRpc(client) {
     "'reservation_created'",
     reservationAuditSchemaVersion,
   ]) {
-    assert(normalizedDefinition.includes(token), `Canonical reservation RPC is missing required transaction token: ${token}.`);
+    assert(normalizedDefinition.includes(token.toLowerCase()), `Canonical reservation RPC is missing required transaction token: ${token}.`);
   }
   return { present: true, definitionSha256: digest(definition) };
 }
