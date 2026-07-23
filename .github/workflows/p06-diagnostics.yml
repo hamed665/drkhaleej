@@ -1,0 +1,56 @@
+name: P06 Diagnostics
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/p06-diagnostics.yml'
+      - 'src/server/admin/import-pharmacy-**'
+      - 'scripts/import/**'
+      - 'scripts/db/**'
+      - 'supabase/migrations/0083_import_pharmacy_atomic_rollback_authority.sql'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: corepack prepare pnpm@10.22.0 --activate
+      - run: pnpm install --frozen-lockfile --silent
+      - name: Capture bounded diagnostics
+        shell: bash
+        run: |
+          mkdir -p artifacts/p06-diagnostics
+          set +e
+          pnpm typecheck > artifacts/p06-diagnostics/typecheck.log 2>&1
+          printf '%s\n' "$?" > artifacts/p06-diagnostics/typecheck.exit
+          pnpm db:validate:migrations > artifacts/p06-diagnostics/migrations.log 2>&1
+          printf '%s\n' "$?" > artifacts/p06-diagnostics/migrations.exit
+          pnpm import:publish-readiness-audit:validate > artifacts/p06-diagnostics/import-audit.log 2>&1
+          printf '%s\n' "$?" > artifacts/p06-diagnostics/import-audit.exit
+          set -e
+      - name: Upload bounded diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p06-diagnostics-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p06-diagnostics
+          if-no-files-found: error
+          retention-days: 2
+      - name: Enforce diagnostic result
+        shell: bash
+        run: |
+          for name in typecheck migrations import-audit; do
+            status="$(cat artifacts/p06-diagnostics/${name}.exit)"
+            if [ "$status" -ne 0 ]; then
+              echo "$name failed"
+              exit "$status"
+            fi
+          done
