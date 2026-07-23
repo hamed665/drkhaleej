@@ -1,0 +1,41 @@
+name: P05 RLS diagnostics
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/p05-rls-diagnostics.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Capture RLS validation
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p05
+          pnpm test:db:rls 2>&1 | tee artifacts/p05/rls.log
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p05-rls-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p05/rls.log
+          if-no-files-found: error
+          retention-days: 2
