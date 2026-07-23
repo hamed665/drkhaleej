@@ -9,7 +9,8 @@ const source = readFileSync(migrationPath, 'utf8');
 const required = [
   /P05 PRIVATE-ADMIN-WIRING/i,
   /create\s+or\s+replace\s+function\s+public\.import_publish_pharmacy_private/i,
-  /p_reservation_audit_id\s+uuid/i,
+  /p_execution_started_audit_id\s+uuid/i,
+  /legacy[\s\S]*parameter name[\s\S]*verified reservation audit id/i,
   /security\s+invoker/i,
   /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i,
   /from\s+public\.import_publish_idempotency_records[\s\S]*for\s+update/i,
@@ -39,6 +40,7 @@ for (const pattern of required) {
 const forbidden = [
   /security\s+definer/i,
   /\bcreate\s+policy\b/i,
+  /\bdrop\s+function\b/i,
   /status\s*=\s*'active'/i,
   /is_active\s*=\s*true/i,
   /is_featured\s*=\s*true/i,
