@@ -85,7 +85,7 @@ describe("Supabase pharmacy private mutation writer", () => {
       expect.objectContaining({
         p_idempotency_record_id: "reservation-001",
         p_rollback_snapshot_id: "snapshot-001",
-        p_reservation_audit_id: "reservation-audit-001",
+        p_execution_started_audit_id: "reservation-audit-001",
         p_audit_schema_version: IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION,
         p_patch: expect.objectContaining({
           name_en: "Controlled Pharmacy",
@@ -102,7 +102,7 @@ describe("Supabase pharmacy private mutation writer", () => {
     const rpcArgs = rpc.mock.calls[0]?.[1] as { p_patch?: Record<string, unknown> } | undefined;
     expect(rpcArgs?.p_patch).not.toHaveProperty("status");
     expect(rpcArgs?.p_patch).not.toHaveProperty("is_active");
-    expect(rpcArgs).not.toHaveProperty("p_execution_started_audit_id");
+    expect(rpcArgs).not.toHaveProperty("p_reservation_audit_id");
   });
 
   it("fails closed on malformed or errored RPC responses", async () => {
