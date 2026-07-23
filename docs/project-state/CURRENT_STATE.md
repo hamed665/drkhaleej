@@ -7,7 +7,7 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #950 at baseline commit `23198c95295f72d97c650832ee4755e33b80f2dd` (last aligned 2026-07-22).
+- Import-readiness runtime is aligned through PR #953 at baseline commit `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` (last aligned 2026-07-23).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
@@ -21,11 +21,11 @@
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #950 |
-| Runtime baseline | `23198c95295f72d97c650832ee4755e33b80f2dd` |
-| Last aligned | `2026-07-22` |
+| Aligned through | PR #953 |
+| Runtime baseline | `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` |
+| Last aligned | `2026-07-23` |
 | Current migration | `0081_import_pharmacy_reservation_audit_split.sql` |
-| Current next | `VERIFIED-RESERVATION-HANDOFF` |
+| Current next | `PRIVATE-ADMIN-WIRING` |
 | Reservation audit event | `reservation_created` |
 | Reservation audit phase | `reservation` |
 
@@ -35,11 +35,11 @@
 | 1 | COMPLETE | PRs #940–#941 |
 | 2.1 | COMPLETE | PRs #942, #949 and #950; atomic transaction, hosted DB proof and reservation audit split complete |
 | 2.2 | COMPLETE | PRs #943 and #946; Admin reservation operation and authorization-linked integrity readback proven |
-| 3+ | OPEN | Starts only after the ordered reservation gates are green |
+| 3+ | PARTIAL | PR #953 completes the verified Reservation handoff contract; private Admin wiring and actual mutation remain disabled |
 
-The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. The existing private-executor handoff and exact rollback recovery remain open. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port, invokes no second Reservation, exposes no raw persistence identifiers, and keeps actual mutation disabled. Private Admin wiring, terminal persistence, post-mutation readback, and exact rollback recovery remain open. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
 
-Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. PR #946 was approved by an independent reviewer before merge.
+Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. Import-readiness implementation PRs remain independently review-gated before merge.
 
 The current reservation audit signature is `event_type=reservation_created`, `event_payload.phase=reservation`, and `schema_version=drkhaleej.import.publishAudit.v2`. Legacy `execution_started + phase=reservation` rows remain read/replay compatible only with prior schema versions.
 
@@ -134,7 +134,7 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#950 are the current import-readiness runtime baseline.
+- PRs #936–#953 are the current import-readiness runtime baseline.
 - Migration validation passes through `0081_import_pharmacy_reservation_audit_split.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build, and lint gates pass in CI.
 

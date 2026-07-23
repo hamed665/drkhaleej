@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #950 at baseline `23198c95295f72d97c650832ee4755e33b80f2dd` (last aligned 2026-07-22).
+- Import-readiness runtime is aligned through PR #953 at baseline `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` (last aligned 2026-07-23).
 - Migrations validate through `0081_import_pharmacy_reservation_audit_split.sql`.
-- The current next implementation is `VERIFIED-RESERVATION-HANDOFF`.
+- The current next implementation is `PRIVATE-ADMIN-WIRING`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, and admin commercial add-on assignment shell.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
 - Article pages are still static shell pages only.
@@ -103,11 +103,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #950 |
-| Runtime baseline | `23198c95295f72d97c650832ee4755e33b80f2dd` |
-| Last aligned | `2026-07-22` |
+| Aligned through | PR #953 |
+| Runtime baseline | `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` |
+| Last aligned | `2026-07-23` |
 | Current migration | `0081_import_pharmacy_reservation_audit_split.sql` |
-| Current next | `VERIFIED-RESERVATION-HANDOFF` |
+| Current next | `PRIVATE-ADMIN-WIRING` |
 
 ## Import readiness capability mapping
 
@@ -125,8 +125,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Admin reserve operation | Complete | #943 | Maintain bounded operation regression |
 | Reservation integrity proof | Complete | #946 | Maintain readback regression |
 | Reservation DB safety proof | Complete | #949 | Maintain hosted proof |
-| Reservation audit split | Complete | #950 | `VERIFIED-RESERVATION-HANDOFF` |
-| Existing private executor handoff | Open | — | `VERIFIED-RESERVATION-HANDOFF` |
+| Reservation audit split | Complete | #950 | Maintain audit compatibility |
+| Existing private executor handoff | Complete | #953 | `PRIVATE-ADMIN-WIRING` |
 | Exact rollback recovery | Open | — | Wave 4 |
 | Pharmacy public/index/sitemap | Disabled/Open | — | After Admin canary |
 | AI-assisted intake | Planned | — | After intake convergence |

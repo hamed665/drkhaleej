@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #950 at `23198c95295f72d97c650832ee4755e33b80f2dd`**. The current next implementation is **`VERIFIED-RESERVATION-HANDOFF`**.
+Current import-readiness runtime baseline: **PR #953 at `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0`**. The current next implementation is **`PRIVATE-ADMIN-WIRING`**.
 
 Completed migrations: **`0001` through `0081`**. Migration validation is expected through `0081_import_pharmacy_reservation_audit_split.sql`.
 

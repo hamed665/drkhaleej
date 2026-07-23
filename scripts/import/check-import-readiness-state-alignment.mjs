@@ -10,17 +10,17 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 950,
-  runtimeBaseline: '23198c95295f72d97c650832ee4755e33b80f2dd',
-  lastAligned: '2026-07-22',
+  alignedThroughPr: 953,
+  runtimeBaseline: 'af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0',
+  lastAligned: '2026-07-23',
   currentMigration: '0081_import_pharmacy_reservation_audit_split.sql',
-  currentNext: 'VERIFIED-RESERVATION-HANDOFF',
+  currentNext: 'PRIVATE-ADMIN-WIRING',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
     '2.1': 'COMPLETE',
     '2.2': 'COMPLETE',
-    '3+': 'OPEN',
+    '3+': 'PARTIAL',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -32,12 +32,10 @@ const expectedCanonicalState = {
 function parseRootArgument(argv) {
   const rootIndex = argv.indexOf('--root');
   if (rootIndex === -1) return process.cwd();
-
   const value = argv[rootIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new Error('Usage: check-import-readiness-state-alignment.mjs [--root <repository-root>]');
   }
-
   return path.resolve(value);
 }
 
@@ -68,7 +66,6 @@ function extractSection(file, source, heading) {
   const marker = `## ${heading}`;
   const start = source.indexOf(marker);
   if (start === -1) fail(file, `section ${heading}`, 'present', '<missing>');
-
   const next = source.indexOf('\n## ', start + marker.length);
   return source.slice(start, next === -1 ? source.length : next);
 }
@@ -90,7 +87,6 @@ function parseTable(file, source, heading, keyColumn) {
   if (currentGroup.length > 0) groups.push(currentGroup);
 
   const rows = groups.find((group) => group[0]?.includes(keyColumn)) ?? [];
-
   if (rows.length < 3) fail(file, `${heading} table`, 'header and data rows', rows.length);
 
   const headers = rows[0];
@@ -99,20 +95,17 @@ function parseTable(file, source, heading, keyColumn) {
 
   const isSeparator = (row) => row.every((cell) => /^:?-{3,}:?$/.test(cell));
   const entries = new Map();
-
   for (const row of rows.slice(1)) {
     if (isSeparator(row)) continue;
     const record = Object.fromEntries(headers.map((header, index) => [header, row[index] ?? '']));
     entries.set(row[keyIndex], record);
   }
-
   return entries;
 }
 
 function extractManifest(source) {
   const match = source.match(/```json import-readiness-state\s*\r?\n([\s\S]*?)\r?\n```/);
   if (!match) fail(files.roadmap, 'machine-readable alignment manifest', 'present', '<missing>');
-
   try {
     return JSON.parse(match[1]);
   } catch (error) {
@@ -136,7 +129,6 @@ function validateCanonicalManifest(manifest) {
   for (const [wave, status] of Object.entries(expectedCanonicalState.waves)) {
     assertEqual(files.roadmap, `manifest.waves.${wave}`, manifest.waves?.[wave], status);
   }
-
   for (const [field, value] of Object.entries(expectedCanonicalState.currentReservationAudit)) {
     assertEqual(
       files.roadmap,
@@ -151,7 +143,6 @@ function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
   const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
-
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -159,12 +150,7 @@ function validateVisibleRoadmapLedger(source, manifest) {
 
   const currentNextSection = extractSection(files.roadmap, source, 'Current next implementation');
   const currentNextMatch = currentNextSection.match(/```text\s*\r?\n([^\r\n]+)\r?\n```/);
-  assertEqual(
-    files.roadmap,
-    'visible current next',
-    currentNextMatch?.[1]?.trim(),
-    manifest.currentNext,
-  );
+  assertEqual(files.roadmap, 'visible current next', currentNextMatch?.[1]?.trim(), manifest.currentNext);
 }
 
 function validateBaselineTable(file, table, manifest) {
@@ -175,7 +161,6 @@ function validateBaselineTable(file, table, manifest) {
     'Current migration': manifest.currentMigration,
     'Current next': manifest.currentNext,
   };
-
   for (const [field, expected] of Object.entries(expectedRows)) {
     assertEqual(file, `${field} value`, table.get(field)?.Value, expected);
   }
@@ -225,7 +210,7 @@ function validateMatrix(source, manifest) {
     'Reservation integrity proof': ['Complete', '#946'],
     'Reservation DB safety proof': ['Complete', '#949'],
     'Reservation audit split': ['Complete', '#950'],
-    'Existing private executor handoff': ['Open', '—'],
+    'Existing private executor handoff': ['Complete', '#953'],
     'Exact rollback recovery': ['Open', '—'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
@@ -245,17 +230,15 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    `\`0001\` through \`0081\``,
+    '`0001` through `0081`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
     '[`docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md`](docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md)',
   ];
-
   for (const token of required) {
     if (!section.includes(token)) fail(files.readme, 'current status token', token, '<missing>');
   }
-
   if (/Database\/migration status:[^\n]*0053/.test(section)) {
     fail(files.readme, 'current migration', manifest.currentMigration, '0053 presented as current');
   }

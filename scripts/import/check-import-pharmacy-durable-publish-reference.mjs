@@ -5,6 +5,7 @@ const root = process.cwd();
 const migrationPath = 'supabase/migrations/0072_import_pharmacy_publish_references.sql';
 const adapterPath = 'src/server/admin/import-pharmacy-durable-publish-reference.ts';
 const wiringPath = 'src/server/admin/import-pharmacy-private-admin-real-wiring.ts';
+const handoffPath = 'src/server/admin/import-pharmacy-verified-reservation-handoff.ts';
 
 async function read(relativePath) {
   return readFile(path.join(root, relativePath), 'utf8');
@@ -14,10 +15,11 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const [migration, adapter, wiring] = await Promise.all([
+const [migration, adapter, wiring, handoff] = await Promise.all([
   read(migrationPath),
   read(adapterPath),
   read(wiringPath),
+  read(handoffPath),
 ]);
 
 for (const token of [
@@ -40,7 +42,16 @@ for (const token of [
   'new Date(row.expires_at).getTime() <= now().getTime()',
 ]) assert(adapter.includes(token), `${adapterPath} must include ${token}`);
 
-assert(wiring.includes('expectedSnapshotHash: context.canaryInput.expectedSnapshotHash'), `${wiringPath} must bind the reference to the reservation snapshot hash`);
+for (const token of [
+  'loadVerifiedReservationEvidence',
+  'verifiedReservationExecutor?: PharmacyVerifiedReservationExecutorPort',
+]) assert(wiring.includes(token), `${wiringPath} must preserve the server-only verified handoff boundary with ${token}`);
+
+for (const token of [
+  'context.canaryInput.expectedSnapshotHash !== review.snapshotHash',
+  'context.canaryInput.expectedSnapshotHash !== verification.expectedSnapshotHash',
+  'verification.expectedRollbackSnapshotId',
+]) assert(handoff.includes(token), `${handoffPath} must bind the durable reference inputs to verified reservation evidence with ${token}`);
 
 for (const forbidden of [
   'visibility: "public"',
@@ -51,6 +62,7 @@ for (const forbidden of [
 ]) {
   assert(!migration.includes(forbidden), `${migrationPath} must not include ${forbidden}`);
   assert(!adapter.includes(forbidden), `${adapterPath} must not include ${forbidden}`);
+  assert(!handoff.includes(forbidden), `${handoffPath} must not include ${forbidden}`);
 }
 
 console.log('import Pharmacy durable publish reference check passed.');
