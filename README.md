@@ -26,10 +26,10 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #950** at baseline **`23198c95295f72d97c650832ee4755e33b80f2dd`**.
+- Import-readiness runtime is aligned through **PR #953** at baseline **`af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0`**.
 - Database/migration status: **validates through `0081_import_pharmacy_reservation_audit_split.sql`**.
 - Completed migration set: **`0001` through `0081`**.
-- Current import-readiness implementation: **`VERIFIED-RESERVATION-HANDOFF`**.
+- Current import-readiness implementation: **`PRIVATE-ADMIN-WIRING`**.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:
