@@ -11,6 +11,8 @@ on:
       - '.github/workflows/preview-migration-sync.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
 
 permissions:
   contents: read
@@ -20,9 +22,10 @@ env:
   PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
   PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
   PREVIEW_MIGRATION_EVIDENCE_PATH: artifacts/preview-migration-sync/evidence.json
+  PREVIEW_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
 
 concurrency:
-  group: preview-migration-sync
+  group: drmuscat-isolated-preview-database-write
   cancel-in-progress: false
 
 jobs:
@@ -37,14 +40,16 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
 
-      - name: Record exact revision
+      - name: Verify exact revision
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          test "$(git rev-parse HEAD)" = "$PREVIEW_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -52,15 +57,15 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Supabase CLI
+      - name: Setup pinned Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.101.0
 
-      - name: Validate repository migration contract
+      - name: Validate repository migration and RLS contracts
         run: |
           pnpm db:validate:migrations
           pnpm test:db:rls
@@ -68,10 +73,10 @@ jobs:
       - name: Fail-closed identity preflight
         run: node scripts/db/preview-migration-sync.mjs preflight
 
-      - name: Apply only missing migrations under advisory lock
+      - name: Apply ledger-missing migrations under advisory lock
         run: node scripts/db/run-preview-migration-sync.mjs
 
-      - name: Verify ledger, gaps, drift inventory, RLS and RPCs
+      - name: Verify exact ledger and database inventories
         run: node scripts/db/preview-migration-sync.mjs verify
 
       - name: Upload red or green exact-SHA evidence
