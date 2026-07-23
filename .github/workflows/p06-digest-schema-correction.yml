@@ -1,0 +1,88 @@
+name: P06 digest schema correction
+
+on:
+  push:
+    branches:
+      - agent/rollback-authority-hardening-p06
+    paths:
+      - .github/workflows/p06-digest-schema-correction.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p06-digest-schema-correction
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/rollback-authority-hardening-p06
+          fetch-depth: 1
+      - name: Apply forward migration inventory and proof correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          runner = Path('scripts/import/run-p06-rollback-authority-proof.mjs')
+          source = runner.read_text()
+          replacements = {
+              "where version = '0083'": "where version = '0084'",
+              "Preview migration ledger does not include 0083.": "Preview migration ledger does not include 0084.",
+              "migration0083Verified: true": "migration0084Verified: true",
+              "min(encode(digest(consumed_result::text, 'sha256'), 'hex'))": "min(encode(extensions.digest(consumed_result::text, 'sha256'), 'hex'))",
+          }
+          for old, new in replacements.items():
+              if source.count(old) != 1:
+                  raise SystemExit(f'P06 runner replacement not found exactly once: {old}')
+              source = source.replace(old, new)
+          runner.write_text(source)
+
+          validator = Path('scripts/db/validate-migrations-current.mjs')
+          source = validator.read_text()
+          anchors = [
+              (
+                  "const pharmacyAtomicRollbackAuthorityMigrationName = '0083_import_pharmacy_atomic_rollback_authority.sql';\n",
+                  "const pharmacyAtomicRollbackAuthorityMigrationName = '0083_import_pharmacy_atomic_rollback_authority.sql';\nconst pharmacyRollbackDigestSchemaMigrationName = '0084_import_pharmacy_rollback_digest_schema.sql';\n",
+              ),
+              (
+                  "const pharmacyAtomicRollbackAuthorityMigrationPath = path.join(migrationsDir, pharmacyAtomicRollbackAuthorityMigrationName);\n",
+                  "const pharmacyAtomicRollbackAuthorityMigrationPath = path.join(migrationsDir, pharmacyAtomicRollbackAuthorityMigrationName);\nconst pharmacyRollbackDigestSchemaMigrationPath = path.join(migrationsDir, pharmacyRollbackDigestSchemaMigrationName);\n",
+              ),
+              (
+                  "const hiddenPharmacyAtomicRollbackAuthorityMigrationPath = path.join(migrationsDir, `.pharmacy-atomic-rollback-authority-${pharmacyAtomicRollbackAuthorityMigrationName}.hidden`);\n",
+                  "const hiddenPharmacyAtomicRollbackAuthorityMigrationPath = path.join(migrationsDir, `.pharmacy-atomic-rollback-authority-${pharmacyAtomicRollbackAuthorityMigrationName}.hidden`);\nconst hiddenPharmacyRollbackDigestSchemaMigrationPath = path.join(migrationsDir, `.pharmacy-rollback-digest-schema-${pharmacyRollbackDigestSchemaMigrationName}.hidden`);\n",
+              ),
+              (
+                  "  [pharmacyAtomicRollbackAuthorityMigrationName, pharmacyAtomicRollbackAuthorityMigrationPath, hiddenPharmacyAtomicRollbackAuthorityMigrationPath],\n",
+                  "  [pharmacyAtomicRollbackAuthorityMigrationName, pharmacyAtomicRollbackAuthorityMigrationPath, hiddenPharmacyAtomicRollbackAuthorityMigrationPath],\n  [pharmacyRollbackDigestSchemaMigrationName, pharmacyRollbackDigestSchemaMigrationPath, hiddenPharmacyRollbackDigestSchemaMigrationPath],\n",
+              ),
+              (
+                  "  requireCondition(existsSync(pharmacyAtomicRollbackAuthorityMigrationPath), `${pharmacyAtomicRollbackAuthorityMigrationName} is missing.`);\n  execFileSync(process.execPath, [pharmacyRollbackValidator], { cwd: repoRoot, stdio: 'inherit' });\n",
+                  "  requireCondition(existsSync(pharmacyAtomicRollbackAuthorityMigrationPath), `${pharmacyAtomicRollbackAuthorityMigrationName} is missing.`);\n  requireCondition(existsSync(pharmacyRollbackDigestSchemaMigrationPath), `${pharmacyRollbackDigestSchemaMigrationName} is missing.`);\n  execFileSync(process.execPath, [pharmacyRollbackValidator], { cwd: repoRoot, stdio: 'inherit' });\n",
+              ),
+          ]
+          for old, new in anchors:
+              if source.count(old) != 1:
+                  raise SystemExit(f'Migration inventory anchor not found exactly once: {old[:80]}')
+              source = source.replace(old, new)
+          validator.write_text(source)
+          PY
+          node --check scripts/import/run-p06-rollback-authority-proof.mjs
+          node --check scripts/db/validate-migrations-current.mjs
+      - name: Commit correction and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/p06-digest-schema-correction.yml
+          git add scripts/import/run-p06-rollback-authority-proof.mjs scripts/db/validate-migrations-current.mjs
+          git commit -m "fix(p06): verify schema-qualified rollback digests"
+          git push origin HEAD:agent/rollback-authority-hardening-p06
