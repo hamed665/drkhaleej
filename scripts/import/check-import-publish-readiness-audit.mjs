@@ -84,5 +84,6 @@ import './test-import-readiness-state-alignment.mjs';
 import './check-import-reservation-db-safety-proof.mjs';
 import './test-import-reservation-db-safety-proof.mjs';
 import './check-import-reservation-audit-split.mjs';
+import './check-import-p05-private-publish-proof.mjs';
 
 console.log('import publish readiness audit check passed.');
