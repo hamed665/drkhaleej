@@ -19,18 +19,20 @@ const FINGERPRINT = "d".repeat(64);
 type RollbackWriter = NonNullable<PharmacyPrivateAdminRealWiringDependencies["rollbackWriter"]>;
 
 function publishContext(): PharmacyPrivateAdminPublishContext {
-  return {
-    canaryInput: {
-      actorId: "admin-1",
-      entityId: "pharmacy-1",
-      expectedSnapshotHash: SNAPSHOT_HASH,
-      expectedEntityFingerprint: FINGERPRINT,
-      reservationRequest: {
-        idempotencyKey: "operation-1",
-        requestHash: REQUEST_HASH,
-        expectedVersion: "version-1",
-      },
+  const canaryInput = {
+    actorId: "admin-1",
+    entityId: "pharmacy-1",
+    expectedSnapshotHash: SNAPSHOT_HASH,
+    expectedEntityFingerprint: FINGERPRINT,
+    reservationRequest: {
+      idempotencyKey: "operation-1",
+      requestHash: REQUEST_HASH,
+      expectedVersion: "version-1",
     },
+  } as unknown as PharmacyPrivateAdminPublishContext["canaryInput"];
+
+  return {
+    canaryInput,
     mutationRequest: {
       family: "pharmacy",
       selectedFamily: "pharmacy",
