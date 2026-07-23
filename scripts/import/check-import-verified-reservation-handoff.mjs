@@ -141,7 +141,7 @@ for (const token of [
   'incomplete',
   'P05',
   'disabled',
-  'no Production',
+  'No Production',
 ]) {
   assert(docs.includes(token), `${files.docs} must include ${token}`);
 }
