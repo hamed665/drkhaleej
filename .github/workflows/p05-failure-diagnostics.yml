@@ -1,0 +1,59 @@
+name: P05 failure diagnostics
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/p05-failure-diagnostics.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Capture failing gates
+        shell: bash
+        run: |
+          set +e
+          mkdir -p artifacts/p05
+          pnpm test > artifacts/p05/unit-tests.log 2>&1
+          unit_status=$?
+          pnpm db:validate:migrations > artifacts/p05/migrations.log 2>&1
+          migration_status=$?
+          pnpm test:db:rls > artifacts/p05/rls.log 2>&1
+          rls_status=$?
+          pnpm import:publish-readiness-audit:validate > artifacts/p05/import-audit.log 2>&1
+          audit_status=$?
+          printf 'unit=%s\nmigrations=%s\nrls=%s\nimport_audit=%s\n' "$unit_status" "$migration_status" "$rls_status" "$audit_status" > artifacts/p05/status.txt
+          cat artifacts/p05/status.txt
+          exit $(( unit_status || migration_status || rls_status || audit_status ))
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p05-failure-diagnostics-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p05/
+          if-no-files-found: error
+          retention-days: 2
