@@ -27,7 +27,7 @@ function completed(operation: PharmacyPrivateAdminOperation) {
     indexEligible: false as const,
     sitemapEligible: false as const,
     routeEnabled: false as const,
-    executionReference: "reference-1",
+    executionReference: operation === "rollback" ? "rollback-replayed-safe" : "reference-1",
   };
 }
 
@@ -172,7 +172,7 @@ describe("pharmacy private Admin server action", () => {
     expect(execute).toHaveBeenCalledTimes(1);
   });
 
-  it("requires an opaque publish reference before rollback", async () => {
+  it("accepts rollback only with an entity-bound confirmation and no raw reference field", async () => {
     const execute = vi.fn(async () => completed("rollback"));
     const action = createPharmacyPrivateAdminServerAction({
       executionEnabled: true,
@@ -182,16 +182,33 @@ describe("pharmacy private Admin server action", () => {
       execute,
     });
 
+    const blocked = await action({
+      actorId: "admin-1",
+      formData: form({
+        operation: "rollback",
+        entityId: "pharmacy-1",
+        confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-2",
+      }),
+    });
+    expect(blocked).toEqual({ ok: false, blockers: ["invalid_confirmation"] });
+
     const result = await action({
       actorId: "admin-1",
       formData: form({
         operation: "rollback",
         entityId: "pharmacy-1",
-        confirmation: "ROLLBACK PRIVATE PHARMACY",
+        confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-1",
+        publishReference: "browser-supplied-value-must-be-ignored",
       }),
     });
 
-    expect(result).toEqual({ ok: false, blockers: ["invalid_publish_reference"] });
-    expect(execute).not.toHaveBeenCalled();
+    expect(result).toEqual({ ok: true, workflow: completed("rollback") });
+    expect(execute).toHaveBeenCalledWith({
+      operation: "rollback",
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+      confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-1",
+    });
+    expect(JSON.stringify(execute.mock.calls)).not.toContain("browser-supplied-value-must-be-ignored");
   });
 });
