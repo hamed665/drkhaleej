@@ -33,10 +33,16 @@ for (const token of [
   'environment_not_preview',
   'RESERVE PRIVATE PUBLISH',
   'EXECUTE PRIVATE PUBLISH',
-  'ROLLBACK PRIVATE PHARMACY',
-  'invalid_publish_reference',
+  'ROLLBACK PRIVATE PUBLISH',
   'dependencies.execute',
 ]) assert(boundary.includes(token), `${boundaryPath} must include ${token}`);
+
+for (const forbidden of [
+  'invalid_publish_reference',
+  'readSingle(input.formData, "publishReference")',
+  'publishReference:',
+  'ROLLBACK PRIVATE PHARMACY',
+]) assert(!boundary.includes(forbidden), `${boundaryPath} must not include ${forbidden}`);
 
 for (const token of [
   '"use server"',
@@ -78,7 +84,7 @@ for (const forbidden of [
   assert(!boundary.includes(forbidden), `${boundaryPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);
 }
-assert(!action.includes('"rollback"\n] as const'), `${actionPath} must keep rollback disabled until P06.`);
+assert(!action.includes('"rollback"\n] as const'), `${actionPath} must keep rollback UI activation disabled until P08/P09.`);
 
 for (const token of [
   'fails closed while the production action switch is disabled',
@@ -86,7 +92,9 @@ for (const token of [
   'requires exact entity-bound confirmation before one reservation',
   'rejects duplicate fields, non-allowlisted entities, and production mutation',
   'requires exact entity-bound confirmation before one private publish',
-  'requires an opaque publish reference before rollback',
+  'accepts rollback only with an entity-bound confirmation and no raw reference field',
 ]) assert(tests.includes(token), `${testPath} must cover ${token}`);
+
+assert(!boundary.includes('publishReference'), `${boundaryPath} must keep the raw rollback reference outside the browser contract.`);
 
 console.log('import Pharmacy private Admin server action check passed.');
