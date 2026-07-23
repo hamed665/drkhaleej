@@ -75,7 +75,9 @@ assert(source.readback.includes('schema_version: stringValue(row.schema_version)
 assert(source.runtime.includes('auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION'), `${files.runtime} must use the v2 reservation audit schema.`);
 
 for (const token of [
-  'p_reservation_audit_id',
+  'p_execution_started_audit_id',
+  'legacy',
+  'verified reservation audit id',
   "'execution_started'",
   "'phase', 'mutation'",
   'drkhaleej.import.publishAudit.v3',
