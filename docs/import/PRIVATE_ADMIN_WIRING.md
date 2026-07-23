@@ -18,6 +18,7 @@ P05 extends the existing Review, Authorization, Reservation, rollback snapshot, 
 ## Required behavior
 
 - require the persisted exact Review and its complete identity binding;
+- require the entity-bound confirmation `EXECUTE PRIVATE PUBLISH <entity-id>`;
 - consume the already verified Reservation without invoking the Reservation RPC again;
 - append `execution_started` only at the real mutation boundary;
 - apply the exact reviewed canonical Pharmacy patch;
