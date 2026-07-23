@@ -1,75 +1,13 @@
-name: P05 patch migration validator
+name: P05 migration patch workflow retired
 
 on:
-  pull_request:
-    paths:
-      - .github/workflows/p05-patch-migration-validator.yml
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: agent/private-admin-wiring-p05
-      - name: Patch exact migration validator
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('scripts/db/validate-migrations-current.mjs')
-          source = path.read_text()
-
-          replacements = [
-            (
-              "const pharmacyReservationAuditSplitMigrationName = '0081_import_pharmacy_reservation_audit_split.sql';",
-              "const pharmacyReservationAuditSplitMigrationName = '0081_import_pharmacy_reservation_audit_split.sql';\nconst pharmacyPrivateExecutionAuditMigrationName = '0082_import_pharmacy_private_execution_audit.sql';",
-            ),
-            (
-              "const pharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, pharmacyReservationAuditSplitMigrationName);",
-              "const pharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, pharmacyReservationAuditSplitMigrationName);\nconst pharmacyPrivateExecutionAuditMigrationPath = path.join(migrationsDir, pharmacyPrivateExecutionAuditMigrationName);",
-            ),
-            (
-              "const hiddenPharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, `.pharmacy-reservation-audit-split-${pharmacyReservationAuditSplitMigrationName}.hidden`);",
-              "const hiddenPharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, `.pharmacy-reservation-audit-split-${pharmacyReservationAuditSplitMigrationName}.hidden`);\nconst hiddenPharmacyPrivateExecutionAuditMigrationPath = path.join(migrationsDir, `.pharmacy-private-execution-audit-${pharmacyPrivateExecutionAuditMigrationName}.hidden`);",
-            ),
-            (
-              "  [pharmacyReservationAuditSplitMigrationName, pharmacyReservationAuditSplitMigrationPath, hiddenPharmacyReservationAuditSplitMigrationPath],\n];",
-              "  [pharmacyReservationAuditSplitMigrationName, pharmacyReservationAuditSplitMigrationPath, hiddenPharmacyReservationAuditSplitMigrationPath],\n  [pharmacyPrivateExecutionAuditMigrationName, pharmacyPrivateExecutionAuditMigrationPath, hiddenPharmacyPrivateExecutionAuditMigrationPath],\n];",
-            ),
-          ]
-          for old, new in replacements:
-              if source.count(old) != 1:
-                  raise SystemExit(f'migration validator anchor mismatch: {old[:80]}')
-              source = source.replace(old, new, 1)
-
-          function_anchor = "\nfunction runLegacyValidatorWithoutCurrentOnlyMigrations() {"
-          function_text = """
-function validatePharmacyPrivateExecutionAuditMigration() {
-  requireCondition(existsSync(pharmacyPrivateExecutionAuditMigrationPath), `${pharmacyPrivateExecutionAuditMigrationName} is missing.`);
-  execFileSync(process.execPath, [pharmacyPublishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
-}
-"""
-          if source.count(function_anchor) != 1:
-              raise SystemExit('migration validator function anchor mismatch')
-          source = source.replace(function_anchor, function_text + function_anchor, 1)
-
-          call_anchor = "validatePharmacyReservationAuditSplitMigration();\n\nconsole.log('Current migration validation passed.');"
-          call_text = "validatePharmacyReservationAuditSplitMigration();\nvalidatePharmacyPrivateExecutionAuditMigration();\n\nconsole.log('Current migration validation passed.');"
-          if source.count(call_anchor) != 1:
-              raise SystemExit('migration validator call anchor mismatch')
-          source = source.replace(call_anchor, call_text, 1)
-          path.write_text(source)
-          PY
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/p05-patch-migration-validator.yml
-          git add scripts/db/validate-migrations-current.mjs
-          git commit -m "test(p05): register additive execution migration"
-          git push origin HEAD:agent/private-admin-wiring-p05
+      - run: echo "Temporary P05 migration patch workflow retired."
