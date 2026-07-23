@@ -1,6 +1,9 @@
 name: P04-B SEO diagnostics
 
 on:
+  pull_request:
+    paths:
+      - .github/workflows/p04b-seo-diagnostics.yml
   push:
     branches:
       - agent/verified-reservation-handoff-p04b
@@ -15,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout branch
+      - name: Checkout exact PR head
         uses: actions/checkout@v4
         with:
-          ref: agent/verified-reservation-handoff-p04b
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -45,7 +48,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: p04b-seo-diagnostics-${{ github.sha }}
+          name: p04b-seo-diagnostics-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p04b/seo-check.log
           if-no-files-found: error
           retention-days: 2
