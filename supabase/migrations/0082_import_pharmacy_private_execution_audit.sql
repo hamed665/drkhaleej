@@ -3,6 +3,13 @@
 -- This function appends execution_started only at real mutation time, persists the terminal result,
 -- and keeps the entity draft/private with no route, index, sitemap, or public activation.
 
+-- PostgreSQL does not allow an input parameter to be renamed by CREATE OR REPLACE.
+-- Drop and recreate this exact function signature inside the migration transaction; no table,
+-- type, schema, policy, data, or Production object is dropped.
+drop function if exists public.import_publish_pharmacy_private(
+  uuid, uuid, uuid, uuid, uuid, text, jsonb, text
+);
+
 create or replace function public.import_publish_pharmacy_private(
   p_idempotency_record_id uuid,
   p_rollback_snapshot_id uuid,
