@@ -4,6 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const boundaryPath = 'src/server/admin/import-pharmacy-private-admin-server-action.ts';
 const actionPath = 'src/app/admin/imports/readiness/actions.ts';
+const operationPath = 'src/server/admin/import-pharmacy-private-admin-publish-operation.ts';
 const testPath = 'src/server/admin/import-pharmacy-private-admin-server-action.test.ts';
 
 async function readText(relativePath) {
@@ -14,9 +15,12 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const boundary = await readText(boundaryPath);
-const action = await readText(actionPath);
-const tests = await readText(testPath);
+const [boundary, action, operation, tests] = await Promise.all([
+  readText(boundaryPath),
+  readText(actionPath),
+  readText(operationPath),
+  readText(testPath),
+]);
 
 for (const token of [
   'executionEnabled: boolean',
@@ -28,21 +32,19 @@ for (const token of [
   'entity_not_allowed',
   'environment_not_preview',
   'RESERVE PRIVATE PUBLISH',
-  'PUBLISH PRIVATE PHARMACY',
+  'EXECUTE PRIVATE PUBLISH',
   'ROLLBACK PRIVATE PHARMACY',
   'invalid_publish_reference',
   'dependencies.execute',
-]) {
-  assert(boundary.includes(token), `${boundaryPath} must include ${token}`);
-}
+]) assert(boundary.includes(token), `${boundaryPath} must include ${token}`);
 
 for (const token of [
   '"use server"',
   'requirePlatformAdmin()',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const',
+  '"reserve_private_publish"',
+  '"private_publish"',
   'executionEnabled: process.env.VERCEL_ENV === "preview"',
   'enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS',
-  'operation !== "dry_run" && operation !== "review" && operation !== "reserve_private_publish"',
   'runPharmacyPrivateAdminActionState',
   'process.env.VERCEL_ENV',
   'IMPORT_PREVIEW_CANARY_ENTITY_IDS',
@@ -50,9 +52,17 @@ for (const token of [
   'createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment',
   'loadPharmacyPrivateAdminRuntimeContext',
   'runPharmacyAdminReservationOperation',
-]) {
-  assert(action.includes(token), `${actionPath} must include ${token}`);
-}
+  'runPharmacyPrivateAdminPublishOperation',
+]) assert(action.includes(token), `${actionPath} must include ${token}`);
+
+for (const token of [
+  'environment !== "preview"',
+  'EXECUTE PRIVATE PUBLISH ${input.entityId}',
+  'loadPharmacyVerifiedReservationForPublish',
+  'createPharmacyPrivateAdminPublishExecutor',
+  'createPharmacyPrivateAdminRealPorts',
+  'rawIdentifiersExposed: false',
+]) assert(operation.includes(token), `${operationPath} must include ${token}`);
 
 for (const forbidden of [
   '.from(',
@@ -64,22 +74,19 @@ for (const forbidden of [
   'sitemapEligible: true',
   'routeEnabled: true',
   'Promise.all(',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["private_publish"',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["rollback"',
 ]) {
   assert(!boundary.includes(forbidden), `${boundaryPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);
 }
+assert(!action.includes('"rollback"\n] as const'), `${actionPath} must keep rollback disabled until P06.`);
 
 for (const token of [
   'fails closed while the production action switch is disabled',
   'allows only explicitly enabled read operations',
   'requires exact entity-bound confirmation before one reservation',
   'rejects duplicate fields, non-allowlisted entities, and production mutation',
-  'requires exact confirmation before one private publish',
+  'requires exact entity-bound confirmation before one private publish',
   'requires an opaque publish reference before rollback',
-]) {
-  assert(tests.includes(token), `${testPath} must cover ${token}`);
-}
+]) assert(tests.includes(token), `${testPath} must cover ${token}`);
 
-console.log('import pharmacy private Admin server action check passed.');
+console.log('import Pharmacy private Admin server action check passed.');
