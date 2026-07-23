@@ -10,17 +10,19 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 954,
-  runtimeBaseline: '9d0511ba6b2ff5a53e8fd857cb09273d269d602d',
+  alignedThroughPr: 955,
+  runtimeBaseline: 'e32d3e8789df5fb2cb744723cc5acd8e59d4827d',
   lastAligned: '2026-07-24',
-  currentMigration: '0082_import_pharmacy_private_execution_audit.sql',
-  currentNext: 'ROLLBACK-AUTHORITY-HARDENING',
+  currentMigration: '0084_import_pharmacy_rollback_digest_schema.sql',
+  currentNext: 'ROLLBACK-EXACT-RECOVERY',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
     '2.1': 'COMPLETE',
     '2.2': 'COMPLETE',
     '3+': 'COMPLETE',
+    '4.1': 'COMPLETE',
+    '4.2': 'OPEN',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -142,7 +144,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -212,6 +214,7 @@ function validateMatrix(source, manifest) {
     'Reservation audit split': ['Complete', '#950'],
     'Existing private executor handoff': ['Complete', '#953'],
     'Private Admin wiring and publish readback': ['Complete', '#954'],
+    'Durable rollback authority': ['Complete', '#955'],
     'Exact rollback recovery': ['Open', '—'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
@@ -231,7 +234,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0082`',
+    '`0001` through `0084`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

@@ -16,6 +16,8 @@ import {
 import type { PharmacyVerifiedReservationExecutorPort } from "./import-pharmacy-verified-reservation-handoff";
 import type { PharmacyPrivatePublishReadbackClient } from "./import-supabase-pharmacy-private-publish-readback";
 
+const BOUNDED_ROLLBACK_AUTHORITY_REFERENCE = "rollback-authority-ready";
+
 export type PharmacyPrivateAdminPublishExecutionResult = {
   ok: boolean;
   reference: string | null;
@@ -138,7 +140,10 @@ export function createPharmacyPrivateAdminPublishExecutor(
     execute,
     async acceptVerifiedReservation(request) {
       const result = await execute(request);
-      return { ok: result.ok, reference: result.reference };
+      return {
+        ok: result.ok,
+        reference: result.ok ? BOUNDED_ROLLBACK_AUTHORITY_REFERENCE : null,
+      };
     },
   };
 }

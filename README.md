@@ -26,11 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #954** at baseline **`9d0511ba6b2ff5a53e8fd857cb09273d269d602d`**.
-- Database/migration status: **validates through `0082_import_pharmacy_private_execution_audit.sql`**.
-- Completed migration set: **`0001` through `0082`**.
-- Current import-readiness implementation: **`ROLLBACK-AUTHORITY-HARDENING`**.
-- P05 enables only the guarded Preview Pharmacy `private_publish` path after verified Reservation handoff, exact mutation, terminal persistence, durable-reference creation, and post-mutation readback. Public/index/sitemap/route promotion and Production execution remain disabled.
+- Import-readiness runtime is aligned through **PR #955** at baseline **`e32d3e8789df5fb2cb744723cc5acd8e59d4827d`**.
+- Database/migration status: **validates through `0084_import_pharmacy_rollback_digest_schema.sql`**.
+- Completed migration set: **`0001` through `0084`**.
+- Current import-readiness implementation: **`ROLLBACK-EXACT-RECOVERY`**.
+- P06 hardens the existing Preview Pharmacy rollback authority with server-selected actor/entity/version/snapshot binding, atomic consume-or-abort, bounded replay and no raw-reference browser custody. Exact recovery, rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

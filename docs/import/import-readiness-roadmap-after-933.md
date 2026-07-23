@@ -18,13 +18,15 @@ Wave 1     COMPLETE  (#940–#941) Server-owned authorization persistence, inval
 Wave 2.1   COMPLETE  (#942, #949, #950) Atomic reservation, hosted DB safety, and reservation audit-event separation complete
 Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-linked integrity readback proven
 Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven
+Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time consumption and bounded replay proven
+Wave 4.2   OPEN      Exact logical recovery verification remains next
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #954
-Baseline commit: 9d0511b
+Aligned through: PR #955
+Baseline commit: e32d3e8
 Last aligned: 2026-07-24
 ```
 
@@ -33,17 +35,19 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 954,
-  "runtimeBaseline": "9d0511ba6b2ff5a53e8fd857cb09273d269d602d",
+  "alignedThroughPr": 955,
+  "runtimeBaseline": "e32d3e8789df5fb2cb744723cc5acd8e59d4827d",
   "lastAligned": "2026-07-24",
-  "currentMigration": "0082_import_pharmacy_private_execution_audit.sql",
-  "currentNext": "ROLLBACK-AUTHORITY-HARDENING",
+  "currentMigration": "0084_import_pharmacy_rollback_digest_schema.sql",
+  "currentNext": "ROLLBACK-EXACT-RECOVERY",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
     "2.1": "COMPLETE",
     "2.2": "COMPLETE",
-    "3+": "COMPLETE"
+    "3+": "COMPLETE",
+    "4.1": "COMPLETE",
+    "4.2": "OPEN"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -228,17 +232,33 @@ The executor creates one opaque server-only durable rollback reference and retur
 
 The isolated hosted P05 proof runs only after Preview Migration Sync verifies migration 0082 on the exact PR SHA. Production is not connected or changed.
 
-## Wave 4 — Existing rollback path `OPEN`
+## Wave 4 — Existing rollback path `PARTIAL`
 
-### 4.1 Durable rollback authority
+### 4.1 Durable rollback authority `COMPLETE (#955)`
 
-Use and harden the existing durable publish reference. Raw reference remains server-side, is bound to terminal publish identity/current version, and is consumed atomically.
+Operation contract:
 
 ```text
 ROLLBACK PRIVATE PUBLISH <entity-id>
 ```
 
-### 4.2 Exact recovery
+P06 hardens the existing durable Pharmacy publish reference rather than introducing a second rollback authority. Migrations 0083 and 0084 add bounded consumption state and the service-role-only atomic authority RPC, then apply the forward pgcrypto schema correction proven by isolated Preview.
+
+The authority path now:
+
+- accepts only allowlisted actor/entity identity and entity-bound confirmation;
+- keeps the random raw reference out of browser, form, workflow and canary inputs/results;
+- binds the eligible authority to successful terminal publish identity, current entity version, rollback snapshot identity/hash, actor, entity and expiry;
+- locks the center, reference, terminal record and snapshot;
+- executes the existing Pharmacy rollback RPC and consumes the authority in one transaction;
+- leaves failed or conflicting authority state unconsumed;
+- returns bounded `rolled_back` or persisted `replayed` evidence;
+- persists a bounded consumed result and SHA-256 integrity hash;
+- preserves private/draft/inactive/noindex/no-route/no-sitemap state.
+
+The exact-SHA hosted proof produced one fresh rollback and one replay from concurrent clients, exactly one consumed reference, exactly one rollback-success audit, zero duplicate rollback, zero public exposure, an unconsumed failed fixture and deterministic cleanup. Production was not connected or changed.
+
+### 4.2 Exact recovery `OPEN`
 
 Compare original logical state with post-rollback state. Bounded fields, publication state, locale, country, path, projection, metadata, relations included by snapshot contract, deletion and sort state must match.
 
@@ -352,15 +372,14 @@ Do not add:
 ## Current next implementation
 
 ```text
-ROLLBACK-AUTHORITY-HARDENING
+ROLLBACK-EXACT-RECOVERY
 ```
 
-P05 completed the guarded Preview-only Pharmacy private mutation using one already verified Reservation, exact canonical patch, terminal persistence, one durable rollback reference and post-mutation readback. The next implementation is P06 hardening of the existing durable rollback authority. Raw references remain server-only and public/index/sitemap/route promotion stays disabled.
+P06 completed atomic server-selected rollback authority consumption and bounded replay using the existing Pharmacy rollback path. The next implementation is P07 exact logical recovery verification. Rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.
 
-After `ROLLBACK-AUTHORITY-HARDENING` is green:
+After `ROLLBACK-EXACT-RECOVERY` is green:
 
 ```text
-ROLLBACK-EXACT-RECOVERY
-→ ADMIN-STATE-MACHINE
+ADMIN-STATE-MACHINE
 → REAL-ADMIN-CANARY
 ```

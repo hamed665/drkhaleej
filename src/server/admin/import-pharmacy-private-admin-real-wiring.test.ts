@@ -106,14 +106,21 @@ function verifiedEvidence(): PharmacyVerifiedReservationEvidence {
   };
 }
 
+function rolledBack(kind: "rolled_back" | "replayed" = "rolled_back"): ImportPharmacyPrivateRollbackResult {
+  return {
+    kind,
+    entityId: "pharmacy-1",
+    actualVersion: "version-3",
+    authorityConsumed: true,
+    privateBoundaryVerified: true,
+    rawReferenceExposed: false,
+  };
+}
+
 function harness() {
-  const acceptVerifiedReservation = vi.fn(async () => ({ ok: true, reference: "handoff-reference-1" }));
+  const acceptVerifiedReservation = vi.fn(async () => ({ ok: true, reference: "rollback-authority-ready" }));
   const rollbackWriter = vi.fn(
-    async (..._args: Parameters<RollbackWriter>): Promise<ImportPharmacyPrivateRollbackResult> => ({
-      kind: "rolled_back",
-      entityId: "pharmacy-1",
-      actualVersion: "version-3",
-    }),
+    async (..._args: Parameters<RollbackWriter>): Promise<ImportPharmacyPrivateRollbackResult> => rolledBack(),
   );
   const loadPublishContext = vi.fn(async () => publishContext());
   const verifyPublishReview = vi.fn(async () => true);
@@ -125,14 +132,6 @@ function harness() {
     verifyPublishReview,
     loadVerifiedReservationEvidence,
     verifiedReservationExecutor: { acceptVerifiedReservation },
-    resolveRollbackRequest: vi.fn(async () => ({
-      reservationId: "reservation-1",
-      rollbackSnapshotId: "snapshot-1",
-      entityId: "pharmacy-1",
-      actorId: "admin-1",
-      expectedCurrentVersion: "version-2",
-      expectedSnapshotHash: SNAPSHOT_HASH,
-    })),
     dryRun: vi.fn(async () => ({ ok: true, reference: "dry-1" })),
     review: vi.fn(async () => ({ ok: true, reference: "review-1" })),
     audit: vi.fn(async () => true),
@@ -158,7 +157,7 @@ describe("pharmacy private admin real wiring", () => {
       entityId: "pharmacy-1",
     });
 
-    expect(result).toEqual({ ok: true, reference: "handoff-reference-1" });
+    expect(result).toEqual({ ok: true, reference: "rollback-authority-ready" });
     expect(test.loadPublishContext).toHaveBeenCalledTimes(1);
     expect(test.verifyPublishReview).toHaveBeenCalledWith({
       actorId: "admin-1",
@@ -254,15 +253,27 @@ describe("pharmacy private admin real wiring", () => {
     expect(JSON.stringify(result)).not.toContain("authorization-1");
   });
 
-  it("resolves an opaque reference and runs the existing rollback boundary once", async () => {
+  it("invokes the atomic authority rollback once without resolving a raw reference", async () => {
     const test = harness();
     const result = await createPharmacyPrivateAdminRealPorts(test.dependencies).rollback({
       actorId: "admin-1",
       entityId: "pharmacy-1",
-      publishReference: "publish-reference-1",
     });
 
-    expect(result).toEqual({ ok: true, reference: "publish-reference-1" });
+    expect(result).toEqual({ ok: true, reference: "rollback-authority-consumed" });
+    expect(test.rollbackWriter).toHaveBeenCalledTimes(1);
+    expect(test.rollbackWriter).toHaveBeenCalledWith({ actorId: "admin-1", entityId: "pharmacy-1" });
+    expect(JSON.stringify(test.rollbackWriter.mock.calls)).not.toContain("publishReference");
+  });
+
+  it("distinguishes a bounded rollback replay without a second authority path", async () => {
+    const test = harness();
+    test.rollbackWriter.mockResolvedValueOnce(rolledBack("replayed"));
+
+    await expect(createPharmacyPrivateAdminRealPorts(test.dependencies).rollback({
+      actorId: "admin-1",
+      entityId: "pharmacy-1",
+    })).resolves.toEqual({ ok: true, reference: "rollback-authority-replayed" });
     expect(test.rollbackWriter).toHaveBeenCalledTimes(1);
   });
 });

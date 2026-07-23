@@ -81,7 +81,6 @@ export function createPharmacyPrivateAdminRuntimeExecutor(
             readinessPassed: execution.controlState.readinessPassed,
             reviewApproved: execution.controlState.reviewApproved,
             confirmation: input.confirmation,
-            publishReference: input.publishReference,
             auditAvailable: execution.controlState.auditAvailable,
           },
           execution.ports,

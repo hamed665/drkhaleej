@@ -5,83 +5,105 @@ vi.mock("server-only", () => ({}));
 import { describe, expect, it } from "vitest";
 import { createSupabasePharmacyPrivateRollbackWriter } from "./import-supabase-pharmacy-private-rollback-writer";
 
-const snapshotHash = "a".repeat(64);
-
 function request() {
   return {
-    reservationId: "reservation-001",
-    rollbackSnapshotId: "snapshot-001",
     entityId: "11111111-1111-4111-8111-111111111111",
     actorId: "22222222-2222-4222-8222-222222222222",
-    expectedCurrentVersion: "2026-07-12 02:00:00+00",
-    expectedSnapshotHash: snapshotHash,
   };
 }
 
-describe("Supabase pharmacy private rollback writer", () => {
-  it("calls only the atomic rollback RPC with exact identity and hash", async () => {
-    const rpc = vi.fn().mockResolvedValue({
-      data: {
-        status: "rolled_back",
-        entityId: request().entityId,
-        actualVersion: "2026-07-12 02:01:00+00",
-      },
-      error: null,
-    });
+function success(status: "rolled_back" | "replayed") {
+  return {
+    status,
+    entityId: request().entityId,
+    actualVersion: "2026-07-24 02:01:00+00",
+    authorityConsumed: true,
+    privateBoundaryVerified: true,
+    rawReferenceExposed: false,
+  };
+}
+
+describe("Supabase pharmacy atomic rollback authority writer", () => {
+  it("calls only the authority RPC with actor/entity identity and no raw reference", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: success("rolled_back"), error: null });
     const rollback = createSupabasePharmacyPrivateRollbackWriter({ rpc });
 
     await expect(rollback(request())).resolves.toEqual({
       kind: "rolled_back",
       entityId: request().entityId,
-      actualVersion: "2026-07-12 02:01:00+00",
+      actualVersion: "2026-07-24 02:01:00+00",
+      authorityConsumed: true,
+      privateBoundaryVerified: true,
+      rawReferenceExposed: false,
     });
-    expect(rpc).toHaveBeenCalledWith("import_rollback_pharmacy_private", {
-      p_idempotency_record_id: "reservation-001",
-      p_rollback_snapshot_id: "snapshot-001",
+    expect(rpc).toHaveBeenCalledWith("import_rollback_pharmacy_private_by_authority", {
       p_entity_id: request().entityId,
       p_actor_profile_id: request().actorId,
-      p_expected_current_version: "2026-07-12 02:00:00+00",
-      p_expected_snapshot_hash: snapshotHash,
-      p_audit_schema_version: "1",
+      p_audit_schema_version: "drkhaleej.import.publishAudit.v4",
     });
+    expect(JSON.stringify(rpc.mock.calls)).not.toContain("publishReference");
+    expect(JSON.stringify(rpc.mock.calls)).not.toContain("rollbackSnapshotId");
+    expect(JSON.stringify(rpc.mock.calls)).not.toContain("reservationId");
   });
 
-  it("returns replayed for an already restored snapshot", async () => {
+  it("returns a bounded replay for an already consumed authority", async () => {
     const rollback = createSupabasePharmacyPrivateRollbackWriter({
-      rpc: vi.fn().mockResolvedValue({
-        data: { status: "replayed", entityId: request().entityId, actualVersion: "v3" },
-        error: null,
-      }),
+      rpc: vi.fn().mockResolvedValue({ data: success("replayed"), error: null }),
     });
     await expect(rollback(request())).resolves.toEqual({
       kind: "replayed",
       entityId: request().entityId,
-      actualVersion: "v3",
+      actualVersion: "2026-07-24 02:01:00+00",
+      authorityConsumed: true,
+      privateBoundaryVerified: true,
+      rawReferenceExposed: false,
     });
   });
 
-  it("fails closed before RPC for an invalid snapshot hash", async () => {
+  it("fails closed before RPC for missing actor or entity identity", async () => {
     const rpc = vi.fn();
     const rollback = createSupabasePharmacyPrivateRollbackWriter({ rpc });
-    await expect(rollback({ ...request(), expectedSnapshotHash: "bad" })).resolves.toEqual({ kind: "failed" });
+    await expect(rollback({ ...request(), actorId: "" })).resolves.toEqual({
+      kind: "failed",
+      authorityConsumed: false,
+      rawReferenceExposed: false,
+    });
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it("normalizes approved conflicts and rejects malformed responses", async () => {
-    const conflict = createSupabasePharmacyPrivateRollbackWriter({
+  it("normalizes approved conflicts only when consumption stayed false", async () => {
+    const rollback = createSupabasePharmacyPrivateRollbackWriter({
       rpc: vi.fn().mockResolvedValue({
-        data: { status: "conflict", reason: "rollback_current_version_mismatch" },
+        data: {
+          status: "conflict",
+          reason: "rollback_authority_not_available",
+          authorityConsumed: false,
+          rawReferenceExposed: false,
+        },
         error: null,
       }),
     });
-    await expect(conflict(request())).resolves.toEqual({
+    await expect(rollback(request())).resolves.toEqual({
       kind: "conflict",
-      reason: "rollback_current_version_mismatch",
+      reason: "rollback_authority_not_available",
+      authorityConsumed: false,
+      rawReferenceExposed: false,
     });
+  });
 
-    const malformed = createSupabasePharmacyPrivateRollbackWriter({
-      rpc: vi.fn().mockResolvedValue({ data: { status: "rolled_back" }, error: null }),
-    });
-    await expect(malformed(request())).resolves.toEqual({ kind: "failed" });
+  it("rejects malformed success, raw-reference exposure, and RPC errors", async () => {
+    for (const response of [
+      { data: { ...success("rolled_back"), authorityConsumed: false }, error: null },
+      { data: { ...success("rolled_back"), rawReferenceExposed: true }, error: null },
+      { data: { status: "rolled_back" }, error: null },
+      { data: null, error: { message: "rpc failed" } },
+    ]) {
+      const rollback = createSupabasePharmacyPrivateRollbackWriter({ rpc: vi.fn().mockResolvedValue(response) });
+      await expect(rollback(request())).resolves.toEqual({
+        kind: "failed",
+        authorityConsumed: false,
+        rawReferenceExposed: false,
+      });
+    }
   });
 });

@@ -32,7 +32,7 @@ const successfulReadback = {
   },
 };
 
-function completed(reference = "opaque-reference") {
+function completed(reference = "rollback-authority-ready") {
   return {
     operation: "private_publish" as const,
     status: "completed" as const,
@@ -47,7 +47,7 @@ function completed(reference = "opaque-reference") {
 }
 
 describe("runPharmacyRealPreviewCanary", () => {
-  it("verifies exactly one persistence chain and a private Pharmacy entity", async () => {
+  it("verifies exactly one persistence chain without handing readback a raw reference", async () => {
     const executor = vi.fn(async () => completed());
     const read = vi.fn(async () => ({ data: successfulReadback, error: null }));
 
@@ -62,14 +62,15 @@ describe("runPharmacyRealPreviewCanary", () => {
     expect(result.publicVisibility).toBe("private");
     expect(result.indexEligible).toBe(false);
     expect(result.sitemapEligible).toBe(false);
+    expect(result.rawReferenceExposed).toBe(false);
     expect(executor).toHaveBeenCalledWith({
       operation: "private_publish",
       actorId: "actor-1",
       entityId: "pharmacy-1",
       confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
-      publishReference: null,
     });
-    expect(read).toHaveBeenCalledWith({ actorId: "actor-1", entityId: "pharmacy-1", publishReference: "opaque-reference" });
+    expect(read).toHaveBeenCalledWith({ actorId: "actor-1", entityId: "pharmacy-1" });
+    expect(JSON.stringify(read.mock.calls)).not.toContain("rollback-authority-ready");
   });
 
   it("does not execute when activation is disabled", async () => {
@@ -86,7 +87,7 @@ describe("runPharmacyRealPreviewCanary", () => {
   });
 
   it("fails closed when execution does not complete", async () => {
-    const executor = vi.fn(async () => ({ ...completed(null as unknown as string), status: "failed" as const, executionReference: null }));
+    const executor = vi.fn(async () => ({ ...completed(), status: "failed" as const, executionReference: null }));
     const read = vi.fn();
     const result = await runPharmacyRealPreviewCanary({ activation, executor, readbackClient: { read } });
     expect(result.blockers).toEqual(["publish_failed"]);

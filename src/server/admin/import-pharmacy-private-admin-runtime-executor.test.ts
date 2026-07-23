@@ -9,8 +9,8 @@ function ports() {
     dryRun: vi.fn(async () => ({ ok: true, reference: "dry-run-1" })),
     review: vi.fn(async () => ({ ok: true, reference: "review-1" })),
     reservePrivatePublish: vi.fn(async () => ({ ok: true, reference: "reservation-1" })),
-    privatePublish: vi.fn(async () => ({ ok: true, reference: "publish-1" })),
-    rollback: vi.fn(async () => ({ ok: true, reference: "publish-1" })),
+    privatePublish: vi.fn(async () => ({ ok: true, reference: "rollback-authority-ready" })),
+    rollback: vi.fn(async () => ({ ok: true, reference: "rollback-authority-consumed" })),
     audit: vi.fn(async () => true),
   };
 }
@@ -30,10 +30,9 @@ describe("pharmacy private Admin runtime executor", () => {
       actorId: "admin-1",
       entityId: "pharmacy-1",
       confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
-      publishReference: null,
     });
 
-    expect(result).toMatchObject({ status: "completed", entityId: "pharmacy-1", executionReference: "publish-1" });
+    expect(result).toMatchObject({ status: "completed", entityId: "pharmacy-1", executionReference: "rollback-authority-ready" });
     expect(runtimePorts.privatePublish).toHaveBeenCalledOnce();
     expect(runtimePorts.audit).toHaveBeenCalledOnce();
   });
@@ -48,7 +47,6 @@ describe("pharmacy private Admin runtime executor", () => {
       actorId: "admin-1",
       entityId: "pharmacy-1",
       confirmation: null,
-      publishReference: null,
     })).resolves.toMatchObject({ status: "failed", executionReference: null });
   });
 
@@ -66,7 +64,6 @@ describe("pharmacy private Admin runtime executor", () => {
       actorId: "admin-1",
       entityId: "pharmacy-1",
       confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
-      publishReference: null,
     });
 
     expect(result.status).toBe("blocked");

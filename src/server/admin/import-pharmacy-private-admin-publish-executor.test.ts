@@ -166,14 +166,14 @@ function readback(requestValue: ImportPharmacyPrivateMutationRequest): PharmacyP
 }
 
 describe("Pharmacy private Admin publish executor", () => {
-  it("returns the opaque reference only after mutation and exact readback", async () => {
+  it("uses the raw reference only for server readback and returns a bounded authority marker", async () => {
     const requestValue = request();
     const mutationWriter = {
       mutateOne: vi.fn(async () => ({ kind: "mutated" as const, entityId: "pharmacy-1", actualVersion: "version-2" })),
       rollbackOne: vi.fn(async () => false),
     };
     const publishReferenceStore = {
-      create: vi.fn(async () => "opaque-reference-1"),
+      create: vi.fn(async () => "raw-opaque-reference-1"),
       resolve: vi.fn(async () => null),
     };
     const readbackClient = {
@@ -186,13 +186,14 @@ describe("Pharmacy private Admin publish executor", () => {
       readbackClient,
     });
 
-    await expect(executor.acceptVerifiedReservation(requestValue)).resolves.toEqual({
-      ok: true,
-      reference: "opaque-reference-1",
-    });
+    const result = await executor.acceptVerifiedReservation(requestValue);
+    expect(result).toEqual({ ok: true, reference: "rollback-authority-ready" });
+    expect(JSON.stringify(result)).not.toContain("raw-opaque-reference-1");
     expect(mutationWriter.mutateOne).toHaveBeenCalledTimes(1);
     expect(publishReferenceStore.create).toHaveBeenCalledTimes(1);
-    expect(readbackClient.read).toHaveBeenCalledTimes(1);
+    expect(readbackClient.read).toHaveBeenCalledWith(expect.objectContaining({
+      publishReference: "raw-opaque-reference-1",
+    }));
   });
 
   it("fails closed and withholds the reference when readback detects exposure", async () => {

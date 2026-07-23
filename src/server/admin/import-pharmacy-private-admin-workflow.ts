@@ -15,7 +15,6 @@ export type PharmacyPrivateAdminWorkflowBlocker =
   | "preview_required"
   | "readiness_blocked"
   | "review_required"
-  | "publish_reference_required"
   | "audit_unavailable";
 
 export type PharmacyPrivateAdminRequest = {
@@ -28,7 +27,6 @@ export type PharmacyPrivateAdminRequest = {
   readinessPassed: boolean;
   reviewApproved: boolean;
   confirmation: string | null;
-  publishReference: string | null;
   auditAvailable: boolean;
 };
 
@@ -49,7 +47,7 @@ export type PharmacyPrivateAdminWorkflowPorts = {
   review(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   reservePrivatePublish(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   privatePublish(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
-  rollback(input: { actorId: string; entityId: string; publishReference: string }): Promise<{ ok: boolean; reference: string | null }>;
+  rollback(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   audit(input: { actorId: string; entityId: string; operation: PharmacyPrivateAdminOperation; reference: string | null }): Promise<boolean>;
 };
 
@@ -74,15 +72,15 @@ export function getPharmacyPrivateAdminBlockers(input: PharmacyPrivateAdminReque
   if (input.operation !== "dry_run" && !input.readinessPassed) blockers.push("readiness_blocked");
   if (["reserve_private_publish", "private_publish", "rollback"].includes(input.operation) && input.environment !== "preview") blockers.push("preview_required");
   if ((input.operation === "reserve_private_publish" || input.operation === "private_publish") && !input.reviewApproved) blockers.push("review_required");
-  if (input.operation === "rollback" && !input.publishReference) blockers.push("publish_reference_required");
 
   if (
     input.operation === "private_publish" &&
     (entityId === null || input.confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`)
   ) blockers.push("missing_confirmation");
-  if (input.operation === "rollback" && input.confirmation !== "ROLLBACK PRIVATE PHARMACY") {
-    blockers.push("missing_confirmation");
-  }
+  if (
+    input.operation === "rollback" &&
+    (entityId === null || input.confirmation !== `ROLLBACK PRIVATE PUBLISH ${entityId}`)
+  ) blockers.push("missing_confirmation");
   return [...new Set(blockers)];
 }
 
@@ -111,7 +109,7 @@ export async function executePharmacyPrivateAdminWorkflow(
           ? await ports.reservePrivatePublish({ actorId: input.actorId, entityId })
           : input.operation === "private_publish"
             ? await ports.privatePublish({ actorId: input.actorId, entityId })
-            : await ports.rollback({ actorId: input.actorId, entityId, publishReference: input.publishReference! });
+            : await ports.rollback({ actorId: input.actorId, entityId });
 
     if (!result.ok) return { ...base, status: "failed", blockers: [], executionReference: result.reference };
     const audited = await ports.audit({ actorId: input.actorId, entityId, operation: input.operation, reference: result.reference });

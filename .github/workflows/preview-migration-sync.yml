@@ -11,6 +11,8 @@ on:
       - 'scripts/import/check-preview-database-url.mjs'
       - 'scripts/import/run-p05-private-publish-proof.mjs'
       - 'scripts/import/check-import-p05-private-publish-proof.mjs'
+      - 'scripts/import/run-p06-rollback-authority-proof.mjs'
+      - 'scripts/import/check-import-p06-rollback-authority-proof.mjs'
       - 'scripts/import/check-import-readiness-state-alignment.mjs'
       - 'docs/import/import-readiness-roadmap-after-933.md'
       - 'docs/project-state/CURRENT_STATE.md'
@@ -38,6 +40,12 @@ env:
   P05_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P05_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P05_EVIDENCE_PATH: artifacts/p05/private-publish-proof.json
+  P06_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P06_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P06_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P06_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P06_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  P06_EVIDENCE_PATH: artifacts/p06/rollback-authority-proof.json
 
 concurrency:
   group: drmuscat-isolated-preview-database-write
@@ -61,6 +69,7 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$PREVIEW_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P05_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$P06_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -85,12 +94,13 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
             node scripts/import/check-import-readiness-state-alignment.mjs
             node scripts/import/check-import-p05-private-publish-proof.mjs
+            node scripts/import/check-import-p06-rollback-authority-proof.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -108,6 +118,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-p05-private-publish-proof.mjs 2>&1 | tee artifacts/p05/hosted-proof.log
 
+      - name: Run isolated P06 atomic rollback authority proof
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p06-rollback-authority-proof.mjs 2>&1 | tee artifacts/p06/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -123,5 +139,14 @@ jobs:
         with:
           name: p05-private-publish-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p05/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload exact-SHA P06 rollback authority evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p06-rollback-authority-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p06/
           if-no-files-found: error
           retention-days: 14

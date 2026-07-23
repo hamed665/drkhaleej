@@ -92,7 +92,6 @@ export async function runPharmacyPrivateAdminPublishOperation(input: {
     loadVerifiedReservationEvidence: async ({ actorId, entityId }) =>
       actorId === loaded.review.actorId && entityId === loaded.review.entityId ? loaded.evidence : null,
     verifiedReservationExecutor: input.dependencies.executor,
-    resolveRollbackRequest: async () => null,
     dryRun: async () => ({ ok: false, reference: null }),
     review: async () => ({ ok: false, reference: null }),
     audit: async () => true,

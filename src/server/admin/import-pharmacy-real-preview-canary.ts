@@ -23,7 +23,6 @@ export type PharmacyRealPreviewCanaryReadbackClient = {
   read(input: {
     actorId: string;
     entityId: string;
-    publishReference: string;
   }): Promise<{ data: PharmacyRealPreviewCanaryReadback | null; error: { message?: string } | null }>;
 };
 
@@ -51,6 +50,7 @@ export type PharmacyRealPreviewCanaryResult = {
   indexEligible: false;
   sitemapEligible: false;
   routeEnabled: false;
+  rawReferenceExposed: false;
 };
 
 function result(input: {
@@ -67,6 +67,7 @@ function result(input: {
     indexEligible: false,
     sitemapEligible: false,
     routeEnabled: false,
+    rawReferenceExposed: false,
   };
 }
 
@@ -85,7 +86,6 @@ export async function runPharmacyRealPreviewCanary(input: {
     actorId,
     entityId,
     confirmation: `EXECUTE PRIVATE PUBLISH ${entityId}`,
-    publishReference: null,
   });
 
   if (execution.status !== "completed") {
@@ -96,7 +96,7 @@ export async function runPharmacyRealPreviewCanary(input: {
   }
 
   const publishReference = execution.executionReference;
-  const read = await input.readbackClient.read({ actorId, entityId, publishReference });
+  const read = await input.readbackClient.read({ actorId, entityId });
   if (read.error || !read.data) {
     return result({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["readback_failed"] });
   }

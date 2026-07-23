@@ -11,13 +11,14 @@ function publishCanary(overrides: Partial<PharmacyRealPreviewCanaryResult> = {})
     verified: true,
     actorId: "actor-1",
     entityId: "pharmacy-1",
-    publishReference: "opaque-reference",
+    publishReference: "rollback-authority-ready",
     readback: null,
     blockers: [],
     publicVisibility: "private",
     indexEligible: false,
     sitemapEligible: false,
     routeEnabled: false,
+    rawReferenceExposed: false,
     ...overrides,
   };
 }
@@ -27,13 +28,14 @@ function rollbackCanary(overrides: Partial<PharmacyRealRollbackCanaryResult> = {
     verified: true,
     actorId: "actor-1",
     entityId: "pharmacy-1",
-    publishReference: "opaque-reference",
+    publishReference: "rollback-authority-ready",
     readback: null,
     blockers: [],
     publicVisibility: "private",
     indexEligible: false,
     sitemapEligible: false,
     routeEnabled: false,
+    rawReferenceExposed: false,
     ...overrides,
   };
 }
@@ -77,7 +79,7 @@ describe("buildPharmacyCanaryIntegrityReport", () => {
     expect(read).toHaveBeenCalledWith({
       actorId: "actor-1",
       entityId: "pharmacy-1",
-      publishReference: "opaque-reference",
+      publishReference: "rollback-authority-ready",
     });
   });
 

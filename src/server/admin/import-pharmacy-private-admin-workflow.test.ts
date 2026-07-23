@@ -19,7 +19,6 @@ const baseRequest: PharmacyPrivateAdminRequest = {
   readinessPassed: true,
   reviewApproved: true,
   confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
-  publishReference: null,
   auditAvailable: true,
 };
 
@@ -28,8 +27,8 @@ function ports(): PharmacyPrivateAdminWorkflowPorts {
     dryRun: vi.fn(async () => ({ ok: true, reference: "dry-1" })),
     review: vi.fn(async () => ({ ok: true, reference: "review-1" })),
     reservePrivatePublish: vi.fn(async () => ({ ok: true, reference: "attempt-1" })),
-    privatePublish: vi.fn(async () => ({ ok: true, reference: "publish-1" })),
-    rollback: vi.fn(async () => ({ ok: true, reference: "rollback-1" })),
+    privatePublish: vi.fn(async () => ({ ok: true, reference: "rollback-authority-ready" })),
+    rollback: vi.fn(async () => ({ ok: true, reference: "rollback-replayed-safe" })),
     audit: vi.fn(async () => true),
   };
 }
@@ -74,25 +73,26 @@ describe("pharmacy private admin workflow", () => {
     })).toContain("missing_confirmation");
   });
 
-  it("requires the source publish reference before rollback", async () => {
+  it("requires the exact entity-bound rollback confirmation", async () => {
     const workflowPorts = ports();
     const result = await executePharmacyPrivateAdminWorkflow(
-      { ...baseRequest, operation: "rollback", confirmation: "ROLLBACK PRIVATE PHARMACY", publishReference: null },
+      { ...baseRequest, operation: "rollback", confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-2" },
       workflowPorts,
     );
     expect(result.status).toBe("blocked");
-    expect(result.blockers).toContain("publish_reference_required");
+    expect(result.blockers).toContain("missing_confirmation");
     expect(workflowPorts.rollback).not.toHaveBeenCalled();
   });
 
-  it("runs rollback only in preview with confirmation and audit", async () => {
+  it("runs rollback only in preview without receiving a raw reference", async () => {
     const workflowPorts = ports();
     const result = await executePharmacyPrivateAdminWorkflow(
-      { ...baseRequest, operation: "rollback", confirmation: "ROLLBACK PRIVATE PHARMACY", publishReference: "publish-1" },
+      { ...baseRequest, operation: "rollback", confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-1" },
       workflowPorts,
     );
-    expect(result).toMatchObject({ status: "completed", executionReference: "rollback-1", routeEnabled: false });
-    expect(workflowPorts.rollback).toHaveBeenCalledWith({ actorId: "admin-1", entityId: "pharmacy-1", publishReference: "publish-1" });
+    expect(result).toMatchObject({ status: "completed", executionReference: "rollback-replayed-safe", routeEnabled: false });
+    expect(workflowPorts.rollback).toHaveBeenCalledWith({ actorId: "admin-1", entityId: "pharmacy-1" });
+    expect(JSON.stringify(vi.mocked(workflowPorts.rollback).mock.calls)).not.toContain("publishReference");
   });
 
   it("fails honestly when the audit cannot be persisted", async () => {
