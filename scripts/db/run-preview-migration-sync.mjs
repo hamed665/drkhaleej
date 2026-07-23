@@ -56,15 +56,16 @@ function runSupabase(databaseUrl) {
       ['db', 'push', '--db-url', databaseUrl, '--include-all', '--yes'],
       { env: process.env, stdio: ['ignore', 'pipe', 'pipe'] },
     );
-    let stderr = '';
-    child.stderr.on('data', (chunk) => {
-      stderr = `${stderr}${chunk.toString()}`.slice(-4000);
-    });
-    child.stdout.resume();
+    let output = '';
+    const append = (chunk) => {
+      output = `${output}${chunk.toString()}`.slice(-12_000);
+    };
+    child.stdout.on('data', append);
+    child.stderr.on('data', append);
     child.on('error', reject);
     child.on('close', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`Supabase migration push exited with code ${code}. ${redact(stderr).slice(-1200)}`));
+      else reject(new Error(`Supabase migration push exited with code ${code}. ${redact(output).slice(-4_000)}`));
     });
   });
 }
