@@ -20,7 +20,8 @@ const writerRequired = [
   /import_publish_pharmacy_private/,
   /p_idempotency_record_id:\s*payload\.reservationId/,
   /p_rollback_snapshot_id:\s*payload\.rollbackSnapshotId/,
-  /p_reservation_audit_id:\s*payload\.auditEventId/,
+  /p_execution_started_audit_id:\s*payload\.auditEventId/,
+  /verified reservation audit id/,
   /p_expected_version:\s*payload\.expectedVersion/,
   /p_patch:\s*buildPharmacyCanonicalMutationPatch\(payload\.draft\)/,
   /p_audit_schema_version:\s*IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION/,
@@ -32,7 +33,7 @@ for (const pattern of writerRequired) {
 
 for (const pattern of [
   /calls only the atomic Pharmacy RPC with the verified Reservation audit/,
-  /p_reservation_audit_id:\s*"reservation-audit-001"/,
+  /p_execution_started_audit_id:\s*"reservation-audit-001"/,
   /metadata_patch:\s*expect\.objectContaining/,
   /does not claim rollback support before P06/,
 ]) {
@@ -52,7 +53,7 @@ for (const pattern of canonicalPrivateBoundary) {
 }
 
 const forbiddenWriterPatterns = [
-  /p_execution_started_audit_id/,
+  /p_reservation_audit_id/,
   /\.from\(/,
   /\.insert\(/,
   /\.update\(/,
