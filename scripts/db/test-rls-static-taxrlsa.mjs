@@ -10,6 +10,7 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
 const legacyRlsStaticTest = path.join(repoRoot, 'scripts', 'db', 'test-rls-static.mjs');
 const publishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-publish-transaction-rpcs.mjs');
+const pharmacyPrivatePublishRpcValidator = path.join(repoRoot, 'scripts', 'db', 'check-import-pharmacy-private-publish-rpc.mjs');
 
 const migrations = {
   taxRls: '0055_taxonomy_public_rls.sql',
@@ -31,6 +32,7 @@ const migrations = {
   pharmacyAtomicAuthorizationReservation: '0079_import_pharmacy_atomic_authorization_reservation.sql',
   pharmacyReadStateUpsertIdentity: '0080_import_pharmacy_read_state_upsert_identity.sql',
   pharmacyReservationAuditSplit: '0081_import_pharmacy_reservation_audit_split.sql',
+  pharmacyPrivateExecutionAudit: '0082_import_pharmacy_private_execution_audit.sql',
 };
 
 const migrationPaths = Object.fromEntries(
@@ -206,6 +208,25 @@ function validateLaterMigrations() {
   requirePattern(reservationAuditSplit, /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0081 must pin the reservation RPC search_path.');
   requirePattern(reservationAuditSplit, /revoke\s+all\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0081 must revoke reservation RPC access from public roles.');
   requirePattern(reservationAuditSplit, /grant\s+execute\s+on\s+function\s+public\.import_publish_reserve_snapshot_audit[\s\S]*to\s+service_role/i, '0081 must grant the reservation RPC only to service_role.');
+
+  const privateExecution = validateClosedMigration(
+    'pharmacyPrivateExecutionAudit',
+    '0082',
+    [],
+    { allowServiceRoleGrant: true, allowRowLocks: true },
+  );
+  requirePattern(privateExecution, /P05 PRIVATE-ADMIN-WIRING/i, '0082 must include its phase marker.');
+  requirePattern(privateExecution, /drop\s+function\s+if\s+exists\s+public\.import_publish_pharmacy_private[\s\S]*uuid\s*,\s*uuid\s*,\s*uuid\s*,\s*uuid\s*,\s*uuid\s*,\s*text\s*,\s*jsonb\s*,\s*text[\s\S]*\)\s*;/i, '0082 must atomically replace only the exact existing function signature.');
+  forbidPattern(privateExecution, /drop\s+(table|schema|type|database)\b/i, '0082 must not drop data-bearing or namespace objects.');
+  forbidPattern(privateExecution, /drop\s+function[\s\S]*cascade/i, '0082 function replacement must not cascade.');
+  requirePattern(privateExecution, /security\s+invoker/i, '0082 must keep the private publish RPC security invoker.');
+  requirePattern(privateExecution, /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0082 must pin the private publish RPC search_path.');
+  requirePattern(privateExecution, /revoke\s+all\s+on\s+function\s+public\.import_publish_pharmacy_private[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i, '0082 must revoke private publish RPC access from public roles.');
+  requirePattern(privateExecution, /grant\s+execute\s+on\s+function\s+public\.import_publish_pharmacy_private[\s\S]*to\s+service_role/i, '0082 must grant the private publish RPC only to service_role.');
+  requirePattern(privateExecution, /status\s*=\s*'draft'::public\.provider_status/i, '0082 must keep Pharmacy status draft.');
+  requirePattern(privateExecution, /is_active\s*=\s*false/i, '0082 must keep Pharmacy inactive.');
+  requirePattern(privateExecution, /is_featured\s*=\s*false/i, '0082 must keep Pharmacy unfeatured.');
+  execFileSync(process.execPath, [pharmacyPrivatePublishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
 }
 
 function validatePharmacyReadStateUpsertIdentityMigration() {
