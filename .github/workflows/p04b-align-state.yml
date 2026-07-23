@@ -1,0 +1,117 @@
+name: P04-B state alignment
+
+on:
+  push:
+    branches:
+      - agent/verified-reservation-handoff-p04b
+    paths:
+      - .github/workflows/p04b-align-state.yml
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout P04-B branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/verified-reservation-handoff-p04b
+          fetch-depth: 1
+
+      - name: Apply exact factual alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new, count=1):
+              file = Path(path)
+              source = file.read_text()
+              actual = source.count(old)
+              if actual != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:100]}')
+              file.write_text(source.replace(old, new, count))
+
+          baseline = 'af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0'
+
+          roadmap = 'docs/import/import-readiness-roadmap-after-933.md'
+          replace(roadmap, 'Wave 3+    OPEN', 'Wave 3+    PARTIAL   (#953) Verified Reservation handoff complete; Admin wiring and mutation remain open')
+          replace(roadmap, 'Aligned through: PR #950', 'Aligned through: PR #953')
+          replace(roadmap, 'Baseline commit: 23198c9', f'Baseline commit: {baseline[:7]}')
+          replace(roadmap, 'Last aligned: 2026-07-22', 'Last aligned: 2026-07-23')
+          replace(roadmap, '"alignedThroughPr": 950', '"alignedThroughPr": 953')
+          replace(roadmap, '"runtimeBaseline": "23198c95295f72d97c650832ee4755e33b80f2dd"', f'"runtimeBaseline": "{baseline}"')
+          replace(roadmap, '"lastAligned": "2026-07-22"', '"lastAligned": "2026-07-23"')
+          replace(roadmap, '"currentNext": "VERIFIED-RESERVATION-HANDOFF"', '"currentNext": "PRIVATE-ADMIN-WIRING"')
+          replace(roadmap, '"3+": "OPEN"', '"3+": "PARTIAL"')
+          replace(roadmap, '## Wave 3 — Existing Pharmacy private executor `OPEN`', '## Wave 3 — Existing Pharmacy private executor `PARTIAL (#953)`')
+          replace(roadmap, '### 3.1 Reservation→Execution gate', '### 3.1 Reservation→Execution gate `COMPLETE (#953)`')
+          replace(
+              roadmap,
+              '- Consume the already-implemented `reservation_created` reservation audit contract.\n- Preserve old audit reader compatibility.\n- Append `execution_started` only at real mutation time.\n- Resolve and consume the already-verified Admin Reservation.\n- Do not create a second Reservation inside private publish.',
+              '- P04-B consumes the already-implemented `reservation_created` reservation audit contract while preserving legacy reader compatibility.\n- The server-only handoff binds actor, entity, Review, operation attempt, idempotency, request hash, patch hash, expected version, snapshot hash, fingerprint, family, scope, expiry, Reservation, rollback snapshot and audit evidence.\n- Stale, foreign, incomplete, expired, unverified, duplicate, orphan, audit-gap and incompatible audit evidence fails closed before the executor port.\n- The handoff invokes no Reservation RPC and creates no second Reservation.\n- `execution_started`, real mutation, terminal persistence and post-mutation readback remain disabled until P05.'
+          )
+          replace(roadmap, '### 3.2 Admin wiring and publish readback', '### 3.2 Admin wiring and publish readback `OPEN`')
+          replace(
+              roadmap,
+              '```text\nVERIFIED-RESERVATION-HANDOFF\n```\n\nP03 proved the atomic reservation transaction on an isolated Preview database. P04-A then introduced the v2 `reservation_created` audit contract without activating mutation. The next implementation is the independent P04-B server-only handoff from the already-verified Reservation to the existing private executor. It must not create a second Reservation.\n\nAfter `VERIFIED-RESERVATION-HANDOFF` is green:\n\n```text\nPRIVATE-ADMIN-WIRING\n→ ROLLBACK-AUTHORITY-HARDENING',
+              '```text\nPRIVATE-ADMIN-WIRING\n```\n\nP04-B completed the server-only handoff from one fully verified Reservation to an injected executor port. It creates no second Reservation, exposes no raw persistence identifiers, and leaves actual mutation disabled. The next implementation is P05 private Admin wiring, terminal persistence and post-mutation readback through the existing Pharmacy executor authority.\n\nAfter `PRIVATE-ADMIN-WIRING` is green:\n\n```text\nROLLBACK-AUTHORITY-HARDENING'
+          )
+
+          matrix = 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
+          replace(matrix, 'PR #950 at baseline `23198c95295f72d97c650832ee4755e33b80f2dd` (last aligned 2026-07-22)', f'PR #953 at baseline `{baseline}` (last aligned 2026-07-23)')
+          replace(matrix, 'The current next implementation is `VERIFIED-RESERVATION-HANDOFF`.', 'The current next implementation is `PRIVATE-ADMIN-WIRING`.')
+          replace(matrix, '| Aligned through | PR #950 |', '| Aligned through | PR #953 |')
+          replace(matrix, '| Runtime baseline | `23198c95295f72d97c650832ee4755e33b80f2dd` |', f'| Runtime baseline | `{baseline}` |')
+          replace(matrix, '| Last aligned | `2026-07-22` |', '| Last aligned | `2026-07-23` |')
+          replace(matrix, '| Current next | `VERIFIED-RESERVATION-HANDOFF` |', '| Current next | `PRIVATE-ADMIN-WIRING` |')
+          replace(matrix, '| Reservation audit split | Complete | #950 | `VERIFIED-RESERVATION-HANDOFF` |', '| Reservation audit split | Complete | #950 | Maintain audit compatibility |')
+          replace(matrix, '| Existing private executor handoff | Open | — | `VERIFIED-RESERVATION-HANDOFF` |', '| Existing private executor handoff | Complete | #953 | `PRIVATE-ADMIN-WIRING` |')
+
+          readme = 'README.md'
+          replace(readme, 'PR #950** at baseline **`23198c95295f72d97c650832ee4755e33b80f2dd`**', f'PR #953** at baseline **`{baseline}`**')
+          replace(readme, 'Current import-readiness implementation: **`VERIFIED-RESERVATION-HANDOFF`**.', 'Current import-readiness implementation: **`PRIVATE-ADMIN-WIRING`**.')
+
+          agents = 'AGENTS.md'
+          replace(agents, 'PR #950 at `23198c95295f72d97c650832ee4755e33b80f2dd`', f'PR #953 at `{baseline}`')
+          replace(agents, 'current next implementation is **`VERIFIED-RESERVATION-HANDOFF`**', 'current next implementation is **`PRIVATE-ADMIN-WIRING`**')
+
+          validator = 'scripts/import/check-import-readiness-state-alignment.mjs'
+          replace(validator, 'alignedThroughPr: 950', 'alignedThroughPr: 953')
+          replace(validator, "runtimeBaseline: '23198c95295f72d97c650832ee4755e33b80f2dd'", f"runtimeBaseline: '{baseline}'")
+          replace(validator, "lastAligned: '2026-07-22'", "lastAligned: '2026-07-23'")
+          replace(validator, "currentNext: 'VERIFIED-RESERVATION-HANDOFF'", "currentNext: 'PRIVATE-ADMIN-WIRING'")
+          replace(validator, "'3+': 'OPEN'", "'3+': 'PARTIAL'")
+          replace(validator, "'Existing private executor handoff': ['Open', '—']", "'Existing private executor handoff': ['Complete', '#953']")
+
+          tests = 'scripts/import/test-import-readiness-state-alignment.mjs'
+          replace(tests, 'from: \'"currentNext": "VERIFIED-RESERVATION-HANDOFF"\',\n      to: \'"currentNext": "PRIVATE-ADMIN-WIRING"\'', 'from: \'"currentNext": "PRIVATE-ADMIN-WIRING"\',\n      to: \'"currentNext": "ROLLBACK-AUTHORITY-HARDENING"\'')
+          replace(tests, "from: '| Reservation audit split | Complete | #950 | `VERIFIED-RESERVATION-HANDOFF` |',\n      to: '| Reservation audit split | Complete | #949 | `VERIFIED-RESERVATION-HANDOFF` |'", "from: '| Existing private executor handoff | Complete | #953 | `PRIVATE-ADMIN-WIRING` |',\n      to: '| Existing private executor handoff | Complete | #950 | `PRIVATE-ADMIN-WIRING` |'")
+          replace(tests, "expectedError: 'Reservation audit split evidence drifted'", "expectedError: 'Existing private executor handoff evidence drifted'")
+
+          handoff_doc = 'docs/import/VERIFIED_RESERVATION_HANDOFF.md'
+          replace(handoff_doc, '`pnpm import:verified-reservation-handoff:validate`', '`node scripts/import/check-import-verified-reservation-handoff.mjs`')
+
+          current_state = Path('docs/project-state/CURRENT_STATE.md').read_text()
+          for token in [f'PR #953', baseline, '`PRIVATE-ADMIN-WIRING`', '| 3+ | PARTIAL |']:
+              if token not in current_state:
+                  raise SystemExit(f'CURRENT_STATE.md missing aligned token: {token}')
+          PY
+
+          node scripts/import/check-import-verified-reservation-handoff.mjs
+          node scripts/import/check-import-readiness-state-alignment.mjs
+          node scripts/import/test-import-readiness-state-alignment.mjs
+
+      - name: Commit alignment and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/p04b-align-state.yml
+          git add AGENTS.md README.md docs/import/import-readiness-roadmap-after-933.md docs/import/VERIFIED_RESERVATION_HANDOFF.md docs/project-state/CURRENT_STATE.md docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md scripts/import/check-import-readiness-state-alignment.mjs scripts/import/test-import-readiness-state-alignment.mjs
+          git commit -m "docs: align import readiness through P04-B"
+          git push origin HEAD:agent/verified-reservation-handoff-p04b
