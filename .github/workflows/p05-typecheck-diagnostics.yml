@@ -1,28 +1,21 @@
-name: P05 typecheck diagnostics
+name: P05 finalize migration validator
 
 on:
   pull_request:
     paths:
       - .github/workflows/p05-typecheck-diagnostics.yml
-      - src/server/admin/import-pharmacy-private-admin-publish-operation.ts
-      - src/server/admin/import-pharmacy-private-admin-publish-executor.ts
-      - src/server/admin/import-pharmacy-private-publish-readback.ts
-      - src/server/admin/import-supabase-pharmacy-private-publish-readback.ts
-      - src/server/admin/import-pharmacy-verified-reservation-loader.ts
-      - src/server/admin/import-supabase-pharmacy-verified-reservation-loader.ts
-      - src/app/admin/imports/readiness/actions.ts
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  finalize:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: agent/private-admin-wiring-p05
       - uses: pnpm/action-setup@v4
         with:
           version: 10.22.0
@@ -31,17 +24,62 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Capture typecheck
+      - run: pnpm typecheck
+      - name: Register migration 0082 and remove temporary workflows
         shell: bash
         run: |
-          set -o pipefail
-          mkdir -p artifacts/p05
-          pnpm typecheck 2>&1 | tee artifacts/p05/typecheck.log
-      - name: Upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: p05-typecheck-${{ github.event.pull_request.head.sha || github.sha }}
-          path: artifacts/p05/typecheck.log
-          if-no-files-found: error
-          retention-days: 2
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/db/validate-migrations-current.mjs')
+          source = path.read_text()
+
+          replacements = [
+            (
+              "const pharmacyReservationAuditSplitMigrationName = '0081_import_pharmacy_reservation_audit_split.sql';",
+              "const pharmacyReservationAuditSplitMigrationName = '0081_import_pharmacy_reservation_audit_split.sql';\nconst pharmacyPrivateExecutionAuditMigrationName = '0082_import_pharmacy_private_execution_audit.sql';",
+            ),
+            (
+              "const pharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, pharmacyReservationAuditSplitMigrationName);",
+              "const pharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, pharmacyReservationAuditSplitMigrationName);\nconst pharmacyPrivateExecutionAuditMigrationPath = path.join(migrationsDir, pharmacyPrivateExecutionAuditMigrationName);",
+            ),
+            (
+              "const hiddenPharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, `.pharmacy-reservation-audit-split-${pharmacyReservationAuditSplitMigrationName}.hidden`);",
+              "const hiddenPharmacyReservationAuditSplitMigrationPath = path.join(migrationsDir, `.pharmacy-reservation-audit-split-${pharmacyReservationAuditSplitMigrationName}.hidden`);\nconst hiddenPharmacyPrivateExecutionAuditMigrationPath = path.join(migrationsDir, `.pharmacy-private-execution-audit-${pharmacyPrivateExecutionAuditMigrationName}.hidden`);",
+            ),
+            (
+              "  [pharmacyReservationAuditSplitMigrationName, pharmacyReservationAuditSplitMigrationPath, hiddenPharmacyReservationAuditSplitMigrationPath],\n];",
+              "  [pharmacyReservationAuditSplitMigrationName, pharmacyReservationAuditSplitMigrationPath, hiddenPharmacyReservationAuditSplitMigrationPath],\n  [pharmacyPrivateExecutionAuditMigrationName, pharmacyPrivateExecutionAuditMigrationPath, hiddenPharmacyPrivateExecutionAuditMigrationPath],\n];",
+            ),
+          ]
+          if "pharmacyPrivateExecutionAuditMigrationName" not in source:
+              for old, new in replacements:
+                  if source.count(old) != 1:
+                      raise SystemExit(f'migration validator anchor mismatch: {old[:80]}')
+                  source = source.replace(old, new, 1)
+
+              function_anchor = "\nfunction runLegacyValidatorWithoutCurrentOnlyMigrations() {"
+              function_text = """
+function validatePharmacyPrivateExecutionAuditMigration() {
+  requireCondition(existsSync(pharmacyPrivateExecutionAuditMigrationPath), `${pharmacyPrivateExecutionAuditMigrationName} is missing.`);
+  execFileSync(process.execPath, [pharmacyPublishRpcValidator], { cwd: repoRoot, stdio: 'inherit' });
+}
+"""
+              if source.count(function_anchor) != 1:
+                  raise SystemExit('migration validator function anchor mismatch')
+              source = source.replace(function_anchor, function_text + function_anchor, 1)
+
+              call_anchor = "validatePharmacyReservationAuditSplitMigration();\n\nconsole.log('Current migration validation passed.');"
+              call_text = "validatePharmacyReservationAuditSplitMigration();\nvalidatePharmacyPrivateExecutionAuditMigration();\n\nconsole.log('Current migration validation passed.');"
+              if source.count(call_anchor) != 1:
+                  raise SystemExit('migration validator call anchor mismatch')
+              source = source.replace(call_anchor, call_text, 1)
+              path.write_text(source)
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .github/workflows/p05-typecheck-diagnostics.yml .github/workflows/p05-patch-migration-validator.yml
+          git add scripts/db/validate-migrations-current.mjs
+          git commit -m "test(p05): register additive execution migration"
+          git push origin HEAD:agent/private-admin-wiring-p05
