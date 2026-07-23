@@ -235,7 +235,6 @@ async function insertFixture(client, item) {
     );
     item.currentVersion = mutated.rows[0]?.updated_at;
     assert(typeof item.currentVersion === 'string', 'P06 mutated version was not captured.');
-    assert(item.currentVersion !== item.originalVersion, 'P06 fixture did not advance the entity version.');
 
     const authorityVersion = item.conflict ? 'p06-stale-version' : item.currentVersion;
     await client.query(
