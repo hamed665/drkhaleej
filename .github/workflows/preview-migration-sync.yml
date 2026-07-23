@@ -68,9 +68,14 @@ jobs:
           version: 2.101.0
 
       - name: Validate repository migration and RLS contracts
+        shell: bash
         run: |
-          pnpm db:validate:migrations
-          pnpm test:db:rls
+          set -o pipefail
+          mkdir -p artifacts/preview-migration-sync
+          {
+            pnpm db:validate:migrations
+            pnpm test:db:rls
+          } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
         run: node scripts/db/preview-migration-sync.mjs preflight
