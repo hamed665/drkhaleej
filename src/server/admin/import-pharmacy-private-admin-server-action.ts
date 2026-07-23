@@ -12,7 +12,6 @@ export type PharmacyPrivateAdminServerActionBlocker =
   | "invalid_entity"
   | "entity_not_allowed"
   | "invalid_confirmation"
-  | "invalid_publish_reference"
   | "environment_not_preview";
 
 export type PharmacyPrivateAdminServerActionResult =
@@ -25,7 +24,6 @@ export type PharmacyPrivateAdminServerActionExecutor = (input: {
   actorId: string;
   entityId: string;
   confirmation: string | null;
-  publishReference: string | null;
 }) => Promise<PharmacyPrivateAdminWorkflowResult>;
 
 export type PharmacyPrivateAdminServerActionDependencies = {
@@ -67,7 +65,6 @@ export function createPharmacyPrivateAdminServerAction(
     const operationValue = readSingle(input.formData, "operation");
     const entityId = readSingle(input.formData, "entityId");
     const confirmation = readSingle(input.formData, "confirmation");
-    const publishReference = readSingle(input.formData, "publishReference");
     const blockers: PharmacyPrivateAdminServerActionBlocker[] = [];
 
     if (!dependencies.executionEnabled) blockers.push("action_disabled");
@@ -84,15 +81,14 @@ export function createPharmacyPrivateAdminServerAction(
     if (operationValue === "private_publish" && entityId && confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`) {
       blockers.push("invalid_confirmation");
     }
-    if (operationValue === "rollback") {
-      if (confirmation !== "ROLLBACK PRIVATE PHARMACY") blockers.push("invalid_confirmation");
-      if (!publishReference) blockers.push("invalid_publish_reference");
+    if (operationValue === "rollback" && entityId && confirmation !== `ROLLBACK PRIVATE PUBLISH ${entityId}`) {
+      blockers.push("invalid_confirmation");
     }
 
     const uniqueBlockers = [...new Set(blockers)];
     if (uniqueBlockers.length > 0 || !isOperation(operationValue) || !entityId) return { ok: false, blockers: uniqueBlockers };
 
-    const workflow = await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation, publishReference });
+    const workflow = await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
     if (workflow.status !== "completed") return { ok: false, blockers: [], workflow };
     return { ok: true, workflow };
   };
