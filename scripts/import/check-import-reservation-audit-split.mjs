@@ -6,12 +6,12 @@ import path from 'node:path';
 const root = process.cwd();
 const files = {
   migration: 'supabase/migrations/0081_import_pharmacy_reservation_audit_split.sql',
+  executionMigration: 'supabase/migrations/0082_import_pharmacy_private_execution_audit.sql',
   contract: 'src/server/admin/import-reservation-audit-contract.ts',
   verifier: 'src/server/admin/import-persistence-readback-verifier.ts',
   verifierTest: 'src/server/admin/import-persistence-readback-verifier.test.ts',
   readback: 'src/server/admin/import-supabase-persistence-readback-client.ts',
   runtime: 'src/server/admin/import-pharmacy-private-admin-runtime-context.ts',
-  mutationRpc: 'supabase/migrations/0070_import_pharmacy_private_publish_rpc.sql',
   action: 'src/app/admin/imports/readiness/actions.ts',
 };
 
@@ -74,16 +74,30 @@ assert(source.readback.includes('event_type,outcome,schema_version,expected_vers
 assert(source.readback.includes('schema_version: stringValue(row.schema_version)'), `${files.readback} must map schema_version.`);
 assert(source.runtime.includes('auditSchemaVersion: IMPORT_RESERVATION_AUDIT_SCHEMA_VERSION'), `${files.runtime} must use the v2 reservation audit schema.`);
 
-for (const token of ['p_execution_started_audit_id', "event_type = 'execution_started'"]) {
-  assert(source.mutationRpc.includes(token), `${files.mutationRpc} must retain execution_started at the mutation boundary.`);
+for (const token of [
+  'p_execution_started_audit_id',
+  'legacy',
+  'verified reservation audit id',
+  "'execution_started'",
+  "'phase', 'mutation'",
+  'drkhaleej.import.publishAudit.v3',
+  "event_payload ->> 'phase' = 'reservation'",
+]) {
+  assert(source.executionMigration.includes(token), `${files.executionMigration} must preserve the Reservation→execution boundary with ${token}.`);
 }
-
 assert(
-  source.action.includes('IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const'),
-  `${files.action} must keep private publish disabled in P04-A.`,
+  source.executionMigration.indexOf("event_payload ->> 'phase' = 'reservation'") <
+    source.executionMigration.indexOf("'execution_started'"),
+  `${files.executionMigration} must verify the Reservation audit before appending execution_started.`,
 );
-for (const forbidden of ['"private_publish"] as const', '"rollback"] as const']) {
-  assert(!source.action.includes(forbidden), `${files.action} must not activate ${forbidden}.`);
-}
 
-console.log('P04-A reservation audit split contract passed.');
+for (const token of [
+  '"reserve_private_publish"',
+  '"private_publish"',
+  'runPharmacyPrivateAdminPublishOperation',
+]) {
+  assert(source.action.includes(token), `${files.action} must include P05 activation token ${token}.`);
+}
+assert(!source.action.includes('"rollback"\n] as const'), `${files.action} must keep rollback disabled until P06.`);
+
+console.log('P04-A reservation audit split and P05 execution boundary contract passed.');

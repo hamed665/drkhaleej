@@ -26,6 +26,10 @@ import {
   type PharmacyPreviewPublishCapability,
 } from "@/server/admin/import-pharmacy-preview-publish-capability";
 import {
+  createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment,
+  runPharmacyPrivateAdminPublishOperation,
+} from "@/server/admin/import-pharmacy-private-admin-publish-operation";
+import {
   createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment,
   loadPharmacyPrivateAdminRuntimeContext,
 } from "@/server/admin/import-pharmacy-private-admin-runtime-context";
@@ -34,7 +38,12 @@ import {
   type PharmacyPrivateAdminServerActionResult,
 } from "@/server/admin/import-pharmacy-private-admin-server-action";
 
-const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const;
+const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = [
+  "dry_run",
+  "review",
+  "reserve_private_publish",
+  "private_publish",
+] as const;
 const READ_STATE_TTL_MS = 15 * 60 * 1000;
 
 export type PharmacyPublishAuthorizationUiState = {
@@ -143,8 +152,23 @@ export async function runPharmacyPrivateAdminAction(
     environment: process.env.VERCEL_ENV,
     allowedEntityIds,
     execute: async ({ operation, actorId, entityId, confirmation }) => {
-      if (operation !== "dry_run" && operation !== "review" && operation !== "reserve_private_publish") {
-        return { operation, status: "failed", entityId, blockers: [], publicVisibility: "private", indexEligible: false, sitemapEligible: false, routeEnabled: false, executionReference: null };
+      if (
+        operation !== "dry_run" &&
+        operation !== "review" &&
+        operation !== "reserve_private_publish" &&
+        operation !== "private_publish"
+      ) {
+        return {
+          operation,
+          status: "failed",
+          entityId,
+          blockers: [],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: null,
+        };
       }
 
       const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();
@@ -179,19 +203,63 @@ export async function runPharmacyPrivateAdminAction(
         };
       }
 
+      if (operation === "private_publish") {
+        const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+          allowedActorIds,
+          allowedEntityIds,
+        });
+        const published = dependencies
+          ? await runPharmacyPrivateAdminPublishOperation({
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              now: new Date().toISOString(),
+              dependencies,
+            })
+          : null;
+        return {
+          operation,
+          status: published?.published ? "completed" : "failed",
+          entityId,
+          blockers: published?.blocker ? ["readiness_blocked"] : [],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: published?.executionReference ?? null,
+        };
+      }
+
       if (operation === "reserve_private_publish") {
         const now = new Date().toISOString();
         const reviewState = await store.readLatestFresh({ actorId, entityId, operation: "review", now });
         const dependencies = createPharmacyAdminReservationDependenciesFromEnvironment();
         reservationState = reviewState && dependencies
           ? await runPharmacyAdminReservationOperation({
-              environment: process.env.VERCEL_ENV, actorId, entityId, allowedActorIds, allowedEntityIds,
-              confirmation: confirmation ?? "", now, reviewState, context: context.context, dependencies,
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              now,
+              reviewState,
+              context: context.context,
+              dependencies,
             })
           : null;
         return {
-          operation, status: reservationState?.reserved && reservationState.integrityVerified ? "completed" : "failed", entityId, blockers: [],
-          publicVisibility: "private", indexEligible: false, sitemapEligible: false, routeEnabled: false,
+          operation,
+          status: reservationState?.reserved && reservationState.integrityVerified ? "completed" : "failed",
+          entityId,
+          blockers: [],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
           executionReference: reservationState?.reserved && reservationState.integrityVerified
             ? reviewState?.operationAttemptId ?? null
             : null,

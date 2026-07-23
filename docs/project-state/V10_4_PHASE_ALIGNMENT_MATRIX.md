@@ -15,10 +15,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #953 at baseline `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` (last aligned 2026-07-23).
-- Migrations validate through `0081_import_pharmacy_reservation_audit_split.sql`.
-- The current next implementation is `PRIVATE-ADMIN-WIRING`.
-- Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, and admin commercial add-on assignment shell.
+- Import-readiness runtime is aligned through PR #954 at baseline `9d0511ba6b2ff5a53e8fd857cb09273d269d602d` (last aligned 2026-07-24).
+- Migrations validate through `0082_import_pharmacy_private_execution_audit.sql`.
+- The current next implementation is `ROLLBACK-AUTHORITY-HARDENING`.
+- Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
+- The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
 - Article pages are still static shell pages only.
 - Official Offers, public commercial rendering, article CMS, article placement engine, AI content workflows, live financial workflows, real seed rows, provider dashboard mutations, sales/referral/reporting expansion, and other business expansion features remain out of scope unless explicitly approved.
@@ -89,7 +90,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Draft center creation from lead | Completed admin baseline | Phase 4 / Phase 5 | Phase 5 / Phase 6 | Phase 5 / Phase 6 | Uses `note_added` with `event_kind: draft_center_created`. |
 | Center subscription view/assignment | Completed foundation | Phase 6 | Phase 9 / Phase 5 | Phase 7 / Phase 15 | Admin assignment only. |
 | Commercial add-on assignment shell | Completed draft/internal shell | Phase 6 | Phase 8 / Phase 5 | Phase 15 | Homepage Ads and Special Offer Placement only. |
-| Migrations through `0081` | Completed | Phase 2 | Phase 2 / Phase 3 | Phase 1 / Phase 2 | Existing SQL migrations must not be modified unless approved. |
+| Pharmacy private publish/readback | Completed Preview authority | Phase 4 / Phase 9 | Phase 10 / Phase 11 | Phase 6 / Phase 18 | Single entity, verified Reservation, exact patch, terminal persistence, durable reference and hosted readback; Production and public promotion remain disabled. |
+| Migrations through `0082` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -103,11 +105,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #953 |
-| Runtime baseline | `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0` |
-| Last aligned | `2026-07-23` |
-| Current migration | `0081_import_pharmacy_reservation_audit_split.sql` |
-| Current next | `PRIVATE-ADMIN-WIRING` |
+| Aligned through | PR #954 |
+| Runtime baseline | `9d0511ba6b2ff5a53e8fd857cb09273d269d602d` |
+| Last aligned | `2026-07-24` |
+| Current migration | `0082_import_pharmacy_private_execution_audit.sql` |
+| Current next | `ROLLBACK-AUTHORITY-HARDENING` |
 
 ## Import readiness capability mapping
 
@@ -126,13 +128,14 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Reservation integrity proof | Complete | #946 | Maintain readback regression |
 | Reservation DB safety proof | Complete | #949 | Maintain hosted proof |
 | Reservation audit split | Complete | #950 | Maintain audit compatibility |
-| Existing private executor handoff | Complete | #953 | `PRIVATE-ADMIN-WIRING` |
+| Existing private executor handoff | Complete | #953 | Maintain handoff regression |
+| Private Admin wiring and publish readback | Complete | #954 | `ROLLBACK-AUTHORITY-HARDENING` |
 | Exact rollback recovery | Open | — | Wave 4 |
 | Pharmacy public/index/sitemap | Disabled/Open | — | After Admin canary |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
-The current reservation audit signature is `event_type=reservation_created`, `event_payload.phase=reservation`, and `schema_version=drkhaleej.import.publishAudit.v2`; legacy reservation-phase `execution_started` rows remain compatible only with prior schema versions.
+The current reservation audit signature is `event_type=reservation_created`, `event_payload.phase=reservation`, and `schema_version=drkhaleej.import.publishAudit.v2`; legacy reservation-phase `execution_started` rows remain compatible only with prior schema versions. Mutation execution uses `execution_started + phase=mutation` and terminal success under `drkhaleej.import.publishAudit.v3`.
 
 ## Immediate task mapping
 

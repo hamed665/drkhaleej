@@ -3,7 +3,10 @@ import { vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { describe, expect, it } from "vitest";
-import { createSupabasePharmacyPrivateMutationWriter } from "./import-supabase-pharmacy-private-mutation-writer";
+import {
+  createSupabasePharmacyPrivateMutationWriter,
+  IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION,
+} from "./import-supabase-pharmacy-private-mutation-writer";
 import type { ImportPharmacyPrivateMutationPayload } from "./import-pharmacy-private-mutation-adapter";
 
 function payload(): ImportPharmacyPrivateMutationPayload {
@@ -14,7 +17,7 @@ function payload(): ImportPharmacyPrivateMutationPayload {
     expectedVersion: "2026-07-11 18:00:00+00",
     reservationId: "reservation-001",
     rollbackSnapshotId: "snapshot-001",
-    auditEventId: "audit-001",
+    auditEventId: "reservation-audit-001",
     draft: {
       draftId: "11111111-1111-4111-8111-111111111111",
       source: "excel",
@@ -60,7 +63,7 @@ function payload(): ImportPharmacyPrivateMutationPayload {
 }
 
 describe("Supabase pharmacy private mutation writer", () => {
-  it("calls only the atomic pharmacy RPC and preserves private flags", async () => {
+  it("calls only the atomic Pharmacy RPC with the verified Reservation audit", async () => {
     const rpc = vi.fn().mockResolvedValue({
       data: {
         status: "mutated",
@@ -82,9 +85,16 @@ describe("Supabase pharmacy private mutation writer", () => {
       expect.objectContaining({
         p_idempotency_record_id: "reservation-001",
         p_rollback_snapshot_id: "snapshot-001",
-        p_execution_started_audit_id: "audit-001",
+        p_execution_started_audit_id: "reservation-audit-001",
+        p_audit_schema_version: IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION,
         p_patch: expect.objectContaining({
           name_en: "Controlled Pharmacy",
+          metadata_patch: expect.objectContaining({
+            visibility: "private",
+            publicRouteEnabled: false,
+            indexable: false,
+            sitemapEligible: false,
+          }),
         }),
       }),
     );
@@ -92,6 +102,7 @@ describe("Supabase pharmacy private mutation writer", () => {
     const rpcArgs = rpc.mock.calls[0]?.[1] as { p_patch?: Record<string, unknown> } | undefined;
     expect(rpcArgs?.p_patch).not.toHaveProperty("status");
     expect(rpcArgs?.p_patch).not.toHaveProperty("is_active");
+    expect(rpcArgs).not.toHaveProperty("p_reservation_audit_id");
   });
 
   it("fails closed on malformed or errored RPC responses", async () => {
@@ -106,7 +117,7 @@ describe("Supabase pharmacy private mutation writer", () => {
     await expect(errored.mutateOne(payload())).resolves.toEqual({ kind: "failed" });
   });
 
-  it("does not claim rollback support before the rollback RPC exists", async () => {
+  it("does not claim rollback support before P06", async () => {
     const writer = createSupabasePharmacyPrivateMutationWriter({
       rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     });

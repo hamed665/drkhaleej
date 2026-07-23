@@ -66,7 +66,7 @@ describe("runPharmacyRealPreviewCanary", () => {
       operation: "private_publish",
       actorId: "actor-1",
       entityId: "pharmacy-1",
-      confirmation: "PUBLISH PRIVATE PHARMACY",
+      confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
       publishReference: null,
     });
     expect(read).toHaveBeenCalledWith({ actorId: "actor-1", entityId: "pharmacy-1", publishReference: "opaque-reference" });

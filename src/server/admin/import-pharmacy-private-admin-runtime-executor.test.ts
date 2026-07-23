@@ -29,7 +29,7 @@ describe("pharmacy private Admin runtime executor", () => {
       operation: "private_publish",
       actorId: "admin-1",
       entityId: "pharmacy-1",
-      confirmation: "PUBLISH PRIVATE PHARMACY",
+      confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
       publishReference: null,
     });
 
@@ -65,7 +65,7 @@ describe("pharmacy private Admin runtime executor", () => {
       operation: "private_publish",
       actorId: "admin-1",
       entityId: "pharmacy-1",
-      confirmation: "PUBLISH PRIVATE PHARMACY",
+      confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
       publishReference: null,
     });
 

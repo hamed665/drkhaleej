@@ -61,13 +61,9 @@ const permissionByOperation: Record<PharmacyPrivateAdminOperation, ImportAdminCa
   rollback: "imports.publish",
 };
 
-const confirmationByOperation: Partial<Record<PharmacyPrivateAdminOperation, string>> = {
-  private_publish: "PUBLISH PRIVATE PHARMACY",
-  rollback: "ROLLBACK PRIVATE PHARMACY",
-};
-
 export function getPharmacyPrivateAdminBlockers(input: PharmacyPrivateAdminRequest): readonly PharmacyPrivateAdminWorkflowBlocker[] {
   const blockers: PharmacyPrivateAdminWorkflowBlocker[] = [];
+  const entityId = input.entityIds.length === 1 ? input.entityIds[0] ?? null : null;
   if (input.family !== "pharmacy") blockers.push("wrong_family");
   if (input.entityIds.length !== 1) blockers.push("bulk_not_allowed");
   if (input.actorId.trim().length === 0) blockers.push("missing_actor");
@@ -80,8 +76,13 @@ export function getPharmacyPrivateAdminBlockers(input: PharmacyPrivateAdminReque
   if ((input.operation === "reserve_private_publish" || input.operation === "private_publish") && !input.reviewApproved) blockers.push("review_required");
   if (input.operation === "rollback" && !input.publishReference) blockers.push("publish_reference_required");
 
-  const requiredConfirmation = confirmationByOperation[input.operation];
-  if (requiredConfirmation && input.confirmation !== requiredConfirmation) blockers.push("missing_confirmation");
+  if (
+    input.operation === "private_publish" &&
+    (entityId === null || input.confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`)
+  ) blockers.push("missing_confirmation");
+  if (input.operation === "rollback" && input.confirmation !== "ROLLBACK PRIVATE PHARMACY") {
+    blockers.push("missing_confirmation");
+  }
   return [...new Set(blockers)];
 }
 

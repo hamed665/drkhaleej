@@ -81,7 +81,9 @@ export function createPharmacyPrivateAdminServerAction(
     if (operationValue === "reserve_private_publish" && entityId && confirmation !== `RESERVE PRIVATE PUBLISH ${entityId}`) {
       blockers.push("invalid_confirmation");
     }
-    if (operationValue === "private_publish" && confirmation !== "PUBLISH PRIVATE PHARMACY") blockers.push("invalid_confirmation");
+    if (operationValue === "private_publish" && entityId && confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`) {
+      blockers.push("invalid_confirmation");
+    }
     if (operationValue === "rollback") {
       if (confirmation !== "ROLLBACK PRIVATE PHARMACY") blockers.push("invalid_confirmation");
       if (!publishReference) blockers.push("invalid_publish_reference");

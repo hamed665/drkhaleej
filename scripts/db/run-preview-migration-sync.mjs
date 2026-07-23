@@ -10,6 +10,8 @@ const lockKey = 824731905;
 const artifactPath = path.resolve(
   process.env.PREVIEW_MIGRATION_EVIDENCE_PATH || 'artifacts/preview-migration-sync/evidence.json',
 );
+const diagnosticsPath = path.join(path.dirname(artifactPath), 'migration.log');
+let migrationOutput = '';
 
 function assert(value, message) {
   if (!value) throw new Error(message);
@@ -56,15 +58,15 @@ function runSupabase(databaseUrl) {
       ['db', 'push', '--db-url', databaseUrl, '--include-all', '--yes'],
       { env: process.env, stdio: ['ignore', 'pipe', 'pipe'] },
     );
-    let stderr = '';
-    child.stderr.on('data', (chunk) => {
-      stderr = `${stderr}${chunk.toString()}`.slice(-4000);
-    });
-    child.stdout.resume();
+    const append = (chunk) => {
+      migrationOutput = `${migrationOutput}${chunk.toString()}`.slice(-50_000);
+    };
+    child.stdout.on('data', append);
+    child.stderr.on('data', append);
     child.on('error', reject);
     child.on('close', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`Supabase migration push exited with code ${code}. ${redact(stderr).slice(-1200)}`));
+      else reject(new Error(`Supabase migration push exited with code ${code}. See redacted migration diagnostics artifact.`));
     });
   });
 }
@@ -82,7 +84,10 @@ async function writeRedEvidence(error, identityMode = null) {
     generatedAt: new Date().toISOString(),
   };
   await mkdir(path.dirname(artifactPath), { recursive: true });
-  await writeFile(artifactPath, `${JSON.stringify(evidence, null, 2)}\n`);
+  await Promise.all([
+    writeFile(artifactPath, `${JSON.stringify(evidence, null, 2)}\n`),
+    writeFile(diagnosticsPath, redact(migrationOutput || 'No migration command output was captured.')),
+  ]);
 }
 
 let client;

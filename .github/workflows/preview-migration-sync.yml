@@ -9,9 +9,17 @@ on:
       - 'scripts/db/preview-migration-sync.mjs'
       - 'scripts/db/run-preview-migration-sync.mjs'
       - 'scripts/import/check-preview-database-url.mjs'
+      - 'scripts/import/run-p05-private-publish-proof.mjs'
+      - 'scripts/import/check-import-p05-private-publish-proof.mjs'
+      - 'scripts/import/check-import-readiness-state-alignment.mjs'
+      - 'docs/import/import-readiness-roadmap-after-933.md'
+      - 'docs/project-state/CURRENT_STATE.md'
+      - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
+      - 'README.md'
       - '.github/workflows/preview-migration-sync.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'
+      - 'scripts/db/test-rls-static.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
 
@@ -24,6 +32,12 @@ env:
   PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
   PREVIEW_MIGRATION_EVIDENCE_PATH: artifacts/preview-migration-sync/evidence.json
   PREVIEW_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P05_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P05_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P05_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P05_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P05_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  P05_EVIDENCE_PATH: artifacts/p05/private-publish-proof.json
 
 concurrency:
   group: drmuscat-isolated-preview-database-write
@@ -33,7 +47,7 @@ jobs:
   sync:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout exact revision
         uses: actions/checkout@v4
@@ -46,6 +60,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$PREVIEW_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$P05_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -66,10 +81,17 @@ jobs:
         with:
           version: 2.101.0
 
-      - name: Validate repository migration and RLS contracts
+      - name: Validate repository migration, RLS and aligned state contracts
+        shell: bash
         run: |
-          pnpm db:validate:migrations
-          pnpm test:db:rls
+          set -o pipefail
+          mkdir -p artifacts/preview-migration-sync artifacts/p05
+          {
+            pnpm db:validate:migrations
+            pnpm test:db:rls
+            node scripts/import/check-import-readiness-state-alignment.mjs
+            node scripts/import/check-import-p05-private-publish-proof.mjs
+          } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
         run: node scripts/db/preview-migration-sync.mjs preflight
@@ -80,11 +102,26 @@ jobs:
       - name: Verify exact ledger and database inventories
         run: node scripts/db/preview-migration-sync.mjs verify
 
-      - name: Upload red or green exact-SHA evidence
+      - name: Run isolated P05 private publish proof
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p05-private-publish-proof.mjs 2>&1 | tee artifacts/p05/hosted-proof.log
+
+      - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: preview-migration-sync-${{ github.event.pull_request.head.sha || github.sha }}
-          path: artifacts/preview-migration-sync/evidence.json
+          path: artifacts/preview-migration-sync/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload exact-SHA P05 private publish evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p05-private-publish-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p05/
           if-no-files-found: error
           retention-days: 14

@@ -7,10 +7,13 @@ const files = {
   handoffTest: 'src/server/admin/import-pharmacy-verified-reservation-handoff.test.ts',
   wiring: 'src/server/admin/import-pharmacy-private-admin-real-wiring.ts',
   wiringTest: 'src/server/admin/import-pharmacy-private-admin-real-wiring.test.ts',
+  operation: 'src/server/admin/import-pharmacy-private-admin-publish-operation.ts',
+  executor: 'src/server/admin/import-pharmacy-private-admin-publish-executor.ts',
   action: 'src/app/admin/imports/readiness/actions.ts',
   serverAction: 'src/server/admin/import-pharmacy-private-admin-server-action.ts',
   panel: 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx',
   docs: 'docs/import/VERIFIED_RESERVATION_HANDOFF.md',
+  p05Docs: 'docs/import/PRIVATE_ADMIN_WIRING.md',
 };
 
 const text = async (file) => readFile(path.join(root, file), 'utf8');
@@ -18,15 +21,18 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [handoff, handoffTest, wiring, wiringTest, action, serverAction, panel, docs] = await Promise.all([
+const [handoff, handoffTest, wiring, wiringTest, operation, executor, action, serverAction, panel, docs, p05Docs] = await Promise.all([
   text(files.handoff),
   text(files.handoffTest),
   text(files.wiring),
   text(files.wiringTest),
+  text(files.operation),
+  text(files.executor),
   text(files.action),
   text(files.serverAction),
   text(files.panel),
   text(files.docs),
+  text(files.p05Docs),
 ]);
 
 for (const token of [
@@ -113,11 +119,25 @@ for (const token of [
 }
 
 for (const token of [
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const',
-  'operation !== "dry_run" && operation !== "review" && operation !== "reserve_private_publish"',
+  '"reserve_private_publish"',
+  '"private_publish"',
+  'runPharmacyPrivateAdminPublishOperation',
 ]) {
-  assert(action.includes(token), `${files.action} must keep private publish disabled with ${token}`);
+  assert(action.includes(token), `${files.action} must activate P05 through ${token}`);
 }
+assert(!/IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS\s*=\s*\[[\s\S]*?"rollback"[\s\S]*?\]\s+as const/.test(action), `${files.action} must keep rollback disabled until P06.`);
+
+for (const token of [
+  'loadPharmacyVerifiedReservationForPublish',
+  'createPharmacyPrivateAdminRealPorts',
+  'verifiedReservationExecutor: input.dependencies.executor',
+]) assert(operation.includes(token), `${files.operation} must preserve the verified handoff through ${token}`);
+
+for (const token of [
+  'runImportPharmacyPrivateMutation',
+  'publishReferenceStore.create',
+  'verifyPharmacyPrivatePublishReadback',
+]) assert(executor.includes(token), `${files.executor} must consume the verified handoff through ${token}`);
 
 for (const source of [action, serverAction, panel]) {
   for (const forbidden of [
@@ -145,5 +165,12 @@ for (const token of [
 ]) {
   assert(docs.includes(token), `${files.docs} must include ${token}`);
 }
+for (const token of [
+  'P05 Private Admin Wiring',
+  'already verified Reservation',
+  'must not create a second Reservation',
+  'post-mutation readback',
+  'no Production',
+]) assert(p05Docs.toLowerCase().includes(token.toLowerCase()), `${files.p05Docs} must include ${token}`);
 
-console.log('import verified reservation handoff contract passed.');
+console.log('import verified Reservation handoff contract passed through P05 activation.');

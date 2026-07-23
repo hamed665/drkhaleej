@@ -47,10 +47,11 @@ for (const token of [
 
 for (const token of [
   'executionEnabled: process.env.VERCEL_ENV === "preview"',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "reserve_private_publish"] as const',
-  'operation !== "dry_run" && operation !== "review" && operation !== "reserve_private_publish"',
+  '"dry_run",\n  "review",\n  "reserve_private_publish",\n  "private_publish",',
+  'operation !== "reserve_private_publish" &&\n        operation !== "private_publish"',
   'createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()',
   'loadPharmacyPrivateAdminRuntimeContext(',
+  'runPharmacyPrivateAdminPublishOperation',
 ]) {
   assert(action.includes(token), `${actionPath} must include ${token}`);
 }
@@ -62,8 +63,7 @@ for (const forbidden of [
   'sitemapPolicy: "included"',
   'visibility: "public"',
   'Promise.all(',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["private_publish"',
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["rollback"',
+  '"rollback",\n] as const',
 ]) {
   assert(!context.includes(forbidden), `${contextPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);

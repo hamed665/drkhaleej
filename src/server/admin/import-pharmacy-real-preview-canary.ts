@@ -84,7 +84,7 @@ export async function runPharmacyRealPreviewCanary(input: {
     operation: "private_publish",
     actorId,
     entityId,
-    confirmation: "PUBLISH PRIVATE PHARMACY",
+    confirmation: `EXECUTE PRIVATE PUBLISH ${entityId}`,
     publishReference: null,
   });
 

@@ -72,7 +72,7 @@ describe("pharmacy private Admin server action", () => {
       formData: form({
         operation: "private_publish",
         entityId: "pharmacy-1",
-        confirmation: "PUBLISH PRIVATE PHARMACY",
+        confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
       }),
     });
     expect(publish).toEqual({ ok: false, blockers: ["operation_not_enabled"] });
@@ -126,7 +126,7 @@ describe("pharmacy private Admin server action", () => {
       formData: form({
         operation: ["private_publish", "rollback"],
         entityId: "pharmacy-2",
-        confirmation: "PUBLISH PRIVATE PHARMACY",
+        confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-2",
       }),
     });
 
@@ -139,7 +139,7 @@ describe("pharmacy private Admin server action", () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
-  it("requires exact confirmation before one private publish", async () => {
+  it("requires exact entity-bound confirmation before one private publish", async () => {
     const execute = vi.fn(async () => completed("private_publish"));
     const action = createPharmacyPrivateAdminServerAction({
       executionEnabled: true,
@@ -151,7 +151,11 @@ describe("pharmacy private Admin server action", () => {
 
     const blocked = await action({
       actorId: "admin-1",
-      formData: form({ operation: "private_publish", entityId: "pharmacy-1", confirmation: "publish" }),
+      formData: form({
+        operation: "private_publish",
+        entityId: "pharmacy-1",
+        confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-2",
+      }),
     });
     expect(blocked).toEqual({ ok: false, blockers: ["invalid_confirmation"] });
 
@@ -160,7 +164,7 @@ describe("pharmacy private Admin server action", () => {
       formData: form({
         operation: "private_publish",
         entityId: "pharmacy-1",
-        confirmation: "PUBLISH PRIVATE PHARMACY",
+        confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
       }),
     });
 

@@ -26,10 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #953** at baseline **`af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0`**.
-- Database/migration status: **validates through `0081_import_pharmacy_reservation_audit_split.sql`**.
-- Completed migration set: **`0001` through `0081`**.
-- Current import-readiness implementation: **`PRIVATE-ADMIN-WIRING`**.
+- Import-readiness runtime is aligned through **PR #954** at baseline **`9d0511ba6b2ff5a53e8fd857cb09273d269d602d`**.
+- Database/migration status: **validates through `0082_import_pharmacy_private_execution_audit.sql`**.
+- Completed migration set: **`0001` through `0082`**.
+- Current import-readiness implementation: **`ROLLBACK-AUTHORITY-HARDENING`**.
+- P05 enables only the guarded Preview Pharmacy `private_publish` path after verified Reservation handoff, exact mutation, terminal persistence, durable-reference creation, and post-mutation readback. Public/index/sitemap/route promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

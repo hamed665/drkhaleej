@@ -76,11 +76,11 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #953 at `af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0`**. The current next implementation is **`PRIVATE-ADMIN-WIRING`**.
+Current import-readiness runtime baseline: **PR #954 at `9d0511ba6b2ff5a53e8fd857cb09273d269d602d`**. The current next implementation is **`ROLLBACK-AUTHORITY-HARDENING`**.
 
-Completed migrations: **`0001` through `0081`**. Migration validation is expected through `0081_import_pharmacy_reservation_audit_split.sql`.
+Completed migrations: **`0001` through `0082`**. Migration validation is expected through `0082_import_pharmacy_private_execution_audit.sql`.
 
-Approved current surfaces include localized public catalog/detail surfaces, static public article shell routes, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, minimal admin login, admin provider onboarding lead list/detail, limited status/priority lead mutation, read-only lead history UI, status/priority lead history writes, draft center creation from provider onboarding lead, admin center subscription view/assignment foundation, base plan catalog initializer, admin quick navigation, admin commercial add-on assignment shell, healthcare vertical/category taxonomy foundation, and public read RLS for approved public taxonomy rows.
+Approved current surfaces include localized public catalog/detail surfaces, static public article shell routes, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, minimal admin login, admin provider onboarding lead list/detail, limited status/priority lead mutation, read-only lead history UI, status/priority lead history writes, draft center creation from provider onboarding lead, admin center subscription view/assignment foundation, base plan catalog initializer, admin quick navigation, admin commercial add-on assignment shell, healthcare vertical/category taxonomy foundation, public read RLS for approved public taxonomy rows, and the Preview-only guarded Pharmacy private publish/readback authority. The Pharmacy path remains single-entity, private, noindex, excluded from sitemap and routes, and unavailable in Production.
 
 Do not infer approval for broader business features from the current foundations.
 

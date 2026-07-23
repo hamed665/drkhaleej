@@ -17,7 +17,7 @@ function requirePattern(content, pattern, message) {
 
 for (const [pattern, message] of [
   [/activation\.enabled/, 'runner must require the activation gate.'],
-  [/PUBLISH PRIVATE PHARMACY/, 'runner must use the exact private publish confirmation.'],
+  [/EXECUTE PRIVATE PUBLISH/, 'runner must use the exact entity-bound private publish confirmation.'],
   [/reservationCount\s*!==\s*1/, 'runner must require exactly one reservation.'],
   [/rollbackSnapshotCount\s*!==\s*1/, 'runner must require exactly one rollback snapshot.'],
   [/executionStartedAuditCount\s*!==\s*1/, 'runner must require exactly one execution_started audit.'],
