@@ -61,8 +61,8 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "VERIFIED-RESERVATION-HANDOFF"',
-      to: '"currentNext": "PRIVATE-ADMIN-WIRING"',
+      from: '"currentNext": "PRIVATE-ADMIN-WIRING"',
+      to: '"currentNext": "ROLLBACK-AUTHORITY-HARDENING"',
       expectedError: 'manifest.currentNext drifted',
     },
     {
@@ -75,9 +75,9 @@ try {
     {
       label: 'phase matrix drift',
       file: fixtureFiles[2],
-      from: '| Reservation audit split | Complete | #950 | `VERIFIED-RESERVATION-HANDOFF` |',
-      to: '| Reservation audit split | Complete | #949 | `VERIFIED-RESERVATION-HANDOFF` |',
-      expectedError: 'Reservation audit split evidence drifted',
+      from: '| Existing private executor handoff | Complete | #953 | `PRIVATE-ADMIN-WIRING` |',
+      to: '| Existing private executor handoff | Complete | #950 | `PRIVATE-ADMIN-WIRING` |',
+      expectedError: 'Existing private executor handoff evidence drifted',
     },
     {
       label: 'README pointer drift',
