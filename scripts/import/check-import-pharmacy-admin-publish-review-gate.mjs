@@ -40,6 +40,8 @@ for (const token of [
   "expectedSnapshotHash: context.canaryInput.expectedSnapshotHash",
   "expectedEntityFingerprint: context.canaryInput.expectedEntityFingerprint",
   "if (!reviewApproved) return { ok: false, reference: null }",
+  "loadVerifiedReservationEvidence",
+  "runPharmacyVerifiedReservationHandoff",
 ]) assert(wiring.includes(token), `${wiringPath} must include ${token}`);
 
 for (const token of [
@@ -49,8 +51,9 @@ for (const token of [
 ]) assert(gateTests.includes(token), `${gateTestPath} must cover ${token}`);
 
 for (const token of [
-  "requires review, reserves, mutates one pharmacy, and creates an opaque publish reference",
-  "fails closed before reservation when persisted review is not approved",
+  "hands a pre-verified reservation to the injected executor exactly once",
+  "fails closed before reading reservation evidence when persisted review is not approved",
+  "keeps private publish disabled when the executor port is absent",
 ]) assert(wiringTests.includes(token), `${wiringTestPath} must cover ${token}`);
 
 for (const forbidden of [
