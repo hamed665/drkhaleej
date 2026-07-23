@@ -17,15 +17,15 @@ Wave 0     COMPLETE  (#936–#939) Client-boundary authorization removal, canoni
 Wave 1     COMPLETE  (#940–#941) Server-owned authorization persistence, invalidation, bounded readback
 Wave 2.1   COMPLETE  (#942, #949, #950) Atomic reservation, hosted DB safety, and reservation audit-event separation complete
 Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-linked integrity readback proven
-Wave 3+    PARTIAL   (#953) Verified Reservation handoff complete; Admin wiring and mutation remain open
+Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #953
-Baseline commit: af2d964
-Last aligned: 2026-07-23
+Aligned through: PR #954
+Baseline commit: 9d0511b
+Last aligned: 2026-07-24
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -33,17 +33,17 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 953,
-  "runtimeBaseline": "af2d964c4d71f07be6b3ec0f5e3b04db75a1d1b0",
-  "lastAligned": "2026-07-23",
-  "currentMigration": "0081_import_pharmacy_reservation_audit_split.sql",
-  "currentNext": "PRIVATE-ADMIN-WIRING",
+  "alignedThroughPr": 954,
+  "runtimeBaseline": "9d0511ba6b2ff5a53e8fd857cb09273d269d602d",
+  "lastAligned": "2026-07-24",
+  "currentMigration": "0082_import_pharmacy_private_execution_audit.sql",
+  "currentNext": "ROLLBACK-AUTHORITY-HARDENING",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
     "2.1": "COMPLETE",
     "2.2": "COMPLETE",
-    "3+": "PARTIAL"
+    "3+": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -188,7 +188,7 @@ The verifier recognizes both legacy `execution_started + phase=reservation` rows
 
 PR #947 separately established independent code ownership. The active `main-protected-review` ruleset requires a pull request, one approval, Code Owner review, approval of the most recent reviewable push, resolved conversations, and blocks branch deletion and force pushes.
 
-## Wave 3 — Existing Pharmacy private executor `PARTIAL (#953)`
+## Wave 3 — Existing Pharmacy private executor `COMPLETE (#953, #954)`
 
 ### 3.1 Reservation→Execution gate `COMPLETE (#953)`
 
@@ -201,10 +201,9 @@ P04-B extends the existing authorities rather than creating another transaction 
 - rejects stale, foreign, incomplete, expired, unverified, non-exact, or incompatible evidence before the executor port;
 - hands the already verified Reservation to one injected server-only executor port;
 - invokes no Reservation RPC and creates no second Reservation;
-- returns only a bounded result and exposes no raw persistence identifiers;
-- keeps `private_publish`, real mutation, `execution_started`, terminal persistence, and post-mutation readback disabled until P05.
+- returns only a bounded result and exposes no raw persistence identifiers.
 
-### 3.2 Admin wiring and publish readback `OPEN`
+### 3.2 Admin wiring and publish readback `COMPLETE (#954)`
 
 Operation:
 
@@ -213,11 +212,21 @@ private_publish
 EXECUTE PRIVATE PUBLISH <entity-id>
 ```
 
-P05 must wire the existing guarded Pharmacy executor and add no independent SQL mutation path.
+P05 wires the already verified Reservation to the existing guarded Pharmacy executor and adds no independent SQL mutation path.
 
-Mutation must append `execution_started`, apply the exact reviewed canonical patch, persist terminal result/audit, and create or resolve the existing durable rollback reference.
+Migration 0082 preserves the existing PostgreSQL RPC identity while changing its third argument semantics to carry the verified reservation-audit ID. The RPC verifies the reservation audit, appends exactly one `execution_started + phase=mutation` event under `drkhaleej.import.publishAudit.v3`, applies the exact reviewed canonical patch, preserves protected metadata and the private boundary, and persists terminal success in the existing authority.
 
-Readback must verify terminal state, versions, exact patch, protected metadata, private/noindex/no-sitemap/no-route state, one rollback authority, no duplicate execution, and no public leakage.
+The executor creates one opaque server-only durable rollback reference and returns success only after readback verifies:
+
+- exactly one Reservation, rollback snapshot, reservation audit, mutation start, terminal success and durable reference;
+- exact expected and actual versions;
+- exact reviewed canonical patch;
+- canonical geo and projection metadata preservation;
+- private/draft/inactive/unfeatured/noindex/no-route/no-sitemap state;
+- zero duplicate execution and zero public exposure;
+- bounded replay and deterministic cleanup.
+
+The isolated hosted P05 proof runs only after Preview Migration Sync verifies migration 0082 on the exact PR SHA. Production is not connected or changed.
 
 ## Wave 4 — Existing rollback path `OPEN`
 
@@ -343,16 +352,15 @@ Do not add:
 ## Current next implementation
 
 ```text
-PRIVATE-ADMIN-WIRING
+ROLLBACK-AUTHORITY-HARDENING
 ```
 
-P04-B completed the server-only handoff from one fully verified Reservation to an injected executor port. It creates no second Reservation, exposes no raw persistence identifiers, and leaves actual mutation disabled. The next implementation is P05 private Admin wiring, terminal persistence, and post-mutation readback through the existing Pharmacy executor authority.
+P05 completed the guarded Preview-only Pharmacy private mutation using one already verified Reservation, exact canonical patch, terminal persistence, one durable rollback reference and post-mutation readback. The next implementation is P06 hardening of the existing durable rollback authority. Raw references remain server-only and public/index/sitemap/route promotion stays disabled.
 
-After `PRIVATE-ADMIN-WIRING` is green:
+After `ROLLBACK-AUTHORITY-HARDENING` is green:
 
 ```text
-ROLLBACK-AUTHORITY-HARDENING
-→ ROLLBACK-EXACT-RECOVERY
+ROLLBACK-EXACT-RECOVERY
 → ADMIN-STATE-MACHINE
 → REAL-ADMIN-CANARY
 ```
