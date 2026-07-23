@@ -5,23 +5,14 @@ import type {
   ImportPersistenceReadbackVerificationInput,
   ImportPersistenceReadbackVerificationResult,
 } from "./import-persistence-readback-verifier";
+import type { ImportRealReservationCanaryInput } from "./import-real-reservation-canary";
 import type {
   ImportPharmacyPrivateMutationRequest,
 } from "./import-pharmacy-private-mutation-adapter";
 import type { ImportPublishPersistenceTransactionResult } from "./import-private-persistence-adapter";
 
 export type PharmacyVerifiedReservationPublishContext = {
-  canaryInput: {
-    actorId: string;
-    entityId: string;
-    expectedSnapshotHash: string;
-    expectedEntityFingerprint: string;
-    reservationRequest: {
-      idempotencyKey: string;
-      requestHash: string;
-      expectedVersion: string;
-    };
-  };
+  canaryInput: ImportRealReservationCanaryInput;
   mutationRequest: Omit<ImportPharmacyPrivateMutationRequest, "reservationResult">;
 };
 
