@@ -2,39 +2,60 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-const migrationPath = path.resolve('supabase/migrations/0071_import_pharmacy_private_rollback_rpc.sql');
+const legacyMigrationPath = path.resolve('supabase/migrations/0071_import_pharmacy_private_rollback_rpc.sql');
+const authorityMigrationPath = path.resolve('supabase/migrations/0083_import_pharmacy_atomic_rollback_authority.sql');
 const writerPath = path.resolve('src/server/admin/import-supabase-pharmacy-private-rollback-writer.ts');
 
-for (const file of [migrationPath, writerPath]) {
+for (const file of [legacyMigrationPath, authorityMigrationPath, writerPath]) {
   if (!existsSync(file)) throw new Error(`required rollback file missing: ${file}`);
 }
 
-const sql = readFileSync(migrationPath, 'utf8');
+const legacySql = readFileSync(legacyMigrationPath, 'utf8');
+const authoritySql = readFileSync(authorityMigrationPath, 'utf8');
 const writer = readFileSync(writerPath, 'utf8');
 
-const requiredSql = [
+for (const pattern of [
   /IMPORT-PUBLISH-V: atomic pharmacy private rollback RPC/i,
   /create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_private/i,
   /security\s+invoker/i,
-  /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i,
   /snapshot_hash\s*<>\s*p_expected_snapshot_hash/i,
-  /restored_at\s+is\s+not\s+null/i,
   /v_record\.status\s*<>\s*'succeeded'/i,
-  /terminal_result->>'actualVersion'/i,
-  /center_type\s*<>\s*'pharmacy'::public\.center_type/i,
   /updated_at::text\s*<>\s*p_expected_current_version/i,
-  /status\s*=\s*'draft'::public\.provider_status/i,
-  /is_active\s*=\s*false/i,
-  /is_featured\s*=\s*false/i,
-  /restored_by_profile_id\s*=\s*p_actor_profile_id/i,
-  /status\s*=\s*'in_progress'\s*,\s*terminal_result\s*=\s*NULL/i,
   /public\.import_publish_persist_terminal_result\([\s\S]*'rolled_back'/i,
-  /rollback_terminal_persistence_failed/i,
+  /grant\s+execute\s+on\s+function[\s\S]*to\s+service_role/i,
+]) {
+  if (!pattern.test(legacySql)) throw new Error(`0071 missing preserved rollback authority pattern: ${pattern}`);
+}
+
+for (const pattern of [
+  /P06 ROLLBACK-AUTHORITY-HARDENING/i,
+  /add\s+column\s+if\s+not\s+exists\s+consumed_by_profile_id\s+uuid/i,
+  /add\s+column\s+if\s+not\s+exists\s+consumed_result\s+jsonb/i,
+  /add\s+column\s+if\s+not\s+exists\s+consumed_result_hash\s+text/i,
+  /create\s+unique\s+index\s+if\s+not\s+exists\s+import_pharmacy_publish_references_active_version_unique/i,
+  /create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_private_by_authority/i,
+  /p_audit_schema_version\s+is\s+distinct\s+from\s+'drkhaleej\.import\.publishAudit\.v4'/i,
+  /from\s+public\.centers[\s\S]*for\s+update/i,
+  /consumed_result_hash\s*=\s*encode\(digest\(r\.consumed_result::text,\s*'sha256'\)/i,
+  /i\.status\s*=\s*'succeeded'/i,
+  /i\.terminal_result\s*->>\s*'kind'\s*=\s*'mutated'/i,
+  /r\.expected_current_version\s*=\s*v_center\.updated_at::text/i,
+  /s\.restored_at\s+is\s+null/i,
+  /for\s+update\s+of\s+r\s*,\s*i\s*,\s*s/i,
+  /public\.import_rollback_pharmacy_private\(/i,
+  /set\s+consumed_at\s*=\s*clock_timestamp\(\)/i,
+  /consumed_by_profile_id\s*=\s*p_actor_profile_id/i,
+  /consumed_result\s*=\s*v_consumed_result/i,
+  /get\s+diagnostics\s+v_updated\s*=\s*row_count/i,
+  /rollback_authority_atomic_consume_failed/i,
+  /'status',\s*'replayed'/i,
+  /'rawReferenceExposed',\s*false/i,
+  /security\s+invoker/i,
+  /set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i,
   /revoke\s+all\s+on\s+function[\s\S]*from\s+public\s*,\s*anon\s*,\s*authenticated/i,
   /grant\s+execute\s+on\s+function[\s\S]*to\s+service_role/i,
-];
-for (const pattern of requiredSql) {
-  if (!pattern.test(sql)) throw new Error(`0071 missing rollback safety pattern: ${pattern}`);
+]) {
+  if (!pattern.test(authoritySql)) throw new Error(`0083 missing rollback authority pattern: ${pattern}`);
 }
 
 for (const pattern of [
@@ -43,23 +64,33 @@ for (const pattern of [
   /is_active\s*=\s*true/i,
   /sitemapEligible['"]?\s*,?\s*true/i,
   /indexable['"]?\s*,?\s*true/i,
-  /insert\s+into\s+public\.import_publish_audit_events/i,
+  /grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i,
 ]) {
-  if (pattern.test(sql)) throw new Error(`0071 contains forbidden rollback pattern: ${pattern}`);
+  if (pattern.test(authoritySql)) throw new Error(`0083 contains forbidden rollback authority pattern: ${pattern}`);
 }
 
 for (const pattern of [
   /import\s+"server-only"/,
-  /import_rollback_pharmacy_private/,
-  /p_expected_current_version/,
-  /p_expected_snapshot_hash/,
-  /\^\[a-f0-9\]\{64\}\$/,
+  /import_rollback_pharmacy_private_by_authority/,
+  /p_entity_id/,
+  /p_actor_profile_id/,
+  /drkhaleej\.import\.publishAudit\.v4/,
+  /authorityConsumed:\s*true/,
+  /rawReferenceExposed:\s*false/,
 ]) {
-  if (!pattern.test(writer)) throw new Error(`rollback writer missing required pattern: ${pattern}`);
+  if (!pattern.test(writer)) throw new Error(`rollback writer missing required P06 pattern: ${pattern}`);
 }
 
-for (const pattern of [/\.from\(['"]centers['"]\)/, /\.update\(/, /status:\s*['"]active['"]/, /is_active:\s*true/]) {
-  if (pattern.test(writer)) throw new Error(`rollback writer contains forbidden direct-write pattern: ${pattern}`);
+for (const pattern of [
+  /publishReference/,
+  /rollbackSnapshotId/,
+  /reservationId/,
+  /\.from\(['"]centers['"]\)/,
+  /\.update\(/,
+  /status:\s*['"]active['"]/,
+  /is_active:\s*true/,
+]) {
+  if (pattern.test(writer)) throw new Error(`rollback writer contains forbidden direct/raw-reference pattern: ${pattern}`);
 }
 
-console.log('pharmacy private rollback validation passed.');
+console.log('pharmacy atomic rollback authority validation passed.');
