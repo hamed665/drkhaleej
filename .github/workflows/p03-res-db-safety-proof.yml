@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      P03_PREVIEW_DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}
-      P03_PREVIEW_PROJECT_REF: ${{ secrets.P03_PREVIEW_PROJECT_REF }}
-      P03_PRODUCTION_PROJECT_REF: ${{ secrets.P03_PRODUCTION_PROJECT_REF }}
+      P03_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+      P03_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+      P03_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
       P03_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       P03_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
       P03_EVIDENCE_PATH: artifacts/p03/res-db-safety-proof.json
