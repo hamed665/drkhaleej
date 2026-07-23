@@ -5,15 +5,17 @@ import path from 'node:path';
 
 const runnerPath = path.resolve('scripts/import/run-p06-rollback-authority-proof.mjs');
 const workflowPath = path.resolve('.github/workflows/preview-migration-sync.yml');
-const migrationPath = path.resolve('supabase/migrations/0083_import_pharmacy_atomic_rollback_authority.sql');
+const authorityMigrationPath = path.resolve('supabase/migrations/0083_import_pharmacy_atomic_rollback_authority.sql');
+const digestMigrationPath = path.resolve('supabase/migrations/0084_import_pharmacy_rollback_digest_schema.sql');
 
-for (const file of [runnerPath, workflowPath, migrationPath]) {
+for (const file of [runnerPath, workflowPath, authorityMigrationPath, digestMigrationPath]) {
   if (!existsSync(file)) throw new Error(`P06 hosted proof file is missing: ${file}`);
 }
 
 const runner = readFileSync(runnerPath, 'utf8');
 const workflow = readFileSync(workflowPath, 'utf8');
-const migration = readFileSync(migrationPath, 'utf8');
+const authorityMigration = readFileSync(authorityMigrationPath, 'utf8');
+const digestMigration = readFileSync(digestMigrationPath, 'utf8');
 
 function requirePattern(content, pattern, message) {
   if (!pattern.test(content)) throw new Error(message);
@@ -30,11 +32,12 @@ for (const [pattern, message] of [
   [/Preview and Production project refs must be present and different/, 'P06 proof must fail closed on identical project refs.'],
   [/pooler\.supabase\.com/, 'P06 proof must require the Session pooler.'],
   [/parsed\.port === '5432'/, 'P06 proof must require port 5432.'],
-  [/version = '0083'/, 'P06 proof must verify migration 0083 in the hosted ledger.'],
+  [/version = '0084'/, 'P06 proof must verify the final P06 correction migration in the hosted ledger.'],
+  [/migration0084Verified:\s*true/, 'P06 evidence must bind to the final P06 migration.'],
   [/import_rollback_pharmacy_private_by_authority/, 'P06 proof must execute the atomic authority RPC.'],
   [/Promise\.all\(\[\s*invokeRollback\(concurrentA/, 'P06 proof must exercise two-client concurrency.'],
   [/\['replayed', 'rolled_back'\]/, 'P06 proof must require one fresh rollback and one replay.'],
-  [/consumed_result_hash/, 'P06 proof must verify the persisted result hash.'],
+  [/extensions\.digest\(consumed_result::text/, 'P06 proof must verify persisted result hashing with the installed pgcrypto schema.'],
   [/rollback_succeeded/, 'P06 proof must verify exactly one rollback success audit.'],
   [/failedRollbackAuthorityConsumed:\s*false/, 'P06 evidence must prove failed rollback does not consume authority.'],
   [/exactSnapshotRestored:\s*true/, 'P06 evidence must prove exact snapshot restoration.'],
@@ -69,6 +72,22 @@ for (const [pattern, message] of [
   [/consumed_result_hash/i, 'Migration 0083 must persist bounded result integrity.'],
   [/rollback_authority_atomic_consume_failed/i, 'Migration 0083 must fail if atomic consumption is lost.'],
   [/'status',\s*'replayed'/i, 'Migration 0083 must return bounded replay.'],
-]) requirePattern(migration, pattern, message);
+]) requirePattern(authorityMigration, pattern, message);
+
+for (const [pattern, message] of [
+  [/Forward-only correction after isolated Preview proved pgcrypto is installed in the extensions schema/i, 'Migration 0084 must document the Preview-proven forward correction.'],
+  [/create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_private_by_authority/i, 'Migration 0084 must replace the existing authority RPC only.'],
+  [/extensions\.digest\(r\.consumed_result::text,\s*'sha256'\)/i, 'Migration 0084 must schema-qualify replay hashing.'],
+  [/extensions\.digest\(v_consumed_result::text,\s*'sha256'\)/i, 'Migration 0084 must schema-qualify consumption hashing.'],
+  [/security\s+invoker/i, 'Migration 0084 must remain security invoker.'],
+  [/grant\s+execute[\s\S]*to\s+service_role/i, 'Migration 0084 must remain service-role-only.'],
+]) requirePattern(digestMigration, pattern, message);
+
+for (const forbidden of [
+  /\balter\s+table\b/i,
+  /\bdrop\b/i,
+  /\bcreate\s+policy\b/i,
+  /grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i,
+]) forbidPattern(digestMigration, forbidden, `Migration 0084 contains forbidden correction scope: ${forbidden}`);
 
 console.log('P06 isolated hosted rollback authority proof contract passed.');
