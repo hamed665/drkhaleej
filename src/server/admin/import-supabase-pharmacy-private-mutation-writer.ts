@@ -6,6 +6,9 @@ import type {
   ImportPharmacyPrivateMutationWriter,
 } from "./import-pharmacy-private-mutation-adapter";
 
+export const IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION =
+  "drkhaleej.import.publishAudit.v3" as const;
+
 export type ImportPharmacyMutationRpcClient = {
   rpc(
     name: "import_publish_pharmacy_private",
@@ -56,12 +59,12 @@ export function createSupabasePharmacyPrivateMutationWriter(
       const { data, error } = await client.rpc("import_publish_pharmacy_private", {
         p_idempotency_record_id: payload.reservationId,
         p_rollback_snapshot_id: payload.rollbackSnapshotId,
-        p_execution_started_audit_id: payload.auditEventId,
+        p_reservation_audit_id: payload.auditEventId,
         p_entity_id: payload.draft.draftId,
         p_actor_profile_id: payload.actorId,
         p_expected_version: payload.expectedVersion,
         p_patch: buildPharmacyCanonicalMutationPatch(payload.draft),
-        p_audit_schema_version: "1",
+        p_audit_schema_version: IMPORT_PHARMACY_EXECUTION_AUDIT_SCHEMA_VERSION,
       });
 
       if (error) return { kind: "failed" };
