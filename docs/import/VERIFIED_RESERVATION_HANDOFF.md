@@ -55,7 +55,7 @@ P04-B is refactor, contract, and injected-port proof only.
 - focused handoff unit tests;
 - real-wiring injected-port integration tests;
 - static no-second-Reservation and no-client-ID checks;
-- `pnpm import:verified-reservation-handoff:validate`;
+- `node scripts/import/check-import-verified-reservation-handoff.mjs`;
 - `pnpm import:publish-readiness-audit:validate`;
 - `pnpm typecheck`;
 - `pnpm lint`;
