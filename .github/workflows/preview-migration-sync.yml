@@ -11,6 +11,11 @@ on:
       - 'scripts/import/check-preview-database-url.mjs'
       - 'scripts/import/run-p05-private-publish-proof.mjs'
       - 'scripts/import/check-import-p05-private-publish-proof.mjs'
+      - 'scripts/import/check-import-readiness-state-alignment.mjs'
+      - 'docs/import/import-readiness-roadmap-after-933.md'
+      - 'docs/project-state/CURRENT_STATE.md'
+      - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
+      - 'README.md'
       - '.github/workflows/preview-migration-sync.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'
@@ -76,7 +81,7 @@ jobs:
         with:
           version: 2.101.0
 
-      - name: Validate repository migration and RLS contracts
+      - name: Validate repository migration, RLS and aligned state contracts
         shell: bash
         run: |
           set -o pipefail
@@ -84,6 +89,7 @@ jobs:
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
+            node scripts/import/check-import-readiness-state-alignment.mjs
             node scripts/import/check-import-p05-private-publish-proof.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
