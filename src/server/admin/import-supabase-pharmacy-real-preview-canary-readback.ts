@@ -1,6 +1,5 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
@@ -8,30 +7,28 @@ import type {
   PharmacyRealPreviewCanaryReadback,
 } from "./import-pharmacy-real-preview-canary";
 
-function sha256(value: string): string {
-  return createHash("sha256").update(value).digest("hex");
-}
-
 export function createSupabasePharmacyRealPreviewCanaryReadbackClient(
   client: SupabaseClient,
 ): PharmacyRealPreviewCanaryReadbackClient {
   return {
-    async read({ actorId, entityId, publishReference }) {
+    async read({ actorId, entityId }) {
       try {
-        const reference = await client
+        const references = await client
           .from("import_pharmacy_publish_references")
           .select("id,actor_profile_id,entity_id,idempotency_record_id,rollback_snapshot_id")
-          .eq("token_hash", sha256(publishReference))
-          .maybeSingle();
-        if (reference.error || !reference.data) return { data: null, error: { message: "publish_reference_read_failed" } };
-        if (reference.data.actor_profile_id !== actorId || reference.data.entity_id !== entityId) {
-          return { data: null, error: { message: "publish_reference_identity_mismatch" } };
+          .eq("actor_profile_id", actorId)
+          .eq("entity_id", entityId)
+          .is("consumed_at", null)
+          .limit(2);
+        if (references.error || !references.data || references.data.length !== 1) {
+          return { data: null, error: { message: "publish_reference_identity_read_failed" } };
         }
+        const reference = references.data[0]!;
 
         const idempotency = await client
           .from("import_publish_idempotency_records")
           .select("id,idempotency_key,request_hash,status")
-          .eq("id", reference.data.idempotency_record_id)
+          .eq("id", reference.idempotency_record_id)
           .eq("entity_id", entityId)
           .eq("actor_profile_id", actorId);
         if (idempotency.error || !idempotency.data || idempotency.data.length !== 1) {
@@ -43,7 +40,7 @@ export function createSupabasePharmacyRealPreviewCanaryReadbackClient(
           client
             .from("import_publish_rollback_snapshots")
             .select("id")
-            .eq("id", reference.data.rollback_snapshot_id)
+            .eq("id", reference.rollback_snapshot_id)
             .eq("idempotency_record_id", reservation.id)
             .eq("entity_id", entityId)
             .eq("actor_profile_id", actorId),
@@ -61,7 +58,7 @@ export function createSupabasePharmacyRealPreviewCanaryReadbackClient(
           client
             .from("import_pharmacy_publish_references")
             .select("id", { count: "exact", head: true })
-            .eq("id", reference.data.id),
+            .eq("id", reference.id),
           client
             .from("import_publish_idempotency_records")
             .select("id", { count: "exact", head: true })
