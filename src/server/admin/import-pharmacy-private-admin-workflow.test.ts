@@ -18,7 +18,7 @@ const baseRequest: PharmacyPrivateAdminRequest = {
   grantedPermissions: ["imports.publish"],
   readinessPassed: true,
   reviewApproved: true,
-  confirmation: "PUBLISH PRIVATE PHARMACY",
+  confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-1",
   publishReference: null,
   auditAvailable: true,
 };
@@ -65,6 +65,13 @@ describe("pharmacy private admin workflow", () => {
     expect(workflowPorts.privatePublish).toHaveBeenCalledTimes(1);
     expect(workflowPorts.audit).toHaveBeenCalledTimes(1);
     expect(workflowPorts.rollback).not.toHaveBeenCalled();
+  });
+
+  it("rejects a confirmation for another Pharmacy", () => {
+    expect(getPharmacyPrivateAdminBlockers({
+      ...baseRequest,
+      confirmation: "EXECUTE PRIVATE PUBLISH pharmacy-2",
+    })).toContain("missing_confirmation");
   });
 
   it("requires the source publish reference before rollback", async () => {
