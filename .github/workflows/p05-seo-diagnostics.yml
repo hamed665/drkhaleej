@@ -1,0 +1,40 @@
+name: P05 SEO Diagnostics
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/p05-seo-diagnostics.yml'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'docs/import/**'
+      - 'docs/project-state/**'
+      - 'scripts/import/**'
+      - 'src/server/admin/import-pharmacy-**'
+      - 'supabase/migrations/0082_import_pharmacy_private_execution_audit.sql'
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enable corepack
+        run: corepack enable
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@10.22.0 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --silent
+      - name: Run bounded SEO diagnostic
+        shell: bash
+        run: |
+          log_file="$(mktemp)"
+          if ! pnpm seo:check >"${log_file}" 2>&1; then
+            echo "SEO_DIAGNOSTIC_FAILURE"
+            tail -n 220 "${log_file}"
+            exit 1
+          fi
+          echo "SEO_DIAGNOSTIC_SUCCESS"
