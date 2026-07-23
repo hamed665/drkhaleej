@@ -66,12 +66,19 @@ jobs:
         run: pnpm import:reservation-audit-split:validate
 
       - name: Run isolated Preview transaction proof
-        run: pnpm test:db:reservation-safety
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p03
+          pnpm test:db:reservation-safety 2>&1 | tee artifacts/p03/hosted-proof.log
 
-      - name: Upload redacted P03 evidence
+      - name: Upload redacted P03 evidence and diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: p03-res-db-safety-${{ github.event.pull_request.head.sha || github.sha }}
-          path: artifacts/p03/res-db-safety-proof.json
+          path: |
+            artifacts/p03/res-db-safety-proof.json
+            artifacts/p03/hosted-proof.log
           if-no-files-found: error
           retention-days: 14
