@@ -30,9 +30,11 @@ for (const token of [
   'context.mutationRequest.family === "pharmacy"',
   'context.mutationRequest.selectedFamily === "pharmacy"',
   '(context.mutationRequest.batchSize ?? 1) === 1',
-  'resolveRollbackRequest',
-  'request.actorId !== actorId',
-  'request.entityId !== entityId',
+  'rollbackWriter({ actorId, entityId })',
+  'result.kind === "rolled_back"',
+  'result.kind === "replayed"',
+  'rollback-authority-consumed',
+  'rollback-authority-replayed',
 ]) {
   assert(wiring.includes(token), `${wiringPath} must include ${token}`);
 }
@@ -43,6 +45,8 @@ for (const forbidden of [
   'runReservationSnapshotAuditTransaction',
   'runImportPharmacyPrivateMutation',
   'createSupabasePharmacyPrivateMutationWriter',
+  'resolveRollbackRequest',
+  'publishReference })',
   '.from(',
   '.insert(',
   '.update(',
@@ -61,7 +65,8 @@ for (const token of [
   'fails closed before the executor when verified evidence is stale or foreign',
   'rejects mismatched publish context before reading reservation evidence',
   'does not expose raw reservation identifiers in the workflow result',
-  'resolves an opaque reference and runs the existing rollback boundary once',
+  'invokes the atomic authority rollback once without resolving a raw reference',
+  'distinguishes a bounded rollback replay without a second authority path',
 ]) {
   assert(tests.includes(token), `${testPath} must cover ${token}`);
 }
@@ -76,7 +81,7 @@ for (const token of [
 ]) {
   assert(action.includes(token), `${actionPath} must include P05 activation token ${token}`);
 }
-assert(!/IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS\s*=\s*\[[\s\S]*?"rollback"[\s\S]*?\]\s+as const/.test(action), `${actionPath} must keep rollback disabled until P06.`);
+assert(!/IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS\s*=\s*\[[\s\S]*?"rollback"[\s\S]*?\]\s+as const/.test(action), `${actionPath} must keep rollback UI activation disabled until P08/P09.`);
 
 for (const token of [
   'loadPharmacyVerifiedReservationForPublish',
@@ -92,6 +97,7 @@ for (const token of [
   'readbackClient.read',
   'verifyPharmacyPrivatePublishReadback',
   'readback.verified',
+  'BOUNDED_ROLLBACK_AUTHORITY_REFERENCE',
 ]) assert(executor.includes(token), `${executorPath} must include ${token}`);
 
 for (const source of [action, operation, executor]) {
@@ -101,7 +107,7 @@ for (const source of [action, operation, executor]) {
     'sitemapEligible: true',
     'routeEnabled: true',
     'publicRouteEnabled: true',
-  ]) assert(!source.includes(forbidden), `P05 private Admin wiring must not include ${forbidden}`);
+  ]) assert(!source.includes(forbidden), `P06 private Admin wiring must not include ${forbidden}`);
 }
 
 console.log('import Pharmacy private Admin real wiring check passed.');
