@@ -42,11 +42,6 @@ export type PharmacyPrivateAdminRealWiringDependencies = {
     entityId: string;
   }): Promise<PharmacyVerifiedReservationEvidence | null>;
   verifiedReservationExecutor?: PharmacyVerifiedReservationExecutorPort;
-  resolveRollbackRequest(input: {
-    actorId: string;
-    entityId: string;
-    publishReference: string;
-  }): Promise<ImportPharmacyPrivateRollbackRequest | null>;
   dryRun(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   review(input: { actorId: string; entityId: string }): Promise<{ ok: boolean; reference: string | null }>;
   audit(input: Parameters<PharmacyPrivateAdminWorkflowPorts["audit"]>[0]): Promise<boolean>;
@@ -122,17 +117,15 @@ export function createPharmacyPrivateAdminRealPorts(
         : { ok: false, reference: null };
     },
 
-    async rollback({ actorId, entityId, publishReference }) {
-      const request = await dependencies.resolveRollbackRequest({ actorId, entityId, publishReference });
-      if (!request || request.actorId !== actorId || request.entityId !== entityId) {
-        return { ok: false, reference: null };
+    async rollback({ actorId, entityId }) {
+      const result = await rollbackWriter({ actorId, entityId });
+      if (result.kind === "rolled_back") {
+        return { ok: true, reference: "rollback-authority-consumed" };
       }
-
-      const result = await rollbackWriter(request);
-      if (result.kind !== "rolled_back" && result.kind !== "replayed") {
-        return { ok: false, reference: null };
+      if (result.kind === "replayed") {
+        return { ok: true, reference: "rollback-authority-replayed" };
       }
-      return { ok: true, reference: publishReference };
+      return { ok: false, reference: null };
     },
 
     audit: dependencies.audit,
