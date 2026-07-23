@@ -87,6 +87,7 @@ for (const token of [
 
 for (const token of [
   'runImportPharmacyPrivateMutation',
+  'if (mutation.kind !== "mutated")',
   'publishReferenceStore.create',
   'readbackClient.read',
   'verifyPharmacyPrivatePublishReadback',
