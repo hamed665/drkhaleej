@@ -23,9 +23,8 @@ for (const token of [
   'input.family !== "pharmacy"',
   'input.environment !== "preview"',
   'input.confirmation !== `EXECUTE PRIVATE PUBLISH ${entityId}`',
-  '"ROLLBACK PRIVATE PHARMACY"',
+  'input.confirmation !== `ROLLBACK PRIVATE PUBLISH ${entityId}`',
   'review_required',
-  'publish_reference_required',
   'audit_unavailable',
   'publicVisibility: "private" as const',
   'indexEligible: false as const',
@@ -33,7 +32,7 @@ for (const token of [
   'routeEnabled: false as const',
   'ports.reservePrivatePublish',
   'ports.privatePublish',
-  'ports.rollback',
+  'ports.rollback({ actorId: input.actorId, entityId })',
   'ports.audit',
 ]) {
   assert(workflow.includes(token), `${workflowPath} must include ${token}`);
@@ -50,7 +49,10 @@ for (const forbidden of [
   'sitemapEligible: true',
   'routeEnabled: true',
   'Promise.all(input.entityIds',
+  'publishReference:',
+  'publish_reference_required',
   '"PUBLISH PRIVATE PHARMACY"',
+  '"ROLLBACK PRIVATE PHARMACY"',
 ]) {
   assert(!workflow.includes(forbidden), `${workflowPath} must not include ${forbidden}`);
 }
@@ -59,11 +61,13 @@ for (const token of [
   'blocks bulk, wrong-family, unreviewed, unconfirmed, and production publish requests',
   'dispatches one reviewed Preview reservation without mutation',
   'executes exactly one private publish and preserves zero public exposure',
-  'requires the source publish reference before rollback',
-  'runs rollback only in preview with confirmation and audit',
+  'requires the exact entity-bound rollback confirmation',
+  'runs rollback only in preview without receiving a raw reference',
   'fails honestly when the audit cannot be persisted',
 ]) {
   assert(tests.includes(token), `${testPath} must cover ${token}`);
 }
+
+assert(!tests.includes('publishReference: "publish-1"'), `${testPath} must not restore the raw rollback-reference contract.`);
 
 console.log('import pharmacy private admin workflow check passed.');
