@@ -37,7 +37,7 @@ for (const [pattern, message] of [
   [/rawValuesExposed:\s*false/, 'P07 comparator must state raw values are not exposed.'],
   [/maskAllowedDifferences/, 'P07 comparator must mask allowlisted operational differences before aggregate hashing.'],
   [/diagnosticsTruncated/, 'P07 comparator must report bounded diagnostic truncation.'],
-  [/canonicalize\(value\)/, 'P07 comparator must canonicalize nested logical state.'],
+  [/function\s+canonicalize\(value:\s*unknown\):\s*unknown/, 'P07 comparator must canonicalize nested logical state.'],
 ]) requirePattern(comparator, pattern, message);
 
 for (const [pattern, message] of [
