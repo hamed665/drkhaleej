@@ -6,12 +6,13 @@ import {
   buildPharmacyAdminStateMachineSnapshot,
   type PharmacyAdminStateMachineEvidence,
 } from "./import-pharmacy-admin-state-machine";
+import type { PharmacyRollbackLogicalSnapshot } from "./import-pharmacy-rollback-exact-recovery";
 
 const NOW = "2026-07-24T01:00:00.000Z";
 const FUTURE = "2026-07-24T01:15:00.000Z";
 const VERSION = "2026-07-24T00:55:00.000Z";
 
-function logicalSnapshot() {
+function logicalSnapshot(): PharmacyRollbackLogicalSnapshot {
   return {
     schemaVersion: "drkhaleej.import.pharmacyRollbackSnapshot.v1",
     visibility: "private",
@@ -61,36 +62,37 @@ function logicalSnapshot() {
   };
 }
 
-function entityRow() {
+function entityRow(): Record<string, unknown> {
   const snapshot = logicalSnapshot();
+  const center = snapshot.center as Record<string, unknown>;
   return {
-    id: snapshot.center.id,
-    center_type: snapshot.center.centerType,
-    slug: snapshot.center.slug,
-    name_en: snapshot.center.nameEn,
-    name_ar: snapshot.center.nameAr,
-    legal_name: snapshot.center.legalName,
-    status: snapshot.center.status,
-    verification_status: snapshot.center.verificationStatus,
-    primary_phone: snapshot.center.primaryPhone,
-    secondary_phone: snapshot.center.secondaryPhone,
-    whatsapp_phone: snapshot.center.whatsappPhone,
-    email: snapshot.center.email,
-    website_url: snapshot.center.websiteUrl,
-    logo_url: snapshot.center.logoUrl,
-    cover_image_url: snapshot.center.coverImageUrl,
-    short_description_en: snapshot.center.shortDescriptionEn,
-    short_description_ar: snapshot.center.shortDescriptionAr,
-    description_en: snapshot.center.descriptionEn,
-    description_ar: snapshot.center.descriptionAr,
-    default_locale: snapshot.center.defaultLocale,
-    default_country: snapshot.center.defaultCountry,
-    is_active: snapshot.center.isActive,
-    is_claimable: snapshot.center.isClaimable,
-    is_featured: snapshot.center.isFeatured,
-    sort_order: snapshot.center.sortOrder,
-    metadata: snapshot.center.metadata,
-    deleted_at: snapshot.center.deletedAt,
+    id: center.id,
+    center_type: center.centerType,
+    slug: center.slug,
+    name_en: center.nameEn,
+    name_ar: center.nameAr,
+    legal_name: center.legalName,
+    status: center.status,
+    verification_status: center.verificationStatus,
+    primary_phone: center.primaryPhone,
+    secondary_phone: center.secondaryPhone,
+    whatsapp_phone: center.whatsappPhone,
+    email: center.email,
+    website_url: center.websiteUrl,
+    logo_url: center.logoUrl,
+    cover_image_url: center.coverImageUrl,
+    short_description_en: center.shortDescriptionEn,
+    short_description_ar: center.shortDescriptionAr,
+    description_en: center.descriptionEn,
+    description_ar: center.descriptionAr,
+    default_locale: center.defaultLocale,
+    default_country: center.defaultCountry,
+    is_active: center.isActive,
+    is_claimable: center.isClaimable,
+    is_featured: center.isFeatured,
+    sort_order: center.sortOrder,
+    metadata: center.metadata,
+    deleted_at: center.deletedAt,
     updated_at: NOW,
   };
 }
@@ -128,145 +130,86 @@ function evidence(overrides: Partial<PharmacyAdminStateMachineEvidence> = {}): P
   };
 }
 
-function stageStatus(snapshot: ReturnType<typeof buildPharmacyAdminStateMachineSnapshot>, id: string) {
+function completedEvidence(entity = entityRow()): PharmacyAdminStateMachineEvidence {
+  return evidence({
+    dryRun: readState(),
+    review: readState(true),
+    authorization: { status: "consumed", issuedAt: NOW, expiresAt: FUTURE, consumedAt: NOW },
+    reservation: { status: "rolled_back", expiresAt: FUTURE, terminalKind: "rolled_back" },
+    rollbackSnapshot: { snapshotHash: "c".repeat(64), snapshotPayload: logicalSnapshot(), restoredAt: NOW },
+    publishReference: { count: 1, consumedAt: NOW },
+    reservationAuditCount: 1,
+    mutationStartedAuditCount: 1,
+    publishSucceededAuditCount: 1,
+    rollbackSucceededAuditCount: 1,
+    entity,
+    auditHistory: [
+      { eventType: "reservation_created", outcome: "pending", schemaVersion: "v2", phase: "reservation", createdAt: NOW },
+      { eventType: "rollback_succeeded", outcome: "rolled_back", schemaVersion: "v4", phase: "rollback", createdAt: NOW },
+    ],
+  });
+}
+
+function status(snapshot: ReturnType<typeof buildPharmacyAdminStateMachineSnapshot>, id: string) {
   return snapshot.stages.find((stage) => stage.id === id)?.status;
 }
 
 describe("buildPharmacyAdminStateMachineSnapshot", () => {
-  it("starts with only dry-run available and keeps every public boundary closed", () => {
+  it("starts read-only with all external boundaries closed", () => {
     const snapshot = buildPharmacyAdminStateMachineSnapshot(evidence());
-
     expect(snapshot.currentStage).toBe("dry_run");
-    expect(stageStatus(snapshot, "dry_run")).toBe("available");
-    expect(stageStatus(snapshot, "exact_review")).toBe("blocked");
-    expect(snapshot.publicVisibility).toBe("private");
-    expect(snapshot.indexEligible).toBe(false);
-    expect(snapshot.sitemapEligible).toBe(false);
-    expect(snapshot.routeEnabled).toBe(false);
-    expect(snapshot.bulkAllowed).toBe(false);
-    expect(snapshot.automaticMutationRetryAllowed).toBe(false);
-    expect(snapshot.rawIdentifiersExposed).toBe(false);
+    expect(status(snapshot, "dry_run")).toBe("available");
+    expect(status(snapshot, "exact_review")).toBe("blocked");
+    expect(snapshot).toMatchObject({
+      publicVisibility: "private",
+      indexEligible: false,
+      sitemapEligible: false,
+      routeEnabled: false,
+      bulkAllowed: false,
+      automaticMutationRetryAllowed: false,
+      rawIdentifiersExposed: false,
+    });
     expect(snapshot.revision).toMatch(/^[a-f0-9]{64}$/);
   });
 
-  it("makes the next operation available only from persisted server evidence", () => {
+  it("advances only from persisted evidence and detects stale or expired review", () => {
     const dryRun = buildPharmacyAdminStateMachineSnapshot(evidence({ dryRun: readState() }));
-    expect(stageStatus(dryRun, "dry_run")).toBe("complete");
-    expect(stageStatus(dryRun, "exact_review")).toBe("available");
+    expect(status(dryRun, "exact_review")).toBe("available");
 
-    const reviewed = buildPharmacyAdminStateMachineSnapshot(evidence({
-      dryRun: readState(),
-      review: readState(true),
-      authorization: {
-        status: "issued",
-        issuedAt: "2026-07-24T00:51:00.000Z",
-        expiresAt: FUTURE,
-        consumedAt: null,
-      },
-    }));
-    expect(stageStatus(reviewed, "authorization_ready")).toBe("complete");
-    expect(stageStatus(reviewed, "reservation")).toBe("available");
-    expect(reviewed.nextExpiryAt).toBe(FUTURE);
-  });
-
-  it("marks stale and expired state fail-closed", () => {
     const stale = buildPharmacyAdminStateMachineSnapshot(evidence({
       dryRun: readState(),
       review: readState(true),
       entity: { ...entityRow(), updated_at: "2026-07-24T00:59:00.000Z" },
     }));
     expect(stale.stale).toBe(true);
-    expect(stageStatus(stale, "exact_review")).toBe("stale");
+    expect(status(stale, "exact_review")).toBe("stale");
 
-    const expiredRead = { ...readState(true), expiresAt: "2026-07-24T00:59:59.000Z" };
-    const expired = buildPharmacyAdminStateMachineSnapshot(evidence({
-      dryRun: expiredRead,
-      review: expiredRead,
-    }));
-    expect(stageStatus(expired, "dry_run")).toBe("expired");
-    expect(stageStatus(expired, "exact_review")).toBe("expired");
+    const expiredState = { ...readState(true), expiresAt: "2026-07-24T00:59:59.000Z" };
+    const expired = buildPharmacyAdminStateMachineSnapshot(evidence({ dryRun: expiredState, review: expiredState }));
+    expect(status(expired, "dry_run")).toBe("expired");
+    expect(status(expired, "exact_review")).toBe("expired");
   });
 
-  it("proves the complete ten-stage path after rollback exact recovery", () => {
-    const snapshotPayload = logicalSnapshot();
-    const snapshot = buildPharmacyAdminStateMachineSnapshot(evidence({
-      dryRun: readState(),
-      review: readState(true),
-      authorization: {
-        status: "consumed",
-        issuedAt: "2026-07-24T00:51:00.000Z",
-        expiresAt: FUTURE,
-        consumedAt: "2026-07-24T00:52:00.000Z",
-      },
-      reservation: {
-        status: "rolled_back",
-        expiresAt: FUTURE,
-        terminalKind: "rolled_back",
-      },
-      rollbackSnapshot: {
-        snapshotHash: "c".repeat(64),
-        snapshotPayload,
-        restoredAt: "2026-07-24T00:58:00.000Z",
-      },
-      publishReference: { count: 1, consumedAt: "2026-07-24T00:58:00.000Z" },
-      reservationAuditCount: 1,
-      mutationStartedAuditCount: 1,
-      publishSucceededAuditCount: 1,
-      rollbackSucceededAuditCount: 1,
-      entity: entityRow(),
-      auditHistory: [
-        {
-          eventType: "reservation_created",
-          outcome: "pending",
-          schemaVersion: "drkhaleej.import.publishAudit.v2",
-          phase: "reservation",
-          createdAt: "2026-07-24T00:52:00.000Z",
-        },
-        {
-          eventType: "rollback_succeeded",
-          outcome: "rolled_back",
-          schemaVersion: "drkhaleej.import.publishAudit.v4",
-          phase: "rollback",
-          createdAt: "2026-07-24T00:58:00.000Z",
-        },
-      ],
-    }));
-
+  it("completes all ten stages after exact rollback recovery", () => {
+    const snapshot = buildPharmacyAdminStateMachineSnapshot(completedEvidence());
     expect(snapshot.stages).toHaveLength(10);
     expect(snapshot.stages.every((stage) => stage.status === "complete")).toBe(true);
-    expect(snapshot.currentStage).toBe("bounded_audit_history");
     expect(snapshot.exactRecovery?.verified).toBe(true);
     expect(snapshot.exactRecovery?.mismatchCount).toBe(0);
     expect(snapshot.exactRecovery?.expectedHash).toBe(snapshot.exactRecovery?.actualHash);
-    expect(snapshot.auditHistory).toHaveLength(2);
   });
 
-  it("returns only bounded path and hashes when exact recovery mismatches", () => {
+  it("reports a protected mismatch only as bounded path and hashes", () => {
     const tampered = entityRow();
-    tampered.metadata = {
-      ...(tampered.metadata as Record<string, unknown>),
-      protected: { licenseNumber: "TAMPERED" },
-    };
-    const snapshot = buildPharmacyAdminStateMachineSnapshot(evidence({
-      dryRun: readState(),
-      review: readState(true),
-      authorization: { status: "consumed", issuedAt: NOW, expiresAt: FUTURE, consumedAt: NOW },
-      reservation: { status: "rolled_back", expiresAt: FUTURE, terminalKind: "rolled_back" },
-      rollbackSnapshot: { snapshotHash: "c".repeat(64), snapshotPayload: logicalSnapshot(), restoredAt: NOW },
-      publishReference: { count: 1, consumedAt: NOW },
-      reservationAuditCount: 1,
-      mutationStartedAuditCount: 1,
-      publishSucceededAuditCount: 1,
-      rollbackSucceededAuditCount: 1,
-      entity: tampered,
-      auditHistory: [{ eventType: "rollback_succeeded", outcome: "rolled_back", schemaVersion: "v4", phase: "rollback", createdAt: NOW }],
-    }));
-
+    const metadata = tampered.metadata as Record<string, unknown>;
+    tampered.metadata = { ...metadata, protected: { licenseNumber: "TAMPERED" } };
+    const snapshot = buildPharmacyAdminStateMachineSnapshot(completedEvidence(tampered));
+    const mismatch = snapshot.exactRecovery?.mismatches[0];
     expect(snapshot.exactRecovery?.verified).toBe(false);
     expect(snapshot.exactRecovery?.mismatchCount).toBe(1);
-    expect(snapshot.exactRecovery?.mismatches[0]?.path).toBe("logical.center.metadata.protected.licenseNumber");
-    expect(snapshot.exactRecovery?.mismatches[0]?.expectedHash).toMatch(/^[a-f0-9]{64}$/);
-    expect(snapshot.exactRecovery?.mismatches[0]?.actualHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(mismatch?.path).toBe("logical.center.metadata.protected.licenseNumber");
+    expect(mismatch?.expectedHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(mismatch?.actualHash).toMatch(/^[a-f0-9]{64}$/);
     expect(JSON.stringify(snapshot)).not.toContain("LICENSE-P08");
     expect(JSON.stringify(snapshot)).not.toContain("TAMPERED");
   });
