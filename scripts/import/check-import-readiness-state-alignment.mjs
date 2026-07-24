@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 956,
-  runtimeBaseline: '60c9ca8fc466605af55360237ed40861e0106c78',
+  alignedThroughPr: 957,
+  runtimeBaseline: 'd9ba9059df05184d6e9576bc694642118cdecf07',
   lastAligned: '2026-07-24',
   currentMigration: '0084_import_pharmacy_rollback_digest_schema.sql',
-  currentNext: 'ADMIN-STATE-MACHINE',
+  currentNext: 'REAL-ADMIN-CANARY',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -23,6 +23,7 @@ const expectedCanonicalState = {
     '3+': 'COMPLETE',
     '4.1': 'COMPLETE',
     '4.2': 'COMPLETE',
+    5: 'PARTIAL',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -144,7 +145,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -216,6 +217,7 @@ function validateMatrix(source, manifest) {
     'Private Admin wiring and publish readback': ['Complete', '#954'],
     'Durable rollback authority': ['Complete', '#955'],
     'Exact rollback recovery': ['Complete', '#956'],
+    'Admin state machine': ['Complete', '#957'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],

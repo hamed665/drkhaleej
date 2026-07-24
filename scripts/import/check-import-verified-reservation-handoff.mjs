@@ -8,6 +8,8 @@ const files = {
   wiring: 'src/server/admin/import-pharmacy-private-admin-real-wiring.ts',
   wiringTest: 'src/server/admin/import-pharmacy-private-admin-real-wiring.test.ts',
   operation: 'src/server/admin/import-pharmacy-private-admin-publish-operation.ts',
+  rollbackOperation: 'src/server/admin/import-pharmacy-private-admin-rollback-operation.ts',
+  stateMachine: 'src/server/admin/import-pharmacy-admin-state-machine.ts',
   executor: 'src/server/admin/import-pharmacy-private-admin-publish-executor.ts',
   action: 'src/app/admin/imports/readiness/actions.ts',
   serverAction: 'src/server/admin/import-pharmacy-private-admin-server-action.ts',
@@ -21,12 +23,28 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [handoff, handoffTest, wiring, wiringTest, operation, executor, action, serverAction, panel, docs, p05Docs] = await Promise.all([
+const [
+  handoff,
+  handoffTest,
+  wiring,
+  wiringTest,
+  operation,
+  rollbackOperation,
+  stateMachine,
+  executor,
+  action,
+  serverAction,
+  panel,
+  docs,
+  p05Docs,
+] = await Promise.all([
   text(files.handoff),
   text(files.handoffTest),
   text(files.wiring),
   text(files.wiringTest),
   text(files.operation),
+  text(files.rollbackOperation),
+  text(files.stateMachine),
   text(files.executor),
   text(files.action),
   text(files.serverAction),
@@ -121,11 +139,14 @@ for (const token of [
 for (const token of [
   '"reserve_private_publish"',
   '"private_publish"',
+  '"rollback"',
   'runPharmacyPrivateAdminPublishOperation',
+  'runPharmacyPrivateAdminRollbackOperation',
+  'submittedRevision !== beforeState.revision',
+  'state_readback_unverified',
 ]) {
-  assert(action.includes(token), `${files.action} must activate P05 through ${token}`);
+  assert(action.includes(token), `${files.action} must activate the bounded P08 flow through ${token}`);
 }
-assert(!/IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS\s*=\s*\[[\s\S]*?"rollback"[\s\S]*?\]\s+as const/.test(action), `${files.action} must keep rollback disabled until P06.`);
 
 for (const token of [
   'loadPharmacyVerifiedReservationForPublish',
@@ -134,10 +155,27 @@ for (const token of [
 ]) assert(operation.includes(token), `${files.operation} must preserve the verified handoff through ${token}`);
 
 for (const token of [
+  'environment !== "preview"',
+  'confirmation !== `ROLLBACK PRIVATE PUBLISH ${input.entityId}`',
+  'createSupabasePharmacyPrivateRollbackWriter',
+  'rawReferenceExposed: false',
+]) assert(rollbackOperation.includes(token), `${files.rollbackOperation} must preserve bounded rollback authority through ${token}`);
+
+for (const token of [
   'runImportPharmacyPrivateMutation',
   'publishReferenceStore.create',
   'verifyPharmacyPrivatePublishReadback',
 ]) assert(executor.includes(token), `${files.executor} must consume the verified handoff through ${token}`);
+
+for (const token of [
+  'automaticMutationRetryAllowed: false',
+  'rawIdentifiersExposed: false',
+  'bulkAllowed: false',
+  'publicVisibility: "private"',
+  'indexEligible: false',
+  'sitemapEligible: false',
+  'routeEnabled: false',
+]) assert(stateMachine.includes(token), `${files.stateMachine} must preserve the bounded P08 contract through ${token}`);
 
 for (const source of [action, serverAction, panel]) {
   for (const forbidden of [
@@ -150,6 +188,16 @@ for (const source of [action, serverAction, panel]) {
   ]) {
     assert(!source.includes(forbidden), `browser/action surface must not expose ${forbidden}`);
   }
+}
+
+for (const source of [action, rollbackOperation, stateMachine]) {
+  for (const forbidden of [
+    'visibility: "public"',
+    'indexEligible: true',
+    'sitemapEligible: true',
+    'routeEnabled: true',
+    'publicRouteEnabled: true',
+  ]) assert(!source.includes(forbidden), `P08 browser/action surface must not include ${forbidden}`);
 }
 
 for (const token of [
@@ -173,4 +221,4 @@ for (const token of [
   'no Production',
 ]) assert(p05Docs.toLowerCase().includes(token.toLowerCase()), `${files.p05Docs} must include ${token}`);
 
-console.log('import verified Reservation handoff contract passed through P05 activation.');
+console.log('import verified Reservation handoff contract passed through bounded P08 activation.');

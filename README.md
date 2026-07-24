@@ -26,11 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #956** at baseline **`60c9ca8fc466605af55360237ed40861e0106c78`**.
+- Import-readiness runtime is aligned through **PR #957** at baseline **`d9ba9059df05184d6e9576bc694642118cdecf07`**.
 - Database/migration status: **validates through `0084_import_pharmacy_rollback_digest_schema.sql`**.
 - Completed migration set: **`0001` through `0084`**.
-- Current import-readiness implementation: **`ADMIN-STATE-MACHINE`**.
-- P07 proves exact logical Pharmacy recovery using the existing rollback authority, equal canonical hashes and bounded path-and-hash-only mismatch diagnostics. Rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.
+- Current import-readiness implementation: **`REAL-ADMIN-CANARY`**.
+- P08 implements the protected ten-stage server-authoritative Pharmacy Admin state machine with revision-bound forms, readback-only refresh, stale/expiry handling, replay/fresh receipts, double-submit protection, manual rollback, exact recovery, and bounded audit history. P09 real Admin canary, public/index/sitemap/route promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

@@ -6,6 +6,8 @@ const wiringPath = 'src/server/admin/import-pharmacy-private-admin-real-wiring.t
 const testPath = 'src/server/admin/import-pharmacy-private-admin-real-wiring.test.ts';
 const actionPath = 'src/app/admin/imports/readiness/actions.ts';
 const operationPath = 'src/server/admin/import-pharmacy-private-admin-publish-operation.ts';
+const rollbackOperationPath = 'src/server/admin/import-pharmacy-private-admin-rollback-operation.ts';
+const stateMachinePath = 'src/server/admin/import-pharmacy-admin-state-machine.ts';
 const executorPath = 'src/server/admin/import-pharmacy-private-admin-publish-executor.ts';
 
 const readText = (relativePath) => readFile(path.join(root, relativePath), 'utf8');
@@ -13,11 +15,13 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [wiring, tests, action, operation, executor] = await Promise.all([
+const [wiring, tests, action, operation, rollbackOperation, stateMachine, executor] = await Promise.all([
   readText(wiringPath),
   readText(testPath),
   readText(actionPath),
   readText(operationPath),
+  readText(rollbackOperationPath),
+  readText(stateMachinePath),
   readText(executorPath),
 ]);
 
@@ -76,12 +80,31 @@ for (const token of [
   '"review"',
   '"reserve_private_publish"',
   '"private_publish"',
-  'operation !== "private_publish"',
+  '"rollback"',
+  'if (operation === "private_publish")',
+  'if (operation === "rollback")',
   'runPharmacyPrivateAdminPublishOperation',
+  'runPharmacyPrivateAdminRollbackOperation',
+  'submittedRevision !== beforeState.revision',
+  'state_readback_unverified',
 ]) {
-  assert(action.includes(token), `${actionPath} must include P05 activation token ${token}`);
+  assert(action.includes(token), `${actionPath} must include P08 activation token ${token}`);
 }
-assert(!/IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS\s*=\s*\[[\s\S]*?"rollback"[\s\S]*?\]\s+as const/.test(action), `${actionPath} must keep rollback UI activation disabled until P08/P09.`);
+
+for (const token of [
+  'environment !== "preview"',
+  '!input.allowedActorIds.includes(input.actorId)',
+  '!input.allowedEntityIds.includes(input.entityId)',
+  'confirmation !== `ROLLBACK PRIVATE PUBLISH ${input.entityId}`',
+  'createSupabasePharmacyPrivateRollbackWriter',
+  'rawReferenceExposed: false',
+  'publicVisibility: "private"',
+  'indexEligible: false',
+  'sitemapEligible: false',
+  'routeEnabled: false',
+]) {
+  assert(rollbackOperation.includes(token), `${rollbackOperationPath} must include ${token}`);
+}
 
 for (const token of [
   'loadPharmacyVerifiedReservationForPublish',
@@ -100,14 +123,29 @@ for (const token of [
   'BOUNDED_ROLLBACK_AUTHORITY_REFERENCE',
 ]) assert(executor.includes(token), `${executorPath} must include ${token}`);
 
-for (const source of [action, operation, executor]) {
+for (const token of [
+  'automaticMutationRetryAllowed: false',
+  'rawIdentifiersExposed: false',
+  'publicVisibility: "private"',
+  'indexEligible: false',
+  'sitemapEligible: false',
+  'routeEnabled: false',
+  'bulkAllowed: false',
+]) assert(stateMachine.includes(token), `${stateMachinePath} must include ${token}`);
+
+for (const source of [action, operation, rollbackOperation, executor, stateMachine]) {
   for (const forbidden of [
     'visibility: "public"',
     'indexEligible: true',
     'sitemapEligible: true',
     'routeEnabled: true',
     'publicRouteEnabled: true',
-  ]) assert(!source.includes(forbidden), `P06 private Admin wiring must not include ${forbidden}`);
+  ]) assert(!source.includes(forbidden), `P08 private Admin wiring must not include ${forbidden}`);
 }
+
+for (const forbidden of [
+  /setTimeout\s*\(/,
+  /setInterval\s*\(/,
+]) assert(!forbidden.test(action), `${actionPath} must not automatically retry writes`);
 
 console.log('import Pharmacy private Admin real wiring check passed.');

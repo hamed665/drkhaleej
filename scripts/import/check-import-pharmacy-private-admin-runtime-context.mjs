@@ -4,6 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const contextPath = 'src/server/admin/import-pharmacy-private-admin-runtime-context.ts';
 const actionPath = 'src/app/admin/imports/readiness/actions.ts';
+const rollbackOperationPath = 'src/server/admin/import-pharmacy-private-admin-rollback-operation.ts';
+const stateMachinePath = 'src/server/admin/import-pharmacy-admin-state-machine.ts';
 const persistencePath = 'src/server/admin/import-private-persistence-adapter.ts';
 
 async function readText(relativePath) {
@@ -14,9 +16,13 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const context = await readText(contextPath);
-const action = await readText(actionPath);
-const persistence = await readText(persistencePath);
+const [context, action, rollbackOperation, stateMachine, persistence] = await Promise.all([
+  readText(contextPath),
+  readText(actionPath),
+  readText(rollbackOperationPath),
+  readText(stateMachinePath),
+  readText(persistencePath),
+]);
 
 for (const token of [
   'createSupabasePharmacyPrivateAdminContextReader',
@@ -47,13 +53,40 @@ for (const token of [
 
 for (const token of [
   'executionEnabled: process.env.VERCEL_ENV === "preview"',
-  '"dry_run",\n  "review",\n  "reserve_private_publish",\n  "private_publish",',
-  'operation !== "reserve_private_publish" &&\n        operation !== "private_publish"',
+  '"dry_run",\n  "review",\n  "reserve_private_publish",\n  "private_publish",\n  "rollback",',
+  'if (operation === "rollback")',
+  'if (operation === "private_publish")',
+  'if (operation === "reserve_private_publish")',
   'createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()',
   'loadPharmacyPrivateAdminRuntimeContext(',
   'runPharmacyPrivateAdminPublishOperation',
+  'runPharmacyPrivateAdminRollbackOperation',
+  'submittedRevision !== beforeState.revision',
+  'state_readback_unverified',
 ]) {
   assert(action.includes(token), `${actionPath} must include ${token}`);
+}
+
+for (const token of [
+  'environment !== "preview"',
+  '!input.allowedActorIds.includes(input.actorId)',
+  '!input.allowedEntityIds.includes(input.entityId)',
+  'confirmation !== `ROLLBACK PRIVATE PUBLISH ${input.entityId}`',
+  'rawReferenceExposed: false',
+]) {
+  assert(rollbackOperation.includes(token), `${rollbackOperationPath} must include ${token}`);
+}
+
+for (const token of [
+  'automaticMutationRetryAllowed: false',
+  'rawIdentifiersExposed: false',
+  'publicVisibility: "private"',
+  'indexEligible: false',
+  'sitemapEligible: false',
+  'routeEnabled: false',
+  'bulkAllowed: false',
+]) {
+  assert(stateMachine.includes(token), `${stateMachinePath} must include ${token}`);
 }
 
 for (const forbidden of [
@@ -62,11 +95,15 @@ for (const forbidden of [
   'indexPolicy: "index"',
   'sitemapPolicy: "included"',
   'visibility: "public"',
-  'Promise.all(',
-  '"rollback",\n] as const',
 ]) {
   assert(!context.includes(forbidden), `${contextPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);
+  assert(!rollbackOperation.includes(forbidden), `${rollbackOperationPath} must not include ${forbidden}`);
+  assert(!stateMachine.includes(forbidden), `${stateMachinePath} must not include ${forbidden}`);
 }
 
-console.log('import pharmacy private Admin runtime context check passed.');
+for (const forbidden of [/setTimeout\s*\(/, /setInterval\s*\(/]) {
+  assert(!forbidden.test(action), `${actionPath} must not automatically retry writes`);
+}
+
+console.log('import pharmacy private Admin runtime context check passed through bounded P08 activation.');

@@ -20,13 +20,14 @@ Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-
 Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven
 Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time consumption and bounded replay proven
 Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatch diagnostics proven
+Wave 5     PARTIAL   (#957) Server-authoritative Admin state machine complete; real Admin canary and Post-P09 decision remain open
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #956
-Baseline commit: 60c9ca8
+Aligned through: PR #957
+Baseline commit: d9ba9059
 Last aligned: 2026-07-24
 ```
 
@@ -35,11 +36,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 956,
-  "runtimeBaseline": "60c9ca8fc466605af55360237ed40861e0106c78",
+  "alignedThroughPr": 957,
+  "runtimeBaseline": "d9ba9059df05184d6e9576bc694642118cdecf07",
   "lastAligned": "2026-07-24",
   "currentMigration": "0084_import_pharmacy_rollback_digest_schema.sql",
-  "currentNext": "ADMIN-STATE-MACHINE",
+  "currentNext": "REAL-ADMIN-CANARY",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -47,7 +48,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "2.2": "COMPLETE",
     "3+": "COMPLETE",
     "4.1": "COMPLETE",
-    "4.2": "COMPLETE"
+    "4.2": "COMPLETE",
+    "5": "PARTIAL"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -266,7 +268,7 @@ Only append-only audit/history state, monotonic entity-version metadata, rollbac
 
 The exact-SHA isolated Preview proof produced equal expected/actual logical hashes, mismatch count zero, verified a deliberate protected nested mismatch using hash-only diagnostics, preserved private/noindex/no-route/no-sitemap state, reported zero public exposure, completed deterministic cleanup and kept Production disconnected.
 
-## Wave 5 — Admin state machine and canary `OPEN`
+## Wave 5 — Admin state machine and canary `PARTIAL (#957)`
 
 Keep `/admin/imports/readiness` and the existing design system.
 
@@ -283,9 +285,11 @@ Dry Run
 → Bounded Audit History
 ```
 
-Add server-authoritative refresh, stale detection, expiry countdown, double-submit protection, replay/fresh display, multi-tab collision handling, and readback-only safe retry. Never auto-retry Reservation, mutation, or rollback.
+P08 extends the existing protected `/admin/imports/readiness` workflow with all ten stages above. Every visible stage is derived from persisted server readback. The UI provides explicit readback-only refresh, stale and expiry handling, countdown, client pending lock, server revision binding for multi-tab collisions, fresh/replayed receipts, bounded audit history, and manual Preview-only rollback through the existing atomic authority. Reservation, mutation, and rollback are never retried automatically. Raw durable references, protected values, and unrestricted payloads remain outside browser contracts.
 
-Run one real Preview Pharmacy through the complete Admin path. Integrity findings for orphan/duplicate/audit gap/unfinished execution/state mismatch/public/index/sitemap exposure/secret leakage/unrestricted payload must all be zero.
+P08 changes no database schema or authority and keeps the workflow single-entity, Pharmacy-only, private/noindex/no-route/no-sitemap, actor/entity allowlisted, and unavailable in Production.
+
+P09 must run one real Preview Pharmacy through the complete Admin path. Integrity findings for orphan/duplicate/audit gap/unfinished execution/state mismatch/public/index/sitemap exposure/secret leakage/unrestricted payload must all be zero.
 
 Wave 5 فقط پس از تکمیل checklist مستقل Post-P09 Go/No-Go و ثبت `GO` کامل است. این GO فقط Registry/Pharmacy Public work را باز می‌کند؛ Agent، Content و Bulk Gateهای جدا دارند.
 
@@ -374,13 +378,7 @@ Do not add:
 ## Current next implementation
 
 ```text
-ADMIN-STATE-MACHINE
-```
-
-P07 completed exact logical Pharmacy recovery verification with bounded path-and-hash-only mismatch diagnostics on the existing rollback path. The next implementation is P08 Admin state-machine wiring. Public/index/sitemap/route promotion, real P09 Admin canary execution and Production execution remain disabled.
-
-After `ADMIN-STATE-MACHINE` is green:
-
-```text
 REAL-ADMIN-CANARY
 ```
+
+P08 completed the server-authoritative ten-stage Pharmacy Admin workflow with readback-only refresh, expiry/stale handling, replay/fresh receipts, multi-tab revision rejection, double-submit protection, bounded audit history, manual rollback, and P07 exact-recovery readback. The next implementation is P09 real Admin canary. Public/index/sitemap/route promotion, Production execution, Agent, Content, Hospital, Doctor, Registry, and Bulk remain disabled.

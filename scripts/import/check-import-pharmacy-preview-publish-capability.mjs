@@ -6,13 +6,15 @@ const resolverPath = "src/server/admin/import-pharmacy-preview-publish-capabilit
 const resolverTestPath = "src/server/admin/import-pharmacy-preview-publish-capability.test.ts";
 const actionPath = "src/app/admin/imports/readiness/actions.ts";
 const panelPath = "src/components/admin/import-pharmacy-private-admin-control-panel.tsx";
+const stateMachinePath = "src/server/admin/import-pharmacy-admin-state-machine.ts";
 
 const readText = (relativePath) => readFile(path.join(root, relativePath), "utf8");
-const [resolver, tests, action, panel] = await Promise.all([
+const [resolver, tests, action, panel, stateMachine] = await Promise.all([
   readText(resolverPath),
   readText(resolverTestPath),
   readText(actionPath),
   readText(panelPath),
+  readText(stateMachinePath),
 ]);
 
 function assert(condition, message) {
@@ -47,28 +49,54 @@ for (const token of [
   "reviewState: readback",
   "expectedSnapshotHash: context.snapshotHash",
   "expectedEntityFingerprint: context.context.canaryInput.expectedEntityFingerprint",
+  'if (operation === "private_publish")',
+  "runPharmacyPrivateAdminPublishOperation",
+  "submittedRevision !== beforeState.revision",
+  "state_readback_unverified",
 ]) assert(action.includes(token), `${actionPath} must include ${token}`);
 
 for (const token of [
-  'name={step.operation === "review" ? "publishConfirmation" : "confirmation"}',
-  "publishCapability?.visible === true",
-  "Preview eligible · execution disabled",
-  "mutation execution remains disabled",
+  'confirmationName: "publishConfirmation"',
+  'confirmationPrefix: "PRIVATE PUBLISH"',
+  'confirmationName: "confirmation"',
+  'confirmationPrefix: "EXECUTE PRIVATE PUBLISH"',
+  'name={operation.confirmationName}',
+  'name="stateRevision"',
+  'operationAvailable',
+  'Locked by server state',
+  'Waiting for server readback',
+  'No automatic mutation retry',
 ]) assert(panel.includes(token), `${panelPath} must include ${token}`);
 
+for (const token of [
+  '"authorization_ready"',
+  '"private_publish"',
+  '"publish_verified"',
+  'automaticMutationRetryAllowed: false',
+  'publicVisibility: "private"',
+  'indexEligible: false',
+  'sitemapEligible: false',
+  'routeEnabled: false',
+  'bulkAllowed: false',
+]) assert(stateMachine.includes(token), `${stateMachinePath} must include ${token}`);
+
 for (const forbidden of [
-  'IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = ["dry_run", "review", "private_publish"]',
   'operation: "private_publish",\n    readOnlyEnabled: true',
   'type="submit"\n                        disabled\n                        aria-disabled="true"',
-  "executionEnabled: true,\n    enabledOperations: [\"private_publish\"]",
   'visibility: "public"',
   "indexEligible: true",
   "sitemapEligible: true",
   "routeEnabled: true",
+  "publicRouteEnabled: true",
 ]) {
   assert(!resolver.includes(forbidden), `${resolverPath} must not include ${forbidden}`);
   assert(!action.includes(forbidden), `${actionPath} must not include ${forbidden}`);
   assert(!panel.includes(forbidden), `${panelPath} must not include ${forbidden}`);
+  assert(!stateMachine.includes(forbidden), `${stateMachinePath} must not include ${forbidden}`);
 }
 
-console.log("import Pharmacy preview publish capability check passed.");
+for (const forbidden of [/setTimeout\s*\(/, /setInterval\s*\(/]) {
+  assert(!forbidden.test(action), `${actionPath} must not automatically retry publish`);
+}
+
+console.log("import Pharmacy preview publish capability check passed through P08 staged activation.");
