@@ -35,7 +35,7 @@ export default async function AdminImportReadinessPage() {
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-950">Controlled boundary</h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          The Preview-only Pharmacy workflow exposes manual dry-run, exact review, Reservation, private publish, and rollback only to the single allowlisted admin and only when bounded server readback makes the next stage available. Refresh is readback-only. Reservation, mutation, and rollback are never retried automatically. Public routing, indexing, sitemap inclusion, Production access, P09 automatic canary execution, and bulk remain locked.
+          Readiness data remains read-only. The separate Preview-only Pharmacy control panel exposes manual dry-run, exact review, Reservation, private publish, and rollback only to the single allowlisted admin and only when bounded server readback makes the next stage available. Refresh is readback-only. Reservation, mutation, and rollback are never retried automatically. Public routing, indexing, sitemap inclusion, Production access, P09 automatic canary execution, and bulk remain locked.
         </p>
       </section>
     </div>
