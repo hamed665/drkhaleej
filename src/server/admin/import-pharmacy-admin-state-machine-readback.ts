@@ -11,6 +11,8 @@ import {
 } from "./import-pharmacy-admin-state-machine";
 import type { PharmacyRollbackLogicalSnapshot } from "./import-pharmacy-rollback-exact-recovery";
 
+type AuthorizationStatus = "issued" | "consumed" | "invalidated" | "expired";
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -22,6 +24,12 @@ function readString(record: Readonly<Record<string, unknown>>, key: string): str
 
 function readNullableString(record: Readonly<Record<string, unknown>>, key: string): string | null {
   return record[key] === null ? null : readString(record, key);
+}
+
+function readAuthorizationStatus(value: unknown): AuthorizationStatus | null {
+  return value === "issued" || value === "consumed" || value === "invalidated" || value === "expired"
+    ? value
+    : null;
 }
 
 function parseSingle(value: string | undefined): string[] {
@@ -214,18 +222,20 @@ export async function readPharmacyAdminStateMachineSnapshot(input: {
       (row) => readString(row, "event_type") === "rollback_succeeded" && readString(row, "outcome") === "rolled_back",
     ).length;
 
-    const authorizationStatus = authorizationRow ? readString(authorizationRow, "status") : null;
-    const authorization = authorizationRow &&
-      (authorizationStatus === "issued" || authorizationStatus === "consumed" || authorizationStatus === "invalidated" || authorizationStatus === "expired") &&
-      readString(authorizationRow, "issued_at") &&
-      readString(authorizationRow, "expires_at")
-      ? {
-          status: authorizationStatus,
-          issuedAt: readString(authorizationRow, "issued_at")!,
-          expiresAt: readString(authorizationRow, "expires_at")!,
-          consumedAt: readNullableString(authorizationRow, "consumed_at"),
-        }
+    const authorizationStatus = authorizationRow
+      ? readAuthorizationStatus(authorizationRow.status)
       : null;
+    const issuedAt = authorizationRow ? readString(authorizationRow, "issued_at") : null;
+    const authorizationExpiresAt = authorizationRow ? readString(authorizationRow, "expires_at") : null;
+    const authorization: PharmacyAdminStateMachineEvidence["authorization"] =
+      authorizationStatus && issuedAt && authorizationExpiresAt
+        ? {
+            status: authorizationStatus,
+            issuedAt,
+            expiresAt: authorizationExpiresAt,
+            consumedAt: readNullableString(authorizationRow!, "consumed_at"),
+          }
+        : null;
     const reservationStatus = reservationRow ? readString(reservationRow, "status") : null;
     const reservationExpiresAt = reservationRow ? readString(reservationRow, "expires_at") : null;
     const evidence: PharmacyAdminStateMachineEvidence = {
