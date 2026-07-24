@@ -4,6 +4,7 @@ import { resolvePharmacyPreviewCanaryActivation } from "./import-pharmacy-previe
 
 export type PharmacyMinimalAdminUiModel = {
   activationEnabled: boolean;
+  actorId: string | null;
   entityId: string | null;
   mode: "preview_canary" | "locked";
   publicVisibility: "private";
@@ -19,6 +20,7 @@ export function getPharmacyMinimalAdminUiModel(
 
   return {
     activationEnabled: activation.enabled,
+    actorId: activation.enabled ? activation.actorId : null,
     entityId: activation.enabled ? activation.entityId : null,
     mode: activation.enabled ? "preview_canary" : "locked",
     publicVisibility: "private",
