@@ -23,6 +23,10 @@ const actions = readFileSync(
   path.join(repoRoot, "src/app/admin/imports/readiness/actions.ts"),
   "utf8",
 );
+const stateModel = readFileSync(
+  path.join(repoRoot, "src/server/admin/import-pharmacy-admin-state-machine.ts"),
+  "utf8",
+);
 
 function requirePattern(source, pattern, message) {
   if (!pattern.test(source)) {
@@ -52,6 +56,7 @@ for (const [pattern, message] of [
 
 for (const [pattern, message] of [
   [/requirePlatformAdmin/, "page must bind initial state to the authenticated admin"],
+  [/pharmacyUiModel\.actorId === admin\.id/, "page must keep controls locked for non-allowlisted admins"],
   [/createPharmacyAdminStateMachineReaderFromEnvironment/, "page must load initial state from server readback"],
   [/initialStateMachine=/, "page must pass bounded initial state to the client"],
   [/never retried automatically/, "page must preserve no-auto-retry policy"],
@@ -65,16 +70,32 @@ for (const [pattern, message] of [
   [/state_readback_unverified/, "actions must fail when post-operation readback is not proven"],
   [/operationValue === "refresh_state"/, "refresh must be readback-only"],
   [/runPharmacyPrivateAdminRollbackOperation/, "rollback UI must reuse the existing atomic authority"],
-  [/automaticMutationRetryAllowed/, "actions must consume the bounded state-machine contract"],
 ]) requirePattern(actions, pattern, message);
 
 for (const [pattern, message] of [
   [/resolvePharmacyPreviewCanaryActivation/, "must derive activation from the existing Preview gate"],
+  [/actorId:\s*string \| null/, "server UI model must retain the allowlisted actor binding"],
   [/publicVisibility:\s*"private"/, "must preserve private visibility"],
   [/indexEligible:\s*false/, "must preserve noindex"],
   [/sitemapEligible:\s*false/, "must remain outside sitemap"],
   [/bulkAllowed:\s*false/, "must reject bulk"],
 ]) requirePattern(model, pattern, message);
+
+for (const [pattern, message] of [
+  [/PHARMACY_ADMIN_STATE_MACHINE_STAGE_IDS/, "must define one canonical ordered stage list"],
+  [/"dry_run"[\s\S]*"exact_review"[\s\S]*"authorization_ready"[\s\S]*"reservation"[\s\S]*"reservation_verified"[\s\S]*"private_publish"[\s\S]*"publish_verified"[\s\S]*"rollback"[\s\S]*"exact_recovery_verified"[\s\S]*"bounded_audit_history"/, "must preserve all ten ordered stages"],
+  [/comparePharmacyRollbackExactRecovery/, "must reuse the proven P07 exact recovery comparator"],
+  [/allowedDifferencePaths:\s*allowedRecoveryDifferences/, "must keep the exact recovery allowlist explicit"],
+  [/slice\(-10\)/, "must cap bounded audit history"],
+  [/revisionHash/, "must derive a server revision for stale-form rejection"],
+  [/automaticMutationRetryAllowed:\s*false/, "must forbid automatic Reservation, mutation, and rollback retry"],
+  [/rawIdentifiersExposed:\s*false/, "must state raw identifiers are not exposed"],
+  [/publicVisibility:\s*"private"/, "must preserve private visibility"],
+  [/indexEligible:\s*false/, "must preserve noindex"],
+  [/sitemapEligible:\s*false/, "must preserve sitemap exclusion"],
+  [/routeEnabled:\s*false/, "must preserve route exclusion"],
+  [/bulkAllowed:\s*false/, "must preserve no-bulk boundary"],
+]) requirePattern(stateModel, pattern, message);
 
 for (const [source, pattern, message] of [
   [panel, /dangerouslySetInnerHTML/, "must not render unrestricted payload HTML"],
@@ -82,6 +103,7 @@ for (const [source, pattern, message] of [
   [panel, /publishReference|rollbackSnapshotId|reservationId/, "panel must not receive raw persistence identifiers"],
   [page, /process\.env/, "route must not interpret runtime environment directly"],
   [actions, /setTimeout|setInterval/, "Server Action must not automatically retry writes"],
+  [stateModel, /rawExpected|rawActual|expectedValue|actualValue/, "state model must not expose raw mismatch values"],
 ]) {
   if (pattern.test(source)) {
     console.error(`❌ P08 Pharmacy Admin state machine: ${message}`);
