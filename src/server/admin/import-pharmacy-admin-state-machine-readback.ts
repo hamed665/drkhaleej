@@ -24,6 +24,11 @@ function readNullableString(record: Readonly<Record<string, unknown>>, key: stri
   return record[key] === null ? null : readString(record, key);
 }
 
+function parseSingle(value: string | undefined): string[] {
+  if (!value) return [];
+  return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+}
+
 function readState(row: Record<string, unknown> | null): PharmacyAdminStateMachineReadStateEvidence | null {
   if (!row) return null;
   const operationAttemptId = readString(row, "operation_attempt_id");
@@ -110,12 +115,14 @@ export async function readPharmacyAdminStateMachineSnapshot(input: {
 
     const dryRun = readState(dryRunResponse);
     const review = readState(reviewResponse);
-    const authorizationQuery = input.client
+    const authorizationBase = input.client
       .from("import_pharmacy_publish_authorizations")
       .select("status,issued_at,expires_at,consumed_at,operation_attempt_id")
       .eq("actor_profile_id", input.actorId)
       .eq("entity_id", input.entityId);
-    if (review) authorizationQuery.eq("operation_attempt_id", review.operationAttemptId);
+    const authorizationQuery = review
+      ? authorizationBase.eq("operation_attempt_id", review.operationAttemptId)
+      : authorizationBase;
     const [authorizationResponse, reservationResponse] = await Promise.all([
       authorizationQuery.order("issued_at", { ascending: false }).limit(1).maybeSingle(),
       input.client
@@ -168,6 +175,7 @@ export async function readPharmacyAdminStateMachineSnapshot(input: {
       snapshotRow = snapshotResponse.data as Record<string, unknown> | null;
       auditRows = (auditsResponse.data ?? []) as Record<string, unknown>[];
       referenceRows = (referenceResponse.data ?? []) as Record<string, unknown>[];
+      if (referenceRows.length > 1) return null;
     }
 
     const snapshotPayload = snapshotRow && isRecord(snapshotRow.snapshot_payload)
@@ -261,9 +269,22 @@ export function createPharmacyAdminStateMachineReaderFromEnvironment(
 ): ((input: { actorId: string; entityId: string; now: string }) => Promise<PharmacyAdminStateMachineSnapshot | null>) | null {
   const url = environment.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const key = environment.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (environment.VERCEL_ENV !== "preview" || !url || !key) return null;
+  const actorIds = parseSingle(environment.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
+  const entityIds = parseSingle(environment.IMPORT_PREVIEW_CANARY_ENTITY_IDS);
+  if (
+    environment.VERCEL_ENV !== "preview" ||
+    !url ||
+    !key ||
+    actorIds.length !== 1 ||
+    entityIds.length !== 1
+  ) return null;
   const client = createClient(url, key, {
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
   });
-  return (input) => readPharmacyAdminStateMachineSnapshot({ client, ...input });
+  return (input) => {
+    if (input.actorId !== actorIds[0] || input.entityId !== entityIds[0]) {
+      return Promise.resolve(null);
+    }
+    return readPharmacyAdminStateMachineSnapshot({ client, ...input });
+  };
 }
