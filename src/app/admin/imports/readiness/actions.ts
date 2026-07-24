@@ -247,6 +247,7 @@ export async function runPharmacyPrivateAdminAction(
   let publishCapability: PharmacyPreviewPublishCapability | null = null;
   let authorizationUiState: PharmacyPublishAuthorizationUiState | null = null;
   let reservationState: PharmacyAdminReservationResult | null = null;
+  let reservationReplayed = false;
   let rollbackReplayed = false;
 
   const action = createPharmacyPrivateAdminServerAction({
@@ -350,7 +351,7 @@ export async function runPharmacyPrivateAdminAction(
         const now = new Date().toISOString();
         const reviewState = await store.readLatestFresh({ actorId, entityId: actionEntityId, operation: "review", now });
         const dependencies = createPharmacyAdminReservationDependenciesFromEnvironment();
-        reservationState = reviewState && dependencies
+        const reservationResult = reviewState && dependencies
           ? await runPharmacyAdminReservationOperation({
               environment: process.env.VERCEL_ENV,
               actorId,
@@ -364,16 +365,18 @@ export async function runPharmacyPrivateAdminAction(
               dependencies,
             })
           : null;
+        reservationState = reservationResult;
+        reservationReplayed = reservationResult?.replayed === true;
         return {
           operation,
-          status: reservationState?.reserved && reservationState.integrityVerified ? "completed" : "failed",
+          status: reservationResult?.reserved && reservationResult.integrityVerified ? "completed" : "failed",
           entityId: actionEntityId,
           blockers: [],
           publicVisibility: "private",
           indexEligible: false,
           sitemapEligible: false,
           routeEnabled: false,
-          executionReference: reservationState?.reserved && reservationState.integrityVerified
+          executionReference: reservationResult?.reserved && reservationResult.integrityVerified
             ? reviewState?.operationAttemptId ?? null
             : null,
         };
@@ -499,7 +502,7 @@ export async function runPharmacyPrivateAdminAction(
   const readbackVerified = stageComplete(afterState, expectedReadbackStage(requestedOperation));
   const succeeded = actionResult.ok && readbackVerified;
   const replayed = requestedOperation === "reserve_private_publish"
-    ? reservationState?.replayed === true
+    ? reservationReplayed
     : requestedOperation === "rollback"
       ? rollbackReplayed
       : stageComplete(beforeState, expectedReadbackStage(requestedOperation));
