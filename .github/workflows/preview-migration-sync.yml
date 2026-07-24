@@ -13,7 +13,12 @@ on:
       - 'scripts/import/check-import-p05-private-publish-proof.mjs'
       - 'scripts/import/run-p06-rollback-authority-proof.mjs'
       - 'scripts/import/check-import-p06-rollback-authority-proof.mjs'
+      - 'scripts/import/run-p07-rollback-exact-recovery-proof.mjs'
+      - 'scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs'
+      - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
+      - 'src/server/admin/import-pharmacy-real-rollback-canary*'
       - 'scripts/import/check-import-readiness-state-alignment.mjs'
+      - 'docs/import/ROLLBACK_EXACT_RECOVERY.md'
       - 'docs/import/import-readiness-roadmap-after-933.md'
       - 'docs/project-state/CURRENT_STATE.md'
       - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
@@ -46,6 +51,12 @@ env:
   P06_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P06_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P06_EVIDENCE_PATH: artifacts/p06/rollback-authority-proof.json
+  P07_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P07_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P07_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P07_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P07_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  P07_EVIDENCE_PATH: artifacts/p07/rollback-exact-recovery-proof.json
 
 concurrency:
   group: drmuscat-isolated-preview-database-write
@@ -55,7 +66,7 @@ jobs:
   sync:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - name: Checkout exact revision
         uses: actions/checkout@v4
@@ -70,6 +81,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$PREVIEW_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P05_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P06_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$P07_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -94,13 +106,14 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
             node scripts/import/check-import-readiness-state-alignment.mjs
             node scripts/import/check-import-p05-private-publish-proof.mjs
             node scripts/import/check-import-p06-rollback-authority-proof.mjs
+            node scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -123,6 +136,12 @@ jobs:
         run: |
           set -o pipefail
           node scripts/import/run-p06-rollback-authority-proof.mjs 2>&1 | tee artifacts/p06/hosted-proof.log
+
+      - name: Run isolated P07 exact rollback recovery proof
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p07-rollback-exact-recovery-proof.mjs 2>&1 | tee artifacts/p07/hosted-proof.log
 
       - name: Upload Preview migration evidence
         if: always()
@@ -148,5 +167,14 @@ jobs:
         with:
           name: p06-rollback-authority-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p06/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload exact-SHA P07 rollback exact recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p07-rollback-exact-recovery-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p07/
           if-no-files-found: error
           retention-days: 14

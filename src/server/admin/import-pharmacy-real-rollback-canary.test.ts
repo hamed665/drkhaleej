@@ -2,10 +2,28 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+import { comparePharmacyRollbackExactRecovery } from "./import-pharmacy-rollback-exact-recovery";
 import { runPharmacyRealRollbackCanary } from "./import-pharmacy-real-rollback-canary";
 import type { PharmacyRealPreviewCanaryResult } from "./import-pharmacy-real-preview-canary";
 
-const HASH = "a".repeat(64);
+const ORIGINAL_SNAPSHOT = {
+  schemaVersion: "drkhaleej.import.pharmacyRollbackSnapshot.v1",
+  canonicalRoute: "/en/om/pharmacies/pharmacy-1",
+  center: {
+    id: "pharmacy-1",
+    centerType: "pharmacy",
+    status: "draft",
+    isActive: false,
+    isFeatured: false,
+    metadata: {
+      visibility: "private",
+      publicRouteEnabled: false,
+      indexable: false,
+      sitemapEligible: false,
+    },
+  },
+  relations: [],
+};
 
 function publishCanary(overrides: Partial<PharmacyRealPreviewCanaryResult> = {}): PharmacyRealPreviewCanaryResult {
   return {
@@ -31,13 +49,16 @@ function readback(overrides: Record<string, unknown> = {}) {
     duplicateRollbackCount: 0,
     referenceCount: 1,
     referenceConsumed: true,
+    exactRecovery: comparePharmacyRollbackExactRecovery({
+      expected: ORIGINAL_SNAPSHOT,
+      actual: ORIGINAL_SNAPSHOT,
+    }),
     entity: {
       id: "pharmacy-1",
       centerType: "pharmacy",
       status: "draft",
       isActive: false,
       isFeatured: false,
-      logicalSnapshotHash: HASH,
     },
     ...overrides,
   };
@@ -64,7 +85,7 @@ describe("runPharmacyRealRollbackCanary", () => {
 
     const result = await runPharmacyRealRollbackCanary({
       publishCanary: publishCanary(),
-      expectedOriginalSnapshotHash: HASH,
+      expectedOriginalSnapshot: ORIGINAL_SNAPSHOT,
       executor,
       readbackClient: client,
     });
@@ -72,13 +93,18 @@ describe("runPharmacyRealRollbackCanary", () => {
     expect(result.verified).toBe(true);
     expect(result.blockers).toEqual([]);
     expect(result.rawReferenceExposed).toBe(false);
+    expect(result.readback?.exactRecovery.verified).toBe(true);
     expect(executor).toHaveBeenCalledWith({
       operation: "rollback",
       actorId: "actor-1",
       entityId: "pharmacy-1",
       confirmation: "ROLLBACK PRIVATE PUBLISH pharmacy-1",
     });
-    expect(client.read).toHaveBeenCalledWith({ actorId: "actor-1", entityId: "pharmacy-1" });
+    expect(client.read).toHaveBeenCalledWith({
+      actorId: "actor-1",
+      entityId: "pharmacy-1",
+      expectedOriginalSnapshot: ORIGINAL_SNAPSHOT,
+    });
     expect(JSON.stringify(executor.mock.calls)).not.toContain("rollback-authority-ready");
   });
 
@@ -86,7 +112,7 @@ describe("runPharmacyRealRollbackCanary", () => {
     const executor = vi.fn();
     const result = await runPharmacyRealRollbackCanary({
       publishCanary: publishCanary({ verified: false }),
-      expectedOriginalSnapshotHash: HASH,
+      expectedOriginalSnapshot: ORIGINAL_SNAPSHOT,
       executor,
       readbackClient: { read: vi.fn() },
     });
@@ -96,11 +122,24 @@ describe("runPharmacyRealRollbackCanary", () => {
     expect(executor).not.toHaveBeenCalled();
   });
 
+  it("rejects a missing original logical snapshot before rollback", async () => {
+    const executor = vi.fn();
+    const result = await runPharmacyRealRollbackCanary({
+      publishCanary: publishCanary(),
+      expectedOriginalSnapshot: {},
+      executor,
+      readbackClient: { read: vi.fn() },
+    });
+
+    expect(result.blockers).toEqual(["expected_original_snapshot_missing"]);
+    expect(executor).not.toHaveBeenCalled();
+  });
+
   it("rejects an unbounded rollback result before readback", async () => {
     const read = vi.fn();
     const result = await runPharmacyRealRollbackCanary({
       publishCanary: publishCanary(),
-      expectedOriginalSnapshotHash: HASH,
+      expectedOriginalSnapshot: ORIGINAL_SNAPSHOT,
       executor: vi.fn().mockResolvedValue(completed("rollback-authority-ready")),
       readbackClient: { read },
     });
@@ -108,17 +147,38 @@ describe("runPharmacyRealRollbackCanary", () => {
     expect(read).not.toHaveBeenCalled();
   });
 
-  it("rejects snapshot mismatch and duplicate rollback", async () => {
+  it("rejects bounded exact-recovery mismatch and duplicate rollback", async () => {
+    const actual = {
+      ...ORIGINAL_SNAPSHOT,
+      center: {
+        ...ORIGINAL_SNAPSHOT.center,
+        metadata: {
+          ...ORIGINAL_SNAPSHOT.center.metadata,
+          protected: { licenseNumber: "ACTUAL-SECRET" },
+        },
+      },
+    };
+    const expected = {
+      ...ORIGINAL_SNAPSHOT,
+      center: {
+        ...ORIGINAL_SNAPSHOT.center,
+        metadata: {
+          ...ORIGINAL_SNAPSHOT.center.metadata,
+          protected: { licenseNumber: "EXPECTED-SECRET" },
+        },
+      },
+    };
+    const mismatch = comparePharmacyRollbackExactRecovery({ expected, actual });
     const result = await runPharmacyRealRollbackCanary({
       publishCanary: publishCanary(),
-      expectedOriginalSnapshotHash: HASH,
+      expectedOriginalSnapshot: expected,
       executor: vi.fn().mockResolvedValue(completed("rollback-authority-replayed")),
       readbackClient: {
         read: vi.fn().mockResolvedValue({
           data: readback({
             duplicateRollbackCount: 1,
             referenceConsumed: false,
-            entity: { ...readback().entity, logicalSnapshotHash: "b".repeat(64) },
+            exactRecovery: mismatch,
           }),
           error: null,
         }),
@@ -129,7 +189,34 @@ describe("runPharmacyRealRollbackCanary", () => {
     expect(result.blockers).toEqual(expect.arrayContaining([
       "duplicate_rollback_detected",
       "publish_reference_not_consumed",
-      "entity_snapshot_mismatch",
+      "exact_recovery_mismatch_detected",
     ]));
+    expect(JSON.stringify(result)).not.toContain("EXPECTED-SECRET");
+    expect(JSON.stringify(result)).not.toContain("ACTUAL-SECRET");
+  });
+
+  it("rejects malformed or value-bearing diagnostics", async () => {
+    const report = comparePharmacyRollbackExactRecovery({
+      expected: ORIGINAL_SNAPSHOT,
+      actual: ORIGINAL_SNAPSHOT,
+    });
+    const result = await runPharmacyRealRollbackCanary({
+      publishCanary: publishCanary(),
+      expectedOriginalSnapshot: ORIGINAL_SNAPSHOT,
+      executor: vi.fn().mockResolvedValue(completed()),
+      readbackClient: {
+        read: vi.fn().mockResolvedValue({
+          data: readback({
+            exactRecovery: {
+              ...report,
+              rawValuesExposed: true,
+            },
+          }),
+          error: null,
+        }),
+      },
+    });
+
+    expect(result.blockers).toContain("exact_recovery_diagnostics_invalid");
   });
 });

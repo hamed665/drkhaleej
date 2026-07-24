@@ -61,8 +61,8 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "ROLLBACK-EXACT-RECOVERY"',
-      to: '"currentNext": "ADMIN-STATE-MACHINE"',
+      from: '"currentNext": "ADMIN-STATE-MACHINE"',
+      to: '"currentNext": "REAL-ADMIN-CANARY"',
       expectedError: 'manifest.currentNext drifted',
     },
     {
@@ -75,9 +75,9 @@ try {
     {
       label: 'phase matrix drift',
       file: fixtureFiles[2],
-      from: '| Durable rollback authority | Complete | #955 | `ROLLBACK-EXACT-RECOVERY` |',
-      to: '| Durable rollback authority | Complete | #954 | `ROLLBACK-EXACT-RECOVERY` |',
-      expectedError: 'Durable rollback authority evidence drifted',
+      from: '| Exact rollback recovery | Complete | #956 | `ADMIN-STATE-MACHINE` |',
+      to: '| Exact rollback recovery | Complete | #955 | `ADMIN-STATE-MACHINE` |',
+      expectedError: 'Exact rollback recovery evidence drifted',
     },
     {
       label: 'README pointer drift',

@@ -7,7 +7,7 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #955 at baseline commit `e32d3e8789df5fb2cb744723cc5acd8e59d4827d` (last aligned 2026-07-24).
+- Import-readiness runtime is aligned through PR #956 at baseline commit `60c9ca8fc466605af55360237ed40861e0106c78` (last aligned 2026-07-24).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
@@ -21,11 +21,11 @@
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #955 |
-| Runtime baseline | `e32d3e8789df5fb2cb744723cc5acd8e59d4827d` |
+| Aligned through | PR #956 |
+| Runtime baseline | `60c9ca8fc466605af55360237ed40861e0106c78` |
 | Last aligned | `2026-07-24` |
 | Current migration | `0084_import_pharmacy_rollback_digest_schema.sql` |
-| Current next | `ROLLBACK-EXACT-RECOVERY` |
+| Current next | `ADMIN-STATE-MACHINE` |
 | Reservation audit event | `reservation_created` |
 | Reservation audit phase | `reservation` |
 
@@ -37,9 +37,9 @@
 | 2.2 | COMPLETE | PRs #943 and #946; Admin reservation operation and authorization-linked integrity readback proven |
 | 3+ | COMPLETE | PRs #953 and #954; verified Reservation handoff, guarded private mutation, terminal persistence and publish readback proven |
 | 4.1 | COMPLETE | PR #955; server-selected atomic rollback authority consumption and bounded replay proven |
-| 4.2 | OPEN | Exact logical recovery verification remains next |
+| 4.2 | COMPLETE | PR #956; exact logical recovery and bounded hash-only mismatch diagnostics proven |
 
-The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. Exact logical recovery remains open. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. P07 proves equal original/post-rollback logical hashes across bounded fields, locale/country, canonical route, geo/projection and protected metadata, deletion/sort state, private publication flags and the current exact empty relation snapshot contract. Unexpected differences fail closed with bounded field paths and hashes only. Pharmacy public/index/sitemap promotion remains disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
 
 Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. Import-readiness implementation PRs remain independently review-gated before merge.
 
@@ -117,7 +117,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Ops workflow state
 
-- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression and runs the exact-SHA P06 atomic rollback authority proof.
+- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression, the exact-SHA P06 atomic rollback authority proof and the P07 exact logical recovery proof.
 - A manual-only Supabase remote migration workflow exists for operator-triggered migration pushes.
 - Remote migration execution remains guarded by GitHub secrets and the exact manual confirmation input `PUSH_REMOTE_DB`.
 
@@ -138,10 +138,10 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#955 are the current import-readiness runtime baseline.
+- PRs #936–#956 are the current import-readiness runtime baseline.
 - Migration validation passes through `0084_import_pharmacy_rollback_digest_schema.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build and lint gates pass in CI.
-- Preview Migration Sync, the isolated P05 regression proof and the P06 concurrent rollback authority proof pass with Production disconnected.
+- Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof and P07 exact logical recovery proof pass with Production disconnected.
 
 ## Future phase rules
 

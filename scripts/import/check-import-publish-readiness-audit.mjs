@@ -23,6 +23,7 @@ import './check-import-pharmacy-durable-publish-reference.mjs';
 import './check-import-pharmacy-preview-canary-activation.mjs';
 import './check-import-pharmacy-real-preview-canary.mjs';
 import './check-import-pharmacy-real-rollback-canary.mjs';
+import './check-import-p07-rollback-exact-recovery-proof.mjs';
 import './check-import-pharmacy-canary-integrity-report.mjs';
 import './check-import-pharmacy-minimal-admin-ui.mjs';
 import './check-import-pharmacy-admin-publish-review-gate.mjs';

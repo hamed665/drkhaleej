@@ -1,6 +1,11 @@
 import "server-only";
 
 import type { PharmacyPrivateAdminServerActionExecutor } from "./import-pharmacy-private-admin-server-action";
+import {
+  hashPharmacyRollbackLogicalSnapshot,
+  type PharmacyRollbackExactRecoveryReport,
+  type PharmacyRollbackLogicalSnapshot,
+} from "./import-pharmacy-rollback-exact-recovery";
 import type { PharmacyRealPreviewCanaryResult } from "./import-pharmacy-real-preview-canary";
 
 export type PharmacyRealRollbackCanaryReadback = {
@@ -9,13 +14,13 @@ export type PharmacyRealRollbackCanaryReadback = {
   duplicateRollbackCount: number;
   referenceCount: number;
   referenceConsumed: boolean;
+  exactRecovery: PharmacyRollbackExactRecoveryReport;
   entity: {
     id: string;
     centerType: string;
     status: string;
     isActive: boolean;
     isFeatured: boolean;
-    logicalSnapshotHash: string;
   } | null;
 };
 
@@ -23,13 +28,14 @@ export type PharmacyRealRollbackCanaryReadbackClient = {
   read(input: {
     actorId: string;
     entityId: string;
+    expectedOriginalSnapshot: PharmacyRollbackLogicalSnapshot;
   }): Promise<{ data: PharmacyRealRollbackCanaryReadback | null; error: { message?: string } | null }>;
 };
 
 export type PharmacyRealRollbackCanaryBlocker =
   | "publish_canary_not_verified"
   | "publish_reference_missing"
-  | "expected_snapshot_hash_missing"
+  | "expected_original_snapshot_missing"
   | "rollback_failed"
   | "rollback_authority_result_invalid"
   | "rollback_readback_failed"
@@ -39,7 +45,8 @@ export type PharmacyRealRollbackCanaryBlocker =
   | "publish_reference_count_invalid"
   | "publish_reference_not_consumed"
   | "entity_state_invalid"
-  | "entity_snapshot_mismatch";
+  | "exact_recovery_diagnostics_invalid"
+  | "exact_recovery_mismatch_detected";
 
 export type PharmacyRealRollbackCanaryResult = {
   verified: boolean;
@@ -66,13 +73,53 @@ function buildResult(input: Omit<PharmacyRealRollbackCanaryResult, "publicVisibi
   };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function isSha256(value: string | null | undefined): value is string {
   return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 }
 
+function exactRecoveryDiagnosticsValid(
+  report: PharmacyRollbackExactRecoveryReport,
+  expectedHash: string,
+): boolean {
+  if (
+    report.rawValuesExposed !== false ||
+    !isSha256(report.expectedHash) ||
+    !isSha256(report.actualHash) ||
+    report.expectedHash !== expectedHash ||
+    !Number.isInteger(report.mismatchCount) ||
+    report.mismatchCount < 0 ||
+    report.mismatches.length > 24 ||
+    report.diagnosticsTruncated !== (report.mismatchCount > report.mismatches.length)
+  ) {
+    return false;
+  }
+
+  if (
+    report.mismatches.some(
+      (mismatch) =>
+        !mismatch.path ||
+        mismatch.path.length > 180 ||
+        !isSha256(mismatch.expectedHash) ||
+        !isSha256(mismatch.actualHash),
+    )
+  ) {
+    return false;
+  }
+
+  return report.verified
+    ? report.mismatchCount === 0 &&
+        report.mismatches.length === 0 &&
+        report.expectedHash === report.actualHash
+    : report.mismatchCount > 0 && report.expectedHash !== report.actualHash;
+}
+
 export async function runPharmacyRealRollbackCanary(input: {
   publishCanary: PharmacyRealPreviewCanaryResult;
-  expectedOriginalSnapshotHash: string;
+  expectedOriginalSnapshot: PharmacyRollbackLogicalSnapshot;
   executor: PharmacyPrivateAdminServerActionExecutor;
   readbackClient: PharmacyRealRollbackCanaryReadbackClient;
 }): Promise<PharmacyRealRollbackCanaryResult> {
@@ -83,13 +130,14 @@ export async function runPharmacyRealRollbackCanary(input: {
   if (!publish.publishReference) {
     return buildResult({ verified: false, actorId: publish.actorId, entityId: publish.entityId, publishReference: null, readback: null, blockers: ["publish_reference_missing"] });
   }
-  if (!isSha256(input.expectedOriginalSnapshotHash)) {
-    return buildResult({ verified: false, actorId: publish.actorId, entityId: publish.entityId, publishReference: publish.publishReference, readback: null, blockers: ["expected_snapshot_hash_missing"] });
+  if (!isRecord(input.expectedOriginalSnapshot) || Object.keys(input.expectedOriginalSnapshot).length === 0) {
+    return buildResult({ verified: false, actorId: publish.actorId, entityId: publish.entityId, publishReference: publish.publishReference, readback: null, blockers: ["expected_original_snapshot_missing"] });
   }
 
   const actorId = publish.actorId;
   const entityId = publish.entityId;
   const publishReference = publish.publishReference;
+  const expectedSnapshotHash = hashPharmacyRollbackLogicalSnapshot(input.expectedOriginalSnapshot);
   const execution = await input.executor({
     operation: "rollback",
     actorId,
@@ -107,7 +155,11 @@ export async function runPharmacyRealRollbackCanary(input: {
     return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_authority_result_invalid"] });
   }
 
-  const read = await input.readbackClient.read({ actorId, entityId });
+  const read = await input.readbackClient.read({
+    actorId,
+    entityId,
+    expectedOriginalSnapshot: input.expectedOriginalSnapshot,
+  });
   if (read.error || !read.data) {
     return buildResult({ verified: false, actorId, entityId, publishReference, readback: null, blockers: ["rollback_readback_failed"] });
   }
@@ -127,8 +179,10 @@ export async function runPharmacyRealRollbackCanary(input: {
     data.entity.isActive ||
     data.entity.isFeatured
   ) blockers.push("entity_state_invalid");
-  if (!data.entity || data.entity.logicalSnapshotHash !== input.expectedOriginalSnapshotHash) {
-    blockers.push("entity_snapshot_mismatch");
+  if (!exactRecoveryDiagnosticsValid(data.exactRecovery, expectedSnapshotHash)) {
+    blockers.push("exact_recovery_diagnostics_invalid");
+  } else if (!data.exactRecovery.verified) {
+    blockers.push("exact_recovery_mismatch_detected");
   }
 
   return buildResult({

@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 955,
-  runtimeBaseline: 'e32d3e8789df5fb2cb744723cc5acd8e59d4827d',
+  alignedThroughPr: 956,
+  runtimeBaseline: '60c9ca8fc466605af55360237ed40861e0106c78',
   lastAligned: '2026-07-24',
   currentMigration: '0084_import_pharmacy_rollback_digest_schema.sql',
-  currentNext: 'ROLLBACK-EXACT-RECOVERY',
+  currentNext: 'ADMIN-STATE-MACHINE',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -22,7 +22,7 @@ const expectedCanonicalState = {
     '2.2': 'COMPLETE',
     '3+': 'COMPLETE',
     '4.1': 'COMPLETE',
-    '4.2': 'OPEN',
+    '4.2': 'COMPLETE',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -215,7 +215,7 @@ function validateMatrix(source, manifest) {
     'Existing private executor handoff': ['Complete', '#953'],
     'Private Admin wiring and publish readback': ['Complete', '#954'],
     'Durable rollback authority': ['Complete', '#955'],
-    'Exact rollback recovery': ['Open', '—'],
+    'Exact rollback recovery': ['Complete', '#956'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],

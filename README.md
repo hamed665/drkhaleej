@@ -26,11 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #955** at baseline **`e32d3e8789df5fb2cb744723cc5acd8e59d4827d`**.
+- Import-readiness runtime is aligned through **PR #956** at baseline **`60c9ca8fc466605af55360237ed40861e0106c78`**.
 - Database/migration status: **validates through `0084_import_pharmacy_rollback_digest_schema.sql`**.
 - Completed migration set: **`0001` through `0084`**.
-- Current import-readiness implementation: **`ROLLBACK-EXACT-RECOVERY`**.
-- P06 hardens the existing Preview Pharmacy rollback authority with server-selected actor/entity/version/snapshot binding, atomic consume-or-abort, bounded replay and no raw-reference browser custody. Exact recovery, rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.
+- Current import-readiness implementation: **`ADMIN-STATE-MACHINE`**.
+- P07 proves exact logical Pharmacy recovery using the existing rollback authority, equal canonical hashes and bounded path-and-hash-only mismatch diagnostics. Rollback UI/state-machine activation, public/index/sitemap/route promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:
