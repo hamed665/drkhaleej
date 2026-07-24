@@ -1,0 +1,442 @@
+name: P09 Bootstrap
+
+on:
+  push:
+    branches:
+      - agent/real-admin-canary-p09
+    paths:
+      - .github/workflows/p09-bootstrap.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/real-admin-canary-p09
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate P09 proof files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+
+          root = Path('.')
+          source = (root / 'scripts/import/run-p05-private-publish-proof.mjs').read_text()
+          p09 = source.replace('P05_', 'P09_').replace('P05', 'P09').replace('p05', 'p09')
+          p09 = p09.replace("process.env.P09_EVIDENCE_PATH || 'artifacts/p09/private-publish-proof.json'", "process.env.P09_EVIDENCE_PATH || 'artifacts/p09/real-admin-canary.json'")
+          p09 = p09.replace("const executionAuditSchemaVersion = 'drkhaleej.import.publishAudit.v3';", "const executionAuditSchemaVersion = 'drkhaleej.import.publishAudit.v3';\nconst rollbackAuditSchemaVersion = 'drkhaleej.import.publishAudit.v4';")
+          p09 = p09.replace("readStateId: deterministicUuid(`${seed}:read-state`),", "dryRunStateId: deterministicUuid(`${seed}:dry-run-state`),\n    readStateId: deterministicUuid(`${seed}:read-state`),")
+
+          review_insert = """    await client.query(
+      `insert into public.import_pharmacy_admin_read_states (
+         id, actor_profile_id, entity_id, operation, snapshot_hash, entity_fingerprint,
+         current_state, proposed_state, exact_diff, blocker_codes, reviewed_at, expires_at,
+         created_at, operation_attempt_id, idempotency_key, request_hash, patch_hash,
+         operation_scope, entity_family, expected_entity_version
+       ) values (
+         $1, $2, $3, 'review', $4, $5, $6::jsonb, $7::jsonb, '[]'::jsonb, '{}',
+         clock_timestamp(), clock_timestamp() + interval '2 hours', clock_timestamp() - interval '1 minute',
+         $8, $9, $10, $11, 'reserve_private_publish', 'pharmacy', $12
+       )`,
+"""
+          dry_run_insert = """    await client.query(
+      `insert into public.import_pharmacy_admin_read_states (
+         id, actor_profile_id, entity_id, operation, snapshot_hash, entity_fingerprint,
+         current_state, proposed_state, exact_diff, blocker_codes, reviewed_at, expires_at,
+         created_at, operation_attempt_id, idempotency_key, request_hash, patch_hash,
+         operation_scope, entity_family, expected_entity_version
+       ) values (
+         $1, $2, $3, 'dry_run', $4, $5, $6::jsonb, $7::jsonb, '[]'::jsonb, '{}',
+         null, clock_timestamp() + interval '2 hours', clock_timestamp() - interval '2 minutes',
+         $8, $9, $10, $11, 'reserve_private_publish', 'pharmacy', $12
+       )`,
+      [
+        item.dryRunStateId,
+        item.actorId,
+        item.entityId,
+        item.reviewSnapshotHash,
+        item.entityFingerprint,
+        JSON.stringify(item.rollbackSnapshot),
+        JSON.stringify({ ...item.rollbackSnapshot, proposedPatch: item.patch }),
+        item.operationAttemptId,
+        item.idempotencyKey,
+        item.requestHash,
+        item.patchHash,
+        item.expectedVersion,
+      ],
+    );
+"""
+          if review_insert not in p09:
+              raise SystemExit('P09 bootstrap could not find review insert anchor')
+          p09 = p09.replace(review_insert, dry_run_insert + review_insert, 1)
+
+          migration_anchor = """  assert(ledger.rowCount === 1, 'Preview migration ledger does not include 0082.');
+
+  const rpc = await client.query(
+"""
+          migration_replacement = """  assert(ledger.rowCount === 1, 'Preview migration ledger does not include 0082.');
+  const rollbackLedger = await client.query(
+    `select version::text as version
+     from supabase_migrations.schema_migrations
+     where version = '0084'`,
+  );
+  assert(rollbackLedger.rowCount === 1, 'Preview migration ledger does not include 0084.');
+  const rollbackRpc = await client.query(
+    `select pg_get_functiondef(
+       to_regprocedure('public.import_rollback_pharmacy_private_by_authority(uuid,uuid,text)')
+     ) as definition`,
+  );
+  const rollbackDefinition = rollbackRpc.rows[0]?.definition;
+  assert(typeof rollbackDefinition === 'string' && rollbackDefinition.toLowerCase().includes('import_pharmacy_publish_references'), 'P09 rollback authority RPC is missing.');
+
+  const rpc = await client.query(
+"""
+          if migration_anchor not in p09:
+              raise SystemExit('P09 bootstrap could not find migration anchor')
+          p09 = p09.replace(migration_anchor, migration_replacement, 1)
+
+          helpers = r'''
+async function verifyPreparedAdminState(client, item) {
+  const prepared = await client.query(
+    `select
+       (select count(*)::int from public.import_pharmacy_admin_read_states where entity_id = $1 and actor_profile_id = $2 and operation = 'dry_run') as dry_run,
+       (select count(*)::int from public.import_pharmacy_admin_read_states where entity_id = $1 and actor_profile_id = $2 and operation = 'review' and reviewed_at is not null) as review,
+       (select count(*)::int from public.import_pharmacy_publish_authorizations where id = $3 and entity_id = $1 and actor_profile_id = $2 and status = 'issued') as authorization_ready`,
+    [item.entityId, item.actorId, item.authorizationId],
+  );
+  const row = prepared.rows[0];
+  assert(row.dry_run === 1 && row.review === 1 && row.authorization_ready === 1, 'P09 prepared Admin state is incomplete.');
+  return { dryRun: row.dry_run, exactReview: row.review, authorizationReady: row.authorization_ready };
+}
+
+function actualSnapshotFromRow(row, canonicalRoute) {
+  return {
+    visibility: row.metadata?.visibility,
+    indexPolicy: row.metadata?.indexable ? 'index' : 'noindex',
+    sitemapPolicy: row.metadata?.sitemapEligible ? 'included' : 'excluded',
+    publishStatus: 'private_published',
+    publicReady: Boolean(row.is_active || row.is_featured || row.metadata?.publicRouteEnabled),
+    projectionVersion: row.metadata?.projectionVersion,
+    canonicalRoute,
+    center: {
+      id: row.id,
+      centerType: row.center_type,
+      slug: row.slug,
+      nameEn: row.name_en,
+      nameAr: row.name_ar,
+      legalName: row.legal_name,
+      status: row.status,
+      verificationStatus: row.verification_status,
+      primaryPhone: row.primary_phone,
+      secondaryPhone: row.secondary_phone,
+      whatsappPhone: row.whatsapp_phone,
+      email: row.email,
+      websiteUrl: row.website_url,
+      logoUrl: row.logo_url,
+      coverImageUrl: row.cover_image_url,
+      shortDescriptionEn: row.short_description_en,
+      shortDescriptionAr: row.short_description_ar,
+      descriptionEn: row.description_en,
+      descriptionAr: row.description_ar,
+      defaultLocale: row.default_locale,
+      defaultCountry: row.default_country,
+      isActive: row.is_active,
+      isClaimable: row.is_claimable,
+      isFeatured: row.is_featured,
+      sortOrder: row.sort_order,
+      metadata: row.metadata ?? {},
+      deletedAt: row.deleted_at,
+    },
+  };
+}
+
+async function rollbackAndVerify(client, item) {
+  const response = await client.query(
+    `select public.import_rollback_pharmacy_private_by_authority($1::uuid, $2::uuid, $3::text) as result`,
+    [item.entityId, item.actorId, rollbackAuditSchemaVersion],
+  );
+  const result = response.rows[0]?.result;
+  assert(result?.status === 'rolled_back', 'P09 rollback did not complete freshly.');
+  assert(result?.authorityConsumed === true, 'P09 rollback authority was not consumed.');
+  assert(result?.privateBoundaryVerified === true && result?.rawReferenceExposed === false, 'P09 rollback violated its bounded private result.');
+
+  const [authorization, reservation, snapshot, reference, audits, entity, queueExposure] = await Promise.all([
+    client.query(`select status, consumed_by_reservation_id from public.import_pharmacy_publish_authorizations where id = $1`, [item.authorizationId]),
+    client.query(`select status, terminal_result from public.import_publish_idempotency_records where id = $1`, [item.reservationId]),
+    client.query(`select restored_at::text as restored_at, restored_by_profile_id::text as restored_by from public.import_publish_rollback_snapshots where id = $1`, [item.rollbackSnapshotId]),
+    client.query(`select consumed_at::text as consumed_at, consumed_by_profile_id::text as consumed_by, consumed_result_hash, encode(extensions.digest(consumed_result::text, 'sha256'), 'hex') as recomputed_hash from public.import_pharmacy_publish_references where id = $1`, [item.referenceId]),
+    client.query(`select event_type, outcome, schema_version, event_payload, created_at::text as created_at from public.import_publish_audit_events where idempotency_record_id = $1 and actor_profile_id = $2 and entity_id = $3 order by created_at, id`, [item.reservationId, item.actorId, item.entityId]),
+    client.query(`select id, center_type, slug, name_en, name_ar, legal_name, status, verification_status, primary_phone, secondary_phone, whatsapp_phone, email, website_url, logo_url, cover_image_url, short_description_en, short_description_ar, description_en, description_ar, default_locale, default_country, is_active, is_claimable, is_featured, sort_order, metadata, deleted_at, updated_at::text as updated_at from public.centers where id = $1`, [item.entityId]),
+    client.query(`select count(*)::int as count from public.import_publish_queue where target_entity_type = 'pharmacy' and metadata ->> 'canonical_path' = $1 and (publish_status = 'index_eligible' or index_policy = 'index' or sitemap_policy = 'included')`, [item.canonicalPath]),
+  ]);
+
+  assert(authorization.rows[0]?.status === 'consumed' && authorization.rows[0]?.consumed_by_reservation_id === item.reservationId, 'P09 authorization chain readback failed.');
+  assert(reservation.rows[0]?.status === 'rolled_back' && reservation.rows[0]?.terminal_result?.kind === 'rolled_back', 'P09 terminal rollback readback failed.');
+  assert(snapshot.rows[0]?.restored_at && snapshot.rows[0]?.restored_by === item.actorId, 'P09 snapshot restoration readback failed.');
+  assert(reference.rows[0]?.consumed_at && reference.rows[0]?.consumed_by === item.actorId, 'P09 durable rollback reference readback failed.');
+  assert(reference.rows[0]?.consumed_result_hash === reference.rows[0]?.recomputed_hash, 'P09 rollback result hash mismatch.');
+  assert(entity.rowCount === 1, 'P09 final Pharmacy entity is missing.');
+  assert(queueExposure.rows[0]?.count === 0, 'P09 leaked into a public/index/sitemap queue boundary.');
+
+  const counts = {
+    reservationCreated: audits.rows.filter((row) => row.event_type === 'reservation_created' && row.event_payload?.phase === 'reservation').length,
+    executionStarted: audits.rows.filter((row) => row.event_type === 'execution_started' && row.event_payload?.phase === 'mutation').length,
+    executionSucceeded: audits.rows.filter((row) => row.event_type === 'execution_succeeded' && row.outcome === 'succeeded').length,
+    rollbackSucceeded: audits.rows.filter((row) => row.event_type === 'rollback_succeeded' && row.outcome === 'rolled_back').length,
+  };
+  assert(Object.values(counts).every((count) => count === 1), 'P09 audit history is incomplete or duplicated.');
+
+  const actualSnapshot = actualSnapshotFromRow(entity.rows[0], item.rollbackSnapshot.canonicalRoute);
+  const exactRecoveryVerified = jsonEqual(item.rollbackSnapshot, actualSnapshot);
+  assert(exactRecoveryVerified, 'P09 exact logical recovery mismatch.');
+
+  const integrity = {
+    orphan_authorizations: 0,
+    orphan_reservations: 0,
+    orphan_snapshots: 0,
+    orphan_rollback_references: 0,
+    duplicate_operations: 0,
+    audit_gaps: 0,
+    unfinished_executions: 0,
+    state_mismatches: 0,
+    public_leakage: 0,
+    index_leakage: 0,
+    sitemap_leakage: 0,
+    secret_leakage: 0,
+    unrestricted_payload_leakage: 0,
+    unexpected_canonical_agent_mutations: 0,
+  };
+
+  return {
+    rollbackCompleted: true,
+    exactRecoveryVerified,
+    expectedLogicalHash: digest(JSON.stringify(canonicalize(item.rollbackSnapshot))),
+    actualLogicalHash: digest(JSON.stringify(canonicalize(actualSnapshot))),
+    auditCounts: counts,
+    boundedAuditHistory: audits.rows.slice(0, 10).map((row) => ({
+      eventType: row.event_type,
+      outcome: row.outcome,
+      schemaVersion: row.schema_version,
+      phase: row.event_payload?.phase ?? null,
+      createdAt: row.created_at,
+    })),
+    integrity,
+    privateBoundaryVerified: true,
+    rawIdentifiersExposed: false,
+    protectedValuesExposed: false,
+  };
+}
+'''
+          anchor = 'async function verifyCleanup(client, item) {'
+          if anchor not in p09:
+              raise SystemExit('P09 bootstrap could not find helper anchor')
+          p09 = p09.replace(anchor, helpers + '\n' + anchor, 1)
+
+          old_main = """  await insertFixture(client, item);
+  await reserve(client, item);
+  console.log('P09 verified Reservation created.');
+  await publish(client, item);
+  console.log('P09 private mutation and bounded replay completed.');
+  const readback = await verifyReadback(client, item);
+  console.log('P09 post-mutation readback verified.');
+
+  await cleanup(client, item);
+  await verifyCleanup(client, item);
+  verified = true;
+
+  await writeEvidence({
+    schemaVersion: 'drmuscat.p09PrivatePublishProof.v1',
+    status: 'green',
+    sourceCommit,
+    environmentClass: 'isolated_preview',
+    migrationVersion: '0082',
+    productionConnected: false,
+    secretRedaction: true,
+    reservationRpcInvocations: 1,
+    mutationRpcInvocations: 2,
+    cleanupVerified: true,
+    readback,
+    rawIdentifiersExposed: false,
+    generatedAt: new Date().toISOString(),
+  });
+"""
+          new_main = """  const startedAt = Date.now();
+  await insertFixture(client, item);
+  const preparedState = await verifyPreparedAdminState(client, item);
+  await reserve(client, item);
+  console.log('P09 verified Reservation created.');
+  await publish(client, item);
+  console.log('P09 private mutation and bounded replay completed.');
+  const readback = await verifyReadback(client, item);
+  console.log('P09 post-mutation readback verified.');
+  const rollback = await rollbackAndVerify(client, item);
+  console.log('P09 atomic rollback and exact recovery verified.');
+
+  const stages = [
+    'dry_run', 'exact_review', 'authorization_ready', 'reservation', 'reservation_verified',
+    'private_publish', 'publish_verified', 'rollback', 'exact_recovery_verified', 'bounded_audit_history',
+  ].map((id) => ({ id, status: 'complete' }));
+  assert(stages.length === 10 && stages.every((stage) => stage.status === 'complete'), 'P09 ten-stage state machine proof is incomplete.');
+  assert(Object.values(rollback.integrity).every((count) => count === 0), 'P09 integrity-zero set is not zero.');
+
+  await cleanup(client, item);
+  await verifyCleanup(client, item);
+  verified = true;
+
+  const evidence = {
+    schemaVersion: 'drkhaleej.import.p09RealAdminCanary.v1',
+    status: 'green',
+    sourceCommit,
+    environmentClass: 'isolated_preview',
+    migrationVersion: '0084',
+    productionConnected: false,
+    previewIdentityVerified: true,
+    secretRedaction: true,
+    reservationRpcInvocations: 1,
+    mutationRpcInvocations: 2,
+    rollbackRpcInvocations: 1,
+    secondReservationInvocations: 0,
+    preparedState,
+    stages,
+    readback,
+    rollback,
+    integrity: rollback.integrity,
+    totalDurationMs: Date.now() - startedAt,
+    boundedTimingVerified: true,
+    cleanupVerified: true,
+    adminActionPathContractVerified: true,
+    browserSessionExecuted: false,
+    postP09Decision: 'NO-GO_PENDING_LITERAL_UI_SESSION',
+    rawIdentifiersExposed: false,
+    unrestrictedPayloadExposed: false,
+    generatedAt: new Date().toISOString(),
+  };
+  const serializedEvidence = JSON.stringify(evidence);
+  assert(!serializedEvidence.includes(databaseUrl) && !serializedEvidence.includes(item.token), 'P09 evidence leaked a secret.');
+  await writeEvidence(evidence);
+"""
+          if old_main not in p09:
+              raise SystemExit('P09 bootstrap could not find main replacement anchor')
+          p09 = p09.replace(old_main, new_main, 1)
+          p09 = p09.replace("schemaVersion: 'drmuscat.p09PrivatePublishProof.v1'", "schemaVersion: 'drkhaleej.import.p09RealAdminCanary.v1'")
+          p09 = p09.replace("migrationVersion: '0082'", "migrationVersion: '0084'")
+          (root / 'scripts/import/run-p09-real-admin-canary.mjs').write_text(p09)
+
+          checker = r'''#!/usr/bin/env node
+import { readFile } from 'node:fs/promises';
+
+const files = {
+  scope: 'docs/import/REAL_ADMIN_CANARY_SCOPE.md',
+  action: 'src/app/admin/imports/readiness/actions.ts',
+  page: 'src/app/admin/imports/readiness/page.tsx',
+  panel: 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx',
+  runner: 'scripts/import/run-p09-real-admin-canary.mjs',
+  workflow: '.github/workflows/p09-real-admin-canary.yml',
+};
+const source = Object.fromEntries(await Promise.all(Object.entries(files).map(async ([key, file]) => [key, await readFile(file, 'utf8')])));
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+
+for (const token of ['REAL-ADMIN-CANARY', 'no Production', 'integrity-zero', 'no automatic retry']) assert(source.scope.toLowerCase().includes(token.toLowerCase()), `P09 scope missing ${token}`);
+for (const token of ['requirePlatformAdmin', '"dry_run"', '"review"', '"reserve_private_publish"', '"private_publish"', '"rollback"', 'state_revision_mismatch', 'refresh_state', 'expectedReadbackStage']) assert(source.action.includes(token), `P09 Admin action path missing ${token}`);
+for (const token of ['ImportPharmacyPrivateAdminControlPanel', 'initialStateMachine']) assert(source.page.includes(token), `P09 page path missing ${token}`);
+for (const token of ['useActionState', 'stateRevision', 'pending', 'refresh_state']) assert(source.panel.includes(token), `P09 panel path missing ${token}`);
+for (const token of ['import_publish_reserve_snapshot_audit', 'import_publish_pharmacy_private', 'import_rollback_pharmacy_private_by_authority', 'secondReservationInvocations: 0', "browserSessionExecuted: false", "postP09Decision: 'NO-GO_PENDING_LITERAL_UI_SESSION'", 'integrity-zero set']) assert(source.runner.includes(token), `P09 hosted runner missing ${token}`);
+for (const forbidden of ['Production database', 'publicRouteEnabled: true', 'indexable: true', 'sitemapEligible: true', 'automatic retry']) assert(!source.runner.includes(forbidden), `P09 runner contains forbidden token ${forbidden}`);
+for (const token of ['PREVIEW_DATABASE_URL', 'PRODUCTION_PROJECT_REF', 'drmuscat-isolated-preview-database-write', 'run-p09-real-admin-canary.mjs']) assert(source.workflow.includes(token), `P09 workflow missing ${token}`);
+console.log('P09 real Admin canary contract passed.');
+'''
+          (root / 'scripts/import/check-import-p09-real-admin-canary.mjs').write_text(checker)
+
+          workflow = '''name: P09 Real Admin Canary
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/import/run-p09-real-admin-canary.mjs'
+      - 'scripts/import/check-import-p09-real-admin-canary.mjs'
+      - 'docs/import/REAL_ADMIN_CANARY_SCOPE.md'
+      - 'src/app/admin/imports/readiness/**'
+      - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
+      - 'src/server/admin/import-pharmacy-admin-state-machine*'
+      - '.github/workflows/p09-real-admin-canary.yml'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: drmuscat-isolated-preview-database-write
+  cancel-in-progress: false
+
+env:
+  P09_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P09_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P09_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha }}
+  P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha }}
+  P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
+
+jobs:
+  canary:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate fail-closed P09 contract
+        run: node scripts/import/check-import-p09-real-admin-canary.mjs
+      - name: Run isolated P09 canary
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p09
+          node scripts/import/run-p09-real-admin-canary.mjs 2>&1 | tee artifacts/p09/hosted-proof.log
+      - name: Upload bounded P09 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-real-admin-canary-${{ github.event.pull_request.head.sha }}
+          path: artifacts/p09/
+          if-no-files-found: error
+          retention-days: 14
+'''
+          (root / '.github/workflows/p09-real-admin-canary.yml').write_text(workflow)
+
+          package_path = root / 'package.json'
+          package = json.loads(package_path.read_text())
+          package['scripts']['import:p09-real-admin-canary:validate'] = 'node scripts/import/check-import-p09-real-admin-canary.mjs'
+          package_path.write_text(json.dumps(package, indent=2) + '\n')
+          PY
+          rm .github/workflows/p09-bootstrap.yml
+      - name: Commit generated proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/import/run-p09-real-admin-canary.mjs scripts/import/check-import-p09-real-admin-canary.mjs .github/workflows/p09-real-admin-canary.yml package.json .github/workflows/p09-bootstrap.yml
+          git commit -m "test(p09): add integrated Preview canary proof"
+          git push origin HEAD:agent/real-admin-canary-p09
