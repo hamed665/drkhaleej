@@ -1,0 +1,76 @@
+name: P09 Real Admin Canary
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/import/run-p09-real-admin-canary.mjs'
+      - 'scripts/import/check-import-p09-real-admin-canary.mjs'
+      - 'docs/import/REAL_ADMIN_CANARY_SCOPE.md'
+      - 'src/app/admin/imports/readiness/**'
+      - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
+      - 'src/server/admin/import-pharmacy-admin-state-machine*'
+      - '.github/workflows/p09-real-admin-canary.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: drmuscat-isolated-preview-database-write
+  cancel-in-progress: false
+
+env:
+  P09_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P09_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P09_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha }}
+  P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha }}
+  P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
+
+jobs:
+  canary:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Verify exact revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$P09_SOURCE_COMMIT"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Validate fail-closed P09 contract
+        run: node scripts/import/check-import-p09-real-admin-canary.mjs
+
+      - name: Run isolated P09 integrated canary
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p09
+          node scripts/import/run-p09-real-admin-canary.mjs 2>&1 | tee artifacts/p09/hosted-proof.log
+
+      - name: Upload bounded P09 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-real-admin-canary-${{ github.event.pull_request.head.sha }}
+          path: artifacts/p09/
+          if-no-files-found: error
+          retention-days: 14
