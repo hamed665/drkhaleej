@@ -5,6 +5,8 @@ import { readFile } from "node:fs/promises";
 const files = {
   scope: "docs/import/REAL_ADMIN_CANARY_SCOPE.md",
   decision: "docs/import/POST_P09_GO_NO_GO.md",
+  proxy: "src/proxy.ts",
+  adminLayout: "src/app/admin/layout.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
   page: "src/app/admin/imports/readiness/page.tsx",
   panel: "src/components/admin/import-pharmacy-private-admin-control-panel.tsx",
@@ -44,6 +46,19 @@ for (const token of [
   assert(source.decision.includes(token), `Post-P09 decision is missing ${token}.`);
 }
 assert(!/^```text\s*\nGO\s*\n```/m.test(source.decision), "Post-P09 decision must not record GO before literal UI proof.");
+
+assert(
+  source.proxy.includes("requestHeaders.set('x-drmuscat-request-path', request.nextUrl.pathname)"),
+  "Proxy must forward the exact request path to server layouts.",
+);
+for (const token of [
+  'requestHeaders.get("x-drmuscat-request-path")',
+  'path === "/admin/login"',
+  "return children",
+  "requirePlatformAdmin",
+]) {
+  assert(source.adminLayout.includes(token), `Admin layout login routing is missing ${token}.`);
+}
 
 for (const token of [
   "requirePlatformAdmin",
