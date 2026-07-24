@@ -70,19 +70,17 @@ for (const [pattern, message] of [
   [/Run isolated P06 atomic rollback authority proof[\s\S]*Run isolated P07 exact rollback recovery proof/, 'P07 proof must run after the P06 authority regression.'],
 ]) requirePattern(workflow, pattern, message);
 
-for (const token of [
-  'ROLLBACK-EXACT-RECOVERY',
-  'bounded entity fields',
-  'locale and country',
-  'canonical slug/path identity',
-  'geo and projection metadata',
-  'protected metadata',
-  'snapshot-governed relation state',
-  'deletion and sort state',
-  'no Production connection',
-]) {
-  if (!scope.includes(token)) throw new Error(`P07 scope document is missing required token: ${token}`);
-}
+for (const [pattern, message] of [
+  [/ROLLBACK-EXACT-RECOVERY/, 'P07 scope document must name the subphase.'],
+  [/bounded\s+Pharmacy\s+entity\s+fields/i, 'P07 scope document must cover bounded entity fields.'],
+  [/locale\s+and\s+country/i, 'P07 scope document must cover locale and country.'],
+  [/canonical\s+slug\/path\s+identity/i, 'P07 scope document must cover canonical path identity.'],
+  [/geo\s+and\s+projection\s+metadata/i, 'P07 scope document must cover geo and projection metadata.'],
+  [/protected\s+metadata/i, 'P07 scope document must cover protected metadata.'],
+  [/snapshot-governed\s+relation\s+state/i, 'P07 scope document must cover snapshot-governed relations.'],
+  [/deletion\s+and\s+sort\s+state/i, 'P07 scope document must cover deletion and sort state.'],
+  [/no\s+Production\s+connection/i, 'P07 scope document must keep Production disconnected.'],
+]) requirePattern(scope, pattern, message);
 
 for (const [source, pattern, message] of [
   [comparator, /expectedValue|actualValue|rawExpected|rawActual/, 'P07 comparator must not expose raw mismatch value fields.'],
