@@ -34,7 +34,6 @@ on:
       - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
       - 'README.md'
       - '.github/workflows/preview-migration-sync.yml'
-      - '.github/workflows/p09-real-admin-canary.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'
       - 'scripts/db/test-rls-static.mjs'
@@ -65,6 +64,12 @@ env:
   P07_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P07_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P07_EVIDENCE_PATH: artifacts/p07/rollback-exact-recovery-proof.json
+  P09_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P09_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P09_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
 
 permissions:
   contents: read
@@ -77,7 +82,7 @@ jobs:
   sync:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - name: Checkout exact revision
         uses: actions/checkout@v4
@@ -93,6 +98,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$P05_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P06_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P07_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$P09_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -117,7 +123,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -126,6 +132,7 @@ jobs:
             node scripts/import/check-import-p06-rollback-authority-proof.mjs
             node scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs
             node scripts/import/check-import-pharmacy-minimal-admin-ui.mjs
+            node scripts/import/check-import-p09-real-admin-canary.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -154,6 +161,12 @@ jobs:
         run: |
           set -o pipefail
           node scripts/import/run-p07-rollback-exact-recovery-proof.mjs 2>&1 | tee artifacts/p07/hosted-proof.log
+
+      - name: Run isolated P09 integrated Admin canary proof
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-real-admin-canary.mjs 2>&1 | tee artifacts/p09/hosted-proof.log
 
       - name: Upload Preview migration evidence
         if: always()
@@ -188,5 +201,14 @@ jobs:
         with:
           name: p07-rollback-exact-recovery-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p07/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload exact-SHA P09 Admin canary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-real-admin-canary-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p09/
           if-no-files-found: error
           retention-days: 14
