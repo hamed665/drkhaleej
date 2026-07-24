@@ -8,6 +8,8 @@ export function proxy(request: NextRequest) {
   const locale = segments[0];
   const country = segments[1];
 
+  requestHeaders.set('x-drmuscat-request-path', request.nextUrl.pathname);
+
   if (locale && SUPPORTED_LOCALES.has(locale)) {
     requestHeaders.set('x-drmuscat-locale', locale);
   }
