@@ -15,10 +15,17 @@ on:
       - 'scripts/import/check-import-p06-rollback-authority-proof.mjs'
       - 'scripts/import/run-p07-rollback-exact-recovery-proof.mjs'
       - 'scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs'
+      - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
       - 'src/server/admin/import-pharmacy-real-rollback-canary*'
+      - 'src/server/admin/import-pharmacy-admin-state-machine*'
+      - 'src/server/admin/import-pharmacy-private-admin-rollback-operation*'
+      - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
+      - 'src/app/admin/imports/readiness/**'
+      - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
       - 'scripts/import/check-import-readiness-state-alignment.mjs'
       - 'docs/import/ROLLBACK_EXACT_RECOVERY.md'
+      - 'docs/import/ADMIN_STATE_MACHINE_SCOPE.md'
       - 'docs/import/import-readiness-roadmap-after-933.md'
       - 'docs/project-state/CURRENT_STATE.md'
       - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
@@ -29,9 +36,6 @@ on:
       - 'scripts/db/test-rls-static.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
-
-permissions:
-  contents: read
 
 env:
   PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
@@ -57,6 +61,9 @@ env:
   P07_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P07_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P07_EVIDENCE_PATH: artifacts/p07/rollback-exact-recovery-proof.json
+
+permissions:
+  contents: read
 
 concurrency:
   group: drmuscat-isolated-preview-database-write
@@ -114,6 +121,7 @@ jobs:
             node scripts/import/check-import-p05-private-publish-proof.mjs
             node scripts/import/check-import-p06-rollback-authority-proof.mjs
             node scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs
+            node scripts/import/check-import-pharmacy-minimal-admin-ui.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
