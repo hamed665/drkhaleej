@@ -2,7 +2,6 @@
 
 import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import pg from "pg";
@@ -104,7 +103,7 @@ async function runChild(file, environment) {
 }
 
 async function runPublishPhase(databaseUrl, previewRef, productionRef, sourceCommit, runId) {
-  const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "drkhaleej-p09-"));
+  const temporaryRoot = await mkdtemp(path.join(root, ".drkhaleej-p09-"));
   const source = await readFile(path.join(root, "scripts/import/run-p05-private-publish-proof.mjs"), "utf8");
   const modified = source
     .replace("canonicalRoute: item.canonicalPath,", "canonicalRoute: `/en/om/pharmacies/${row.slug}`,")
