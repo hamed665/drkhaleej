@@ -14,6 +14,13 @@ import {
   type PharmacyAdminReservationResult,
 } from "@/server/admin/import-pharmacy-admin-reservation-operation";
 import {
+  createPharmacyAdminStateMachineReaderFromEnvironment,
+} from "@/server/admin/import-pharmacy-admin-state-machine-readback";
+import type {
+  PharmacyAdminStateMachineSnapshot,
+  PharmacyAdminStateMachineStageId,
+} from "@/server/admin/import-pharmacy-admin-state-machine";
+import {
   buildPharmacyCanonicalMutationPatch,
   projectPharmacyCanonicalMutationPatchForReview,
   projectPharmacyRollbackSnapshotForMutationReview,
@@ -30,19 +37,27 @@ import {
   runPharmacyPrivateAdminPublishOperation,
 } from "@/server/admin/import-pharmacy-private-admin-publish-operation";
 import {
+  createPharmacyPrivateAdminRollbackOperationDependenciesFromEnvironment,
+  runPharmacyPrivateAdminRollbackOperation,
+} from "@/server/admin/import-pharmacy-private-admin-rollback-operation";
+import {
   createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment,
   loadPharmacyPrivateAdminRuntimeContext,
 } from "@/server/admin/import-pharmacy-private-admin-runtime-context";
 import {
   createPharmacyPrivateAdminServerAction,
-  type PharmacyPrivateAdminServerActionResult,
 } from "@/server/admin/import-pharmacy-private-admin-server-action";
+import type {
+  PharmacyPrivateAdminOperation,
+  PharmacyPrivateAdminWorkflowResult,
+} from "@/server/admin/import-pharmacy-private-admin-workflow";
 
 const IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS = [
   "dry_run",
   "review",
   "reserve_private_publish",
   "private_publish",
+  "rollback",
 ] as const;
 const READ_STATE_TTL_MS = 15 * 60 * 1000;
 
@@ -52,11 +67,22 @@ export type PharmacyPublishAuthorizationUiState = {
   authorizationStatus: "unavailable" | "ready" | "expired" | "invalidated" | "consumed";
 };
 
-export type PharmacyPrivateAdminActionStateResult = PharmacyPrivateAdminServerActionResult & {
-  readState?: PharmacyAdminBoundedReadState | null;
-  publishCapability?: PharmacyPreviewPublishCapability | null;
-  authorizationState?: PharmacyPublishAuthorizationUiState | null;
-  reservationState?: PharmacyAdminReservationResult | null;
+export type PharmacyAdminOperationReceipt = Readonly<{
+  operation: PharmacyPrivateAdminOperation | "refresh_state";
+  outcome: "fresh" | "replayed" | "readback_only" | "blocked";
+  recordedAt: string;
+}>;
+
+export type PharmacyPrivateAdminActionStateResult = {
+  ok: boolean;
+  blockers: readonly string[];
+  workflow: PharmacyPrivateAdminWorkflowResult | null;
+  readState: PharmacyAdminBoundedReadState | null;
+  publishCapability: PharmacyPreviewPublishCapability | null;
+  authorizationState: PharmacyPublishAuthorizationUiState | null;
+  reservationState: PharmacyAdminReservationResult | null;
+  stateMachine: PharmacyAdminStateMachineSnapshot | null;
+  receipt: PharmacyAdminOperationReceipt | null;
 };
 
 function parseAllowlist(value: string | undefined): string[] {
@@ -134,40 +160,127 @@ function buildBoundedRecords(
   };
 }
 
+function stageComplete(
+  state: PharmacyAdminStateMachineSnapshot,
+  stageId: PharmacyAdminStateMachineStageId,
+): boolean {
+  return state.stages.some((stage) => stage.id === stageId && stage.status === "complete");
+}
+
+function expectedReadbackStage(operation: PharmacyPrivateAdminOperation): PharmacyAdminStateMachineStageId {
+  if (operation === "dry_run") return "dry_run";
+  if (operation === "review") return "authorization_ready";
+  if (operation === "reserve_private_publish") return "reservation_verified";
+  if (operation === "private_publish") return "publish_verified";
+  return "exact_recovery_verified";
+}
+
+function lockedResult(input: {
+  blocker: string;
+  stateMachine: PharmacyAdminStateMachineSnapshot | null;
+  operation: PharmacyPrivateAdminOperation | "refresh_state";
+}): PharmacyPrivateAdminActionStateResult {
+  return {
+    ok: false,
+    blockers: [input.blocker],
+    workflow: null,
+    readState: null,
+    publishCapability: null,
+    authorizationState: null,
+    reservationState: null,
+    stateMachine: input.stateMachine,
+    receipt: {
+      operation: input.operation,
+      outcome: "blocked",
+      recordedAt: input.stateMachine?.generatedAt ?? new Date().toISOString(),
+    },
+  };
+}
+
 export async function runPharmacyPrivateAdminAction(
   formData: FormData,
 ): Promise<PharmacyPrivateAdminActionStateResult> {
   const admin = await requirePlatformAdmin();
   const allowedActorIds = parseAllowlist(process.env.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
   const allowedEntityIds = parseAllowlist(process.env.IMPORT_PREVIEW_CANARY_ENTITY_IDS);
+  const operationValue = String(formData.get("operation") ?? "").trim();
+  const entityId = String(formData.get("entityId") ?? "").trim();
+  const submittedRevision = String(formData.get("stateRevision") ?? "").trim();
+  const stateReader = createPharmacyAdminStateMachineReaderFromEnvironment();
+  const beforeState = stateReader && entityId
+    ? await stateReader({ actorId: admin.id, entityId, now: new Date().toISOString() })
+    : null;
+
+  if (operationValue === "refresh_state") {
+    return beforeState
+      ? {
+          ok: true,
+          blockers: [],
+          workflow: null,
+          readState: null,
+          publishCapability: null,
+          authorizationState: null,
+          reservationState: null,
+          stateMachine: beforeState,
+          receipt: {
+            operation: "refresh_state",
+            outcome: "readback_only",
+            recordedAt: beforeState.generatedAt,
+          },
+        }
+      : lockedResult({ blocker: "state_readback_unavailable", stateMachine: null, operation: "refresh_state" });
+  }
+
+  if (!IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS.includes(operationValue as PharmacyPrivateAdminOperation)) {
+    return lockedResult({ blocker: "invalid_operation", stateMachine: beforeState, operation: "refresh_state" });
+  }
+  const requestedOperation = operationValue as PharmacyPrivateAdminOperation;
+  if (!beforeState) {
+    return lockedResult({ blocker: "state_readback_unavailable", stateMachine: null, operation: requestedOperation });
+  }
+  if (!submittedRevision || submittedRevision !== beforeState.revision) {
+    return lockedResult({ blocker: "state_revision_mismatch", stateMachine: beforeState, operation: requestedOperation });
+  }
+
   const publishConfirmation = String(formData.get("publishConfirmation") ?? "");
   let persistedReadState: PharmacyAdminBoundedReadState | null = null;
   let publishCapability: PharmacyPreviewPublishCapability | null = null;
   let authorizationUiState: PharmacyPublishAuthorizationUiState | null = null;
   let reservationState: PharmacyAdminReservationResult | null = null;
+  let rollbackReplayed = false;
 
   const action = createPharmacyPrivateAdminServerAction({
     executionEnabled: process.env.VERCEL_ENV === "preview",
     enabledOperations: IMPORT_PHARMACY_PRIVATE_ADMIN_ENABLED_OPERATIONS,
     environment: process.env.VERCEL_ENV,
     allowedEntityIds,
-    execute: async ({ operation, actorId, entityId, confirmation }) => {
-      if (
-        operation !== "dry_run" &&
-        operation !== "review" &&
-        operation !== "reserve_private_publish" &&
-        operation !== "private_publish"
-      ) {
+    execute: async ({ operation, actorId, entityId: actionEntityId, confirmation }) => {
+      if (operation === "rollback") {
+        const dependencies = createPharmacyPrivateAdminRollbackOperationDependenciesFromEnvironment();
+        const rolledBack = dependencies
+          ? await runPharmacyPrivateAdminRollbackOperation({
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId: actionEntityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              dependencies,
+            })
+          : null;
+        rollbackReplayed = rolledBack?.replayed === true;
         return {
           operation,
-          status: "failed",
-          entityId,
-          blockers: [],
+          status: rolledBack?.rolledBack ? "completed" : "failed",
+          entityId: actionEntityId,
+          blockers: rolledBack?.blocker ? ["readiness_blocked"] : [],
           publicVisibility: "private",
           indexEligible: false,
           sitemapEligible: false,
           routeEnabled: false,
-          executionReference: null,
+          executionReference: rolledBack?.rolledBack
+            ? rolledBack.replayed ? "rollback-authority-replayed" : "rollback-authority-consumed"
+            : null,
         };
       }
 
@@ -179,7 +292,7 @@ export async function runPharmacyPrivateAdminAction(
               executionEnabled: true,
               environment: process.env.VERCEL_ENV,
               actorId,
-              entityId,
+              entityId: actionEntityId,
               allowedActorIds,
               allowedEntityIds,
               approvalToken: process.env.IMPORT_PREVIEW_APPROVAL_TOKEN ?? "",
@@ -193,7 +306,7 @@ export async function runPharmacyPrivateAdminAction(
         return {
           operation,
           status: "failed",
-          entityId,
+          entityId: actionEntityId,
           blockers: ["readiness_blocked"],
           publicVisibility: "private",
           indexEligible: false,
@@ -212,7 +325,7 @@ export async function runPharmacyPrivateAdminAction(
           ? await runPharmacyPrivateAdminPublishOperation({
               environment: process.env.VERCEL_ENV,
               actorId,
-              entityId,
+              entityId: actionEntityId,
               allowedActorIds,
               allowedEntityIds,
               confirmation: confirmation ?? "",
@@ -223,7 +336,7 @@ export async function runPharmacyPrivateAdminAction(
         return {
           operation,
           status: published?.published ? "completed" : "failed",
-          entityId,
+          entityId: actionEntityId,
           blockers: published?.blocker ? ["readiness_blocked"] : [],
           publicVisibility: "private",
           indexEligible: false,
@@ -235,13 +348,13 @@ export async function runPharmacyPrivateAdminAction(
 
       if (operation === "reserve_private_publish") {
         const now = new Date().toISOString();
-        const reviewState = await store.readLatestFresh({ actorId, entityId, operation: "review", now });
+        const reviewState = await store.readLatestFresh({ actorId, entityId: actionEntityId, operation: "review", now });
         const dependencies = createPharmacyAdminReservationDependenciesFromEnvironment();
         reservationState = reviewState && dependencies
           ? await runPharmacyAdminReservationOperation({
               environment: process.env.VERCEL_ENV,
               actorId,
-              entityId,
+              entityId: actionEntityId,
               allowedActorIds,
               allowedEntityIds,
               confirmation: confirmation ?? "",
@@ -254,7 +367,7 @@ export async function runPharmacyPrivateAdminAction(
         return {
           operation,
           status: reservationState?.reserved && reservationState.integrityVerified ? "completed" : "failed",
-          entityId,
+          entityId: actionEntityId,
           blockers: [],
           publicVisibility: "private",
           indexEligible: false,
@@ -275,7 +388,7 @@ export async function runPharmacyPrivateAdminAction(
         return {
           operation,
           status: "failed",
-          entityId,
+          entityId: actionEntityId,
           blockers: ["readiness_blocked"],
           publicVisibility: "private",
           indexEligible: false,
@@ -290,7 +403,7 @@ export async function runPharmacyPrivateAdminAction(
       const state = buildPharmacyAdminBoundedReadState({
         operation,
         actorId,
-        entityId,
+        entityId: actionEntityId,
         snapshotHash: context.snapshotHash,
         entityFingerprint: context.context.canaryInput.expectedEntityFingerprint,
         expectedEntityVersion: context.context.canaryInput.reservationRequest.expectedVersion,
@@ -302,13 +415,13 @@ export async function runPharmacyPrivateAdminAction(
       });
       const persisted = await store.persist({ state, current: records.current, proposed: records.proposed });
       const readback = persisted
-        ? await store.readLatestFresh({ actorId, entityId, operation, now: createdAt })
+        ? await store.readLatestFresh({ actorId, entityId: actionEntityId, operation, now: createdAt })
         : null;
       if (!persisted || !readback || readback.snapshotHash !== context.snapshotHash) {
         return {
           operation,
           status: "failed",
-          entityId,
+          entityId: actionEntityId,
           blockers: ["readiness_blocked"],
           publicVisibility: "private",
           indexEligible: false,
@@ -323,7 +436,7 @@ export async function runPharmacyPrivateAdminAction(
         publishCapability = resolvePharmacyPreviewPublishCapability({
           environment: process.env.VERCEL_ENV,
           actorId,
-          entityId,
+          entityId: actionEntityId,
           allowedActorIds,
           allowedEntityIds,
           confirmation: publishConfirmation,
@@ -337,7 +450,7 @@ export async function runPharmacyPrivateAdminAction(
           const issuance = await issuePharmacyPreviewPublishAuthorization({
             capability: publishCapability,
             actorId,
-            entityId,
+            entityId: actionEntityId,
             reviewState: readback,
             store: createPharmacyPublishAuthorizationStoreFromEnvironment(),
           });
@@ -348,7 +461,7 @@ export async function runPharmacyPrivateAdminAction(
       return {
         operation,
         status: "completed",
-        entityId,
+        entityId: actionEntityId,
         blockers: [],
         publicVisibility: "private",
         indexEligible: false,
@@ -359,10 +472,42 @@ export async function runPharmacyPrivateAdminAction(
     },
   });
 
-  const result = await action({ actorId: admin.id, formData });
-  const entityId = String(formData.get("entityId") ?? "");
+  const actionResult = await action({ actorId: admin.id, formData });
+  const workflow = "workflow" in actionResult ? actionResult.workflow : null;
+  const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
+  const afterState = stateReader
+    ? await stateReader({ actorId: admin.id, entityId, now: new Date().toISOString() })
+    : null;
+  if (!afterState) {
+    return {
+      ok: false,
+      blockers: [...actionBlockers, "state_readback_unavailable"],
+      workflow,
+      readState: persistedReadState,
+      publishCapability,
+      authorizationState: authorizationUiState,
+      reservationState,
+      stateMachine: null,
+      receipt: {
+        operation: requestedOperation,
+        outcome: "blocked",
+        recordedAt: new Date().toISOString(),
+      },
+    };
+  }
+
+  const readbackVerified = stageComplete(afterState, expectedReadbackStage(requestedOperation));
+  const succeeded = actionResult.ok && readbackVerified;
+  const replayed = requestedOperation === "reserve_private_publish"
+    ? reservationState?.replayed === true
+    : requestedOperation === "rollback"
+      ? rollbackReplayed
+      : stageComplete(beforeState, expectedReadbackStage(requestedOperation));
+
   return {
-    ...result,
+    ok: succeeded,
+    blockers: succeeded ? [] : [...actionBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])],
+    workflow,
     readState: persistedReadState,
     publishCapability: publishCapability ?? {
       visible: false,
@@ -378,12 +523,19 @@ export async function runPharmacyPrivateAdminAction(
     },
     authorizationState: authorizationUiState,
     reservationState,
+    stateMachine: afterState,
+    receipt: {
+      operation: requestedOperation,
+      outcome: succeeded ? replayed ? "replayed" : "fresh" : "blocked",
+      recordedAt: afterState.generatedAt,
+    },
   };
 }
 
 export async function runPharmacyPrivateAdminActionState(
-  _previousState: PharmacyPrivateAdminActionStateResult | null,
+  previousState: PharmacyPrivateAdminActionStateResult,
   formData: FormData,
 ): Promise<PharmacyPrivateAdminActionStateResult> {
-  return runPharmacyPrivateAdminAction(formData);
+  const result = await runPharmacyPrivateAdminAction(formData);
+  return result.stateMachine ? result : { ...result, stateMachine: previousState.stateMachine };
 }
