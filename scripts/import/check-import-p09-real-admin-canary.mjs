@@ -8,7 +8,7 @@ const files = {
   page: "src/app/admin/imports/readiness/page.tsx",
   panel: "src/components/admin/import-pharmacy-private-admin-control-panel.tsx",
   runner: "scripts/import/run-p09-real-admin-canary.mjs",
-  workflow: ".github/workflows/p09-real-admin-canary.yml",
+  workflow: ".github/workflows/preview-migration-sync.yml",
 };
 
 const entries = await Promise.all(
@@ -105,11 +105,13 @@ for (const token of [
   "PREVIEW_PROJECT_REF",
   "PRODUCTION_PROJECT_REF",
   "drmuscat-isolated-preview-database-write",
+  "P09_SOURCE_COMMIT",
   "run-p09-real-admin-canary.mjs",
   "check-import-p09-real-admin-canary.mjs",
+  "p09-real-admin-canary-${{ github.event.pull_request.head.sha || github.sha }}",
   "github.event.pull_request.head.sha",
 ]) {
-  assert(source.workflow.includes(token), `P09 workflow is missing ${token}.`);
+  assert(source.workflow.includes(token), `Serialized Preview workflow is missing ${token}.`);
 }
 
 console.log("P09 real Admin canary contract passed.");
