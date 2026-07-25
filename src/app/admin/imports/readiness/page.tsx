@@ -3,7 +3,7 @@ import { ImportPharmacyPrivateAdminControlPanel } from "@/components/admin/impor
 import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-readiness-review-readonly-panel";
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import { getImportAdminGeoPerformanceReadOnlyModel } from "@/server/admin/import-admin-geo-performance-readonly";
-import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-readiness-review-readonly";
+import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-admin-readiness-review-readonly";
 import {
   diagnosePharmacyAdminReadback,
   type PharmacyAdminReadbackDiagnostic,
@@ -20,8 +20,6 @@ const diagnosticMessages: Record<PharmacyAdminReadbackDiagnostic, string> = {
   entity_allowlist_invalid: "The Preview Pharmacy allowlist must contain exactly one entry.",
   actor_allowlist_mismatch: "The signed-in Admin does not match the configured Preview actor.",
   entity_allowlist_mismatch: "The selected Pharmacy does not match the configured Preview canary.",
-  service_role_rejected: "The Preview service-role key was rejected by the configured Supabase project.",
-  service_role_forbidden: "The Preview service-role key cannot read the required private state.",
   entity_not_found: "The configured Preview Pharmacy no longer exists.",
   centers_read_failed: "The Preview Pharmacy could not be read from the server.",
   read_states_read_failed: "The Preview dry-run and review state table could not be read.",
