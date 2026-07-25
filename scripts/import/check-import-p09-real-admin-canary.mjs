@@ -8,7 +8,6 @@ const files = {
   proxy: "src/proxy.ts",
   adminLayout: "src/app/admin/layout.tsx",
   loginPage: "src/app/admin/login/page.tsx",
-  loginAction: "src/app/admin/login/actions.ts",
   loginForm: "src/components/admin/admin-login-form.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
   page: "src/app/admin/imports/readiness/page.tsx",
@@ -72,23 +71,19 @@ for (const token of [
 }
 
 for (const token of [
-  "signInAdminWithPassword",
+  "createBrowserClient",
   "signInWithPassword",
-  'formData.get("password")',
-  'redirect("/admin/imports/readiness")',
-  "at least 8 characters",
-]) {
-  assert(source.loginAction.includes(token), `Preview password login action is missing ${token}.`);
-}
-assert(!source.loginAction.includes("signInWithOtp"), "P09 Preview login must not depend on email OTP delivery.");
-
-for (const token of [
-  "signInAdminWithPassword",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   'type="password"',
   'autoComplete="current-password"',
+  'router.replace("/admin/imports/readiness")',
   "Sign in securely",
 ]) {
-  assert(source.loginForm.includes(token), `Preview password login form is missing ${token}.`);
+  assert(source.loginForm.includes(token), `Preview browser password login is missing ${token}.`);
+}
+for (const forbidden of ["signInWithOtp", "requestAdminLoginLink", "Send secure sign-in link"]) {
+  assert(!source.loginForm.includes(forbidden), `P09 Preview login must not contain ${forbidden}.`);
 }
 
 for (const token of [
