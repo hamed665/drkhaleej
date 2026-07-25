@@ -36,7 +36,7 @@ sha256:8e23da340f86a95b0e933e8bc81ed5f811379c7c891c187c5686a06e7a2145cd
 
 ## Remaining literal UI gate
 
-One registered Supabase Preview Auth user whose profile is `is_platform_admin=true` must sign in through the Vercel Preview magic-link flow and execute the protected `/admin/imports/readiness` path:
+One registered Supabase Preview Auth user whose profile is `is_platform_admin=true` must sign in through the Vercel Preview password-auth flow and execute the protected `/admin/imports/readiness` path:
 
 ```text
 Dry Run
@@ -51,7 +51,7 @@ Dry Run
 → Bounded Audit History
 ```
 
-The Vercel Preview deployment must already be fail-closed configured with exactly one allowed actor, exactly one fixed Pharmacy entity, the Preview-only activation flag and matching approval-token values. No raw actor ID, entity ID, approval token or authentication material belongs in this document, PR text, browser-visible evidence or workflow artifacts.
+The Vercel Preview deployment must already be fail-closed configured with exactly one allowed actor, exactly one fixed Pharmacy entity, the Preview-only activation flag and matching approval-token values. The Preview password must remain private and must not be committed, logged, placed in PR text or included in workflow artifacts. No raw actor ID, entity ID, approval token or authentication material belongs in this document, PR text, browser-visible evidence or workflow artifacts.
 
 ## GO requirements
 
