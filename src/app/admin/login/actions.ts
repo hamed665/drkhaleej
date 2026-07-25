@@ -8,11 +8,44 @@ export type AdminLoginActionState = {
   message: string;
 };
 
-const adminLoginFailureState: AdminLoginActionState = {
-  status: "error",
-  message:
-    "We could not send an admin sign-in link. Confirm the email is registered in the Preview project and that the Preview callback URL is allowed.",
-};
+function readSafeAuthFailureReference(error: unknown): string {
+  if (!error || typeof error !== "object") return "auth_request_failed";
+
+  const candidate = error as { code?: unknown; status?: unknown; name?: unknown };
+  if (
+    typeof candidate.code === "string" &&
+    /^[a-z0-9_]{1,64}$/i.test(candidate.code)
+  ) {
+    return candidate.code.toLowerCase();
+  }
+
+  if (
+    typeof candidate.name === "string" &&
+    /^[a-z0-9_]{1,64}$/i.test(candidate.name)
+  ) {
+    return candidate.name.toLowerCase();
+  }
+
+  if (
+    typeof candidate.status === "number" &&
+    Number.isInteger(candidate.status) &&
+    candidate.status >= 400 &&
+    candidate.status <= 599
+  ) {
+    return `http_${candidate.status}`;
+  }
+
+  return "auth_request_failed";
+}
+
+function adminLoginFailureState(error: unknown): AdminLoginActionState {
+  return {
+    status: "error",
+    message:
+      "We could not send an admin sign-in link. Confirm the Preview Auth configuration and try again after the email cooldown. " +
+      `Reference: ${readSafeAuthFailureReference(error)}.`,
+  };
+}
 
 export async function requestAdminLoginLink(
   _previousState: AdminLoginActionState,
@@ -53,9 +86,9 @@ export async function requestAdminLoginLink(
           },
     });
 
-    if (error) return adminLoginFailureState;
-  } catch {
-    return adminLoginFailureState;
+    if (error) return adminLoginFailureState(error);
+  } catch (error) {
+    return adminLoginFailureState(error);
   }
 
   return {
