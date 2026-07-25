@@ -7,6 +7,9 @@ const files = {
   decision: "docs/import/POST_P09_GO_NO_GO.md",
   proxy: "src/proxy.ts",
   adminLayout: "src/app/admin/layout.tsx",
+  loginPage: "src/app/admin/login/page.tsx",
+  loginAction: "src/app/admin/login/actions.ts",
+  loginForm: "src/components/admin/admin-login-form.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
   page: "src/app/admin/imports/readiness/page.tsx",
   panel: "src/components/admin/import-pharmacy-private-admin-control-panel.tsx",
@@ -58,6 +61,34 @@ for (const token of [
   "requirePlatformAdmin",
 ]) {
   assert(source.adminLayout.includes(token), `Admin layout login routing is missing ${token}.`);
+}
+
+for (const token of [
+  "Supabase Password Auth",
+  "matching active",
+  "platform-admin profile",
+]) {
+  assert(source.loginPage.includes(token), `Preview login page is missing ${token}.`);
+}
+
+for (const token of [
+  "signInAdminWithPassword",
+  "signInWithPassword",
+  'formData.get("password")',
+  'redirect("/admin/imports/readiness")',
+  "at least 8 characters",
+]) {
+  assert(source.loginAction.includes(token), `Preview password login action is missing ${token}.`);
+}
+assert(!source.loginAction.includes("signInWithOtp"), "P09 Preview login must not depend on email OTP delivery.");
+
+for (const token of [
+  "signInAdminWithPassword",
+  'type="password"',
+  'autoComplete="current-password"',
+  "Sign in securely",
+]) {
+  assert(source.loginForm.includes(token), `Preview password login form is missing ${token}.`);
 }
 
 for (const token of [
