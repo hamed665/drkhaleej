@@ -41,13 +41,16 @@ The Preview Migration Sync workflow serializes migration verification, P05, P06,
 
 ## Hosted proof versus literal UI session
 
-The exact-SHA hosted runner must prove the same persisted authorities used by the protected Admin workflow and the static contract must prove that the page, panel and Server Action expose no bypass. This does not count as an authenticated browser session. Until one human operator completes the literal Vercel Preview Admin path, evidence must retain `browserSessionExecuted=false` and the Post-P09 decision must remain `NO-GO_PENDING_LITERAL_UI_SESSION`.
+The exact-SHA hosted runner must prove the same persisted authorities used by the protected Admin workflow and the static contract must prove that the page, password-auth form, panel and Server Action expose no bypass. This does not count as an authenticated browser session. Until one human operator completes the literal Vercel Preview Admin path, evidence must retain `browserSessionExecuted=false` and the Post-P09 decision must remain `NO-GO_PENDING_LITERAL_UI_SESSION`.
+
+The Preview login must use Supabase Password Auth for the existing registered user. It must not depend on email OTP or Magic Link delivery. The resulting session remains subject to the existing active `is_platform_admin=true` profile check and all P09 actor/entity allowlist gates.
 
 ## Closed boundaries
 
 - no Production connection, read, migration or mutation;
 - no public, index, sitemap or route promotion;
 - no new database authority, migration, RLS policy or RPC;
+- no parallel authentication authority outside Supabase Auth;
 - no automatic retry of Reservation, private mutation or rollback;
 - no second Reservation;
 - no direct browser-visible persistence identifiers;
