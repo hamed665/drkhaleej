@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
             Platform admin sign in
           </h1>
           <p className="mt-4 text-base leading-7 text-cyan-50/90">
-            Secure preview access for approved platform administrators only.
+            Secure Preview access for approved platform administrators only.
           </p>
         </div>
 
@@ -31,12 +31,12 @@ export default function AdminLoginPage() {
             Admin access
           </p>
           <h2 className="mt-3 text-2xl font-bold tracking-[-0.02em] text-slate-950">
-            Use the email already registered as a platform admin.
+            Sign in with the Preview admin email and password.
           </h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            A secure Supabase Auth magic link will establish your browser
-            session. Admin routes still require a matching platform-admin
-            profile before any protected content is shown.
+            Supabase Password Auth establishes the browser session without relying
+            on email delivery. Protected routes still require the matching active
+            platform-admin profile before any Admin content is shown.
           </p>
           <AdminLoginForm />
         </div>
