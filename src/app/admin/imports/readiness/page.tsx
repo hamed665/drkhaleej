@@ -3,7 +3,7 @@ import { ImportPharmacyPrivateAdminControlPanel } from "@/components/admin/impor
 import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-readiness-review-readonly-panel";
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import { getImportAdminGeoPerformanceReadOnlyModel } from "@/server/admin/import-admin-geo-performance-readonly";
-import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-admin-readiness-review-readonly";
+import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-readiness-review-readonly";
 import {
   diagnosePharmacyAdminReadback,
   type PharmacyAdminReadbackDiagnostic,
@@ -12,7 +12,7 @@ import { createPharmacyAdminStateMachineReaderFromEnvironment } from "@/server/a
 import { getPharmacyMinimalAdminUiModel } from "@/server/admin/import-pharmacy-minimal-admin-ui-model";
 
 const diagnosticMessages: Record<PharmacyAdminReadbackDiagnostic, string> = {
-  ready: "Preview readback is ready.",
+  ready: "The Preview environment is readable, but the bounded state could not be constructed.",
   environment_not_preview: "This deployment is not running as a Vercel Preview.",
   supabase_url_missing: "The Preview Supabase URL is missing from this deployment.",
   service_role_key_missing: "The Preview service-role key is missing from this deployment.",
@@ -34,14 +34,9 @@ export default async function AdminImportReadinessPage() {
   const geoPerformanceModel = getImportAdminGeoPerformanceReadOnlyModel();
   const readinessReviewModel = getImportAdminReadinessReviewReadOnlyModel();
   const pharmacyUiModel = getPharmacyMinimalAdminUiModel();
-  const configuredActorMatches = pharmacyUiModel.actorId === admin.id ||
-    pharmacyUiModel.actorId === admin.auth_user_id;
+  const stateReader = createPharmacyAdminStateMachineReaderFromEnvironment();
   const actorBoundActivation =
-    pharmacyUiModel.activationEnabled && configuredActorMatches;
-  const runtimeEnvironment = configuredActorMatches
-    ? { ...process.env, IMPORT_PREVIEW_ALLOWED_ACTOR_IDS: admin.id }
-    : process.env;
-  const stateReader = createPharmacyAdminStateMachineReaderFromEnvironment(runtimeEnvironment);
+    pharmacyUiModel.activationEnabled && pharmacyUiModel.actorId === admin.id;
   const initialStateMachine = actorBoundActivation && pharmacyUiModel.entityId && stateReader
     ? await stateReader({
         actorId: admin.id,
@@ -52,9 +47,7 @@ export default async function AdminImportReadinessPage() {
   const readbackDiagnostic = pharmacyUiModel.entityId && !initialStateMachine
     ? await diagnosePharmacyAdminReadback({
         actorId: admin.id,
-        actorAliases: admin.auth_user_id ? [admin.auth_user_id] : [],
         entityId: pharmacyUiModel.entityId,
-        environment: runtimeEnvironment,
       })
     : "ready";
 
