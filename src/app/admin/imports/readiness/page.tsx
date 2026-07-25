@@ -4,17 +4,44 @@ import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-re
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import { getImportAdminGeoPerformanceReadOnlyModel } from "@/server/admin/import-admin-geo-performance-readonly";
 import { getImportAdminReadinessReviewReadOnlyModel } from "@/server/admin/import-admin-readiness-review-readonly";
+import {
+  diagnosePharmacyAdminReadback,
+  type PharmacyAdminReadbackDiagnostic,
+} from "@/server/admin/import-pharmacy-admin-readback-diagnostic";
 import { createPharmacyAdminStateMachineReaderFromEnvironment } from "@/server/admin/import-pharmacy-admin-state-machine-readback";
 import { getPharmacyMinimalAdminUiModel } from "@/server/admin/import-pharmacy-minimal-admin-ui-model";
+
+const diagnosticMessages: Record<PharmacyAdminReadbackDiagnostic, string> = {
+  ready: "Preview readback is ready.",
+  environment_not_preview: "This deployment is not running as a Vercel Preview.",
+  supabase_url_missing: "The Preview Supabase URL is missing from this deployment.",
+  service_role_key_missing: "The Preview service-role key is missing from this deployment.",
+  actor_allowlist_invalid: "The Preview actor allowlist must contain exactly one entry.",
+  entity_allowlist_invalid: "The Preview Pharmacy allowlist must contain exactly one entry.",
+  actor_allowlist_mismatch: "The signed-in Admin does not match the configured Preview actor.",
+  entity_allowlist_mismatch: "The selected Pharmacy does not match the configured Preview canary.",
+  service_role_rejected: "The Preview service-role key was rejected by the configured Supabase project.",
+  service_role_forbidden: "The Preview service-role key cannot read the required private state.",
+  entity_not_found: "The configured Preview Pharmacy no longer exists.",
+  centers_read_failed: "The Preview Pharmacy could not be read from the server.",
+  read_states_read_failed: "The Preview dry-run and review state table could not be read.",
+  authorizations_read_failed: "The Preview authorization state table could not be read.",
+  reservations_read_failed: "The Preview Reservation state table could not be read.",
+};
 
 export default async function AdminImportReadinessPage() {
   const admin = await requirePlatformAdmin();
   const geoPerformanceModel = getImportAdminGeoPerformanceReadOnlyModel();
   const readinessReviewModel = getImportAdminReadinessReviewReadOnlyModel();
   const pharmacyUiModel = getPharmacyMinimalAdminUiModel();
-  const stateReader = createPharmacyAdminStateMachineReaderFromEnvironment();
+  const configuredActorMatches = pharmacyUiModel.actorId === admin.id ||
+    pharmacyUiModel.actorId === admin.auth_user_id;
   const actorBoundActivation =
-    pharmacyUiModel.activationEnabled && pharmacyUiModel.actorId === admin.id;
+    pharmacyUiModel.activationEnabled && configuredActorMatches;
+  const runtimeEnvironment = configuredActorMatches
+    ? { ...process.env, IMPORT_PREVIEW_ALLOWED_ACTOR_IDS: admin.id }
+    : process.env;
+  const stateReader = createPharmacyAdminStateMachineReaderFromEnvironment(runtimeEnvironment);
   const initialStateMachine = actorBoundActivation && pharmacyUiModel.entityId && stateReader
     ? await stateReader({
         actorId: admin.id,
@@ -22,11 +49,32 @@ export default async function AdminImportReadinessPage() {
         now: new Date().toISOString(),
       })
     : null;
+  const readbackDiagnostic = pharmacyUiModel.entityId && !initialStateMachine
+    ? await diagnosePharmacyAdminReadback({
+        actorId: admin.id,
+        actorAliases: admin.auth_user_id ? [admin.auth_user_id] : [],
+        entityId: pharmacyUiModel.entityId,
+        environment: runtimeEnvironment,
+      })
+    : "ready";
 
   return (
     <div className="space-y-6">
       <ImportGeoPerformanceReadOnlyPanel model={geoPerformanceModel} />
       <ImportReadinessReviewReadOnlyPanel model={readinessReviewModel} />
+      {!initialStateMachine ? (
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-800">
+            Preview readback diagnosis
+          </p>
+          <p className="mt-2 text-sm font-semibold text-amber-950">
+            {diagnosticMessages[readbackDiagnostic]}
+          </p>
+          <p className="mt-2 font-mono text-xs text-amber-800">
+            Reference: {readbackDiagnostic}
+          </p>
+        </section>
+      ) : null}
       <ImportPharmacyPrivateAdminControlPanel
         entityId={pharmacyUiModel.entityId}
         activationEnabled={actorBoundActivation}
