@@ -1,7 +1,8 @@
 "use server";
 
+import { redirect } from "next/navigation";
+
 import { createSessionAwareSupabaseServerClient } from "@/lib/auth/server";
-import { buildAdminLoginRedirectUrl, getRequestOrigin } from "@/lib/auth/admin-login";
 
 export type AdminLoginActionState = {
   status: "idle" | "success" | "error";
@@ -20,19 +21,20 @@ function readSafeAuthFailureReference(error: unknown): string {
   }
 
   if (
-    typeof candidate.name === "string" &&
-    /^[a-z0-9_]{1,64}$/i.test(candidate.name)
-  ) {
-    return candidate.name.toLowerCase();
-  }
-
-  if (
     typeof candidate.status === "number" &&
     Number.isInteger(candidate.status) &&
     candidate.status >= 400 &&
     candidate.status <= 599
   ) {
     return `http_${candidate.status}`;
+  }
+
+  if (
+    typeof candidate.name === "string" &&
+    candidate.name !== "Error" &&
+    /^[a-z0-9_]{1,64}$/i.test(candidate.name)
+  ) {
+    return candidate.name.toLowerCase();
   }
 
   return "auth_request_failed";
@@ -42,21 +44,29 @@ function adminLoginFailureState(error: unknown): AdminLoginActionState {
   return {
     status: "error",
     message:
-      "We could not send an admin sign-in link. Confirm the Preview Auth configuration and try again after the email cooldown. " +
+      "Admin sign-in failed. Confirm the Preview email and password, then try once. " +
       `Reference: ${readSafeAuthFailureReference(error)}.`,
   };
 }
 
-export async function requestAdminLoginLink(
+export async function signInAdminWithPassword(
   _previousState: AdminLoginActionState,
   formData: FormData,
 ): Promise<AdminLoginActionState> {
   const email = formData.get("email");
+  const password = formData.get("password");
 
   if (typeof email !== "string" || email.trim().length === 0) {
     return {
       status: "error",
       message: "Enter the platform admin email address registered for DrMuscat.",
+    };
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    return {
+      status: "error",
+      message: "Enter the Preview admin password. It must contain at least 8 characters.",
     };
   }
 
@@ -71,19 +81,9 @@ export async function requestAdminLoginLink(
 
   try {
     const supabase = await createSessionAwareSupabaseServerClient();
-    const origin = await getRequestOrigin();
-    const emailRedirectTo = buildAdminLoginRedirectUrl(origin);
-
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
-      options: emailRedirectTo
-        ? {
-            emailRedirectTo,
-            shouldCreateUser: false,
-          }
-        : {
-            shouldCreateUser: false,
-          },
+      password,
     });
 
     if (error) return adminLoginFailureState(error);
@@ -91,9 +91,5 @@ export async function requestAdminLoginLink(
     return adminLoginFailureState(error);
   }
 
-  return {
-    status: "success",
-    message:
-      "If this email is registered for platform admin access, a secure sign-in link has been sent.",
-  };
+  redirect("/admin/imports/readiness");
 }
