@@ -8,6 +8,12 @@ export type AdminLoginActionState = {
   message: string;
 };
 
+const adminLoginFailureState: AdminLoginActionState = {
+  status: "error",
+  message:
+    "We could not send an admin sign-in link. Confirm the email is registered in the Preview project and that the Preview callback URL is allowed.",
+};
+
 export async function requestAdminLoginLink(
   _previousState: AdminLoginActionState,
   formData: FormData,
@@ -30,28 +36,26 @@ export async function requestAdminLoginLink(
     };
   }
 
-  const supabase = await createSessionAwareSupabaseServerClient();
-  const origin = await getRequestOrigin();
-  const emailRedirectTo = buildAdminLoginRedirectUrl(origin);
+  try {
+    const supabase = await createSessionAwareSupabaseServerClient();
+    const origin = await getRequestOrigin();
+    const emailRedirectTo = buildAdminLoginRedirectUrl(origin);
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email: normalizedEmail,
-    options: emailRedirectTo
-      ? {
-          emailRedirectTo,
-          shouldCreateUser: false,
-        }
-      : {
-          shouldCreateUser: false,
-        },
-  });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: normalizedEmail,
+      options: emailRedirectTo
+        ? {
+            emailRedirectTo,
+            shouldCreateUser: false,
+          }
+        : {
+            shouldCreateUser: false,
+          },
+    });
 
-  if (error) {
-    return {
-      status: "error",
-      message:
-        "We could not send an admin sign-in link. Confirm the email is already registered for platform admin access.",
-    };
+    if (error) return adminLoginFailureState;
+  } catch {
+    return adminLoginFailureState;
   }
 
   return {
