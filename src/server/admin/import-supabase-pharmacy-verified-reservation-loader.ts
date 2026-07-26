@@ -173,8 +173,8 @@ export function createSupabasePharmacyVerifiedReservationLoaderDependencies(inpu
       return result.ok ? result.context : null;
     },
 
-    readLatestReview({ actorId, entityId, now }) {
-      return readStateStore.readLatestFresh({ actorId, entityId, operation: "review", now });
+    readLatestReview({ actorId, entityId }) {
+      return readStateStore.readLatest({ actorId, entityId, operation: "review" });
     },
 
     async loadPersistence({ actorId, entityId, review }) {
