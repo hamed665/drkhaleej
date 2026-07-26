@@ -129,6 +129,24 @@ describe("Pharmacy Admin bounded read state store", () => {
     ).resolves.toBeNull();
   });
 
+  it("retains an exact expired review for an already-created Reservation", async () => {
+    const review = makeState("review");
+    const { client } = createClient(makeRow(review));
+    const store = createPharmacyAdminReadStateStore(client);
+
+    await expect(
+      store.readLatest({ actorId: "admin-1", entityId: "pharmacy-1", operation: "review" }),
+    ).resolves.toEqual(review);
+    await expect(
+      store.readLatestFresh({
+        actorId: "admin-1",
+        entityId: "pharmacy-1",
+        operation: "review",
+        now: "2026-07-13T00:20:00.000Z",
+      }),
+    ).resolves.toBeNull();
+  });
+
   it("fails closed on database errors", async () => {
     const { client } = createClient(null, { message: "db unavailable" });
     const store = createPharmacyAdminReadStateStore(client);
