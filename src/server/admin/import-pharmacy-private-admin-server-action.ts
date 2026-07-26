@@ -49,6 +49,15 @@ function readSingle(formData: FormData, key: string): string | null {
   return value.length > 0 ? value : null;
 }
 
+function normalizeExactConfirmation(value: string | null): string | null {
+  if (!value) return null;
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\s\u00a0\u2007\u202f]+/gu, " ")
+    .trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
 function isOperation(value: string | null): value is PharmacyPrivateAdminOperation {
   return value !== null && operations.has(value as PharmacyPrivateAdminOperation);
 }
@@ -64,7 +73,7 @@ export function createPharmacyPrivateAdminServerAction(
   }): Promise<PharmacyPrivateAdminServerActionResult> {
     const operationValue = readSingle(input.formData, "operation");
     const entityId = readSingle(input.formData, "entityId");
-    const confirmation = readSingle(input.formData, "confirmation");
+    const confirmation = normalizeExactConfirmation(readSingle(input.formData, "confirmation"));
     const blockers: PharmacyPrivateAdminServerActionBlocker[] = [];
 
     if (!dependencies.executionEnabled) blockers.push("action_disabled");
