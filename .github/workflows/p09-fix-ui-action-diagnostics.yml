@@ -1,0 +1,137 @@
+name: P09 Fix UI Action Diagnostics
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p09-fix-ui-action-diagnostics.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Patch exact UI diagnostics
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          actions = Path('src/app/admin/imports/readiness/actions.ts')
+          text = actions.read_text()
+          old = '''  let reservationReplayed = false;
+  let rollbackReplayed = false;
+'''
+          new = '''  let reservationReplayed = false;
+  let rollbackReplayed = false;
+  let publishOperationBlocker: string | null = null;
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''        const published = dependencies
+          ? await runPharmacyPrivateAdminPublishOperation({
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId: actionEntityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              now: new Date().toISOString(),
+              dependencies,
+            })
+          : null;
+        return {
+'''
+          new = '''        const published = dependencies
+          ? await runPharmacyPrivateAdminPublishOperation({
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId: actionEntityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              now: new Date().toISOString(),
+              dependencies,
+            })
+          : null;
+        publishOperationBlocker = published?.blocker ?? (dependencies ? null : "publish_dependencies_unavailable");
+        return {
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''  const actionResult = await action({ actorId: admin.id, formData });
+  const workflow = "workflow" in actionResult ? actionResult.workflow : null;
+  const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
+'''
+          new = '''  const actionResult = await action({ actorId: admin.id, formData });
+  const workflow = "workflow" in actionResult ? actionResult.workflow : null;
+  const actionBlockers = actionResult.ok
+    ? []
+    : actionResult.blockers.length > 0
+      ? actionResult.blockers
+      : workflow?.blockers ?? [];
+  const operationBlockers = publishOperationBlocker ? [publishOperationBlocker] : [];
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''    blockers: succeeded ? [] : [...actionBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])],
+'''
+          new = '''    blockers: succeeded
+      ? []
+      : [...new Set([...actionBlockers, ...operationBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])])],
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+          actions.write_text(text)
+
+          panel = Path('src/components/admin/import-pharmacy-private-admin-control-panel.tsx')
+          text = panel.read_text()
+          old = '''      <div className="mt-5 grid gap-4 xl:grid-cols-5" aria-label="Manual Pharmacy operations">
+'''
+          new = '''      {result.blockers.length > 0 ? (
+        <div className="mt-5 rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-950" role="alert">
+          <p className="font-bold">Last manual action was blocked</p>
+          <p className="mt-1 font-mono text-xs">{result.blockers.join(", ")}</p>
+        </div>
+      ) : null}
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-5" aria-label="Manual Pharmacy operations">
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''                    placeholder={confirmation}
+                    className="mt-2 min-h-10 w-full rounded-xl border border-sky-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400"
+'''
+          new = '''                    placeholder={confirmation}
+                    required
+                    minLength={confirmation.length}
+                    maxLength={confirmation.length}
+                    pattern={`^${confirmation}$`}
+                    title={`Paste exactly: ${confirmation}`}
+                    className="mt-2 min-h-10 w-full rounded-xl border border-sky-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 placeholder:text-slate-400 invalid:border-rose-400 invalid:bg-rose-50"
+'''
+          assert old in text
+          text = text.replace(old, new, 1)
+          panel.write_text(text)
+
+          Path('.github/workflows/p09-fix-ui-action-diagnostics.yml').unlink()
+          PY
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/app/admin/imports/readiness/actions.ts src/components/admin/import-pharmacy-private-admin-control-panel.tsx .github/workflows/p09-fix-ui-action-diagnostics.yml
+          git commit -m "fix(p09): surface exact UI publish blockers"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
