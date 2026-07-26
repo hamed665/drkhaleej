@@ -1,9 +1,8 @@
 name: P09 SEO Diagnostic
 
 on:
-  push:
-    branches:
-      - agent/real-admin-canary-p09
+  pull_request:
+    branches: [main]
     paths:
       - '.github/workflows/p09-seo-diagnostic.yml'
 
@@ -17,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: agent/real-admin-canary-p09
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 1
       - uses: actions/setup-node@v4
         with:
@@ -39,7 +38,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: p09-seo-diagnostic-${{ github.sha }}
+          name: p09-seo-diagnostic-${{ github.event.pull_request.head.sha }}
           path: artifacts/seo/seo.log
           if-no-files-found: error
           retention-days: 1
