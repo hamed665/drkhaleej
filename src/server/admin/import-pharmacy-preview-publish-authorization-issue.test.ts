@@ -75,6 +75,7 @@ function store(createResult: string | null = AUTHORIZATION_ID): PharmacyPublishA
     readByReviewStateId: vi.fn(async () => record),
     invalidateActive: vi.fn(async () => 0),
     transition: vi.fn(async () => true),
+    reissueExpired: vi.fn(async () => false),
     consume: vi.fn(async () => false),
   };
 }
