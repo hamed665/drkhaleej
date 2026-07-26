@@ -28,8 +28,6 @@ const rollbackSnapshotId = "rollback-1";
 const auditEventId = "audit-1";
 const snapshotHash = "a".repeat(64);
 const entityFingerprint = "b".repeat(64);
-const requestHash = "c".repeat(64);
-const patchHash = "d".repeat(64);
 const expectedVersion = "2026-07-26T01:00:00.000Z";
 
 const current = Object.fromEntries(
@@ -61,6 +59,8 @@ const review = buildPharmacyAdminBoundedReadState({
   current,
   proposed: current,
 });
+const requestHash = review.requestHash;
+const patchHash = review.patchHash;
 
 const verificationInput: ImportPersistenceReadbackVerificationInput = {
   actorId,
