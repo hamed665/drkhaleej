@@ -1,0 +1,46 @@
+name: P09 UI Publish Diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/import/diagnose-p09-ui-publish-state.mjs'
+      - '.github/workflows/p09-ui-publish-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+      PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+      PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+      P09_UI_ENTITY_ID: 4410ded2-57c5-4120-9e48-ffecc62b8685
+      P09_UI_DIAGNOSTIC_PATH: artifacts/p09-ui-publish/diagnostic.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --reporter=silent
+      - name: Inspect isolated Preview state read-only
+        run: node scripts/import/diagnose-p09-ui-publish-state.mjs
+      - name: Upload redacted diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-ui-publish-diagnostic-${{ github.event.pull_request.head.sha }}
+          path: artifacts/p09-ui-publish/diagnostic.json
+          if-no-files-found: error
+          retention-days: 1
