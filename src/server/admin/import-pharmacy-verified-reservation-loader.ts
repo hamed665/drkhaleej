@@ -1,9 +1,6 @@
 import "server-only";
 
-import {
-  isPharmacyAdminBoundedReadStateFresh,
-  type PharmacyAdminBoundedReadState,
-} from "./import-pharmacy-admin-bounded-read-state";
+import type { PharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
 import type { PharmacyPublishAuthorizationEnvelopeRecord } from "./import-pharmacy-publish-authorization-envelope";
 import type { PharmacyPrivateAdminPublishContext } from "./import-pharmacy-private-admin-real-wiring";
 import type {
@@ -125,12 +122,14 @@ export async function loadPharmacyVerifiedReservationForPublish(input: {
     entityId: input.entityId,
     now: input.now,
   });
+  // Review freshness gates authorization issuance and Reservation creation. Once that
+  // authorization is consumed into one exact persisted Reservation, the Reservation's
+  // own expiry and integrity readback become the publish authority.
   if (
     !review ||
     review.operation !== "review" ||
     review.actorId !== input.actorId ||
-    review.entityId !== input.entityId ||
-    !isPharmacyAdminBoundedReadStateFresh(review, input.now)
+    review.entityId !== input.entityId
   ) return { ok: false, blocker: "review_unavailable" };
 
   const baseContext = await input.dependencies.loadBaseContext({ actorId: input.actorId, entityId: input.entityId });
