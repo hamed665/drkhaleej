@@ -7,17 +7,19 @@ const gateTestPath = "src/server/admin/import-pharmacy-admin-publish-review-gate
 const wiringPath = "src/server/admin/import-pharmacy-private-admin-real-wiring.ts";
 const wiringTestPath = "src/server/admin/import-pharmacy-private-admin-real-wiring.test.ts";
 const loaderPath = "src/server/admin/import-pharmacy-verified-reservation-loader.ts";
+const loaderTestPath = "src/server/admin/import-pharmacy-verified-reservation-loader.test.ts";
 const operationPath = "src/server/admin/import-pharmacy-private-admin-publish-operation.ts";
 const actionPath = "src/app/admin/imports/readiness/actions.ts";
 const panelPath = "src/components/admin/import-pharmacy-private-admin-control-panel.tsx";
 
 const readText = (relativePath) => readFile(path.join(root, relativePath), "utf8");
-const [gate, gateTests, wiring, wiringTests, loader, operation, action, panel] = await Promise.all([
+const [gate, gateTests, wiring, wiringTests, loader, loaderTests, operation, action, panel] = await Promise.all([
   readText(gatePath),
   readText(gateTestPath),
   readText(wiringPath),
   readText(wiringTestPath),
   readText(loaderPath),
+  readText(loaderTestPath),
   readText(operationPath),
   readText(actionPath),
   readText(panelPath),
@@ -53,8 +55,23 @@ for (const token of [
   'review.operation !== "review"',
   "contextMatchesReview",
   "authorizationMatchesReview",
-  "isPharmacyAdminBoundedReadStateFresh",
-]) assert(loader.includes(token), `${loaderPath} must preserve exact Review binding with ${token}`);
+  "Review freshness gates authorization issuance and Reservation creation",
+  "Reservation's",
+  "reservationExpiresAt",
+]) assert(loader.includes(token), `${loaderPath} must preserve exact persisted Reservation binding with ${token}`);
+
+assert(
+  !loader.includes("isPharmacyAdminBoundedReadStateFresh"),
+  `${loaderPath} must not reapply Review TTL after one exact verified Reservation exists`,
+);
+
+for (const token of [
+  "uses the exact persisted review after its TTL when the Reservation remains live",
+  'now: "2026-07-26T02:00:00.000Z"',
+  'expect(result.ok).toBe(true)',
+  'expect(result.review.expiresAt).toBe("2026-07-26T01:15:00.000Z")',
+  'expect(result.evidence.reservationExpiresAt).toBe("2026-07-26T03:00:00.000Z")',
+]) assert(loaderTests.includes(token), `${loaderTestPath} must cover post-Review-TTL publish authority with ${token}`);
 
 for (const token of [
   "verifyPublishReview: async",
@@ -94,4 +111,4 @@ for (const forbidden of [
   assert(!panel.includes(forbidden), `${panelPath} must not include ${forbidden}`);
 }
 
-console.log("persisted Pharmacy private publish Review gate check passed.");
+console.log("persisted Pharmacy private publish Review and verified Reservation gate check passed.");
