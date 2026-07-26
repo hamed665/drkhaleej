@@ -15,10 +15,16 @@ type SelectQuery = {
   maybeSingle(): QueryResponse<Record<string, unknown>>;
 };
 
+type UpdateQuery = {
+  eq(column: string, value: string): UpdateQuery;
+  select(columns: string): { maybeSingle(): QueryResponse<Record<string, unknown>> };
+};
+
 type TableQuery = {
   insert(values: Readonly<Record<string, unknown>>): {
     select(columns: string): { maybeSingle(): QueryResponse<Record<string, unknown>> };
   };
+  update(values: Readonly<Record<string, unknown>>): UpdateQuery;
   select(columns: string): SelectQuery;
 };
 
@@ -236,6 +242,30 @@ export function createPharmacyPublishAuthorizationStore(
         p_reason: input.reason,
       });
       return !response.error && response.data === true;
+    },
+
+    async reissueExpired(input) {
+      const response = await client
+        .from("import_pharmacy_publish_authorizations")
+        .update({
+          token_hash: input.tokenHash,
+          nonce_hash: input.nonceHash,
+          status: "issued",
+          issued_at: input.issuedAt,
+          expires_at: input.expiresAt,
+          consumed_at: null,
+          invalidated_at: null,
+          invalidation_reason: null,
+          consumed_by_reservation_id: null,
+        })
+        .eq("id", input.authorizationId)
+        .eq("status", "expired")
+        .select("id")
+        .maybeSingle();
+
+      return !response.error && response.data
+        ? readString(response.data, "id") === input.authorizationId
+        : false;
     },
 
     async consume(input) {
