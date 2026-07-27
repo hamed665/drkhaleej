@@ -17,6 +17,7 @@ on:
       - 'scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs'
       - 'scripts/import/run-p09-real-admin-canary.mjs'
       - 'scripts/import/run-p09-recovery-review-attempt-proof.mjs'
+      - 'scripts/import/run-p09-literal-ui-state-diagnostic.mjs'
       - 'scripts/import/check-import-p09-real-admin-canary.mjs'
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
@@ -77,6 +78,8 @@ env:
   P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
   P09_RECOVERY_EVIDENCE_PATH: artifacts/p09/recovery-review-attempt.json
+  P09_LITERAL_ENTITY_SHA256: 96c37e7cc021ea720993a05083da7a0fbf0ae0db0c1dfb37c34e02cc89a79187
+  P09_LITERAL_DIAGNOSTIC_PATH: artifacts/p09/literal-ui-state-diagnostic.json
 
 permissions:
   contents: read
@@ -150,6 +153,12 @@ jobs:
 
       - name: Verify exact ledger and database inventories
         run: node scripts/db/preview-migration-sync.mjs verify
+
+      - name: Diagnose persisted literal Admin canary state
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-ui-state-diagnostic.mjs 2>&1 | tee artifacts/p09/literal-ui-state-diagnostic.log
 
       - name: Prove fresh expired-Reservation recovery Review attempt
         shell: bash
