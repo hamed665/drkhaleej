@@ -24,56 +24,26 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           path = Path('src/app/admin/imports/readiness/actions.ts')
           text = path.read_text()
 
-          old = '''  let reservationReplayed = false;
-          let rollbackReplayed = false;
-          '''
-          new = '''  let reservationReplayed = false;
-          let rollbackReplayed = false;
-          let operationFailureBlockers: string[] = [];
-          '''
-          assert old in text
-          text = text.replace(old, new, 1)
+          assert 'let operationFailureBlockers' not in text
+          text = text.replace(
+              '  let reservationReplayed = false;\n  let rollbackReplayed = false;\n',
+              '  let reservationReplayed = false;\n  let rollbackReplayed = false;\n  let operationFailureBlockers: string[] = [];\n',
+              1,
+          )
 
-          old_block = '''      if (operation === "private_publish") {
-                const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
-                  allowedActorIds,
-                  allowedEntityIds,
-                });
-                const published = dependencies
-                  ? await runPharmacyPrivateAdminPublishOperation({
-                      environment: process.env.VERCEL_ENV,
-                      actorId,
-                      entityId: actionEntityId,
-                      allowedActorIds,
-                      allowedEntityIds,
-                      confirmation: confirmation ?? "",
-                      now: new Date().toISOString(),
-                      dependencies,
-                    })
-                  : null;
-                return {
-                  operation,
-                  status: published?.published ? "completed" : "failed",
-                  entityId: actionEntityId,
-                  blockers: published?.blocker ? ["readiness_blocked"] : [],
-                  publicVisibility: "private",
-                  indexEligible: false,
-                  sitemapEligible: false,
-                  routeEnabled: false,
-                  executionReference: published?.executionReference ?? null,
-                };
-              }
+          pattern = re.compile(
+              r'\n      if \(operation === "private_publish"\) \{.*?\n      \}\n\n      if \(operation === "reserve_private_publish"\)',
+              re.S,
+          )
+          match = pattern.search(text)
+          assert match, 'existing private publish block not found'
+          text = text[:match.start()] + '\n\n      if (operation === "reserve_private_publish")' + text[match.end():]
 
-          '''
-          assert text.count(old_block) == 1
-          text = text.replace(old_block, '', 1)
-
-          anchor = '''      const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();
-          '''
           publish_block = '''      if (operation === "private_publish") {
                 const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
                   allowedActorIds,
@@ -109,25 +79,18 @@ jobs:
                 };
               }
 
-          '''
-          assert anchor in text
+'''
+          anchor = '      const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();\n'
+          assert text.count(anchor) == 1
           text = text.replace(anchor, publish_block + anchor, 1)
 
-          old = '''  const actionResult = await action({ actorId: admin.id, formData });
-            const workflow = "workflow" in actionResult ? actionResult.workflow : null;
-            const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
-          '''
-          new = '''  const actionResult = await action({ actorId: admin.id, formData });
-            const workflow = "workflow" in actionResult ? actionResult.workflow : null;
-            const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
-            const workflowBlockers = workflow?.blockers ?? [];
-          '''
-          assert old in text
-          text = text.replace(old, new, 1)
+          marker = '  const actionResult = await action({ actorId: admin.id, formData });\n  const workflow = "workflow" in actionResult ? actionResult.workflow : null;\n  const actionBlockers = actionResult.ok ? [] : actionResult.blockers;\n'
+          replacement = marker + '  const workflowBlockers = workflow?.blockers ?? [];\n'
+          assert text.count(marker) == 1
+          text = text.replace(marker, replacement, 1)
 
-          old = '''    blockers: succeeded ? [] : [...actionBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])],
-          '''
-          new = '''    blockers: succeeded
+          old_blockers = '    blockers: succeeded ? [] : [...actionBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])],\n'
+          new_blockers = '''    blockers: succeeded
               ? []
               : [...new Set([
                   ...actionBlockers,
@@ -135,14 +98,32 @@ jobs:
                   ...operationFailureBlockers,
                   ...(readbackVerified ? [] : ["state_readback_unverified"]),
                 ])],
-          '''
-          assert old in text
-          text = text.replace(old, new, 1)
+'''
+          assert text.count(old_blockers) == 1
+          text = text.replace(old_blockers, new_blockers, 1)
 
+          assert text.index('if (operation === "private_publish")') < text.index('const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()')
+          assert text.count('if (operation === "private_publish")') == 1
           path.write_text(text)
 
-          test = Path('src/app/admin/imports/readiness/actions-routing.test.ts')
-          test.write_text('''import { readFileSync } from "node:fs";\nimport { describe, expect, it } from "vitest";\n\ndescribe("P09 UI private publish routing", () => {\n  it("uses persisted Reservation authority before transient runtime-context gates", () => {\n    const source = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");\n    const publishBranch = source.indexOf('if (operation === "private_publish")');\n    const runtimeReader = source.indexOf("const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()");\n\n    expect(publishBranch).toBeGreaterThan(-1);\n    expect(runtimeReader).toBeGreaterThan(-1);\n    expect(publishBranch).toBeLessThan(runtimeReader);\n    expect(source.match(/if \(operation === "private_publish"\)/g)).toHaveLength(1);\n    expect(source).toContain("operationFailureBlockers = published?.blocker");\n    expect(source).toContain("...workflowBlockers");\n  });\n});\n''')
+          Path('src/app/admin/imports/readiness/actions-routing.test.ts').write_text('''import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+
+describe("P09 UI private publish routing", () => {
+  it("uses persisted Reservation authority before transient runtime-context gates", () => {
+    const source = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
+    const publishBranch = source.indexOf('if (operation === "private_publish")');
+    const runtimeReader = source.indexOf("const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()");
+
+    expect(publishBranch).toBeGreaterThan(-1);
+    expect(runtimeReader).toBeGreaterThan(-1);
+    expect(publishBranch).toBeLessThan(runtimeReader);
+    expect(source.match(/if \(operation === "private_publish"\)/g)).toHaveLength(1);
+    expect(source).toContain("operationFailureBlockers = published?.blocker");
+    expect(source).toContain("...workflowBlockers");
+  });
+});
+''')
 
           Path('.github/workflows/p09-fix-private-publish-routing.yml').unlink()
           PY
