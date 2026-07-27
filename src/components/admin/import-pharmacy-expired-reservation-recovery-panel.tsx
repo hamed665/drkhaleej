@@ -85,6 +85,13 @@ function stageStatus(
   return stateMachine.stages.find((stage) => stage.id === stageId)?.status;
 }
 
+function stageDetail(
+  stateMachine: PharmacyAdminStateMachineSnapshot,
+  stageId: PharmacyAdminStateMachineStageId,
+) {
+  return stateMachine.stages.find((stage) => stage.id === stageId)?.detail;
+}
+
 function nextPhase(operation: RecoveryOperation): RecoveryPhase {
   if (operation === "dry_run") return "review";
   if (operation === "review") return "reserve_private_publish";
@@ -100,14 +107,12 @@ function phaseFromPersistedState(
   if (stageStatus(stateMachine, "rollback") === "available") return "rollback";
   if (stageStatus(stateMachine, "private_publish") === "available") return "private_publish";
 
-  const liveExpiry = stateMachine.nextExpiryAt
-    ? Date.parse(stateMachine.nextExpiryAt) > Date.now()
-    : false;
+  const authorizationIssued = stageDetail(stateMachine, "authorization_ready") === "Authorization is issued.";
   if (
     stageStatus(stateMachine, "reservation") === "expired" &&
     stageStatus(stateMachine, "exact_review") === "complete" &&
     stageStatus(stateMachine, "authorization_ready") === "complete" &&
-    liveExpiry
+    authorizationIssued
   ) return "reserve_private_publish";
 
   if (
