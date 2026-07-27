@@ -32,7 +32,7 @@ jobs:
               and operation = 'review'
             order by created_at desc
             limit 1
-          ), authorization as (
+          ), auth_row as (
             select a.*
             from public.import_pharmacy_publish_authorizations a
             join latest_review r on r.id = a.review_state_id
@@ -40,7 +40,7 @@ jobs:
           ), reservation as (
             select i.*
             from public.import_publish_idempotency_records i
-            join authorization a on a.consumed_by_reservation_id = i.id
+            join auth_row a on a.consumed_by_reservation_id = i.id
             limit 1
           ), snapshot as (
             select s.*
@@ -50,7 +50,7 @@ jobs:
           )
           select json_build_object(
             'review_present', exists(select 1 from latest_review),
-            'authorization_consumed', coalesce((select status = 'consumed' from authorization), false),
+            'authorization_consumed', coalesce((select status = 'consumed' from auth_row), false),
             'reservation_reserved', coalesce((select status = 'reserved' from reservation), false),
             'reservation_live', coalesce((select expires_at > now() from reservation), false),
             'review_reservation_text_equal', coalesce((select lr.expected_entity_version = r.expected_version from latest_review lr cross join reservation r), false),
