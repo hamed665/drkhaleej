@@ -18,8 +18,6 @@ export const PHARMACY_ADMIN_DIFF_FIELDS = [
   ...PHARMACY_CANONICAL_MUTATION_REVIEW_FIELDS,
 ] as const;
 
-export const PHARMACY_EXPIRED_RESERVATION_RECOVERY_MARKER = "expired_reservation_recovery" as const;
-
 export type PharmacyAdminDiffField = (typeof PHARMACY_ADMIN_DIFF_FIELDS)[number];
 export type PharmacyAdminBoundedValue = string | boolean | null;
 
@@ -89,11 +87,8 @@ export function buildPharmacyAdminBoundedReadState(
     if (reviewedAt < createdAt || reviewedAt > expiresAt) throw new Error("reviewed_at_out_of_range");
   }
 
-  const blockerCodes = [...new Set((input.blockerCodes ?? []).map((value) => value.trim()).filter(Boolean))]
-    .sort()
-    .slice(0, 20);
-  const recoveryOperationNonce = blockerCodes.includes(PHARMACY_EXPIRED_RESERVATION_RECOVERY_MARKER)
-    ? input.createdAt
+  const recoveryOperationNonce = input.operation === "review" && input.reviewedAt && input.reviewedAt !== input.createdAt
+    ? input.reviewedAt
     : null;
   const identity = buildPharmacyStableOperationIdentity({
     actorId: input.actorId,
@@ -109,6 +104,9 @@ export function buildPharmacyAdminBoundedReadState(
     const after = input.proposed[field];
     return Object.is(before, after) ? [] : [{ field, before, after }];
   });
+  const blockerCodes = [...new Set((input.blockerCodes ?? []).map((value) => value.trim()).filter(Boolean))]
+    .sort()
+    .slice(0, 20);
 
   return {
     schemaVersion: "pharmacy_admin_read_state_v3",
