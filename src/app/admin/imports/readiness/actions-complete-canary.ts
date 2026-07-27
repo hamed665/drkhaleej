@@ -129,7 +129,7 @@ export async function runPharmacyCompleteCanaryActionState(
     ? await stateReader({ actorId: admin.id, entityId, now: new Date().toISOString() })
     : null;
 
-  if (!currentState) {
+  if (!stateReader || !currentState) {
     return blockedResult({
       blocker: "complete_canary_state_readback_unavailable",
       stateMachine: previousState.stateMachine,
