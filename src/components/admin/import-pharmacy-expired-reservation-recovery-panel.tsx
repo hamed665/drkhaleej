@@ -3,8 +3,8 @@
 import { useActionState } from "react";
 
 import {
-  runExpiredReservationRecoveryActionState,
-} from "@/app/admin/imports/readiness/actions-expired-reservation-recovery";
+  runExpiredReservationRecoverySafeActionState,
+} from "@/app/admin/imports/readiness/actions-expired-reservation-recovery-safe";
 import type {
   PharmacyPrivateAdminActionStateResult,
 } from "@/app/admin/imports/readiness/actions";
@@ -168,7 +168,7 @@ function ExpiredReservationRecoveryWorkflow({
   initialStateMachine: PharmacyAdminStateMachineSnapshot;
 }) {
   const [result, formAction, pending] = useActionState(
-    runExpiredReservationRecoveryActionState,
+    runExpiredReservationRecoverySafeActionState,
     initialActionState(initialStateMachine),
   );
   const stateMachine = result.stateMachine ?? initialStateMachine;
@@ -216,7 +216,11 @@ function ExpiredReservationRecoveryWorkflow({
           </button>
         </div>
       ) : definition ? (
-        <form action={formAction} className="mt-5 rounded-2xl border border-amber-200 bg-white p-5">
+        <form
+          key={`${definition.operation}:${stateMachine.revision}`}
+          action={formAction}
+          className="mt-5 rounded-2xl border border-amber-200 bg-white p-5"
+        >
           <input type="hidden" name="operation" value={definition.operation} />
           <input type="hidden" name="entityId" value={entityId ?? ""} />
           <input type="hidden" name="stateRevision" value={stateMachine.revision} />
