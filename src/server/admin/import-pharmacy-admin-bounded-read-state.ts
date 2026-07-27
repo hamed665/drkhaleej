@@ -87,7 +87,7 @@ export function buildPharmacyAdminBoundedReadState(
     : null;
   if (
     reviewedAt &&
-    (reviewedAt.timestamp < createdAt.timestamp || reviewedAt.timestamp > expiresAt.timestamp)
+    (reviewedAt.timestamp < createdAt.timestamp || reviewedAt.timestamp >= expiresAt.timestamp)
   ) {
     throw new Error("reviewed_at_out_of_range");
   }
