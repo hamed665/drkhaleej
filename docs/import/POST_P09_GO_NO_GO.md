@@ -51,6 +51,8 @@ Dry Run
 → Bounded Audit History
 ```
 
+The operator may complete the chain with the individual controls or the one-click full-cycle control. The one-click path still requires a literal authenticated browser click and one exact entity-bound confirmation. It reads the persisted stage before every operation, invokes each remaining operation at most once, requires exact readback before advancing, and stops immediately on any mismatch. It is not unattended execution and it does not automatically retry Reservation, private mutation or rollback.
+
 The Vercel Preview deployment must already be fail-closed configured with exactly one allowed actor, exactly one fixed Pharmacy entity, the Preview-only activation flag and matching approval-token values. The Preview password must remain private and must not be committed, logged, placed in PR text or included in workflow artifacts. No raw actor ID, entity ID, approval token or authentication material belongs in this document, PR text, browser-visible evidence or workflow artifacts.
 
 ## GO requirements
@@ -60,7 +62,7 @@ The Vercel Preview deployment must already be fail-closed configured with exactl
 - authenticated Preview Admin session completed;
 - every visible stage matched persisted readback;
 - no stale-tab or double-submit bypass;
-- no automatic mutation retry;
+- no automatic mutation retry or repeated operation inside the one-click run;
 - no orphan, duplicate, audit gap or unfinished execution;
 - exact recovery remained verified;
 - public, index, sitemap and route exposure remained zero;
