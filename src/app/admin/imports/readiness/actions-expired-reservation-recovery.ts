@@ -3,6 +3,7 @@
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import {
   buildPharmacyAdminBoundedReadState,
+  isPharmacyAdminBoundedReadStateFresh,
   type PharmacyAdminBoundedValue,
   type PharmacyAdminDiffField,
 } from "@/server/admin/import-pharmacy-admin-bounded-read-state";
@@ -251,11 +252,26 @@ async function runExpiredReservationRecoveryReview(
     current: records.current,
     proposed: records.proposed,
   });
-  const readback = persisted
-    ? await store.readLatestFresh({ actorId: admin.id, entityId, operation: "review", now: createdAt })
-    : null;
-  if (!persisted || !readback || readback.operationAttemptId !== reviewState.operationAttemptId) {
-    return lockedResult({ blocker: "recovery_review_readback_failed", stateMachine: beforeState });
+  if (!persisted) {
+    return lockedResult({ blocker: "recovery_review_persist_failed", stateMachine: beforeState });
+  }
+
+  const readback = await store.readByOperationAttemptId({
+    actorId: admin.id,
+    entityId,
+    operation: "review",
+    operationAttemptId: reviewState.operationAttemptId,
+  });
+  if (!readback) {
+    return lockedResult({ blocker: "recovery_review_exact_readback_failed", stateMachine: beforeState });
+  }
+  if (
+    readback.operationAttemptId !== reviewState.operationAttemptId ||
+    readback.idempotencyKey !== reviewState.idempotencyKey ||
+    readback.requestHash !== reviewState.requestHash ||
+    !isPharmacyAdminBoundedReadStateFresh(readback, createdAt)
+  ) {
+    return lockedResult({ blocker: "recovery_review_identity_mismatch", stateMachine: beforeState });
   }
 
   const capability = resolvePharmacyPreviewPublishCapability({
