@@ -17,7 +17,9 @@ describe("one-click Preview canary static contract", () => {
     expect(source).toContain("executedOperations.has(plan.operation)");
     expect(source).toContain('blocker: "complete_canary_no_progress"');
     expect(source).toContain("readPharmacyCompleteCanaryOperationReadback");
-    expect(source).toContain("completedWithDeferredStateReadback");
+    expect(source).toContain("requiresDeferredStateReadback");
+    expect(source).toContain('blocker === "state_readback_unverified"');
+    expect(source).not.toContain('result.workflow?.status === "completed"');
     expect(source).toContain('blocker: "complete_canary_post_step_readback_unverified"');
     expect(source).toContain("runExpiredReservationRecoverySafeActionState");
     expect(source).toContain("runPharmacyPrivateAdminActionState");
