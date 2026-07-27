@@ -35,6 +35,10 @@ const completePlan = readFileSync(
   path.join(repoRoot, "src/server/admin/import-pharmacy-complete-canary-plan.ts"),
   "utf8",
 );
+const completeReadback = readFileSync(
+  path.join(repoRoot, "src/server/admin/import-pharmacy-complete-canary-readback.ts"),
+  "utf8",
+);
 const stateModel = readFileSync(
   path.join(repoRoot, "src/server/admin/import-pharmacy-admin-state-machine.ts"),
   "utf8",
@@ -107,13 +111,25 @@ for (const [pattern, message] of [
   [/automaticMutationRetryAllowed !== false/, "one-click action must reject any state that permits automatic retries"],
   [/executedOperations\.has\(plan\.operation\)/, "one-click action must never execute an operation twice"],
   [/complete_canary_no_progress/, "one-click action must stop when the persisted state does not advance"],
-  [/complete_canary_post_step_readback_unavailable/, "one-click action must stop when post-step readback is unavailable"],
+  [/complete_canary_post_step_readback_unverified/, "one-click action must stop when bounded post-step readback remains unverified"],
+  [/completedWithDeferredStateReadback/, "one-click action must distinguish completed writes from delayed aggregate readback"],
+  [/readPharmacyCompleteCanaryOperationReadback/, "one-click action must use bounded readback-only convergence"],
   [/runExpiredReservationRecoverySafeActionState/, "one-click action must reuse the fail-closed recovery authority"],
   [/runPharmacyPrivateAdminActionState/, "one-click action must reuse the existing Admin operation authority"],
   [/RESERVE PRIVATE PUBLISH/, "one-click action must retain exact Reservation confirmation"],
   [/EXECUTE PRIVATE PUBLISH/, "one-click action must retain exact mutation confirmation"],
   [/ROLLBACK PRIVATE PUBLISH/, "one-click action must retain exact rollback confirmation"],
 ]) requirePattern(completeAction, pattern, message);
+
+for (const [pattern, message] of [
+  [/DEFAULT_READBACK_ATTEMPTS = 6/, "readback convergence must use a fixed default attempt bound"],
+  [/MAX_READBACK_ATTEMPTS = 8/, "readback convergence must cap operator-supplied attempt counts"],
+  [/setTimeout as wait/, "readback convergence may delay only between persisted reads"],
+  [/await input\.reader/, "readback convergence must call only the state reader"],
+  [/isPharmacyCompleteCanaryOperationReadbackVerified/, "readback convergence must require the operation-specific persisted stage"],
+  [/return "publish_verified"/, "private publish readback must require the verified publish stage"],
+  [/return "exact_recovery_verified"/, "rollback readback must require exact recovery"],
+]) requirePattern(completeReadback, pattern, message);
 
 for (const [pattern, message] of [
   [/resolvePharmacyExpiredReservationRecoveryOperation/, "one-click planner must reuse the recovery phase authority"],
@@ -161,6 +177,7 @@ for (const [source, pattern, message] of [
   [actions, /setTimeout|setInterval/, "Server Action must not automatically retry writes"],
   [completeAction, /setTimeout|setInterval/, "one-click Server Action must not schedule or retry writes"],
   [completeAction, /while\s*\(/, "one-click Server Action must use a fixed bounded operation loop"],
+  [completeReadback, /runPharmacyPrivateAdminActionState|runPharmacyPrivateAdminPublishOperation|runPharmacyPrivateAdminRollbackOperation|runPharmacyAdminReservationOperation/, "readback convergence must never invoke a write authority"],
   [stateModel, /rawExpected|rawActual|expectedValue|actualValue/, "state model must not expose raw mismatch values"],
 ]) {
   if (pattern.test(source)) {
