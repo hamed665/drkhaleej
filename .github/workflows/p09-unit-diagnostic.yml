@@ -1,0 +1,41 @@
+name: P09 Unit Diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/app/admin/imports/readiness/actions.ts'
+      - 'src/app/admin/imports/readiness/actions-private-publish-routing.test.ts'
+      - '.github/workflows/p09-unit-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --reporter=silent
+      - name: Capture unit-test result
+        shell: bash
+        run: |
+          set +e
+          pnpm test > p09-unit-output.txt 2>&1
+          code=$?
+          printf '\nEXIT_CODE=%s\n' "$code" >> p09-unit-output.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p09-unit-diagnostic-${{ github.event.pull_request.head.sha }}
+          path: p09-unit-output.txt
+          if-no-files-found: error
+          retention-days: 1
