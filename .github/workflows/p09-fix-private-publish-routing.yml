@@ -1,0 +1,157 @@
+name: P09 Fix Private Publish Routing
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p09-fix-private-publish-routing.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Route private publish before transient runtime-context gates
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/app/admin/imports/readiness/actions.ts')
+          text = path.read_text()
+
+          old = '''  let reservationReplayed = false;
+          let rollbackReplayed = false;
+          '''
+          new = '''  let reservationReplayed = false;
+          let rollbackReplayed = false;
+          let operationFailureBlockers: string[] = [];
+          '''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old_block = '''      if (operation === "private_publish") {
+                const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+                  allowedActorIds,
+                  allowedEntityIds,
+                });
+                const published = dependencies
+                  ? await runPharmacyPrivateAdminPublishOperation({
+                      environment: process.env.VERCEL_ENV,
+                      actorId,
+                      entityId: actionEntityId,
+                      allowedActorIds,
+                      allowedEntityIds,
+                      confirmation: confirmation ?? "",
+                      now: new Date().toISOString(),
+                      dependencies,
+                    })
+                  : null;
+                return {
+                  operation,
+                  status: published?.published ? "completed" : "failed",
+                  entityId: actionEntityId,
+                  blockers: published?.blocker ? ["readiness_blocked"] : [],
+                  publicVisibility: "private",
+                  indexEligible: false,
+                  sitemapEligible: false,
+                  routeEnabled: false,
+                  executionReference: published?.executionReference ?? null,
+                };
+              }
+
+          '''
+          assert text.count(old_block) == 1
+          text = text.replace(old_block, '', 1)
+
+          anchor = '''      const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();
+          '''
+          publish_block = '''      if (operation === "private_publish") {
+                const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+                  allowedActorIds,
+                  allowedEntityIds,
+                });
+                const published = dependencies
+                  ? await runPharmacyPrivateAdminPublishOperation({
+                      environment: process.env.VERCEL_ENV,
+                      actorId,
+                      entityId: actionEntityId,
+                      allowedActorIds,
+                      allowedEntityIds,
+                      confirmation: confirmation ?? "",
+                      now: new Date().toISOString(),
+                      dependencies,
+                    })
+                  : null;
+                operationFailureBlockers = published?.blocker
+                  ? [published.blocker]
+                  : dependencies
+                    ? []
+                    : ["publish_dependencies_unavailable"];
+                return {
+                  operation,
+                  status: published?.published ? "completed" : "failed",
+                  entityId: actionEntityId,
+                  blockers: [],
+                  publicVisibility: "private",
+                  indexEligible: false,
+                  sitemapEligible: false,
+                  routeEnabled: false,
+                  executionReference: published?.executionReference ?? null,
+                };
+              }
+
+          '''
+          assert anchor in text
+          text = text.replace(anchor, publish_block + anchor, 1)
+
+          old = '''  const actionResult = await action({ actorId: admin.id, formData });
+            const workflow = "workflow" in actionResult ? actionResult.workflow : null;
+            const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
+          '''
+          new = '''  const actionResult = await action({ actorId: admin.id, formData });
+            const workflow = "workflow" in actionResult ? actionResult.workflow : null;
+            const actionBlockers = actionResult.ok ? [] : actionResult.blockers;
+            const workflowBlockers = workflow?.blockers ?? [];
+          '''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          old = '''    blockers: succeeded ? [] : [...actionBlockers, ...(readbackVerified ? [] : ["state_readback_unverified"])],
+          '''
+          new = '''    blockers: succeeded
+              ? []
+              : [...new Set([
+                  ...actionBlockers,
+                  ...workflowBlockers,
+                  ...operationFailureBlockers,
+                  ...(readbackVerified ? [] : ["state_readback_unverified"]),
+                ])],
+          '''
+          assert old in text
+          text = text.replace(old, new, 1)
+
+          path.write_text(text)
+
+          test = Path('src/app/admin/imports/readiness/actions-routing.test.ts')
+          test.write_text('''import { readFileSync } from "node:fs";\nimport { describe, expect, it } from "vitest";\n\ndescribe("P09 UI private publish routing", () => {\n  it("uses persisted Reservation authority before transient runtime-context gates", () => {\n    const source = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");\n    const publishBranch = source.indexOf('if (operation === "private_publish")');\n    const runtimeReader = source.indexOf("const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment()");\n\n    expect(publishBranch).toBeGreaterThan(-1);\n    expect(runtimeReader).toBeGreaterThan(-1);\n    expect(publishBranch).toBeLessThan(runtimeReader);\n    expect(source.match(/if \(operation === "private_publish"\)/g)).toHaveLength(1);\n    expect(source).toContain("operationFailureBlockers = published?.blocker");\n    expect(source).toContain("...workflowBlockers");\n  });\n});\n''')
+
+          Path('.github/workflows/p09-fix-private-publish-routing.yml').unlink()
+          PY
+
+      - name: Commit routing fix
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/app/admin/imports/readiness/actions.ts src/app/admin/imports/readiness/actions-routing.test.ts .github/workflows/p09-fix-private-publish-routing.yml
+          git commit -m "fix(p09): use Reservation as UI publish authority"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
