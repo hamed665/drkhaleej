@@ -71,16 +71,18 @@ describe("expired Reservation recovery phase gate", () => {
     }))).toBe("dry_run");
   });
 
-  it("advances to review only after fresh dry-run readback", () => {
-    expect(resolvePharmacyExpiredReservationRecoveryOperation(snapshot({
-      statuses: {
-        ...expiredBoundary,
-        dry_run: "complete",
-        exact_review: "expired",
-        authorization_ready: "complete",
-      },
-      details: { authorization_ready: "Authorization is consumed." },
-    }))).toBe("review");
+  it("advances to review after fresh dry-run readback even when the old Review badge is complete", () => {
+    for (const exactReview of ["expired", "complete"] as const) {
+      expect(resolvePharmacyExpiredReservationRecoveryOperation(snapshot({
+        statuses: {
+          ...expiredBoundary,
+          dry_run: "complete",
+          exact_review: exactReview,
+          authorization_ready: "complete",
+        },
+        details: { authorization_ready: "Authorization is consumed." },
+      }))).toBe("review");
+    }
   });
 
   it("advances to a fresh Reservation only for a newly issued authorization", () => {
