@@ -104,7 +104,9 @@ async function runEnvironmentBackedPrivatePublish(input: {
     operation: "private_publish",
     status: published?.published ? "completed" : "failed",
     entityId: input.entityId,
-    blockers: published?.blocker ? [published.blocker] : ["publish_dependencies_unavailable"],
+    blockers: published
+      ? published.blocker ? [published.blocker] : []
+      : ["publish_dependencies_unavailable"],
     publicVisibility: "private",
     indexEligible: false,
     sitemapEligible: false,
