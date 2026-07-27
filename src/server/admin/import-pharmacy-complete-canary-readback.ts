@@ -1,5 +1,3 @@
-import "server-only";
-
 import { setTimeout as wait } from "node:timers/promises";
 
 import type {
