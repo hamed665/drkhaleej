@@ -43,6 +43,8 @@ The Preview Migration Sync workflow serializes migration verification, P05, P06,
 
 The exact-SHA hosted runner must prove the same persisted authorities used by the protected Admin workflow and the static contract must prove that the page, password-auth form, panel and Server Action expose no bypass. This does not count as an authenticated browser session. Until one human operator completes the literal Vercel Preview Admin path, evidence must retain `browserSessionExecuted=false` and the Post-P09 decision must remain `NO-GO_PENDING_LITERAL_UI_SESSION`.
 
+The authenticated operator may use the individual bounded controls or the operator-initiated one-click full-cycle control. The one-click control is not unattended execution and is not an automatic retry mechanism. It requires one exact entity-bound confirmation, resumes only from persisted server truth, invokes each remaining operation at most once, performs fresh readback after every operation, and stops immediately on any revision, receipt, progress, persistence or integrity mismatch. Manual controls and fail-closed expired-Reservation recovery remain available as fallback surfaces.
+
 The Preview login must use Supabase Password Auth for the existing registered user. It must not depend on email OTP or Magic Link delivery. The resulting session remains subject to the existing active `is_platform_admin=true` profile check and all P09 actor/entity allowlist gates.
 
 ## Closed boundaries
@@ -52,6 +54,7 @@ The Preview login must use Supabase Password Auth for the existing registered us
 - no new database authority, migration, RLS policy or RPC;
 - no parallel authentication authority outside Supabase Auth;
 - no automatic retry of Reservation, private mutation or rollback;
+- no unattended, scheduled or background canary execution;
 - no second Reservation;
 - no direct browser-visible persistence identifiers;
 - no Registry, Agent, Content, Hospital, Doctor or Bulk work;
@@ -59,4 +62,4 @@ The Preview login must use Supabase Password Auth for the existing registered us
 
 ## Stop conditions
 
-Stop and record `NO-GO` on any unresolved UI-path bypass, orphan, duplicate, audit gap, unfinished execution, state mismatch, public/index/sitemap exposure, secret leakage, unrestricted payload leakage, exact-recovery mismatch, Production identity, or critical review finding.
+Stop and record `NO-GO` on any unresolved UI-path bypass, orphan, duplicate, audit gap, unfinished execution, state mismatch, repeated operation within one one-click run, missing post-step readback, public/index/sitemap exposure, secret leakage, unrestricted payload leakage, exact-recovery mismatch, Production identity, or critical review finding.
