@@ -12,9 +12,11 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 3
     env:
       DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}
+      PGCONNECT_TIMEOUT: '15'
+      PGOPTIONS: '-c statement_timeout=30000 -c lock_timeout=5000'
     steps:
       - name: Fail closed without Preview database
         shell: bash
@@ -23,7 +25,7 @@ jobs:
       - name: Read live Reservation invariants only
         shell: bash
         run: |
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -X -qAt <<'SQL'
+          timeout 60s psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -X -qAt <<'SQL'
           begin transaction read only;
           with latest_review as (
             select *
