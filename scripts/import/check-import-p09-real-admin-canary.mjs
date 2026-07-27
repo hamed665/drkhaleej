@@ -12,6 +12,7 @@ const files = {
   action: "src/app/admin/imports/readiness/actions.ts",
   completeAction: "src/app/admin/imports/readiness/actions-complete-canary.ts",
   completePlan: "src/server/admin/import-pharmacy-complete-canary-plan.ts",
+  completeReadback: "src/server/admin/import-pharmacy-complete-canary-readback.ts",
   completePanel: "src/components/admin/import-pharmacy-complete-canary-panel.tsx",
   recoveryAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery.ts",
   recoverySafeAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery-safe.ts",
@@ -126,7 +127,9 @@ for (const token of [
   "automaticMutationRetryAllowed !== false",
   "executedOperations.has(plan.operation)",
   "complete_canary_no_progress",
-  "complete_canary_post_step_readback_unavailable",
+  "complete_canary_post_step_readback_unverified",
+  "completedWithDeferredStateReadback",
+  "readPharmacyCompleteCanaryOperationReadback",
   "runExpiredReservationRecoverySafeActionState",
   "runPharmacyPrivateAdminActionState",
 ]) {
@@ -134,6 +137,27 @@ for (const token of [
 }
 for (const forbidden of [/while\s*\(/, /setTimeout|setInterval/]) {
   assert(!forbidden.test(source.completeAction), `P09 one-click action contains forbidden retry/scheduling pattern ${forbidden}.`);
+}
+
+for (const token of [
+  "DEFAULT_READBACK_ATTEMPTS = 6",
+  "MAX_READBACK_ATTEMPTS = 8",
+  "setTimeout as wait",
+  "await input.reader",
+  "isPharmacyCompleteCanaryOperationReadbackVerified",
+  'operation === "private_publish"',
+  'return "publish_verified"',
+  'return "exact_recovery_verified"',
+]) {
+  assert(source.completeReadback.includes(token), `P09 readback-only convergence is missing ${token}.`);
+}
+for (const forbidden of [
+  "runPharmacyPrivateAdminActionState",
+  "runPharmacyPrivateAdminPublishOperation",
+  "runPharmacyPrivateAdminRollbackOperation",
+  "runPharmacyAdminReservationOperation",
+]) {
+  assert(!source.completeReadback.includes(forbidden), `P09 readback convergence must not invoke write path ${forbidden}.`);
 }
 
 for (const token of [
