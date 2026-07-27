@@ -15,7 +15,11 @@ export type PharmacyPrivateAdminWorkflowBlocker =
   | "preview_required"
   | "readiness_blocked"
   | "review_required"
-  | "audit_unavailable";
+  | "audit_unavailable"
+  | "publish_boundary_blocked"
+  | "publish_dependencies_unavailable"
+  | "verified_reservation_unavailable"
+  | "publish_execution_failed";
 
 export type PharmacyPrivateAdminRequest = {
   operation: PharmacyPrivateAdminOperation;
