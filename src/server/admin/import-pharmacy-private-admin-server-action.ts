@@ -6,6 +6,7 @@ import {
 } from "./import-pharmacy-private-admin-publish-operation";
 import type {
   PharmacyPrivateAdminOperation,
+  PharmacyPrivateAdminWorkflowBlocker,
   PharmacyPrivateAdminWorkflowResult,
 } from "./import-pharmacy-private-admin-workflow";
 
@@ -21,7 +22,11 @@ export type PharmacyPrivateAdminServerActionBlocker =
 export type PharmacyPrivateAdminServerActionResult =
   | { ok: true; workflow: PharmacyPrivateAdminWorkflowResult }
   | { ok: false; blockers: readonly PharmacyPrivateAdminServerActionBlocker[] }
-  | { ok: false; blockers: readonly []; workflow: PharmacyPrivateAdminWorkflowResult };
+  | {
+      ok: false;
+      blockers: readonly PharmacyPrivateAdminWorkflowBlocker[];
+      workflow: PharmacyPrivateAdminWorkflowResult;
+    };
 
 export type PharmacyPrivateAdminServerActionExecutor = (input: {
   operation: PharmacyPrivateAdminOperation;
@@ -152,7 +157,9 @@ export function createPharmacyPrivateAdminServerAction(
         })
       : await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
 
-    if (workflow.status !== "completed") return { ok: false, blockers: [], workflow };
+    if (workflow.status !== "completed") {
+      return { ok: false, blockers: workflow.blockers, workflow };
+    }
     return { ok: true, workflow };
   };
 }
