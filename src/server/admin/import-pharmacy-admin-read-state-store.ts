@@ -44,9 +44,14 @@ type PharmacyAdminReadStateIdentity = {
   operation: "dry_run" | "review";
 };
 
+type PharmacyAdminReadStateAttemptIdentity = PharmacyAdminReadStateIdentity & {
+  operationAttemptId: string;
+};
+
 export type PharmacyAdminReadStateStore = {
   persist(input: PersistPharmacyAdminReadStateInput): Promise<{ id: string; state: PharmacyAdminBoundedReadState } | null>;
   readLatest(input: PharmacyAdminReadStateIdentity): Promise<PharmacyAdminBoundedReadState | null>;
+  readByOperationAttemptId(input: PharmacyAdminReadStateAttemptIdentity): Promise<PharmacyAdminBoundedReadState | null>;
   readLatestFresh(input: PharmacyAdminReadStateIdentity & { now: string }): Promise<PharmacyAdminBoundedReadState | null>;
 };
 
@@ -141,6 +146,24 @@ export function createPharmacyAdminReadStateStore(
     return readRow(response.data);
   }
 
+  async function readByOperationAttemptId(
+    input: PharmacyAdminReadStateAttemptIdentity,
+  ): Promise<PharmacyAdminBoundedReadState | null> {
+    const response = await client
+      .from("import_pharmacy_admin_read_states")
+      .select(columns)
+      .eq("actor_profile_id", input.actorId)
+      .eq("entity_id", input.entityId)
+      .eq("operation", input.operation)
+      .eq("operation_attempt_id", input.operationAttemptId)
+      .limit(1)
+      .maybeSingle();
+
+    if (response.error || !response.data) return null;
+    const state = readRow(response.data);
+    return state?.operationAttemptId === input.operationAttemptId ? state : null;
+  }
+
   return {
     async persist(input) {
       if (!isPharmacyAdminBoundedReadStateFresh(input.state, input.state.createdAt)) return null;
@@ -179,6 +202,7 @@ export function createPharmacyAdminReadStateStore(
     },
 
     readLatest,
+    readByOperationAttemptId,
 
     async readLatestFresh(input) {
       const state = await readLatest(input);
