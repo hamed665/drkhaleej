@@ -1,0 +1,66 @@
+name: P09 Live Reservation Diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p09-live-reservation-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.P03_PREVIEW_DATABASE_URL }}
+    steps:
+      - name: Fail closed without Preview database
+        shell: bash
+        run: |
+          test -n "$DATABASE_URL" || { echo 'Preview database secret unavailable'; exit 1; }
+      - name: Read live Reservation invariants only
+        shell: bash
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -X -qAt <<'SQL'
+          begin transaction read only;
+          with latest_review as (
+            select *
+            from public.import_pharmacy_admin_read_states
+            where entity_id = '4410ded2-57c5-4120-9e48-ffecc62b8685'
+              and operation = 'review'
+            order by created_at desc
+            limit 1
+          ), authorization as (
+            select a.*
+            from public.import_pharmacy_publish_authorizations a
+            join latest_review r on r.id = a.review_state_id
+            limit 1
+          ), reservation as (
+            select i.*
+            from public.import_publish_idempotency_records i
+            join authorization a on a.consumed_by_reservation_id = i.id
+            limit 1
+          ), snapshot as (
+            select s.*
+            from public.import_publish_rollback_snapshots s
+            join reservation r on r.id = s.idempotency_record_id
+            limit 1
+          )
+          select json_build_object(
+            'review_present', exists(select 1 from latest_review),
+            'authorization_consumed', coalesce((select status = 'consumed' from authorization), false),
+            'reservation_reserved', coalesce((select status = 'reserved' from reservation), false),
+            'reservation_live', coalesce((select expires_at > now() from reservation), false),
+            'review_reservation_text_equal', coalesce((select lr.expected_entity_version = r.expected_version from latest_review lr cross join reservation r), false),
+            'review_reservation_time_equal', coalesce((select lr.expected_entity_version::timestamptz = r.expected_version::timestamptz from latest_review lr cross join reservation r), false),
+            'review_snapshot_text_equal', coalesce((select lr.expected_entity_version = s.expected_version from latest_review lr cross join snapshot s), false),
+            'review_snapshot_time_equal', coalesce((select lr.expected_entity_version::timestamptz = s.expected_version::timestamptz from latest_review lr cross join snapshot s), false),
+            'review_center_text_equal', coalesce((select lr.expected_entity_version = c.updated_at::text from latest_review lr join public.centers c on c.id = lr.entity_id), false),
+            'review_center_time_equal', coalesce((select lr.expected_entity_version::timestamptz = c.updated_at from latest_review lr join public.centers c on c.id = lr.entity_id), false),
+            'mutation_started_count', (select count(*) from public.import_publish_audit_events e join reservation r on r.id = e.idempotency_record_id where e.event_type = 'mutation_started'),
+            'publish_succeeded_count', (select count(*) from public.import_publish_audit_events e join reservation r on r.id = e.idempotency_record_id where e.event_type = 'publish_succeeded')
+          );
+          rollback;
+          SQL
