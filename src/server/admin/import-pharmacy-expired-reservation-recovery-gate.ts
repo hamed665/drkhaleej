@@ -46,10 +46,11 @@ export function resolvePharmacyExpiredReservationRecoveryOperation(
     authorizationIssued
   ) return "reserve_private_publish";
 
-  if (
-    stageStatus(state, "dry_run") === "complete" &&
-    stageStatus(state, "exact_review") !== "complete"
-  ) return "review";
+  // A fresh dry-run is the persisted boundary for issuing a new recovery Review.
+  // The previous Review may still render as complete while its authorization is
+  // consumed, so authorization state, not the old Review badge, decides whether
+  // the next operation is Review or Reservation.
+  if (stageStatus(state, "dry_run") === "complete") return "review";
 
   return "dry_run";
 }
