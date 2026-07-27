@@ -11,6 +11,8 @@ const files = {
   loginForm: "src/components/admin/admin-login-form.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
   recoveryAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery.ts",
+  recoverySafeAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery-safe.ts",
+  recoveryGate: "src/server/admin/import-pharmacy-expired-reservation-recovery-gate.ts",
   recoveryPanel: "src/components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx",
   recoveryMigration: "supabase/migrations/0086_import_pharmacy_recovery_review_attempts.sql",
   readStateStore: "src/server/admin/import-pharmacy-admin-read-state-store.ts",
@@ -118,9 +120,28 @@ for (const token of [
   assert(source.recoveryAction.includes(token), `P09 recovery action is missing ${token}.`);
 }
 for (const token of [
+  "runExpiredReservationRecoverySafeActionState",
+  "resolvePharmacyExpiredReservationRecoveryOperation",
+  'formData.set("stateRevision", currentState.revision)',
+  "recovery_phase_changed",
+  "runExpiredReservationRecoveryActionState(previousState, formData)",
+]) {
+  assert(source.recoverySafeAction.includes(token), `P09 safe recovery action is missing ${token}.`);
+}
+for (const token of [
+  "resolvePharmacyExpiredReservationRecoveryOperation",
+  'stageStatus(state, "rollback") === "available"',
+  'stageStatus(state, "private_publish") === "available"',
+  'stageStatus(state, "reservation") === "expired"',
+  'stageDetail(state, "authorization_ready") === "Authorization is issued."',
+]) {
+  assert(source.recoveryGate.includes(token), `P09 recovery phase gate is missing ${token}.`);
+}
+for (const token of [
   "Fail-closed recovery",
   "Expired Reservation before mutation",
-  "runExpiredReservationRecoveryActionState",
+  "runExpiredReservationRecoverySafeActionState",
+  'key={`${definition.operation}:${stateMachine.revision}`}',
   "readOnly",
   "Waiting for persisted readback",
 ]) {
