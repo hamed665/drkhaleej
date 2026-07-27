@@ -19,6 +19,7 @@ on:
       - 'scripts/import/run-p09-recovery-review-attempt-proof.mjs'
       - 'scripts/import/run-p09-literal-ui-state-diagnostic.mjs'
       - 'scripts/import/run-p09-postgrest-version-diagnostic.mjs'
+      - 'scripts/import/run-p09-literal-publish-transaction-diagnostic.mjs'
       - 'scripts/import/check-import-p09-real-admin-canary.mjs'
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
@@ -82,6 +83,7 @@ env:
   P09_LITERAL_ENTITY_SHA256: 96c37e7cc021ea720993a05083da7a0fbf0ae0db0c1dfb37c34e02cc89a79187
   P09_LITERAL_DIAGNOSTIC_PATH: artifacts/p09/literal-ui-state-diagnostic.json
   P09_POSTGREST_VERSION_DIAGNOSTIC_PATH: artifacts/p09/postgrest-version-diagnostic.json
+  P09_LITERAL_PUBLISH_DIAGNOSTIC_PATH: artifacts/p09/literal-publish-transaction-diagnostic.json
 
 permissions:
   contents: read
@@ -167,6 +169,12 @@ jobs:
         run: |
           set -o pipefail
           node scripts/import/run-p09-postgrest-version-diagnostic.mjs 2>&1 | tee artifacts/p09/postgrest-version-diagnostic.log
+
+      - name: Diagnose literal publish RPC inside rollback transaction
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-publish-transaction-diagnostic.mjs 2>&1 | tee artifacts/p09/literal-publish-transaction-diagnostic.log
 
       - name: Prove fresh expired-Reservation recovery Review attempt
         shell: bash
