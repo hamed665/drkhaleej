@@ -1,0 +1,27 @@
+name: P09 Export Actions Source
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/p09-export-actions-source.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p09-actions-source-${{ github.event.pull_request.head.sha }}
+          path: src/app/admin/imports/readiness/actions.ts
+          if-no-files-found: error
+          retention-days: 1
