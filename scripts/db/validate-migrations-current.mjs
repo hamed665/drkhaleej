@@ -50,6 +50,7 @@ const migrationNames = {
   pharmacyAtomicRollbackAuthority: '0083_import_pharmacy_atomic_rollback_authority.sql',
   pharmacyRollbackDigestSchema: '0084_import_pharmacy_rollback_digest_schema.sql',
   pharmacyExpectedVersionTimestamp: '0085_import_pharmacy_expected_version_timestamp_equivalence.sql',
+  pharmacyRecoveryReviewAttempts: '0086_import_pharmacy_recovery_review_attempts.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -171,6 +172,22 @@ function validateReservationAuditSplit() {
   forbidPattern(content, /'execution_started'\s*,\s*'pending'\s*,\s*p_audit_schema_version/i, '0081 must not write the legacy reservation event.');
 }
 
+function validateRecoveryReviewAttempts() {
+  const content = readMigration(migrationNames.pharmacyRecoveryReviewAttempts);
+  for (const [pattern, message] of [
+    [/P09-B EXPIRED-RESERVATION-RECOVERY/i, '0086 phase marker is missing.'],
+    [/drop\s+index\s+if\s+exists\s+public\.import_pharmacy_admin_read_states_identity_idx/i, '0086 must remove the obsolete all-row read-state identity index.'],
+    [/create\s+unique\s+index\s+if\s+not\s+exists\s+import_pharmacy_admin_read_states_legacy_identity_idx/i, '0086 must preserve a legacy-only identity index.'],
+    [/where\s+operation_attempt_id\s+is\s+null/i, '0086 legacy identity index must exclude v3 recovery attempts.'],
+    [/operation_attempt_id\s+and\s+idempotency_key/i, '0086 must document the v3 stable identity authority.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\b(insert\s+into|update\s+public\.|delete\s+from|truncate\s+table)\b/i, '0086 must not mutate rows.'],
+    [/\bcreate\s+policy\b/i, '0086 must not create policies.'],
+    [/\bgrant\b/i, '0086 must not grant privileges.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -212,5 +229,6 @@ validateAtomicAuthorization();
 validateReadStateUpsert();
 validateReservationAuditSplit();
 runValidator(validators.pharmacyExpectedVersionTimestamp);
+validateRecoveryReviewAttempts();
 
-console.log('Current migration validation passed through 0085.');
+console.log('Current migration validation passed through 0086.');
