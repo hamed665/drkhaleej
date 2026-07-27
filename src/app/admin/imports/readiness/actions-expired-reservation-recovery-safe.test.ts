@@ -21,7 +21,7 @@ describe("expired Reservation recovery stale-revision guard", () => {
 
   it("forces a new browser form for every persisted operation revision", () => {
     const source = readFileSync(
-      new URL("../../../components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx", import.meta.url),
+      new URL("../../../../components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx", import.meta.url),
       "utf8",
     );
 
