@@ -22,6 +22,7 @@ on:
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
       - 'src/server/admin/import-pharmacy-real-rollback-canary*'
       - 'src/server/admin/import-pharmacy-admin-state-machine*'
+      - 'src/server/admin/import-pharmacy-expired-reservation-recovery*'
       - 'src/server/admin/import-pharmacy-private-admin-rollback-operation*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
