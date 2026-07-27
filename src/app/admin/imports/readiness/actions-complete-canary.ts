@@ -115,10 +115,11 @@ function buildOperationForm(
   return formData;
 }
 
-function completedWithDeferredStateReadback(
+function requiresDeferredStateReadback(
   result: PharmacyPrivateAdminActionStateResult,
 ): boolean {
-  return result.workflow?.status === "completed" &&
+  return !result.ok &&
+    result.stateMachine !== null &&
     result.blockers.length > 0 &&
     result.blockers.every((blocker) => blocker === "state_readback_unverified");
 }
@@ -208,7 +209,7 @@ export async function runPharmacyCompleteCanaryActionState(
     const result = plan.recovery
       ? await runExpiredReservationRecoverySafeActionState(delegateState(currentState), operationForm)
       : await runPharmacyPrivateAdminActionState(delegateState(currentState), operationForm);
-    const deferredStateReadback = completedWithDeferredStateReadback(result);
+    const deferredStateReadback = requiresDeferredStateReadback(result);
 
     if ((!result.ok && !deferredStateReadback) || !result.stateMachine) {
       return blockedResult({
