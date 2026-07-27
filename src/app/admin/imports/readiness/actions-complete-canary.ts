@@ -2,6 +2,9 @@
 
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
 import {
+  readPharmacyCompleteCanaryOperationReadback,
+} from "@/server/admin/import-pharmacy-complete-canary-readback";
+import {
   createPharmacyAdminStateMachineReaderFromEnvironment,
 } from "@/server/admin/import-pharmacy-admin-state-machine-readback";
 import type {
@@ -112,6 +115,14 @@ function buildOperationForm(
   return formData;
 }
 
+function completedWithDeferredStateReadback(
+  result: PharmacyPrivateAdminActionStateResult,
+): boolean {
+  return result.workflow?.status === "completed" &&
+    result.blockers.length > 0 &&
+    result.blockers.every((blocker) => blocker === "state_readback_unverified");
+}
+
 export async function runPharmacyCompleteCanaryActionState(
   previousState: PharmacyCompleteCanaryActionStateResult,
   formData: FormData,
@@ -192,12 +203,14 @@ export async function runPharmacyCompleteCanaryActionState(
     }
     executedOperations.add(plan.operation);
 
-    const operationForm = buildOperationForm(plan.operation, entityId, currentState.revision);
+    const beforeRevision = currentState.revision;
+    const operationForm = buildOperationForm(plan.operation, entityId, beforeRevision);
     const result = plan.recovery
       ? await runExpiredReservationRecoverySafeActionState(delegateState(currentState), operationForm)
       : await runPharmacyPrivateAdminActionState(delegateState(currentState), operationForm);
+    const deferredStateReadback = completedWithDeferredStateReadback(result);
 
-    if (!result.ok || !result.stateMachine) {
+    if ((!result.ok && !deferredStateReadback) || !result.stateMachine) {
       return blockedResult({
         blocker: `complete_canary_${plan.operation}_failed`,
         stateMachine: result.stateMachine ?? currentState,
@@ -206,9 +219,12 @@ export async function runPharmacyCompleteCanaryActionState(
       });
     }
     if (
-      !result.receipt ||
-      result.receipt.operation !== plan.operation ||
-      (result.receipt.outcome !== "fresh" && result.receipt.outcome !== "replayed")
+      result.ok &&
+      (
+        !result.receipt ||
+        result.receipt.operation !== plan.operation ||
+        (result.receipt.outcome !== "fresh" && result.receipt.outcome !== "replayed")
+      )
     ) {
       return blockedResult({
         blocker: "complete_canary_receipt_unverified",
@@ -217,31 +233,27 @@ export async function runPharmacyCompleteCanaryActionState(
       });
     }
 
-    steps.push({
-      operation: plan.operation,
-      outcome: result.receipt.outcome,
-      recordedAt: result.receipt.recordedAt,
-    });
-
-    const readback = await stateReader({
+    const readback = await readPharmacyCompleteCanaryOperationReadback({
+      reader: stateReader,
       actorId: admin.id,
       entityId,
-      now: new Date().toISOString(),
+      operation: plan.operation,
+      beforeRevision,
     });
     if (!readback) {
       return blockedResult({
-        blocker: "complete_canary_post_step_readback_unavailable",
+        blocker: "complete_canary_post_step_readback_unverified",
         stateMachine: result.stateMachine,
         steps,
+        extraBlockers: result.blockers,
       });
     }
-    if (readback.revision === currentState.revision && !isPharmacyCompleteCanaryFinished(readback)) {
-      return blockedResult({
-        blocker: "complete_canary_post_step_no_progress",
-        stateMachine: readback,
-        steps,
-      });
-    }
+
+    steps.push({
+      operation: plan.operation,
+      outcome: result.ok && result.receipt?.outcome === "replayed" ? "replayed" : "fresh",
+      recordedAt: readback.generatedAt,
+    });
 
     currentState = readback;
     if (isPharmacyCompleteCanaryFinished(currentState)) {
