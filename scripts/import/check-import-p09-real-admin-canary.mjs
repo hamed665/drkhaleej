@@ -10,6 +10,9 @@ const files = {
   loginPage: "src/app/admin/login/page.tsx",
   loginForm: "src/components/admin/admin-login-form.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
+  completeAction: "src/app/admin/imports/readiness/actions-complete-canary.ts",
+  completePlan: "src/server/admin/import-pharmacy-complete-canary-plan.ts",
+  completePanel: "src/components/admin/import-pharmacy-complete-canary-panel.tsx",
   recoveryAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery.ts",
   recoverySafeAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery-safe.ts",
   recoveryGate: "src/server/admin/import-pharmacy-expired-reservation-recovery-gate.ts",
@@ -39,6 +42,8 @@ for (const token of [
   "integrity-zero set",
   "no Production connection",
   "no automatic retry",
+  "operator-initiated one-click full-cycle control",
+  "no unattended, scheduled or background canary execution",
 ]) {
   assert(source.scope.toLowerCase().includes(token.toLowerCase()), `P09 scope is missing ${token}.`);
 }
@@ -49,6 +54,7 @@ for (const token of [
   "is_platform_admin=true",
   "exactly one allowed actor",
   "exactly one fixed Pharmacy entity",
+  "one-click full-cycle control",
   "Production remained disconnected and unchanged",
 ]) {
   assert(source.decision.includes(token), `Post-P09 decision is missing ${token}.`);
@@ -110,6 +116,54 @@ for (const token of [
 }
 
 for (const token of [
+  "runPharmacyCompleteCanaryActionState",
+  "MAX_ONE_CLICK_OPERATIONS = 5",
+  "COMPLETE PRIVATE CANARY",
+  "requirePlatformAdmin",
+  'process.env.VERCEL_ENV !== "preview"',
+  "allowedActorIds.length !== 1",
+  "allowedEntityIds.length !== 1",
+  "automaticMutationRetryAllowed !== false",
+  "executedOperations.has(plan.operation)",
+  "complete_canary_no_progress",
+  "complete_canary_post_step_readback_unavailable",
+  "runExpiredReservationRecoverySafeActionState",
+  "runPharmacyPrivateAdminActionState",
+]) {
+  assert(source.completeAction.includes(token), `P09 one-click action is missing ${token}.`);
+}
+for (const forbidden of [/while\s*\(/, /setTimeout|setInterval/]) {
+  assert(!forbidden.test(source.completeAction), `P09 one-click action contains forbidden retry/scheduling pattern ${forbidden}.`);
+}
+
+for (const token of [
+  "resolvePharmacyCompleteCanaryPlan",
+  "isPharmacyCompleteCanaryFinished",
+  "expiredReservationRecoveryActive",
+  "resolvePharmacyExpiredReservationRecoveryOperation",
+  'stageStatus(state, "rollback") === "available"',
+  'stageStatus(state, "private_publish") === "available"',
+  'stageStatus(state, "reservation") === "available"',
+]) {
+  assert(source.completePlan.includes(token), `P09 one-click planner is missing ${token}.`);
+}
+
+for (const token of [
+  "P09 · one-click literal canary",
+  "Complete the full Preview cycle",
+  "COMPLETE PRIVATE CANARY",
+  'name="completeCanaryConfirmation"',
+  "readOnly",
+  "Full canary stopped safely",
+  "Running persisted stages",
+]) {
+  assert(source.completePanel.includes(token), `P09 one-click panel is missing ${token}.`);
+}
+for (const forbidden of ["process.env", "dangerouslySetInnerHTML", "publishReference", "rollbackSnapshotId", "reservationId"]) {
+  assert(!source.completePanel.includes(forbidden), `P09 one-click panel contains forbidden token ${forbidden}.`);
+}
+
+for (const token of [
   "runExpiredReservationRecoveryActionState",
   "readByOperationAttemptId",
   "recovery_review_persist_failed",
@@ -134,6 +188,7 @@ for (const token of [
   'stageStatus(state, "private_publish") === "available"',
   'stageStatus(state, "reservation") === "expired"',
   'stageDetail(state, "authorization_ready") === "Authorization is issued."',
+  'stageStatus(state, "dry_run") === "complete"',
 ]) {
   assert(source.recoveryGate.includes(token), `P09 recovery phase gate is missing ${token}.`);
 }
@@ -163,9 +218,11 @@ for (const token of [
 }
 
 for (const token of [
+  "ImportPharmacyCompleteCanaryPanel",
   "ImportPharmacyPrivateAdminControlPanel",
   "initialStateMachine",
   "createPharmacyAdminStateMachineReaderFromEnvironment",
+  "unattended execution",
 ]) {
   assert(source.page.includes(token), `P09 Admin page is missing ${token}.`);
 }
