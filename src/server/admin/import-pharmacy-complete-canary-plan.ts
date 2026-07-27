@@ -24,6 +24,14 @@ function stageStatus(
   return state.stages.find((stage) => stage.id === stageId)?.status ?? null;
 }
 
+function expiredReservationRecoveryActive(
+  state: PharmacyAdminStateMachineSnapshot,
+): boolean {
+  return stageStatus(state, "reservation") === "expired" &&
+    stageStatus(state, "publish_verified") === "blocked" &&
+    stageStatus(state, "exact_recovery_verified") === "blocked";
+}
+
 export function isPharmacyCompleteCanaryFinished(
   state: PharmacyAdminStateMachineSnapshot,
 ): boolean {
@@ -36,9 +44,11 @@ export function resolvePharmacyCompleteCanaryPlan(
 ): PharmacyCompleteCanaryPlan | null {
   if (isPharmacyCompleteCanaryFinished(state)) return null;
 
-  const recoveryOperation = resolvePharmacyExpiredReservationRecoveryOperation(state);
-  if (recoveryOperation) {
-    return { operation: recoveryOperation, recovery: true };
+  if (expiredReservationRecoveryActive(state)) {
+    const recoveryOperation = resolvePharmacyExpiredReservationRecoveryOperation(state);
+    if (recoveryOperation) {
+      return { operation: recoveryOperation, recovery: true };
+    }
   }
 
   if (stageStatus(state, "rollback") === "available") {
