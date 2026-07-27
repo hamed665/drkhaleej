@@ -3,8 +3,10 @@
 import { useActionState } from "react";
 
 import {
-  runPharmacyPrivateAdminActionState,
-  type PharmacyPrivateAdminActionStateResult,
+  runExpiredReservationRecoveryActionState,
+} from "@/app/admin/imports/readiness/actions-expired-reservation-recovery";
+import type {
+  PharmacyPrivateAdminActionStateResult,
 } from "@/app/admin/imports/readiness/actions";
 import type {
   PharmacyAdminStateMachineSnapshot,
@@ -91,9 +93,36 @@ function nextPhase(operation: RecoveryOperation): RecoveryPhase {
   return "complete";
 }
 
-function recoveryPhase(result: PharmacyPrivateAdminActionStateResult): RecoveryPhase {
+function phaseFromPersistedState(
+  stateMachine: PharmacyAdminStateMachineSnapshot,
+): RecoveryPhase {
+  if (stageStatus(stateMachine, "exact_recovery_verified") === "complete") return "complete";
+  if (stageStatus(stateMachine, "rollback") === "available") return "rollback";
+  if (stageStatus(stateMachine, "private_publish") === "available") return "private_publish";
+
+  const liveExpiry = stateMachine.nextExpiryAt
+    ? Date.parse(stateMachine.nextExpiryAt) > Date.now()
+    : false;
+  if (
+    stageStatus(stateMachine, "reservation") === "expired" &&
+    stageStatus(stateMachine, "exact_review") === "complete" &&
+    stageStatus(stateMachine, "authorization_ready") === "complete" &&
+    liveExpiry
+  ) return "reserve_private_publish";
+
+  if (
+    stageStatus(stateMachine, "dry_run") === "complete" &&
+    stageStatus(stateMachine, "exact_review") !== "complete"
+  ) return "review";
+  return "dry_run";
+}
+
+function recoveryPhase(
+  result: PharmacyPrivateAdminActionStateResult,
+  stateMachine: PharmacyAdminStateMachineSnapshot,
+): RecoveryPhase {
   const receipt = result.receipt;
-  if (!receipt || receipt.operation === "refresh_state") return "dry_run";
+  if (!receipt || receipt.operation === "refresh_state") return phaseFromPersistedState(stateMachine);
   if (receipt.outcome === "blocked") return receipt.operation;
   return nextPhase(receipt.operation);
 }
@@ -134,16 +163,21 @@ function ExpiredReservationRecoveryWorkflow({
   initialStateMachine: PharmacyAdminStateMachineSnapshot;
 }) {
   const [result, formAction, pending] = useActionState(
-    runPharmacyPrivateAdminActionState,
+    runExpiredReservationRecoveryActionState,
     initialActionState(initialStateMachine),
   );
   const stateMachine = result.stateMachine ?? initialStateMachine;
-  const phase = recoveryPhase(result);
+  const phase = recoveryPhase(result, stateMachine);
   const definition = phase === "complete" ? null : recoveryDefinitions[phase];
   const confirmation = definition?.confirmationPrefix && entityId
     ? `${definition.confirmationPrefix} ${entityId}`
     : null;
   const controlsEnabled = activationEnabled && Boolean(entityId) && !pending;
+  const detailedBlockers = [...new Set([
+    ...result.blockers,
+    ...(result.reservationState?.blocker ? [result.reservationState.blocker] : []),
+    ...(result.publishCapability?.blockers ?? []),
+  ])];
 
   return (
     <section className="rounded-3xl border-2 border-amber-300 bg-amber-50 p-6 shadow-sm" aria-labelledby="expired-reservation-recovery-title">
@@ -157,10 +191,10 @@ function ExpiredReservationRecoveryWorkflow({
         The previous Reservation expired without starting a mutation. This recovery remains manual: each step is persisted and server-read back before the next step becomes available. No automatic mutation retry is performed.
       </p>
 
-      {result.blockers.length > 0 ? (
+      {detailedBlockers.length > 0 ? (
         <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900" role="alert">
           <p className="font-bold">Recovery step blocked</p>
-          <p className="mt-1 font-mono text-xs">{result.blockers.join(", ")}</p>
+          <p className="mt-1 font-mono text-xs">{detailedBlockers.join(", ")}</p>
         </div>
       ) : null}
 
@@ -184,14 +218,16 @@ function ExpiredReservationRecoveryWorkflow({
           <h3 className="font-bold text-slate-950">{definition.title}</h3>
           {definition.confirmationName && confirmation ? (
             <label className="mt-4 block text-xs font-semibold text-slate-700">
-              Exact confirmation
+              Exact confirmation, pre-filled for this Preview canary
               <input
                 type="text"
                 name={definition.confirmationName}
                 autoComplete="off"
                 spellCheck={false}
-                placeholder={confirmation}
-                className="mt-2 min-h-10 w-full rounded-xl border border-amber-300 bg-white px-3 py-2 font-mono text-xs text-slate-950 placeholder:text-slate-400"
+                value={confirmation}
+                readOnly
+                required
+                className="mt-2 min-h-10 w-full rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 font-mono text-xs text-slate-950"
               />
             </label>
           ) : null}
