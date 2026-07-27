@@ -1,4 +1,5 @@
 import { ImportGeoPerformanceReadOnlyPanel } from "@/components/admin/import-geo-performance-readonly-panel";
+import { ImportPharmacyCompleteCanaryPanel } from "@/components/admin/import-pharmacy-complete-canary-panel";
 import { ImportPharmacyExpiredReservationRecoveryPanel } from "@/components/admin/import-pharmacy-expired-reservation-recovery-panel";
 import { ImportPharmacyPrivateAdminControlPanel } from "@/components/admin/import-pharmacy-private-admin-control-panel";
 import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-readiness-review-readonly-panel";
@@ -67,6 +68,11 @@ export default async function AdminImportReadinessPage() {
           </p>
         </section>
       ) : null}
+      <ImportPharmacyCompleteCanaryPanel
+        entityId={pharmacyUiModel.entityId}
+        activationEnabled={actorBoundActivation}
+        initialStateMachine={initialStateMachine}
+      />
       <ImportPharmacyExpiredReservationRecoveryPanel
         entityId={pharmacyUiModel.entityId}
         activationEnabled={actorBoundActivation}
@@ -80,7 +86,7 @@ export default async function AdminImportReadinessPage() {
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-slate-950">Controlled boundary</h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">
-          Readiness data remains read-only. The separate Preview-only Pharmacy control panel exposes manual dry-run, exact review, Reservation, private publish, and rollback only to the single allowlisted admin and only when bounded server readback makes the next stage available. Refresh is readback-only. Reservation, mutation, and rollback are never retried automatically. Public routing, indexing, sitemap inclusion, Production access, P09 automatic canary execution, and bulk remain locked.
+          Readiness data remains read-only. The Preview-only full-cycle control is available only to the single allowlisted Admin and Pharmacy and only after one exact entity-bound confirmation. It resumes from persisted truth, invokes each remaining operation at most once, and requires server readback before continuing. The manual and fail-closed recovery controls remain available as bounded fallback surfaces. Reservation, mutation, and rollback are never retried automatically. Public routing, indexing, sitemap inclusion, Production access, unattended execution, and bulk remain locked.
         </p>
       </section>
     </div>
