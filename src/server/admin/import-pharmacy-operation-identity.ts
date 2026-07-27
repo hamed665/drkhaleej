@@ -21,6 +21,7 @@ export type BuildPharmacyStableOperationIdentityInput = {
   entityFingerprint: string;
   expectedEntityVersion: string;
   patch: unknown;
+  operationNonce?: string | null;
 };
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -67,30 +68,30 @@ export function buildPharmacyStableOperationIdentity(
   assertSha256(input.snapshotHash, "snapshot_hash");
   assertSha256(input.entityFingerprint, "entity_fingerprint");
 
+  const operationNonce = input.operationNonce?.trim() || null;
+  if (input.operationNonce !== undefined && input.operationNonce !== null) {
+    assertNonEmpty(input.operationNonce, "operation_nonce");
+  }
+
   const patchHash = sha256(input.patch);
-  const identityHash = sha256({
+  const identityPayload = {
     actorId: input.actorId,
     entityId: input.entityId,
-    entityFamily: "pharmacy",
+    entityFamily: "pharmacy" as const,
     operationScope: PHARMACY_PRIVATE_PUBLISH_OPERATION_SCOPE,
     snapshotHash: input.snapshotHash,
     entityFingerprint: input.entityFingerprint,
     expectedEntityVersion: input.expectedEntityVersion,
     patchHash,
-  });
+    ...(operationNonce ? { operationNonce } : {}),
+  };
+  const identityHash = sha256(identityPayload);
   const operationAttemptId = deterministicUuidFromHash(identityHash);
   const idempotencyKey = `pharmacy:${PHARMACY_PRIVATE_PUBLISH_OPERATION_SCOPE}:${operationAttemptId}`;
   const requestHash = sha256({
     operationAttemptId,
     idempotencyKey,
-    actorId: input.actorId,
-    entityId: input.entityId,
-    entityFamily: "pharmacy",
-    operationScope: PHARMACY_PRIVATE_PUBLISH_OPERATION_SCOPE,
-    snapshotHash: input.snapshotHash,
-    entityFingerprint: input.entityFingerprint,
-    expectedEntityVersion: input.expectedEntityVersion,
-    patchHash,
+    ...identityPayload,
   });
 
   return {
