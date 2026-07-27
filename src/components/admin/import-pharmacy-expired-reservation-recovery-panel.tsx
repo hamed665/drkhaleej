@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState } from "react";
 
 import {
   runPharmacyPrivateAdminActionState,
@@ -91,6 +91,13 @@ function nextPhase(operation: RecoveryOperation): RecoveryPhase {
   return "complete";
 }
 
+function recoveryPhase(result: PharmacyPrivateAdminActionStateResult): RecoveryPhase {
+  const receipt = result.receipt;
+  if (!receipt || receipt.operation === "refresh_state") return "dry_run";
+  if (receipt.outcome === "blocked") return receipt.operation;
+  return nextPhase(receipt.operation);
+}
+
 export function ImportPharmacyExpiredReservationRecoveryPanel({
   entityId,
   activationEnabled,
@@ -130,19 +137,9 @@ function ExpiredReservationRecoveryWorkflow({
     runPharmacyPrivateAdminActionState,
     initialActionState(initialStateMachine),
   );
-  const [phase, setPhase] = useState<RecoveryPhase>("dry_run");
   const stateMachine = result.stateMachine ?? initialStateMachine;
-
-  useEffect(() => {
-    if (!result.ok || !result.receipt || result.receipt.outcome === "blocked") return;
-    if (result.receipt.operation === "refresh_state") return;
-    setPhase(nextPhase(result.receipt.operation));
-  }, [result]);
-
-  const definition = useMemo(
-    () => (phase === "complete" ? null : recoveryDefinitions[phase]),
-    [phase],
-  );
+  const phase = recoveryPhase(result);
+  const definition = phase === "complete" ? null : recoveryDefinitions[phase];
   const confirmation = definition?.confirmationPrefix && entityId
     ? `${definition.confirmationPrefix} ${entityId}`
     : null;
