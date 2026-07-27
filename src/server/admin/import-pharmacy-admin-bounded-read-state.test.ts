@@ -104,6 +104,40 @@ describe("bounded Pharmacy Admin read state", () => {
     expect(changedVersion.operationAttemptId).not.toBe(base.operationAttemptId);
   });
 
+  it("uses a persisted review-time nonce only for an explicit recovery review", () => {
+    const normalReview = buildPharmacyAdminBoundedReadState({
+      operation: "review",
+      ...identityInput,
+      createdAt: "2026-07-13T00:00:00.000Z",
+      expiresAt: "2026-07-13T00:15:00.000Z",
+      reviewedAt: "2026-07-13T00:00:00.000Z",
+      current,
+      proposed,
+    });
+    const recoveryInput = {
+      operation: "review" as const,
+      ...identityInput,
+      createdAt: "2026-07-13T00:01:00.000Z",
+      expiresAt: "2026-07-13T00:16:00.000Z",
+      reviewedAt: "2026-07-13T00:01:00.001Z",
+      current,
+      proposed,
+    };
+    const recovery = buildPharmacyAdminBoundedReadState(recoveryInput);
+    const recoveryReplay = buildPharmacyAdminBoundedReadState(recoveryInput);
+    const laterRecovery = buildPharmacyAdminBoundedReadState({
+      ...recoveryInput,
+      createdAt: "2026-07-13T00:02:00.000Z",
+      expiresAt: "2026-07-13T00:17:00.000Z",
+      reviewedAt: "2026-07-13T00:02:00.001Z",
+    });
+
+    expect(recovery.operationAttemptId).toBe(recoveryReplay.operationAttemptId);
+    expect(recovery.operationAttemptId).not.toBe(normalReview.operationAttemptId);
+    expect(laterRecovery.operationAttemptId).not.toBe(recovery.operationAttemptId);
+    expect(recovery.blockerCodes).toEqual([]);
+  });
+
   it("requires a bounded review timestamp for review state", () => {
     expect(() =>
       buildPharmacyAdminBoundedReadState({
