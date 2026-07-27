@@ -15,6 +15,7 @@ import type {
   ImportPersistenceReadbackVerificationResult,
 } from "./import-persistence-readback-verifier";
 import {
+  areEquivalentPharmacyExpectedVersions,
   loadPharmacyVerifiedReservationForPublish,
   type PharmacyVerifiedReservationLoaderDependencies,
 } from "./import-pharmacy-verified-reservation-loader";
@@ -94,7 +95,7 @@ const authorization: PharmacyPublishAuthorizationEnvelopeRecord = {
   idempotencyKey: review.idempotencyKey,
   requestHash,
   patchHash,
-  expectedEntityVersion: expectedVersion,
+  expectedEntityVersion: "2026-07-26 01:00:00+00",
   entityFamily: "pharmacy",
   operationScope: "reserve_private_publish",
   status: "consumed",
@@ -139,13 +140,13 @@ const context = {
       entityId,
       idempotencyKey: review.idempotencyKey,
       requestHash,
-      expectedVersion,
+      expectedVersion: "2026-07-26 01:00:00+00",
     },
   },
   mutationRequest: {
     actorId,
     idempotencyKey: review.idempotencyKey,
-    expectedVersion,
+    expectedVersion: "2026-07-26T05:00:00+04:00",
     family: "pharmacy",
     selectedFamily: "pharmacy",
     executionEnabled: true,
@@ -155,13 +156,31 @@ const context = {
 } as unknown as PharmacyPrivateAdminPublishContext;
 
 describe("verified Pharmacy Reservation loader", () => {
+  it("treats equivalent PostgreSQL and ISO timestamp wire formats as the same version", () => {
+    expect(areEquivalentPharmacyExpectedVersions(
+      "2026-07-26T01:00:00.000Z",
+      "2026-07-26 01:00:00+00",
+    )).toBe(true);
+    expect(areEquivalentPharmacyExpectedVersions(
+      "2026-07-26T01:00:00.000Z",
+      "2026-07-26T05:00:00+04:00",
+    )).toBe(true);
+    expect(areEquivalentPharmacyExpectedVersions(
+      "2026-07-26T01:00:00.000Z",
+      "2026-07-26T01:00:01.000Z",
+    )).toBe(false);
+  });
+
   it("uses the exact persisted review after its TTL when the Reservation remains live", async () => {
     const dependencies: PharmacyVerifiedReservationLoaderDependencies = {
       loadBaseContext: vi.fn(async () => context),
       readLatestReview: vi.fn(async () => review),
       loadPersistence: vi.fn(async () => ({
         authorization,
-        verificationInput,
+        verificationInput: {
+          ...verificationInput,
+          expectedVersion: "2026-07-26 01:00:00+00",
+        },
         reservationExpiresAt: "2026-07-26T03:00:00.000Z",
       })),
       verifyReadback: vi.fn(async () => verificationResult),
@@ -183,6 +202,8 @@ describe("verified Pharmacy Reservation loader", () => {
     if (result.ok) {
       expect(result.evidence.reservationExpiresAt).toBe("2026-07-26T03:00:00.000Z");
       expect(result.review.expiresAt).toBe("2026-07-26T01:15:00.000Z");
+      expect(result.evidence.verificationInput.expectedVersion).toBe(expectedVersion);
+      expect(result.context.mutationRequest.expectedVersion).toBe(expectedVersion);
     }
   });
 });
