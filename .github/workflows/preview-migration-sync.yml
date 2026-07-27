@@ -16,6 +16,7 @@ on:
       - 'scripts/import/run-p07-rollback-exact-recovery-proof.mjs'
       - 'scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs'
       - 'scripts/import/run-p09-real-admin-canary.mjs'
+      - 'scripts/import/run-p09-recovery-review-attempt-proof.mjs'
       - 'scripts/import/check-import-p09-real-admin-canary.mjs'
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
@@ -25,6 +26,7 @@ on:
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
+      - 'src/components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx'
       - 'scripts/import/check-import-readiness-state-alignment.mjs'
       - 'docs/import/ROLLBACK_EXACT_RECOVERY.md'
       - 'docs/import/ADMIN_STATE_MACHINE_SCOPE.md'
@@ -71,6 +73,7 @@ env:
   P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
+  P09_RECOVERY_EVIDENCE_PATH: artifacts/p09/recovery-review-attempt.json
 
 permissions:
   contents: read
@@ -144,6 +147,12 @@ jobs:
 
       - name: Verify exact ledger and database inventories
         run: node scripts/db/preview-migration-sync.mjs verify
+
+      - name: Prove fresh expired-Reservation recovery Review attempt
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-recovery-review-attempt-proof.mjs 2>&1 | tee artifacts/p09/recovery-review-attempt.log
 
       - name: Run isolated P05 private publish proof
         shell: bash
