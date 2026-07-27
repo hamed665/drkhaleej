@@ -10,6 +10,10 @@ const files = {
   loginPage: "src/app/admin/login/page.tsx",
   loginForm: "src/components/admin/admin-login-form.tsx",
   action: "src/app/admin/imports/readiness/actions.ts",
+  recoveryAction: "src/app/admin/imports/readiness/actions-expired-reservation-recovery.ts",
+  recoveryPanel: "src/components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx",
+  recoveryMigration: "supabase/migrations/0086_import_pharmacy_recovery_review_attempts.sql",
+  readStateStore: "src/server/admin/import-pharmacy-admin-read-state-store.ts",
   page: "src/app/admin/imports/readiness/page.tsx",
   panel: "src/components/admin/import-pharmacy-private-admin-control-panel.tsx",
   runner: "scripts/import/run-p09-real-admin-canary.mjs",
@@ -101,6 +105,40 @@ for (const token of [
   "runPharmacyPrivateAdminRollbackOperation",
 ]) {
   assert(source.action.includes(token), `P09 Admin action path is missing ${token}.`);
+}
+
+for (const token of [
+  "runExpiredReservationRecoveryActionState",
+  "readByOperationAttemptId",
+  "recovery_review_persist_failed",
+  "recovery_review_exact_readback_failed",
+  "recovery_review_identity_mismatch",
+  "isPharmacyAdminBoundedReadStateFresh",
+]) {
+  assert(source.recoveryAction.includes(token), `P09 recovery action is missing ${token}.`);
+}
+for (const token of [
+  "Fail-closed recovery",
+  "Expired Reservation before mutation",
+  "runExpiredReservationRecoveryActionState",
+  "readOnly",
+  "Waiting for persisted readback",
+]) {
+  assert(source.recoveryPanel.includes(token), `P09 recovery panel is missing ${token}.`);
+}
+for (const token of [
+  "P09-B EXPIRED-RESERVATION-RECOVERY",
+  "drop index if exists public.import_pharmacy_admin_read_states_identity_idx",
+  "import_pharmacy_admin_read_states_legacy_identity_idx",
+  "where operation_attempt_id is null",
+]) {
+  assert(source.recoveryMigration.includes(token), `P09 recovery migration is missing ${token}.`);
+}
+for (const token of [
+  "readByOperationAttemptId",
+  'eq("operation_attempt_id", input.operationAttemptId)',
+]) {
+  assert(source.readStateStore.includes(token), `P09 exact recovery read-state store is missing ${token}.`);
 }
 
 for (const token of [
