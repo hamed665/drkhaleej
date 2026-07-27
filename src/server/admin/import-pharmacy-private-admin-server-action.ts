@@ -1,5 +1,9 @@
 import "server-only";
 
+import {
+  createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment,
+  runPharmacyPrivateAdminPublishOperation,
+} from "./import-pharmacy-private-admin-publish-operation";
 import type {
   PharmacyPrivateAdminOperation,
   PharmacyPrivateAdminWorkflowResult,
@@ -58,8 +62,50 @@ function normalizeExactConfirmation(value: string | null): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+function parseAllowlist(value: string | undefined): string[] {
+  if (!value) return [];
+  return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+}
+
 function isOperation(value: string | null): value is PharmacyPrivateAdminOperation {
   return value !== null && operations.has(value as PharmacyPrivateAdminOperation);
+}
+
+async function runEnvironmentBackedPrivatePublish(input: {
+  actorId: string;
+  entityId: string;
+  confirmation: string;
+  allowedEntityIds: readonly string[];
+}): Promise<PharmacyPrivateAdminWorkflowResult> {
+  const allowedActorIds = parseAllowlist(process.env.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
+  const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+    allowedActorIds,
+    allowedEntityIds: input.allowedEntityIds,
+  });
+  const published = dependencies
+    ? await runPharmacyPrivateAdminPublishOperation({
+        environment: process.env.VERCEL_ENV,
+        actorId: input.actorId,
+        entityId: input.entityId,
+        allowedActorIds,
+        allowedEntityIds: input.allowedEntityIds,
+        confirmation: input.confirmation,
+        now: new Date().toISOString(),
+        dependencies,
+      })
+    : null;
+
+  return {
+    operation: "private_publish",
+    status: published?.published ? "completed" : "failed",
+    entityId: input.entityId,
+    blockers: published?.blocker ? ["readiness_blocked"] : [],
+    publicVisibility: "private",
+    indexEligible: false,
+    sitemapEligible: false,
+    routeEnabled: false,
+    executionReference: published?.executionReference ?? null,
+  };
 }
 
 export function createPharmacyPrivateAdminServerAction(
@@ -97,7 +143,15 @@ export function createPharmacyPrivateAdminServerAction(
     const uniqueBlockers = [...new Set(blockers)];
     if (uniqueBlockers.length > 0 || !isOperation(operationValue) || !entityId) return { ok: false, blockers: uniqueBlockers };
 
-    const workflow = await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
+    const workflow = operationValue === "private_publish" && process.env.VERCEL_ENV === "preview"
+      ? await runEnvironmentBackedPrivatePublish({
+          actorId: input.actorId,
+          entityId,
+          confirmation: confirmation!,
+          allowedEntityIds: dependencies.allowedEntityIds,
+        })
+      : await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
+
     if (workflow.status !== "completed") return { ok: false, blockers: [], workflow };
     return { ok: true, workflow };
   };
