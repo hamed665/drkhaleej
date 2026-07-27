@@ -115,7 +115,7 @@ function buildOperationForm(
   return formData;
 }
 
-function requiresDeferredStateReadback(
+function completedWithDeferredStateReadback(
   result: PharmacyPrivateAdminActionStateResult,
 ): boolean {
   return !result.ok &&
@@ -209,7 +209,7 @@ export async function runPharmacyCompleteCanaryActionState(
     const result = plan.recovery
       ? await runExpiredReservationRecoverySafeActionState(delegateState(currentState), operationForm)
       : await runPharmacyPrivateAdminActionState(delegateState(currentState), operationForm);
-    const deferredStateReadback = requiresDeferredStateReadback(result);
+    const deferredStateReadback = completedWithDeferredStateReadback(result);
 
     if ((!result.ok && !deferredStateReadback) || !result.stateMachine) {
       return blockedResult({
