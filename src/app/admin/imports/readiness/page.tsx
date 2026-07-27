@@ -1,4 +1,5 @@
 import { ImportGeoPerformanceReadOnlyPanel } from "@/components/admin/import-geo-performance-readonly-panel";
+import { ImportPharmacyExpiredReservationRecoveryPanel } from "@/components/admin/import-pharmacy-expired-reservation-recovery-panel";
 import { ImportPharmacyPrivateAdminControlPanel } from "@/components/admin/import-pharmacy-private-admin-control-panel";
 import { ImportReadinessReviewReadOnlyPanel } from "@/components/admin/import-readiness-review-readonly-panel";
 import { requirePlatformAdmin } from "@/lib/permissions/admin";
@@ -66,6 +67,11 @@ export default async function AdminImportReadinessPage() {
           </p>
         </section>
       ) : null}
+      <ImportPharmacyExpiredReservationRecoveryPanel
+        entityId={pharmacyUiModel.entityId}
+        activationEnabled={actorBoundActivation}
+        initialStateMachine={initialStateMachine}
+      />
       <ImportPharmacyPrivateAdminControlPanel
         entityId={pharmacyUiModel.entityId}
         activationEnabled={actorBoundActivation}
