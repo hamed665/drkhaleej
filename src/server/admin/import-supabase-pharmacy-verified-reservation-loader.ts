@@ -14,7 +14,10 @@ import {
   type ImportPersistenceReadbackVerificationInput,
 } from "./import-persistence-readback-verifier";
 import { createImportSupabasePersistenceReadbackClient } from "./import-supabase-persistence-readback-client";
-import type { PharmacyVerifiedReservationLoaderDependencies } from "./import-pharmacy-verified-reservation-loader";
+import {
+  areEquivalentPharmacyExpectedVersions,
+  type PharmacyVerifiedReservationLoaderDependencies,
+} from "./import-pharmacy-verified-reservation-loader";
 import type { PharmacyAdminReadStateClient } from "./import-pharmacy-admin-read-state-store";
 import type { PharmacyPublishAuthorizationClient } from "./import-pharmacy-publish-authorization-store";
 import type { ImportSupabasePersistenceReadClient } from "./import-supabase-persistence-readback-client";
@@ -79,13 +82,17 @@ async function loadReservationPersistence(input: {
 
   const reservationRow = reservationRows[0]!;
   const snapshotRow = snapshotRows[0]!;
+  const reservationExpectedVersion = readString(reservationRow, "expected_version");
+  const snapshotExpectedVersion = readString(snapshotRow, "expected_version");
   if (
     readString(reservationRow, "idempotency_key") !== input.idempotencyKey ||
     readString(reservationRow, "request_hash") !== input.requestHash ||
-    readString(reservationRow, "expected_version") !== input.expectedVersion ||
+    !reservationExpectedVersion ||
+    !areEquivalentPharmacyExpectedVersions(reservationExpectedVersion, input.expectedVersion) ||
     readString(reservationRow, "pharmacy_authorization_id") !== input.authorizationId ||
     readString(reservationRow, "status") !== "reserved" ||
-    readString(snapshotRow, "expected_version") !== input.expectedVersion ||
+    !snapshotExpectedVersion ||
+    !areEquivalentPharmacyExpectedVersions(snapshotExpectedVersion, input.expectedVersion) ||
     readString(snapshotRow, "snapshot_hash") !== input.expectedSnapshotHash
   ) return null;
 
