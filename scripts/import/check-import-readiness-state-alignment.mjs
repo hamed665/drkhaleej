@@ -13,8 +13,8 @@ const expectedCanonicalState = {
   alignedThroughPr: 958,
   runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
   lastAligned: '2026-07-28',
-  currentMigration: '0086_import_pharmacy_recovery_review_attempts.sql',
-  currentNext: 'PHARMACY-PUBLIC-NOINDEX-LIFECYCLE',
+  currentMigration: '0087_import_pharmacy_public_noindex_authority.sql',
+  currentNext: 'PHARMACY-BILINGUAL-LIVE-VERIFY',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -25,6 +25,7 @@ const expectedCanonicalState = {
     '4.2': 'COMPLETE',
     5: 'COMPLETE',
     6: 'COMPLETE',
+    '7.1': 'PARTIAL',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -146,7 +147,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6|7\.1)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -222,7 +223,11 @@ function validateMatrix(source, manifest) {
     'Real Admin canary': ['Complete', '#958'],
     'Registry authority audit': ['Complete', 'docs/import/registry-authority-audit.md'],
     'Registry convergence': ['Complete', 'docs/import/registry-convergence.md'],
-    'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
+    'Pharmacy public/noindex authority': [
+      'Complete',
+      'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
+    ],
+    'Pharmacy live route/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
   };
@@ -240,7 +245,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0086`',
+    '`0001` through `0087`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

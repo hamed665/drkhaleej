@@ -422,7 +422,7 @@ assert(
   `${files.sitemapReader}: import sitemap must consume canonical family and route authorities.`,
 );
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"') &&
+  sources.roadmap.includes('"currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY"') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: convergence completion/next transition is not aligned.`,
 );

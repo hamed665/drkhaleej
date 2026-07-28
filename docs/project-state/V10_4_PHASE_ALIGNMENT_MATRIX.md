@@ -16,8 +16,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 ## Current Repository Baseline
 
 - Import-readiness runtime is aligned through PR #958 at baseline `baba0cc91508ef8fad16e43650cf425099c8908a` (last aligned 2026-07-28).
-- Migrations validate through `0086_import_pharmacy_recovery_review_attempts.sql`.
-- The Registry Authority Audit and Registry Convergence are complete. The current next implementation is `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE`.
+- Migrations validate through `0087_import_pharmacy_public_noindex_authority.sql`.
+- Registry Convergence and P11 Pharmacy public/noindex authority are complete. The current next implementation is `PHARMACY-BILINGUAL-LIVE-VERIFY`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -92,7 +92,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Commercial add-on assignment shell | Completed draft/internal shell | Phase 6 | Phase 8 / Phase 5 | Phase 15 | Homepage Ads and Special Offer Placement only. |
 | Pharmacy private publish/readback | Completed Preview authority | Phase 4 / Phase 9 | Phase 10 / Phase 11 | Phase 6 / Phase 18 | Single entity, verified Reservation, exact patch, terminal persistence, durable reference and hosted readback; Production and public promotion remain disabled. |
 | Pharmacy rollback authority | Completed Preview authority | Phase 9 | Phase 11 | Phase 6 / Phase 18 | Server-selected actor/entity/version/snapshot-bound authority, atomic consume-or-abort, bounded replay, zero raw-reference browser custody; exact logical recovery, the server-authoritative Admin UI and the P09 literal Preview lifecycle are proven. |
-| Migrations through `0086` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 | Existing SQL migrations must not be modified unless approved. |
+| Pharmacy public/noindex Queue authority | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Binds one approved candidate and bilingual paths to `published_noindex`; public route and rollback remain disabled. |
+| Migrations through `0087` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 / Phase 18 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -109,8 +110,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Aligned through | PR #958 |
 | Runtime baseline | `baba0cc91508ef8fad16e43650cf425099c8908a` |
 | Last aligned | `2026-07-28` |
-| Current migration | `0086_import_pharmacy_recovery_review_attempts.sql` |
-| Current next | `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE` |
+| Current migration | `0087_import_pharmacy_public_noindex_authority.sql` |
+| Current next | `PHARMACY-BILINGUAL-LIVE-VERIFY` |
 
 ## Import readiness capability mapping
 
@@ -136,8 +137,9 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Admin state machine | Complete | #957 | Maintain state-machine regression |
 | Real Admin canary | Complete | #958 | Maintain literal-cycle regression |
 | Registry authority audit | Complete | `docs/import/registry-authority-audit.md` | `REGISTRY-CONVERGENCE` |
-| Registry convergence | Complete | `docs/import/registry-convergence.md` | `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE` |
-| Pharmacy public/index/sitemap | Disabled/Open | — | Pharmacy public/noindex lifecycle |
+| Registry convergence | Complete | `docs/import/registry-convergence.md` | `PHARMACY-PUBLIC-NOINDEX-AUTHORITY` |
+| Pharmacy public/noindex authority | Complete | `docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md` | `PHARMACY-BILINGUAL-LIVE-VERIFY` |
+| Pharmacy live route/index/sitemap | Disabled/Open | — | Bilingual live noindex verification |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -159,6 +161,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `REAL-ADMIN-CANARY` | Phase 9 | Phase 11 | Phase 18 |
 | `REGISTRY-AUTHORITY-AUDIT` | Phase 9 | Phase 10 | Phase 18 |
 | `REGISTRY-CONVERGENCE` | Phase 9 | Phase 10 | Phase 18 |
+| `PHARMACY-PUBLIC-NOINDEX-AUTHORITY` | Phase 9 | Phase 10 | Phase 18 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 

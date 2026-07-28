@@ -24,6 +24,9 @@ on:
       - 'scripts/import/run-p09-literal-finalize-preview-cycle.mjs'
       - 'scripts/import/check-import-p09-real-admin-canary.mjs'
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
+      - 'scripts/import/run-pharmacy-public-noindex-authority-proof.mjs'
+      - 'scripts/import/check-pharmacy-public-noindex-authority.mjs'
+      - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
       - 'src/server/admin/import-pharmacy-real-rollback-canary*'
       - 'src/server/admin/import-pharmacy-admin-state-machine*'
@@ -92,6 +95,12 @@ env:
   P09_LITERAL_PUBLISH_DIAGNOSTIC_PATH: artifacts/p09/literal-publish-transaction-diagnostic.json
   P09_LITERAL_FINALIZE_ENABLED: 'true'
   P09_LITERAL_FINAL_EVIDENCE_PATH: artifacts/p09/literal-final-preview-cycle.json
+  PHARMACY_NOINDEX_AUTHORITY_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  PHARMACY_NOINDEX_AUTHORITY_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  PHARMACY_NOINDEX_AUTHORITY_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  PHARMACY_NOINDEX_AUTHORITY_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  PHARMACY_NOINDEX_AUTHORITY_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  PHARMACY_NOINDEX_AUTHORITY_EVIDENCE_PATH: artifacts/pharmacy-public-noindex-authority/proof.json
 
 permissions:
   contents: read
@@ -121,6 +130,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$P06_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P07_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P09_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_NOINDEX_AUTHORITY_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -145,7 +155,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -155,6 +165,7 @@ jobs:
             node scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs
             node scripts/import/check-import-pharmacy-minimal-admin-ui.mjs
             node scripts/import/check-import-p09-real-admin-canary.mjs
+            node scripts/import/check-pharmacy-public-noindex-authority.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -220,6 +231,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-p09-literal-finalize-preview-cycle.mjs 2>&1 | tee artifacts/p09/literal-final-preview-cycle.log
 
+      - name: Prove Pharmacy public/noindex authority only
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-pharmacy-public-noindex-authority-proof.mjs 2>&1 | tee artifacts/pharmacy-public-noindex-authority/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -262,5 +279,14 @@ jobs:
         with:
           name: p09-real-admin-canary-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p09/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Pharmacy public/noindex authority evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharmacy-public-noindex-authority-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/pharmacy-public-noindex-authority/
           if-no-files-found: error
           retention-days: 30

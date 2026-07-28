@@ -49,6 +49,7 @@
     "import:publish-readiness-audit:validate": "node scripts/import/check-import-publish-readiness-audit.mjs",
     "import:registry-authority-audit:validate": "node scripts/import/check-registry-authority-audit.mjs && node scripts/import/test-registry-authority-audit.mjs",
     "import:registry-convergence:validate": "node scripts/import/check-registry-convergence.mjs && vitest run src/server/admin/import-provider-authority-adapter.test.ts src/lib/catalog/public-entity-family-registry.test.ts src/lib/catalog/public-provider-import-adapter.test.ts src/server/admin/import-link-rule-matrix.test.ts src/server/public/import-sitemap.test.ts",
+    "import:pharmacy-public-noindex-authority:validate": "node scripts/import/check-pharmacy-public-noindex-authority.mjs",
     "import:reservation-db-safety:validate": "node scripts/import/check-import-reservation-db-safety-proof.mjs",
     "import:reservation-audit-split:validate": "node scripts/import/check-import-reservation-audit-split.mjs",
     "import:state-alignment:validate": "node scripts/import/check-import-readiness-state-alignment.mjs && node scripts/import/test-import-readiness-state-alignment.mjs",
