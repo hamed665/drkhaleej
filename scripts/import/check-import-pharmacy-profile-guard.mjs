@@ -74,8 +74,10 @@ for (const token of [
 }
 
 for (const token of [
-  String.raw`^\/(en|ar)\/om\/doctor\/`,
-  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'target_entity_type',
 ]) {
   assertIncludes(importSitemapSource, token, `import sitemap must include reviewed profile sitemap token ${token}`);

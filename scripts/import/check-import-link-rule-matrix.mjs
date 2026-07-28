@@ -69,7 +69,7 @@ for (const token of [
   'target_type: "physiotherapy"',
   'source_type: "pet_clinic"',
   'target_type: "pet_pharmacy"',
-  'target_type: "human_pharmacy" as ImportEntityType',
+  'target_type: "pharmacy"',
   'source_type: "medical_beauty_clinic"',
   'source_type: "dental_clinic"',
   'target_type: "dentist"',
@@ -90,6 +90,7 @@ for (const forbiddenToken of [
   'pet_clinic -> human_pharmacy = allowed',
   'hair_transplant_clinic -> salon = allowed',
   'return { decision: "allowed", rule: null',
+  '"human_pharmacy" as ImportEntityType',
 ]) {
   assertNotIncludes(ruleSource, forbiddenToken, `${rulePath} must not include unsafe shortcut ${forbiddenToken}.`);
 }

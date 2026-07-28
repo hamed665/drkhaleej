@@ -282,7 +282,7 @@ export const IMPORT_ENTITY_LINK_RULES = [
   },
   {
     source_type: "pet_clinic",
-    target_type: "human_pharmacy" as ImportEntityType,
+    target_type: "pharmacy",
     source_domain: "pet_healthcare",
     target_domain: "human_healthcare",
     allowed: false,

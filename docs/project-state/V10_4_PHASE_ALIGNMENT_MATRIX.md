@@ -17,7 +17,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 - Import-readiness runtime is aligned through PR #958 at baseline `baba0cc91508ef8fad16e43650cf425099c8908a` (last aligned 2026-07-28).
 - Migrations validate through `0086_import_pharmacy_recovery_review_attempts.sql`.
-- The Registry Authority Audit is complete. The current next implementation is `REGISTRY-CONVERGENCE`.
+- The Registry Authority Audit and Registry Convergence are complete. The current next implementation is `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -110,7 +110,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Runtime baseline | `baba0cc91508ef8fad16e43650cf425099c8908a` |
 | Last aligned | `2026-07-28` |
 | Current migration | `0086_import_pharmacy_recovery_review_attempts.sql` |
-| Current next | `REGISTRY-CONVERGENCE` |
+| Current next | `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE` |
 
 ## Import readiness capability mapping
 
@@ -136,7 +136,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Admin state machine | Complete | #957 | Maintain state-machine regression |
 | Real Admin canary | Complete | #958 | Maintain literal-cycle regression |
 | Registry authority audit | Complete | `docs/import/registry-authority-audit.md` | `REGISTRY-CONVERGENCE` |
-| Pharmacy public/index/sitemap | Disabled/Open | — | Registry Convergence |
+| Registry convergence | Complete | `docs/import/registry-convergence.md` | `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE` |
+| Pharmacy public/index/sitemap | Disabled/Open | — | Pharmacy public/noindex lifecycle |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 

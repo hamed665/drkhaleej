@@ -21,7 +21,7 @@ Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private 
 Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time consumption and bounded replay proven
 Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatch diagnostics proven
 Wave 5     COMPLETE  (#957, #958) Server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete
-Wave 6     PARTIAL   Registry Authority Audit complete; Registry Convergence remains closed
+Wave 6     COMPLETE  Registry Authority Audit and Registry Convergence complete; no public activation
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
@@ -41,7 +41,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
   "runtimeBaseline": "baba0cc91508ef8fad16e43650cf425099c8908a",
   "lastAligned": "2026-07-28",
   "currentMigration": "0086_import_pharmacy_recovery_review_attempts.sql",
-  "currentNext": "REGISTRY-CONVERGENCE",
+  "currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -51,7 +51,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "4.1": "COMPLETE",
     "4.2": "COMPLETE",
     "5": "COMPLETE",
-    "6": "PARTIAL"
+    "6": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -295,7 +295,7 @@ P09 completed the fixed isolated Preview Pharmacy lifecycle across all ten persi
 
 The independent Post-P09 decision is `GO_LITERAL_PREVIEW_CYCLE_COMPLETE`. This GO opens only the separately reviewed Registry/Pharmacy-public planning gate; Agent, Content, Hospital, Doctor, later-family and Bulk gates remain closed.
 
-## Wave 6 — Registry convergence `PARTIAL`
+## Wave 6 — Registry convergence `COMPLETE`
 
 Audit and document:
 
@@ -314,7 +314,7 @@ Mark supported/planned/disabled/unsupported. Extend existing registries only. Do
 
 The Registry Authority Audit is complete in [`registry-authority-audit.md`](registry-authority-audit.md). It found split intake/public vocabularies, a noncanonical relation alias, capability flags that must not act as release approval, a non-fail-closed family lookup, and a legacy helper that couples index and sitemap promotion.
 
-`REGISTRY-CONVERGENCE` is one substantial review package: one total intake-to-public/storage/route adapter, fail-closed lookup, canonical relation types, capability/release separation, and proof of human/pet domain separation. Every currently disabled route remains disabled.
+`REGISTRY-CONVERGENCE` is complete in [`registry-convergence.md`](registry-convergence.md). One total intake-to-public/storage/route adapter now covers all canonical entity types, legacy Admin staging vocabulary resolves explicitly, unknown family lookup fails closed, relation rules use canonical types, and capability metadata remains separate from route release. The public sitemap now consumes the canonical family and route authorities. Every previously disabled route remains disabled.
 
 Index/sitemap decoupling remains part of the later independent Pharmacy index and sitemap promotions. This wave does not authorize route activation, public promotion, a migration, or Production execution.
 
@@ -386,7 +386,7 @@ Do not add:
 ## Current next implementation
 
 ```text
-REGISTRY-CONVERGENCE
+PHARMACY-PUBLIC-NOINDEX-LIFECYCLE
 ```
 
-P09, the Post-P09 GO, and the documentation/contract-only Registry Authority Audit are complete. The next gate is `REGISTRY-CONVERGENCE`. It may not activate a route, public record, index policy, sitemap entry, Agent, Content, Hospital, Doctor, later family, Bulk behavior, or Production execution.
+P09, the Post-P09 GO, the Registry Authority Audit, and Registry Convergence are complete. The next gate is `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE`. It may implement only the separately authorized Pharmacy public/noindex lifecycle with its own exact readback and rollback proof; Index, Sitemap, Agent, Content, Hospital, Doctor, later family, Bulk behavior, and Production execution remain closed.

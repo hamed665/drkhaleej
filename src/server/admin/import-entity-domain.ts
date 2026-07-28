@@ -46,6 +46,17 @@ export type ImportEntityType =
   | "pet_grooming"
   | "pet_boarding";
 
+export const ADMIN_IMPORT_ENTITY_TYPES = [
+  "doctor",
+  "hospital",
+  "pharmacy",
+  "clinic",
+  "laboratory",
+  "medical_center",
+] as const;
+
+export type AdminImportEntityType = (typeof ADMIN_IMPORT_ENTITY_TYPES)[number];
+
 export type ImportDoctorSpecialty =
   | "cardiology"
   | "dermatology"
@@ -121,6 +132,15 @@ export const IMPORT_ENTITY_DOMAIN_BY_TYPE = {
   pet_boarding: "pet_healthcare",
 } as const satisfies Record<ImportEntityType, ImportEntityDomain>;
 
+export const ADMIN_IMPORT_ENTITY_TYPE_TO_CANONICAL = {
+  doctor: "doctor",
+  hospital: "hospital",
+  pharmacy: "pharmacy",
+  clinic: "clinic",
+  laboratory: "lab",
+  medical_center: "clinic",
+} as const satisfies Record<AdminImportEntityType, ImportEntityType>;
+
 export const IMPORT_DOCTOR_SPECIALTIES = [
   "cardiology",
   "dermatology",
@@ -154,6 +174,7 @@ const supportedDomains = new Set<ImportEntityDomain>([
 ]);
 
 const supportedEntityTypes = new Set<ImportEntityType>(Object.keys(IMPORT_ENTITY_DOMAIN_BY_TYPE) as ImportEntityType[]);
+const supportedAdminEntityTypes = new Set<AdminImportEntityType>(ADMIN_IMPORT_ENTITY_TYPES);
 const supportedDoctorSpecialties = new Set<ImportDoctorSpecialty>(IMPORT_DOCTOR_SPECIALTIES);
 
 export function isImportEntityDomain(value: string | null | undefined): value is ImportEntityDomain {
@@ -162,6 +183,20 @@ export function isImportEntityDomain(value: string | null | undefined): value is
 
 export function isImportEntityType(value: string | null | undefined): value is ImportEntityType {
   return supportedEntityTypes.has(value as ImportEntityType);
+}
+
+export function isAdminImportEntityType(
+  value: string | null | undefined,
+): value is AdminImportEntityType {
+  return supportedAdminEntityTypes.has(value as AdminImportEntityType);
+}
+
+export function resolveImportStagingEntityType(
+  value: string | null | undefined,
+): ImportEntityType | null {
+  if (isImportEntityType(value)) return value;
+  if (!isAdminImportEntityType(value)) return null;
+  return ADMIN_IMPORT_ENTITY_TYPE_TO_CANONICAL[value];
 }
 
 export function isImportDoctorSpecialty(value: string | null | undefined): value is ImportDoctorSpecialty {

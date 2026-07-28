@@ -29,8 +29,8 @@ Build mode:
 - Import-readiness runtime is aligned through **PR #958** at baseline **`baba0cc91508ef8fad16e43650cf425099c8908a`**.
 - Database/migration status: **validates through `0086_import_pharmacy_recovery_review_attempts.sql`**.
 - Completed migration set: **`0001` through `0086`**.
-- Current import-readiness implementation: **`REGISTRY-CONVERGENCE`**.
-- P09 completed the isolated Preview Pharmacy lifecycle across all ten persisted stages, including private publish, durable rollback, bounded replay, exact logical recovery, and integrity-zero readback. The Registry Authority Audit is complete and records the current supported/planned/disabled/unsupported mappings. Public/index/sitemap/route promotion and Production execution remain disabled.
+- Current import-readiness implementation: **`PHARMACY-PUBLIC-NOINDEX-LIFECYCLE`**.
+- P09 completed the isolated Preview Pharmacy lifecycle across all ten persisted stages, including private publish, durable rollback, bounded replay, exact logical recovery, and integrity-zero readback. The Registry Authority Audit and Registry Convergence are complete; the total adapter and fail-closed route boundary are recorded in [`docs/import/registry-convergence.md`](docs/import/registry-convergence.md). Index/sitemap promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

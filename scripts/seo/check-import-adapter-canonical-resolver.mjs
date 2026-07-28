@@ -35,19 +35,15 @@ const adapterSource = readRequired(adapterPath, 'public provider import adapter'
 const resolverSource = readRequired(resolverPath, 'public provider canonical resolver');
 
 requirePhrases('public provider import adapter', adapterSource, [
+  'resolveImportStagingEntityType',
+  'resolveImportProviderAuthority',
   'resolvePublicProviderCanonicalRoute',
-  'type PublicProviderRouteFamily',
-  'ROUTE_FAMILY_BY_ENTITY',
-  'doctor: "doctor"',
-  'pharmacy: "pharmacy"',
-  'hospital: "hospital"',
-  'lab: "lab"',
-  'radiology: "imaging_center"',
-  'dentistry: "dental_clinic"',
-  'beauty: "beauty_clinic"',
   'function localeFromPath',
+  'candidateEntityType ?? queueEntityType',
+  'if (!authorityResolution.ok) return null;',
+  'if (publicProjection === null || routeRelease.family === null) return null;',
   'const resolvedRoute = resolvePublicProviderCanonicalRoute({',
-  'family: routeFamily,',
+  'family: routeRelease.family,',
   'locale,',
   'country: "om"',
   'resolvedRoute.publicRouteEnabled',
@@ -60,6 +56,8 @@ requirePhrases('public provider import adapter', adapterSource, [
 forbidPhrases('public provider import adapter', adapterSource, [
   'const routeMatchesFamily = canonicalPath.split("/").filter(Boolean).includes(family);',
   'const publicDiscoveryEligible = Boolean(publicDetailEligible && routeMatchesFamily);',
+  'FAMILY_BY_ENTITY',
+  'ROUTE_FAMILY_BY_ENTITY',
 ]);
 
 requirePhrases('public provider canonical resolver', resolverSource, [

@@ -127,9 +127,10 @@ for (const token of [
 }
 
 for (const token of [
-  String.raw`^\/(en|ar)\/om\/doctor\/`,
-  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
-  String.raw`^\/(en|ar)\/om\/hospitals\/`,
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'target_entity_type',
 ]) {
   assertIncludes(importSitemapSource, token, `import sitemap must preserve reviewed sitemap token ${token}`);

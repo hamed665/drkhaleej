@@ -47,9 +47,10 @@ const packageSource = await readText('package.json');
 
 for (const token of [
   'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital"',
-  String.raw`^\/(en|ar)\/om\/doctor\/`,
-  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
-  String.raw`^\/(en|ar)\/om\/hospitals\/`,
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'hospital: 500',
   'hasReviewedImportEvidence',
   '.eq("publish_status", "index_eligible")',
@@ -65,7 +66,7 @@ for (const forbiddenToken of [
   'insurance',
   'claim',
   'provider-dashboard',
-  'admin',
+  'href="/admin',
   'preview',
 ]) {
   assertNotIncludes(sitemapSource, forbiddenToken, `import sitemap must not include ${forbiddenToken}.`);

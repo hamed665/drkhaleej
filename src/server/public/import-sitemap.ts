@@ -1,6 +1,8 @@
 import "server-only";
 
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
+import { resolvePublicProviderCanonicalRoute } from "@/lib/catalog/public-provider-route-resolver";
+import { resolveImportProviderAuthority } from "@/server/admin/import-provider-authority-adapter";
 
 type QueryResult<T> = { data: T[] | null; error: unknown | null };
 
@@ -17,7 +19,7 @@ type ImportSitemapClient = {
 
 type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";
 
-type IncludedImportSitemapRow = {
+export type IncludedImportSitemapRow = {
   id: string;
   target_entity_type: string;
   updated_at: string;
@@ -74,18 +76,20 @@ function emptyFamilyCounters(): Record<SupportedImportSitemapEntityType, number>
   };
 }
 
-function isSafePublicCanonicalPathForEntity(
-  entityType: SupportedImportSitemapEntityType,
-  pathname: string,
-): boolean {
-  switch (entityType) {
-    case "doctor":
-      return /^\/(en|ar)\/om\/doctor\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
-    case "pharmacy":
-      return /^\/(en|ar)\/om\/pharmacies\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
-    case "hospital":
-      return /^\/(en|ar)\/om\/hospitals\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
-  }
+function routeIdentity(pathname: string): {
+  locale: "en" | "ar";
+  country: "om";
+  slug: string;
+} | null {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length !== 4) return null;
+
+  const [locale, country, , slug] = parts;
+  if (locale !== "en" && locale !== "ar") return null;
+  if (country !== "om") return null;
+  if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
+
+  return { locale, country, slug };
 }
 
 function parseLastModified(value: string): Date {
@@ -100,14 +104,35 @@ function hasReviewedImportEvidence(metadata: JsonRecord): boolean {
   return readString(metadata, "import_entity_candidate_id") !== null;
 }
 
-function rowToSitemapEntry(row: IncludedImportSitemapRow): InternalImportSitemapEntry | null {
+export function buildPublicImportSitemapEntry(
+  row: IncludedImportSitemapRow,
+): InternalImportSitemapEntry | null {
   const entityType = supportedEntityType(row.target_entity_type);
   if (entityType === null) return null;
   if (!isRecord(row.metadata)) return null;
   if (!hasReviewedImportEvidence(row.metadata)) return null;
 
   const canonicalPath = readString(row.metadata, "canonical_path");
-  if (canonicalPath === null || !isSafePublicCanonicalPathForEntity(entityType, canonicalPath)) return null;
+  if (canonicalPath === null) return null;
+
+  const identity = routeIdentity(canonicalPath);
+  if (identity === null) return null;
+
+  const authorityResolution = resolveImportProviderAuthority(entityType);
+  if (!authorityResolution.ok) return null;
+
+  const routeFamily = authorityResolution.authority.routeRelease.family;
+  if (routeFamily === null) return null;
+
+  const resolvedRoute = resolvePublicProviderCanonicalRoute({
+    family: routeFamily,
+    slug: identity.slug,
+    locale: identity.locale,
+    country: identity.country,
+  });
+  if (!resolvedRoute.publicRouteEnabled || resolvedRoute.canonicalPath !== canonicalPath) {
+    return null;
+  }
 
   return {
     entityType,
@@ -166,7 +191,7 @@ export async function listPublicImportSitemapEntries(): Promise<readonly PublicI
     }
 
     const entries = result.data
-      .map(rowToSitemapEntry)
+      .map(buildPublicImportSitemapEntry)
       .filter((entry): entry is InternalImportSitemapEntry => entry !== null);
 
     return applyFamilyCaps(entries);

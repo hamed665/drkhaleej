@@ -136,6 +136,8 @@ export function isPublicProviderEntityFamily(value: string): value is PublicProv
   return publicProviderEntityFamilies.includes(value as PublicProviderEntityFamily);
 }
 
-export function getPublicEntityFamilyRegistryEntry(family: PublicEntityFamily): PublicEntityFamilyRegistryEntry {
-  return publicEntityFamilyRegistry.find((entry) => entry.family === family) ?? publicEntityFamilyRegistry[0];
+export function getPublicEntityFamilyRegistryEntry(
+  family: string,
+): PublicEntityFamilyRegistryEntry | null {
+  return publicEntityFamilyRegistry.find((entry) => entry.family === family) ?? null;
 }

@@ -165,3 +165,7 @@ The next work is intentionally consolidated into four substantial review package
 4. `PHARMACY-SITEMAP-PROMOTION` — independent sitemap authority, readback, and rollback; the legacy coupled helper cannot be reused unchanged.
 
 Later families, intake convergence, workers, Agents, Content, Admin expansion, and Bulk remain separate gates rather than being pre-split into speculative pull requests.
+
+## Post-audit resolution
+
+`REGISTRY-CONVERGENCE` subsequently resolved the actionable findings while preserving the audit above as the immutable snapshot of what was discovered. The implementation and proof record are in [`registry-convergence.md`](registry-convergence.md). `AUTH-007` remains intentionally deferred to the independent Pharmacy Index and Sitemap promotion packages; the coupled legacy helper is not a release authority.

@@ -14,7 +14,7 @@ const expectedCanonicalState = {
   runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
   lastAligned: '2026-07-28',
   currentMigration: '0086_import_pharmacy_recovery_review_attempts.sql',
-  currentNext: 'REGISTRY-CONVERGENCE',
+  currentNext: 'PHARMACY-PUBLIC-NOINDEX-LIFECYCLE',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -24,7 +24,7 @@ const expectedCanonicalState = {
     '4.1': 'COMPLETE',
     '4.2': 'COMPLETE',
     5: 'COMPLETE',
-    6: 'PARTIAL',
+    6: 'COMPLETE',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -221,6 +221,7 @@ function validateMatrix(source, manifest) {
     'Admin state machine': ['Complete', '#957'],
     'Real Admin canary': ['Complete', '#958'],
     'Registry authority audit': ['Complete', 'docs/import/registry-authority-audit.md'],
+    'Registry convergence': ['Complete', 'docs/import/registry-convergence.md'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
