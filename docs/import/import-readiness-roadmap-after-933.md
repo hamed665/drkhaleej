@@ -20,15 +20,15 @@ Wave 2.2   COMPLETE  (#943, #946) Admin reservation operation and authorization-
 Wave 3+    COMPLETE  (#953, #954) Verified Reservation handoff, guarded private mutation, terminal persistence, durable reference and publish readback proven
 Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time consumption and bounded replay proven
 Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatch diagnostics proven
-Wave 5     PARTIAL   (#957) Server-authoritative Admin state machine complete; real Admin canary and Post-P09 decision remain open
+Wave 5     COMPLETE  (#957, #958) Server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #957
-Baseline commit: d9ba9059
-Last aligned: 2026-07-24
+Aligned through: PR #958
+Baseline commit: baba0cc9
+Last aligned: 2026-07-28
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -36,11 +36,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 957,
-  "runtimeBaseline": "d9ba9059df05184d6e9576bc694642118cdecf07",
-  "lastAligned": "2026-07-24",
-  "currentMigration": "0084_import_pharmacy_rollback_digest_schema.sql",
-  "currentNext": "REAL-ADMIN-CANARY",
+  "alignedThroughPr": 958,
+  "runtimeBaseline": "baba0cc91508ef8fad16e43650cf425099c8908a",
+  "lastAligned": "2026-07-28",
+  "currentMigration": "0086_import_pharmacy_recovery_review_attempts.sql",
+  "currentNext": "REGISTRY-AUTHORITY-AUDIT",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -49,7 +49,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "3+": "COMPLETE",
     "4.1": "COMPLETE",
     "4.2": "COMPLETE",
-    "5": "PARTIAL"
+    "5": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -268,7 +268,7 @@ Only append-only audit/history state, monotonic entity-version metadata, rollbac
 
 The exact-SHA isolated Preview proof produced equal expected/actual logical hashes, mismatch count zero, verified a deliberate protected nested mismatch using hash-only diagnostics, preserved private/noindex/no-route/no-sitemap state, reported zero public exposure, completed deterministic cleanup and kept Production disconnected.
 
-## Wave 5 — Admin state machine and canary `PARTIAL (#957)`
+## Wave 5 — Admin state machine and canary `COMPLETE (#957, #958)`
 
 Keep `/admin/imports/readiness` and the existing design system.
 
@@ -289,9 +289,9 @@ P08 extends the existing protected `/admin/imports/readiness` workflow with all 
 
 P08 changes no database schema or authority and keeps the workflow single-entity, Pharmacy-only, private/noindex/no-route/no-sitemap, actor/entity allowlisted, and unavailable in Production.
 
-P09 must run one real Preview Pharmacy through the complete Admin path. Integrity findings for orphan/duplicate/audit gap/unfinished execution/state mismatch/public/index/sitemap exposure/secret leakage/unrestricted payload must all be zero.
+P09 completed the fixed isolated Preview Pharmacy lifecycle across all ten persisted stages. The exact-head proof records one fresh Private Publish, one durable rollback authority, one fresh rollback, one bounded replay, exact logical recovery, and zero orphan, duplicate, audit-gap, unfinished-execution, state-mismatch, public, index, sitemap, secret, raw-identifier, or unrestricted-payload findings. Production remained disconnected and unchanged.
 
-Wave 5 فقط پس از تکمیل checklist مستقل Post-P09 Go/No-Go و ثبت `GO` کامل است. این GO فقط Registry/Pharmacy Public work را باز می‌کند؛ Agent، Content و Bulk Gateهای جدا دارند.
+The independent Post-P09 decision is `GO_LITERAL_PREVIEW_CYCLE_COMPLETE`. This GO opens only the separately reviewed Registry/Pharmacy-public planning gate; Agent, Content, Hospital, Doctor, later-family and Bulk gates remain closed.
 
 ## Wave 6 — Registry convergence `OPEN`
 
@@ -378,7 +378,7 @@ Do not add:
 ## Current next implementation
 
 ```text
-REAL-ADMIN-CANARY
+REGISTRY-AUTHORITY-AUDIT
 ```
 
-P08 completed the server-authoritative ten-stage Pharmacy Admin workflow with readback-only refresh, expiry/stale handling, replay/fresh receipts, multi-tab revision rejection, double-submit protection, bounded audit history, manual rollback, and P07 exact-recovery readback. The next implementation is P09 real Admin canary. Public/index/sitemap/route promotion, Production execution, Agent, Content, Hospital, Doctor, Registry, and Bulk remain disabled.
+P09 and the Post-P09 GO are complete. The next task is the P10 Registry authority audit: reconcile the existing entity, public-family, route-family, storage-family, SEO, schema, relation and sitemap registries; mark each mapping supported, planned, disabled or unsupported; and extend only existing registry documentation/contracts if separately approved. This audit adds no routes, placeholders, category pages, sitemap entries, public promotion, Production execution, Agent, Content, Hospital, Doctor, later-family implementation or Bulk behavior.

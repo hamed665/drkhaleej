@@ -26,11 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #957** at baseline **`d9ba9059df05184d6e9576bc694642118cdecf07`**.
-- Database/migration status: **validates through `0084_import_pharmacy_rollback_digest_schema.sql`**.
-- Completed migration set: **`0001` through `0084`**.
-- Current import-readiness implementation: **`REAL-ADMIN-CANARY`**.
-- P08 implements the protected ten-stage server-authoritative Pharmacy Admin state machine with revision-bound forms, readback-only refresh, stale/expiry handling, replay/fresh receipts, double-submit protection, manual rollback, exact recovery, and bounded audit history. P09 real Admin canary, public/index/sitemap/route promotion and Production execution remain disabled.
+- Import-readiness runtime is aligned through **PR #958** at baseline **`baba0cc91508ef8fad16e43650cf425099c8908a`**.
+- Database/migration status: **validates through `0086_import_pharmacy_recovery_review_attempts.sql`**.
+- Completed migration set: **`0001` through `0086`**.
+- Current import-readiness implementation: **`REGISTRY-AUTHORITY-AUDIT`**.
+- P09 completed the isolated Preview Pharmacy lifecycle across all ten persisted stages, including private publish, durable rollback, bounded replay, exact logical recovery, and integrity-zero readback. The recorded Post-P09 GO opens only the separately reviewed Registry/Pharmacy-public planning gate. Public/index/sitemap/route promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:
