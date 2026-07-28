@@ -1,0 +1,70 @@
+name: P09 Literal Application Diagnostic
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/import/run-p09-literal-application-preflight-diagnostic.mjs'
+      - '.github/workflows/p09-literal-application-diagnostic.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: drmuscat-p09-literal-application-diagnostic
+  cancel-in-progress: false
+
+env:
+  P09_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P09_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P09_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P09_LITERAL_ENTITY_SHA256: 96c37e7cc021ea720993a05083da7a0fbf0ae0db0c1dfb37c34e02cc89a79187
+  P09_LITERAL_APPLICATION_PREFLIGHT_PATH: artifacts/p09/literal-application-preflight-diagnostic.json
+
+jobs:
+  diagnose:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+
+      - name: Verify exact revision
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "$P09_SOURCE_COMMIT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Diagnose literal application preflight
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/p09
+          node scripts/import/run-p09-literal-application-preflight-diagnostic.mjs 2>&1 | tee artifacts/p09/literal-application-preflight-diagnostic.log
+
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-literal-application-preflight-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p09/
+          if-no-files-found: error
+          retention-days: 14
