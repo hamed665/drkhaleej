@@ -36,6 +36,7 @@ const expectedColumns = [
 ];
 
 const allowedStatuses = ['supported', 'planned', 'disabled', 'unsupported'];
+const auditedEnabledRouteFamilies = new Set(['center', 'doctor']);
 const expectedFindings = new Map([
   ['AUTH-001', 'unsupported'],
   ['AUTH-002', 'disabled'],
@@ -241,7 +242,7 @@ assert(
   'AUTH-007 is stale: the legacy sitemap helper no longer couples index and sitemap promotion.',
 );
 assert(
-  sameValues([...enabledRouteFamilies].sort(), ['center', 'doctor']),
+  sameValues([...enabledRouteFamilies].sort(), ['center', 'doctor', 'pharmacy']),
   `${files.routeResolver}: enabled route families drifted.`,
 );
 assert(
@@ -310,7 +311,7 @@ for (const row of rows) {
       routeFamilies.has(row.routeFamily),
       `${files.audit}: ${row.entityType} references unknown route family ${row.routeFamily}.`,
     );
-    const expectedStatus = enabledRouteFamilies.has(row.routeFamily)
+    const expectedStatus = auditedEnabledRouteFamilies.has(row.routeFamily)
       ? row.entityType === row.routeFamily
         ? 'supported'
         : 'planned'
@@ -408,9 +409,9 @@ try {
 assert(
   sources.routeResolver.includes("if (family === 'doctor')") &&
     sources.routeResolver.includes("if (family === 'center')") &&
-    !sources.routeResolver.includes("if (family === 'pharmacy')") &&
+    sources.routeResolver.includes("if (family === 'pharmacy')") &&
     !sources.routeResolver.includes("if (family === 'hospital')"),
-  `${files.routeResolver}: Pharmacy/Hospital route disablement drifted.`,
+  `${files.routeResolver}: independently released route-family boundary drifted.`,
 );
 assert(
   sources.sitemapReader.includes(
@@ -422,7 +423,7 @@ assert(
   `${files.sitemapReader}: import sitemap must consume canonical family and route authorities.`,
 );
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY"') &&
+  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-ROLLBACK"') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: convergence completion/next transition is not aligned.`,
 );

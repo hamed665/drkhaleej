@@ -34,7 +34,7 @@ for (const token of [
   'metadata.sitemap_included !== true',
   'readString(metadata, "robots_policy") !== "index"',
   'readString(metadata, "canonical_path") === null',
-  'readString(metadata, "import_entity_candidate_id") !== null',
+  'readString(metadata, "import_entity_candidate_id") === null',
   '.select("id, target_entity_type, updated_at, metadata")',
   '.eq("publish_status", "index_eligible")',
   '.eq("index_policy", "index")',

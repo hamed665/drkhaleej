@@ -29,8 +29,8 @@ Build mode:
 - Import-readiness runtime is aligned through **PR #958** at baseline **`baba0cc91508ef8fad16e43650cf425099c8908a`**.
 - Database/migration status: **validates through `0087_import_pharmacy_public_noindex_authority.sql`**.
 - Completed migration set: **`0001` through `0087`**.
-- Current import-readiness implementation: **`PHARMACY-BILINGUAL-LIVE-VERIFY`**.
-- P11 adds only the isolated Preview Pharmacy public/noindex authority recorded in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). Bilingual paths are bound to a `published_noindex` Queue record, while the public route, rollback, JSON-LD, Index, Sitemap promotion and Production execution remain disabled.
+- Current import-readiness implementation: **`PHARMACY-PUBLIC-ROLLBACK`**.
+- P11 adds the isolated Preview Pharmacy public/noindex authority recorded in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact bilingual route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md). Every Pharmacy page remains `noindex`, excluded from discovery and Sitemap, without JSON-LD; public rollback, Index/Sitemap promotion and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

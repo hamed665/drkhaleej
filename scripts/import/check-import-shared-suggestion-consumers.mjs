@@ -36,7 +36,6 @@ for (const token of [
 
 for (const [consumerPath, familyToken] of [
   ['src/server/public/import-doctor-profile-guard.ts', 'sourceFamily: "doctor"'],
-  ['src/server/public/import-pharmacy-profile-guard.ts', 'sourceFamily: "pharmacy"'],
   ['src/server/public/import-hospital-profile-guard.ts', 'sourceFamily: "hospital"'],
 ]) {
   const source = await readText(consumerPath);
@@ -49,6 +48,21 @@ for (const [consumerPath, familyToken] of [
   ]) {
     assertIncludes(source, token, consumerPath);
   }
+}
+
+const pharmacySource = await readText('src/server/public/import-pharmacy-profile-guard.ts');
+for (const token of [
+  'PublicImportLocalSuggestion',
+  'localSuggestions: PublicImportLocalSuggestion[];',
+  'localSuggestions: []',
+]) {
+  assertIncludes(pharmacySource, token, 'src/server/public/import-pharmacy-profile-guard.ts');
+}
+for (const token of [
+  'buildPublicImportLocalSuggestions({',
+  'sourceFamily: "pharmacy"',
+]) {
+  assertNotIncludes(pharmacySource, token, 'src/server/public/import-pharmacy-profile-guard.ts');
 }
 
 const hospitalSource = await readText('src/server/public/import-hospital-profile-guard.ts');
@@ -66,8 +80,8 @@ const contractSource = await readText('docs/import/public-local-suggestion-guard
 for (const token of [
   'Current imported profile guards using this shared runtime boundary:',
   'src/server/public/import-doctor-profile-guard.ts',
-  'src/server/public/import-pharmacy-profile-guard.ts',
   'src/server/public/import-hospital-profile-guard.ts',
+  'P12 Pharmacy exception',
 ]) {
   assertIncludes(contractSource, token, 'docs/import/public-local-suggestion-guard-contract.md');
 }

@@ -92,4 +92,19 @@ describe("public provider import adapter convergence", () => {
       ),
     ).toBeNull();
   });
+
+  it("does not treat Pharmacy route release as Index or discovery approval", () => {
+    expect(
+      buildImportedProviderDiscoveryEntry(
+        queueRow("pharmacy", "/en/om/pharmacies/reviewed-pharmacy"),
+        candidate("pharmacy"),
+      ),
+    ).toMatchObject({
+      entityType: "pharmacy",
+      canonicalPath: "/en/om/pharmacies/reviewed-pharmacy",
+      publicDetailEligible: false,
+      publicDiscoveryEligible: false,
+      publicSitemapEligible: false,
+    });
+  });
 });

@@ -196,8 +196,8 @@ const enabledRouteFamilies = [
   .map((item) => item[1])
   .sort();
 assert(
-  sameValues(enabledRouteFamilies, ['center', 'doctor']),
-  `${files.routeResolver}: disabled route families must remain disabled.`,
+  sameValues(enabledRouteFamilies, ['center', 'doctor', 'pharmacy']),
+  `${files.routeResolver}: only the independently released route families may be enabled.`,
 );
 assert(
   /index_policy:\s*"index"[\s\S]*sitemap_policy:\s*"included"/.test(
@@ -207,7 +207,7 @@ assert(
 );
 
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY"') &&
+  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-ROLLBACK"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: completed convergence state is not aligned.`,

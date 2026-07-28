@@ -46,7 +46,7 @@ describe("import provider authority adapter", () => {
     });
   });
 
-  it("keeps capabilities separate from release authority", () => {
+  it("records the independently released Pharmacy route without implying discovery", () => {
     const pharmacy = resolveImportProviderAuthority("pharmacy");
     expect(pharmacy).toMatchObject({
       ok: true,
@@ -63,15 +63,15 @@ describe("import provider authority adapter", () => {
         },
         routeRelease: {
           family: "pharmacy",
-          status: "disabled",
-          publicRouteEnabled: false,
-          reason: "route_disabled",
+          status: "supported",
+          publicRouteEnabled: true,
+          reason: "enabled",
         },
       },
     });
   });
 
-  it("preserves the existing doctor route and all existing disabled routes", () => {
+  it("preserves the existing doctor route and later disabled routes", () => {
     expect(resolveImportProviderAuthority("doctor")).toMatchObject({
       ok: true,
       authority: {

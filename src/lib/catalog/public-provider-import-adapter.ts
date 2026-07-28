@@ -208,12 +208,16 @@ export function buildImportedProviderDiscoveryEntry(
   const evidence = sourceEvidence(metadata, candidate);
   const lastCheckedAt = evidence.lastCheckedAt ?? row.updated_at;
   const routeMatchesResolver = Boolean(resolvedRoute.publicRouteEnabled && resolvedRoute.canonicalPath === metadataCanonicalPath);
+  const independentIndexReleased =
+    canonicalEntityType !== "pharmacy" ||
+    text(metadata, "pharmacy_index_promotion_schema_version") ===
+      "drkhaleej.import.pharmacyIndexPromotion.v1";
   const hasGeo = location.area !== null || location.wilayat !== null || location.governorate !== null;
   const hasSource = evidence.sourceName !== null || evidence.sourceUrl !== null;
   const statusAllowsDetail = row.publish_status === "index_eligible" || row.publish_status === "published";
   const robotsAllowsIndex = row.robots_policy === undefined || row.robots_policy === null || row.robots_policy === "index";
 
-  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && approvedCandidate(candidate, canonicalEntityType) && routeMatchesResolver && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
+  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && independentIndexReleased && approvedCandidate(candidate, canonicalEntityType) && routeMatchesResolver && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
   const publicDiscoveryEligible = Boolean(publicDetailEligible && routeMatchesResolver);
   const publicSitemapEligible = Boolean(publicDiscoveryEligible && row.sitemap_policy === "included" && robotsAllowsIndex);
 
