@@ -7,25 +7,25 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #957 at baseline commit `d9ba9059df05184d6e9576bc694642118cdecf07` (last aligned 2026-07-24).
+- Import-readiness runtime is aligned through PR #958 at baseline commit `baba0cc91508ef8fad16e43650cf425099c8908a` (last aligned 2026-07-28).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0084`.
-- Migration validation is expected through `0084_import_pharmacy_rollback_digest_schema.sql`.
+- Completed migration set: `0001` through `0086`.
+- Migration validation is expected through `0086_import_pharmacy_recovery_review_attempts.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Import readiness alignment
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #957 |
-| Runtime baseline | `d9ba9059df05184d6e9576bc694642118cdecf07` |
-| Last aligned | `2026-07-24` |
-| Current migration | `0084_import_pharmacy_rollback_digest_schema.sql` |
-| Current next | `REAL-ADMIN-CANARY` |
+| Aligned through | PR #958 |
+| Runtime baseline | `baba0cc91508ef8fad16e43650cf425099c8908a` |
+| Last aligned | `2026-07-28` |
+| Current migration | `0086_import_pharmacy_recovery_review_attempts.sql` |
+| Current next | `REGISTRY-AUTHORITY-AUDIT` |
 | Reservation audit event | `reservation_created` |
 | Reservation audit phase | `reservation` |
 
@@ -38,9 +38,9 @@
 | 3+ | COMPLETE | PRs #953 and #954; verified Reservation handoff, guarded private mutation, terminal persistence and publish readback proven |
 | 4.1 | COMPLETE | PR #955; server-selected atomic rollback authority consumption and bounded replay proven |
 | 4.2 | COMPLETE | PR #956; exact logical recovery and bounded hash-only mismatch diagnostics proven |
-| 5 | PARTIAL | PR #957; server-authoritative Admin state machine complete, while P09 canary and Post-P09 Go/No-Go remain open |
+| 5 | COMPLETE | PRs #957 and #958; server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete |
 
-The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. P07 proves equal original/post-rollback logical hashes across bounded fields, locale/country, canonical route, geo/projection and protected metadata, deletion/sort state, private publication flags and the current exact empty relation snapshot contract. Unexpected differences fail closed with bounded field paths and hashes only. P08 now derives ten Admin stages from persisted server readback, provides readback-only refresh, expiry and stale handling, fresh/replayed receipts, server revision binding for multi-tab collisions, client pending lock, manual rollback, exact-recovery verification, and bounded audit history. Reservation, mutation, and rollback are never retried automatically. Pharmacy public/index/sitemap promotion and the P09 real Admin canary remain disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. P07 proves equal original/post-rollback logical hashes across bounded fields, locale/country, canonical route, geo/projection and protected metadata, deletion/sort state, private publication flags and the current exact empty relation snapshot contract. Unexpected differences fail closed with bounded field paths and hashes only. P08 derives ten Admin stages from persisted server readback, provides readback-only refresh, expiry and stale handling, fresh/replayed receipts, server revision binding for multi-tab collisions, client pending lock, manual rollback, exact-recovery verification, and bounded audit history. P09 completed all ten persisted stages for the fixed isolated Preview Pharmacy and proved one fresh private publish, one durable rollback authority, one fresh rollback, one bounded replay, exact logical recovery, and zero duplicate, audit-gap, unfinished-execution, state-mismatch, public, index, sitemap, raw-identifier, or unrestricted-payload findings. Reservation, mutation, and rollback are never retried automatically. The Post-P09 decision is `GO_LITERAL_PREVIEW_CYCLE_COMPLETE`, which opens only Registry/Pharmacy-public planning. Public/index/sitemap promotion, Production execution, Agent, Content, Hospital, Doctor, later families and Bulk remain disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
 
 Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. Import-readiness implementation PRs remain independently review-gated before merge.
 
@@ -80,12 +80,12 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 - Admin quick navigation links exist for provider leads, center subscriptions, and commercial add-ons.
 - Admin commercial add-on assignment shell exists at `/admin/commercial-addons` for Homepage Ads and Special Offer Placement.
 - Preview-only guarded Pharmacy `private_publish` exists after exact Review, Authorization, Reservation verification and entity-bound confirmation. It remains single-entity, private/noindex/no-route/no-sitemap, bounded by post-mutation readback, and unavailable in Production.
-- The protected `/admin/imports/readiness` page implements the P08 ten-stage server-authoritative Pharmacy state machine. Only one allowlisted actor/entity can access manual Preview controls; every action is revision-bound and accepted only after persisted post-operation readback. Refresh is readback-only, stale/expired state fails closed, fresh/replay outcomes are explicit, and bounded audit/exact-recovery diagnostics expose no raw values or persistence identifiers.
+- The protected `/admin/imports/readiness` page implements the ten-stage server-authoritative Pharmacy state machine. Only one allowlisted actor/entity can access manual Preview controls; every action is revision-bound and accepted only after persisted post-operation readback. Refresh is readback-only, stale/expired state fails closed, fresh/replay outcomes are explicit, and bounded audit/exact-recovery diagnostics expose no raw values or persistence identifiers. P09 completed this lifecycle for the fixed isolated Preview entity without enabling Production or public behavior.
 - Admin lead contact-action, sales automation, full audit-write, provider dashboard, billing, payment, invoice, and public activation workflows remain out of scope and are not implemented.
 
 ## Data/RLS foundations
 
-- Database foundations validate through `0084_import_pharmacy_rollback_digest_schema.sql`.
+- Database foundations validate through `0086_import_pharmacy_recovery_review_attempts.sql`.
 - Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, provider onboarding lead event-history DB foundation, landing content foundations, and review companion table foundations exist.
 - Provider onboarding lead event history supports the currently allowed event types: `status_changed`, `priority_changed`, and `note_added`.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
@@ -119,7 +119,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Ops workflow state
 
-- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression, the exact-SHA P06 atomic rollback authority proof and the P07 exact logical recovery proof. P08 Admin state-machine changes trigger the same hosted regressions and the bounded Admin UI/static contracts.
+- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression, the exact-SHA P06 atomic rollback authority proof, the P07 exact logical recovery proof and the serialized P09 hosted/literal completion. P08/P09 Admin-state changes trigger the same hosted regressions and bounded Admin UI/static contracts.
 - A manual-only Supabase remote migration workflow exists for operator-triggered migration pushes.
 - Remote migration execution remains guarded by GitHub secrets and the exact manual confirmation input `PUSH_REMOTE_DB`.
 
@@ -140,10 +140,10 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#957 are the current import-readiness runtime baseline.
-- Migration validation passes through `0084_import_pharmacy_rollback_digest_schema.sql`.
+- PRs #936–#958 are the current import-readiness runtime baseline.
+- Migration validation passes through `0086_import_pharmacy_recovery_review_attempts.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build and lint gates pass in CI.
-- Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof and P07 exact logical recovery proof pass on the P08 runtime evidence baseline with Production disconnected. P08 lint, typecheck, unit, build, route, env, migration, seed, RLS, SEO and import-readiness gates pass.
+- Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof, P07 exact logical recovery proof and P09 hosted/literal completion pass on the exact P09 baseline with Production disconnected. P09 lint, typecheck, unit, build, route, env, migration, seed, RLS, SEO, import-readiness and Vercel gates pass.
 
 ## Future phase rules
 

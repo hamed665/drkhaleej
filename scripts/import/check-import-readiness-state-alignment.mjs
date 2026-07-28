@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 957,
-  runtimeBaseline: 'd9ba9059df05184d6e9576bc694642118cdecf07',
-  lastAligned: '2026-07-24',
-  currentMigration: '0084_import_pharmacy_rollback_digest_schema.sql',
-  currentNext: 'REAL-ADMIN-CANARY',
+  alignedThroughPr: 958,
+  runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
+  lastAligned: '2026-07-28',
+  currentMigration: '0086_import_pharmacy_recovery_review_attempts.sql',
+  currentNext: 'REGISTRY-AUTHORITY-AUDIT',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -23,7 +23,7 @@ const expectedCanonicalState = {
     '3+': 'COMPLETE',
     '4.1': 'COMPLETE',
     '4.2': 'COMPLETE',
-    5: 'PARTIAL',
+    5: 'COMPLETE',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -218,6 +218,7 @@ function validateMatrix(source, manifest) {
     'Durable rollback authority': ['Complete', '#955'],
     'Exact rollback recovery': ['Complete', '#956'],
     'Admin state machine': ['Complete', '#957'],
+    'Real Admin canary': ['Complete', '#958'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
@@ -236,7 +237,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0084`',
+    '`0001` through `0086`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

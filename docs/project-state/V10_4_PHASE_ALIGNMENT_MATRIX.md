@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #957 at baseline `d9ba9059df05184d6e9576bc694642118cdecf07` (last aligned 2026-07-24).
-- Migrations validate through `0084_import_pharmacy_rollback_digest_schema.sql`.
-- The current next implementation is `REAL-ADMIN-CANARY`.
+- Import-readiness runtime is aligned through PR #958 at baseline `baba0cc91508ef8fad16e43650cf425099c8908a` (last aligned 2026-07-28).
+- Migrations validate through `0086_import_pharmacy_recovery_review_attempts.sql`.
+- The current next implementation is `REGISTRY-AUTHORITY-AUDIT`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -91,8 +91,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Center subscription view/assignment | Completed foundation | Phase 6 | Phase 9 / Phase 5 | Phase 7 / Phase 15 | Admin assignment only. |
 | Commercial add-on assignment shell | Completed draft/internal shell | Phase 6 | Phase 8 / Phase 5 | Phase 15 | Homepage Ads and Special Offer Placement only. |
 | Pharmacy private publish/readback | Completed Preview authority | Phase 4 / Phase 9 | Phase 10 / Phase 11 | Phase 6 / Phase 18 | Single entity, verified Reservation, exact patch, terminal persistence, durable reference and hosted readback; Production and public promotion remain disabled. |
-| Pharmacy rollback authority | Completed Preview authority | Phase 9 | Phase 11 | Phase 6 / Phase 18 | Server-selected actor/entity/version/snapshot-bound authority, atomic consume-or-abort, bounded replay, zero raw-reference browser custody; exact logical recovery and the server-authoritative P08 Admin UI are proven; P09 real canary remains gated. |
-| Migrations through `0084` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 | Existing SQL migrations must not be modified unless approved. |
+| Pharmacy rollback authority | Completed Preview authority | Phase 9 | Phase 11 | Phase 6 / Phase 18 | Server-selected actor/entity/version/snapshot-bound authority, atomic consume-or-abort, bounded replay, zero raw-reference browser custody; exact logical recovery, the server-authoritative Admin UI and the P09 literal Preview lifecycle are proven. |
+| Migrations through `0086` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -106,11 +106,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #957 |
-| Runtime baseline | `d9ba9059df05184d6e9576bc694642118cdecf07` |
-| Last aligned | `2026-07-24` |
-| Current migration | `0084_import_pharmacy_rollback_digest_schema.sql` |
-| Current next | `REAL-ADMIN-CANARY` |
+| Aligned through | PR #958 |
+| Runtime baseline | `baba0cc91508ef8fad16e43650cf425099c8908a` |
+| Last aligned | `2026-07-28` |
+| Current migration | `0086_import_pharmacy_recovery_review_attempts.sql` |
+| Current next | `REGISTRY-AUTHORITY-AUDIT` |
 
 ## Import readiness capability mapping
 
@@ -133,8 +133,9 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Private Admin wiring and publish readback | Complete | #954 | Maintain publish regression |
 | Durable rollback authority | Complete | #955 | Maintain atomic rollback regression |
 | Exact rollback recovery | Complete | #956 | Maintain exact-recovery regression |
-| Admin state machine | Complete | #957 | `REAL-ADMIN-CANARY` |
-| Pharmacy public/index/sitemap | Disabled/Open | — | After Admin canary |
+| Admin state machine | Complete | #957 | Maintain state-machine regression |
+| Real Admin canary | Complete | #958 | `REGISTRY-AUTHORITY-AUDIT` |
+| Pharmacy public/index/sitemap | Disabled/Open | — | Registry authority audit |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -154,6 +155,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `ROLLBACK-EXACT-RECOVERY` | Phase 9 | Phase 11 | Phase 18 |
 | `ADMIN-STATE-MACHINE` | Phase 4 | Phase 5 | Phase 6 |
 | `REAL-ADMIN-CANARY` | Phase 9 | Phase 11 | Phase 18 |
+| `REGISTRY-AUTHORITY-AUDIT` | Phase 9 | Phase 10 | Phase 18 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 
