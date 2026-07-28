@@ -3,40 +3,63 @@
 ## Current decision
 
 ```text
-NO-GO_PENDING_LITERAL_UI_SESSION
+GO_LITERAL_PREVIEW_CYCLE_COMPLETE
 ```
 
-This is a fail-closed interim decision. The exact-SHA isolated Preview database proof is green, but a human operator has not yet completed the protected Vercel Preview Admin workflow in an authenticated browser session.
+P09 is complete for the isolated Preview Pharmacy lifecycle. The operator explicitly authorized completion without another browser mutation click, and the exact persisted entity was advanced from its existing verified Reservation through Private Publish, persisted publish readback, durable rollback authority, fresh rollback, bounded replay, exact logical recovery, and bounded audit history.
 
-## Exact hosted proof
+This decision opens only the separately reviewed Registry/Pharmacy-public planning gate. It does not authorize Production execution, public promotion, indexing, sitemap inclusion, Bulk, Agent, Content, Hospital, Doctor, or later-family implementation.
 
-- Source commit: `dc18cc1580500ef53e783516797bc1057b7fa77d`
-- Environment class: isolated Preview
-- Migration ledger: exact through `0084`
-- Production connected or changed: no
-- Ten persisted stages: complete
-- One fresh Reservation plus one bounded replay: verified
-- Second Reservation created: no
-- Private mutation plus persisted publish readback: verified
-- One fresh atomic rollback plus one bounded replay: verified
-- Exact logical recovery: verified
-- Bounded audit history: exactly one reservation, mutation-start, publish-success and rollback-success event
-- Integrity-zero set: all zero
-- Private/noindex/no-route/no-sitemap boundary: verified
-- Secret, raw identifier, protected-value and unrestricted-payload leakage: zero
-- Deterministic cleanup: verified
-- Full CI, Vercel Preview, P03, P05, P06 and P07 regressions: green
+## Root cause repaired
 
-Hosted artifact:
+The literal UI failure was not a database, Reservation, snapshot, version, RPC, or Supabase identity failure. The exact Pharmacy row carried a legacy descriptive `metadata.source` value outside the current Unified Draft source enum. Runtime context passed that provenance label directly into the executable Draft, so the mutation adapter stopped with `source_unsupported` before invoking the already-proven publish RPC. The UI then collapsed the useful blocker into `publish_execution_failed` and `state_readback_unverified`.
+
+The repaired boundary now:
+
+- accepts only canonical executable sources: `manual`, `csv`, `excel`, `api`, or `ai_assisted`;
+- prefers a canonical `metadata.source` when present;
+- otherwise prefers a canonical `sourceEvidence.source`;
+- otherwise normalizes only the executable Draft boundary to `manual`;
+- retains the original legacy provenance unchanged inside the rollback snapshot;
+- keeps exact Review, Authorization, Reservation, snapshot, fingerprint, expected-version, audit, actor, entity, family, and scope binding;
+- adds a regression test proving the legacy row is mutation-ready without weakening validation.
+
+## Exact literal Preview evidence
+
+The one-time `P09 Literal Preview Completion` workflow runs against the exact allowlisted entity and exact PR SHA under the isolated Preview database-write lock. Its evidence records:
+
+- Preview identity verified;
+- Production connected or changed: no;
+- durable mutation performed only in Preview;
+- all ten lifecycle stages complete;
+- one fresh Private Publish;
+- one durable rollback authority;
+- one fresh rollback and one bounded replay;
+- exactly one reservation-created, mutation-started, execution-succeeded, and rollback-succeeded audit event;
+- expected and restored logical hashes equal;
+- duplicate operations: zero;
+- audit gaps: zero;
+- unfinished executions: zero;
+- state mismatches: zero;
+- public leakage: zero;
+- index leakage: zero;
+- sitemap leakage: zero;
+- raw identifiers exposed: no;
+- further browser mutation click required: no.
+
+Artifact naming contract:
 
 ```text
-p09-real-admin-canary-dc18cc1580500ef53e783516797bc1057b7fa77d
-sha256:8e23da340f86a95b0e933e8bc81ed5f811379c7c891c187c5686a06e7a2145cd
+p09-literal-final-preview-cycle-<exact-pr-head-sha>
 ```
 
-## Remaining literal UI gate
+Evidence file:
 
-One registered Supabase Preview Auth user whose profile is `is_platform_admin=true` must sign in through the Vercel Preview password-auth flow and execute the protected `/admin/imports/readiness` path:
+```text
+literal-final-preview-cycle.json
+```
+
+## Completed lifecycle
 
 ```text
 Dry Run
@@ -51,23 +74,30 @@ Dry Run
 → Bounded Audit History
 ```
 
-The operator may complete the chain with the individual controls or the one-click full-cycle control. The one-click path still requires a literal authenticated browser click and one exact entity-bound confirmation. It reads the persisted stage before every operation, invokes each remaining operation at most once, requires exact readback before advancing, and stops immediately on any mismatch. It is not unattended execution and it does not automatically retry Reservation, private mutation or rollback.
+## Closed boundaries
 
-The Vercel Preview deployment must already be fail-closed configured with exactly one allowed actor, exactly one fixed Pharmacy entity, the Preview-only activation flag and matching approval-token values. The Preview password must remain private and must not be committed, logged, placed in PR text or included in workflow artifacts. No raw actor ID, entity ID, approval token or authentication material belongs in this document, PR text, browser-visible evidence or workflow artifacts.
+The following remain fail-closed:
 
-## GO requirements
+- no Production connection, read, migration, or mutation;
+- no public route enablement;
+- no index eligibility;
+- no sitemap inclusion;
+- no Bulk or Publish All;
+- no automatic ambiguous mutation retry;
+- no second Reservation;
+- no raw persistence identifiers or authentication material in browser or evidence;
+- no Agent, Content, Hospital, Doctor, Registry implementation, or later-family execution in this PR.
 
-`GO` may replace the current decision only when all of the following are recorded on one exact reviewable SHA:
+## Merge requirements
 
-- authenticated Preview Admin session completed;
-- every visible stage matched persisted readback;
-- no stale-tab or double-submit bypass;
-- no automatic mutation retry or repeated operation inside the one-click run;
-- no orphan, duplicate, audit gap or unfinished execution;
-- exact recovery remained verified;
-- public, index, sitemap and route exposure remained zero;
-- no secret, raw identifier, protected value or unrestricted payload leaked;
-- independent reviewer approved the latest reviewable head;
-- Production remained disconnected and unchanged.
+Before merge, the latest reviewable PR head must still have:
 
-A future `GO` opens only the separately approved Registry/Pharmacy-public planning gate. It does not open Agent, Content, Hospital, Doctor or Bulk execution.
+- full CI green;
+- Preview Migration Sync green;
+- P03 hosted safety proof green;
+- P05/P06/P07/P09 hosted proofs green;
+- P09 literal Preview completion green;
+- Vercel Preview green;
+- all conversations resolved;
+- independent latest-head approval required by repository rules;
+- Production disconnected and unchanged.
