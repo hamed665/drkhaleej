@@ -46,7 +46,7 @@ describe("public import sitemap entry", () => {
     ).toBeNull();
   });
 
-  it("keeps pharmacy and hospital out while their canonical routes are disabled", () => {
+  it("keeps pharmacy out until independent Sitemap promotion and keeps hospital disabled", () => {
     expect(
       buildPublicImportSitemapEntry(
         reviewedRow("pharmacy", "/en/om/pharmacies/al-khuwair-pharmacy"),

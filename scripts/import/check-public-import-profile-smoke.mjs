@@ -38,7 +38,7 @@ const profileContracts = [
       'getPublicImportPharmacyProfile',
       'pathname: `/pharmacies/${pharmacySlug}`',
       'notFound()',
-      'robots: { index: false, follow: true }',
+      'buildProfileNoindexMetadata(metadata)',
     ],
   },
   {
@@ -94,6 +94,45 @@ function assertNotIncludes(source, token, message) {
 async function assertGuard(contract) {
   await assertFile(contract.guardPath);
   const source = await readText(contract.guardPath);
+
+  if (contract.entity === 'pharmacy') {
+    for (const token of [
+      'import "server-only";',
+      'createSupabaseServiceRoleClient',
+      contract.guardExport,
+      'family: "pharmacies"',
+      'entityType: "pharmacy"',
+      'pharmacySlug: string',
+      'function safeSlug(value: string): string | null',
+      'resolvePublicProviderCanonicalRoute',
+      'isPublicNoindexPharmacyQueueRow',
+      'isPublicNoindexPharmacyAuthorization',
+      'row.target_entity_type !== "pharmacy"',
+      'row.publish_status !== "published_noindex"',
+      'row.index_policy !== "noindex"',
+      'row.sitemap_policy !== "excluded"',
+      'row.metadata.sitemap_included !== false',
+      'row.metadata.index_promoted !== false',
+      'row.metadata.public_route_enabled !== false',
+      'import_pharmacy_public_noindex_authorizations',
+      'candidate.entity_type !== "pharmacy"',
+      'candidate.candidate_status !== "approved"',
+      'hasLocalGeo(geo)',
+      'hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)',
+      'hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })',
+      '.from<PharmacyPublicNoindexQueueRow>("import_publish_queue")',
+      '.eq("sitemap_policy", "excluded")',
+      '.eq("index_policy", "noindex")',
+      '.eq("publish_status", "published_noindex")',
+      '.from<CandidateRow>("import_entity_candidates")',
+      '.eq("candidate_status", "approved")',
+      '.maybeSingle()',
+      'qualityScore: Math.max(0, Math.min(100',
+    ]) {
+      assertIncludes(source, token, `${contract.guardPath} must include ${token}`);
+    }
+    return;
+  }
 
   for (const token of [
     'import "server-only";',

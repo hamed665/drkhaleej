@@ -22,7 +22,8 @@ Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time 
 Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatch diagnostics proven
 Wave 5     COMPLETE  (#957, #958) Server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete
 Wave 6     COMPLETE  Registry Authority Audit and Registry Convergence complete; no public activation
-Wave 7.1   PARTIAL   Pharmacy public/noindex authority complete; live bilingual routes and rollback remain separate
+Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noindex route complete
+Wave 7.2   PARTIAL   Pharmacy public rollback remains the current separate gate
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
@@ -42,7 +43,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
   "runtimeBaseline": "baba0cc91508ef8fad16e43650cf425099c8908a",
   "lastAligned": "2026-07-28",
   "currentMigration": "0087_import_pharmacy_public_noindex_authority.sql",
-  "currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY",
+  "currentNext": "PHARMACY-PUBLIC-ROLLBACK",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -53,7 +54,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "4.2": "COMPLETE",
     "5": "COMPLETE",
     "6": "COMPLETE",
-    "7.1": "PARTIAL"
+    "7.1": "COMPLETE",
+    "7.2": "PARTIAL"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -334,10 +336,12 @@ P11 `PHARMACY-PUBLIC-NOINDEX-AUTHORITY` is complete in
 [`PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md).
 Migration `0087` installs only the protected authorization/publication
 authority and binds bilingual paths to a `published_noindex` Queue record.
-The public Pharmacy guard remains index-only, the route resolver remains
-disabled for Pharmacy, rollback is not installed, and Production remains
-disconnected. P12 must independently prove the EN/AR live noindex route before
-P13 adds rollback authority.
+P12 `PHARMACY-BILINGUAL-LIVE-VERIFY` is complete in
+[`PHARMACY_BILINGUAL_LIVE_VERIFY.md`](PHARMACY_BILINGUAL_LIVE_VERIFY.md). The
+exact EN/AR routes now require that P11 authority and always remain noindex,
+outside imported discovery and Sitemap output, and without JSON-LD. Rollback
+is not installed and Production remains disconnected. P13 must independently
+add and prove public rollback authority.
 
 ## Wave 8 — Intake convergence and core families `OPEN`
 
@@ -397,12 +401,11 @@ Do not add:
 ## Current next implementation
 
 ```text
-PHARMACY-BILINGUAL-LIVE-VERIFY
+PHARMACY-PUBLIC-ROLLBACK
 ```
 
-P11 Pharmacy public/noindex authority is complete. The next gate is
-`PHARMACY-BILINGUAL-LIVE-VERIFY`; it may activate and verify only the bilingual
-Pharmacy `published_noindex` route while preserving `noindex`, Sitemap
-exclusion and the absence of JSON-LD. Rollback remains P13. Index, Sitemap
-promotion, Agent, Content, Hospital, Doctor, later-family, Bulk behavior and
-Production execution remain closed.
+P11 Pharmacy public/noindex authority and P12 bilingual live verification are
+complete. The next gate is `PHARMACY-PUBLIC-ROLLBACK`; it may add only the
+independent public/noindex rollback authority and exact recovery proof. Index,
+Sitemap promotion, JSON-LD, Agent, Content, Hospital, Doctor, later-family,
+Bulk behavior and Production execution remain closed.

@@ -26,7 +26,16 @@ on:
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'scripts/import/run-pharmacy-public-noindex-authority-proof.mjs'
       - 'scripts/import/check-pharmacy-public-noindex-authority.mjs'
+      - 'scripts/import/check-pharmacy-bilingual-live-verify.mjs'
+      - 'scripts/import/write-pharmacy-bilingual-live-evidence.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
+      - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
+      - 'src/lib/routes/public.ts'
+      - 'src/lib/catalog/public-provider-route-resolver*'
+      - 'src/lib/catalog/public-provider-import-adapter*'
+      - 'src/server/public/import-pharmacy-profile-guard*'
+      - 'src/server/public/import-sitemap*'
+      - 'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/page.tsx'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
       - 'src/server/admin/import-pharmacy-real-rollback-canary*'
       - 'src/server/admin/import-pharmacy-admin-state-machine*'
@@ -101,6 +110,8 @@ env:
   PHARMACY_NOINDEX_AUTHORITY_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_NOINDEX_AUTHORITY_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_NOINDEX_AUTHORITY_EVIDENCE_PATH: artifacts/pharmacy-public-noindex-authority/proof.json
+  PHARMACY_BILINGUAL_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  PHARMACY_BILINGUAL_EVIDENCE_PATH: artifacts/pharmacy-bilingual-live-verify/proof.json
 
 permissions:
   contents: read
@@ -131,6 +142,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$P07_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P09_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_NOINDEX_AUTHORITY_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_BILINGUAL_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -155,7 +167,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -166,6 +178,7 @@ jobs:
             node scripts/import/check-import-pharmacy-minimal-admin-ui.mjs
             node scripts/import/check-import-p09-real-admin-canary.mjs
             node scripts/import/check-pharmacy-public-noindex-authority.mjs
+            pnpm import:pharmacy-bilingual-live:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -237,6 +250,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-pharmacy-public-noindex-authority-proof.mjs 2>&1 | tee artifacts/pharmacy-public-noindex-authority/hosted-proof.log
 
+      - name: Write Pharmacy bilingual live route evidence
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/write-pharmacy-bilingual-live-evidence.mjs 2>&1 | tee artifacts/pharmacy-bilingual-live-verify/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -288,5 +307,14 @@ jobs:
         with:
           name: pharmacy-public-noindex-authority-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/pharmacy-public-noindex-authority/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Pharmacy bilingual live route evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharmacy-bilingual-live-verify-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/pharmacy-bilingual-live-verify/
           if-no-files-found: error
           retention-days: 30

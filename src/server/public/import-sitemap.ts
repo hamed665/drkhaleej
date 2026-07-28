@@ -97,11 +97,22 @@ function parseLastModified(value: string): Date {
   return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
 }
 
-function hasReviewedImportEvidence(metadata: JsonRecord): boolean {
+function hasReviewedImportEvidence(
+  entityType: SupportedImportSitemapEntityType,
+  metadata: JsonRecord,
+): boolean {
   if (metadata.sitemap_included !== true) return false;
   if (readString(metadata, "robots_policy") !== "index") return false;
   if (readString(metadata, "canonical_path") === null) return false;
-  return readString(metadata, "import_entity_candidate_id") !== null;
+  if (readString(metadata, "import_entity_candidate_id") === null) return false;
+  if (
+    entityType === "pharmacy" &&
+    readString(metadata, "pharmacy_sitemap_promotion_schema_version") !==
+      "drkhaleej.import.pharmacySitemapPromotion.v1"
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function buildPublicImportSitemapEntry(
@@ -110,7 +121,7 @@ export function buildPublicImportSitemapEntry(
   const entityType = supportedEntityType(row.target_entity_type);
   if (entityType === null) return null;
   if (!isRecord(row.metadata)) return null;
-  if (!hasReviewedImportEvidence(row.metadata)) return null;
+  if (!hasReviewedImportEvidence(entityType, row.metadata)) return null;
 
   const canonicalPath = readString(row.metadata, "canonical_path");
   if (canonicalPath === null) return null;

@@ -34,20 +34,23 @@ for (const pattern of [
 
 for (const pattern of [
   /if \(!result\.ok\) notFound\(\)/,
-  /robots:\s*\{\s*index:\s*false/,
+  /buildProfileNoindexMetadata\(metadata\)/,
 ]) {
   if (!pattern.test(route)) throw new Error(`pharmacy route missing private fail-closed pattern: ${pattern}`);
 }
 
 for (const pattern of [
-  /publish_status !== "index_eligible"/,
-  /index_policy !== "index"/,
-  /sitemap_policy !== "included"/,
-  /metadata\.sitemap_included !== true/,
-  /robots_policy"\) !== "index"/,
-  /\.eq\("publish_status", "index_eligible"\)/,
-  /\.eq\("index_policy", "index"\)/,
-  /\.eq\("sitemap_policy", "included"\)/,
+  /publish_status !== "published_noindex"/,
+  /index_policy !== "noindex"/,
+  /sitemap_policy !== "excluded"/,
+  /metadata\.sitemap_included !== false/,
+  /metadata\.index_promoted !== false/,
+  /metadata\.public_route_enabled !== false/,
+  /robots_policy"\) !== "noindex"/,
+  /import_pharmacy_public_noindex_authorizations/,
+  /\.eq\("publish_status", "published_noindex"\)/,
+  /\.eq\("index_policy", "noindex"\)/,
+  /\.eq\("sitemap_policy", "excluded"\)/,
   /\.limit\(lookupLimit\)/,
 ]) {
   if (!pattern.test(guard)) throw new Error(`public pharmacy guard missing exposure gate: ${pattern}`);

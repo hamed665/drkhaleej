@@ -14,7 +14,7 @@ const expectedCanonicalState = {
   runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
   lastAligned: '2026-07-28',
   currentMigration: '0087_import_pharmacy_public_noindex_authority.sql',
-  currentNext: 'PHARMACY-BILINGUAL-LIVE-VERIFY',
+  currentNext: 'PHARMACY-PUBLIC-ROLLBACK',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -25,7 +25,8 @@ const expectedCanonicalState = {
     '4.2': 'COMPLETE',
     5: 'COMPLETE',
     6: 'COMPLETE',
-    '7.1': 'PARTIAL',
+    '7.1': 'COMPLETE',
+    '7.2': 'PARTIAL',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -147,7 +148,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6|7\.1)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6|7\.1|7\.2)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -227,7 +228,12 @@ function validateMatrix(source, manifest) {
       'Complete',
       'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
     ],
-    'Pharmacy live route/index/sitemap': ['Disabled/Open', '—'],
+    'Pharmacy bilingual live noindex route': [
+      'Complete',
+      'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md',
+    ],
+    'Pharmacy public rollback': ['Disabled/Open', '—'],
+    'Pharmacy index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
   };

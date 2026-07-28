@@ -89,7 +89,7 @@ for (const token of [
   'metadata.sitemap_included !== true',
   'readString(metadata, "robots_policy") !== "index"',
   'readString(metadata, "canonical_path") === null',
-  'readString(metadata, "import_entity_candidate_id") !== null',
+  'readString(metadata, "import_entity_candidate_id") === null',
   'resolveImportProviderAuthority',
   'resolvePublicProviderCanonicalRoute',
   'resolvedRoute.publicRouteEnabled',

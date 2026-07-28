@@ -63,7 +63,7 @@ for (const token of [
   '.eq("sitemap_policy", "included")',
   'hasReviewedImportEvidence',
   'readString(metadata, "canonical_path") === null',
-  'readString(metadata, "import_entity_candidate_id") !== null',
+  'readString(metadata, "import_entity_candidate_id") === null',
 ]) {
   assertIncludes(importSitemapSource, token, 'import sitemap family gate');
 }

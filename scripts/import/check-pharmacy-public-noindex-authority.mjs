@@ -5,8 +5,6 @@ const root = process.cwd();
 const files = {
   migration:
     'supabase/migrations/0087_import_pharmacy_public_noindex_authority.sql',
-  resolver: 'src/lib/catalog/public-provider-route-resolver.ts',
-  publicGuard: 'src/server/public/import-pharmacy-profile-guard.ts',
   proof: 'scripts/import/run-pharmacy-public-noindex-authority-proof.mjs',
   workflow: '.github/workflows/preview-migration-sync.yml',
   contract: 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
@@ -71,33 +69,6 @@ for (const forbidden of [
 ]) {
   excludes(sources.migration.toLowerCase(), forbidden, files.migration);
 }
-
-includes(
-  sources.resolver,
-  "reason: 'route_disabled'",
-  files.resolver,
-);
-excludes(
-  sources.resolver,
-  "if (family === 'pharmacy')",
-  files.resolver,
-);
-for (const token of [
-  'row.publish_status !== "index_eligible"',
-  'row.index_policy !== "index"',
-  'row.sitemap_policy !== "included"',
-  '.eq("publish_status", "index_eligible")',
-  '.eq("index_policy", "index")',
-  '.eq("sitemap_policy", "included")',
-]) {
-  includes(sources.publicGuard, token, files.publicGuard);
-}
-excludes(sources.publicGuard, 'published_noindex', files.publicGuard);
-excludes(
-  sources.publicGuard,
-  'import_pharmacy_public_noindex_authorizations',
-  files.publicGuard,
-);
 
 for (const token of [
   'PHARMACY_NOINDEX_AUTHORITY_PREVIEW_DATABASE_URL',
@@ -177,8 +148,8 @@ assert(
 
 for (const token of [
   '"currentMigration": "0087_import_pharmacy_public_noindex_authority.sql"',
-  '"currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY"',
-  'Wave 7.1   PARTIAL',
+  '"currentNext": "PHARMACY-PUBLIC-ROLLBACK"',
+  'Wave 7.1   COMPLETE',
   'PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
 ]) {
   includes(sources.roadmap, token, files.roadmap);

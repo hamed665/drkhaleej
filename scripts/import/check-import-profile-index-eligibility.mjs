@@ -24,6 +24,10 @@ function assertIncludes(source, token, message) {
   assert(source.includes(token), message);
 }
 
+function assertNotIncludes(source, token, message) {
+  assert(!source.includes(token), message);
+}
+
 const helperPath = 'src/lib/catalog/public-import-profile-index-eligibility.ts';
 const helper = await readText(helperPath);
 for (const token of [
@@ -68,13 +72,18 @@ for (const token of [
 const pharmacyRoutePath = 'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/page.tsx';
 const pharmacyRoute = await readText(pharmacyRoutePath);
 for (const token of [
-  'isPublicImportProfileIndexEligible',
   'buildProfileNoindexMetadata',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile)',
-  'return importIndexEligibility.eligible ? metadata : buildProfileNoindexMetadata(metadata)',
+  'return buildProfileNoindexMetadata(metadata)',
+  'data-index-policy="noindex"',
+  'data-sitemap-policy="excluded"',
 ]) {
   assertIncludes(pharmacyRoute, token, `${pharmacyRoutePath} must include ${token}`);
 }
+assertNotIncludes(
+  pharmacyRoute,
+  'isPublicImportProfileIndexEligible',
+  `${pharmacyRoutePath} must not make P12 indexable from the generic quality gate.`,
+);
 
 for (const blockedHospitalRoutePath of [
   'src/pages/[locale]/[country]/hospitals/[hospitalSlug].tsx',

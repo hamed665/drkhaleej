@@ -319,7 +319,8 @@ assertFileIncludes('src/lib/catalog/public-import-profile-index-eligibility.test
 assertFileIncludes('scripts/import/check-import-profile-index-eligibility.mjs', [
   'isPublicImportProfileIndexEligible',
   'const importIndexEligibility = isPublicImportProfileIndexEligible(importResult.profile)',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile)',
+  'return buildProfileNoindexMetadata(metadata)',
+  'must not make P12 indexable',
   'const importIndexEligibility = isPublicImportProfileIndexEligible(profile)',
 ]);
 assertFileIncludes('scripts/import/check-public-import-profile-smoke.mjs', [

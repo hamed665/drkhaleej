@@ -75,8 +75,11 @@ No ratings, reviews, bookings, insurance claims, provider dashboard links, schem
 Current imported profile guards using this shared runtime boundary:
 
 - `src/server/public/import-doctor-profile-guard.ts`
-- `src/server/public/import-pharmacy-profile-guard.ts`
 - `src/server/public/import-hospital-profile-guard.ts`
+
+P12 Pharmacy exception: the bilingual Pharmacy noindex route deliberately
+returns an empty suggestion set and renders no candidate-relation links until
+that family receives a separately reviewed relation-link release gate.
 
 ## Future profile guards
 

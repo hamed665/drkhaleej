@@ -1,5 +1,9 @@
 import type { SupportedCountry, SupportedLocale } from '@/lib/i18n/config';
-import { publicCenterDetailRoute, publicDoctorDetailRoute } from '@/lib/routes/public';
+import {
+  publicCenterDetailRoute,
+  publicDoctorDetailRoute,
+  publicPharmacyDetailRoute,
+} from '@/lib/routes/public';
 
 export const publicProviderRouteFamilies = [
   'doctor',
@@ -49,7 +53,7 @@ function normalizeSlug(value: string | null | undefined): string | null {
   if (typeof value !== 'string') return null;
   const slug = value.trim();
   if (slug.length === 0) return null;
-  if (slug.includes('/')) return null;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
   return slug;
 }
 
@@ -119,6 +123,15 @@ export function resolvePublicProviderCanonicalRoute(
   if (family === 'center') {
     return {
       canonicalPath: publicCenterDetailRoute(input.locale, input.country, slug),
+      routeFamily: family,
+      publicRouteEnabled: true,
+      reason: 'enabled',
+    };
+  }
+
+  if (family === 'pharmacy') {
+    return {
+      canonicalPath: publicPharmacyDetailRoute(input.locale, input.country, slug),
       routeFamily: family,
       publicRouteEnabled: true,
       reason: 'enabled',
