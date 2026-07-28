@@ -14,7 +14,7 @@ const expectedCanonicalState = {
   runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
   lastAligned: '2026-07-28',
   currentMigration: '0086_import_pharmacy_recovery_review_attempts.sql',
-  currentNext: 'REGISTRY-AUTHORITY-AUDIT',
+  currentNext: 'REGISTRY-CONVERGENCE',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -24,6 +24,7 @@ const expectedCanonicalState = {
     '4.1': 'COMPLETE',
     '4.2': 'COMPLETE',
     5: 'COMPLETE',
+    6: 'PARTIAL',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -145,7 +146,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -219,6 +220,7 @@ function validateMatrix(source, manifest) {
     'Exact rollback recovery': ['Complete', '#956'],
     'Admin state machine': ['Complete', '#957'],
     'Real Admin canary': ['Complete', '#958'],
+    'Registry authority audit': ['Complete', 'docs/import/registry-authority-audit.md'],
     'Pharmacy public/index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],

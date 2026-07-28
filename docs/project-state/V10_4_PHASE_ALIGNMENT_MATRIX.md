@@ -17,7 +17,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 - Import-readiness runtime is aligned through PR #958 at baseline `baba0cc91508ef8fad16e43650cf425099c8908a` (last aligned 2026-07-28).
 - Migrations validate through `0086_import_pharmacy_recovery_review_attempts.sql`.
-- The current next implementation is `REGISTRY-AUTHORITY-AUDIT`.
+- The Registry Authority Audit is complete. The current next implementation is `REGISTRY-CONVERGENCE`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -110,7 +110,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Runtime baseline | `baba0cc91508ef8fad16e43650cf425099c8908a` |
 | Last aligned | `2026-07-28` |
 | Current migration | `0086_import_pharmacy_recovery_review_attempts.sql` |
-| Current next | `REGISTRY-AUTHORITY-AUDIT` |
+| Current next | `REGISTRY-CONVERGENCE` |
 
 ## Import readiness capability mapping
 
@@ -134,8 +134,9 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Durable rollback authority | Complete | #955 | Maintain atomic rollback regression |
 | Exact rollback recovery | Complete | #956 | Maintain exact-recovery regression |
 | Admin state machine | Complete | #957 | Maintain state-machine regression |
-| Real Admin canary | Complete | #958 | `REGISTRY-AUTHORITY-AUDIT` |
-| Pharmacy public/index/sitemap | Disabled/Open | — | Registry authority audit |
+| Real Admin canary | Complete | #958 | Maintain literal-cycle regression |
+| Registry authority audit | Complete | `docs/import/registry-authority-audit.md` | `REGISTRY-CONVERGENCE` |
+| Pharmacy public/index/sitemap | Disabled/Open | — | Registry Convergence |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -156,6 +157,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `ADMIN-STATE-MACHINE` | Phase 4 | Phase 5 | Phase 6 |
 | `REAL-ADMIN-CANARY` | Phase 9 | Phase 11 | Phase 18 |
 | `REGISTRY-AUTHORITY-AUDIT` | Phase 9 | Phase 10 | Phase 18 |
+| `REGISTRY-CONVERGENCE` | Phase 9 | Phase 10 | Phase 18 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 

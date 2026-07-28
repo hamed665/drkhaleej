@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #958 at `baba0cc91508ef8fad16e43650cf425099c8908a`**. The current next implementation is **`REGISTRY-AUTHORITY-AUDIT`**.
+Current import-readiness runtime baseline: **PR #958 at `baba0cc91508ef8fad16e43650cf425099c8908a`**. The documentation/contract-only Registry Authority Audit is complete. The current next implementation is **`REGISTRY-CONVERGENCE`**. It authorizes no route or public activation.
 
 Completed migrations: **`0001` through `0086`**. Migration validation is expected through `0086_import_pharmacy_recovery_review_attempts.sql`.
 

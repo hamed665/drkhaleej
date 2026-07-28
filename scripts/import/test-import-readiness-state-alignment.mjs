@@ -61,7 +61,7 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "REGISTRY-AUTHORITY-AUDIT"',
+      from: '"currentNext": "REGISTRY-CONVERGENCE"',
       to: '"currentNext": "PHARMACY-PUBLIC-NOINDEX-AUTHORITY"',
       expectedError: 'manifest.currentNext drifted',
     },
@@ -75,8 +75,8 @@ try {
     {
       label: 'phase matrix drift',
       file: fixtureFiles[2],
-      from: '| Real Admin canary | Complete | #958 | `REGISTRY-AUTHORITY-AUDIT` |',
-      to: '| Real Admin canary | Complete | #957 | `REGISTRY-AUTHORITY-AUDIT` |',
+      from: '| Real Admin canary | Complete | #958 | Maintain literal-cycle regression |',
+      to: '| Real Admin canary | Complete | #957 | Maintain literal-cycle regression |',
       expectedError: 'Real Admin canary evidence drifted',
     },
     {
