@@ -90,6 +90,8 @@ env:
   P09_LITERAL_DIAGNOSTIC_PATH: artifacts/p09/literal-ui-state-diagnostic.json
   P09_POSTGREST_VERSION_DIAGNOSTIC_PATH: artifacts/p09/postgrest-version-diagnostic.json
   P09_LITERAL_PUBLISH_DIAGNOSTIC_PATH: artifacts/p09/literal-publish-transaction-diagnostic.json
+  P09_LITERAL_FINALIZE_ENABLED: 'true'
+  P09_LITERAL_FINAL_EVIDENCE_PATH: artifacts/p09/literal-final-preview-cycle.json
 
 permissions:
   contents: read
@@ -212,6 +214,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-p09-real-admin-canary.mjs 2>&1 | tee artifacts/p09/hosted-proof.log
 
+      - name: Complete exact literal Preview cycle from persisted truth
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-finalize-preview-cycle.mjs 2>&1 | tee artifacts/p09/literal-final-preview-cycle.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -255,4 +263,4 @@ jobs:
           name: p09-real-admin-canary-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/p09/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
