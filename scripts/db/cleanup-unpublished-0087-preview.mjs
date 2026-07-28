@@ -187,7 +187,7 @@ try {
          c.relname as table_name,
          c.relkind = 'r' as ordinary_table,
          c.relrowsecurity as rls_enabled,
-         array_agg(a.attname order by a.attnum)
+         array_agg(a.attname::text order by a.attnum)
            filter (where a.attnum > 0 and not a.attisdropped) as columns
        from pg_catalog.pg_class c
        join pg_catalog.pg_namespace n on n.oid = c.relnamespace
