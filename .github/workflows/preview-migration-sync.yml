@@ -105,6 +105,10 @@ env:
   PHARMACY_NOINDEX_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_NOINDEX_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_NOINDEX_EVIDENCE_PATH: artifacts/pharmacy-public-noindex/lifecycle-proof.json
+  PREVIEW_0087_CLEANUP_CONFIRMATION: REMOVE_UNPUBLISHED_0087_FROM_ISOLATED_PREVIEW_PR_962
+  PREVIEW_0087_CLEANUP_PR_NUMBER: ${{ github.event.pull_request.number }}
+  PREVIEW_0087_CLEANUP_HEAD_REF: ${{ github.head_ref }}
+  PREVIEW_0087_CLEANUP_REPOSITORY: ${{ github.repository }}
 
 permissions:
   contents: read
@@ -114,8 +118,58 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  cleanup_unpublished_0087:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.number == 962 &&
+      github.head_ref == 'agent/pharmacy-public-noindex-lifecycle' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact cleanup revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Verify exact cleanup revision
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "$PREVIEW_SOURCE_COMMIT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Remove unpublished 0087 from isolated Preview
+        run: node scripts/db/cleanup-unpublished-0087-preview.mjs
+
+      - name: Upload cleanup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-unpublished-0087-cleanup-${{ github.event.pull_request.head.sha }}
+          path: artifacts/preview-0087-cleanup/
+          if-no-files-found: error
+          retention-days: 30
+
   sync:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository) &&
+      !(github.event_name == 'pull_request' &&
+        github.event.pull_request.number == 962 &&
+        github.head_ref == 'agent/pharmacy-public-noindex-lifecycle')
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
