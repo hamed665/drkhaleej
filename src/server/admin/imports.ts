@@ -12,15 +12,10 @@ import {
   normalizeImportRawPayload,
   type ImportJsonValue,
 } from "@/server/admin/import-row-normalizer";
+import type { AdminImportEntityType } from "@/server/admin/import-entity-domain";
 import { requireAdminPermission } from "@/server/admin/permissions";
 
-export type AdminImportEntityType =
-  | "doctor"
-  | "hospital"
-  | "pharmacy"
-  | "clinic"
-  | "laboratory"
-  | "medical_center";
+export type { AdminImportEntityType } from "@/server/admin/import-entity-domain";
 
 export type AdminImportBatchStatus =
   | "draft"

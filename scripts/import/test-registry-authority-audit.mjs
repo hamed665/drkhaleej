@@ -14,6 +14,7 @@ const fixtureFiles = [
   'docs/import/import-readiness-roadmap-after-933.md',
   'src/server/admin/import-entity-domain.ts',
   'src/server/admin/imports.ts',
+  'src/server/admin/import-provider-authority-adapter.ts',
   'src/lib/catalog/public-entity-family-registry.ts',
   'src/lib/catalog/public-provider-route-resolver.ts',
   'src/lib/catalog/public-eligible-queries.ts',

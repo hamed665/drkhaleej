@@ -42,9 +42,11 @@ for (const token of [
 }
 
 for (const token of [
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'function routeIdentity(pathname: string):',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'hasReviewedImportEvidence',
   '.select("id, target_entity_type, updated_at, metadata")',
   '.eq("publish_status", "index_eligible")',
@@ -55,6 +57,9 @@ for (const token of [
 }
 
 for (const forbiddenToken of [
+  '^\\/(en|ar)\\/om\\/doctor\\/',
+  '^\\/(en|ar)\\/om\\/pharmacies\\/',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
   'booking',
   'insurance',
   'claim',

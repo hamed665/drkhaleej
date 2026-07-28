@@ -26,8 +26,10 @@ const packageSource = await readText('package.json');
 for (const token of [
   'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";',
   'if (value === "doctor" || value === "pharmacy" || value === "hospital") return value;',
-  'case "hospital":',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'hasReviewedImportEvidence',
   'metadata.sitemap_included !== true',
   'readString(metadata, "robots_policy") !== "index"',
@@ -43,6 +45,7 @@ for (const token of [
 
 for (const forbiddenToken of [
   '/hospital/',
+  '^\\/(en|ar)\\/om\\/hospitals\\/',
   'rating',
   'booking',
   'insurance',

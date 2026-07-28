@@ -1,12 +1,13 @@
+import "server-only";
+
 import {
   resolvePublicProviderCanonicalRoute,
-  type PublicProviderRouteFamily,
 } from "./public-provider-route-resolver";
 import type {
   PublicProviderDiscoveryEntry,
-  PublicProviderEntityType,
-  PublicProviderFamily,
 } from "./public-provider-projection";
+import { resolveImportStagingEntityType } from "@/server/admin/import-entity-domain";
+import { resolveImportProviderAuthority } from "@/server/admin/import-provider-authority-adapter";
 
 export type PublicImportJson =
   | string
@@ -37,28 +38,6 @@ export type PublicImportProviderCandidateRow = {
   entity_type: string | null;
 };
 
-const FAMILY_BY_ENTITY: Partial<Record<PublicProviderEntityType, PublicProviderFamily>> = {
-  doctor: "doctors",
-  pharmacy: "pharmacies",
-  hospital: "hospitals",
-  clinic: "centers",
-  lab: "labs",
-  radiology: "radiology",
-  dentistry: "dentistry",
-  beauty: "beauty",
-};
-
-const ROUTE_FAMILY_BY_ENTITY: Partial<Record<PublicProviderEntityType, PublicProviderRouteFamily>> = {
-  doctor: "doctor",
-  pharmacy: "pharmacy",
-  hospital: "hospital",
-  clinic: "clinic",
-  lab: "lab",
-  radiology: "imaging_center",
-  dentistry: "dental_clinic",
-  beauty: "beauty_clinic",
-};
-
 function record(value: PublicImportJson | undefined): JsonRecord {
   if (value === null || value === undefined || typeof value !== "object" || Array.isArray(value)) return {};
   return value;
@@ -79,13 +58,6 @@ function list(source: JsonRecord, ...keys: string[]): string[] {
     return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0).map((item) => item.trim());
   }
   return [];
-}
-
-function entity(value: string | null): PublicProviderEntityType | null {
-  if (value === "doctor" || value === "pharmacy" || value === "hospital" || value === "clinic" || value === "lab" || value === "radiology" || value === "dentistry" || value === "beauty") {
-    return value;
-  }
-  return null;
 }
 
 function normalizedPath(path: string | null): string | null {
@@ -155,9 +127,17 @@ function hasContactOrMap(metadata: JsonRecord, candidate: PublicImportProviderCa
   );
 }
 
-function approvedCandidate(candidate: PublicImportProviderCandidateRow | null, expectedEntity: PublicProviderEntityType): boolean {
+function approvedCandidate(
+  candidate: PublicImportProviderCandidateRow | null,
+  expectedEntity: string,
+): boolean {
   if (!candidate) return true;
-  if (candidate.entity_type !== null && candidate.entity_type !== expectedEntity) return false;
+  if (
+    candidate.entity_type !== null &&
+    resolveImportStagingEntityType(candidate.entity_type) !== expectedEntity
+  ) {
+    return false;
+  }
   return candidate.candidate_status === null || candidate.candidate_status === "approved";
 }
 
@@ -165,14 +145,42 @@ export function buildImportedProviderDiscoveryEntry(
   row: PublicImportProviderQueueRow,
   candidate: PublicImportProviderCandidateRow | null,
 ): PublicProviderDiscoveryEntry | null {
-  const entityType = entity(row.target_entity_type ?? row.target_entity ?? null);
-  if (!entityType) return null;
+  const queueEntityValue = row.target_entity_type ?? row.target_entity ?? null;
+  const queueEntityType = resolveImportStagingEntityType(queueEntityValue);
+  const candidateEntityType = resolveImportStagingEntityType(candidate?.entity_type);
+  if (
+    queueEntityValue !== null &&
+    queueEntityType === null &&
+    queueEntityValue !== "center"
+  ) {
+    return null;
+  }
+  if (
+    candidate?.entity_type !== null &&
+    candidate?.entity_type !== undefined &&
+    candidateEntityType === null
+  ) {
+    return null;
+  }
+  if (
+    queueEntityType !== null &&
+    candidateEntityType !== null &&
+    queueEntityType !== candidateEntityType
+  ) {
+    return null;
+  }
 
-  const family = FAMILY_BY_ENTITY[entityType];
-  if (!family) return null;
+  const authorityResolution = resolveImportProviderAuthority(
+    candidateEntityType ?? queueEntityType,
+  );
+  if (!authorityResolution.ok) return null;
 
-  const routeFamily = ROUTE_FAMILY_BY_ENTITY[entityType];
-  if (!routeFamily) return null;
+  const {
+    entityType: canonicalEntityType,
+    publicProjection,
+    routeRelease,
+  } = authorityResolution.authority;
+  if (publicProjection === null || routeRelease.family === null) return null;
 
   const metadata = record(row.metadata);
   const metadataCanonicalPath = normalizedPath(text(metadata, "canonical_path", "canonicalPath"));
@@ -185,7 +193,7 @@ export function buildImportedProviderDiscoveryEntry(
   if (!locale) return null;
 
   const resolvedRoute = resolvePublicProviderCanonicalRoute({
-    family: routeFamily,
+    family: routeRelease.family,
     slug,
     locale,
     country: "om",
@@ -205,15 +213,15 @@ export function buildImportedProviderDiscoveryEntry(
   const statusAllowsDetail = row.publish_status === "index_eligible" || row.publish_status === "published";
   const robotsAllowsIndex = row.robots_policy === undefined || row.robots_policy === null || row.robots_policy === "index";
 
-  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && approvedCandidate(candidate, entityType) && routeMatchesResolver && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
+  const publicDetailEligible = Boolean(statusAllowsDetail && row.index_policy === "index" && approvedCandidate(candidate, canonicalEntityType) && routeMatchesResolver && hasGeo && hasSource && lastCheckedAt !== null && hasContactOrMap(metadata, candidate));
   const publicDiscoveryEligible = Boolean(publicDetailEligible && routeMatchesResolver);
   const publicSitemapEligible = Boolean(publicDiscoveryEligible && row.sitemap_policy === "included" && robotsAllowsIndex);
 
   return {
     id: `import:${row.id}`,
     sourceKind: "import",
-    entityType,
-    family,
+    entityType: publicProjection.entityType,
+    family: publicProjection.family,
     slug,
     canonicalPath,
     nameEn,

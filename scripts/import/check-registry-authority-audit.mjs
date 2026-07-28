@@ -6,6 +6,7 @@ const files = {
   roadmap: 'docs/import/import-readiness-roadmap-after-933.md',
   importDomain: 'src/server/admin/import-entity-domain.ts',
   adminImports: 'src/server/admin/imports.ts',
+  convergenceAdapter: 'src/server/admin/import-provider-authority-adapter.ts',
   publicFamilies: 'src/lib/catalog/public-entity-family-registry.ts',
   routeResolver: 'src/lib/catalog/public-provider-route-resolver.ts',
   publicStorage: 'src/lib/catalog/public-eligible-queries.ts',
@@ -101,6 +102,12 @@ function extractSchemaEntityTypes(source) {
   return [...match[1].matchAll(/^\s{2}([a-z0-9_]+):/gm)].map((item) => item[1]);
 }
 
+function extractObjectKeys(source, objectName) {
+  const match = source.match(new RegExp(`${objectName} = \\{([\\s\\S]*?)\\n\\} as const`));
+  assert(match, `could not read ${objectName}.`);
+  return [...match[1].matchAll(/^\s{2}([a-z0-9_]+):/gm)].map((item) => item[1]);
+}
+
 function extractCanonicalLinkEntityTypes(source, canonicalTypes) {
   const values = [...source.matchAll(/(?:source_type|target_type): "([a-z0-9_]+)"/g)].map(
     (item) => item[1],
@@ -183,7 +190,11 @@ for (const [name, expected] of Object.entries(expectedAuthorities)) {
 
 const importTypes = extractTypeUnion(sources.importDomain, 'ImportEntityType');
 const importTypeSet = new Set(importTypes);
-const adminImportTypes = extractTypeUnion(sources.adminImports, 'AdminImportEntityType');
+const adminImportTypes = extractConstArray(sources.importDomain, 'ADMIN_IMPORT_ENTITY_TYPES');
+const convergedAdapterTypes = extractObjectKeys(
+  sources.convergenceAdapter,
+  'PUBLIC_FAMILY_BY_IMPORT_ENTITY_TYPE',
+);
 const publicProviderEntityTypes = extractTypeUnion(
   sources.publicProjection,
   'PublicProviderEntityType',
@@ -210,12 +221,18 @@ assert(
   'AUTH-001 is stale: PublicProviderEntityType unexpectedly converged with ImportEntityType.',
 );
 assert(
-  sources.relation.includes('"human_pharmacy" as ImportEntityType'),
-  'AUTH-004 is stale: the forced human_pharmacy alias is no longer present.',
+  sameValues([...convergedAdapterTypes].sort(), [...importTypes].sort()),
+  'AUTH-001 remediation drifted: the total convergence adapter no longer covers ImportEntityType.',
 );
 assert(
-  sources.publicFamilies.includes('?? publicEntityFamilyRegistry[0]'),
-  'AUTH-008 is stale: the public-family lookup no longer falls back to doctor.',
+  !sources.relation.includes('"human_pharmacy" as ImportEntityType') &&
+    sources.relation.includes('target_type: "pharmacy"'),
+  'AUTH-004 remediation drifted: relation rules must use canonical pharmacy without a cast.',
+);
+assert(
+  !sources.publicFamilies.includes('?? publicEntityFamilyRegistry[0]') &&
+    sources.publicFamilies.includes('?? null'),
+  'AUTH-008 remediation drifted: public-family lookup must fail closed.',
 );
 assert(
   /index_policy:\s*"index"[\s\S]*sitemap_policy:\s*"included"/.test(
@@ -398,13 +415,16 @@ assert(
 assert(
   sources.sitemapReader.includes(
     'type SupportedImportSitemapEntityType = "doctor" | "pharmacy" | "hospital";',
-  ),
-  `${files.sitemapReader}: import sitemap family reader drifted.`,
+  ) &&
+    sources.sitemapReader.includes('resolveImportProviderAuthority') &&
+    sources.sitemapReader.includes('resolvePublicProviderCanonicalRoute') &&
+    sources.sitemapReader.includes('resolvedRoute.publicRouteEnabled'),
+  `${files.sitemapReader}: import sitemap must consume canonical family and route authorities.`,
 );
 assert(
-  sources.roadmap.includes('"currentNext": "REGISTRY-CONVERGENCE"') &&
-    sources.roadmap.includes('Registry Authority Audit complete'),
-  `${files.roadmap}: audit completion/next transition is not aligned.`,
+  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"') &&
+    sources.roadmap.includes('Registry Convergence complete'),
+  `${files.roadmap}: convergence completion/next transition is not aligned.`,
 );
 
 for (const forbidden of [

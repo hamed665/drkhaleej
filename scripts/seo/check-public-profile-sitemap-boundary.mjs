@@ -90,10 +90,10 @@ for (const token of [
   'readString(metadata, "robots_policy") !== "index"',
   'readString(metadata, "canonical_path") === null',
   'readString(metadata, "import_entity_candidate_id") !== null',
-  'isSafePublicCanonicalPathForEntity',
-  '^\\/(en|ar)\\/om\\/doctor\\/',
-  '^\\/(en|ar)\\/om\\/pharmacies\\/',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   '.eq("publish_status", "index_eligible")',
   '.eq("index_policy", "index")',
   '.eq("sitemap_policy", "included")',
@@ -107,7 +107,7 @@ for (const forbiddenToken of [
   'insurance',
   'claim',
   'provider-dashboard',
-  'admin',
+  'href="/admin',
   'preview',
 ]) {
   assertNotIncludes(importSitemap, forbiddenToken, importSitemapPath);

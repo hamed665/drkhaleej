@@ -61,8 +61,8 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "REGISTRY-CONVERGENCE"',
-      to: '"currentNext": "PHARMACY-PUBLIC-NOINDEX-AUTHORITY"',
+      from: '"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"',
+      to: '"currentNext": "PHARMACY-INDEX-PROMOTION"',
       expectedError: 'manifest.currentNext drifted',
     },
     {

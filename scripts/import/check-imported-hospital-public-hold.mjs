@@ -54,7 +54,10 @@ for (const token of [
   'hospital: 500',
   'doctor: 3000',
   'pharmacy: 1500',
-  '^\\/(en|ar)\\/om\\/hospitals\\/',
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   '.eq("publish_status", "index_eligible")',
   '.eq("index_policy", "index")',
   '.eq("sitemap_policy", "included")',
@@ -70,7 +73,7 @@ for (const token of [
   'booking',
   'insurance',
   'provider-dashboard',
-  'admin',
+  'href="/admin',
   'preview',
 ]) {
   assertNotIncludes(importSitemapSource, token, 'import sitemap family gate');

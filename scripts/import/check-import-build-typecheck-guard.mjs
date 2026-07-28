@@ -31,6 +31,7 @@ requireScript(scripts, 'build', 'next build');
 requireScript(scripts, 'lint', 'eslint .');
 requireScript(scripts, 'import:publish-readiness-audit:validate', 'node scripts/import/check-import-publish-readiness-audit.mjs');
 requireScript(scripts, 'import:registry-authority-audit:validate', 'node scripts/import/check-registry-authority-audit.mjs');
+requireScript(scripts, 'import:registry-convergence:validate', 'node scripts/import/check-registry-convergence.mjs');
 
 for (const forbidden of ['--ignore-build-errors', 'ignoreBuildErrors', 'typescript.ignoreBuildErrors', 'eslint.ignoreDuringBuilds']) {
   assert(!JSON.stringify(packageJson).includes(forbidden), `package.json must not include unsafe build bypass ${forbidden}.`);
@@ -62,6 +63,7 @@ for (const requiredValidator of [
   './check-import-admin-action-result-contract.mjs',
   './check-registry-authority-audit.mjs',
   './test-registry-authority-audit.mjs',
+  './check-registry-convergence.mjs',
 ]) {
   assert(auditSource.includes(`import '${requiredValidator}';`), `import readiness audit must include ${requiredValidator}.`);
 }

@@ -85,8 +85,10 @@ for (const forbiddenToken of [
 }
 
 for (const token of [
-  String.raw`^\/(en|ar)\/om\/doctor\/`,
-  String.raw`^\/(en|ar)\/om\/pharmacies\/`,
+  'resolveImportProviderAuthority',
+  'resolvePublicProviderCanonicalRoute',
+  'resolvedRoute.publicRouteEnabled',
+  'resolvedRoute.canonicalPath !== canonicalPath',
   'hasReviewedImportEvidence',
   'import_entity_candidate_id',
 ]) {

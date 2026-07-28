@@ -32,6 +32,7 @@ for (const [name, expected] of [
   ['lint', 'eslint .'],
   ['import:publish-readiness-audit:validate', 'scripts/import/check-import-publish-readiness-audit.mjs'],
   ['import:registry-authority-audit:validate', 'scripts/import/check-registry-authority-audit.mjs'],
+  ['import:registry-convergence:validate', 'scripts/import/check-registry-convergence.mjs'],
 ]) {
   assertScript(scripts, name, expected);
 }
@@ -59,6 +60,7 @@ for (const validator of [
   './check-import-admin-capability-audit.mjs',
   './check-registry-authority-audit.mjs',
   './test-registry-authority-audit.mjs',
+  './check-registry-convergence.mjs',
 ]) {
   assert(auditSource.includes(`import '${validator}';`), `publish readiness audit must chain ${validator}.`);
 }
