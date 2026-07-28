@@ -212,18 +212,23 @@ async function verifyMigrationAndRpcs(client) {
     'public.import_rollback_pharmacy_public_noindex_by_authority(uuid,uuid,text)',
   ]) {
     const result = await client.query(
-      'select pg_get_functiondef(to_regprocedure($1)) as definition',
+      `select
+         p.oid::regprocedure::text as identity,
+         not p.prosecdef as security_invoker,
+         exists (
+           select 1
+           from unnest(coalesce(p.proconfig, '{}'::text[])) as setting
+           where replace(setting, ' ', '') = 'search_path=pg_catalog,public'
+         ) as search_path_pinned
+       from pg_catalog.pg_proc p
+       where p.oid = to_regprocedure($1)`,
       [identity],
     );
-    const definition = result.rows[0]?.definition;
-    const pinsRequiredSearchPath =
-      typeof definition === 'string' &&
-      (definition.includes('SET search_path TO pg_catalog, public') ||
-        definition.includes("SET search_path TO 'pg_catalog', 'public'"));
+    const rpc = result.rows[0];
     assert(
-      typeof definition === 'string' &&
-        definition.includes('SECURITY INVOKER') &&
-        pinsRequiredSearchPath,
+      result.rowCount === 1 &&
+        rpc.security_invoker === true &&
+        rpc.search_path_pinned === true,
       `Missing protected RPC identity: ${identity}`,
     );
   }

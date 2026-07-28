@@ -172,6 +172,9 @@ for (const token of [
   'sitemapLeakageCount: 0',
   'cleanupVerified: true',
   'productionConnected: false',
+  'from pg_catalog.pg_proc p',
+  'not p.prosecdef as security_invoker',
+  "'search_path=pg_catalog,public'",
 ]) {
   includes(sources.proof, token, files.proof);
 }
