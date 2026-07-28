@@ -12,8 +12,7 @@ import {
   localeDirection,
   type SupportedLocale,
 } from "@/lib/i18n/config";
-import { createJsonLd, serializeJsonLd } from "@/lib/seo/jsonld";
-import { buildCanonicalUrl, buildLocalizedMetadata } from "@/lib/seo/metadata";
+import { buildLocalizedMetadata } from "@/lib/seo/metadata";
 import { buildProfileNoindexMetadata } from "@/lib/seo/profile-metadata-index-gate";
 import { getPublicImportPharmacyProfile } from "@/server/public/import-pharmacy-profile-guard";
 
@@ -143,20 +142,6 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
   const profileSummary = buildPublicImportProfileSummary(locale, profile satisfies PublicImportProfileSummaryInput);
   const location = localArea([profile.area, profile.wilayat, profile.governorate]);
   const serviceSignals = [...profile.services, ...profile.departments].slice(0, 8);
-  const addressLocality = profile.area ?? profile.wilayat;
-  const jsonLd = createJsonLd({
-    "@context": "https://schema.org",
-    "@type": "Pharmacy",
-    name: title,
-    url: buildCanonicalUrl(`/pharmacies/${pharmacySlug}`, locale, country),
-    description: profileSummary,
-    address: {
-      "@type": "PostalAddress",
-      ...(addressLocality ? { addressLocality } : {}),
-      ...(profile.governorate ? { addressRegion: profile.governorate } : {}),
-      addressCountry: "OM",
-    },
-  });
 
   return (
     <main
@@ -254,12 +239,6 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
           {copy.directoryLabel}
         </Link>
       </section>
-      <script
-        id={`pharmacy-profile-jsonld-${locale}-${pharmacySlug}`}
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
     </main>
   );
 }

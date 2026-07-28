@@ -45,10 +45,6 @@ for (const token of [
   'return buildProfileNoindexMetadata(metadata)',
   'data-index-policy="noindex"',
   'data-sitemap-policy="excluded"',
-  'application/ld+json',
-  '"@type": "Pharmacy"',
-  'serializeJsonLd(jsonLd)',
-  'buildCanonicalUrl(`/pharmacies/${pharmacySlug}`',
   'profile.lastCheckedAt',
   'profile.sourceName ?? profile.sourceUrl',
   'providerConfirmation',
@@ -77,6 +73,10 @@ for (const forbiddenToken of [
   'profile.localSuggestions.map',
   'publicLocalSuggestionHref',
   'isPublicImportProfileIndexEligible',
+  'application/ld+json',
+  'createJsonLd',
+  'serializeJsonLd',
+  '"@type": "Pharmacy"',
 ]) {
   assertNotIncludes(routeSource, forbiddenToken, `${routePath} must not include ${forbiddenToken}.`);
 }

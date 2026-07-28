@@ -118,9 +118,6 @@ for (const token of [
   'return buildProfileNoindexMetadata(metadata)',
   'data-index-policy="noindex"',
   'data-sitemap-policy="excluded"',
-  '"@type": "Pharmacy"',
-  'serializeJsonLd(jsonLd)',
-  'buildCanonicalUrl(`/pharmacies/${pharmacySlug}`',
   'buildLocalizedMetadata',
   'href={`/${locale}/${country}/pharmacies`}',
 ]) {
@@ -134,6 +131,10 @@ for (const forbidden of [
   'booking',
   'insurance',
   'claim',
+  'application/ld+json',
+  'createJsonLd',
+  'serializeJsonLd',
+  '"@type": "Pharmacy"',
 ]) {
   excludes(sources.route, forbidden, files.route);
 }
