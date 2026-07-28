@@ -37,6 +37,8 @@ GO_LITERAL_PREVIEW_CYCLE_COMPLETE
 
 No further browser mutation click is required. The operator explicitly authorized one-time completion through the protected GitHub workflow after repeated literal browser attempts had already established the authenticated actor/entity boundary. This was not scheduled, background, bulk, or Production execution.
 
+The protected page retains the operator-initiated one-click full-cycle control as a bounded manual surface. P09 completion does not convert that control into automatic retry or unattended execution.
+
 ## Root-cause repair
 
 The literal UI failure was traced to a legacy descriptive `metadata.source` value outside the canonical Unified Draft source enum. The database authority and publish RPC were valid, but the application mutation adapter rejected the Draft before RPC with `source_unsupported`.
@@ -91,16 +93,16 @@ The one-time completion workflow is fail-closed and entity-hash-bound. It:
 - proves exact restored state and zero public/index/sitemap leakage;
 - emits bounded evidence with no raw identifiers.
 
-The workflow shares the existing isolated Preview database-write concurrency lock with Preview Migration Sync and the hosted P05/P06/P07/P09 proofs.
+The workflow shares the existing isolated Preview database-write concurrency lock with Preview Migration Sync and the hosted P05/P06/P07/P09 proofs. The standalone completion workflow is manual-only; the exact PR proof is serialized inside Preview Migration Sync.
 
 ## Closed boundaries
 
-- no Production connection, read, migration, or mutation;
+- no Production connection, read, migration or mutation;
 - no public, index, sitemap, or route promotion;
 - no new database authority, migration, RLS policy, or RPC for the legacy-source repair;
 - no parallel authentication authority outside Supabase Auth;
 - no automatic retry of an ambiguous Reservation, private mutation, or rollback;
-- no scheduled or recurring canary execution;
+- no unattended, scheduled or background canary execution;
 - no second Reservation;
 - no direct browser-visible persistence identifiers;
 - no Registry implementation, Agent, Content, Hospital, Doctor, or Bulk work in this PR;
