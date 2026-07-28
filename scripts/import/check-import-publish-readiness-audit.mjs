@@ -82,6 +82,8 @@ import './check-import-admin-action-result-contract.mjs';
 import './check-import-build-typecheck-guard.mjs';
 import './check-import-readiness-state-alignment.mjs';
 import './test-import-readiness-state-alignment.mjs';
+import './check-registry-authority-audit.mjs';
+import './test-registry-authority-audit.mjs';
 import './check-import-reservation-db-safety-proof.mjs';
 import './test-import-reservation-db-safety-proof.mjs';
 import './check-import-reservation-audit-split.mjs';
