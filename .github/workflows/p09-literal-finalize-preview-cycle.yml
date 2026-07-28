@@ -28,7 +28,12 @@ env:
 
 jobs:
   finalize:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # This one-time mutation proof may run automatically only on the dedicated P09 branch.
+    # After merge, future PRs cannot mutate the fixed Preview canary merely by touching shared files.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.head_ref == 'agent/real-admin-canary-p09')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
