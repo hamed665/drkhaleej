@@ -9,6 +9,10 @@ import type { ImportCanonicalGeo } from "./import-canonical-geo";
 import type { ImportControlledPublishState } from "./import-controlled-publish-dry-run-executor";
 import type { PharmacyPrivateAdminPublishContext } from "./import-pharmacy-private-admin-real-wiring";
 import type { ImportPublishRollbackSnapshot } from "./import-private-persistence-adapter";
+import {
+  resolveImportDraftEntitySource,
+  type ImportDraftEntitySource,
+} from "./import-unified-draft-entity";
 
 export const PHARMACY_PRIVATE_ADMIN_CENTER_SELECT = "id,center_type,slug,name_en,name_ar,legal_name,status,verification_status,primary_phone,secondary_phone,whatsapp_phone,email,website_url,logo_url,cover_image_url,short_description_en,short_description_ar,description_en,description_ar,default_locale,default_country,is_active,is_claimable,is_featured,sort_order,metadata,deleted_at,updated_at";
 
@@ -112,6 +116,23 @@ function readCanonicalGeo(metadata: Record<string, unknown>): ImportCanonicalGeo
     return null;
   }
   return value as ImportCanonicalGeo;
+}
+
+export function resolvePharmacyPrivateAdminDraftSource(
+  metadata: Readonly<Record<string, unknown>>,
+  sourceEvidence: Readonly<Record<string, unknown>>,
+): ImportDraftEntitySource {
+  const metadataSource = typeof metadata.source === "string"
+    ? resolveImportDraftEntitySource(metadata.source)
+    : null;
+  const evidenceSource = typeof sourceEvidence.source === "string"
+    ? resolveImportDraftEntitySource(sourceEvidence.source)
+    : null;
+
+  // Older Preview fixtures used descriptive provenance labels outside the canonical
+  // import-source enum. Keep that provenance in the rollback snapshot, but normalize
+  // the executable Draft boundary so a verified Reservation is not rejected before RPC.
+  return metadataSource ?? evidenceSource ?? "manual";
 }
 
 export function buildPharmacyPrivateAdminCenterSnapshot(
@@ -225,7 +246,7 @@ export async function loadPharmacyPrivateAdminRuntimeContext(
   };
   const draft = {
     draftId: center.id,
-    source: typeof metadata.source === "string" ? metadata.source : "manual",
+    source: resolvePharmacyPrivateAdminDraftSource(metadata, sourceEvidence),
     entityType: "pharmacy",
     name: center.name_en,
     legalName: center.legal_name,

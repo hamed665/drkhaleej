@@ -1,9 +1,6 @@
 import "server-only";
 
-import {
-  isPharmacyAdminBoundedReadStateFresh,
-  type PharmacyAdminBoundedReadState,
-} from "./import-pharmacy-admin-bounded-read-state";
+import type { PharmacyAdminBoundedReadState } from "./import-pharmacy-admin-bounded-read-state";
 import type { PharmacyPublishAuthorizationEnvelopeRecord } from "./import-pharmacy-publish-authorization-envelope";
 import type { PharmacyPrivateAdminPublishContext } from "./import-pharmacy-private-admin-real-wiring";
 import type {
@@ -47,6 +44,13 @@ export type PharmacyVerifiedReservationLoadResult =
         | "readback_failed";
     };
 
+export function areEquivalentPharmacyExpectedVersions(left: string, right: string): boolean {
+  if (left === right) return true;
+  const leftMs = Date.parse(left);
+  const rightMs = Date.parse(right);
+  return Number.isFinite(leftMs) && Number.isFinite(rightMs) && leftMs === rightMs;
+}
+
 function authorizationMatchesReview(
   authorization: PharmacyPublishAuthorizationEnvelopeRecord,
   review: PharmacyAdminBoundedReadState,
@@ -64,7 +68,7 @@ function authorizationMatchesReview(
     authorization.idempotencyKey === review.idempotencyKey &&
     authorization.requestHash === review.requestHash &&
     authorization.patchHash === review.patchHash &&
-    authorization.expectedEntityVersion === review.expectedEntityVersion &&
+    areEquivalentPharmacyExpectedVersions(authorization.expectedEntityVersion, review.expectedEntityVersion) &&
     authorization.entityFamily === "pharmacy" &&
     authorization.operationScope === "reserve_private_publish";
 }
@@ -79,8 +83,11 @@ function contextMatchesReview(
     context.mutationRequest.draft.draftId === review.entityId &&
     context.canaryInput.expectedSnapshotHash === review.snapshotHash &&
     context.canaryInput.expectedEntityFingerprint === review.entityFingerprint &&
-    context.canaryInput.reservationRequest.expectedVersion === review.expectedEntityVersion &&
-    context.mutationRequest.expectedVersion === review.expectedEntityVersion &&
+    areEquivalentPharmacyExpectedVersions(
+      context.canaryInput.reservationRequest.expectedVersion,
+      review.expectedEntityVersion,
+    ) &&
+    areEquivalentPharmacyExpectedVersions(context.mutationRequest.expectedVersion, review.expectedEntityVersion) &&
     context.mutationRequest.family === "pharmacy" &&
     context.mutationRequest.selectedFamily === "pharmacy" &&
     context.mutationRequest.executionEnabled === true &&
@@ -125,12 +132,14 @@ export async function loadPharmacyVerifiedReservationForPublish(input: {
     entityId: input.entityId,
     now: input.now,
   });
+  // Review freshness gates authorization issuance and Reservation creation. Once that
+  // authorization is consumed into one exact persisted Reservation, the Reservation's
+  // own expiry and integrity readback become the publish authority.
   if (
     !review ||
     review.operation !== "review" ||
     review.actorId !== input.actorId ||
-    review.entityId !== input.entityId ||
-    !isPharmacyAdminBoundedReadStateFresh(review, input.now)
+    review.entityId !== input.entityId
   ) return { ok: false, blocker: "review_unavailable" };
 
   const baseContext = await input.dependencies.loadBaseContext({ actorId: input.actorId, entityId: input.entityId });
@@ -175,7 +184,10 @@ export async function loadPharmacyVerifiedReservationForPublish(input: {
         entityFamily: "pharmacy",
         operationScope: "reserve_private_publish",
       },
-      verificationInput: persistence.verificationInput,
+      verificationInput: {
+        ...persistence.verificationInput,
+        expectedVersion: review.expectedEntityVersion,
+      },
       verificationResult,
       reservationExpiresAt: persistence.reservationExpiresAt,
     },

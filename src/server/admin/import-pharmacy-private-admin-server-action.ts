@@ -1,7 +1,12 @@
 import "server-only";
 
+import {
+  createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment,
+  runPharmacyPrivateAdminPublishOperation,
+} from "./import-pharmacy-private-admin-publish-operation";
 import type {
   PharmacyPrivateAdminOperation,
+  PharmacyPrivateAdminWorkflowBlocker,
   PharmacyPrivateAdminWorkflowResult,
 } from "./import-pharmacy-private-admin-workflow";
 
@@ -17,7 +22,11 @@ export type PharmacyPrivateAdminServerActionBlocker =
 export type PharmacyPrivateAdminServerActionResult =
   | { ok: true; workflow: PharmacyPrivateAdminWorkflowResult }
   | { ok: false; blockers: readonly PharmacyPrivateAdminServerActionBlocker[] }
-  | { ok: false; blockers: readonly []; workflow: PharmacyPrivateAdminWorkflowResult };
+  | {
+      ok: false;
+      blockers: readonly PharmacyPrivateAdminWorkflowBlocker[];
+      workflow: PharmacyPrivateAdminWorkflowResult;
+    };
 
 export type PharmacyPrivateAdminServerActionExecutor = (input: {
   operation: PharmacyPrivateAdminOperation;
@@ -49,8 +58,61 @@ function readSingle(formData: FormData, key: string): string | null {
   return value.length > 0 ? value : null;
 }
 
+function normalizeExactConfirmation(value: string | null): string | null {
+  if (!value) return null;
+  const normalized = value
+    .normalize("NFKC")
+    .replace(/[\s\u00a0\u2007\u202f]+/gu, " ")
+    .trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function parseAllowlist(value: string | undefined): string[] {
+  if (!value) return [];
+  return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+}
+
 function isOperation(value: string | null): value is PharmacyPrivateAdminOperation {
   return value !== null && operations.has(value as PharmacyPrivateAdminOperation);
+}
+
+async function runEnvironmentBackedPrivatePublish(input: {
+  actorId: string;
+  entityId: string;
+  confirmation: string;
+  allowedEntityIds: readonly string[];
+}): Promise<PharmacyPrivateAdminWorkflowResult> {
+  const allowedActorIds = parseAllowlist(process.env.IMPORT_PREVIEW_ALLOWED_ACTOR_IDS);
+  const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+    allowedActorIds,
+    allowedEntityIds: input.allowedEntityIds,
+  });
+  const published = dependencies
+    ? await runPharmacyPrivateAdminPublishOperation({
+        environment: process.env.VERCEL_ENV,
+        actorId: input.actorId,
+        entityId: input.entityId,
+        allowedActorIds,
+        allowedEntityIds: input.allowedEntityIds,
+        confirmation: input.confirmation,
+        now: new Date().toISOString(),
+        dependencies,
+      })
+    : null;
+
+  return {
+    operation: "private_publish",
+    status: published?.published ? "completed" : "failed",
+    entityId: input.entityId,
+    blockers: published
+      ? published.blocker ? [published.blocker] : []
+      : ["publish_dependencies_unavailable"],
+    publicVisibility: "private",
+    indexEligible: false,
+    sitemapEligible: false,
+    routeEnabled: false,
+    executionReference: published?.executionReference ?? null,
+  };
 }
 
 export function createPharmacyPrivateAdminServerAction(
@@ -64,7 +126,7 @@ export function createPharmacyPrivateAdminServerAction(
   }): Promise<PharmacyPrivateAdminServerActionResult> {
     const operationValue = readSingle(input.formData, "operation");
     const entityId = readSingle(input.formData, "entityId");
-    const confirmation = readSingle(input.formData, "confirmation");
+    const confirmation = normalizeExactConfirmation(readSingle(input.formData, "confirmation"));
     const blockers: PharmacyPrivateAdminServerActionBlocker[] = [];
 
     if (!dependencies.executionEnabled) blockers.push("action_disabled");
@@ -88,8 +150,18 @@ export function createPharmacyPrivateAdminServerAction(
     const uniqueBlockers = [...new Set(blockers)];
     if (uniqueBlockers.length > 0 || !isOperation(operationValue) || !entityId) return { ok: false, blockers: uniqueBlockers };
 
-    const workflow = await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
-    if (workflow.status !== "completed") return { ok: false, blockers: [], workflow };
+    const workflow = operationValue === "private_publish" && process.env.VERCEL_ENV === "preview"
+      ? await runEnvironmentBackedPrivatePublish({
+          actorId: input.actorId,
+          entityId,
+          confirmation: confirmation!,
+          allowedEntityIds: dependencies.allowedEntityIds,
+        })
+      : await dependencies.execute({ operation: operationValue, actorId: input.actorId, entityId, confirmation });
+
+    if (workflow.status !== "completed") {
+      return { ok: false, blockers: workflow.blockers, workflow };
+    }
     return { ok: true, workflow };
   };
 }

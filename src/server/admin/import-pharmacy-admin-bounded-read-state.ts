@@ -64,10 +64,10 @@ function assertNonEmpty(value: string, name: string): void {
   if (value.trim().length === 0) throw new Error(`${name}_required`);
 }
 
-function assertIsoDate(value: string, name: string): number {
+function canonicalIsoDate(value: string, name: string): { iso: string; timestamp: number } {
   const timestamp = Date.parse(value);
   if (!Number.isFinite(timestamp)) throw new Error(`${name}_invalid`);
-  return timestamp;
+  return { iso: new Date(timestamp).toISOString(), timestamp };
 }
 
 export function buildPharmacyAdminBoundedReadState(
@@ -77,16 +77,27 @@ export function buildPharmacyAdminBoundedReadState(
   assertNonEmpty(input.entityId, "entity_id");
   assertNonEmpty(input.expectedEntityVersion, "expected_entity_version");
 
-  const createdAt = assertIsoDate(input.createdAt, "created_at");
-  const expiresAt = assertIsoDate(input.expiresAt, "expires_at");
-  if (expiresAt <= createdAt) throw new Error("expiry_not_after_creation");
+  const createdAt = canonicalIsoDate(input.createdAt, "created_at");
+  const expiresAt = canonicalIsoDate(input.expiresAt, "expires_at");
+  if (expiresAt.timestamp <= createdAt.timestamp) throw new Error("expiry_not_after_creation");
 
   if (input.operation === "review" && !input.reviewedAt) throw new Error("reviewed_at_required");
-  if (input.reviewedAt) {
-    const reviewedAt = assertIsoDate(input.reviewedAt, "reviewed_at");
-    if (reviewedAt < createdAt || reviewedAt > expiresAt) throw new Error("reviewed_at_out_of_range");
+  const reviewedAt = input.reviewedAt
+    ? canonicalIsoDate(input.reviewedAt, "reviewed_at")
+    : null;
+  if (
+    reviewedAt &&
+    (reviewedAt.timestamp < createdAt.timestamp || reviewedAt.timestamp >= expiresAt.timestamp)
+  ) {
+    throw new Error("reviewed_at_out_of_range");
   }
 
+  // PostgreSQL/Supabase can return the same timestamptz using a different textual
+  // offset (for example Z versus +00:00). Identity must bind to the instant, not
+  // to whichever equivalent spelling crossed the network.
+  const recoveryOperationNonce = input.operation === "review" && reviewedAt && reviewedAt.iso !== createdAt.iso
+    ? reviewedAt.iso
+    : null;
   const identity = buildPharmacyStableOperationIdentity({
     actorId: input.actorId,
     entityId: input.entityId,
@@ -94,6 +105,7 @@ export function buildPharmacyAdminBoundedReadState(
     entityFingerprint: input.entityFingerprint,
     expectedEntityVersion: input.expectedEntityVersion,
     patch: input.proposed,
+    operationNonce: recoveryOperationNonce,
   });
   const diff = PHARMACY_ADMIN_DIFF_FIELDS.flatMap((field) => {
     const before = input.current[field];
@@ -112,9 +124,9 @@ export function buildPharmacyAdminBoundedReadState(
     snapshotHash: input.snapshotHash,
     entityFingerprint: input.entityFingerprint,
     ...identity,
-    createdAt: input.createdAt,
-    expiresAt: input.expiresAt,
-    reviewedAt: input.reviewedAt ?? null,
+    createdAt: createdAt.iso,
+    expiresAt: expiresAt.iso,
+    reviewedAt: reviewedAt?.iso ?? null,
     diff,
     blockerCodes,
     publicVisibility: "private",

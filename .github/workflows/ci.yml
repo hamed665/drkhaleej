@@ -27,7 +27,19 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
       - name: Unit tests
-        run: pnpm test:unit
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/ci
+          pnpm test:unit 2>&1 | tee artifacts/ci/unit-tests.log
+      - name: Upload unit-test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-diagnostics-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/ci/unit-tests.log
+          if-no-files-found: error
+          retention-days: 7
       - name: Build
         run: pnpm build
       - name: Routes check

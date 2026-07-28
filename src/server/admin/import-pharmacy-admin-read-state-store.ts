@@ -38,14 +38,21 @@ export type PersistPharmacyAdminReadStateInput = {
   proposed: Readonly<Record<PharmacyAdminDiffField, PharmacyAdminBoundedValue>>;
 };
 
+type PharmacyAdminReadStateIdentity = {
+  actorId: string;
+  entityId: string;
+  operation: "dry_run" | "review";
+};
+
+type PharmacyAdminReadStateAttemptIdentity = PharmacyAdminReadStateIdentity & {
+  operationAttemptId: string;
+};
+
 export type PharmacyAdminReadStateStore = {
   persist(input: PersistPharmacyAdminReadStateInput): Promise<{ id: string; state: PharmacyAdminBoundedReadState } | null>;
-  readLatestFresh(input: {
-    actorId: string;
-    entityId: string;
-    operation: "dry_run" | "review";
-    now: string;
-  }): Promise<PharmacyAdminBoundedReadState | null>;
+  readLatest(input: PharmacyAdminReadStateIdentity): Promise<PharmacyAdminBoundedReadState | null>;
+  readByOperationAttemptId(input: PharmacyAdminReadStateAttemptIdentity): Promise<PharmacyAdminBoundedReadState | null>;
+  readLatestFresh(input: PharmacyAdminReadStateIdentity & { now: string }): Promise<PharmacyAdminBoundedReadState | null>;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -124,6 +131,39 @@ export function createPharmacyAdminReadStateStore(
 ): PharmacyAdminReadStateStore {
   const columns = "id,actor_profile_id,entity_id,operation,snapshot_hash,entity_fingerprint,operation_attempt_id,idempotency_key,request_hash,patch_hash,operation_scope,entity_family,expected_entity_version,current_state,proposed_state,blocker_codes,reviewed_at,expires_at,created_at";
 
+  async function readLatest(input: PharmacyAdminReadStateIdentity): Promise<PharmacyAdminBoundedReadState | null> {
+    const response = await client
+      .from("import_pharmacy_admin_read_states")
+      .select(columns)
+      .eq("actor_profile_id", input.actorId)
+      .eq("entity_id", input.entityId)
+      .eq("operation", input.operation)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (response.error || !response.data) return null;
+    return readRow(response.data);
+  }
+
+  async function readByOperationAttemptId(
+    input: PharmacyAdminReadStateAttemptIdentity,
+  ): Promise<PharmacyAdminBoundedReadState | null> {
+    const response = await client
+      .from("import_pharmacy_admin_read_states")
+      .select(columns)
+      .eq("actor_profile_id", input.actorId)
+      .eq("entity_id", input.entityId)
+      .eq("operation", input.operation)
+      .eq("operation_attempt_id", input.operationAttemptId)
+      .limit(1)
+      .maybeSingle();
+
+    if (response.error || !response.data) return null;
+    const state = readRow(response.data);
+    return state?.operationAttemptId === input.operationAttemptId ? state : null;
+  }
+
   return {
     async persist(input) {
       if (!isPharmacyAdminBoundedReadStateFresh(input.state, input.state.createdAt)) return null;
@@ -161,19 +201,11 @@ export function createPharmacyAdminReadStateStore(
       return state ? { id: response.data.id, state } : null;
     },
 
-    async readLatestFresh(input) {
-      const response = await client
-        .from("import_pharmacy_admin_read_states")
-        .select(columns)
-        .eq("actor_profile_id", input.actorId)
-        .eq("entity_id", input.entityId)
-        .eq("operation", input.operation)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+    readLatest,
+    readByOperationAttemptId,
 
-      if (response.error || !response.data) return null;
-      const state = readRow(response.data);
+    async readLatestFresh(input) {
+      const state = await readLatest(input);
       return state && isPharmacyAdminBoundedReadStateFresh(state, input.now) ? state : null;
     },
   };

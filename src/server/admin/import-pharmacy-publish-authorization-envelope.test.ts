@@ -33,13 +33,40 @@ function harness(now = new Date("2026-07-13T00:00:00.000Z")) {
       };
       return true;
     }),
+    reissueExpired: vi.fn(async (value) => {
+      if (
+        !record ||
+        record.authorizationId !== value.authorizationId ||
+        record.status !== "expired"
+      ) return false;
+      record = {
+        ...record,
+        tokenHash: value.tokenHash,
+        nonceHash: value.nonceHash,
+        status: "issued",
+        issuedAt: value.issuedAt,
+        expiresAt: value.expiresAt,
+        consumedAt: null,
+        invalidatedAt: null,
+        invalidationReason: null,
+        consumedByReservationId: null,
+      };
+      return true;
+    }),
     consume: vi.fn(async () => false),
   };
   const service = createPharmacyPublishAuthorizationEnvelopeService(store, {
     now: () => now,
     ttlMs: 5 * 60 * 1000,
   });
-  return { service, store, getRecord: () => record, setRecord: (value: PharmacyPublishAuthorizationEnvelopeRecord | null) => { record = value; } };
+  return {
+    service,
+    store,
+    getRecord: () => record,
+    setRecord: (value: PharmacyPublishAuthorizationEnvelopeRecord | null) => {
+      record = value;
+    },
+  };
 }
 
 const input = {
@@ -102,6 +129,97 @@ describe("Pharmacy publish authorization envelope", () => {
     expect(second).toEqual({ authorization: first?.authorization, legacySecret: null });
     expect(test.store.create).toHaveBeenCalledTimes(1);
     expect(test.store.invalidateActive).toHaveBeenCalledTimes(1);
+  });
+
+  it("reissues an expired authorization for the same exact Review without inserting a duplicate", async () => {
+    const test = harness();
+    const first = await test.service.issue(input);
+    const renewalService = createPharmacyPublishAuthorizationEnvelopeService(test.store, {
+      now: () => new Date("2026-07-13T00:06:00.000Z"),
+      ttlMs: 5 * 60 * 1000,
+    });
+
+    const renewed = await renewalService.issue(input);
+
+    expect(first?.authorization.authorizationId).toBe(AUTHORIZATION_ID);
+    expect(renewed?.authorization).toEqual({
+      authorizationId: AUTHORIZATION_ID,
+      expiresAt: "2026-07-13T00:11:00.000Z",
+    });
+    expect(renewed?.legacySecret?.token).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(renewed?.legacySecret?.nonce).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(test.store.transition).toHaveBeenCalledWith(expect.objectContaining({
+      authorizationId: AUTHORIZATION_ID,
+      toStatus: "expired",
+    }));
+    expect(test.store.reissueExpired).toHaveBeenCalledWith(expect.objectContaining({
+      authorizationId: AUTHORIZATION_ID,
+      issuedAt: "2026-07-13T00:06:00.000Z",
+      expiresAt: "2026-07-13T00:11:00.000Z",
+    }));
+    expect(test.store.create).toHaveBeenCalledTimes(1);
+    expect(test.getRecord()).toMatchObject({
+      authorizationId: AUTHORIZATION_ID,
+      status: "issued",
+      issuedAt: "2026-07-13T00:06:00.000Z",
+      expiresAt: "2026-07-13T00:11:00.000Z",
+      consumedAt: null,
+      invalidatedAt: null,
+      consumedByReservationId: null,
+    });
+  });
+
+  it("replays a concurrent winner when another request renews the same expired authorization first", async () => {
+    const test = harness();
+    await test.service.issue(input);
+    const original = test.getRecord();
+    test.setRecord(original ? { ...original, status: "expired" } : null);
+
+    const reissueExpired = test.store.reissueExpired;
+    expect(reissueExpired).toBeDefined();
+    vi.mocked(reissueExpired!).mockImplementationOnce(async () => {
+      const expired = test.getRecord();
+      test.setRecord(expired ? {
+        ...expired,
+        tokenHash: "e".repeat(64),
+        nonceHash: "f".repeat(64),
+        status: "issued",
+        issuedAt: "2026-07-13T00:06:00.000Z",
+        expiresAt: "2026-07-13T00:11:00.000Z",
+      } : null);
+      return false;
+    });
+
+    const renewalService = createPharmacyPublishAuthorizationEnvelopeService(test.store, {
+      now: () => new Date("2026-07-13T00:06:00.000Z"),
+    });
+
+    await expect(renewalService.issue(input)).resolves.toEqual({
+      authorization: {
+        authorizationId: AUTHORIZATION_ID,
+        expiresAt: "2026-07-13T00:11:00.000Z",
+      },
+      legacySecret: null,
+    });
+  });
+
+  it("does not reissue a consumed authorization", async () => {
+    const test = harness();
+    await test.service.issue(input);
+    const original = test.getRecord();
+    test.setRecord(original ? {
+      ...original,
+      status: "consumed",
+      consumedAt: "2026-07-13T00:01:00.000Z",
+      consumedByReservationId: "44444444-4444-4444-8444-444444444444",
+    } : null);
+
+    const renewalService = createPharmacyPublishAuthorizationEnvelopeService(test.store, {
+      now: () => new Date("2026-07-13T00:06:00.000Z"),
+    });
+
+    await expect(renewalService.issue(input)).resolves.toBeNull();
+    expect(test.store.reissueExpired).not.toHaveBeenCalled();
   });
 
   it("marks an issued authorization expired during server readback", async () => {

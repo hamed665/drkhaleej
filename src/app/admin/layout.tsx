@@ -22,6 +22,7 @@ export default async function AdminLayout({
 }) {
   const requestHeaders = await headers();
   const requestPath =
+    requestHeaders.get("x-drmuscat-request-path") ??
     requestHeaders.get("x-next-url") ??
     requestHeaders.get("x-matched-path") ??
     requestHeaders.get("next-url");

@@ -77,20 +77,22 @@ function makeRow(state = makeState()) {
 
 function createClient(row: Record<string, unknown> | null, error: { message?: string } | null = null) {
   const terminal = { maybeSingle: vi.fn(async () => ({ data: row, error })) };
-  const chain: Record<string, unknown> = {
+  const chain: Record<string, unknown> = {};
+  const eq = vi.fn(() => chain);
+  Object.assign(chain, {
     select: vi.fn(() => chain),
-    eq: vi.fn(() => chain),
+    eq,
     order: vi.fn(() => chain),
-    limit: vi.fn(() => terminal),
+    limit: vi.fn(() => chain),
     maybeSingle: terminal.maybeSingle,
-  };
+  });
   const client = {
     from: vi.fn(() => ({
       upsert: vi.fn(() => ({ select: vi.fn(() => terminal) })),
       select: vi.fn(() => chain),
     })),
   } as unknown as PharmacyAdminReadStateClient;
-  return { client, terminal };
+  return { client, terminal, eq };
 }
 
 describe("Pharmacy Admin bounded read state store", () => {
@@ -127,6 +129,40 @@ describe("Pharmacy Admin bounded read state store", () => {
         now: "2026-07-13T00:10:00.000Z",
       }),
     ).resolves.toBeNull();
+  });
+
+  it("retains an exact expired review for an already-created Reservation", async () => {
+    const review = makeState("review");
+    const { client } = createClient(makeRow(review));
+    const store = createPharmacyAdminReadStateStore(client);
+
+    await expect(
+      store.readLatest({ actorId: "admin-1", entityId: "pharmacy-1", operation: "review" }),
+    ).resolves.toEqual(review);
+    await expect(
+      store.readLatestFresh({
+        actorId: "admin-1",
+        entityId: "pharmacy-1",
+        operation: "review",
+        now: "2026-07-13T00:20:00.000Z",
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it("reads back the exact recovery Review attempt instead of trusting latest-row ordering", async () => {
+    const review = makeState("review");
+    const { client, eq } = createClient(makeRow(review));
+    const store = createPharmacyAdminReadStateStore(client);
+
+    await expect(
+      store.readByOperationAttemptId({
+        actorId: "admin-1",
+        entityId: "pharmacy-1",
+        operation: "review",
+        operationAttemptId: review.operationAttemptId,
+      }),
+    ).resolves.toEqual(review);
+    expect(eq).toHaveBeenCalledWith("operation_attempt_id", review.operationAttemptId);
   });
 
   it("fails closed on database errors", async () => {

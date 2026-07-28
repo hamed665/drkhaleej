@@ -11,6 +11,10 @@ const panel = readFileSync(
   path.join(repoRoot, "src/components/admin/import-pharmacy-private-admin-control-panel.tsx"),
   "utf8",
 );
+const completePanel = readFileSync(
+  path.join(repoRoot, "src/components/admin/import-pharmacy-complete-canary-panel.tsx"),
+  "utf8",
+);
 const page = readFileSync(
   path.join(repoRoot, "src/app/admin/imports/readiness/page.tsx"),
   "utf8",
@@ -21,6 +25,18 @@ const model = readFileSync(
 );
 const actions = readFileSync(
   path.join(repoRoot, "src/app/admin/imports/readiness/actions.ts"),
+  "utf8",
+);
+const completeAction = readFileSync(
+  path.join(repoRoot, "src/app/admin/imports/readiness/actions-complete-canary.ts"),
+  "utf8",
+);
+const completePlan = readFileSync(
+  path.join(repoRoot, "src/server/admin/import-pharmacy-complete-canary-plan.ts"),
+  "utf8",
+);
+const completeReadback = readFileSync(
+  path.join(repoRoot, "src/server/admin/import-pharmacy-complete-canary-readback.ts"),
   "utf8",
 );
 const stateModel = readFileSync(
@@ -55,12 +71,25 @@ for (const [pattern, message] of [
 ]) requirePattern(panel, pattern, message);
 
 for (const [pattern, message] of [
+  [/"use client"/, "one-click panel must remain a client action-state surface"],
+  [/useActionState/, "one-click panel must use an authenticated Server Action"],
+  [/COMPLETE PRIVATE CANARY/, "one-click panel must require exact entity-bound full-cycle confirmation"],
+  [/name="completeCanaryConfirmation"/, "one-click panel must submit the dedicated confirmation field"],
+  [/readOnly/, "one-click confirmation must be server-selected and read-only"],
+  [/Running persisted stages/, "one-click panel must display bounded pending state"],
+  [/window\.location\.reload\(\)/, "one-click panel may reload only after verified completion"],
+  [/Production, public routing, indexing, sitemap inclusion, bulk execution, and automatic retries remain disabled/, "one-click panel must state every closed boundary"],
+  [/Full canary stopped safely/, "one-click panel must expose a bounded fail-closed error state"],
+]) requirePattern(completePanel, pattern, message);
+
+for (const [pattern, message] of [
   [/requirePlatformAdmin/, "page must bind initial state to the authenticated admin"],
   [/pharmacyUiModel\.actorId === admin\.id/, "page must keep controls locked for non-allowlisted admins"],
   [/createPharmacyAdminStateMachineReaderFromEnvironment/, "page must load initial state from server readback"],
   [/initialStateMachine=/, "page must pass bounded initial state to the client"],
+  [/ImportPharmacyCompleteCanaryPanel/, "page must expose the bounded one-click literal canary"],
   [/never retried automatically/, "page must preserve no-auto-retry policy"],
-  [/P09 automatic canary execution.*remain locked/s, "page must keep P09 and promotion closed"],
+  [/unattended execution, and bulk remain locked/, "page must keep unattended execution and promotion closed"],
 ]) requirePattern(page, pattern, message);
 
 for (const [pattern, message] of [
@@ -71,6 +100,46 @@ for (const [pattern, message] of [
   [/operationValue === "refresh_state"/, "refresh must be readback-only"],
   [/runPharmacyPrivateAdminRollbackOperation/, "rollback UI must reuse the existing atomic authority"],
 ]) requirePattern(actions, pattern, message);
+
+for (const [pattern, message] of [
+  [/requirePlatformAdmin/, "one-click action must require the authenticated platform Admin"],
+  [/MAX_ONE_CLICK_OPERATIONS = 5/, "one-click action must have a bounded operation limit"],
+  [/COMPLETE PRIVATE CANARY/, "one-click action must enforce exact full-cycle confirmation"],
+  [/allowedActorIds\.length !== 1/, "one-click action must require exactly one allowed actor"],
+  [/allowedEntityIds\.length !== 1/, "one-click action must require exactly one allowed entity"],
+  [/process\.env\.VERCEL_ENV !== "preview"/, "one-click action must remain Preview-only"],
+  [/automaticMutationRetryAllowed !== false/, "one-click action must reject any state that permits automatic retries"],
+  [/executedOperations\.has\(plan\.operation\)/, "one-click action must never execute an operation twice"],
+  [/complete_canary_no_progress/, "one-click action must stop when the persisted state does not advance"],
+  [/complete_canary_post_step_readback_unverified/, "one-click action must stop when bounded post-step readback remains unverified"],
+  [/completedWithDeferredStateReadback/, "one-click action must distinguish completed writes from delayed aggregate readback"],
+  [/readPharmacyCompleteCanaryOperationReadback/, "one-click action must use bounded readback-only convergence"],
+  [/runExpiredReservationRecoverySafeActionState/, "one-click action must reuse the fail-closed recovery authority"],
+  [/runPharmacyPrivateAdminActionState/, "one-click action must reuse the existing Admin operation authority"],
+  [/RESERVE PRIVATE PUBLISH/, "one-click action must retain exact Reservation confirmation"],
+  [/EXECUTE PRIVATE PUBLISH/, "one-click action must retain exact mutation confirmation"],
+  [/ROLLBACK PRIVATE PUBLISH/, "one-click action must retain exact rollback confirmation"],
+]) requirePattern(completeAction, pattern, message);
+
+for (const [pattern, message] of [
+  [/DEFAULT_READBACK_ATTEMPTS = 6/, "readback convergence must use a fixed default attempt bound"],
+  [/MAX_READBACK_ATTEMPTS = 8/, "readback convergence must cap operator-supplied attempt counts"],
+  [/setTimeout as wait/, "readback convergence may delay only between persisted reads"],
+  [/await input\.reader/, "readback convergence must call only the state reader"],
+  [/isPharmacyCompleteCanaryOperationReadbackVerified/, "readback convergence must require the operation-specific persisted stage"],
+  [/return "publish_verified"/, "private publish readback must require the verified publish stage"],
+  [/return "exact_recovery_verified"/, "rollback readback must require exact recovery"],
+]) requirePattern(completeReadback, pattern, message);
+
+for (const [pattern, message] of [
+  [/resolvePharmacyExpiredReservationRecoveryOperation/, "one-click planner must reuse the recovery phase authority"],
+  [/expiredReservationRecoveryActive/, "one-click planner must scope recovery delegation to an expired Reservation"],
+  [/stageStatus\(state, "rollback"\) === "available"/, "one-click planner must prefer persisted rollback availability"],
+  [/stageStatus\(state, "private_publish"\) === "available"/, "one-click planner must prefer persisted mutation availability"],
+  [/stageStatus\(state, "reservation"\) === "available"/, "one-click planner must require persisted Reservation availability"],
+  [/operation: "dry_run"/, "one-click planner must support fresh dry-run"],
+  [/operation: "review"/, "one-click planner must support exact Review"],
+]) requirePattern(completePlan, pattern, message);
 
 for (const [pattern, message] of [
   [/resolvePharmacyPreviewCanaryActivation/, "must derive activation from the existing Preview gate"],
@@ -101,8 +170,14 @@ for (const [source, pattern, message] of [
   [panel, /dangerouslySetInnerHTML/, "must not render unrestricted payload HTML"],
   [panel, /process\.env/, "panel must not read environment variables"],
   [panel, /publishReference|rollbackSnapshotId|reservationId/, "panel must not receive raw persistence identifiers"],
+  [completePanel, /dangerouslySetInnerHTML/, "one-click panel must not render unrestricted payload HTML"],
+  [completePanel, /process\.env/, "one-click panel must not read environment variables"],
+  [completePanel, /publishReference|rollbackSnapshotId|reservationId/, "one-click panel must not receive raw persistence identifiers"],
   [page, /process\.env/, "route must not interpret runtime environment directly"],
   [actions, /setTimeout|setInterval/, "Server Action must not automatically retry writes"],
+  [completeAction, /setTimeout|setInterval/, "one-click Server Action must not schedule or retry writes"],
+  [completeAction, /while\s*\(/, "one-click Server Action must use a fixed bounded operation loop"],
+  [completeReadback, /runPharmacyPrivateAdminActionState|runPharmacyPrivateAdminPublishOperation|runPharmacyPrivateAdminRollbackOperation|runPharmacyAdminReservationOperation/, "readback convergence must never invoke a write authority"],
   [stateModel, /rawExpected|rawActual|expectedValue|actualValue/, "state model must not expose raw mismatch values"],
 ]) {
   if (pattern.test(source)) {

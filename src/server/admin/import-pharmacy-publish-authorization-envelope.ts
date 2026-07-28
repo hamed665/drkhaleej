@@ -35,6 +35,14 @@ export type PharmacyPublishAuthorizationEnvelopeRecord = {
 
 export type PharmacyPublishAuthorizationCreateRecord = Omit<PharmacyPublishAuthorizationEnvelopeRecord, "authorizationId">;
 
+export type PharmacyPublishAuthorizationReissueInput = {
+  authorizationId: string;
+  tokenHash: string;
+  nonceHash: string;
+  issuedAt: string;
+  expiresAt: string;
+};
+
 export type PharmacyPublishAuthorizationEnvelopeStore = {
   resolveReviewStateId(operationAttemptId: string): Promise<string | null>;
   create(record: PharmacyPublishAuthorizationCreateRecord): Promise<string | null>;
@@ -56,6 +64,7 @@ export type PharmacyPublishAuthorizationEnvelopeStore = {
     transitionedAt: string;
     reason: string | null;
   }): Promise<boolean>;
+  reissueExpired?(input: PharmacyPublishAuthorizationReissueInput): Promise<boolean>;
   consume(input: { tokenHash: string; nonceHash: string; consumedAt: string }): Promise<boolean>;
 };
 
@@ -94,6 +103,14 @@ type PharmacyPublishAuthorizationIdentity = {
   operationScope: "reserve_private_publish";
 };
 
+type PharmacyPublishAuthorizationSecretMaterial = {
+  token: string;
+  nonce: string;
+  tokenHash: string;
+  nonceHash: string;
+  expiresAt: string;
+};
+
 function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
@@ -129,6 +146,36 @@ function toReadback(record: PharmacyPublishAuthorizationEnvelopeRecord): Pharmac
     expiresAt: record.expiresAt,
   };
 }
+function createSecretMaterial(issuedAt: Date, ttlMs: number): PharmacyPublishAuthorizationSecretMaterial {
+  const token = randomBytes(32).toString("base64url");
+  const nonce = randomBytes(24).toString("base64url");
+  return {
+    token,
+    nonce,
+    tokenHash: sha256(token),
+    nonceHash: sha256(nonce),
+    expiresAt: new Date(issuedAt.getTime() + ttlMs).toISOString(),
+  };
+}
+function replayFreshAuthorization(
+  record: PharmacyPublishAuthorizationEnvelopeRecord,
+  input: PharmacyPublishAuthorizationIdentity,
+  issuedAt: Date,
+): PharmacyPublishAuthorizationIssued | null {
+  if (
+    !identityMatches(record, input) ||
+    record.status !== "issued" ||
+    Date.parse(record.expiresAt) <= issuedAt.getTime()
+  ) return null;
+
+  return {
+    authorization: {
+      authorizationId: record.authorizationId,
+      expiresAt: record.expiresAt,
+    },
+    legacySecret: null,
+  };
+}
 
 export function createPharmacyPublishAuthorizationEnvelopeService(
   store: PharmacyPublishAuthorizationEnvelopeStore,
@@ -145,7 +192,7 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
       if (!reviewStateId || !isUuid(reviewStateId)) return null;
 
       const issuedAt = now();
-      const existing = await store.readByReviewStateId(reviewStateId);
+      let existing = await store.readByReviewStateId(reviewStateId);
       if (existing) {
         if (!identityMatches(existing, input)) {
           if (existing.status === "issued") {
@@ -159,22 +206,59 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
           }
           return null;
         }
-        if (existing.status === "issued" && Date.parse(existing.expiresAt) > issuedAt.getTime()) {
-          return {
-            authorization: { authorizationId: existing.authorizationId, expiresAt: existing.expiresAt },
-            legacySecret: null,
-          };
-        }
+
+        const replay = replayFreshAuthorization(existing, input, issuedAt);
+        if (replay) return replay;
+
         if (existing.status === "issued") {
-          await store.transition({
+          const transitioned = await store.transition({
             authorizationId: existing.authorizationId,
             fromStatus: "issued",
             toStatus: "expired",
             transitionedAt: issuedAt.toISOString(),
             reason: null,
           });
+          if (transitioned) {
+            existing = {
+              ...existing,
+              status: "expired",
+              invalidatedAt: null,
+              invalidationReason: null,
+            };
+          } else {
+            const raced = await store.readByReviewStateId(reviewStateId);
+            if (!raced || !identityMatches(raced, input)) return null;
+            const racedReplay = replayFreshAuthorization(raced, input, issuedAt);
+            if (racedReplay) return racedReplay;
+            existing = raced;
+          }
         }
-        return null;
+
+        if (existing.status !== "expired" || !store.reissueExpired) return null;
+
+        const material = createSecretMaterial(issuedAt, ttlMs);
+        const renewed = await store.reissueExpired({
+          authorizationId: existing.authorizationId,
+          tokenHash: material.tokenHash,
+          nonceHash: material.nonceHash,
+          issuedAt: issuedAt.toISOString(),
+          expiresAt: material.expiresAt,
+        });
+        if (renewed) {
+          return {
+            authorization: {
+              authorizationId: existing.authorizationId,
+              expiresAt: material.expiresAt,
+            },
+            legacySecret: {
+              token: material.token,
+              nonce: material.nonce,
+            },
+          };
+        }
+
+        const raced = await store.readByReviewStateId(reviewStateId);
+        return raced ? replayFreshAuthorization(raced, input, issuedAt) : null;
       }
 
       const invalidatedCount = await store.invalidateActive({
@@ -187,22 +271,20 @@ export function createPharmacyPublishAuthorizationEnvelopeService(
       });
       if (invalidatedCount === null) return null;
 
-      const token = randomBytes(32).toString("base64url");
-      const nonce = randomBytes(24).toString("base64url");
-      const expiresAt = new Date(issuedAt.getTime() + ttlMs);
+      const material = createSecretMaterial(issuedAt, ttlMs);
       const authorizationId = await store.create({
-        tokenHash: sha256(token), nonceHash: sha256(nonce), actorId: input.actorId, entityId: input.entityId,
+        tokenHash: material.tokenHash, nonceHash: material.nonceHash, actorId: input.actorId, entityId: input.entityId,
         reviewStateId, reviewSnapshotHash: input.reviewSnapshotHash, entityFingerprint: input.entityFingerprint,
         operationAttemptId: input.operationAttemptId, idempotencyKey: input.idempotencyKey,
         requestHash: input.requestHash, patchHash: input.patchHash, expectedEntityVersion: input.expectedEntityVersion,
         entityFamily: "pharmacy", operationScope: "reserve_private_publish", status: "issued",
-        issuedAt: issuedAt.toISOString(), expiresAt: expiresAt.toISOString(), consumedAt: null,
+        issuedAt: issuedAt.toISOString(), expiresAt: material.expiresAt, consumedAt: null,
         invalidatedAt: null, invalidationReason: null, consumedByReservationId: null,
       });
       if (!authorizationId) return null;
       return {
-        authorization: { authorizationId, expiresAt: expiresAt.toISOString() },
-        legacySecret: { token, nonce },
+        authorization: { authorizationId, expiresAt: material.expiresAt },
+        legacySecret: { token: material.token, nonce: material.nonce },
       };
     },
 

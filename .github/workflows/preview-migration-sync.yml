@@ -15,22 +15,40 @@ on:
       - 'scripts/import/check-import-p06-rollback-authority-proof.mjs'
       - 'scripts/import/run-p07-rollback-exact-recovery-proof.mjs'
       - 'scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs'
+      - 'scripts/import/run-p09-real-admin-canary.mjs'
+      - 'scripts/import/run-p09-recovery-review-attempt-proof.mjs'
+      - 'scripts/import/run-p09-literal-ui-state-diagnostic.mjs'
+      - 'scripts/import/run-p09-postgrest-version-diagnostic.mjs'
+      - 'scripts/import/run-p09-literal-publish-transaction-diagnostic.mjs'
+      - 'scripts/import/run-p09-literal-application-preflight-diagnostic.mjs'
+      - 'scripts/import/run-p09-literal-finalize-preview-cycle.mjs'
+      - 'scripts/import/check-import-p09-real-admin-canary.mjs'
       - 'scripts/import/check-import-pharmacy-minimal-admin-ui.mjs'
       - 'src/server/admin/import-pharmacy-rollback-exact-recovery*'
       - 'src/server/admin/import-pharmacy-real-rollback-canary*'
       - 'src/server/admin/import-pharmacy-admin-state-machine*'
+      - 'src/server/admin/import-pharmacy-expired-reservation-recovery*'
+      - 'src/server/admin/import-pharmacy-complete-canary-plan*'
       - 'src/server/admin/import-pharmacy-private-admin-rollback-operation*'
+      - 'src/server/admin/import-pharmacy-private-admin-runtime-context.ts'
+      - 'src/server/admin/import-pharmacy-private-admin-runtime-context-legacy-source.test.ts'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
+      - 'src/components/admin/import-pharmacy-expired-reservation-recovery-panel.tsx'
+      - 'src/components/admin/import-pharmacy-complete-canary-panel.tsx'
       - 'scripts/import/check-import-readiness-state-alignment.mjs'
       - 'docs/import/ROLLBACK_EXACT_RECOVERY.md'
       - 'docs/import/ADMIN_STATE_MACHINE_SCOPE.md'
+      - 'docs/import/REAL_ADMIN_CANARY_SCOPE.md'
+      - 'docs/import/POST_P09_GO_NO_GO.md'
       - 'docs/import/import-readiness-roadmap-after-933.md'
       - 'docs/project-state/CURRENT_STATE.md'
       - 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md'
       - 'README.md'
       - '.github/workflows/preview-migration-sync.yml'
+      - '.github/workflows/p09-literal-application-diagnostic.yml'
+      - '.github/workflows/p09-literal-finalize-preview-cycle.yml'
       - 'scripts/db/validate-migrations-current.mjs'
       - 'scripts/db/test-rls-static-taxrlsa.mjs'
       - 'scripts/db/test-rls-static.mjs'
@@ -61,6 +79,19 @@ env:
   P07_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   P07_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   P07_EVIDENCE_PATH: artifacts/p07/rollback-exact-recovery-proof.json
+  P09_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  P09_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  P09_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  P09_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  P09_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  P09_EVIDENCE_PATH: artifacts/p09/real-admin-canary.json
+  P09_RECOVERY_EVIDENCE_PATH: artifacts/p09/recovery-review-attempt.json
+  P09_LITERAL_ENTITY_SHA256: 96c37e7cc021ea720993a05083da7a0fbf0ae0db0c1dfb37c34e02cc89a79187
+  P09_LITERAL_DIAGNOSTIC_PATH: artifacts/p09/literal-ui-state-diagnostic.json
+  P09_POSTGREST_VERSION_DIAGNOSTIC_PATH: artifacts/p09/postgrest-version-diagnostic.json
+  P09_LITERAL_PUBLISH_DIAGNOSTIC_PATH: artifacts/p09/literal-publish-transaction-diagnostic.json
+  P09_LITERAL_FINALIZE_ENABLED: 'true'
+  P09_LITERAL_FINAL_EVIDENCE_PATH: artifacts/p09/literal-final-preview-cycle.json
 
 permissions:
   contents: read
@@ -73,7 +104,7 @@ jobs:
   sync:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - name: Checkout exact revision
         uses: actions/checkout@v4
@@ -89,6 +120,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$P05_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P06_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$P07_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$P09_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -113,7 +145,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -122,6 +154,7 @@ jobs:
             node scripts/import/check-import-p06-rollback-authority-proof.mjs
             node scripts/import/check-import-p07-rollback-exact-recovery-proof.mjs
             node scripts/import/check-import-pharmacy-minimal-admin-ui.mjs
+            node scripts/import/check-import-p09-real-admin-canary.mjs
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -132,6 +165,30 @@ jobs:
 
       - name: Verify exact ledger and database inventories
         run: node scripts/db/preview-migration-sync.mjs verify
+
+      - name: Diagnose persisted literal Admin canary state
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-ui-state-diagnostic.mjs 2>&1 | tee artifacts/p09/literal-ui-state-diagnostic.log
+
+      - name: Verify PostgREST timestamp representation
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-postgrest-version-diagnostic.mjs 2>&1 | tee artifacts/p09/postgrest-version-diagnostic.log
+
+      - name: Diagnose literal publish RPC inside rollback transaction
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-publish-transaction-diagnostic.mjs 2>&1 | tee artifacts/p09/literal-publish-transaction-diagnostic.log
+
+      - name: Prove fresh expired-Reservation recovery Review attempt
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-recovery-review-attempt-proof.mjs 2>&1 | tee artifacts/p09/recovery-review-attempt.log
 
       - name: Run isolated P05 private publish proof
         shell: bash
@@ -150,6 +207,18 @@ jobs:
         run: |
           set -o pipefail
           node scripts/import/run-p07-rollback-exact-recovery-proof.mjs 2>&1 | tee artifacts/p07/hosted-proof.log
+
+      - name: Run isolated P09 integrated Admin canary proof
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-real-admin-canary.mjs 2>&1 | tee artifacts/p09/hosted-proof.log
+
+      - name: Complete exact literal Preview cycle from persisted truth
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-p09-literal-finalize-preview-cycle.mjs 2>&1 | tee artifacts/p09/literal-final-preview-cycle.log
 
       - name: Upload Preview migration evidence
         if: always()
@@ -186,3 +255,12 @@ jobs:
           path: artifacts/p07/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Upload exact-SHA P09 Admin canary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p09-real-admin-canary-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/p09/
+          if-no-files-found: error
+          retention-days: 30

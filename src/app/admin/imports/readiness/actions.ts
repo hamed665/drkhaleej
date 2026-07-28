@@ -285,6 +285,36 @@ export async function runPharmacyPrivateAdminAction(
         };
       }
 
+      if (operation === "private_publish") {
+        const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
+          allowedActorIds,
+          allowedEntityIds,
+        });
+        const published = dependencies
+          ? await runPharmacyPrivateAdminPublishOperation({
+              environment: process.env.VERCEL_ENV,
+              actorId,
+              entityId: actionEntityId,
+              allowedActorIds,
+              allowedEntityIds,
+              confirmation: confirmation ?? "",
+              now: new Date().toISOString(),
+              dependencies,
+            })
+          : null;
+        return {
+          operation,
+          status: published?.published ? "completed" : "failed",
+          entityId: actionEntityId,
+          blockers: published?.blocker ? ["readiness_blocked"] : [],
+          publicVisibility: "private",
+          indexEligible: false,
+          sitemapEligible: false,
+          routeEnabled: false,
+          executionReference: published?.executionReference ?? null,
+        };
+      }
+
       const reader = createPharmacyPrivateAdminRuntimeContextReaderFromEnvironment();
       const store = createPharmacyAdminReadStateStoreFromEnvironment();
       const context = reader
@@ -314,36 +344,6 @@ export async function runPharmacyPrivateAdminAction(
           sitemapEligible: false,
           routeEnabled: false,
           executionReference: null,
-        };
-      }
-
-      if (operation === "private_publish") {
-        const dependencies = createPharmacyPrivateAdminPublishOperationDependenciesFromEnvironment({
-          allowedActorIds,
-          allowedEntityIds,
-        });
-        const published = dependencies
-          ? await runPharmacyPrivateAdminPublishOperation({
-              environment: process.env.VERCEL_ENV,
-              actorId,
-              entityId: actionEntityId,
-              allowedActorIds,
-              allowedEntityIds,
-              confirmation: confirmation ?? "",
-              now: new Date().toISOString(),
-              dependencies,
-            })
-          : null;
-        return {
-          operation,
-          status: published?.published ? "completed" : "failed",
-          entityId: actionEntityId,
-          blockers: published?.blocker ? ["readiness_blocked"] : [],
-          publicVisibility: "private",
-          indexEligible: false,
-          sitemapEligible: false,
-          routeEnabled: false,
-          executionReference: published?.executionReference ?? null,
         };
       }
 
