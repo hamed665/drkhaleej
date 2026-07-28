@@ -32,6 +32,15 @@ function redact(value) {
     .replace(/password=[^\s]+/gi, 'password=[REDACTED]');
 }
 
+function catalogTextArray(value, label) {
+  if (Array.isArray(value)) return value;
+  assert(
+    typeof value === 'string' && /^\{[a-z0-9_,]*\}$/.test(value),
+    `Unexpected catalog array representation for ${label}.`,
+  );
+  return value === '{}' ? [] : value.slice(1, -1).split(',');
+}
+
 function verifyPreviewIdentity(databaseUrl, previewRef, productionRef) {
   const parsed = new URL(databaseUrl);
   assert(
@@ -251,10 +260,20 @@ try {
     );
     for (const table of tableShape.rows) {
       assert(
-        table.ordinary_table === true &&
-          table.rls_enabled === true &&
-          JSON.stringify(table.columns) ===
-            JSON.stringify(expectedColumns.get(table.table_name)),
+        table.ordinary_table === true,
+        `Unexpected relation kind for unpublished table: ${table.table_name}`,
+      );
+      assert(
+        table.rls_enabled === true,
+        `RLS is not enabled on unpublished table: ${table.table_name}`,
+      );
+      const actualColumns = catalogTextArray(
+        table.columns,
+        table.table_name,
+      );
+      assert(
+        JSON.stringify(actualColumns) ===
+          JSON.stringify(expectedColumns.get(table.table_name)),
         `Unexpected unpublished table shape: ${table.table_name}`,
       );
     }
