@@ -51,6 +51,7 @@ const migrationNames = {
   pharmacyRollbackDigestSchema: '0084_import_pharmacy_rollback_digest_schema.sql',
   pharmacyExpectedVersionTimestamp: '0085_import_pharmacy_expected_version_timestamp_equivalence.sql',
   pharmacyRecoveryReviewAttempts: '0086_import_pharmacy_recovery_review_attempts.sql',
+  pharmacyPublicNoindexAuthority: '0087_import_pharmacy_public_noindex_authority.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -188,6 +189,43 @@ function validateRecoveryReviewAttempts() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacyPublicNoindexAuthority() {
+  const content = readMigration(migrationNames.pharmacyPublicNoindexAuthority);
+  for (const [pattern, message] of [
+    [/P11 PHARMACY-PUBLIC-NOINDEX-AUTHORITY/i, '0087 authority phase marker is missing.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_public_noindex_authorizations/i, '0087 must create the protected public/noindex authority.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_public_noindex_events/i, '0087 must create append-only public/noindex events.'],
+    [/candidate_id\s+uuid\s+not\s+null/i, '0087 must bind an existing candidate identity.'],
+    [/snapshot_payload\s+jsonb\s+not\s+null/i, '0087 must persist the pre-public Queue snapshot.'],
+    [/create\s+unique\s+index\s+if\s+not\s+exists\s+import_pharmacy_public_noindex_active_entity_unique/i, '0087 must allow only one active authority per Pharmacy.'],
+    [/where\s+status\s+in\s*\(\s*'issued'\s*,\s*'published'\s*\)/i, '0087 active authority index is not authority-bounded.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_authorize_pharmacy_public_noindex/i, '0087 must define independent authorization.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_publish_pharmacy_public_noindex/i, '0087 must define atomic Queue publication.'],
+    [/publish_status\s*=\s*'published_noindex'/i, '0087 must publish only to published_noindex.'],
+    [/index_policy\s*=\s*'noindex'/i, '0087 must preserve noindex.'],
+    [/sitemap_policy\s*=\s*'excluded'/i, '0087 must preserve sitemap exclusion.'],
+    [/'robots_policy'\s*,\s*'noindex'/i, '0087 must persist noindex robots state.'],
+    [/'sitemap_included'\s*,\s*false/i, '0087 must persist sitemap exclusion evidence.'],
+    [/'public_route_enabled'\s*,\s*false/i, '0087 must keep the public route independently locked.'],
+    [/security\s+invoker/i, '0087 RPCs must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0087 RPCs must pin search_path.'],
+    [/alter\s+table\s+public\.import_pharmacy_public_noindex_authorizations\s+enable\s+row\s+level\s+security/i, '0087 must enable authority RLS.'],
+    [/alter\s+table\s+public\.import_pharmacy_public_noindex_events\s+enable\s+row\s+level\s+security/i, '0087 must enable event RLS.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0087 RPCs must be service-role-only.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/import_rollback_pharmacy_public_noindex_by_authority/i, '0087 authority scope must not include rollback.'],
+    [/'rolled_back'/i, '0087 authority scope must not claim rollback state.'],
+    [/\bcreate\s+policy\b/i, '0087 must not create public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0087 must not expose RPCs to public roles.'],
+    [/index_policy\s*=\s*'index'/i, '0087 must not promote index state.'],
+    [/sitemap_policy\s*=\s*'included'/i, '0087 must not promote sitemap state.'],
+    [/status\s*=\s*'active'::public\.provider_status/i, '0087 must not activate the canonical center row.'],
+    [/is_active\s*=\s*true/i, '0087 must not activate the canonical center row.'],
+    [/delete\s+from\s+public\.import_publish_queue/i, '0087 authority scope must not implement rollback.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -230,5 +268,6 @@ validateReadStateUpsert();
 validateReservationAuditSplit();
 runValidator(validators.pharmacyExpectedVersionTimestamp);
 validateRecoveryReviewAttempts();
+validatePharmacyPublicNoindexAuthority();
 
-console.log('Current migration validation passed through 0086.');
+console.log('Current migration validation passed through 0087.');

@@ -68,4 +68,4 @@ try {
 // Reassert the P09 migration's closed service-role-only boundary after restoration.
 run(expectedVersionValidator);
 
-console.log('Current static RLS validation passed through 0085.');
+console.log('Current static RLS validation passed through 0087.');

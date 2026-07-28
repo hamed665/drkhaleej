@@ -207,7 +207,7 @@ assert(
 );
 
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"') &&
+  sources.roadmap.includes('"currentNext": "PHARMACY-BILINGUAL-LIVE-VERIFY"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: completed convergence state is not aligned.`,
