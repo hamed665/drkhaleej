@@ -196,8 +196,8 @@ const enabledRouteFamilies = [
   .map((item) => item[1])
   .sort();
 assert(
-  sameValues(enabledRouteFamilies, ['center', 'doctor']),
-  `${files.routeResolver}: disabled route families must remain disabled.`,
+  sameValues(enabledRouteFamilies, ['center', 'doctor', 'pharmacy']),
+  `${files.routeResolver}: only the completed convergence routes and the current Pharmacy noindex route may be enabled.`,
 );
 assert(
   /index_policy:\s*"index"[\s\S]*sitemap_policy:\s*"included"/.test(
@@ -207,10 +207,11 @@ assert(
 );
 
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"') &&
+  sources.roadmap.includes('"currentNext": "PHARMACY-INDEX-PROMOTION"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
-    sources.roadmap.includes('Registry Convergence complete'),
-  `${files.roadmap}: completed convergence state is not aligned.`,
+    sources.roadmap.includes('Wave 7.1   COMPLETE') &&
+    sources.roadmap.includes('Registry Convergence and the Pharmacy public/noindex lifecycle are complete'),
+  `${files.roadmap}: post-convergence lifecycle state is not aligned.`,
 );
 assert(
   sources.package.includes('"import:registry-convergence:validate"') &&

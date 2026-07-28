@@ -75,8 +75,11 @@ No ratings, reviews, bookings, insurance claims, provider dashboard links, schem
 Current imported profile guards using this shared runtime boundary:
 
 - `src/server/public/import-doctor-profile-guard.ts`
-- `src/server/public/import-pharmacy-profile-guard.ts`
 - `src/server/public/import-hospital-profile-guard.ts`
+
+Pharmacy public/noindex profiles intentionally return an empty suggestion set.
+Candidate-relation public links remain closed until a later independently
+reviewed relation-publication gate.
 
 ## Future profile guards
 

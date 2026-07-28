@@ -319,8 +319,11 @@ assertFileIncludes('src/lib/catalog/public-import-profile-index-eligibility.test
 assertFileIncludes('scripts/import/check-import-profile-index-eligibility.mjs', [
   'isPublicImportProfileIndexEligible',
   'const importIndexEligibility = isPublicImportProfileIndexEligible(importResult.profile)',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile)',
   'const importIndexEligibility = isPublicImportProfileIndexEligible(profile)',
+  'return buildProfileNoindexMetadata(metadata)',
+  'data-index-policy="noindex"',
+  'data-sitemap-policy="excluded"',
+  'must remain forced-noindex until PHARMACY-INDEX-PROMOTION',
 ]);
 assertFileIncludes('scripts/import/check-public-import-profile-smoke.mjs', [
   "import './check-import-profile-index-eligibility.mjs';",

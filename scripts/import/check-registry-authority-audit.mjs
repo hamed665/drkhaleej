@@ -208,6 +208,7 @@ const enabledRouteFamilies = new Set(
     (item) => item[1],
   ),
 );
+const auditedEnabledRouteFamilies = new Set(['center', 'doctor']);
 const schemaTypes = extractSchemaEntityTypes(sources.schema);
 const relationTypes = extractCanonicalLinkEntityTypes(sources.relation, importTypeSet);
 const sitemapFamilies = extractSitemapFamilies(sources.sitemapEligibility);
@@ -241,8 +242,8 @@ assert(
   'AUTH-007 is stale: the legacy sitemap helper no longer couples index and sitemap promotion.',
 );
 assert(
-  sameValues([...enabledRouteFamilies].sort(), ['center', 'doctor']),
-  `${files.routeResolver}: enabled route families drifted.`,
+  sameValues([...enabledRouteFamilies].sort(), ['center', 'doctor', 'pharmacy']),
+  `${files.routeResolver}: current enabled route families drifted.`,
 );
 assert(
   sameValues([...schemaTypes].sort(), [...importTypes].sort()),
@@ -310,7 +311,7 @@ for (const row of rows) {
       routeFamilies.has(row.routeFamily),
       `${files.audit}: ${row.entityType} references unknown route family ${row.routeFamily}.`,
     );
-    const expectedStatus = enabledRouteFamilies.has(row.routeFamily)
+    const expectedStatus = auditedEnabledRouteFamilies.has(row.routeFamily)
       ? row.entityType === row.routeFamily
         ? 'supported'
         : 'planned'
@@ -408,9 +409,9 @@ try {
 assert(
   sources.routeResolver.includes("if (family === 'doctor')") &&
     sources.routeResolver.includes("if (family === 'center')") &&
-    !sources.routeResolver.includes("if (family === 'pharmacy')") &&
+    sources.routeResolver.includes("if (family === 'pharmacy')") &&
     !sources.routeResolver.includes("if (family === 'hospital')"),
-  `${files.routeResolver}: Pharmacy/Hospital route disablement drifted.`,
+  `${files.routeResolver}: current Pharmacy/Hospital route release drifted.`,
 );
 assert(
   sources.sitemapReader.includes(
@@ -422,9 +423,9 @@ assert(
   `${files.sitemapReader}: import sitemap must consume canonical family and route authorities.`,
 );
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE"') &&
-    sources.roadmap.includes('Registry Convergence complete'),
-  `${files.roadmap}: convergence completion/next transition is not aligned.`,
+  sources.roadmap.includes('"currentNext": "PHARMACY-INDEX-PROMOTION"') &&
+    sources.roadmap.includes('Wave 7.1   COMPLETE'),
+  `${files.roadmap}: post-audit lifecycle transition is not aligned.`,
 );
 
 for (const forbidden of [

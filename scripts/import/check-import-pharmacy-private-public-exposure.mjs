@@ -40,14 +40,17 @@ for (const pattern of [
 }
 
 for (const pattern of [
-  /publish_status !== "index_eligible"/,
-  /index_policy !== "index"/,
-  /sitemap_policy !== "included"/,
-  /metadata\.sitemap_included !== true/,
-  /robots_policy"\) !== "index"/,
-  /\.eq\("publish_status", "index_eligible"\)/,
-  /\.eq\("index_policy", "index"\)/,
-  /\.eq\("sitemap_policy", "included"\)/,
+  /publish_status !== "published_noindex"/,
+  /index_policy !== "noindex"/,
+  /sitemap_policy !== "excluded"/,
+  /metadata\.sitemap_included !== false/,
+  /metadata\.index_promoted !== false/,
+  /robots_policy"\) !== "noindex"/,
+  /\.eq\("publish_status", "published_noindex"\)/,
+  /\.eq\("index_policy", "noindex"\)/,
+  /\.eq\("sitemap_policy", "excluded"\)/,
+  /import_pharmacy_public_noindex_authorizations/,
+  /authorization\.status !== "published"/,
   /\.limit\(lookupLimit\)/,
 ]) {
   if (!pattern.test(guard)) throw new Error(`public pharmacy guard missing exposure gate: ${pattern}`);

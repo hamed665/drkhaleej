@@ -34,9 +34,13 @@ Imported profile metadata may stay indexable only when the helper returns `eligi
 ## Route coverage
 
 - imported doctor metadata
-- imported pharmacy metadata
+- imported pharmacy metadata, forced to `noindex,follow` until the independent
+  `PHARMACY-INDEX-PROMOTION` gate
 - imported hospital head metadata
 
 ## Boundary
 
 This does not bypass the import queue, import review, canonical path checks, or sitemap family caps.
+
+The generic helper is not a release authority. Pharmacy remains disconnected
+from generic index eligibility throughout the public/noindex lifecycle.

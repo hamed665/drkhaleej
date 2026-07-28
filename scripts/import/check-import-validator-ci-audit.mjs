@@ -33,6 +33,7 @@ for (const [name, expected] of [
   ['import:publish-readiness-audit:validate', 'scripts/import/check-import-publish-readiness-audit.mjs'],
   ['import:registry-authority-audit:validate', 'scripts/import/check-registry-authority-audit.mjs'],
   ['import:registry-convergence:validate', 'scripts/import/check-registry-convergence.mjs'],
+  ['import:pharmacy-public-noindex:validate', 'scripts/import/check-pharmacy-public-noindex-lifecycle.mjs'],
 ]) {
   assertScript(scripts, name, expected);
 }
@@ -61,6 +62,7 @@ for (const validator of [
   './check-registry-authority-audit.mjs',
   './test-registry-authority-audit.mjs',
   './check-registry-convergence.mjs',
+  './check-pharmacy-public-noindex-lifecycle.mjs',
 ]) {
   assert(auditSource.includes(`import '${validator}';`), `publish readiness audit must chain ${validator}.`);
 }

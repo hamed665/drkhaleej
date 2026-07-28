@@ -1,10 +1,8 @@
 import "server-only";
 
+import { resolvePublicProviderCanonicalRoute } from "@/lib/catalog/public-provider-route-resolver";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
-import {
-  buildPublicImportLocalSuggestions,
-  type PublicImportLocalSuggestion,
-} from "./import-local-suggestion-guard";
+import type { PublicImportLocalSuggestion } from "./import-local-suggestion-guard";
 
 export type PublicImportPharmacyProfile = {
   family: "pharmacies";
@@ -50,13 +48,22 @@ type ProfileClient = {
   from<T extends object = Record<string, unknown>>(table: string): QueryBuilder<T>;
 };
 
-type QueueRow = {
+export type PharmacyPublicNoindexQueueRow = {
+  id: string;
   target_entity_type: string;
   publish_status: string;
   index_policy: string;
   sitemap_policy: string;
   quality_score: number;
   metadata: unknown;
+};
+
+export type PharmacyPublicNoindexAuthorizationRow = {
+  candidate_id: string;
+  status: string;
+  published_queue_id: string | null;
+  canonical_path_en: string;
+  canonical_path_ar: string;
 };
 
 type CandidateRow = {
@@ -106,25 +113,24 @@ function safeSlug(value: string): string | null {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(trimmed) ? trimmed : null;
 }
 
-function canonicalPath(locale: string, country: string, slug: string): string | null {
-  if (locale !== "en" && locale !== "ar") return null;
-  if (country !== "om") return null;
-  return `/${locale}/${country}/pharmacies/${slug}`;
-}
-
-function currentPharmacySlug(path: string): string | null {
-  return safeSlug(path.split("/").filter(Boolean).at(-1) ?? "");
-}
-
-function safeQueueRow(row: QueueRow, path: string): boolean {
+export function isPublicNoindexPharmacyQueueRow(
+  row: PharmacyPublicNoindexQueueRow,
+  path: string,
+): boolean {
   if (row.target_entity_type !== "pharmacy") return false;
-  if (row.publish_status !== "index_eligible") return false;
-  if (row.index_policy !== "index") return false;
-  if (row.sitemap_policy !== "included") return false;
+  if (row.publish_status !== "published_noindex") return false;
+  if (row.index_policy !== "noindex") return false;
+  if (row.sitemap_policy !== "excluded") return false;
   if (!isRecord(row.metadata)) return false;
-  if (row.metadata.sitemap_included !== true) return false;
-  if (stringValue(row.metadata, "robots_policy") !== "index") return false;
-  return stringValue(row.metadata, "canonical_path") === path;
+  if (row.metadata.sitemap_included !== false) return false;
+  if (row.metadata.index_promoted !== false) return false;
+  if (
+    stringValue(row.metadata, "public_noindex_schema_version") !==
+    "drkhaleej.import.pharmacyPublicNoindex.v1"
+  ) return false;
+  if (stringValue(row.metadata, "robots_policy") !== "noindex") return false;
+  const paths = record(row.metadata, "canonical_paths");
+  return stringValue(paths, "en") === path || stringValue(paths, "ar") === path;
 }
 
 function candidateId(metadata: unknown): string | null {
@@ -156,7 +162,23 @@ function hasLocalGeo(geo: JsonRecord): boolean {
   );
 }
 
-function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): PublicImportPharmacyProfile | null {
+export function isPublicNoindexPharmacyAuthorization(
+  authorization: PharmacyPublicNoindexAuthorizationRow,
+  queue: PharmacyPublicNoindexQueueRow,
+  candidateIdValue: string,
+  path: string,
+): boolean {
+  if (authorization.status !== "published") return false;
+  if (authorization.published_queue_id !== queue.id) return false;
+  if (authorization.candidate_id !== candidateIdValue) return false;
+  return authorization.canonical_path_en === path || authorization.canonical_path_ar === path;
+}
+
+function buildProfile(
+  path: string,
+  queue: PharmacyPublicNoindexQueueRow,
+  candidate: CandidateRow,
+): PublicImportPharmacyProfile | null {
   if (candidate.entity_type !== "pharmacy") return null;
   if (candidate.candidate_status !== "approved") return null;
   if (!isRecord(candidate.candidate_payload)) return null;
@@ -196,13 +218,7 @@ function buildProfile(path: string, queue: QueueRow, candidate: CandidateRow): P
     services: stringArray(taxonomy, "services"),
     departments: stringArray(taxonomy, "departments"),
     languages: stringArray(payload, "languages"),
-    localSuggestions: buildPublicImportLocalSuggestions({
-      payload,
-      sourceGeo: geo,
-      sourceFamily: "pharmacy",
-      sourceSlug: currentPharmacySlug(path),
-      limit: 12,
-    }),
+    localSuggestions: [],
     phoneE164,
     whatsappE164,
     email,
@@ -225,36 +241,62 @@ export async function getPublicImportPharmacyProfile(input: {
     const slug = safeSlug(input.pharmacySlug);
     if (slug === null) return { ok: false, reason: "not_found" };
 
-    const path = canonicalPath(input.locale, input.country, slug);
-    if (path === null) return { ok: false, reason: "not_found" };
+    const route = resolvePublicProviderCanonicalRoute({
+      family: "pharmacy",
+      slug,
+      locale: input.locale,
+      country: input.country,
+    });
+    if (!route.publicRouteEnabled || route.canonicalPath === null) {
+      return { ok: false, reason: "not_found" };
+    }
+    const path = route.canonicalPath;
 
     const supabase = client();
     const queueResult = await supabase
-      .from<QueueRow>("import_publish_queue")
-      .select("target_entity_type, publish_status, index_policy, sitemap_policy, quality_score, metadata")
+      .from<PharmacyPublicNoindexQueueRow>("import_publish_queue")
+      .select("id, target_entity_type, publish_status, index_policy, sitemap_policy, quality_score, metadata")
       .eq("target_entity_type", "pharmacy")
-      .eq("sitemap_policy", "included")
-      .eq("index_policy", "index")
-      .eq("publish_status", "index_eligible")
+      .eq("sitemap_policy", "excluded")
+      .eq("index_policy", "noindex")
+      .eq("publish_status", "published_noindex")
       .order("updated_at", { ascending: false })
       .limit(lookupLimit);
 
     if (queueResult.error !== null || queueResult.data === null) return { ok: false, reason: "not_found" };
 
-    const queue = queueResult.data.find((row) => safeQueueRow(row, path));
+    const queue = queueResult.data.find((row) =>
+      isPublicNoindexPharmacyQueueRow(row, path)
+    );
     if (!queue) return { ok: false, reason: "not_found" };
 
     const id = candidateId(queue.metadata);
     if (id === null) return { ok: false, reason: "not_found" };
 
-    const candidateResult = await supabase
-      .from<CandidateRow>("import_entity_candidates")
-      .select("entity_type, candidate_status, candidate_payload")
-      .eq("id", id)
-      .eq("candidate_status", "approved")
-      .maybeSingle();
+    const [authorizationResult, candidateResult] = await Promise.all([
+      supabase
+        .from<PharmacyPublicNoindexAuthorizationRow>("import_pharmacy_public_noindex_authorizations")
+        .select("candidate_id, status, published_queue_id, canonical_path_en, canonical_path_ar")
+        .eq("published_queue_id", queue.id)
+        .eq("status", "published")
+        .maybeSingle(),
+      supabase
+        .from<CandidateRow>("import_entity_candidates")
+        .select("entity_type, candidate_status, candidate_payload")
+        .eq("id", id)
+        .eq("candidate_status", "approved")
+        .maybeSingle(),
+    ]);
 
-    if (candidateResult.error !== null || candidateResult.data === null) return { ok: false, reason: "not_found" };
+    if (
+      authorizationResult.error !== null ||
+      authorizationResult.data === null ||
+      candidateResult.error !== null ||
+      candidateResult.data === null ||
+      !isPublicNoindexPharmacyAuthorization(authorizationResult.data, queue, id, path)
+    ) {
+      return { ok: false, reason: "not_found" };
+    }
 
     const profile = buildProfile(path, queue, candidateResult.data);
     return profile === null ? { ok: false, reason: "not_found" } : { ok: true, profile };

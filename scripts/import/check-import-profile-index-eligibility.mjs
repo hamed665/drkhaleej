@@ -68,13 +68,17 @@ for (const token of [
 const pharmacyRoutePath = 'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/page.tsx';
 const pharmacyRoute = await readText(pharmacyRoutePath);
 for (const token of [
-  'isPublicImportProfileIndexEligible',
   'buildProfileNoindexMetadata',
-  'const importIndexEligibility = isPublicImportProfileIndexEligible(result.profile)',
-  'return importIndexEligibility.eligible ? metadata : buildProfileNoindexMetadata(metadata)',
+  'return buildProfileNoindexMetadata(metadata)',
+  'data-index-policy="noindex"',
+  'data-sitemap-policy="excluded"',
 ]) {
   assertIncludes(pharmacyRoute, token, `${pharmacyRoutePath} must include ${token}`);
 }
+assert(
+  !pharmacyRoute.includes('isPublicImportProfileIndexEligible'),
+  `${pharmacyRoutePath} must remain forced-noindex until PHARMACY-INDEX-PROMOTION.`,
+);
 
 for (const blockedHospitalRoutePath of [
   'src/pages/[locale]/[country]/hospitals/[hospitalSlug].tsx',

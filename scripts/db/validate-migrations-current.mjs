@@ -51,6 +51,7 @@ const migrationNames = {
   pharmacyRollbackDigestSchema: '0084_import_pharmacy_rollback_digest_schema.sql',
   pharmacyExpectedVersionTimestamp: '0085_import_pharmacy_expected_version_timestamp_equivalence.sql',
   pharmacyRecoveryReviewAttempts: '0086_import_pharmacy_recovery_review_attempts.sql',
+  pharmacyPublicNoindexLifecycle: '0087_import_pharmacy_public_noindex_lifecycle.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -188,6 +189,41 @@ function validateRecoveryReviewAttempts() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacyPublicNoindexLifecycle() {
+  const content = readMigration(migrationNames.pharmacyPublicNoindexLifecycle);
+  for (const [pattern, message] of [
+    [/PHARMACY-PUBLIC-NOINDEX-LIFECYCLE/i, '0087 phase marker is missing.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_public_noindex_authorizations/i, '0087 must create the protected public/noindex authority.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_public_noindex_events/i, '0087 must create append-only public/noindex events.'],
+    [/snapshot_payload\s+jsonb\s+not\s+null/i, '0087 must persist a rollback snapshot.'],
+    [/create\s+unique\s+index\s+if\s+not\s+exists\s+import_pharmacy_public_noindex_active_entity_unique/i, '0087 must allow only one active authority per Pharmacy.'],
+    [/where\s+status\s+in\s*\(\s*'issued'\s*,\s*'published'\s*\)/i, '0087 active authority index is not lifecycle-bounded.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_authorize_pharmacy_public_noindex/i, '0087 must define independent authorization.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_publish_pharmacy_public_noindex/i, '0087 must define atomic public/noindex publication.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_public_noindex_by_authority/i, '0087 must define server-selected rollback.'],
+    [/publish_status\s*=\s*'published_noindex'/i, '0087 must publish only to published_noindex.'],
+    [/index_policy\s*=\s*'noindex'/i, '0087 must preserve noindex.'],
+    [/sitemap_policy\s*=\s*'excluded'/i, '0087 must preserve sitemap exclusion.'],
+    [/'robots_policy'\s*,\s*'noindex'/i, '0087 must persist noindex robots state.'],
+    [/'sitemap_included'\s*,\s*false/i, '0087 must persist sitemap exclusion evidence.'],
+    [/delete\s+from\s+public\.import_publish_queue/i, '0087 rollback must remove a queue row that did not exist in the snapshot.'],
+    [/exactLogicalRecovery/i, '0087 rollback must persist exact logical recovery evidence.'],
+    [/security\s+invoker/i, '0087 RPCs must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0087 RPCs must pin search_path.'],
+    [/alter\s+table\s+public\.import_pharmacy_public_noindex_authorizations\s+enable\s+row\s+level\s+security/i, '0087 must enable authority RLS.'],
+    [/alter\s+table\s+public\.import_pharmacy_public_noindex_events\s+enable\s+row\s+level\s+security/i, '0087 must enable event RLS.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0087 RPCs must be service-role-only.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0087 must not create public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0087 must not expose RPCs to public roles.'],
+    [/index_policy\s*=\s*'index'/i, '0087 must not promote index state.'],
+    [/sitemap_policy\s*=\s*'included'/i, '0087 must not promote sitemap state.'],
+    [/status\s*=\s*'active'::public\.provider_status/i, '0087 must not activate the canonical center row.'],
+    [/is_active\s*=\s*true/i, '0087 must not activate the canonical center row.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -230,5 +266,6 @@ validateReadStateUpsert();
 validateReservationAuditSplit();
 runValidator(validators.pharmacyExpectedVersionTimestamp);
 validateRecoveryReviewAttempts();
+validatePharmacyPublicNoindexLifecycle();
 
-console.log('Current migration validation passed through 0086.');
+console.log('Current migration validation passed through 0087.');

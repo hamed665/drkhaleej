@@ -66,7 +66,7 @@ for (const token of [
 
 for (const [label, source, sourceFamilyToken] of [
   [doctorGuardPath, doctorGuardSource, 'sourceFamily: "doctor"'],
-  [pharmacyGuardPath, pharmacyGuardSource, 'sourceFamily: "pharmacy"'],
+  [hospitalGuardPath, hospitalGuardSource, 'sourceFamily: "hospital"'],
 ]) {
   for (const token of [
     'buildPublicImportLocalSuggestions',
@@ -80,13 +80,15 @@ for (const [label, source, sourceFamilyToken] of [
 }
 
 for (const token of [
-  'export type PublicImportHospitalLocalSuggestionFamily',
-  'export type PublicImportHospitalLocalSuggestion',
-  'localSuggestions: PublicImportHospitalLocalSuggestion[];',
-  'approvedLocalSuggestions(payload, geo, currentHospitalSlug(path))',
+  'localSuggestions: PublicImportLocalSuggestion[];',
+  'localSuggestions: []',
 ]) {
-  assertIncludes(hospitalGuardSource, token, hospitalGuardPath);
+  assertIncludes(pharmacyGuardSource, token, pharmacyGuardPath);
 }
+assert(
+  !pharmacyGuardSource.includes('buildPublicImportLocalSuggestions'),
+  `${pharmacyGuardPath} must not expose candidate-relation links during the public/noindex lifecycle.`,
+);
 
 for (const token of [
   'PublicImportLocalSuggestion',
@@ -115,7 +117,8 @@ for (const token of [
   'publicVisible',
   'confidence is `high` or `medium`',
   'the row is not a self-link back to the same source profile',
-  'Future radiology, dentistry, and beauty imported profile guards should use `buildPublicImportLocalSuggestions(...)` directly',
+  'Future imported profile guards should use `buildPublicImportLocalSuggestions(...)` directly',
+  'Pharmacy public/noindex profiles intentionally return an empty suggestion set',
 ]) {
   assertIncludes(contractSource, token, contractPath);
 }

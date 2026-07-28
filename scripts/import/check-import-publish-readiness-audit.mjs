@@ -85,6 +85,7 @@ import './test-import-readiness-state-alignment.mjs';
 import './check-registry-authority-audit.mjs';
 import './test-registry-authority-audit.mjs';
 import './check-registry-convergence.mjs';
+import './check-pharmacy-public-noindex-lifecycle.mjs';
 import './check-import-reservation-db-safety-proof.mjs';
 import './test-import-reservation-db-safety-proof.mjs';
 import './check-import-reservation-audit-split.mjs';

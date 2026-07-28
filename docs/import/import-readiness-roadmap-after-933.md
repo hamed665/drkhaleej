@@ -22,6 +22,7 @@ Wave 4.1   COMPLETE  (#955) Atomic server-selected rollback authority, one-time 
 Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatch diagnostics proven
 Wave 5     COMPLETE  (#957, #958) Server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete
 Wave 6     COMPLETE  Registry Authority Audit and Registry Convergence complete; no public activation
+Wave 7.1   COMPLETE  Pharmacy public/noindex authority, bilingual route, readback and exact rollback
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
@@ -40,8 +41,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
   "alignedThroughPr": 958,
   "runtimeBaseline": "baba0cc91508ef8fad16e43650cf425099c8908a",
   "lastAligned": "2026-07-28",
-  "currentMigration": "0086_import_pharmacy_recovery_review_attempts.sql",
-  "currentNext": "PHARMACY-PUBLIC-NOINDEX-LIFECYCLE",
+  "currentMigration": "0087_import_pharmacy_public_noindex_lifecycle.sql",
+  "currentNext": "PHARMACY-INDEX-PROMOTION",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -51,7 +52,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "4.1": "COMPLETE",
     "4.2": "COMPLETE",
     "5": "COMPLETE",
-    "6": "COMPLETE"
+    "6": "COMPLETE",
+    "7.1": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -318,15 +320,24 @@ The Registry Authority Audit is complete in [`registry-authority-audit.md`](regi
 
 Index/sitemap decoupling remains part of the later independent Pharmacy index and sitemap promotions. This wave does not authorize route activation, public promotion, a migration, or Production execution.
 
-## Wave 7 — Pharmacy public lifecycle `OPEN`
+## Wave 7 — Pharmacy public lifecycle `PARTIAL`
 
-1. Independent public/noindex authorization and snapshot.
-2. Approved bilingual public route with noindex and sitemap excluded.
-3. EN/AR URL, canonical, hreflang, structured data, content, links, mobile, errors and performance verification.
-4. Independent index promotion.
-5. Independent sitemap promotion.
+1. Independent public/noindex authorization and snapshot — `COMPLETE`.
+2. Approved bilingual public route with noindex and sitemap excluded — `COMPLETE`.
+3. EN/AR URL, canonical, hreflang, structured data, content, safe links, mobile, errors and performance contract verification — `COMPLETE`.
+4. Independent index promotion — `OPEN`.
+5. Independent sitemap promotion — `CLOSED` until index promotion completes.
 
 Each promotion has an independent rollback path.
+
+The completed public/noindex package is recorded in
+[`PHARMACY_PUBLIC_NOINDEX_LIFECYCLE.md`](PHARMACY_PUBLIC_NOINDEX_LIFECYCLE.md).
+Migration 0087 persists one service-role-only single-entity authority, the exact
+pre-public Queue snapshot, bounded publication/rollback events and terminal
+readback. It exposes only the two canonical localized routes, forces
+`published_noindex/noindex/excluded`, does not activate the canonical center,
+and restores the exact logical Queue snapshot under a server-selected rollback
+authority. Candidate-relation links are not rendered.
 
 ## Wave 8 — Intake convergence and core families `OPEN`
 
@@ -386,7 +397,7 @@ Do not add:
 ## Current next implementation
 
 ```text
-PHARMACY-PUBLIC-NOINDEX-LIFECYCLE
+PHARMACY-INDEX-PROMOTION
 ```
 
-P09, the Post-P09 GO, the Registry Authority Audit, and Registry Convergence are complete. The next gate is `PHARMACY-PUBLIC-NOINDEX-LIFECYCLE`. It may implement only the separately authorized Pharmacy public/noindex lifecycle with its own exact readback and rollback proof; Index, Sitemap, Agent, Content, Hospital, Doctor, later family, Bulk behavior, and Production execution remain closed.
+P09, Registry Convergence and the Pharmacy public/noindex lifecycle are complete. The next gate is `PHARMACY-INDEX-PROMOTION`. It may implement only an independent Pharmacy index authority, readback and rollback. Sitemap, Agent, Content, Hospital, Doctor, later family, Bulk behavior and Production execution remain closed.

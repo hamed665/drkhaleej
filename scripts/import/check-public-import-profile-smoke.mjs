@@ -95,6 +95,45 @@ async function assertGuard(contract) {
   await assertFile(contract.guardPath);
   const source = await readText(contract.guardPath);
 
+  if (contract.entity === 'pharmacy') {
+    for (const token of [
+      'import "server-only";',
+      'createSupabaseServiceRoleClient',
+      contract.guardExport,
+      `family: "${contract.family}"`,
+      `entityType: "${contract.entity}"`,
+      `${contract.slugParam}: string`,
+      'function safeSlug(value: string): string | null',
+      '^[a-z0-9]+(?:-[a-z0-9]+)*$',
+      'resolvePublicProviderCanonicalRoute',
+      'isPublicNoindexPharmacyQueueRow',
+      'row.publish_status !== "published_noindex"',
+      'row.index_policy !== "noindex"',
+      'row.sitemap_policy !== "excluded"',
+      'row.metadata.sitemap_included !== false',
+      'row.metadata.index_promoted !== false',
+      'stringValue(row.metadata, "robots_policy") !== "noindex"',
+      'import_pharmacy_public_noindex_authorizations',
+      'authorization.status !== "published"',
+      'import_entity_candidate_id',
+      `candidate.entity_type !== "${contract.entity}"`,
+      'candidate.candidate_status !== "approved"',
+      'hasLocalGeo(geo)',
+      'hasSourceEvidence(sourceName, sourceUrl, lastCheckedAt)',
+      'hasContactOrMap({ phoneE164, whatsappE164, email, websiteUrl, googleMapsUrl, directionUrl })',
+      '.from<PharmacyPublicNoindexQueueRow>("import_publish_queue")',
+      '.eq("sitemap_policy", "excluded")',
+      '.eq("index_policy", "noindex")',
+      '.eq("publish_status", "published_noindex")',
+      '.from<CandidateRow>("import_entity_candidates")',
+      '.eq("candidate_status", "approved")',
+      'qualityScore: Math.max(0, Math.min(100',
+    ]) {
+      assertIncludes(source, token, `${contract.guardPath} must include ${token}`);
+    }
+    return;
+  }
+
   for (const token of [
     'import "server-only";',
     'createSupabaseServiceRoleClient',

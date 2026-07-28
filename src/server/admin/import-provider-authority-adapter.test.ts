@@ -63,9 +63,9 @@ describe("import provider authority adapter", () => {
         },
         routeRelease: {
           family: "pharmacy",
-          status: "disabled",
-          publicRouteEnabled: false,
-          reason: "route_disabled",
+          status: "supported",
+          publicRouteEnabled: true,
+          reason: "enabled",
         },
       },
     });
