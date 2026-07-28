@@ -10,6 +10,12 @@ P09 is complete for the isolated Preview Pharmacy lifecycle. The operator explic
 
 This decision opens only the separately reviewed Registry/Pharmacy-public planning gate. It does not authorize Production execution, public promotion, indexing, sitemap inclusion, Bulk, Agent, Content, Hospital, Doctor, or later-family implementation.
 
+## Prior gate history
+
+The previous fail-closed decision was `NO-GO_PENDING_LITERAL_UI_SESSION`. At that time the remaining requirement was described as a literal authenticated browser session using a profile with `is_platform_admin=true`, exactly one allowed actor, exactly one fixed Pharmacy entity, and the protected one-click full-cycle control. Repeated browser attempts established those access boundaries but exposed an application preflight defect before the proven RPC.
+
+The operator then authorized one-time exact-entity completion through the serialized Preview workflow instead of another browser mutation click. Production remained disconnected and unchanged throughout. The prior decision is retained here only as history; it is not the current decision.
+
 ## Root cause repaired
 
 The literal UI failure was not a database, Reservation, snapshot, version, RPC, or Supabase identity failure. The exact Pharmacy row carried a legacy descriptive `metadata.source` value outside the current Unified Draft source enum. Runtime context passed that provenance label directly into the executable Draft, so the mutation adapter stopped with `source_unsupported` before invoking the already-proven publish RPC. The UI then collapsed the useful blocker into `publish_execution_failed` and `state_readback_unverified`.
@@ -26,7 +32,7 @@ The repaired boundary now:
 
 ## Exact literal Preview evidence
 
-The one-time `P09 Literal Preview Completion` workflow runs against the exact allowlisted entity and exact PR SHA under the isolated Preview database-write lock. Its evidence records:
+The one-time P09 completion is serialized inside `Preview Migration Sync` against the exact allowlisted entity and exact PR SHA under one isolated Preview database-write lock. The standalone completion workflow is manual-only and cannot compete with the PR proof queue. Evidence records:
 
 - Preview identity verified;
 - Production connected or changed: no;
@@ -50,10 +56,10 @@ The one-time `P09 Literal Preview Completion` workflow runs against the exact al
 Artifact naming contract:
 
 ```text
-p09-literal-final-preview-cycle-<exact-pr-head-sha>
+p09-real-admin-canary-<exact-pr-head-sha>
 ```
 
-Evidence file:
+Evidence file inside the P09 artifact:
 
 ```text
 literal-final-preview-cycle.json
@@ -96,7 +102,7 @@ Before merge, the latest reviewable PR head must still have:
 - Preview Migration Sync green;
 - P03 hosted safety proof green;
 - P05/P06/P07/P09 hosted proofs green;
-- P09 literal Preview completion green;
+- serialized literal Preview completion green;
 - Vercel Preview green;
 - all conversations resolved;
 - independent latest-head approval required by repository rules;
