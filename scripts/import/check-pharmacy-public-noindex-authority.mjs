@@ -76,17 +76,18 @@ for (const token of [
   'PHARMACY_NOINDEX_AUTHORITY_PRODUCTION_PROJECT_REF',
   "parsed.port === '5432'",
   '.pooler.supabase.com',
-  "where version::text = '0087'",
+  "where version::text in ('0087', '0088')",
   'from pg_catalog.pg_proc p',
   'not p.prosecdef as security_invoker',
   "'search_path=pg_catalog,public'",
   'has_function_privilege',
-  'P11 must not install the independent rollback RPC',
+  'Independent rollback RPC does not match the applied migration ledger',
   'Promise.all([clientA.connect(), clientB.connect()])',
   "'published,replayed'",
   'bilingualLiveRoutesVerified: false',
   'publicRouteEnabled: false',
-  'rollbackInstalled: false',
+  'rollbackGatePresent',
+  'rollbackExercised: false',
   'indexLeakageCount: 0',
   'sitemapLeakageCount: 0',
   'cleanupVerified: true',
@@ -147,8 +148,8 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0087_import_pharmacy_public_noindex_authority.sql"',
-  '"currentNext": "PHARMACY-PUBLIC-ROLLBACK"',
+  '"currentMigration": "0088_import_pharmacy_public_rollback.sql"',
+  '"currentNext": "PHARMACY-INDEX-PROMOTION"',
   'Wave 7.1   COMPLETE',
   'PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
 ]) {
