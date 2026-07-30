@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 958,
-  runtimeBaseline: 'baba0cc91508ef8fad16e43650cf425099c8908a',
-  lastAligned: '2026-07-28',
-  currentMigration: '0087_import_pharmacy_public_noindex_authority.sql',
-  currentNext: 'PHARMACY-PUBLIC-ROLLBACK',
+  alignedThroughPr: 964,
+  runtimeBaseline: 'bef201d705b3c5a8d40906773b833b9a6ca73a44',
+  lastAligned: '2026-07-29',
+  currentMigration: '0088_import_pharmacy_public_rollback.sql',
+  currentNext: 'PHARMACY-INDEX-PROMOTION',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -26,7 +26,7 @@ const expectedCanonicalState = {
     5: 'COMPLETE',
     6: 'COMPLETE',
     '7.1': 'COMPLETE',
-    '7.2': 'PARTIAL',
+    '7.2': 'COMPLETE',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -232,7 +232,7 @@ function validateMatrix(source, manifest) {
       'Complete',
       'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md',
     ],
-    'Pharmacy public rollback': ['Disabled/Open', '—'],
+    'Pharmacy public rollback': ['Complete', 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'],
     'Pharmacy index/sitemap': ['Disabled/Open', '—'],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
@@ -251,7 +251,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0087`',
+    '`0001` through `0088`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

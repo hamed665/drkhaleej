@@ -23,15 +23,15 @@ Wave 4.2   COMPLETE  (#956) Exact logical recovery and bounded hash-only mismatc
 Wave 5     COMPLETE  (#957, #958) Server-authoritative Admin state machine, literal Preview lifecycle, integrity-zero proof and Post-P09 GO complete
 Wave 6     COMPLETE  Registry Authority Audit and Registry Convergence complete; no public activation
 Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noindex route complete
-Wave 7.2   PARTIAL   Pharmacy public rollback remains the current separate gate
+Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #958
-Baseline commit: baba0cc9
-Last aligned: 2026-07-28
+Aligned through: PR #964
+Baseline commit: bef201d7
+Last aligned: 2026-07-29
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -39,11 +39,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 958,
-  "runtimeBaseline": "baba0cc91508ef8fad16e43650cf425099c8908a",
-  "lastAligned": "2026-07-28",
-  "currentMigration": "0087_import_pharmacy_public_noindex_authority.sql",
-  "currentNext": "PHARMACY-PUBLIC-ROLLBACK",
+  "alignedThroughPr": 964,
+  "runtimeBaseline": "bef201d705b3c5a8d40906773b833b9a6ca73a44",
+  "lastAligned": "2026-07-29",
+  "currentMigration": "0088_import_pharmacy_public_rollback.sql",
+  "currentNext": "PHARMACY-INDEX-PROMOTION",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -55,7 +55,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "5": "COMPLETE",
     "6": "COMPLETE",
     "7.1": "COMPLETE",
-    "7.2": "PARTIAL"
+    "7.2": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -339,9 +339,13 @@ authority and binds bilingual paths to a `published_noindex` Queue record.
 P12 `PHARMACY-BILINGUAL-LIVE-VERIFY` is complete in
 [`PHARMACY_BILINGUAL_LIVE_VERIFY.md`](PHARMACY_BILINGUAL_LIVE_VERIFY.md). The
 exact EN/AR routes now require that P11 authority and always remain noindex,
-outside imported discovery and Sitemap output, and without JSON-LD. Rollback
-is not installed and Production remains disconnected. P13 must independently
-add and prove public rollback authority.
+outside imported discovery and Sitemap output, and without JSON-LD. P13
+`PHARMACY-PUBLIC-ROLLBACK` is complete in
+[`PHARMACY_PUBLIC_ROLLBACK.md`](PHARMACY_PUBLIC_ROLLBACK.md). Migration `0088`
+extends the same protected authority, restores a pre-existing Queue exactly or
+removes the P11-created Queue, and proves tamper failure, concurrency and
+persisted replay. Index and Sitemap promotion remain independent and Production
+remains disconnected.
 
 ## Wave 8 — Intake convergence and core families `OPEN`
 
@@ -401,11 +405,11 @@ Do not add:
 ## Current next implementation
 
 ```text
-PHARMACY-PUBLIC-ROLLBACK
+PHARMACY-INDEX-PROMOTION
 ```
 
-P11 Pharmacy public/noindex authority and P12 bilingual live verification are
-complete. The next gate is `PHARMACY-PUBLIC-ROLLBACK`; it may add only the
-independent public/noindex rollback authority and exact recovery proof. Index,
-Sitemap promotion, JSON-LD, Agent, Content, Hospital, Doctor, later-family,
+P11 Pharmacy public/noindex authority, P12 bilingual live verification and P13
+exact public rollback are complete. The next gate is
+`PHARMACY-INDEX-PROMOTION`; it may add only the independently reversible index
+promotion. Sitemap promotion, Agent, Content, Hospital, Doctor, later-family,
 Bulk behavior and Production execution remain closed.

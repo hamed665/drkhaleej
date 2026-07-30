@@ -173,10 +173,10 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0087_import_pharmacy_public_noindex_authority.sql"',
-  '"currentNext": "PHARMACY-PUBLIC-ROLLBACK"',
+  '"currentMigration": "0088_import_pharmacy_public_rollback.sql"',
+  '"currentNext": "PHARMACY-INDEX-PROMOTION"',
   'Wave 7.1   COMPLETE',
-  'Wave 7.2   PARTIAL',
+  'Wave 7.2   COMPLETE',
   'PHARMACY_BILINGUAL_LIVE_VERIFY.md',
 ]) {
   includes(sources.roadmap, token, files.roadmap);

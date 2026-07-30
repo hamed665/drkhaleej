@@ -187,12 +187,14 @@ async function verifyMigrationAuthority(client) {
   const ledger = await client.query(
     `select version::text as version
      from supabase_migrations.schema_migrations
-     where version::text = '0087'`,
+     where version::text in ('0087', '0088')
+     order by version`,
   );
   assert(
-    ledger.rowCount === 1,
-    'Preview migration ledger does not include exactly one 0087.',
+    ledger.rows.some((row) => row.version === '0087'),
+    'Preview migration ledger does not include 0087.',
   );
+  const rollbackGatePresent = ledger.rows.some((row) => row.version === '0088');
 
   const tables = await client.query(
     `select
@@ -253,14 +255,41 @@ async function verifyMigrationAuthority(client) {
   }
 
   const rollback = await client.query(
-    `select to_regprocedure(
+    `select
+       p.oid is not null as present,
+       case when p.oid is null then null else not p.prosecdef end as security_invoker,
+       case when p.oid is null then null else
+         has_function_privilege('service_role', p.oid, 'EXECUTE')
+       end as service_execute,
+       case when p.oid is null then null else
+         has_function_privilege('anon', p.oid, 'EXECUTE')
+       end as anon_execute,
+       case when p.oid is null then null else
+         has_function_privilege('authenticated', p.oid, 'EXECUTE')
+       end as authenticated_execute
+     from pg_catalog.pg_proc p
+     where p.oid = to_regprocedure(
        'public.import_rollback_pharmacy_public_noindex_by_authority(uuid,uuid,text)'
-     ) is null as absent`,
+     )
+     union all
+     select false, null, null, null, null
+     where to_regprocedure(
+       'public.import_rollback_pharmacy_public_noindex_by_authority(uuid,uuid,text)'
+     ) is null
+     limit 1`,
   );
+  const rollbackRpc = rollback.rows[0];
   assert(
-    rollback.rows[0]?.absent === true,
-    'P11 must not install the independent rollback RPC.',
+    rollbackGatePresent
+      ? rollbackRpc?.present === true &&
+          rollbackRpc.security_invoker === true &&
+          rollbackRpc.service_execute === true &&
+          rollbackRpc.anon_execute === false &&
+          rollbackRpc.authenticated_execute === false
+      : rollbackRpc?.present === false,
+    'Independent rollback RPC does not match the applied migration ledger.',
   );
+  return rollbackGatePresent;
 }
 
 async function insertFixture(client, item) {
@@ -554,7 +583,7 @@ try {
   clientB = new Client(connectionConfig(databaseUrl, 'b'));
   await Promise.all([clientA.connect(), clientB.connect()]);
   await cleanup(clientA, item).catch(() => {});
-  await verifyMigrationAuthority(clientA);
+  const rollbackGatePresent = await verifyMigrationAuthority(clientA);
   await insertFixture(clientA, item);
   await authorize(clientA, item);
 
@@ -590,7 +619,8 @@ try {
     bilingualPathsBound: true,
     bilingualLiveRoutesVerified: false,
     publicRouteEnabled: false,
-    rollbackInstalled: false,
+    rollbackGatePresent,
+    rollbackExercised: false,
     robotsNoindexVerified: true,
     sitemapExcludedVerified: true,
     indexLeakageCount: 0,
@@ -611,7 +641,7 @@ try {
     productionConnected: false,
     secretRedaction: true,
     publicRouteEnabled: false,
-    rollbackInstalled: false,
+    rollbackExercised: false,
     rawIdentifiersExposed: false,
     error: redact(error instanceof Error ? error.message : error),
     generatedAt: new Date().toISOString(),
