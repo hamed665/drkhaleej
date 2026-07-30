@@ -403,7 +403,7 @@ async function proveTamperFailsClosed(client, item) {
   const published = await readPublishedQueue(client, item);
   await client.query(
     `update public.import_publish_queue
-     set metadata = metadata || '{"tampered":true}'::jsonb
+     set metadata = metadata || '{"index_promoted":true}'::jsonb
      where id = $1`,
     [published.id],
   );

@@ -71,6 +71,7 @@ for (const token of [
   'PHARMACY_PUBLIC_ROLLBACK_PREVIEW_DATABASE_URL',
   'PHARMACY_PUBLIC_ROLLBACK_PRODUCTION_PROJECT_REF',
   'Promise.all',
+  `metadata || '{"index_promoted":true}'::jsonb`,
   'published_queue_integrity_mismatch',
   'computed_snapshot_hash',
   'productionConnected: false',
