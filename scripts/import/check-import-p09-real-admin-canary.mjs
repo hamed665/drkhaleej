@@ -23,6 +23,7 @@ const files = {
   page: "src/app/admin/imports/readiness/page.tsx",
   panel: "src/components/admin/import-pharmacy-private-admin-control-panel.tsx",
   runner: "scripts/import/run-p09-real-admin-canary.mjs",
+  literalFinalize: "scripts/import/run-p09-literal-finalize-preview-cycle.mjs",
   workflow: ".github/workflows/preview-migration-sync.yml",
 };
 
@@ -281,6 +282,12 @@ for (const token of [
 ]) {
   assert(source.runner.includes(token), `P09 hosted runner is missing ${token}.`);
 }
+assert(
+  source.literalFinalize.includes(`if (row.reservation_status === "reserved") {
+    assert(row.expires_at && new Date(row.expires_at).getTime() > Date.now(), "literal_reservation_expired");
+  }`),
+  "P09 hosted runner must enforce expiry only while the Reservation is reserved.",
+);
 
 for (const forbidden of [
   'productionConnected: true',

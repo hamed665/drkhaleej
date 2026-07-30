@@ -191,7 +191,9 @@ try {
   );
   const row = state.rows[0] ?? null;
   assert(row, "literal_bound_reservation_not_found");
-  assert(row.expires_at && new Date(row.expires_at).getTime() > Date.now(), "literal_reservation_expired");
+  if (row.reservation_status === "reserved") {
+    assert(row.expires_at && new Date(row.expires_at).getTime() > Date.now(), "literal_reservation_expired");
+  }
   assert(row.persisted_snapshot_hash === row.snapshot_hash, "literal_snapshot_hash_mismatch");
   assert(isObject(row.snapshot_payload), "literal_snapshot_payload_missing");
 
