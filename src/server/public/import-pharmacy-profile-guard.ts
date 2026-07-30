@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isPublicImportProfileIndexEligible } from "@/lib/catalog/public-import-profile-index-eligibility";
 import { resolvePublicProviderCanonicalRoute } from "@/lib/catalog/public-provider-route-resolver";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/service-role";
 import type { PublicImportLocalSuggestion } from "./import-local-suggestion-guard";
@@ -7,6 +8,7 @@ import type { PublicImportLocalSuggestion } from "./import-local-suggestion-guar
 export type PublicImportPharmacyProfile = {
   family: "pharmacies";
   canonicalPath: string;
+  indexPolicy: "noindex" | "index";
   entityType: "pharmacy";
   name: string;
   nameAr: string | null;
@@ -59,9 +61,20 @@ export type PharmacyPublicNoindexQueueRow = {
 };
 
 export type PharmacyPublicNoindexAuthorizationRow = {
+  id: string;
   candidate_id: string;
   status: string;
   published_queue_id: string | null;
+  canonical_path_en: string;
+  canonical_path_ar: string;
+};
+
+export type PharmacyIndexAuthorizationRow = {
+  id: string;
+  public_noindex_authorization_id: string;
+  candidate_id: string;
+  queue_id: string | null;
+  status: string;
   canonical_path_en: string;
   canonical_path_ar: string;
 };
@@ -152,6 +165,40 @@ export function isPublicNoindexPharmacyQueueRow(
   );
 }
 
+export function isPublicIndexPharmacyQueueRow(
+  row: PharmacyPublicNoindexQueueRow,
+  path: string,
+): boolean {
+  if (row.target_entity_type !== "pharmacy") return false;
+  if (row.publish_status !== "index_eligible") return false;
+  if (row.index_policy !== "index_eligible") return false;
+  if (row.sitemap_policy !== "excluded") return false;
+  if (!isRecord(row.metadata)) return false;
+  if (row.metadata.sitemap_included !== false) return false;
+  if (row.metadata.index_promoted !== true) return false;
+  if (row.metadata.public_route_enabled !== false) return false;
+  if (
+    stringValue(row.metadata, "public_noindex_schema_version") !==
+      "drkhaleej.import.pharmacyPublicNoindex.v1" ||
+    stringValue(row.metadata, "pharmacy_index_promotion_schema_version") !==
+      "drkhaleej.import.pharmacyIndexPromotion.v1"
+  ) {
+    return false;
+  }
+  if (stringValue(row.metadata, "pharmacy_index_authorization_id") === null) {
+    return false;
+  }
+  if (stringValue(row.metadata, "robots_policy") !== "index") return false;
+  const expectedPaths = bilingualPaths(path);
+  if (expectedPaths === null) return false;
+  const paths = record(row.metadata, "canonical_paths");
+  return (
+    stringValue(row.metadata, "canonical_path") === expectedPaths.en &&
+    stringValue(paths, "en") === expectedPaths.en &&
+    stringValue(paths, "ar") === expectedPaths.ar
+  );
+}
+
 function candidateId(metadata: unknown): string | null {
   return isRecord(metadata) ? stringValue(metadata, "import_entity_candidate_id") : null;
 }
@@ -198,10 +245,38 @@ export function isPublicNoindexPharmacyAuthorization(
   );
 }
 
+export function isPublicIndexPharmacyAuthorization(
+  authorization: PharmacyIndexAuthorizationRow,
+  publicAuthorization: PharmacyPublicNoindexAuthorizationRow,
+  queue: PharmacyPublicNoindexQueueRow,
+  candidateIdValue: string,
+  path: string,
+): boolean {
+  const expectedPaths = bilingualPaths(path);
+  if (expectedPaths === null || !isRecord(queue.metadata)) return false;
+  if (authorization.status !== "promoted") return false;
+  if (authorization.public_noindex_authorization_id !== publicAuthorization.id) {
+    return false;
+  }
+  if (authorization.queue_id !== queue.id) return false;
+  if (authorization.candidate_id !== candidateIdValue) return false;
+  if (
+    stringValue(queue.metadata, "pharmacy_index_authorization_id") !==
+    authorization.id
+  ) {
+    return false;
+  }
+  return (
+    authorization.canonical_path_en === expectedPaths.en &&
+    authorization.canonical_path_ar === expectedPaths.ar
+  );
+}
+
 function buildProfile(
   path: string,
   queue: PharmacyPublicNoindexQueueRow,
   candidate: CandidateRow,
+  indexPolicy: "noindex" | "index",
 ): PublicImportPharmacyProfile | null {
   if (candidate.entity_type !== "pharmacy") return null;
   if (candidate.candidate_status !== "approved") return null;
@@ -233,6 +308,7 @@ function buildProfile(
   return {
     family: "pharmacies",
     canonicalPath: path,
+    indexPolicy,
     entityType: "pharmacy",
     name,
     nameAr: stringValue(identity, "nameAr"),
@@ -282,17 +358,18 @@ export async function getPublicImportPharmacyProfile(input: {
       .select("id, target_entity_type, publish_status, index_policy, sitemap_policy, quality_score, metadata")
       .eq("target_entity_type", "pharmacy")
       .eq("sitemap_policy", "excluded")
-      .eq("index_policy", "noindex")
-      .eq("publish_status", "published_noindex")
       .order("updated_at", { ascending: false })
       .limit(lookupLimit);
 
     if (queueResult.error !== null || queueResult.data === null) return { ok: false, reason: "not_found" };
 
-    const queue = queueResult.data.find((row) =>
-      isPublicNoindexPharmacyQueueRow(row, path)
+    const queue = queueResult.data.find(
+      (row) =>
+        isPublicNoindexPharmacyQueueRow(row, path) ||
+        isPublicIndexPharmacyQueueRow(row, path),
     );
     if (!queue) return { ok: false, reason: "not_found" };
+    const indexPromoted = isPublicIndexPharmacyQueueRow(queue, path);
 
     const id = candidateId(queue.metadata);
     if (id === null) return { ok: false, reason: "not_found" };
@@ -300,7 +377,7 @@ export async function getPublicImportPharmacyProfile(input: {
     const [authorizationResult, candidateResult] = await Promise.all([
       supabase
         .from<PharmacyPublicNoindexAuthorizationRow>("import_pharmacy_public_noindex_authorizations")
-        .select("candidate_id, status, published_queue_id, canonical_path_en, canonical_path_ar")
+        .select("id, candidate_id, status, published_queue_id, canonical_path_en, canonical_path_ar")
         .eq("published_queue_id", queue.id)
         .eq("status", "published")
         .maybeSingle(),
@@ -322,8 +399,43 @@ export async function getPublicImportPharmacyProfile(input: {
       return { ok: false, reason: "not_found" };
     }
 
-    const profile = buildProfile(path, queue, candidateResult.data);
-    return profile === null ? { ok: false, reason: "not_found" } : { ok: true, profile };
+    if (indexPromoted) {
+      const indexAuthorizationResult = await supabase
+        .from<PharmacyIndexAuthorizationRow>("import_pharmacy_index_authorizations")
+        .select("id, public_noindex_authorization_id, candidate_id, queue_id, status, canonical_path_en, canonical_path_ar")
+        .eq("queue_id", queue.id)
+        .eq("status", "promoted")
+        .maybeSingle();
+
+      if (
+        indexAuthorizationResult.error !== null ||
+        indexAuthorizationResult.data === null ||
+        !isPublicIndexPharmacyAuthorization(
+          indexAuthorizationResult.data,
+          authorizationResult.data,
+          queue,
+          id,
+          path,
+        )
+      ) {
+        return { ok: false, reason: "not_found" };
+      }
+    }
+
+    const profile = buildProfile(
+      path,
+      queue,
+      candidateResult.data,
+      indexPromoted ? "index" : "noindex",
+    );
+    if (profile === null) return { ok: false, reason: "not_found" };
+    if (
+      profile.indexPolicy === "index" &&
+      !isPublicImportProfileIndexEligible(profile).eligible
+    ) {
+      return { ok: true, profile: { ...profile, indexPolicy: "noindex" } };
+    }
+    return { ok: true, profile };
   } catch {
     return { ok: false, reason: "not_found" };
   }

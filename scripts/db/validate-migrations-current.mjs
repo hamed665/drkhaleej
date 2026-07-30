@@ -53,6 +53,7 @@ const migrationNames = {
   pharmacyRecoveryReviewAttempts: '0086_import_pharmacy_recovery_review_attempts.sql',
   pharmacyPublicNoindexAuthority: '0087_import_pharmacy_public_noindex_authority.sql',
   pharmacyPublicRollback: '0088_import_pharmacy_public_rollback.sql',
+  pharmacyIndexPromotion: '0089_import_pharmacy_index_promotion.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -254,6 +255,44 @@ function validatePharmacyPublicRollback() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacyIndexPromotion() {
+  const content = readMigration(migrationNames.pharmacyIndexPromotion);
+  for (const [pattern, message] of [
+    [/P14 PHARMACY-INDEX-PROMOTION/i, '0089 Index phase marker is missing.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_index_authorizations/i, '0089 must create the independent Index authority.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_index_events/i, '0089 must create append-only Index events.'],
+    [/public_noindex_authorization_id\s+uuid\s+not\s+null/i, '0089 must bind the P11 public/noindex authority.'],
+    [/snapshot_payload\s+jsonb\s+not\s+null/i, '0089 must persist the exact pre-Index Queue snapshot.'],
+    [/where\s+status\s+in\s*\(\s*'issued'\s*,\s*'promoted'\s*\)/i, '0089 must allow only one active Index authority per Pharmacy.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_authorize_pharmacy_index_promotion/i, '0089 must define independent Index authorization.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_promote_pharmacy_index_by_authority/i, '0089 must define atomic Index promotion.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_index_by_authority/i, '0089 must define exact Index rollback.'],
+    [/publish_status\s*=\s*'index_eligible'/i, '0089 must use the existing index-eligible Queue state.'],
+    [/index_policy\s*=\s*'index_eligible'/i, '0089 must promote only the Index policy.'],
+    [/sitemap_policy\s*=\s*'excluded'/i, '0089 must keep Sitemap excluded.'],
+    [/'sitemap_included'\s*,\s*false/i, '0089 must persist Sitemap exclusion.'],
+    [/jsonb_array_elements_text\([\s\S]*candidate_payload\s*->\s*'languages'/i, '0089 must require an Index language signal.'],
+    [/candidate_payload\s*#>\s*'\{taxonomy,services\}'/i, '0089 must require an Index taxonomy signal.'],
+    [/'index_candidate_content_ineligible'/i, '0089 must fail closed on thin Index content.'],
+    [/extensions\.digest\(v_authorization\.snapshot_payload::text/i, '0089 must verify the protected Queue snapshot hash.'],
+    [/index_policy\s*=\s*v_snapshot_queue\s*->>\s*'indexPolicy'/i, '0089 rollback must restore the prior Index policy.'],
+    [/security\s+invoker/i, '0089 RPCs must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0089 RPCs must pin search_path.'],
+    [/alter\s+table\s+public\.import_pharmacy_index_authorizations\s+enable\s+row\s+level\s+security/i, '0089 must enable authority RLS.'],
+    [/alter\s+table\s+public\.import_pharmacy_index_events\s+enable\s+row\s+level\s+security/i, '0089 must enable event RLS.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0089 RPCs must be service-role-only.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0089 must not create public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0089 must not expose public roles.'],
+    [/sitemap_policy\s*=\s*'included'/i, '0089 must not include Sitemap.'],
+    [/'sitemap_included'\s*,\s*true/i, '0089 must not persist Sitemap inclusion.'],
+    [/status\s*=\s*'active'::public\.provider_status/i, '0089 must not activate the canonical center.'],
+    [/is_active\s*=\s*true/i, '0089 must not activate the canonical center.'],
+    [/pharmacy_sitemap_promotion/i, '0089 must not claim the later Sitemap authority.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -298,5 +337,6 @@ runValidator(validators.pharmacyExpectedVersionTimestamp);
 validateRecoveryReviewAttempts();
 validatePharmacyPublicNoindexAuthority();
 validatePharmacyPublicRollback();
+validatePharmacyIndexPromotion();
 
-console.log('Current migration validation passed through 0088.');
+console.log('Current migration validation passed through 0089.');

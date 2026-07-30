@@ -148,8 +148,8 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0088_import_pharmacy_public_rollback.sql"',
-  '"currentNext": "PHARMACY-INDEX-PROMOTION"',
+  '"currentMigration": "0089_import_pharmacy_index_promotion.sql"',
+  '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
   'Wave 7.1   COMPLETE',
   'PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
 ]) {
