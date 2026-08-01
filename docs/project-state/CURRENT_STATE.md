@@ -13,8 +13,8 @@
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0090`.
-- Migration validation is expected through `0090_import_pharmacy_sitemap_promotion.sql`.
+- Completed migration set: `0001` through `0091`.
+- Migration validation is expected through `0091_import_publish_queue_index_policy_compat.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Import readiness alignment
@@ -24,7 +24,7 @@
 | Aligned through | PR #966 |
 | Runtime baseline | `4758ea463fb65a59beba6f70372c3cf57bd163f8` |
 | Last aligned | `2026-08-01` |
-| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |
+| Current migration | `0091_import_publish_queue_index_policy_compat.sql` |
 | Current next | `INTAKE-CONTRACT-CONVERGENCE` |
 | Reservation audit event | `reservation_created` |
 | Reservation audit phase | `reservation` |
@@ -90,7 +90,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Data/RLS foundations
 
-- Database foundations validate through `0090_import_pharmacy_sitemap_promotion.sql`.
+- Database foundations validate through `0091_import_publish_queue_index_policy_compat.sql`.
 - Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, provider onboarding lead event-history DB foundation, landing content foundations, and review companion table foundations exist.
 - Provider onboarding lead event history supports the currently allowed event types: `status_changed`, `priority_changed`, and `note_added`.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
@@ -146,7 +146,7 @@ Current validation gate:
 ## Last known validation status
 
 - PRs #936–#966 are the current import-readiness runtime baseline.
-- Migration validation passes through `0090_import_pharmacy_sitemap_promotion.sql`.
+- Migration validation passes through `0091_import_publish_queue_index_policy_compat.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build and lint gates pass in CI.
 - Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof, P07 exact logical recovery proof, P09 hosted/literal completion, P11 authority proof, P13 exact public rollback proof, P14 independent Index proof and P15 independent Sitemap proof run against the exact PR head with Production disconnected.
 

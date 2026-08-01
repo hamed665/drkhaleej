@@ -68,8 +68,8 @@ try {
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |',
-      to: '| Current migration | `0089_import_pharmacy_index_promotion.sql` |',
+      from: '| Current migration | `0091_import_publish_queue_index_policy_compat.sql` |',
+      to: '| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {

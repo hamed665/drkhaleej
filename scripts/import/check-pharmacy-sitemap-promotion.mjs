@@ -3,6 +3,8 @@ import path from 'node:path';
 
 const files = {
   migration: 'supabase/migrations/0090_import_pharmacy_sitemap_promotion.sql',
+  compatibilityMigration:
+    'supabase/migrations/0091_import_publish_queue_index_policy_compat.sql',
   writer: 'src/server/admin/import-supabase-pharmacy-sitemap-writer.ts',
   operation: 'src/server/admin/import-pharmacy-sitemap-operation.ts',
   sitemap: 'src/server/public/import-sitemap.ts',
@@ -26,6 +28,17 @@ const sources = Object.fromEntries(
     ]),
   ),
 );
+
+for (const token of [
+  'P15 hosted compatibility correction',
+  'drop constraint if exists import_publish_queue_index_policy_check',
+  "index_policy in ('noindex', 'index_eligible', 'index', 'blocked')",
+]) {
+  assert(
+    sources.compatibilityMigration.toLowerCase().includes(token.toLowerCase()),
+    `${files.compatibilityMigration} must include ${token}`,
+  );
+}
 
 for (const token of [
   'P15 PHARMACY-SITEMAP-PROMOTION',
@@ -106,6 +119,8 @@ assert(
 for (const token of [
   'PHARMACY_SITEMAP_PREVIEW_DATABASE_URL',
   'PHARMACY_SITEMAP_PRODUCTION_PROJECT_REF',
+  "join(',') === '0090,0091'",
+  'import_publish_queue_index_policy_check',
   'Promise.all',
   'sitemap_prerequisite_queue_integrity_mismatch',
   'sitemap_included_queue_integrity_mismatch',
@@ -132,6 +147,8 @@ assert(
   manifest.schemaVersion === 'drkhaleej.pharmacySitemapPromotion.v1' &&
     manifest.status === 'complete' &&
     manifest.migration === '0090_import_pharmacy_sitemap_promotion.sql' &&
+    manifest.compatibilityMigration ===
+      '0091_import_publish_queue_index_policy_compat.sql' &&
     manifest.phaseMapping?.subphaseId === 'PHARMACY-SITEMAP-PROMOTION' &&
     manifest.promotionState?.indexPolicy === 'index' &&
     manifest.promotionState?.robotsPolicy === 'index' &&
@@ -144,7 +161,7 @@ assert(
   `${files.contract} P15 record drifted.`,
 );
 assert(
-  sources.roadmap.includes('"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"') &&
+  sources.roadmap.includes('"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"') &&
     sources.roadmap.includes('"currentNext": "INTAKE-CONTRACT-CONVERGENCE"') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE'),
   `${files.roadmap} P15 state drifted.`,

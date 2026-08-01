@@ -208,7 +208,7 @@ assert(
 
 assert(
   sources.roadmap.includes(
-    '"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"',
+    '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
   ) &&
     sources.roadmap.includes('"currentNext": "INTAKE-CONTRACT-CONVERGENCE"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&

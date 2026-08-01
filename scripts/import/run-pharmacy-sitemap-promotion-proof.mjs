@@ -141,9 +141,30 @@ async function verifyMigration(client) {
   const ledger = await client.query(
     `select version::text as version
      from supabase_migrations.schema_migrations
-     where version::text = '0090'`,
+     where version::text in ('0090', '0091')
+     order by version`,
   );
-  assert(ledger.rowCount === 1, 'Preview ledger must include exactly one 0090.');
+  assert(
+    ledger.rowCount === 2 &&
+      ledger.rows.map((row) => row.version).join(',') === '0090,0091',
+    'Preview ledger must include exactly one 0090 and one 0091.',
+  );
+
+  const queuePolicyConstraint = await client.query(
+    `select pg_catalog.pg_get_constraintdef(c.oid) as definition
+     from pg_catalog.pg_constraint c
+     where c.conrelid = 'public.import_publish_queue'::regclass
+       and c.conname = 'import_publish_queue_index_policy_check'`,
+  );
+  const queuePolicyDefinition = queuePolicyConstraint.rows[0]?.definition ?? '';
+  assert(
+    queuePolicyConstraint.rowCount === 1 &&
+      queuePolicyDefinition.includes("'noindex'::text") &&
+      queuePolicyDefinition.includes("'index_eligible'::text") &&
+      queuePolicyDefinition.includes("'index'::text") &&
+      queuePolicyDefinition.includes("'blocked'::text"),
+    'Preview Queue policy constraint is not compatible with reviewed Sitemap Index.',
+  );
 
   const rpcs = await client.query(
     `select
@@ -954,7 +975,8 @@ try {
     status: 'green',
     sourceCommit,
     environmentClass: 'isolated_preview',
-    migrationVersion: '0090',
+    migrationVersion: '0091',
+    authorityMigrationVersion: '0090',
     productionConnected: false,
     secretRedaction: true,
     publicNoindexPrerequisiteVerified: true,
@@ -986,7 +1008,8 @@ try {
     status: 'red',
     sourceCommit,
     environmentClass: 'isolated_preview',
-    migrationVersion: '0090',
+    migrationVersion: '0091',
+    authorityMigrationVersion: '0090',
     productionConnected: false,
     secretRedaction: true,
     rawIdentifiersExposed: false,

@@ -44,7 +44,7 @@ The full runtime baseline and the cross-document state tokens are machine-readab
   "alignedThroughPr": 966,
   "runtimeBaseline": "4758ea463fb65a59beba6f70372c3cf57bd163f8",
   "lastAligned": "2026-08-01",
-  "currentMigration": "0090_import_pharmacy_sitemap_promotion.sql",
+  "currentMigration": "0091_import_publish_queue_index_policy_compat.sql",
   "currentNext": "INTAKE-CONTRACT-CONVERGENCE",
   "waves": {
     "0": "COMPLETE",
@@ -360,6 +360,9 @@ complete in [`PHARMACY_SITEMAP_PROMOTION.md`](PHARMACY_SITEMAP_PROMOTION.md).
 Migration `0090` binds the exact promoted P14 authority, moves only the Queue
 from `index_eligible/index_eligible/excluded` to
 `index_eligible/index/included`, and restores the exact P14 Queue on rollback.
+Forward-only Migration `0091` aligns the pre-existing Queue policy constraint
+with that reviewed terminal `index` state; it changes no data, grant or RLS
+policy.
 The existing dynamic Sitemap reader requires the P15 evidence marker and an
 exact canonical route match. JSON-LD, candidate links, later families and
 Production remain closed.

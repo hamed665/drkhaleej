@@ -148,7 +148,7 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"',
+  '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
   '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
   'Wave 7.1   COMPLETE',
   'Wave 7.4   COMPLETE',

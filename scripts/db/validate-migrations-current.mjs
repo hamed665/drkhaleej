@@ -55,6 +55,8 @@ const migrationNames = {
   pharmacyPublicRollback: '0088_import_pharmacy_public_rollback.sql',
   pharmacyIndexPromotion: '0089_import_pharmacy_index_promotion.sql',
   pharmacySitemapPromotion: '0090_import_pharmacy_sitemap_promotion.sql',
+  importPublishQueueIndexPolicyCompat:
+    '0091_import_publish_queue_index_policy_compat.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -328,6 +330,23 @@ function validatePharmacySitemapPromotion() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validateImportPublishQueueIndexPolicyCompat() {
+  const content = readMigration(migrationNames.importPublishQueueIndexPolicyCompat);
+  for (const [pattern, message] of [
+    [/P15 hosted compatibility correction/i, '0091 compatibility phase marker is missing.'],
+    [/alter\s+table\s+public\.import_publish_queue\s+drop\s+constraint\s+if\s+exists\s+import_publish_queue_index_policy_check/i, '0091 must replace only the existing Queue policy constraint.'],
+    [/alter\s+table\s+public\.import_publish_queue\s+add\s+constraint\s+import_publish_queue_index_policy_check/i, '0091 must restore the named Queue policy constraint.'],
+    [/index_policy\s+in\s*\(\s*'noindex'\s*,\s*'index_eligible'\s*,\s*'index'\s*,\s*'blocked'\s*\)/i, '0091 must preserve every prior state and add only the reviewed Sitemap Index state.'],
+    [/comment\s+on\s+constraint\s+import_publish_queue_index_policy_check/i, '0091 must document the corrected policy boundary.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\b(insert|update|delete|truncate)\b/i, '0091 must not mutate Queue data.'],
+    [/\bcreate\s+policy\b/i, '0091 must not create public policies.'],
+    [/\bgrant\b/i, '0091 must not change grants.'],
+    [/\bcreate\s+(table|function)\b/i, '0091 must not create runtime surfaces.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -374,5 +393,6 @@ validatePharmacyPublicNoindexAuthority();
 validatePharmacyPublicRollback();
 validatePharmacyIndexPromotion();
 validatePharmacySitemapPromotion();
+validateImportPublishQueueIndexPolicyCompat();
 
-console.log('Current migration validation passed through 0090.');
+console.log('Current migration validation passed through 0091.');

@@ -13,7 +13,7 @@ const expectedCanonicalState = {
   alignedThroughPr: 966,
   runtimeBaseline: '4758ea463fb65a59beba6f70372c3cf57bd163f8',
   lastAligned: '2026-08-01',
-  currentMigration: '0090_import_pharmacy_sitemap_promotion.sql',
+  currentMigration: '0091_import_publish_queue_index_policy_compat.sql',
   currentNext: 'INTAKE-CONTRACT-CONVERGENCE',
   waves: {
     0: 'COMPLETE',
@@ -257,7 +257,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0090`',
+    '`0001` through `0091`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

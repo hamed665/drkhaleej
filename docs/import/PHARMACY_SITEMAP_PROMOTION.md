@@ -26,6 +26,11 @@ Admin, one Pharmacy, the exact promoted P14 authority, its approved candidate,
 Queue, bilingual canonical paths, protected hashes, request identity, and an
 exact pre-Sitemap P14 Queue snapshot.
 
+Migration `0091_import_publish_queue_index_policy_compat.sql` is the forward-only
+hosted compatibility correction. It preserves every prior Queue policy and adds
+the already-contracted terminal `index` value required by reviewed Sitemap
+inclusion; it performs no data write and changes no grant or RLS policy.
+
 Three service-role-only, security-invoker RPCs implement the lifecycle:
 
 ```text
@@ -111,6 +116,7 @@ The exact-SHA isolated Preview proof:
   "schemaVersion": "drkhaleej.pharmacySitemapPromotion.v1",
   "status": "complete",
   "migration": "0090_import_pharmacy_sitemap_promotion.sql",
+  "compatibilityMigration": "0091_import_publish_queue_index_policy_compat.sql",
   "phaseMapping": {
     "executionPhase": 9,
     "lockScope": 10,
