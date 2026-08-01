@@ -7,25 +7,25 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #965 at baseline commit `f75146ff4a3ef3375216b6a5937e354c0df75e85` (last aligned 2026-07-30).
+- Import-readiness runtime is aligned through PR #966 at baseline commit `4758ea463fb65a59beba6f70372c3cf57bd163f8` (last aligned 2026-08-01).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
 ## Completed migration range
 
-- Completed migration set: `0001` through `0089`.
-- Migration validation is expected through `0089_import_pharmacy_index_promotion.sql`.
+- Completed migration set: `0001` through `0091`.
+- Migration validation is expected through `0091_import_publish_queue_index_policy_compat.sql`.
 - Existing SQL migrations must not be modified unless explicitly approved.
 
 ## Import readiness alignment
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #965 |
-| Runtime baseline | `f75146ff4a3ef3375216b6a5937e354c0df75e85` |
-| Last aligned | `2026-07-30` |
-| Current migration | `0089_import_pharmacy_index_promotion.sql` |
-| Current next | `PHARMACY-SITEMAP-PROMOTION` |
+| Aligned through | PR #966 |
+| Runtime baseline | `4758ea463fb65a59beba6f70372c3cf57bd163f8` |
+| Last aligned | `2026-08-01` |
+| Current migration | `0091_import_publish_queue_index_policy_compat.sql` |
+| Current next | `INTAKE-CONTRACT-CONVERGENCE` |
 | Reservation audit event | `reservation_created` |
 | Reservation audit phase | `reservation` |
 
@@ -43,8 +43,9 @@
 | 7.1 | COMPLETE | P11 public/noindex authority and P12 bilingual live noindex route complete |
 | 7.2 | COMPLETE | P13 reuses the public/noindex authority, restores or removes the Queue exactly, proves tamper failure, concurrency and persisted replay |
 | 7.3 | COMPLETE | P14 uses an independent Index authority, keeps Sitemap excluded and proves exact public/noindex rollback, concurrency and persisted replay |
+| 7.4 | COMPLETE | P15 binds the exact promoted P14 authority, includes only its reviewed bilingual Queue in Sitemap and proves exact P14 recovery, concurrency and persisted replay |
 
-The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. P07 proves equal original/post-rollback logical hashes across bounded fields, locale/country, canonical route, geo/projection and protected metadata, deletion/sort state, private publication flags and the current exact empty relation snapshot contract. Unexpected differences fail closed with bounded field paths and hashes only. P08 derives ten Admin stages from persisted server readback, provides readback-only refresh, expiry and stale handling, fresh/replayed receipts, server revision binding for multi-tab collisions, client pending lock, manual rollback, exact-recovery verification, and bounded audit history. P09 completed all ten persisted stages for the fixed isolated Preview Pharmacy and proved one fresh private publish, one durable rollback authority, one fresh rollback, one bounded replay, exact logical recovery, and zero duplicate, audit-gap, unfinished-execution, state-mismatch, public, index, sitemap, raw-identifier, or unrestricted-payload findings. Reservation, mutation, and rollback are never retried automatically. The Post-P09 decision is `GO_LITERAL_PREVIEW_CYCLE_COMPLETE`. The Registry Authority Audit and Registry Convergence are complete and record the audited mapping and total fail-closed adapter in [`docs/import/registry-authority-audit.md`](../import/registry-authority-audit.md) and [`docs/import/registry-convergence.md`](../import/registry-convergence.md). P11 independently adds the Pharmacy public/noindex authority in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](../import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact EN/AR route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](../import/PHARMACY_BILINGUAL_LIVE_VERIFY.md): at the P12 boundary the guard required the published P11 authority and Queue policy and always emitted noindex with canonical/hreflang; imported discovery, Sitemap output, candidate-relation links and JSON-LD remained closed. P13 extends that same authority with exact Queue recovery in [`docs/import/PHARMACY_PUBLIC_ROLLBACK.md`](../import/PHARMACY_PUBLIC_ROLLBACK.md): tamper fails before consumption, one concurrent rollback wins, replay is persisted, and route access disappears immediately. P14 adds the independent Index authority in [`docs/import/PHARMACY_INDEX_PROMOTION.md`](../import/PHARMACY_INDEX_PROMOTION.md): the public guard requires P11 plus P14 and the shared content-eligibility gate, robots becomes indexable while Sitemap stays excluded, tamper fails before consumption, concurrent promotion/rollback and persisted replay are proven, and rollback restores exact P11 public/noindex state. `PHARMACY-SITEMAP-PROMOTION` is next. Production execution, Agent, Content, Hospital, Doctor, later families and Bulk remain disabled. AI-assisted intake and the Content/SEO Agent are planned capabilities, not production implementations.
+The Admin reservation operation and bounded authorization-linked integrity readback are implemented and proven on an isolated Preview database. P03 additionally proved replay, conflict, two-client lock waiting, forced rollback at all four write boundaries, deterministic cleanup and zero partial writes. P04-A writes `reservation_created` with the exact v2 schema while retaining legacy reader compatibility. P04-B hands only an already verified, fully bound Reservation to an injected server-only executor port and invokes no second Reservation. P05 wires that handoff to the existing Pharmacy mutation authority, appends mutation-phase `execution_started` v3, applies the exact reviewed canonical patch, persists terminal success, creates one server-only durable rollback reference and requires post-mutation readback. The hosted P05 proof verifies one Reservation, one snapshot, one reservation audit, one mutation start, one terminal success, one durable reference, zero duplicate execution, zero public exposure, exact patch and protected metadata preservation, bounded replay and deterministic cleanup. Rollback authority hardening is complete. P06 keeps raw references server-only, atomically consumes one actor/entity/version/snapshot-bound authority, returns bounded replay, proves one rollback audit with zero duplicate/public exposure, and leaves failed authority unconsumed. P07 proves equal original/post-rollback logical hashes across bounded fields, locale/country, canonical route, geo/projection and protected metadata, deletion/sort state, private publication flags and the current exact empty relation snapshot contract. Unexpected differences fail closed with bounded field paths and hashes only. P08 derives ten Admin stages from persisted server readback, provides readback-only refresh, expiry and stale handling, fresh/replayed receipts, server revision binding for multi-tab collisions, client pending lock, manual rollback, exact-recovery verification, and bounded audit history. P09 completed all ten persisted stages for the fixed isolated Preview Pharmacy and proved one fresh private publish, one durable rollback authority, one fresh rollback, one bounded replay, exact logical recovery, and zero duplicate, audit-gap, unfinished-execution, state-mismatch, public, index, sitemap, raw-identifier, or unrestricted-payload findings. Reservation, mutation, and rollback are never retried automatically. The Post-P09 decision is `GO_LITERAL_PREVIEW_CYCLE_COMPLETE`. The Registry Authority Audit and Registry Convergence are complete and record the audited mapping and total fail-closed adapter in [`docs/import/registry-authority-audit.md`](../import/registry-authority-audit.md) and [`docs/import/registry-convergence.md`](../import/registry-convergence.md). P11 independently adds the Pharmacy public/noindex authority in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](../import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact EN/AR route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](../import/PHARMACY_BILINGUAL_LIVE_VERIFY.md). P13 extends the same authority with exact Queue recovery in [`docs/import/PHARMACY_PUBLIC_ROLLBACK.md`](../import/PHARMACY_PUBLIC_ROLLBACK.md). P14 adds the independent Index authority in [`docs/import/PHARMACY_INDEX_PROMOTION.md`](../import/PHARMACY_INDEX_PROMOTION.md). P15 adds the independent Sitemap authority in [`docs/import/PHARMACY_SITEMAP_PROMOTION.md`](../import/PHARMACY_SITEMAP_PROMOTION.md): the existing Sitemap reader emits only an exact `index_eligible/index/included` Pharmacy with the P15 evidence marker and canonical route match; tamper, concurrency, replay and exact rollback to the P14 Index Queue are proven. Production execution, Agent, Content, Hospital, Doctor, later families and Bulk remain disabled. `INTAKE-CONTRACT-CONVERGENCE` is next, and AI-assisted intake still ends at Draft/Review.
 
 Independent code ownership and review governance are recorded by PR #947 and the active `main-protected-review` ruleset. Import-readiness implementation PRs remain independently review-gated before merge.
 
@@ -89,7 +90,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Data/RLS foundations
 
-- Database foundations validate through `0089_import_pharmacy_index_promotion.sql`.
+- Database foundations validate through `0091_import_publish_queue_index_policy_compat.sql`.
 - Contact visibility, callback request, provider license verification, media public visibility/RLS hardening, provider onboarding leads, provider onboarding lead event-history DB foundation, landing content foundations, and review companion table foundations exist.
 - Provider onboarding lead event history supports the currently allowed event types: `status_changed`, `priority_changed`, and `note_added`.
 - Legacy/current review foundations already exist in `0020_reviews.sql` and `0021_review_reports.sql`; `0052_review_companion_tables.sql` adds review companion tables only.
@@ -123,7 +124,7 @@ The canonical ledger and ordered next steps live in [`docs/import/import-readine
 
 ## Ops workflow state
 
-- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression, the exact-SHA P06 atomic rollback authority proof, the P07 exact logical recovery proof, the serialized P09 hosted/literal completion, the P11 public/noindex regression, the P12 route evidence, the exact-SHA P13 public rollback proof, and the exact-SHA P14 independent Index promotion/rollback proof. Production is not connected.
+- A fail-closed Preview Migration Sync workflow validates repository migration/RLS contracts, verifies isolated Preview identity, applies ledger-missing migrations under an advisory lock, verifies the exact ledger, runs the isolated P05 private publish/readback regression, the exact-SHA P06 atomic rollback authority proof, the P07 exact logical recovery proof, the serialized P09 hosted/literal completion, the P11 public/noindex regression, the P12 route evidence, the exact-SHA P13 public rollback proof, the exact-SHA P14 independent Index promotion/rollback proof, and the exact-SHA P15 Sitemap inclusion/rollback proof. Production is not connected.
 - A manual-only Supabase remote migration workflow exists for operator-triggered migration pushes.
 - Remote migration execution remains guarded by GitHub secrets and the exact manual confirmation input `PUSH_REMOTE_DB`.
 
@@ -144,10 +145,10 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#965 are the current import-readiness runtime baseline.
-- Migration validation passes through `0089_import_pharmacy_index_promotion.sql`.
+- PRs #936–#966 are the current import-readiness runtime baseline.
+- Migration validation passes through `0091_import_publish_queue_index_policy_compat.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build and lint gates pass in CI.
-- Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof, P07 exact logical recovery proof, P09 hosted/literal completion, P11 authority proof, P13 exact public rollback proof and P14 independent Index promotion/rollback proof run against the exact PR head with Production disconnected. Sitemap remains a separate gate.
+- Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof, P07 exact logical recovery proof, P09 hosted/literal completion, P11 authority proof, P13 exact public rollback proof, P14 independent Index proof and P15 independent Sitemap proof run against the exact PR head with Production disconnected.
 
 ## Future phase rules
 

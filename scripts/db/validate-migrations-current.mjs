@@ -54,6 +54,9 @@ const migrationNames = {
   pharmacyPublicNoindexAuthority: '0087_import_pharmacy_public_noindex_authority.sql',
   pharmacyPublicRollback: '0088_import_pharmacy_public_rollback.sql',
   pharmacyIndexPromotion: '0089_import_pharmacy_index_promotion.sql',
+  pharmacySitemapPromotion: '0090_import_pharmacy_sitemap_promotion.sql',
+  importPublishQueueIndexPolicyCompat:
+    '0091_import_publish_queue_index_policy_compat.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -293,6 +296,57 @@ function validatePharmacyIndexPromotion() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validatePharmacySitemapPromotion() {
+  const content = readMigration(migrationNames.pharmacySitemapPromotion);
+  for (const [pattern, message] of [
+    [/P15 PHARMACY-SITEMAP-PROMOTION/i, '0090 Sitemap phase marker is missing.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_sitemap_authorizations/i, '0090 must create the independent Sitemap authority.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_pharmacy_sitemap_events/i, '0090 must create append-only Sitemap events.'],
+    [/index_authorization_id\s+uuid\s+not\s+null/i, '0090 must bind the exact P14 Index authority.'],
+    [/snapshot_payload\s+jsonb\s+not\s+null/i, '0090 must persist the exact pre-Sitemap Queue snapshot.'],
+    [/where\s+status\s+in\s*\(\s*'issued'\s*,\s*'included'\s*\)/i, '0090 must allow only one active Sitemap authority per Pharmacy.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_authorize_pharmacy_sitemap_promotion/i, '0090 must define independent Sitemap authorization.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_include_pharmacy_sitemap_by_authority/i, '0090 must define atomic Sitemap inclusion.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_rollback_pharmacy_sitemap_by_authority/i, '0090 must define exact Sitemap rollback.'],
+    [/publish_status\s*=\s*'index_eligible'/i, '0090 must preserve the P14 publish status.'],
+    [/index_policy\s*=\s*'index'/i, '0090 must emit the existing included-Sitemap Index policy.'],
+    [/sitemap_policy\s*=\s*'included'/i, '0090 must include only the authorized Sitemap row.'],
+    [/'sitemap_included'\s*,\s*true/i, '0090 must persist Sitemap inclusion evidence.'],
+    [/extensions\.digest\(v_authorization\.snapshot_payload::text/i, '0090 must verify the protected P14 Queue snapshot hash.'],
+    [/sitemap_policy\s*=\s*v_snapshot_queue\s*->>\s*'sitemapPolicy'/i, '0090 rollback must restore the prior Sitemap policy.'],
+    [/index_policy\s*=\s*v_snapshot_queue\s*->>\s*'indexPolicy'/i, '0090 rollback must restore the prior Index policy exactly.'],
+    [/security\s+invoker/i, '0090 RPCs must remain security invoker.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0090 RPCs must pin search_path.'],
+    [/alter\s+table\s+public\.import_pharmacy_sitemap_authorizations\s+enable\s+row\s+level\s+security/i, '0090 must enable authority RLS.'],
+    [/alter\s+table\s+public\.import_pharmacy_sitemap_events\s+enable\s+row\s+level\s+security/i, '0090 must enable event RLS.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0090 RPCs must be service-role-only.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0090 must not create public policies.'],
+    [/grant\s+execute[\s\S]*to\s+(public|anon|authenticated)/i, '0090 must not expose public roles.'],
+    [/status\s*=\s*'active'::public\.provider_status/i, '0090 must not activate the canonical center.'],
+    [/is_active\s*=\s*true/i, '0090 must not activate the canonical center.'],
+    [/json_ld/i, '0090 must not add JSON-LD behavior.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
+function validateImportPublishQueueIndexPolicyCompat() {
+  const content = readMigration(migrationNames.importPublishQueueIndexPolicyCompat);
+  for (const [pattern, message] of [
+    [/P15 hosted compatibility correction/i, '0091 compatibility phase marker is missing.'],
+    [/alter\s+table\s+public\.import_publish_queue\s+drop\s+constraint\s+if\s+exists\s+import_publish_queue_index_policy_check/i, '0091 must replace only the existing Queue policy constraint.'],
+    [/alter\s+table\s+public\.import_publish_queue\s+add\s+constraint\s+import_publish_queue_index_policy_check/i, '0091 must restore the named Queue policy constraint.'],
+    [/index_policy\s+in\s*\(\s*'noindex'\s*,\s*'index_eligible'\s*,\s*'index'\s*,\s*'blocked'\s*\)/i, '0091 must preserve every prior state and add only the reviewed Sitemap Index state.'],
+    [/comment\s+on\s+constraint\s+import_publish_queue_index_policy_check/i, '0091 must document the corrected policy boundary.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\b(insert|update|delete|truncate)\b/i, '0091 must not mutate Queue data.'],
+    [/\bcreate\s+policy\b/i, '0091 must not create public policies.'],
+    [/\bgrant\b/i, '0091 must not change grants.'],
+    [/\bcreate\s+(table|function)\b/i, '0091 must not create runtime surfaces.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -338,5 +392,7 @@ validateRecoveryReviewAttempts();
 validatePharmacyPublicNoindexAuthority();
 validatePharmacyPublicRollback();
 validatePharmacyIndexPromotion();
+validatePharmacySitemapPromotion();
+validateImportPublishQueueIndexPolicyCompat();
 
-console.log('Current migration validation passed through 0089.');
+console.log('Current migration validation passed through 0091.');

@@ -26,11 +26,11 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #965** at baseline **`f75146ff4a3ef3375216b6a5937e354c0df75e85`**.
-- Database/migration status: **validates through `0089_import_pharmacy_index_promotion.sql`**.
-- Completed migration set: **`0001` through `0089`**.
-- Current import-readiness implementation: **`PHARMACY-SITEMAP-PROMOTION`**.
-- P11 adds the isolated Preview Pharmacy public/noindex authority recorded in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact bilingual route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md). P13 adds exact server-selected public rollback as recorded in [`docs/import/PHARMACY_PUBLIC_ROLLBACK.md`](docs/import/PHARMACY_PUBLIC_ROLLBACK.md). P14 adds independent, reversible Index promotion as recorded in [`docs/import/PHARMACY_INDEX_PROMOTION.md`](docs/import/PHARMACY_INDEX_PROMOTION.md). Only an exact P14 authority makes the Pharmacy page indexable; imported discovery, Sitemap and JSON-LD remain disabled, and Production execution is not connected.
+- Import-readiness runtime is aligned through **PR #966** at baseline **`4758ea463fb65a59beba6f70372c3cf57bd163f8`**.
+- Database/migration status: **validates through `0091_import_publish_queue_index_policy_compat.sql`**.
+- Completed migration set: **`0001` through `0091`**.
+- Current import-readiness implementation: **`INTAKE-CONTRACT-CONVERGENCE`**.
+- P11 adds the isolated Preview Pharmacy public/noindex authority recorded in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact bilingual route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md). P13 adds exact server-selected public rollback as recorded in [`docs/import/PHARMACY_PUBLIC_ROLLBACK.md`](docs/import/PHARMACY_PUBLIC_ROLLBACK.md). P14 adds independent, reversible Index promotion as recorded in [`docs/import/PHARMACY_INDEX_PROMOTION.md`](docs/import/PHARMACY_INDEX_PROMOTION.md). P15 adds independent, reversible Sitemap inclusion as recorded in [`docs/import/PHARMACY_SITEMAP_PROMOTION.md`](docs/import/PHARMACY_SITEMAP_PROMOTION.md); forward-only `0091` aligns the pre-existing Queue constraint with its reviewed terminal `index` state. The Sitemap reader requires the exact P15 evidence marker and canonical route match; JSON-LD, candidate links, other families and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 
 Canonical current-state sources:

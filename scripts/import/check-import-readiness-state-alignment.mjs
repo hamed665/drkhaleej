@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 965,
-  runtimeBaseline: 'f75146ff4a3ef3375216b6a5937e354c0df75e85',
-  lastAligned: '2026-07-30',
-  currentMigration: '0089_import_pharmacy_index_promotion.sql',
-  currentNext: 'PHARMACY-SITEMAP-PROMOTION',
+  alignedThroughPr: 966,
+  runtimeBaseline: '4758ea463fb65a59beba6f70372c3cf57bd163f8',
+  lastAligned: '2026-08-01',
+  currentMigration: '0091_import_publish_queue_index_policy_compat.sql',
+  currentNext: 'INTAKE-CONTRACT-CONVERGENCE',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -28,6 +28,7 @@ const expectedCanonicalState = {
     '7.1': 'COMPLETE',
     '7.2': 'COMPLETE',
     '7.3': 'COMPLETE',
+    '7.4': 'COMPLETE',
   },
   currentReservationAudit: {
     eventType: 'reservation_created',
@@ -149,7 +150,7 @@ function validateCanonicalManifest(manifest) {
 function validateVisibleRoadmapLedger(source, manifest) {
   const statusSection = extractSection(files.roadmap, source, 'Status');
   const visibleWaves = new Map();
-  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6|7\.1|7\.2|7\.3)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
+  const wavePattern = /^Wave\s+(0|1|2\.1|2\.2|3\+|4\.1|4\.2|5|6|7\.1|7\.2|7\.3|7\.4)\s+(COMPLETE|PARTIAL|OPEN)\b/gm;
   for (const match of statusSection.matchAll(wavePattern)) visibleWaves.set(match[1], match[2]);
   for (const [wave, status] of Object.entries(manifest.waves)) {
     assertEqual(files.roadmap, `visible wave ${wave}`, visibleWaves.get(wave), status);
@@ -235,7 +236,10 @@ function validateMatrix(source, manifest) {
     ],
     'Pharmacy public rollback': ['Complete', 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'],
     'Pharmacy Index promotion': ['Complete', 'docs/import/PHARMACY_INDEX_PROMOTION.md'],
-    'Pharmacy Sitemap promotion': ['Disabled/Open', '—'],
+    'Pharmacy Sitemap promotion': [
+      'Complete',
+      'docs/import/PHARMACY_SITEMAP_PROMOTION.md',
+    ],
     'AI-assisted intake': ['Planned', '—'],
     'Content/SEO Agent': ['Planned separate track', '—'],
   };
@@ -253,7 +257,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0089`',
+    '`0001` through `0091`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
