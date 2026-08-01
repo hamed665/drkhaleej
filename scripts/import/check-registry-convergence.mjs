@@ -207,8 +207,12 @@ assert(
 );
 
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-SITEMAP-PROMOTION"') &&
+  sources.roadmap.includes(
+    '"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"',
+  ) &&
+    sources.roadmap.includes('"currentNext": "INTAKE-CONTRACT-CONVERGENCE"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
+    sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: completed convergence state is not aligned.`,
 );

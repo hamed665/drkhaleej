@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #965 at baseline `f75146ff4a3ef3375216b6a5937e354c0df75e85` (last aligned 2026-07-30).
-- Migrations validate through `0089_import_pharmacy_index_promotion.sql`.
-- Registry Convergence and P11–P14 of the Pharmacy public lifecycle are complete. The current next implementation is `PHARMACY-SITEMAP-PROMOTION`.
+- Import-readiness runtime is aligned through PR #966 at baseline `4758ea463fb65a59beba6f70372c3cf57bd163f8` (last aligned 2026-08-01).
+- Migrations validate through `0090_import_pharmacy_sitemap_promotion.sql`.
+- Registry Convergence and P11–P15 of the Pharmacy public lifecycle are complete. The current next implementation is `INTAKE-CONTRACT-CONVERGENCE`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -96,7 +96,8 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Pharmacy bilingual live noindex route | Completed route gate | Phase 9 | Phase 10 | Phase 18 | Requires the P11 authority; canonical/hreflang are bilingual; noindex, discovery/Sitemap exclusion, no JSON-LD and no candidate-relation links are enforced. |
 | Pharmacy public rollback | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Restores the prior Queue exactly or removes the P11-created Queue; tamper fails closed and concurrency/replay are proven. |
 | Pharmacy Index promotion | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Independent P14 authority promotes only robots/Index state, keeps Sitemap excluded and restores exact P11 public/noindex state. |
-| Migrations through `0089` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 / Phase 18 | Existing SQL migrations must not be modified unless approved. |
+| Pharmacy Sitemap promotion | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Independent P15 authority includes only the exact promoted P14 Queue and restores exact P14 Index state. |
+| Migrations through `0090` | Completed | Phase 2 / Phase 4 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 / Phase 18 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -110,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #965 |
-| Runtime baseline | `f75146ff4a3ef3375216b6a5937e354c0df75e85` |
-| Last aligned | `2026-07-30` |
-| Current migration | `0089_import_pharmacy_index_promotion.sql` |
-| Current next | `PHARMACY-SITEMAP-PROMOTION` |
+| Aligned through | PR #966 |
+| Runtime baseline | `4758ea463fb65a59beba6f70372c3cf57bd163f8` |
+| Last aligned | `2026-08-01` |
+| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |
+| Current next | `INTAKE-CONTRACT-CONVERGENCE` |
 
 ## Import readiness capability mapping
 
@@ -144,8 +145,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Pharmacy public/noindex authority | Complete | `docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md` | `PHARMACY-BILINGUAL-LIVE-VERIFY` |
 | Pharmacy bilingual live noindex route | Complete | `docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md` | `PHARMACY-PUBLIC-ROLLBACK` |
 | Pharmacy public rollback | Complete | `docs/import/PHARMACY_PUBLIC_ROLLBACK.md` | `PHARMACY-INDEX-PROMOTION` |
-| Pharmacy Index promotion | Complete | `docs/import/PHARMACY_INDEX_PROMOTION.md` | `PHARMACY-SITEMAP-PROMOTION` |
-| Pharmacy Sitemap promotion | Disabled/Open | — | After independent Index promotion |
+| Pharmacy Index promotion | Complete | `docs/import/PHARMACY_INDEX_PROMOTION.md` | Maintain Index regression |
+| Pharmacy Sitemap promotion | Complete | `docs/import/PHARMACY_SITEMAP_PROMOTION.md` | `INTAKE-CONTRACT-CONVERGENCE` |
 | AI-assisted intake | Planned | — | After intake convergence |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -171,6 +172,8 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `PHARMACY-BILINGUAL-LIVE-VERIFY` | Phase 9 | Phase 10 | Phase 18 |
 | `PHARMACY-PUBLIC-ROLLBACK` | Phase 9 | Phase 10 | Phase 18 |
 | `PHARMACY-INDEX-PROMOTION` | Phase 9 | Phase 10 | Phase 18 |
+| `PHARMACY-SITEMAP-PROMOTION` | Phase 9 | Phase 10 | Phase 18 |
+| `INTAKE-CONTRACT-CONVERGENCE` | Phase 9 | Phase 10 | Phase 6 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 

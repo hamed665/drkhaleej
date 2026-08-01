@@ -32,10 +32,13 @@ on:
       - 'scripts/import/check-pharmacy-public-rollback.mjs'
       - 'scripts/import/run-pharmacy-index-promotion-proof.mjs'
       - 'scripts/import/check-pharmacy-index-promotion.mjs'
+      - 'scripts/import/run-pharmacy-sitemap-promotion-proof.mjs'
+      - 'scripts/import/check-pharmacy-sitemap-promotion.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
       - 'docs/import/PHARMACY_INDEX_PROMOTION.md'
+      - 'docs/import/PHARMACY_SITEMAP_PROMOTION.md'
       - 'src/lib/routes/public.ts'
       - 'src/lib/catalog/public-provider-route-resolver*'
       - 'src/lib/catalog/public-provider-import-adapter*'
@@ -54,6 +57,8 @@ on:
       - 'src/server/admin/import-supabase-pharmacy-public-rollback-writer*'
       - 'src/server/admin/import-pharmacy-index-operation*'
       - 'src/server/admin/import-supabase-pharmacy-index-writer*'
+      - 'src/server/admin/import-pharmacy-sitemap-operation*'
+      - 'src/server/admin/import-supabase-pharmacy-sitemap-writer*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -134,6 +139,12 @@ env:
   PHARMACY_INDEX_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_INDEX_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_INDEX_EVIDENCE_PATH: artifacts/pharmacy-index-promotion/proof.json
+  PHARMACY_SITEMAP_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  PHARMACY_SITEMAP_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  PHARMACY_SITEMAP_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  PHARMACY_SITEMAP_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  PHARMACY_SITEMAP_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
+  PHARMACY_SITEMAP_EVIDENCE_PATH: artifacts/pharmacy-sitemap-promotion/proof.json
 
 permissions:
   contents: read
@@ -167,6 +178,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_BILINGUAL_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_PUBLIC_ROLLBACK_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_INDEX_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_SITEMAP_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -191,7 +203,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -205,6 +217,7 @@ jobs:
             pnpm import:pharmacy-bilingual-live:validate
             pnpm import:pharmacy-public-rollback:validate
             pnpm import:pharmacy-index-promotion:validate
+            pnpm import:pharmacy-sitemap-promotion:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -294,6 +307,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-pharmacy-index-promotion-proof.mjs 2>&1 | tee artifacts/pharmacy-index-promotion/hosted-proof.log
 
+      - name: Prove independent Pharmacy Sitemap inclusion and rollback
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-pharmacy-sitemap-promotion-proof.mjs 2>&1 | tee artifacts/pharmacy-sitemap-promotion/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -372,5 +391,14 @@ jobs:
         with:
           name: pharmacy-index-promotion-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/pharmacy-index-promotion/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Pharmacy Sitemap promotion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharmacy-sitemap-promotion-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/pharmacy-sitemap-promotion/
           if-no-files-found: error
           retention-days: 30

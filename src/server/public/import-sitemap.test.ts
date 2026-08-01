@@ -46,12 +46,30 @@ describe("public import sitemap entry", () => {
     ).toBeNull();
   });
 
-  it("keeps pharmacy out until independent Sitemap promotion and keeps hospital disabled", () => {
+  it("accepts Pharmacy only with the independent P15 Sitemap evidence", () => {
+    const promoted = reviewedRow(
+      "pharmacy",
+      "/en/om/pharmacies/al-khuwair-pharmacy",
+    );
+    promoted.metadata = {
+      ...(promoted.metadata as Record<string, unknown>),
+      pharmacy_sitemap_promotion_schema_version:
+        "drkhaleej.import.pharmacySitemapPromotion.v1",
+    };
+    expect(buildPublicImportSitemapEntry(promoted)).toEqual({
+      entityType: "pharmacy",
+      pathname: "/en/om/pharmacies/al-khuwair-pharmacy",
+      lastModified: new Date("2026-07-28T10:00:00.000Z"),
+    });
+
     expect(
       buildPublicImportSitemapEntry(
         reviewedRow("pharmacy", "/en/om/pharmacies/al-khuwair-pharmacy"),
       ),
     ).toBeNull();
+  });
+
+  it("keeps Hospital disabled", () => {
     expect(
       buildPublicImportSitemapEntry(
         reviewedRow("hospital", "/ar/om/hospitals/muscat-general"),

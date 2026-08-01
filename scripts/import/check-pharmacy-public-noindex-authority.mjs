@@ -148,9 +148,10 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0089_import_pharmacy_index_promotion.sql"',
-  '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
+  '"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"',
+  '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
   'Wave 7.1   COMPLETE',
+  'Wave 7.4   COMPLETE',
   'PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md',
 ]) {
   includes(sources.roadmap, token, files.roadmap);

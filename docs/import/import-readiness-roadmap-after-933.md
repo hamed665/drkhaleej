@@ -25,14 +25,15 @@ Wave 6     COMPLETE  Registry Authority Audit and Registry Convergence complete;
 Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noindex route complete
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
+Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #965
-Baseline commit: f75146ff
-Last aligned: 2026-07-30
+Aligned through: PR #966
+Baseline commit: 4758ea46
+Last aligned: 2026-08-01
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -40,11 +41,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 965,
-  "runtimeBaseline": "f75146ff4a3ef3375216b6a5937e354c0df75e85",
-  "lastAligned": "2026-07-30",
-  "currentMigration": "0089_import_pharmacy_index_promotion.sql",
-  "currentNext": "PHARMACY-SITEMAP-PROMOTION",
+  "alignedThroughPr": 966,
+  "runtimeBaseline": "4758ea463fb65a59beba6f70372c3cf57bd163f8",
+  "lastAligned": "2026-08-01",
+  "currentMigration": "0090_import_pharmacy_sitemap_promotion.sql",
+  "currentNext": "INTAKE-CONTRACT-CONVERGENCE",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -57,7 +58,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "6": "COMPLETE",
     "7.1": "COMPLETE",
     "7.2": "COMPLETE",
-    "7.3": "COMPLETE"
+    "7.3": "COMPLETE",
+    "7.4": "COMPLETE"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -324,7 +326,7 @@ The Registry Authority Audit is complete in [`registry-authority-audit.md`](regi
 
 Index/sitemap decoupling remains part of the later independent Pharmacy index and sitemap promotions. This wave does not authorize route activation, public promotion, a migration, or Production execution.
 
-## Wave 7 — Pharmacy public lifecycle `PARTIAL`
+## Wave 7 — Pharmacy public lifecycle `COMPLETE`
 
 1. Independent public/noindex authorization and snapshot.
 2. Approved bilingual public route with noindex and sitemap excluded.
@@ -353,7 +355,14 @@ adds a separate Index authority, promotes only robots/Index state while
 Sitemap remains excluded, and restores the exact P11 public/noindex Queue on
 rollback. Tamper failure, concurrent promotion/rollback, persisted replay and
 readback are proven on isolated Preview. Sitemap promotion remains independent
-and Production remains disconnected.
+and Production remains disconnected. P15 `PHARMACY-SITEMAP-PROMOTION` is
+complete in [`PHARMACY_SITEMAP_PROMOTION.md`](PHARMACY_SITEMAP_PROMOTION.md).
+Migration `0090` binds the exact promoted P14 authority, moves only the Queue
+from `index_eligible/index_eligible/excluded` to
+`index_eligible/index/included`, and restores the exact P14 Queue on rollback.
+The existing dynamic Sitemap reader requires the P15 evidence marker and an
+exact canonical route match. JSON-LD, candidate links, later families and
+Production remain closed.
 
 ## Wave 8 — Intake convergence and core families `OPEN`
 
@@ -413,12 +422,11 @@ Do not add:
 ## Current next implementation
 
 ```text
-PHARMACY-SITEMAP-PROMOTION
+INTAKE-CONTRACT-CONVERGENCE
 ```
 
-P11 Pharmacy public/noindex authority, P12 bilingual live verification, P13
-exact public rollback and P14 independent Index promotion are complete. The
-next gate is `PHARMACY-SITEMAP-PROMOTION`; it may add only independently
-reversible Sitemap inclusion on top of a valid P14 authority. Agent, Content,
-Hospital, Doctor, later-family, Bulk behavior and Production execution remain
-closed.
+P11–P15 of the independently reversible Pharmacy public lifecycle are
+complete. The next gate is `INTAKE-CONTRACT-CONVERGENCE`; Manual, CSV, Excel,
+API and AI-assisted entrypoints may converge only into bounded Draft/Evidence
+contracts. Agent publish, Content, Hospital, Doctor, later-family, Bulk
+behavior and Production execution remain closed.

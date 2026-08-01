@@ -61,15 +61,15 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
-      to: '"currentNext": "PHARMACY-INDEX-PROMOTION"',
+      from: '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
+      to: '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
       expectedError: 'manifest.currentNext drifted',
     },
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0089_import_pharmacy_index_promotion.sql` |',
-      to: '| Current migration | `0088_import_pharmacy_public_rollback.sql` |',
+      from: '| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |',
+      to: '| Current migration | `0089_import_pharmacy_index_promotion.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {

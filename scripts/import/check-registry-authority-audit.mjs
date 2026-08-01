@@ -423,7 +423,11 @@ assert(
   `${files.sitemapReader}: import sitemap must consume canonical family and route authorities.`,
 );
 assert(
-  sources.roadmap.includes('"currentNext": "PHARMACY-SITEMAP-PROMOTION"') &&
+  sources.roadmap.includes(
+    '"currentMigration": "0090_import_pharmacy_sitemap_promotion.sql"',
+  ) &&
+    sources.roadmap.includes('"currentNext": "INTAKE-CONTRACT-CONVERGENCE"') &&
+    sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete'),
   `${files.roadmap}: convergence completion/next transition is not aligned.`,
 );
