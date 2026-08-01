@@ -73,8 +73,9 @@ const pharmacyRoutePath = 'src/app/[locale]/[country]/pharmacies/[pharmacySlug]/
 const pharmacyRoute = await readText(pharmacyRoutePath);
 for (const token of [
   'buildProfileNoindexMetadata',
-  'return buildProfileNoindexMetadata(metadata)',
-  'data-index-policy="noindex"',
+  'result.profile.indexPolicy === "index"',
+  ': buildProfileNoindexMetadata(metadata)',
+  'data-index-policy={profile.indexPolicy}',
   'data-sitemap-policy="excluded"',
 ]) {
   assertIncludes(pharmacyRoute, token, `${pharmacyRoutePath} must include ${token}`);
@@ -82,8 +83,22 @@ for (const token of [
 assertNotIncludes(
   pharmacyRoute,
   'isPublicImportProfileIndexEligible',
-  `${pharmacyRoutePath} must not make P12 indexable from the generic quality gate.`,
+  `${pharmacyRoutePath} must not bypass the P14 authority with the generic quality gate.`,
 );
+
+const pharmacyGuardPath = 'src/server/public/import-pharmacy-profile-guard.ts';
+const pharmacyGuard = await readText(pharmacyGuardPath);
+for (const token of [
+  'isPublicImportProfileIndexEligible',
+  'profile.indexPolicy === "index"',
+  'profile: { ...profile, indexPolicy: "noindex" }',
+]) {
+  assertIncludes(
+    pharmacyGuard,
+    token,
+    `${pharmacyGuardPath} must keep P14 content eligibility fail-closed with ${token}`,
+  );
+}
 
 for (const blockedHospitalRoutePath of [
   'src/pages/[locale]/[country]/hospitals/[hospitalSlug].tsx',

@@ -80,9 +80,10 @@ for (const forbidden of [
 }
 
 for (const token of [
-  'return buildProfileNoindexMetadata(metadata)',
+  'result.profile.indexPolicy === "index"',
+  ': buildProfileNoindexMetadata(metadata)',
   'buildLocalizedMetadata',
-  'data-index-policy="noindex"',
+  'data-index-policy={profile.indexPolicy}',
   'data-sitemap-policy="excluded"',
   'href={`/${locale}/${country}/pharmacies`}',
   'تصفح الصيدليات',
@@ -173,10 +174,11 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0088_import_pharmacy_public_rollback.sql"',
-  '"currentNext": "PHARMACY-INDEX-PROMOTION"',
+  '"currentMigration": "0089_import_pharmacy_index_promotion.sql"',
+  '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
   'Wave 7.1   COMPLETE',
   'Wave 7.2   COMPLETE',
+  'Wave 7.3   COMPLETE',
   'PHARMACY_BILINGUAL_LIVE_VERIFY.md',
 ]) {
   includes(sources.roadmap, token, files.roadmap);

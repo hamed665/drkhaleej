@@ -34,6 +34,7 @@ for (const pattern of [
 
 for (const pattern of [
   /if \(!result\.ok\) notFound\(\)/,
+  /result\.profile\.indexPolicy === "index"/,
   /buildProfileNoindexMetadata\(metadata\)/,
 ]) {
   if (!pattern.test(route)) throw new Error(`pharmacy route missing private fail-closed pattern: ${pattern}`);
@@ -47,9 +48,14 @@ for (const pattern of [
   /metadata\.index_promoted !== false/,
   /metadata\.public_route_enabled !== false/,
   /robots_policy"\) !== "noindex"/,
+  /isPublicIndexPharmacyQueueRow/,
+  /publish_status !== "index_eligible"/,
+  /index_policy !== "index_eligible"/,
+  /metadata\.index_promoted !== true/,
+  /robots_policy"\) !== "index"/,
   /import_pharmacy_public_noindex_authorizations/,
-  /\.eq\("publish_status", "published_noindex"\)/,
-  /\.eq\("index_policy", "noindex"\)/,
+  /import_pharmacy_index_authorizations/,
+  /\.eq\("target_entity_type", "pharmacy"\)/,
   /\.eq\("sitemap_policy", "excluded"\)/,
   /\.limit\(lookupLimit\)/,
 ]) {

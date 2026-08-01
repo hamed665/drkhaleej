@@ -33,12 +33,14 @@ for (const token of [
   'family: "pharmacy"',
   'isPublicNoindexPharmacyQueueRow',
   'isPublicNoindexPharmacyAuthorization',
+  'isPublicIndexPharmacyQueueRow',
+  'isPublicIndexPharmacyAuthorization',
+  'isPublicImportProfileIndexEligible',
   'row.target_entity_type !== "pharmacy"',
   '.eq("target_entity_type", "pharmacy")',
   '.eq("sitemap_policy", "excluded")',
-  '.eq("index_policy", "noindex")',
-  '.eq("publish_status", "published_noindex")',
   'import_pharmacy_public_noindex_authorizations',
+  'import_pharmacy_index_authorizations',
   '.eq("status", "published")',
   'candidate.entity_type !== "pharmacy"',
   'candidate.candidate_status !== "approved"',
@@ -47,6 +49,8 @@ for (const token of [
   'hasLocalGeo(geo)',
   'localSuggestions: PublicImportLocalSuggestion[];',
   'localSuggestions: []',
+  'indexPromoted ? "index" : "noindex"',
+  'profile: { ...profile, indexPolicy: "noindex" }',
 ]) {
   assertIncludes(guardSource, token, `${guardPath} must include ${token}`);
 }

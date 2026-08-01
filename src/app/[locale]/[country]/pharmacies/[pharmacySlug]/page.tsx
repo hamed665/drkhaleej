@@ -125,7 +125,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: metadataTitle(name),
     description: buildPublicImportProfileMetaDescription(profileSummary),
   });
-  return buildProfileNoindexMetadata(metadata);
+  return result.profile.indexPolicy === "index"
+    ? metadata
+    : buildProfileNoindexMetadata(metadata);
 }
 
 export default async function PublicImportedPharmacyProfilePage({ params }: { params: Promise<Params> }) {
@@ -148,7 +150,7 @@ export default async function PublicImportedPharmacyProfilePage({ params }: { pa
       className="home-foundation dm2026-home-page"
       dir={dir}
       data-profile-family={profile.family}
-      data-index-policy="noindex"
+      data-index-policy={profile.indexPolicy}
       data-sitemap-policy="excluded"
     >
       <section className="dm2026-container dm2026-search-surface" aria-labelledby="pharmacy-profile-title">

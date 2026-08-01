@@ -107,8 +107,8 @@ assert(
   `${files.contract} rollback record drifted.`,
 );
 assert(
-  sources.roadmap.includes('"currentMigration": "0088_import_pharmacy_public_rollback.sql"') &&
-    sources.roadmap.includes('"currentNext": "PHARMACY-INDEX-PROMOTION"') &&
+  sources.roadmap.includes('"currentMigration": "0089_import_pharmacy_index_promotion.sql"') &&
+    sources.roadmap.includes('"currentNext": "PHARMACY-SITEMAP-PROMOTION"') &&
     sources.roadmap.includes('Wave 7.2   COMPLETE'),
   `${files.roadmap} P13 state drifted.`,
 );
