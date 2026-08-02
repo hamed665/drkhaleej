@@ -76,9 +76,9 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #967 at `1e7e18e4b888eefbacfb9f1689d0be6b96501ad6`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle and P16 Intake Contract Convergence are complete. The current next implementation is **`SOURCE-EVIDENCE-LEDGER`**. It authorizes neither Agent/Worker runtime nor Production execution.
+Current import-readiness runtime baseline: **PR #968 at `e11d598f87adae81aa09422ae05bb2861bfe1cf8`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence and P17 Source Evidence Ledger are complete. The current next implementation is **`DUPLICATE-GEO-CONTRACT`**. It authorizes neither Agent/Worker runtime nor Production execution.
 
-Completed migrations: **`0001` through `0091`**. Migration validation is expected through `0091_import_publish_queue_index_policy_compat.sql`.
+Completed migrations: **`0001` through `0092`**. Migration validation is expected through `0092_import_source_evidence_ledger.sql`.
 
 Approved current surfaces include localized public catalog/detail surfaces, static public article shell routes, contact/callback/media/license foundations, provider onboarding lead capture, protected root `/admin`, minimal admin login, admin provider onboarding lead list/detail, limited status/priority lead mutation, read-only lead history UI, status/priority lead history writes, draft center creation from provider onboarding lead, admin center subscription view/assignment foundation, base plan catalog initializer, admin quick navigation, admin commercial add-on assignment shell, healthcare vertical/category taxonomy foundation, public read RLS for approved public taxonomy rows, and the Preview-only guarded Pharmacy private publish/readback, atomic rollback-authority, exact logical recovery, server-authoritative ten-stage Admin state machine, completed P09 literal Preview lifecycle proof, P11 public/noindex authority, P12 bilingual public noindex route, P13 exact public rollback, P14 Index promotion and P15 Sitemap inclusion. The single Pharmacy remains authority-gated with independently reversible public, Index and Sitemap states, without JSON-LD, candidate links or Production execution.
 

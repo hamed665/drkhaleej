@@ -61,8 +61,8 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
-      to: '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
+      from: '"currentNext": "DUPLICATE-GEO-CONTRACT"',
+      to: '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
       expectedError: 'manifest.currentNext drifted',
     },
     {
@@ -75,8 +75,8 @@ try {
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0091_import_publish_queue_index_policy_compat.sql` |',
-      to: '| Current migration | `0090_import_pharmacy_sitemap_promotion.sql` |',
+      from: '| Current migration | `0092_import_source_evidence_ledger.sql` |',
+      to: '| Current migration | `0091_import_publish_queue_index_policy_compat.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {

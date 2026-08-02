@@ -26,10 +26,10 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #967** at baseline **`1e7e18e4b888eefbacfb9f1689d0be6b96501ad6`**.
-- Database/migration status: **validates through `0091_import_publish_queue_index_policy_compat.sql`**.
-- Completed migration set: **`0001` through `0091`**.
-- Current import-readiness implementation: **`SOURCE-EVIDENCE-LEDGER`**. P16 Intake Contract Convergence is complete and recorded in [`docs/import/INTAKE_CONTRACT_CONVERGENCE.md`](docs/import/INTAKE_CONTRACT_CONVERGENCE.md).
+- Import-readiness runtime is aligned through **PR #968** at baseline **`e11d598f87adae81aa09422ae05bb2861bfe1cf8`**.
+- Database/migration status: **validates through `0092_import_source_evidence_ledger.sql`**.
+- Completed migration set: **`0001` through `0092`**.
+- Current import-readiness implementation: **`DUPLICATE-GEO-CONTRACT`**. P17 Source Evidence Ledger is complete and recorded in [`docs/import/SOURCE_EVIDENCE_LEDGER.md`](docs/import/SOURCE_EVIDENCE_LEDGER.md); P16 remains recorded in [`docs/import/INTAKE_CONTRACT_CONVERGENCE.md`](docs/import/INTAKE_CONTRACT_CONVERGENCE.md).
 - P11 adds the isolated Preview Pharmacy public/noindex authority recorded in [`docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md`](docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md). P12 activates only its exact bilingual route as recorded in [`docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md`](docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md). P13 adds exact server-selected public rollback as recorded in [`docs/import/PHARMACY_PUBLIC_ROLLBACK.md`](docs/import/PHARMACY_PUBLIC_ROLLBACK.md). P14 adds independent, reversible Index promotion as recorded in [`docs/import/PHARMACY_INDEX_PROMOTION.md`](docs/import/PHARMACY_INDEX_PROMOTION.md). P15 adds independent, reversible Sitemap inclusion as recorded in [`docs/import/PHARMACY_SITEMAP_PROMOTION.md`](docs/import/PHARMACY_SITEMAP_PROMOTION.md); forward-only `0091` aligns the pre-existing Queue constraint with its reviewed terminal `index` state. The Sitemap reader requires the exact P15 evidence marker and canonical route match; JSON-LD, candidate links, other families and Production execution remain disabled.
 - Implementation remains phase-gated. Do not infer approval for new business features from the existence of current public/admin baselines.
 

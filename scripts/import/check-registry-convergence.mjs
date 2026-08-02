@@ -208,9 +208,9 @@ assert(
 
 assert(
   sources.roadmap.includes(
-    '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
+    '"currentMigration": "0092_import_source_evidence_ledger.sql"',
   ) &&
-    sources.roadmap.includes('"currentNext": "SOURCE-EVIDENCE-LEDGER"') &&
+    sources.roadmap.includes('"currentNext": "DUPLICATE-GEO-CONTRACT"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete') &&
