@@ -426,9 +426,10 @@ assert(
   sources.roadmap.includes(
     '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
   ) &&
-    sources.roadmap.includes('"currentNext": "INTAKE-CONTRACT-CONVERGENCE"') &&
+    sources.roadmap.includes('"currentNext": "SOURCE-EVIDENCE-LEDGER"') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
-    sources.roadmap.includes('Registry Convergence complete'),
+    sources.roadmap.includes('Registry Convergence complete') &&
+    sources.roadmap.includes('Wave 8     PARTIAL'),
   `${files.roadmap}: convergence completion/next transition is not aligned.`,
 );
 

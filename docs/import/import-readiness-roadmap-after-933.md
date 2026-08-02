@@ -26,14 +26,15 @@ Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noinde
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
 Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
+Wave 8     PARTIAL   P16 versioned intake convergence complete; Source Evidence ledger, duplicate/geo and Review remain gated
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #966
-Baseline commit: 4758ea46
-Last aligned: 2026-08-01
+Aligned through: PR #967
+Baseline commit: 1e7e18e4
+Last aligned: 2026-08-02
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -41,11 +42,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 966,
-  "runtimeBaseline": "4758ea463fb65a59beba6f70372c3cf57bd163f8",
-  "lastAligned": "2026-08-01",
+  "alignedThroughPr": 967,
+  "runtimeBaseline": "1e7e18e4b888eefbacfb9f1689d0be6b96501ad6",
+  "lastAligned": "2026-08-02",
   "currentMigration": "0091_import_publish_queue_index_policy_compat.sql",
-  "currentNext": "INTAKE-CONTRACT-CONVERGENCE",
+  "currentNext": "SOURCE-EVIDENCE-LEDGER",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -59,7 +60,8 @@ The full runtime baseline and the cross-document state tokens are machine-readab
     "7.1": "COMPLETE",
     "7.2": "COMPLETE",
     "7.3": "COMPLETE",
-    "7.4": "COMPLETE"
+    "7.4": "COMPLETE",
+    "8": "PARTIAL"
   },
   "currentReservationAudit": {
     "eventType": "reservation_created",
@@ -367,7 +369,7 @@ The existing dynamic Sitemap reader requires the P15 evidence marker and an
 exact canonical route match. JSON-LD, candidate links, later families and
 Production remain closed.
 
-## Wave 8 — Intake convergence and core families `OPEN`
+## Wave 8 — Intake convergence and core families `PARTIAL`
 
 Manual, CSV, Excel, API and AI-assisted ingestion converge into Unified Draft, canonical geo, evidence, duplicate detection, readiness, exact Review and controlled publish. Direct entity-table writes and entrypoint-specific publication are forbidden.
 
@@ -425,11 +427,12 @@ Do not add:
 ## Current next implementation
 
 ```text
-INTAKE-CONTRACT-CONVERGENCE
+SOURCE-EVIDENCE-LEDGER
 ```
 
-P11–P15 of the independently reversible Pharmacy public lifecycle are
-complete. The next gate is `INTAKE-CONTRACT-CONVERGENCE`; Manual, CSV, Excel,
-API and AI-assisted entrypoints may converge only into bounded Draft/Evidence
-contracts. Agent publish, Content, Hospital, Doctor, later-family, Bulk
-behavior and Production execution remain closed.
+P16 `INTAKE-CONTRACT-CONVERGENCE` is complete in
+[`INTAKE_CONTRACT_CONVERGENCE.md`](INTAKE_CONTRACT_CONVERGENCE.md). Manual,
+CSV, Excel, API and AI-assisted entrypoints converge only into the existing
+Unified Draft plus bounded Evidence references. The next gate is
+`SOURCE-EVIDENCE-LEDGER`; Agent publish, Content, Hospital, Doctor,
+later-family, Bulk behavior and Production execution remain closed.

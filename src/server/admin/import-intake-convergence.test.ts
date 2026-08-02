@@ -5,11 +5,17 @@ vi.mock("server-only", () => ({}));
 import { describe, expect, it } from "vitest";
 
 import {
+  IMPORT_INTAKE_MAX_EVIDENCE_REFERENCES,
+  IMPORT_INTAKE_SCHEMA_VERSION,
+  convergeImportIntake,
+  normalizeAiAssistedImport,
+  normalizeApiImport,
   normalizeCsvImport,
   normalizeExcelImport,
   normalizeManualImport,
   selectFirstPrivatePublishFamily,
   type ImportFamilyEvidence,
+  type ImportIntakeEvidenceReference,
   type ImportIntakePayload,
 } from "./import-intake-convergence";
 
@@ -34,44 +40,100 @@ function validPayload(): ImportIntakePayload {
       sourceId: "source-001",
       sourceName: "controlled-canary",
       importedBy: "actor-001",
-      importedAt: "2026-07-11T18:00:00.000Z",
+      importedAt: "2026-08-02T01:00:00.000Z",
     },
     duplicateCandidateIds: [],
     requiresManualReview: false,
   };
 }
 
+function evidenceReferences(): readonly ImportIntakeEvidenceReference[] {
+  return [{ referenceId: "evidence-001", fieldPaths: ["name", "canonicalGeo"] }];
+}
+
 function comparable(result: ReturnType<typeof normalizeManualImport>) {
-  const { source: _source, sourceEvidence, ...draft } = result.draft;
-  const { source: _evidenceSource, ...evidence } = sourceEvidence;
-  return { ...draft, sourceEvidence: evidence };
+  return Object.fromEntries(
+    Object.entries(result.draft!).map(([key, value]) => [
+      key,
+      key === "source"
+        ? "<converged-source>"
+        : key === "sourceEvidence"
+          ? { ...result.draft!.sourceEvidence, source: "<converged-source>" }
+          : value,
+    ]),
+  );
 }
 
 describe("import intake convergence", () => {
-  it("normalizes manual, CSV, and Excel through the same unified draft shape", () => {
+  it("normalizes all five entrypoints through the same versioned unified draft shape", () => {
     const payload = validPayload();
-    const manual = normalizeManualImport(payload);
-    const csv = normalizeCsvImport(payload);
-    const excel = normalizeExcelImport(payload);
+    const references = evidenceReferences();
+    const results = [
+      normalizeManualImport(payload, references),
+      normalizeCsvImport(payload, references),
+      normalizeExcelImport(payload, references),
+      normalizeApiImport(payload, references),
+      normalizeAiAssistedImport(payload, references),
+    ];
 
-    expect(manual.converged).toBe(true);
-    expect(csv.converged).toBe(true);
-    expect(excel.converged).toBe(true);
-    expect(comparable(csv)).toEqual(comparable(manual));
-    expect(comparable(excel)).toEqual(comparable(manual));
-    expect(manual.directEntityWriteAllowed).toBe(false);
-    expect(csv.directEntityWriteAllowed).toBe(false);
-    expect(excel.directEntityWriteAllowed).toBe(false);
-    expect(manual.draft.source).toBe("manual");
-    expect(csv.draft.source).toBe("csv");
-    expect(excel.draft.source).toBe("excel");
+    for (const result of results) {
+      expect(result.schemaVersion).toBe(IMPORT_INTAKE_SCHEMA_VERSION);
+      expect(result.converged).toBe(true);
+      expect(result.directEntityWriteAllowed).toBe(false);
+      expect(result.evidenceReferences).toEqual(references);
+    }
+    expect(comparable(results[1]!)).toEqual(comparable(results[0]!));
+    expect(results.map((result) => result.source)).toEqual(["manual", "csv", "excel", "api", "ai_assisted"]);
   });
 
-  it("returns the same blockers for equivalent invalid payloads", () => {
-    const payload: ImportIntakePayload = { ...validPayload(), canonicalGeo: null };
-    expect(normalizeManualImport(payload).blockers).toEqual(["canonical_geo_missing"]);
-    expect(normalizeCsvImport(payload).blockers).toEqual(["canonical_geo_missing"]);
-    expect(normalizeExcelImport(payload).blockers).toEqual(["canonical_geo_missing"]);
+  it("keeps an incomplete but contract-valid intake as a reviewable draft", () => {
+    const result = normalizeManualImport({ ...validPayload(), canonicalGeo: null }, evidenceReferences());
+
+    expect(result.converged).toBe(true);
+    expect(result.readyForValidation).toBe(false);
+    expect(result.draft).not.toBeNull();
+    expect(result.draftBlockers).toEqual(["canonical_geo_missing"]);
+  });
+
+  it("rejects an unknown schema version or source without manufacturing a fallback draft", () => {
+    const base = { schemaVersion: IMPORT_INTAKE_SCHEMA_VERSION, source: "manual", payload: validPayload(), evidenceReferences: evidenceReferences() };
+    const unknownVersion = convergeImportIntake({ ...base, schemaVersion: "drkhaleej.import.intake.v2" });
+    const unknownSource = convergeImportIntake({ ...base, source: "crawler" });
+
+    expect(unknownVersion.draft).toBeNull();
+    expect(unknownVersion.blockers).toEqual(["schema_version_unsupported"]);
+    expect(unknownSource.draft).toBeNull();
+    expect(unknownSource.blockers).toEqual(["source_unsupported"]);
+    expect(convergeImportIntake({ ...base, payload: { ...validPayload(), draftId: 123 } }).blockers).toEqual(["payload_invalid"]);
+  });
+
+  it("rejects missing, unbounded, duplicate, and structurally invalid evidence references", () => {
+    const base = { schemaVersion: IMPORT_INTAKE_SCHEMA_VERSION, source: "manual", payload: validPayload() };
+    const tooMany = Array.from({ length: IMPORT_INTAKE_MAX_EVIDENCE_REFERENCES + 1 }, (_, index) => ({ referenceId: `evidence-${index}`, fieldPaths: ["name"] }));
+
+    expect(convergeImportIntake({ ...base, evidenceReferences: [] }).blockers).toEqual(["evidence_references_missing"]);
+    expect(convergeImportIntake({ ...base, evidenceReferences: tooMany }).blockers).toEqual(["evidence_reference_count_exceeded"]);
+    expect(convergeImportIntake({ ...base, evidenceReferences: [{ referenceId: "same", fieldPaths: ["name"] }, { referenceId: "same", fieldPaths: ["legalName"] }] }).blockers).toEqual(["evidence_reference_duplicate"]);
+    expect(convergeImportIntake({ ...base, evidenceReferences: [{ referenceId: "raw", fieldPaths: ["name"], rawBody: "forbidden" }] }).blockers).toEqual(["evidence_reference_invalid"]);
+  });
+
+  it("forces AI-assisted intake into needs_review even when the producer requests otherwise", () => {
+    const result = normalizeAiAssistedImport({ ...validPayload(), requiresManualReview: false }, evidenceReferences());
+
+    expect(result.draft?.status).toBe("needs_review");
+    expect(result.draft?.requiresManualReview).toBe(true);
+    expect(result.requiresHumanReview).toBe(true);
+    expect(result.readyForValidation).toBe(false);
+    expect(result.blockers).toContain("manual_review_required");
+  });
+
+  it("does not treat draft convergence as publish, approval, or persistence authority", () => {
+    const result = normalizeApiImport(validPayload(), evidenceReferences());
+
+    expect(result.converged).toBe(true);
+    expect(result.readyForValidation).toBe(true);
+    expect(result.draft?.status).toBe("draft");
+    expect(result.directEntityWriteAllowed).toBe(false);
   });
 });
 

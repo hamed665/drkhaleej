@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #966 at `4758ea463fb65a59beba6f70372c3cf57bd163f8`**. The Registry Authority Audit, Registry Convergence and P11–P15 Pharmacy public lifecycle are complete. The current next implementation is **`INTAKE-CONTRACT-CONVERGENCE`**. It authorizes neither Agent/Worker runtime nor Production execution.
+Current import-readiness runtime baseline: **PR #967 at `1e7e18e4b888eefbacfb9f1689d0be6b96501ad6`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle and P16 Intake Contract Convergence are complete. The current next implementation is **`SOURCE-EVIDENCE-LEDGER`**. It authorizes neither Agent/Worker runtime nor Production execution.
 
 Completed migrations: **`0001` through `0091`**. Migration validation is expected through `0091_import_publish_queue_index_policy_compat.sql`.
 
