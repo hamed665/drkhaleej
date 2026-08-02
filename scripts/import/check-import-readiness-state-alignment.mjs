@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 967,
-  runtimeBaseline: '1e7e18e4b888eefbacfb9f1689d0be6b96501ad6',
+  alignedThroughPr: 968,
+  runtimeBaseline: 'e11d598f87adae81aa09422ae05bb2861bfe1cf8',
   lastAligned: '2026-08-02',
-  currentMigration: '0091_import_publish_queue_index_policy_compat.sql',
-  currentNext: 'SOURCE-EVIDENCE-LEDGER',
+  currentMigration: '0092_import_source_evidence_ledger.sql',
+  currentNext: 'DUPLICATE-GEO-CONTRACT',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -245,6 +245,10 @@ function validateMatrix(source, manifest) {
       'Complete',
       'docs/import/INTAKE_CONTRACT_CONVERGENCE.md',
     ],
+    'Source Evidence ledger': [
+      'Complete',
+      'docs/import/SOURCE_EVIDENCE_LEDGER.md',
+    ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
       'docs/import/INTAKE_CONTRACT_CONVERGENCE.md',
@@ -265,7 +269,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0091`',
+    '`0001` through `0092`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',

@@ -34,11 +34,14 @@ on:
       - 'scripts/import/check-pharmacy-index-promotion.mjs'
       - 'scripts/import/run-pharmacy-sitemap-promotion-proof.mjs'
       - 'scripts/import/check-pharmacy-sitemap-promotion.mjs'
+      - 'scripts/import/run-source-evidence-ledger-proof.mjs'
+      - 'scripts/import/check-source-evidence-ledger.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
       - 'docs/import/PHARMACY_INDEX_PROMOTION.md'
       - 'docs/import/PHARMACY_SITEMAP_PROMOTION.md'
+      - 'docs/import/SOURCE_EVIDENCE_LEDGER.md'
       - 'src/lib/routes/public.ts'
       - 'src/lib/catalog/public-provider-route-resolver*'
       - 'src/lib/catalog/public-provider-import-adapter*'
@@ -59,6 +62,7 @@ on:
       - 'src/server/admin/import-supabase-pharmacy-index-writer*'
       - 'src/server/admin/import-pharmacy-sitemap-operation*'
       - 'src/server/admin/import-supabase-pharmacy-sitemap-writer*'
+      - 'src/server/admin/import-source-evidence-ledger*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -145,6 +149,11 @@ env:
   PHARMACY_SITEMAP_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_SITEMAP_RUN_ID: github-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.event.pull_request.head.sha || github.sha }}
   PHARMACY_SITEMAP_EVIDENCE_PATH: artifacts/pharmacy-sitemap-promotion/proof.json
+  SOURCE_EVIDENCE_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  SOURCE_EVIDENCE_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  SOURCE_EVIDENCE_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  SOURCE_EVIDENCE_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  SOURCE_EVIDENCE_LEDGER_EVIDENCE_PATH: artifacts/source-evidence-ledger/proof.json
 
 permissions:
   contents: read
@@ -178,6 +187,7 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_BILINGUAL_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_PUBLIC_ROLLBACK_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_INDEX_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$SOURCE_EVIDENCE_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_SITEMAP_SOURCE_COMMIT"
 
       - name: Setup pnpm
@@ -203,7 +213,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion artifacts/source-evidence-ledger
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -218,6 +228,7 @@ jobs:
             pnpm import:pharmacy-public-rollback:validate
             pnpm import:pharmacy-index-promotion:validate
             pnpm import:pharmacy-sitemap-promotion:validate
+            pnpm import:source-evidence-ledger:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -313,6 +324,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-pharmacy-sitemap-promotion-proof.mjs 2>&1 | tee artifacts/pharmacy-sitemap-promotion/hosted-proof.log
 
+      - name: Prove private Source Evidence ledger lifecycle
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-source-evidence-ledger-proof.mjs 2>&1 | tee artifacts/source-evidence-ledger/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -400,5 +417,14 @@ jobs:
         with:
           name: pharmacy-sitemap-promotion-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/pharmacy-sitemap-promotion/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Source Evidence ledger evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-evidence-ledger-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/source-evidence-ledger/
           if-no-files-found: error
           retention-days: 30

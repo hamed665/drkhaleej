@@ -148,8 +148,8 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
-  '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
+  '"currentMigration": "0092_import_source_evidence_ledger.sql"',
+  '"currentNext": "DUPLICATE-GEO-CONTRACT"',
   'Wave 7.1   COMPLETE',
   'Wave 7.4   COMPLETE',
   'Wave 8     PARTIAL',

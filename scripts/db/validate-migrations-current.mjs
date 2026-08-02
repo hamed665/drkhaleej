@@ -57,6 +57,7 @@ const migrationNames = {
   pharmacySitemapPromotion: '0090_import_pharmacy_sitemap_promotion.sql',
   importPublishQueueIndexPolicyCompat:
     '0091_import_publish_queue_index_policy_compat.sql',
+  sourceEvidenceLedger: '0092_import_source_evidence_ledger.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -347,6 +348,38 @@ function validateImportPublishQueueIndexPolicyCompat() {
   ]) forbidPattern(content, pattern, message);
 }
 
+function validateSourceEvidenceLedger() {
+  const content = readMigration(migrationNames.sourceEvidenceLedger);
+  for (const [pattern, message] of [
+    [/P17 SOURCE-EVIDENCE-LEDGER/i, '0092 phase marker is missing.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_source_observations/i, '0092 must create private observations.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_source_evidence\s*\(/i, '0092 must create bounded evidence.'],
+    [/create\s+table\s+if\s+not\s+exists\s+public\.import_source_evidence_events/i, '0092 must create lifecycle audit events.'],
+    [/policy_status\s+in\s*\(\s*'accepted'\s*,\s*'denied'\s*,\s*'needs_review'\s*\)/i, '0092 must use the reviewed policy vocabulary.'],
+    [/interval\s+'30 days'/i, '0092 must cap standard retention at 30 days.'],
+    [/interval\s+'90 days'/i, '0092 must cap dispute retention at 90 days.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_register_source_evidence/i, '0092 must define atomic registration.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_read_source_evidence/i, '0092 must define bounded audited readback.'],
+    [/create\s+or\s+replace\s+function\s+public\.import_record_source_observation_deletion/i, '0092 must define deletion audit.'],
+    [/source_evidence_append_only/i, '0092 must protect append-only rows.'],
+    [/pg_advisory_xact_lock/i, '0092 must serialize idempotency-key races before readback.'],
+    [/for\s+update/i, '0092 must serialize idempotency and lifecycle transitions.'],
+    [/security\s+definer/i, '0092 RPCs must cross the private table boundary through a pinned definer.'],
+    [/set\s+search_path\s*=\s*pg_catalog\s*,\s*public/i, '0092 functions must pin search_path.'],
+    [/grant\s+execute[\s\S]*to\s+service_role/i, '0092 RPCs must be service-role-only.'],
+    [/alter\s+table\s+public\.import_source_observations\s+enable\s+row\s+level\s+security/i, '0092 must enable Observation RLS.'],
+    [/alter\s+table\s+public\.import_source_evidence\s+enable\s+row\s+level\s+security/i, '0092 must enable Evidence RLS.'],
+    [/alter\s+table\s+public\.import_source_evidence_events\s+enable\s+row\s+level\s+security/i, '0092 must enable event RLS.'],
+    [/revoke\s+all\s+on\s+table\s+public\.import_source_observations\s+from\s+public\s*,\s*anon\s*,\s*authenticated\s*,\s*service_role/i, '0092 must close direct Observation access.'],
+  ]) requirePattern(content, pattern, message);
+  for (const [pattern, message] of [
+    [/\bcreate\s+policy\b/i, '0092 must not create public policies.'],
+    [/grant\s+(select|insert|update|delete|all)\s+on\s+(table\s+)?public\.import_source_/i, '0092 must not grant direct table access.'],
+    [/\b(insert|update|delete)\s+(into\s+)?public\.(centers|doctors|import_publish_queue)\b/i, '0092 must not mutate canonical or publish rows.'],
+    [/json_ld|sitemap_policy|index_policy/i, '0092 must not open SEO promotion behavior.'],
+  ]) forbidPattern(content, pattern, message);
+}
+
 function runLegacyValidatorWithoutCurrentOnlyMigrations() {
   for (const [name, source, hidden] of currentOnlyMigrations) {
     requireCondition(existsSync(source), `${name} is missing before legacy validation.`);
@@ -394,5 +427,6 @@ validatePharmacyPublicRollback();
 validatePharmacyIndexPromotion();
 validatePharmacySitemapPromotion();
 validateImportPublishQueueIndexPolicyCompat();
+validateSourceEvidenceLedger();
 
-console.log('Current migration validation passed through 0091.');
+console.log('Current migration validation passed through 0092.');

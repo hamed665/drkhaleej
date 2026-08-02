@@ -26,14 +26,14 @@ Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noinde
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
 Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
-Wave 8     PARTIAL   P16 versioned intake convergence complete; Source Evidence ledger, duplicate/geo and Review remain gated
+Wave 8     PARTIAL   P16 intake convergence and P17 private Source Evidence ledger complete; duplicate/geo and Review remain gated
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #967
-Baseline commit: 1e7e18e4
+Aligned through: PR #968
+Baseline commit: e11d598f
 Last aligned: 2026-08-02
 ```
 
@@ -42,11 +42,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 967,
-  "runtimeBaseline": "1e7e18e4b888eefbacfb9f1689d0be6b96501ad6",
+  "alignedThroughPr": 968,
+  "runtimeBaseline": "e11d598f87adae81aa09422ae05bb2861bfe1cf8",
   "lastAligned": "2026-08-02",
-  "currentMigration": "0091_import_publish_queue_index_policy_compat.sql",
-  "currentNext": "SOURCE-EVIDENCE-LEDGER",
+  "currentMigration": "0092_import_source_evidence_ledger.sql",
+  "currentNext": "DUPLICATE-GEO-CONTRACT",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -427,12 +427,12 @@ Do not add:
 ## Current next implementation
 
 ```text
-SOURCE-EVIDENCE-LEDGER
+DUPLICATE-GEO-CONTRACT
 ```
 
-P16 `INTAKE-CONTRACT-CONVERGENCE` is complete in
-[`INTAKE_CONTRACT_CONVERGENCE.md`](INTAKE_CONTRACT_CONVERGENCE.md). Manual,
-CSV, Excel, API and AI-assisted entrypoints converge only into the existing
-Unified Draft plus bounded Evidence references. The next gate is
-`SOURCE-EVIDENCE-LEDGER`; Agent publish, Content, Hospital, Doctor,
+P17 `SOURCE-EVIDENCE-LEDGER` is complete in
+[`SOURCE_EVIDENCE_LEDGER.md`](SOURCE_EVIDENCE_LEDGER.md). It persists private
+Observation metadata, object-storage references and bounded selected Evidence
+without granting entity or publish authority. The next gate is
+`DUPLICATE-GEO-CONTRACT`; Agent publish, Content, Hospital, Doctor,
 later-family, Bulk behavior and Production execution remain closed.
