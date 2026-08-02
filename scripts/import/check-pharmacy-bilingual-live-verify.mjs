@@ -175,11 +175,12 @@ assert(
 
 for (const token of [
   '"currentMigration": "0091_import_publish_queue_index_policy_compat.sql"',
-  '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
+  '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
   'Wave 7.1   COMPLETE',
   'Wave 7.2   COMPLETE',
   'Wave 7.3   COMPLETE',
   'Wave 7.4   COMPLETE',
+  'Wave 8     PARTIAL',
   'PHARMACY_BILINGUAL_LIVE_VERIFY.md',
 ]) {
   includes(sources.roadmap, token, files.roadmap);

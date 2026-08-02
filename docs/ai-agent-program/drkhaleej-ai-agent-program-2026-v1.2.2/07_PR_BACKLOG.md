@@ -127,7 +127,7 @@ Mapping نهایی باید هنگام branch creation با V10.4 current main �
 
 ## Milestone M3/M4 — Intake و Automation
 
-- P16 INTAKE-CONTRACT-CONVERGENCE
+- P16 INTAKE-CONTRACT-CONVERGENCE — COMPLETE
 - P17 SOURCE-EVIDENCE-LEDGER
 - P18 DUPLICATE-GEO-CONTRACT
 - G-C CONTRACT-HARDENING gate

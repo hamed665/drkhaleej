@@ -61,9 +61,16 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
-      to: '"currentNext": "PHARMACY-SITEMAP-PROMOTION"',
+      from: '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
+      to: '"currentNext": "INTAKE-CONTRACT-CONVERGENCE"',
       expectedError: 'manifest.currentNext drifted',
+    },
+    {
+      label: 'wave 8 drift',
+      file: fixtureFiles[0],
+      from: '"8": "PARTIAL"',
+      to: '"8": "OPEN"',
+      expectedError: 'manifest.waves.8 drifted',
     },
     {
       label: 'current state drift',
