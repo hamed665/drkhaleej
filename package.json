@@ -56,6 +56,7 @@
     "import:pharmacy-sitemap-promotion:validate": "node scripts/import/check-pharmacy-sitemap-promotion.mjs && vitest run src/server/admin/import-supabase-pharmacy-sitemap-writer.test.ts src/server/admin/import-pharmacy-sitemap-operation.test.ts src/server/public/import-sitemap.test.ts",
     "import:intake-convergence:validate": "node scripts/import/check-import-intake-convergence.mjs && vitest run src/server/admin/import-intake-convergence.test.ts",
     "import:source-evidence-ledger:validate": "node scripts/import/check-source-evidence-ledger.mjs && vitest run src/server/admin/import-source-evidence-ledger.test.ts",
+    "import:duplicate-geo-contract:validate": "node scripts/import/check-import-duplicate-geo-contract.mjs && vitest run src/server/admin/import-duplicate-geo-contract.test.ts",
     "import:reservation-db-safety:validate": "node scripts/import/check-import-reservation-db-safety-proof.mjs",
     "import:reservation-audit-split:validate": "node scripts/import/check-import-reservation-audit-split.mjs",
     "import:state-alignment:validate": "node scripts/import/check-import-readiness-state-alignment.mjs && node scripts/import/test-import-readiness-state-alignment.mjs",

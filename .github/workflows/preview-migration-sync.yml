@@ -36,12 +36,14 @@ on:
       - 'scripts/import/check-pharmacy-sitemap-promotion.mjs'
       - 'scripts/import/run-source-evidence-ledger-proof.mjs'
       - 'scripts/import/check-source-evidence-ledger.mjs'
+      - 'scripts/import/check-import-duplicate-geo-contract.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
       - 'docs/import/PHARMACY_INDEX_PROMOTION.md'
       - 'docs/import/PHARMACY_SITEMAP_PROMOTION.md'
       - 'docs/import/SOURCE_EVIDENCE_LEDGER.md'
+      - 'docs/import/DUPLICATE_GEO_CONTRACT.md'
       - 'src/lib/routes/public.ts'
       - 'src/lib/catalog/public-provider-route-resolver*'
       - 'src/lib/catalog/public-provider-import-adapter*'
@@ -63,6 +65,7 @@ on:
       - 'src/server/admin/import-pharmacy-sitemap-operation*'
       - 'src/server/admin/import-supabase-pharmacy-sitemap-writer*'
       - 'src/server/admin/import-source-evidence-ledger*'
+      - 'src/server/admin/import-duplicate-geo-contract*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -229,6 +232,7 @@ jobs:
             pnpm import:pharmacy-index-promotion:validate
             pnpm import:pharmacy-sitemap-promotion:validate
             pnpm import:source-evidence-ledger:validate
+            pnpm import:duplicate-geo-contract:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
