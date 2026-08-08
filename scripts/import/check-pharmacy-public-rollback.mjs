@@ -110,7 +110,7 @@ assert(
   sources.roadmap.includes(
     '"currentMigration": "0092_import_source_evidence_ledger.sql"',
   ) &&
-    sources.roadmap.includes('"currentNext": "CONTRACT-HARDENING"') &&
+    sources.roadmap.includes('"currentNext": "ENTITY-CANDIDATE-PIPELINE"') &&
     sources.roadmap.includes('Wave 7.2   COMPLETE') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Wave 8     PARTIAL'),

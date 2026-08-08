@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 969,
-  runtimeBaseline: '2ab5e6754bca0e398655b43b5574299ff5644d42',
-  lastAligned: '2026-08-03',
+  alignedThroughPr: 970,
+  runtimeBaseline: 'd17ce242ae442ca607a9167abfcf01ede1261ceb',
+  lastAligned: '2026-08-08',
   currentMigration: '0092_import_source_evidence_ledger.sql',
-  currentNext: 'CONTRACT-HARDENING',
+  currentNext: 'ENTITY-CANDIDATE-PIPELINE',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',

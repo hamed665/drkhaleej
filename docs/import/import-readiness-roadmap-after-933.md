@@ -26,15 +26,15 @@ Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noinde
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
 Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
-Wave 8     PARTIAL   P16 intake, P17 Source Evidence and P18 duplicate/geo candidate contracts complete; contract hardening and Review remain gated
+Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidates and Gate B Contract Hardening complete; Entity Candidate persistence and Review remain gated
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #969
-Baseline commit: 2ab5e675
-Last aligned: 2026-08-03
+Aligned through: PR #970
+Baseline commit: d17ce242
+Last aligned: 2026-08-08
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -42,11 +42,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 969,
-  "runtimeBaseline": "2ab5e6754bca0e398655b43b5574299ff5644d42",
-  "lastAligned": "2026-08-03",
+  "alignedThroughPr": 970,
+  "runtimeBaseline": "d17ce242ae442ca607a9167abfcf01ede1261ceb",
+  "lastAligned": "2026-08-08",
   "currentMigration": "0092_import_source_evidence_ledger.sql",
-  "currentNext": "CONTRACT-HARDENING",
+  "currentNext": "ENTITY-CANDIDATE-PIPELINE",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -427,12 +427,11 @@ Do not add:
 ## Current next implementation
 
 ```text
-CONTRACT-HARDENING
+ENTITY-CANDIDATE-PIPELINE
 ```
 
-P18 `DUPLICATE-GEO-CONTRACT` is complete in
-[`DUPLICATE_GEO_CONTRACT.md`](DUPLICATE_GEO_CONTRACT.md). It creates only
-Evidence-bound duplicate and canonical-geo candidates against existing
-authorities, without granting resolution, merge, verification, entity-write or
-publish authority. The next gate is `CONTRACT-HARDENING`; Agent publish, Content, Hospital, Doctor,
-later-family, Bulk behavior and Production execution remain closed.
+Gate B `CONTRACT-HARDENING` is complete in
+[`CONTRACT_HARDENING.md`](CONTRACT_HARDENING.md). It reconciles and validates the nine v1.2.2
+schemas and adds versioned canonical hashing without activating any writer or runtime authority.
+The next gate is `ENTITY-CANDIDATE-PIPELINE`; Agent publish, Human resolution, Worker runtime,
+Content, Hospital, Doctor, later-family, Bulk behavior and Production execution remain closed.
