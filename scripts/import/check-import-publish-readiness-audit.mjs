@@ -6,6 +6,7 @@ import './check-import-unified-draft-entity.mjs';
 import './check-import-intake-convergence.mjs';
 import './check-source-evidence-ledger.mjs';
 import './check-import-duplicate-geo-contract.mjs';
+import './check-import-contract-hardening.mjs';
 import './check-import-pharmacy-private-mutation-adapter.mjs';
 import './check-import-pharmacy-canonical-mutation-patch.mjs';
 import './check-import-pharmacy-metadata-locale-preservation.mjs';

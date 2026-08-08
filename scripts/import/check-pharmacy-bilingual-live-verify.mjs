@@ -175,7 +175,7 @@ assert(
 
 for (const token of [
   '"currentMigration": "0092_import_source_evidence_ledger.sql"',
-  '"currentNext": "CONTRACT-HARDENING"',
+  '"currentNext": "ENTITY-CANDIDATE-PIPELINE"',
   'Wave 7.1   COMPLETE',
   'Wave 7.2   COMPLETE',
   'Wave 7.3   COMPLETE',
