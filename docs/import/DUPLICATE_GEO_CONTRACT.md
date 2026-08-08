@@ -33,7 +33,7 @@ Accepted output can be persisted only as candidate material. Every result fixes 
 - `directEntityWriteAllowed: false`
 - `publishAllowed: false`
 
-The boundary neither calls a database client nor changes canonical records. Human Review, the next `CONTRACT-HARDENING` gate, runtime wiring, Production execution, Content, Hospital, Doctor, later families and Bulk remain gated.
+The boundary neither calls a database client nor changes canonical records. The subsequent `CONTRACT-HARDENING` gate is recorded separately; Human Review, runtime wiring, Production execution, Content, Hospital, Doctor, later families and Bulk remain gated.
 
 ## Validation
 

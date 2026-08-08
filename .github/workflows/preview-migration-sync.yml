@@ -37,6 +37,7 @@ on:
       - 'scripts/import/run-source-evidence-ledger-proof.mjs'
       - 'scripts/import/check-source-evidence-ledger.mjs'
       - 'scripts/import/check-import-duplicate-geo-contract.mjs'
+      - 'scripts/import/check-import-contract-hardening.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
@@ -44,6 +45,9 @@ on:
       - 'docs/import/PHARMACY_SITEMAP_PROMOTION.md'
       - 'docs/import/SOURCE_EVIDENCE_LEDGER.md'
       - 'docs/import/DUPLICATE_GEO_CONTRACT.md'
+      - 'docs/import/CONTRACT_HARDENING.md'
+      - 'docs/import/contract-hardening-reconciliation.json'
+      - 'docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/**'
       - 'src/lib/routes/public.ts'
       - 'src/lib/catalog/public-provider-route-resolver*'
       - 'src/lib/catalog/public-provider-import-adapter*'
@@ -66,6 +70,7 @@ on:
       - 'src/server/admin/import-supabase-pharmacy-sitemap-writer*'
       - 'src/server/admin/import-source-evidence-ledger*'
       - 'src/server/admin/import-duplicate-geo-contract*'
+      - 'src/server/admin/import-contract-canonical-hash*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -207,6 +212,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install locked contract validator dependencies
+        run: npm --prefix docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2 ci --ignore-scripts --cache "${RUNNER_TEMP}/drkhaleej-contract-npm-cache"
+
       - name: Setup pinned Supabase CLI
         uses: supabase/setup-cli@v1
         with:
@@ -233,6 +241,7 @@ jobs:
             pnpm import:pharmacy-sitemap-promotion:validate
             pnpm import:source-evidence-ledger:validate
             pnpm import:duplicate-geo-contract:validate
+            pnpm import:contract-hardening:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight

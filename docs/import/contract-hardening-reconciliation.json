@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "drkhaleej.import.contractHardeningReconciliation.v1",
+  "baseline": {
+    "pullRequest": 970,
+    "commit": "d17ce242ae442ca607a9167abfcf01ede1261ceb",
+    "alignedAt": "2026-08-08"
+  },
+  "contractPackageVersion": "1.2.2",
+  "canonicalizationVersion": "drkhaleej.import.canonicalJson.v1",
+  "currentAuthorities": {
+    "entityFamily": "src/server/admin/import-entity-domain.ts#ImportEntityType",
+    "intake": "drkhaleej.import.intake.v1",
+    "sourceEvidence": "drkhaleej.import.sourceEvidenceLedger.v1",
+    "duplicateGeoSchema": "drkhaleej.import.duplicateGeo.v1",
+    "duplicateGeoPolicy": "drkhaleej.import.duplicateGeoPolicy.v1",
+    "duplicateCandidates": "import_duplicate_candidates",
+    "governorate": "geo_regions.id"
+  },
+  "contracts": [
+    {
+      "schemaPath": "contracts/article-draft.schema.json",
+      "schemaId": "urn:drkhaleej:schema:article-draft:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "CONTENT_AUTHORITY_GATED"
+    },
+    {
+      "schemaPath": "contracts/article-review-decision.schema.json",
+      "schemaId": "urn:drkhaleej:schema:article-review-decision:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "CONTENT_AUTHORITY_GATED"
+    },
+    {
+      "schemaPath": "contracts/automation-job.schema.json",
+      "schemaId": "urn:drkhaleej:schema:automation-job:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "WORKER_RUNTIME_ADR_GATED"
+    },
+    {
+      "schemaPath": "contracts/entity-draft.schema.json",
+      "schemaId": "urn:drkhaleej:schema:entity-draft:1.2.2",
+      "status": "HARDENED_CANDIDATE_BOUNDARY",
+      "runtimeDisposition": "ENTITY_CANDIDATE_PIPELINE_NEXT"
+    },
+    {
+      "schemaPath": "contracts/entity-review-decision.schema.json",
+      "schemaId": "urn:drkhaleej:schema:entity-review-decision:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "ENTITY_RESOLUTION_GATE_GATED"
+    },
+    {
+      "schemaPath": "contracts/persian-report.schema.json",
+      "schemaId": "urn:drkhaleej:schema:persian-operations-report:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "WORKER_RUNTIME_ADR_GATED"
+    },
+    {
+      "schemaPath": "contracts/service-identity-claims.schema.json",
+      "schemaId": "urn:drkhaleej:schema:service-identity-claims:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "WORKER_RUNTIME_ADR_GATED"
+    },
+    {
+      "schemaPath": "contracts/source-observation.schema.json",
+      "schemaId": "urn:drkhaleej:schema:source-observation:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "P17_AUTHORITY_UNCHANGED"
+    },
+    {
+      "schemaPath": "contracts/source-policy.schema.json",
+      "schemaId": "urn:drkhaleej:schema:source-policy:1.2.2",
+      "status": "HARDENED_SCHEMA_ONLY",
+      "runtimeDisposition": "P17_AUTHORITY_UNCHANGED"
+    }
+  ],
+  "authorityClaims": {
+    "agentReviewAllowed": false,
+    "duplicateResolutionAllowed": false,
+    "geoVerificationAllowed": false,
+    "workerRuntimeAllowed": false,
+    "contentRuntimeAllowed": false,
+    "directEntityWriteAllowed": false,
+    "publishAllowed": false,
+    "productionExecutionAllowed": false
+  },
+  "repositoryChanges": {
+    "dependencySetChanged": false,
+    "migrationAdded": false,
+    "routeAdded": false,
+    "rpcAdded": false
+  },
+  "currentNext": "ENTITY-CANDIDATE-PIPELINE"
+}
