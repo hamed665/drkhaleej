@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #968 at baseline `e11d598f87adae81aa09422ae05bb2861bfe1cf8` (last aligned 2026-08-02).
+- Import-readiness runtime is aligned through PR #969 at baseline `2ab5e6754bca0e398655b43b5574299ff5644d42` (last aligned 2026-08-03).
 - Migrations validate through `0092_import_source_evidence_ledger.sql`.
-- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence and P17 Source Evidence Ledger are complete. The current next implementation is `DUPLICATE-GEO-CONTRACT`.
+- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger and P18 Duplicate / Geo Candidate Contract are complete. The current next implementation is `CONTRACT-HARDENING`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -111,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #968 |
-| Runtime baseline | `e11d598f87adae81aa09422ae05bb2861bfe1cf8` |
-| Last aligned | `2026-08-02` |
+| Aligned through | PR #969 |
+| Runtime baseline | `2ab5e6754bca0e398655b43b5574299ff5644d42` |
+| Last aligned | `2026-08-03` |
 | Current migration | `0092_import_source_evidence_ledger.sql` |
-| Current next | `DUPLICATE-GEO-CONTRACT` |
+| Current next | `CONTRACT-HARDENING` |
 
 ## Import readiness capability mapping
 
@@ -149,7 +149,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Pharmacy Sitemap promotion | Complete | `docs/import/PHARMACY_SITEMAP_PROMOTION.md` | `INTAKE-CONTRACT-CONVERGENCE` |
 | Intake contract convergence | Complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | `SOURCE-EVIDENCE-LEDGER` |
 | Source Evidence ledger | Complete | `docs/import/SOURCE_EVIDENCE_LEDGER.md` | `DUPLICATE-GEO-CONTRACT` |
-| AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Duplicate/geo contract; no runtime or publish |
+| Duplicate / geo candidate contract | Complete | `docs/import/DUPLICATE_GEO_CONTRACT.md` | `CONTRACT-HARDENING` |
+| AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Contract hardening; no runtime or publish |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
 The current reservation audit signature is `event_type=reservation_created`, `event_payload.phase=reservation`, and `schema_version=drkhaleej.import.publishAudit.v2`; legacy reservation-phase `execution_started` rows remain compatible only with prior schema versions. Mutation execution uses `execution_started + phase=mutation` and terminal success under `drkhaleej.import.publishAudit.v3`.

@@ -61,8 +61,8 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "DUPLICATE-GEO-CONTRACT"',
-      to: '"currentNext": "SOURCE-EVIDENCE-LEDGER"',
+      from: '"currentNext": "CONTRACT-HARDENING"',
+      to: '"currentNext": "DUPLICATE-GEO-CONTRACT"',
       expectedError: 'manifest.currentNext drifted',
     },
     {

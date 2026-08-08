@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #968 at `e11d598f87adae81aa09422ae05bb2861bfe1cf8`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence and P17 Source Evidence Ledger are complete. The current next implementation is **`DUPLICATE-GEO-CONTRACT`**. It authorizes neither Agent/Worker runtime nor Production execution.
+Current import-readiness runtime baseline: **PR #969 at `2ab5e6754bca0e398655b43b5574299ff5644d42`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger and P18 Duplicate / Geo Candidate Contract are complete. The current next implementation is **`CONTRACT-HARDENING`**. It authorizes neither Agent/Worker runtime nor Production execution.
 
 Completed migrations: **`0001` through `0092`**. Migration validation is expected through `0092_import_source_evidence_ledger.sql`.
 

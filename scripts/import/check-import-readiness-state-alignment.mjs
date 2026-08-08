@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 968,
-  runtimeBaseline: 'e11d598f87adae81aa09422ae05bb2861bfe1cf8',
-  lastAligned: '2026-08-02',
+  alignedThroughPr: 969,
+  runtimeBaseline: '2ab5e6754bca0e398655b43b5574299ff5644d42',
+  lastAligned: '2026-08-03',
   currentMigration: '0092_import_source_evidence_ledger.sql',
-  currentNext: 'DUPLICATE-GEO-CONTRACT',
+  currentNext: 'CONTRACT-HARDENING',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -248,6 +248,10 @@ function validateMatrix(source, manifest) {
     'Source Evidence ledger': [
       'Complete',
       'docs/import/SOURCE_EVIDENCE_LEDGER.md',
+    ],
+    'Duplicate / geo candidate contract': [
+      'Complete',
+      'docs/import/DUPLICATE_GEO_CONTRACT.md',
     ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
