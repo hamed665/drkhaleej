@@ -54,6 +54,7 @@ requireTokens(files.migration, migration, [
 forbidPattern(files.migration, migration, /\bcreate\s+policy\b/i, 'must not create public policies');
 forbidPattern(files.migration, migration, /\b(insert|update|delete)\s+(into\s+)?public\.(centers|doctors|import_publish_queue)\b/i, 'must not mutate canonical or publish authorities');
 forbidPattern(files.migration, migration, /grant\s+execute[\s\S]*to\s+(anon|authenticated)/i, 'must not expose RPCs to public roles');
+forbidPattern(files.migration, migration, /<>\s+case\s+when/i, 'must parenthesize CASE operands in PL/pgSQL IF conditions');
 
 requireTokens(files.runtime, runtime, [
   'drkhaleej.import.entityCandidatePipeline.v1',

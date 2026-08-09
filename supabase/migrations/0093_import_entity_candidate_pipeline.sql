@@ -317,7 +317,7 @@ begin
     v_readback := public.import_entity_candidate_pipeline_readback(v_existing.id);
     if v_readback is null
       or (v_readback->>'duplicateCandidateCount')::integer <> jsonb_array_length(p_pipeline->'duplicateCandidates')
-      or (v_readback->>'geoMappingCount')::integer <> case when p_pipeline->'geoCandidate' = 'null'::jsonb then 0 else 1 end then
+      or (v_readback->>'geoMappingCount')::integer <> (case when p_pipeline->'geoCandidate' = 'null'::jsonb then 0 else 1 end) then
       return jsonb_build_object('status', 'conflict', 'reason', 'candidate_readback_integrity_mismatch');
     end if;
     return v_readback || jsonb_build_object('status', 'replayed');
@@ -588,7 +588,7 @@ begin
   v_geo_count := (v_readback->>'geoMappingCount')::integer;
   if v_readback is null
     or v_duplicate_count <> jsonb_array_length(v_duplicates)
-    or v_geo_count <> case when v_geo = 'null'::jsonb then 0 else 1 end
+    or v_geo_count <> (case when v_geo = 'null'::jsonb then 0 else 1 end)
     or coalesce(v_readback->>'receiptHash', '') !~ '^[a-f0-9]{64}$' then
     raise exception 'candidate_persistence_readback_mismatch' using errcode = '55000';
   end if;
