@@ -28,7 +28,7 @@ Draft/revision binding uses `drkhaleej.import.canonicalJson.v1` with SHA-256 dom
 - rejects non-finite numbers, unsupported values, cycles, normalized-key collisions and exceeded depth/size bounds;
 - returns bounded hash metadata only, never the canonical payload.
 
-This PR supplies hashing and contract validation only. Candidate persistence starts, if approved, in `ENTITY-CANDIDATE-PIPELINE`; reviewer authority remains for `ENTITY-RESOLUTION-GATE`.
+Gate B supplied hashing and contract validation only. Candidate persistence was subsequently completed in `ENTITY-CANDIDATE-PIPELINE`; reviewer authority remains for `ENTITY-RESOLUTION-GATE`.
 
 ## Authority boundary
 

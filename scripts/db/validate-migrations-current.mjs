@@ -26,6 +26,7 @@ const validators = {
   pharmacyAuthorizationV2: script('import', 'check-import-pharmacy-authorization-persistence-v2.mjs'),
   pharmacyAuthorizationLifecycle: script('import', 'check-import-pharmacy-authorization-invalidation-readback.mjs'),
   pharmacyExpectedVersionTimestamp: script('db', 'check-import-pharmacy-expected-version-timestamp-equivalence.mjs'),
+  entityCandidatePipeline: script('import', 'check-entity-candidate-pipeline.mjs'),
 };
 
 const migrationNames = {
@@ -58,6 +59,7 @@ const migrationNames = {
   importPublishQueueIndexPolicyCompat:
     '0091_import_publish_queue_index_policy_compat.sql',
   sourceEvidenceLedger: '0092_import_source_evidence_ledger.sql',
+  entityCandidatePipeline: '0093_import_entity_candidate_pipeline.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -428,5 +430,7 @@ validatePharmacyIndexPromotion();
 validatePharmacySitemapPromotion();
 validateImportPublishQueueIndexPolicyCompat();
 validateSourceEvidenceLedger();
+requireCondition(existsSync(migration(migrationNames.entityCandidatePipeline)), `${migrationNames.entityCandidatePipeline} is missing.`);
+runValidator(validators.entityCandidatePipeline);
 
-console.log('Current migration validation passed through 0092.');
+console.log('Current migration validation passed through 0093.');

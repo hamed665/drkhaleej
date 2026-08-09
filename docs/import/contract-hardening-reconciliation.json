@@ -39,7 +39,7 @@
       "schemaPath": "contracts/entity-draft.schema.json",
       "schemaId": "urn:drkhaleej:schema:entity-draft:1.2.2",
       "status": "HARDENED_CANDIDATE_BOUNDARY",
-      "runtimeDisposition": "ENTITY_CANDIDATE_PIPELINE_NEXT"
+      "runtimeDisposition": "ENTITY_CANDIDATE_PIPELINE_COMPLETE"
     },
     {
       "schemaPath": "contracts/entity-review-decision.schema.json",
@@ -88,5 +88,5 @@
     "routeAdded": false,
     "rpcAdded": false
   },
-  "currentNext": "ENTITY-CANDIDATE-PIPELINE"
+  "currentNext": "ENTITY-RESOLUTION-GATE"
 }

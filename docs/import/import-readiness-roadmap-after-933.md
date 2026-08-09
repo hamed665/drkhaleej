@@ -26,15 +26,15 @@ Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noinde
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
 Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
-Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidates and Gate B Contract Hardening complete; Entity Candidate persistence and Review remain gated
+Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidates, Gate B Contract Hardening and Entity Candidate persistence complete; Human Review remains gated
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #970
-Baseline commit: d17ce242
-Last aligned: 2026-08-08
+Aligned through: PR #971
+Baseline commit: 4cda767
+Last aligned: 2026-08-09
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -42,11 +42,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 970,
-  "runtimeBaseline": "d17ce242ae442ca607a9167abfcf01ede1261ceb",
-  "lastAligned": "2026-08-08",
-  "currentMigration": "0092_import_source_evidence_ledger.sql",
-  "currentNext": "ENTITY-CANDIDATE-PIPELINE",
+  "alignedThroughPr": 971,
+  "runtimeBaseline": "4cda76704813449719982c5d72b6c28b60788ab0",
+  "lastAligned": "2026-08-09",
+  "currentMigration": "0093_import_entity_candidate_pipeline.sql",
+  "currentNext": "ENTITY-RESOLUTION-GATE",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -427,11 +427,11 @@ Do not add:
 ## Current next implementation
 
 ```text
-ENTITY-CANDIDATE-PIPELINE
+ENTITY-RESOLUTION-GATE
 ```
 
-Gate B `CONTRACT-HARDENING` is complete in
-[`CONTRACT_HARDENING.md`](CONTRACT_HARDENING.md). It reconciles and validates the nine v1.2.2
-schemas and adds versioned canonical hashing without activating any writer or runtime authority.
-The next gate is `ENTITY-CANDIDATE-PIPELINE`; Agent publish, Human resolution, Worker runtime,
+`ENTITY-CANDIDATE-PIPELINE` is complete in
+[`ENTITY_CANDIDATE_PIPELINE.md`](ENTITY_CANDIDATE_PIPELINE.md). It atomically persists only
+P16/P17/P18-bound `collecting`/`needs_review` Candidate/Evidence with idempotent readback.
+The next gate is `ENTITY-RESOLUTION-GATE`; Agent publish, unbound Human resolution, Worker runtime,
 Content, Hospital, Doctor, later-family, Bulk behavior and Production execution remain closed.
