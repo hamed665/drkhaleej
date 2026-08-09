@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #970 at baseline `d17ce242ae442ca607a9167abfcf01ede1261ceb` (last aligned 2026-08-08).
-- Migrations validate through `0092_import_source_evidence_ledger.sql`.
-- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract and Gate B Contract Hardening are complete. The current next implementation is `ENTITY-CANDIDATE-PIPELINE`.
+- Import-readiness runtime is aligned through PR #971 at baseline `4cda76704813449719982c5d72b6c28b60788ab0` (last aligned 2026-08-09).
+- Migrations validate through `0093_import_entity_candidate_pipeline.sql`.
+- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening and Entity Candidate Pipeline are complete. The current next implementation is `ENTITY-RESOLUTION-GATE`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -111,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #970 |
-| Runtime baseline | `d17ce242ae442ca607a9167abfcf01ede1261ceb` |
-| Last aligned | `2026-08-08` |
-| Current migration | `0092_import_source_evidence_ledger.sql` |
-| Current next | `ENTITY-CANDIDATE-PIPELINE` |
+| Aligned through | PR #971 |
+| Runtime baseline | `4cda76704813449719982c5d72b6c28b60788ab0` |
+| Last aligned | `2026-08-09` |
+| Current migration | `0093_import_entity_candidate_pipeline.sql` |
+| Current next | `ENTITY-RESOLUTION-GATE` |
 
 ## Import readiness capability mapping
 
@@ -151,6 +151,7 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Source Evidence ledger | Complete | `docs/import/SOURCE_EVIDENCE_LEDGER.md` | `DUPLICATE-GEO-CONTRACT` |
 | Duplicate / geo candidate contract | Complete | `docs/import/DUPLICATE_GEO_CONTRACT.md` | `CONTRACT-HARDENING` |
 | Gate B Contract Hardening | Complete | `docs/import/CONTRACT_HARDENING.md` | `ENTITY-CANDIDATE-PIPELINE` |
+| Entity Candidate Pipeline | Complete | `docs/import/ENTITY_CANDIDATE_PIPELINE.md` | `ENTITY-RESOLUTION-GATE` |
 | AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Contract hardening; no runtime or publish |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -181,6 +182,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `SOURCE-EVIDENCE-LEDGER` | Phase 9 | Phase 10 | Phase 6 |
 | `DUPLICATE-GEO-CONTRACT` | Phase 9 | Phase 10 | Phase 6 |
 | `CONTRACT-HARDENING` | Phase 9 | Phase 10 | Phase 6 |
+| `ENTITY-CANDIDATE-PIPELINE` | Phase 9 | Phase 10 | Phase 6 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 

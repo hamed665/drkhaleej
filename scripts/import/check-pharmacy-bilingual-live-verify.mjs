@@ -174,8 +174,8 @@ assert(
 );
 
 for (const token of [
-  '"currentMigration": "0092_import_source_evidence_ledger.sql"',
-  '"currentNext": "ENTITY-CANDIDATE-PIPELINE"',
+  '"currentMigration": "0093_import_entity_candidate_pipeline.sql"',
+  '"currentNext": "ENTITY-RESOLUTION-GATE"',
   'Wave 7.1   COMPLETE',
   'Wave 7.2   COMPLETE',
   'Wave 7.3   COMPLETE',

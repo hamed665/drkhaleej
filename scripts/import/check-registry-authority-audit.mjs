@@ -424,9 +424,9 @@ assert(
 );
 assert(
   sources.roadmap.includes(
-    '"currentMigration": "0092_import_source_evidence_ledger.sql"',
+    '"currentMigration": "0093_import_entity_candidate_pipeline.sql"',
   ) &&
-    sources.roadmap.includes('"currentNext": "ENTITY-CANDIDATE-PIPELINE"') &&
+    sources.roadmap.includes('"currentNext": "ENTITY-RESOLUTION-GATE"') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete') &&
     sources.roadmap.includes('Wave 8     PARTIAL'),

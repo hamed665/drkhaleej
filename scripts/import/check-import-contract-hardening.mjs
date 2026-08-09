@@ -38,7 +38,7 @@ assert(reconciliation.baseline?.commit === 'd17ce242ae442ca607a9167abfcf01ede126
 assert(reconciliation.baseline?.alignedAt === '2026-08-08', 'baseline alignment date drifted');
 assert(reconciliation.contractPackageVersion === '1.2.2', 'contract package version drifted');
 assert(reconciliation.canonicalizationVersion === 'drkhaleej.import.canonicalJson.v1', 'canonicalization version drifted');
-assert(reconciliation.currentNext === 'ENTITY-CANDIDATE-PIPELINE', 'next gate drifted');
+assert(reconciliation.currentNext === 'ENTITY-RESOLUTION-GATE', 'next gate drifted');
 
 const contractDirectory = path.join(packageRoot, 'contracts');
 const schemaNames = (await readdir(contractDirectory))
@@ -150,6 +150,7 @@ requireTokens(files.docs, sources.docs, [
   '`contentRuntimeAllowed: false`',
   '`publishAllowed: false`',
   '`ENTITY-CANDIDATE-PIPELINE`',
+  '`ENTITY-RESOLUTION-GATE`',
 ]);
 requireTokens(files.packageJson, sources.packageJson, [
   '"import:contract-hardening:validate"',
