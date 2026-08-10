@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #971 at baseline `4cda76704813449719982c5d72b6c28b60788ab0` (last aligned 2026-08-09).
-- Migrations validate through `0093_import_entity_candidate_pipeline.sql`.
-- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening and Entity Candidate Pipeline are complete. The current next implementation is `ENTITY-RESOLUTION-GATE`.
+- Import-readiness runtime is aligned through PR #972 at baseline `fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972` (last aligned 2026-08-10).
+- Migrations validate through `0094_import_entity_resolution_gate.sql`.
+- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline and additive Entity Resolution decisions are complete. The current next implementation is `ROADMAP-DECISION-REQUIRED`.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -97,7 +97,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 | Pharmacy public rollback | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Restores the prior Queue exactly or removes the P11-created Queue; tamper fails closed and concurrency/replay are proven. |
 | Pharmacy Index promotion | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Independent P14 authority promotes only robots/Index state, keeps Sitemap excluded and restores exact P11 public/noindex state. |
 | Pharmacy Sitemap promotion | Completed Preview authority | Phase 9 | Phase 10 | Phase 18 | Independent P15 authority includes only the exact promoted P14 Queue and restores exact P14 Index state. |
-| Migrations through `0092` | Completed | Phase 2 / Phase 4 / Phase 9 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 / Phase 18 | Existing SQL migrations must not be modified unless approved. |
+| Migrations through `0094` | Completed | Phase 2 / Phase 4 / Phase 9 | Phase 2 / Phase 3 / Phase 10 | Phase 1 / Phase 2 / Phase 6 / Phase 18 | Existing SQL migrations must not be modified unless approved. |
 | Review companion foundation | Foundation only | Phase 2 | Phase 2 / Phase 3 | Phase 10 | Full review product is not implemented. |
 | Official Offers | Not started / phase-gated | Phase 6 | Phase 8 | Phase 13 | Needed before real Special Offer Placement. |
 | Article placement engine | Not started / phase-gated | Phase 3 / Phase 6 | Phase 4 / Phase 8 | Phase 9 / Phase 13 / Phase 15 | Future slot system only after approval. |
@@ -111,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #971 |
-| Runtime baseline | `4cda76704813449719982c5d72b6c28b60788ab0` |
-| Last aligned | `2026-08-09` |
-| Current migration | `0093_import_entity_candidate_pipeline.sql` |
-| Current next | `ENTITY-RESOLUTION-GATE` |
+| Aligned through | PR #972 |
+| Runtime baseline | `fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972` |
+| Last aligned | `2026-08-10` |
+| Current migration | `0094_import_entity_resolution_gate.sql` |
+| Current next | `ROADMAP-DECISION-REQUIRED` |
 
 ## Import readiness capability mapping
 
@@ -152,6 +152,7 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Duplicate / geo candidate contract | Complete | `docs/import/DUPLICATE_GEO_CONTRACT.md` | `CONTRACT-HARDENING` |
 | Gate B Contract Hardening | Complete | `docs/import/CONTRACT_HARDENING.md` | `ENTITY-CANDIDATE-PIPELINE` |
 | Entity Candidate Pipeline | Complete | `docs/import/ENTITY_CANDIDATE_PIPELINE.md` | `ENTITY-RESOLUTION-GATE` |
+| Entity Resolution Gate | Complete | `docs/import/ENTITY_RESOLUTION_GATE.md` | `ROADMAP-DECISION-REQUIRED` |
 | AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Contract hardening; no runtime or publish |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 

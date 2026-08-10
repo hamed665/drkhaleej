@@ -61,7 +61,7 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "ENTITY-RESOLUTION-GATE"',
+      from: '"currentNext": "ROADMAP-DECISION-REQUIRED"',
       to: '"currentNext": "CONTRACT-HARDENING"',
       expectedError: 'manifest.currentNext drifted',
     },
@@ -75,8 +75,8 @@ try {
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0093_import_entity_candidate_pipeline.sql` |',
-      to: '| Current migration | `0092_import_source_evidence_ledger.sql` |',
+      from: '| Current migration | `0094_import_entity_resolution_gate.sql` |',
+      to: '| Current migration | `0093_import_entity_candidate_pipeline.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {
