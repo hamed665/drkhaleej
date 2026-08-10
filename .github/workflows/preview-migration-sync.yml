@@ -40,6 +40,8 @@ on:
       - 'scripts/import/check-import-contract-hardening.mjs'
       - 'scripts/import/run-entity-candidate-pipeline-proof.mjs'
       - 'scripts/import/check-entity-candidate-pipeline.mjs'
+      - 'scripts/import/run-entity-resolution-gate-proof.mjs'
+      - 'scripts/import/check-entity-resolution-gate.mjs'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
@@ -49,6 +51,7 @@ on:
       - 'docs/import/DUPLICATE_GEO_CONTRACT.md'
       - 'docs/import/CONTRACT_HARDENING.md'
       - 'docs/import/ENTITY_CANDIDATE_PIPELINE.md'
+      - 'docs/import/ENTITY_RESOLUTION_GATE.md'
       - 'docs/import/contract-hardening-reconciliation.json'
       - 'docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/**'
       - 'src/lib/routes/public.ts'
@@ -75,6 +78,7 @@ on:
       - 'src/server/admin/import-duplicate-geo-contract*'
       - 'src/server/admin/import-contract-canonical-hash*'
       - 'src/server/admin/import-entity-candidate-pipeline*'
+      - 'src/server/admin/import-entity-resolution-gate*'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -171,6 +175,11 @@ env:
   ENTITY_CANDIDATE_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
   ENTITY_CANDIDATE_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   ENTITY_CANDIDATE_EVIDENCE_PATH: artifacts/entity-candidate-pipeline/proof.json
+  ENTITY_RESOLUTION_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  ENTITY_RESOLUTION_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  ENTITY_RESOLUTION_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  ENTITY_RESOLUTION_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  ENTITY_RESOLUTION_EVIDENCE_PATH: artifacts/entity-resolution-gate/proof.json
 
 permissions:
   contents: read
@@ -233,7 +242,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion artifacts/source-evidence-ledger artifacts/entity-candidate-pipeline
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion artifacts/source-evidence-ledger artifacts/entity-candidate-pipeline artifacts/entity-resolution-gate
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -252,6 +261,7 @@ jobs:
             pnpm import:duplicate-geo-contract:validate
             pnpm import:contract-hardening:validate
             pnpm import:entity-candidate-pipeline:validate
+            pnpm import:entity-resolution-gate:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -359,6 +369,12 @@ jobs:
           set -o pipefail
           node scripts/import/run-entity-candidate-pipeline-proof.mjs 2>&1 | tee artifacts/entity-candidate-pipeline/hosted-proof.log
 
+      - name: Prove additive Entity Resolution decision authority
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-entity-resolution-gate-proof.mjs 2>&1 | tee artifacts/entity-resolution-gate/hosted-proof.log
+
       - name: Upload Preview migration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -464,5 +480,14 @@ jobs:
         with:
           name: entity-candidate-pipeline-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/entity-candidate-pipeline/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Entity Resolution gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: entity-resolution-gate-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/entity-resolution-gate/
           if-no-files-found: error
           retention-days: 30

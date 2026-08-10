@@ -59,6 +59,7 @@
     "import:duplicate-geo-contract:validate": "node scripts/import/check-import-duplicate-geo-contract.mjs && vitest run src/server/admin/import-duplicate-geo-contract.test.ts",
     "import:contract-hardening:validate": "node scripts/import/check-import-contract-hardening.mjs && vitest run src/server/admin/import-contract-canonical-hash.test.ts && npm --prefix docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2 run validate",
     "import:entity-candidate-pipeline:validate": "node scripts/import/check-entity-candidate-pipeline.mjs && vitest run src/server/admin/import-entity-candidate-pipeline.test.ts",
+    "import:entity-resolution-gate:validate": "node scripts/import/check-entity-resolution-gate.mjs && vitest run src/server/admin/import-entity-resolution-gate.test.ts",
     "import:reservation-db-safety:validate": "node scripts/import/check-import-reservation-db-safety-proof.mjs",
     "import:reservation-audit-split:validate": "node scripts/import/check-import-reservation-audit-split.mjs",
     "import:state-alignment:validate": "node scripts/import/check-import-readiness-state-alignment.mjs && node scripts/import/test-import-readiness-state-alignment.mjs",

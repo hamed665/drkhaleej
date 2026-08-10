@@ -10,11 +10,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 971,
-  runtimeBaseline: '4cda76704813449719982c5d72b6c28b60788ab0',
-  lastAligned: '2026-08-09',
-  currentMigration: '0093_import_entity_candidate_pipeline.sql',
-  currentNext: 'ENTITY-RESOLUTION-GATE',
+  alignedThroughPr: 972,
+  runtimeBaseline: 'fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972',
+  lastAligned: '2026-08-10',
+  currentMigration: '0094_import_entity_resolution_gate.sql',
+  currentNext: 'ROADMAP-DECISION-REQUIRED',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -257,6 +257,10 @@ function validateMatrix(source, manifest) {
       'Complete',
       'docs/import/ENTITY_CANDIDATE_PIPELINE.md',
     ],
+    'Entity Resolution Gate': [
+      'Complete',
+      'docs/import/ENTITY_RESOLUTION_GATE.md',
+    ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
       'docs/import/INTAKE_CONTRACT_CONVERGENCE.md',
@@ -277,7 +281,7 @@ function validateReadme(source, manifest) {
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0093`',
+    '`0001` through `0094`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
