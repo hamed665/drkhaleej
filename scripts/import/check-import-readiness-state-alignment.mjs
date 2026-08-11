@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const files = {
   roadmap: 'docs/import/import-readiness-roadmap-after-933.md',
+  workerRuntimeAdrGate: 'docs/import/WORKER_RUNTIME_ADR_GATE.md',
   currentState: 'docs/project-state/CURRENT_STATE.md',
   matrix: 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md',
   readme: 'README.md',
@@ -10,11 +11,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 972,
-  runtimeBaseline: 'fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972',
-  lastAligned: '2026-08-10',
+  alignedThroughPr: 973,
+  runtimeBaseline: 'f6f4fb567afd0a46e56b720bd8cc8eb0397a5acd',
+  lastAligned: '2026-08-11',
   currentMigration: '0094_import_entity_resolution_gate.sql',
-  currentNext: 'ROADMAP-DECISION-REQUIRED',
+  currentNext: 'WORKER-RUNTIME-ADR',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -261,6 +262,10 @@ function validateMatrix(source, manifest) {
       'Complete',
       'docs/import/ENTITY_RESOLUTION_GATE.md',
     ],
+    'Worker Runtime ADR': [
+      'Roadmap-authorized / docs only',
+      'docs/import/WORKER_RUNTIME_ADR_GATE.md',
+    ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
       'docs/import/INTAKE_CONTRACT_CONVERGENCE.md',
@@ -275,6 +280,24 @@ function validateMatrix(source, manifest) {
   }
 }
 
+function validateWorkerRuntimeAdrGate(source) {
+  const required = [
+    '# WORKER-RUNTIME-ADR',
+    'Execution Phase: 9',
+    'Lock Scope: 10',
+    'Product Module: 6',
+    'Subphase ID: `WORKER-RUNTIME-ADR`',
+    '`AUTOMATION-JOB-RUNTIME`; it is not authorized by this document',
+    'No migration, runtime\ncode, dependency, secret, external resource, deployment or Production connection may be added',
+  ];
+
+  for (const token of required) {
+    if (!source.includes(token)) {
+      fail(files.workerRuntimeAdrGate, 'required closed-boundary token', token, '<missing>');
+    }
+  }
+}
+
 function validateReadme(source, manifest) {
   const section = extractSection(files.readme, source, 'Current project phase status');
   const required = [
@@ -284,6 +307,7 @@ function validateReadme(source, manifest) {
     '`0001` through `0094`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
+    '[`docs/import/WORKER_RUNTIME_ADR_GATE.md`](docs/import/WORKER_RUNTIME_ADR_GATE.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
     '[`docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md`](docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md)',
   ];
@@ -308,6 +332,7 @@ const sources = Object.fromEntries(
 const manifest = extractManifest(sources.roadmap);
 validateCanonicalManifest(manifest);
 validateVisibleRoadmapLedger(sources.roadmap, manifest);
+validateWorkerRuntimeAdrGate(sources.workerRuntimeAdrGate);
 validateCurrentState(sources.currentState, manifest);
 validateMatrix(sources.matrix, manifest);
 validateReadme(sources.readme, manifest);

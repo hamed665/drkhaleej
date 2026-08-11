@@ -13,6 +13,7 @@ const fixtureFiles = [
   'docs/project-state/CURRENT_STATE.md',
   'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md',
   'README.md',
+  'docs/import/WORKER_RUNTIME_ADR_GATE.md',
 ];
 
 async function seedFixture(root) {
@@ -61,7 +62,7 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "ROADMAP-DECISION-REQUIRED"',
+      from: '"currentNext": "WORKER-RUNTIME-ADR"',
       to: '"currentNext": "CONTRACT-HARDENING"',
       expectedError: 'manifest.currentNext drifted',
     },
@@ -92,6 +93,13 @@ try {
       from: '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
       to: '[stale roadmap](docs/import/stale.md)',
       expectedError: 'current status token drifted',
+    },
+    {
+      label: 'Worker runtime ADR boundary drift',
+      file: fixtureFiles[4],
+      from: 'Subphase ID: `WORKER-RUNTIME-ADR`',
+      to: 'Subphase ID: `AUTOMATION-JOB-RUNTIME`',
+      expectedError: 'required closed-boundary token drifted',
     },
   ]) {
     await expectDriftFailure(temporaryRoot, testCase);

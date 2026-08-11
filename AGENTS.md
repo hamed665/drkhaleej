@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #972 at `fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline and the additive Entity Resolution decision gate are complete. The current next implementation is **`ROADMAP-DECISION-REQUIRED`**; no subsequent gate may be inferred. It authorizes neither decision application, Agent/Worker runtime nor Production execution.
+Current import-readiness runtime baseline: **PR #973 at `f6f4fb567afd0a46e56b720bd8cc8eb0397a5acd`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline and the additive Entity Resolution decision gate are complete. The current next implementation is the documentation-only **`WORKER-RUNTIME-ADR`** gate. It authorizes neither P19 implementation, decision application, Agent/Worker runtime nor Production execution.
 
 Completed migrations: **`0001` through `0094`**. Migration validation is expected through `0094_import_entity_resolution_gate.sql`.
 

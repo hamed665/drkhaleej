@@ -162,7 +162,7 @@ assert(
 );
 assert(
   sources.roadmap.includes('"currentMigration": "0094_import_entity_resolution_gate.sql"') &&
-    sources.roadmap.includes('"currentNext": "ROADMAP-DECISION-REQUIRED"') &&
+    sources.roadmap.includes('"currentNext": "WORKER-RUNTIME-ADR"') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Wave 8     PARTIAL'),
   `${files.roadmap} P15 state drifted.`,

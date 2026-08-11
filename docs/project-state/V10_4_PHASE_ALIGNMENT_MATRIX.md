@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #972 at baseline `fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972` (last aligned 2026-08-10).
+- Import-readiness runtime is aligned through PR #973 at baseline `f6f4fb567afd0a46e56b720bd8cc8eb0397a5acd` (last aligned 2026-08-11).
 - Migrations validate through `0094_import_entity_resolution_gate.sql`.
-- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline and additive Entity Resolution decisions are complete. The current next implementation is `ROADMAP-DECISION-REQUIRED`.
+- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline and additive Entity Resolution decisions are complete. The current next implementation is the documentation-only `WORKER-RUNTIME-ADR` gate.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -111,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #972 |
-| Runtime baseline | `fb4ee8e1a9f7df85199697ea630b5e4fd3f6a972` |
-| Last aligned | `2026-08-10` |
+| Aligned through | PR #973 |
+| Runtime baseline | `f6f4fb567afd0a46e56b720bd8cc8eb0397a5acd` |
+| Last aligned | `2026-08-11` |
 | Current migration | `0094_import_entity_resolution_gate.sql` |
-| Current next | `ROADMAP-DECISION-REQUIRED` |
+| Current next | `WORKER-RUNTIME-ADR` |
 
 ## Import readiness capability mapping
 
@@ -152,7 +152,8 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Duplicate / geo candidate contract | Complete | `docs/import/DUPLICATE_GEO_CONTRACT.md` | `CONTRACT-HARDENING` |
 | Gate B Contract Hardening | Complete | `docs/import/CONTRACT_HARDENING.md` | `ENTITY-CANDIDATE-PIPELINE` |
 | Entity Candidate Pipeline | Complete | `docs/import/ENTITY_CANDIDATE_PIPELINE.md` | `ENTITY-RESOLUTION-GATE` |
-| Entity Resolution Gate | Complete | `docs/import/ENTITY_RESOLUTION_GATE.md` | `ROADMAP-DECISION-REQUIRED` |
+| Entity Resolution Gate | Complete | `docs/import/ENTITY_RESOLUTION_GATE.md` | `WORKER-RUNTIME-ADR` |
+| Worker Runtime ADR | Roadmap-authorized / docs only | `docs/import/WORKER_RUNTIME_ADR_GATE.md` | Complete ADR choices before naming P19 |
 | AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Contract hardening; no runtime or publish |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -184,6 +185,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `DUPLICATE-GEO-CONTRACT` | Phase 9 | Phase 10 | Phase 6 |
 | `CONTRACT-HARDENING` | Phase 9 | Phase 10 | Phase 6 |
 | `ENTITY-CANDIDATE-PIPELINE` | Phase 9 | Phase 10 | Phase 6 |
+| `WORKER-RUNTIME-ADR` | Phase 9 | Phase 10 | Phase 6 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 
