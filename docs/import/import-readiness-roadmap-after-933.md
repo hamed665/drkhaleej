@@ -26,14 +26,14 @@ Wave 7.1   COMPLETE  Pharmacy public/noindex authority and bilingual live noinde
 Wave 7.2   COMPLETE  Pharmacy public rollback and exact Queue recovery are proven
 Wave 7.3   COMPLETE  Independent Pharmacy Index promotion and exact public/noindex rollback are proven
 Wave 7.4   COMPLETE  Independent Pharmacy Sitemap inclusion and exact P14 Index rollback are proven
-Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidates, Gate B Contract Hardening, Entity Candidate persistence, additive Human Review decisions and WORKER-RUNTIME-ADR complete; AUTOMATION-JOB-RUNTIME is the next independent PR
+Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidates, Gate B Contract Hardening, Entity Candidate persistence, additive Human Review decisions, WORKER-RUNTIME-ADR and closed-by-default AUTOMATION-JOB-RUNTIME complete; Preview activation remains closed
 ```
 
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #974
-Baseline commit: e3b759a
+Aligned through: PR #975
+Baseline commit: d5632e9
 Last aligned: 2026-08-12
 ```
 
@@ -42,11 +42,11 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 974,
-  "runtimeBaseline": "e3b759a3e0b07a7458addab416a44917f3e43801",
+  "alignedThroughPr": 975,
+  "runtimeBaseline": "d5632e9600902afe20046c0f71fdfa0d466d8359",
   "lastAligned": "2026-08-12",
-  "currentMigration": "0094_import_entity_resolution_gate.sql",
-  "currentNext": "AUTOMATION-JOB-RUNTIME",
+  "currentMigration": "0095_import_automation_job_runtime.sql",
+  "currentNext": "AUTOMATION-JOB-PREVIEW-ACTIVATION",
   "waves": {
     "0": "COMPLETE",
     "1": "COMPLETE",
@@ -427,7 +427,7 @@ Do not add:
 ## Current next implementation
 
 ```text
-AUTOMATION-JOB-RUNTIME
+AUTOMATION-JOB-PREVIEW-ACTIVATION
 ```
 
 `ENTITY-CANDIDATE-PIPELINE` is complete in
@@ -436,7 +436,9 @@ AUTOMATION-JOB-RUNTIME
 Review decision and does not apply it. The documentation-only
 [`WORKER-RUNTIME-ADR`](WORKER_RUNTIME_ADR_GATE.md) gate is complete, with its concrete providers,
 identity, storage, fencing, egress, observability, cost, ownership and recovery choices recorded in
-[`WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](WORKER_RUNTIME_ARCHITECTURE_DECISION.md). The next
-independently reviewable PR may be named `AUTOMATION-JOB-RUNTIME`. Naming it does not authorize it in
-the ADR change. Decision application, Agent/Worker activation, Content, Hospital, Doctor,
-later-family, Bulk behavior and Production execution remain closed.
+[`WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](WORKER_RUNTIME_ARCHITECTURE_DECISION.md).
+[`AUTOMATION-JOB-RUNTIME`](AUTOMATION_JOB_RUNTIME.md) implements the private queue, signed service
+boundary, lease fencing, bounded outbox, internal API and an idle Worker shell with every switch and
+identity disabled. `AUTOMATION-JOB-PREVIEW-ACTIVATION` is the next independent gate; it must supply
+the complete accepted evidence bundle before provisioning or starting the loop. Decision application,
+Content, Hospital, Doctor, later-family, Bulk behavior and Production execution remain closed.

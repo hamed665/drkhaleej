@@ -28,6 +28,7 @@ const validators = {
   pharmacyExpectedVersionTimestamp: script('db', 'check-import-pharmacy-expected-version-timestamp-equivalence.mjs'),
   entityCandidatePipeline: script('import', 'check-entity-candidate-pipeline.mjs'),
   entityResolutionGate: script('import', 'check-entity-resolution-gate.mjs'),
+  automationJobRuntime: script('import', 'check-automation-job-runtime.mjs'),
 };
 
 const migrationNames = {
@@ -62,6 +63,7 @@ const migrationNames = {
   sourceEvidenceLedger: '0092_import_source_evidence_ledger.sql',
   entityCandidatePipeline: '0093_import_entity_candidate_pipeline.sql',
   entityResolutionGate: '0094_import_entity_resolution_gate.sql',
+  automationJobRuntime: '0095_import_automation_job_runtime.sql',
 };
 
 const currentOnlyMigrations = Object.values(migrationNames).map((name) => [
@@ -436,5 +438,7 @@ requireCondition(existsSync(migration(migrationNames.entityCandidatePipeline)), 
 runValidator(validators.entityCandidatePipeline);
 requireCondition(existsSync(migration(migrationNames.entityResolutionGate)), `${migrationNames.entityResolutionGate} is missing.`);
 runValidator(validators.entityResolutionGate);
+requireCondition(existsSync(migration(migrationNames.automationJobRuntime)), `${migrationNames.automationJobRuntime} is missing.`);
+runValidator(validators.automationJobRuntime);
 
-console.log('Current migration validation passed through 0094.');
+console.log('Current migration validation passed through 0095.');

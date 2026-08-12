@@ -208,9 +208,9 @@ assert(
 
 assert(
   sources.roadmap.includes(
-    '"currentMigration": "0094_import_entity_resolution_gate.sql"',
+    '"currentMigration": "0095_import_automation_job_runtime.sql"',
   ) &&
-    sources.roadmap.includes('"currentNext": "AUTOMATION-JOB-RUNTIME"') &&
+    sources.roadmap.includes('"currentNext": "AUTOMATION-JOB-PREVIEW-ACTIVATION"') &&
     sources.roadmap.includes('Wave 6     COMPLETE') &&
     sources.roadmap.includes('Wave 7.4   COMPLETE') &&
     sources.roadmap.includes('Registry Convergence complete') &&

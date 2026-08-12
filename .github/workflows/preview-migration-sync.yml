@@ -42,6 +42,9 @@ on:
       - 'scripts/import/check-entity-candidate-pipeline.mjs'
       - 'scripts/import/run-entity-resolution-gate-proof.mjs'
       - 'scripts/import/check-entity-resolution-gate.mjs'
+      - 'scripts/import/run-automation-job-runtime-proof.mjs'
+      - 'scripts/import/check-automation-job-runtime.mjs'
+      - 'scripts/automation/**'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
       - 'docs/import/PHARMACY_PUBLIC_ROLLBACK.md'
@@ -52,6 +55,7 @@ on:
       - 'docs/import/CONTRACT_HARDENING.md'
       - 'docs/import/ENTITY_CANDIDATE_PIPELINE.md'
       - 'docs/import/ENTITY_RESOLUTION_GATE.md'
+      - 'docs/import/AUTOMATION_JOB_RUNTIME.md'
       - 'docs/import/contract-hardening-reconciliation.json'
       - 'docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/**'
       - 'src/lib/routes/public.ts'
@@ -79,6 +83,8 @@ on:
       - 'src/server/admin/import-contract-canonical-hash*'
       - 'src/server/admin/import-entity-candidate-pipeline*'
       - 'src/server/admin/import-entity-resolution-gate*'
+      - 'src/server/imports/**'
+      - 'src/app/api/internal/automation/**'
       - 'src/server/admin/import-pharmacy-minimal-admin-ui-model.ts'
       - 'src/app/admin/imports/readiness/**'
       - 'src/components/admin/import-pharmacy-private-admin-control-panel.tsx'
@@ -101,6 +107,8 @@ on:
       - 'scripts/db/test-rls-static.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'render.yaml'
+      - '.env.example'
 
 env:
   PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
@@ -180,6 +188,11 @@ env:
   ENTITY_RESOLUTION_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
   ENTITY_RESOLUTION_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
   ENTITY_RESOLUTION_EVIDENCE_PATH: artifacts/entity-resolution-gate/proof.json
+  AUTOMATION_JOB_RUNTIME_PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+  AUTOMATION_JOB_RUNTIME_PREVIEW_PROJECT_REF: ${{ secrets.PREVIEW_PROJECT_REF }}
+  AUTOMATION_JOB_RUNTIME_PRODUCTION_PROJECT_REF: ${{ secrets.PRODUCTION_PROJECT_REF }}
+  AUTOMATION_JOB_RUNTIME_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+  AUTOMATION_JOB_RUNTIME_EVIDENCE_PATH: artifacts/automation-job-runtime/proof.json
 
 permissions:
   contents: read
@@ -215,6 +228,9 @@ jobs:
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_INDEX_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$SOURCE_EVIDENCE_SOURCE_COMMIT"
           test "$PREVIEW_SOURCE_COMMIT" = "$PHARMACY_SITEMAP_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$ENTITY_CANDIDATE_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$ENTITY_RESOLUTION_SOURCE_COMMIT"
+          test "$PREVIEW_SOURCE_COMMIT" = "$AUTOMATION_JOB_RUNTIME_SOURCE_COMMIT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -242,7 +258,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion artifacts/source-evidence-ledger artifacts/entity-candidate-pipeline artifacts/entity-resolution-gate
+          mkdir -p artifacts/preview-migration-sync artifacts/p05 artifacts/p06 artifacts/p07 artifacts/p09 artifacts/pharmacy-public-noindex-authority artifacts/pharmacy-bilingual-live-verify artifacts/pharmacy-public-rollback artifacts/pharmacy-index-promotion artifacts/pharmacy-sitemap-promotion artifacts/source-evidence-ledger artifacts/entity-candidate-pipeline artifacts/entity-resolution-gate artifacts/automation-job-runtime
           {
             pnpm db:validate:migrations
             pnpm test:db:rls
@@ -262,6 +278,7 @@ jobs:
             pnpm import:contract-hardening:validate
             pnpm import:entity-candidate-pipeline:validate
             pnpm import:entity-resolution-gate:validate
+            pnpm import:automation-job-runtime:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight
@@ -374,6 +391,12 @@ jobs:
         run: |
           set -o pipefail
           node scripts/import/run-entity-resolution-gate-proof.mjs 2>&1 | tee artifacts/entity-resolution-gate/hosted-proof.log
+
+      - name: Prove fenced Automation Job runtime
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/import/run-automation-job-runtime-proof.mjs 2>&1 | tee artifacts/automation-job-runtime/hosted-proof.log
 
       - name: Upload Preview migration evidence
         if: always()
@@ -489,5 +512,14 @@ jobs:
         with:
           name: entity-resolution-gate-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/entity-resolution-gate/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload exact-SHA Automation Job runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-job-runtime-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/automation-job-runtime/
           if-no-files-found: error
           retention-days: 30

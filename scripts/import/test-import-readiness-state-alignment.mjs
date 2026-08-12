@@ -15,6 +15,7 @@ const fixtureFiles = [
   'README.md',
   'docs/import/WORKER_RUNTIME_ADR_GATE.md',
   'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
+  'docs/import/AUTOMATION_JOB_RUNTIME.md',
 ];
 
 async function seedFixture(root) {
@@ -63,7 +64,7 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "AUTOMATION-JOB-RUNTIME"',
+      from: '"currentNext": "AUTOMATION-JOB-PREVIEW-ACTIVATION"',
       to: '"currentNext": "CONTRACT-HARDENING"',
       expectedError: 'manifest.currentNext drifted',
     },
@@ -77,8 +78,8 @@ try {
     {
       label: 'current state drift',
       file: fixtureFiles[1],
-      from: '| Current migration | `0094_import_entity_resolution_gate.sql` |',
-      to: '| Current migration | `0093_import_entity_candidate_pipeline.sql` |',
+      from: '| Current migration | `0095_import_automation_job_runtime.sql` |',
+      to: '| Current migration | `0094_import_entity_resolution_gate.sql` |',
       expectedError: 'Current migration value drifted',
     },
     {
@@ -129,6 +130,13 @@ try {
       from: '    "publish",\n    "rollback",',
       to: '    "rollback",',
       expectedError: 'manifest.deniedScopes drifted',
+    },
+    {
+      label: 'Automation runtime activation drift',
+      file: fixtureFiles[6],
+      from: 'all controls and identities default disabled',
+      to: 'all controls and identities default enabled',
+      expectedError: 'required closed-runtime token drifted',
     },
     {
       label: 'Worker raw-network boundary drift',
