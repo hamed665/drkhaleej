@@ -2,10 +2,10 @@
 
 ## Roadmap decision
 
-The approved next gate after `ENTITY-RESOLUTION-GATE` is the documentation-only
-`WORKER-RUNTIME-ADR` gate from the staged AI Agent program. This decision opens only the
-architecture work needed to make the Worker boundary reviewable. It does not open P19 runtime
-implementation.
+The documentation-only `WORKER-RUNTIME-ADR` gate after `ENTITY-RESOLUTION-GATE` is decision-complete.
+The accepted bundle is [`WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](WORKER_RUNTIME_ARCHITECTURE_DECISION.md).
+It selects the providers, ownership, authority, security, retention, recovery and cost boundaries
+needed to make the next Worker implementation reviewable. It does not open P19 runtime implementation.
 
 Four-axis mapping:
 
@@ -14,28 +14,26 @@ Four-axis mapping:
 - Product Module: 6 — Admin Foundation
 - Subphase ID: `WORKER-RUNTIME-ADR`
 
-## Required decisions
+## Gate resolution
 
-The gate is complete only when one reviewed ADR bundle records all of the following without
-placeholders:
+The accepted ADR records all required choices without implementation placeholders:
 
-- one repository with separately deployed Web/Admin and long-lived Worker runtimes;
-- the concrete Worker host, owner, deployment boundary and rollback procedure;
-- the Postgres/Supabase job control plane, atomic lease transitions, increasing lease epoch and
-  stale-worker fencing semantics;
-- the service-identity provider, signed-token algorithm and key lifecycle, audience, canonical
-  scope vocabulary, five-minute maximum TTL, `jti` replay protection and rotation/revocation drill;
-- the private raw-observation storage provider, access boundary, encryption, default 30-day
-  retention, approved dispute extension, deletion job and access audit;
-- the observability provider and a redaction/retention policy that cannot fall back to raw payloads,
-  credentials or reviewer session material;
-- egress and SSRF controls, redirect/DNS revalidation, size/time limits and source-policy
-  enforcement boundaries;
-- transactional outbox and bounded notification ownership;
-- kill switches for global automation, source, family, AI calls and notifications;
-- owners, plans, hard/soft caps, alerts and current monthly cost for Worker compute, storage,
-  observability, notifications and security;
-- Preview-only integration and two-worker reclaim evidence required before any runtime activation.
+- one repository; Web/Admin on Vercel and one separately deployed long-lived Render Background
+  Worker Starter instance in Frankfurt;
+- existing Supabase Postgres behind a Vercel internal API, atomic leases, increasing lease/control
+  epochs and stale-worker fencing;
+- the DrKhaleej internal Ed25519 service issuer, exact audience/scopes, 300-second maximum TTL,
+  `jti` replay protection and a 90-day key lifecycle with revocation drill;
+- one private Supabase Storage bucket, AES-256/TLS provider encryption, 30-day default retention,
+  reason-bound 90-day maximum dispute retention, deletion and access audit;
+- Sentry Developer with 30-day sanitized retention and no raw-payload/log fallback;
+- source-policy allowlisting, DNS/IP/redirect revalidation, bounded time/size/rate/concurrency and
+  outbound-byte enforcement;
+- transactional outbox and Resend Free email delivery with application/provider caps;
+- global, source, family, AI and notification kill switches;
+- `hamed665` ownership, exact plans, USD 0 current cost, USD 7 selected steady incremental cost,
+  hard stops and alerts;
+- exact-SHA isolated Preview integration and adversarial two-worker reclaim proof before activation.
 
 ## Fixed authority boundary
 
@@ -50,11 +48,11 @@ Hospital, Doctor, later-family, Bulk or Production behavior.
 
 ## Exit and stop conditions
 
-The gate exits only after the ADR bundle is independently reviewed and every required provider,
-owner, retention, cost, security and recovery choice is concrete. The separately reviewable next
-implementation may then be named `AUTOMATION-JOB-RUNTIME`; it is not authorized by this document.
+After this bundle is independently approved and merged, the separately reviewable current next may
+be named `AUTOMATION-JOB-RUNTIME`; it is not authorized by this document. That future PR must begin
+with every switch off and may target only the isolated Preview evidence contract in the accepted ADR.
 
-Stop at this gate when any host, identity, storage, observability, egress, cost, compliance,
-retention, reviewer or Preview-isolation decision is missing or ambiguous. No migration, runtime
-code, dependency, secret, external resource, deployment or Production connection may be added
-while completing this gate.
+Reopen this gate and stop if a selected host, identity, storage, observability, notification, egress,
+cost, retention, owner, reviewer or Preview-isolation choice changes or becomes ambiguous. No
+migration, runtime code, dependency, secret, external resource, deployment or Production connection
+is added by this gate-completion change.

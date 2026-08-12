@@ -14,6 +14,7 @@ const fixtureFiles = [
   'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md',
   'README.md',
   'docs/import/WORKER_RUNTIME_ADR_GATE.md',
+  'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
 ];
 
 async function seedFixture(root) {
@@ -62,7 +63,7 @@ try {
     {
       label: 'canonical manifest drift',
       file: fixtureFiles[0],
-      from: '"currentNext": "WORKER-RUNTIME-ADR"',
+      from: '"currentNext": "AUTOMATION-JOB-RUNTIME"',
       to: '"currentNext": "CONTRACT-HARDENING"',
       expectedError: 'manifest.currentNext drifted',
     },
@@ -100,6 +101,41 @@ try {
       from: 'Subphase ID: `WORKER-RUNTIME-ADR`',
       to: 'Subphase ID: `AUTOMATION-JOB-RUNTIME`',
       expectedError: 'required closed-boundary token drifted',
+    },
+    {
+      label: 'Worker runtime provider drift',
+      file: fixtureFiles[5],
+      from: '"provider": "Render Background Worker"',
+      to: '"provider": "Unreviewed Worker Host"',
+      expectedError: 'manifest.worker.provider drifted',
+    },
+    {
+      label: 'Worker runtime TTL drift',
+      file: fixtureFiles[5],
+      from: '"maxTtlSeconds": 300',
+      to: '"maxTtlSeconds": 600',
+      expectedError: 'manifest.identity.maxTtlSeconds drifted',
+    },
+    {
+      label: 'Worker runtime authorization drift',
+      file: fixtureFiles[5],
+      from: '"implementationAuthorized": false',
+      to: '"implementationAuthorized": true',
+      expectedError: 'manifest.implementationAuthorized drifted',
+    },
+    {
+      label: 'Worker forbidden scope drift',
+      file: fixtureFiles[5],
+      from: '    "publish",\n    "rollback",',
+      to: '    "rollback",',
+      expectedError: 'manifest.deniedScopes drifted',
+    },
+    {
+      label: 'Worker raw-network boundary drift',
+      file: fixtureFiles[5],
+      from: 'direct imports of `fetch`,\n`http`, `https`, socket or alternate HTTP clients are forbidden',
+      to: 'direct network clients are allowed',
+      expectedError: 'required concrete-decision token drifted',
     },
   ]) {
     await expectDriftFailure(temporaryRoot, testCase);

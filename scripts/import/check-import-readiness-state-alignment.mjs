@@ -4,6 +4,7 @@ import path from 'node:path';
 const files = {
   roadmap: 'docs/import/import-readiness-roadmap-after-933.md',
   workerRuntimeAdrGate: 'docs/import/WORKER_RUNTIME_ADR_GATE.md',
+  workerRuntimeAdr: 'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
   currentState: 'docs/project-state/CURRENT_STATE.md',
   matrix: 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md',
   readme: 'README.md',
@@ -11,11 +12,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 973,
-  runtimeBaseline: 'f6f4fb567afd0a46e56b720bd8cc8eb0397a5acd',
-  lastAligned: '2026-08-11',
+  alignedThroughPr: 974,
+  runtimeBaseline: 'e3b759a3e0b07a7458addab416a44917f3e43801',
+  lastAligned: '2026-08-12',
   currentMigration: '0094_import_entity_resolution_gate.sql',
-  currentNext: 'WORKER-RUNTIME-ADR',
+  currentNext: 'AUTOMATION-JOB-RUNTIME',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -37,6 +38,66 @@ const expectedCanonicalState = {
     phase: 'reservation',
   },
   reservationCreatedImplemented: true,
+};
+
+const expectedWorkerRuntimeAdr = {
+  schemaVersion: 'drkhaleej.workerRuntimeAdr.v1',
+  status: 'accepted-decision-implementation-closed',
+  decisionDate: '2026-08-12',
+  decisionOwner: 'hamed665',
+  implementationAuthorized: false,
+  productionAuthorized: false,
+  nextImplementation: 'AUTOMATION-JOB-RUNTIME',
+  webRuntime: 'Vercel Web/Admin',
+  worker: {
+    provider: 'Render Background Worker',
+    region: 'frankfurt',
+    plan: 'Starter',
+    instances: 1,
+    steadyMonthlyUsd: 7,
+  },
+  jobControl: {
+    provider: 'existing Supabase Postgres',
+    workerDatabaseCredential: false,
+    boundary: 'Vercel internal automation API plus transactional Postgres RPC',
+  },
+  identity: {
+    provider: 'DrKhaleej internal service issuer',
+    algorithm: 'Ed25519',
+    audience: 'urn:drkhaleej:internal-automation:v1',
+    maxTtlSeconds: 300,
+    jtiReplayProtection: true,
+  },
+  storage: {
+    provider: 'Supabase Storage private bucket',
+    defaultRetentionDays: 30,
+    maximumDisputeRetentionDays: 90,
+    hardCapacityGb: 1,
+  },
+  observability: {
+    provider: 'Sentry',
+    plan: 'Developer',
+    retentionDays: 30,
+    monthlyUsd: 0,
+  },
+  notifications: {
+    provider: 'Resend',
+    plan: 'Free',
+    applicationDailyCap: 20,
+    applicationMonthlyCap: 500,
+    monthlyUsd: 0,
+  },
+  security: {
+    provider: 'GitHub public-repository secret scanning and Dependabot',
+    monthlyUsd: 0,
+  },
+  deniedScopes: [
+    'publish',
+    'rollback',
+    'public_promote',
+    'index_promote',
+    'sitemap_promote',
+  ],
 };
 
 function parseRootArgument(argv) {
@@ -120,6 +181,16 @@ function extractManifest(source) {
     return JSON.parse(match[1]);
   } catch (error) {
     fail(files.roadmap, 'machine-readable alignment manifest JSON', 'valid JSON', error.message);
+  }
+}
+
+function extractWorkerRuntimeAdrManifest(source) {
+  const match = source.match(/```json worker-runtime-adr\s*\r?\n([\s\S]*?)\r?\n```/);
+  if (!match) fail(files.workerRuntimeAdr, 'machine-readable ADR manifest', 'present', '<missing>');
+  try {
+    return JSON.parse(match[1]);
+  } catch (error) {
+    fail(files.workerRuntimeAdr, 'machine-readable ADR manifest JSON', 'valid JSON', error.message);
   }
 }
 
@@ -263,8 +334,8 @@ function validateMatrix(source, manifest) {
       'docs/import/ENTITY_RESOLUTION_GATE.md',
     ],
     'Worker Runtime ADR': [
-      'Roadmap-authorized / docs only',
-      'docs/import/WORKER_RUNTIME_ADR_GATE.md',
+      'Complete / implementation closed',
+      'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
     ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
@@ -287,13 +358,87 @@ function validateWorkerRuntimeAdrGate(source) {
     'Lock Scope: 10',
     'Product Module: 6',
     'Subphase ID: `WORKER-RUNTIME-ADR`',
+    '[`WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](WORKER_RUNTIME_ARCHITECTURE_DECISION.md)',
     '`AUTOMATION-JOB-RUNTIME`; it is not authorized by this document',
-    'No migration, runtime\ncode, dependency, secret, external resource, deployment or Production connection may be added',
+    'No\nmigration, runtime code, dependency, secret, external resource, deployment or Production connection\nis added by this gate-completion change',
   ];
 
   for (const token of required) {
     if (!source.includes(token)) {
       fail(files.workerRuntimeAdrGate, 'required closed-boundary token', token, '<missing>');
+    }
+  }
+}
+
+function validateWorkerRuntimeAdr(source) {
+  const manifest = extractWorkerRuntimeAdrManifest(source);
+  const scalarFields = [
+    'schemaVersion',
+    'status',
+    'decisionDate',
+    'decisionOwner',
+    'implementationAuthorized',
+    'productionAuthorized',
+    'nextImplementation',
+    'webRuntime',
+  ];
+  for (const field of scalarFields) {
+    assertEqual(
+      files.workerRuntimeAdr,
+      `manifest.${field}`,
+      manifest[field],
+      expectedWorkerRuntimeAdr[field],
+    );
+  }
+  for (const group of [
+    'worker',
+    'jobControl',
+    'identity',
+    'storage',
+    'observability',
+    'notifications',
+    'security',
+  ]) {
+    for (const [field, expected] of Object.entries(expectedWorkerRuntimeAdr[group])) {
+      assertEqual(
+        files.workerRuntimeAdr,
+        `manifest.${group}.${field}`,
+        manifest[group]?.[field],
+        expected,
+      );
+    }
+  }
+  assertEqual(
+    files.workerRuntimeAdr,
+    'manifest.deniedScopes',
+    JSON.stringify(manifest.deniedScopes),
+    JSON.stringify(expectedWorkerRuntimeAdr.deniedScopes),
+  );
+
+  const required = [
+    '# Worker Runtime Architecture Decision',
+    'accepted architecture decision; implementation remains closed',
+    '`AUTOMATION-JOB-RUNTIME` remains a separate pull request',
+    'One Render **Background Worker**, Starter instance, in `frankfurt`',
+    'The Worker receives **no**\ndatabase URL, Supabase secret/service-role key or direct Storage credential',
+    'Lease duration is 60 seconds; heartbeat cadence is 20 seconds',
+    'boot-unique Worker instance UUID',
+    'DrKhaleej internal service issuer',
+    'TTL no greater than 300 seconds',
+    '`automation-raw-observations-preview`',
+    'Default expiry is capture time plus 30 days',
+    'at most 90 days from capture',
+    'Sentry Developer is the concrete provider',
+    'Resend Free; email only',
+    'direct imports of `fetch`,\n`http`, `https`, socket or alternate HTTP clients are forbidden',
+    '| Global automation |',
+    'selected steady incremental cost is USD\n7/month',
+    'two distinct boot-unique Worker process IDs under the registered Worker service identity racing\n   one job: exactly one lease succeeds',
+    'No token, role, route or adapter may accept `publish`, `rollback`, `public_promote`,\n`index_promote` or `sitemap_promote`',
+  ];
+  for (const token of required) {
+    if (!source.includes(token)) {
+      fail(files.workerRuntimeAdr, 'required concrete-decision token', token, '<missing>');
     }
   }
 }
@@ -308,6 +453,7 @@ function validateReadme(source, manifest) {
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/WORKER_RUNTIME_ADR_GATE.md`](docs/import/WORKER_RUNTIME_ADR_GATE.md)',
+    '[`docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
     '[`docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md`](docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md)',
   ];
@@ -333,6 +479,7 @@ const manifest = extractManifest(sources.roadmap);
 validateCanonicalManifest(manifest);
 validateVisibleRoadmapLedger(sources.roadmap, manifest);
 validateWorkerRuntimeAdrGate(sources.workerRuntimeAdrGate);
+validateWorkerRuntimeAdr(sources.workerRuntimeAdr);
 validateCurrentState(sources.currentState, manifest);
 validateMatrix(sources.matrix, manifest);
 validateReadme(sources.readme, manifest);
