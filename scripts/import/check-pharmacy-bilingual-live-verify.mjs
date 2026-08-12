@@ -175,7 +175,7 @@ assert(
 
 for (const token of [
   '"currentMigration": "0094_import_entity_resolution_gate.sql"',
-  '"currentNext": "ROADMAP-DECISION-REQUIRED"',
+  '"currentNext": "WORKER-RUNTIME-ADR"',
   'Wave 7.1   COMPLETE',
   'Wave 7.2   COMPLETE',
   'Wave 7.3   COMPLETE',
