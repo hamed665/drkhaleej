@@ -85,6 +85,18 @@ forbid(files.migration, migration, /\b(insert|update|delete)\s+(into\s+)?public\
   'must not mutate canonical, decision or publication authorities');
 forbid(files.migration, migration, /SUPABASE_SERVICE_ROLE_KEY|DATABASE_URL|storage\.objects/i,
   'migration must not embed runtime credentials or open direct Storage access');
+const cancelBody = migration.match(/create or replace function public\.import_automation_cancel_job\([\s\S]*?\n\$\$;/)?.[0] ?? '';
+const controlBody = migration.match(/create or replace function public\.import_automation_set_control\([\s\S]*?\n\$\$;/)?.[0] ?? '';
+const identityBody = migration.match(/create or replace function public\.import_automation_configure_service_identity\([\s\S]*?\n\$\$;/)?.[0] ?? '';
+requireTokens(files.migration, cancelBody, ['p_actor_profile_id', 'p_job_id', 'p_reason']);
+forbid(files.migration, cancelBody, /\bp_(enabled|active|active_key_ids)\b/,
+  'cancel RPC must not reference parameters from another function');
+requireTokens(files.migration, controlBody, ['p_enabled is null']);
+forbid(files.migration, controlBody, /\bp_(active|active_key_ids)\b/,
+  'control RPC must not reference identity parameters');
+requireTokens(files.migration, identityBody, ['p_active is null', 'p_active_key_ids is null']);
+forbid(files.migration, identityBody, /\bp_enabled\b/,
+  'identity RPC must not reference control parameters');
 
 requireTokens(files.runtime, runtime, [
   'drkhaleej.import.automationJobRuntime.v1',

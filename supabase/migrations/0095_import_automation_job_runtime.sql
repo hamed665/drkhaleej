@@ -714,7 +714,6 @@ declare
   v_job public.import_automation_jobs%rowtype;
 begin
   if not exists (select 1 from public.profiles where id=p_actor_profile_id and is_platform_admin)
-    or p_enabled is null
     or char_length(btrim(coalesce(p_reason,''))) not between 8 and 500 then
     return jsonb_build_object('status','rejected','reason','automation_cancel_not_authorized');
   end if;
@@ -759,7 +758,7 @@ declare
   v_epoch bigint;
 begin
   if not exists (select 1 from public.profiles where id=p_actor_profile_id and is_platform_admin)
-    or p_active is null or p_active_key_ids is null
+    or p_enabled is null
     or char_length(btrim(coalesce(p_reason,''))) not between 8 and 500
     or p_control_kind not in ('global','family','source','ai','notifications')
     or (p_control_kind='family' and p_control_target<>'pharmacy')
@@ -815,6 +814,7 @@ set search_path = pg_catalog, public
 as $$
 begin
   if not exists (select 1 from public.profiles where id=p_actor_profile_id and is_platform_admin)
+    or p_active is null or p_active_key_ids is null
     or p_subject not in ('urn:drkhaleej:service:worker-preview','urn:drkhaleej:service:n8n-preview')
     or cardinality(p_active_key_ids) not between 1 and 2
     or exists (select 1 from unnest(p_active_key_ids) kid where kid !~ '^(worker-preview|n8n-preview)-[0-9]{8}-[0-9]{2}$')
