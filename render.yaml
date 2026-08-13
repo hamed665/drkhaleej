@@ -1,0 +1,24 @@
+services:
+  - type: worker
+    name: drkhaleej-automation-worker-preview
+    runtime: node
+    region: frankfurt
+    plan: starter
+    numInstances: 1
+    autoDeployTrigger: off
+    buildCommand: corepack enable && corepack prepare pnpm@10.22.0 --activate && pnpm install --frozen-lockfile
+    startCommand: pnpm automation:worker
+    maxShutdownDelaySeconds: 60
+    envVars:
+      - key: APP_ENV
+        value: preview
+      - key: AUTOMATION_EMERGENCY_ENABLED
+        value: "false"
+      - key: AUTOMATION_RUNTIME_PROBE_ENABLED
+        value: "false"
+      - key: AUTOMATION_INTERNAL_API_BASE_URL
+        sync: false
+      - key: AUTOMATION_SERVICE_KEY_ID
+        sync: false
+      - key: AUTOMATION_SERVICE_PRIVATE_KEY_PEM_BASE64
+        sync: false

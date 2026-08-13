@@ -15,9 +15,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #974 at baseline `e3b759a3e0b07a7458addab416a44917f3e43801` (last aligned 2026-08-12).
-- Migrations validate through `0094_import_entity_resolution_gate.sql`.
-- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline, additive Entity Resolution decisions and the Worker Runtime architecture decision are complete. `AUTOMATION-JOB-RUNTIME` is the next independently reviewable implementation; naming it grants no runtime or Production authority.
+- Import-readiness runtime is aligned through PR #975 at baseline `d5632e9600902afe20046c0f71fdfa0d466d8359` (last aligned 2026-08-12).
+- Migrations validate through `0095_import_automation_job_runtime.sql`.
+- Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline, additive Entity Resolution decisions, the Worker Runtime architecture decision and the closed-by-default Automation Job Runtime are complete. `AUTOMATION-JOB-PREVIEW-ACTIVATION` is the next independent gate; external runtime and Production authority remain closed.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
 - The Pharmacy private publish path consumes one already verified Reservation, applies the exact reviewed canonical patch, persists terminal state, creates one server-only durable rollback reference and remains private/noindex/no-route/no-sitemap.
 - The commercial add-on shell creates draft/internal Homepage Ads and Special Offer Placement assignments only.
@@ -111,11 +111,11 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #974 |
-| Runtime baseline | `e3b759a3e0b07a7458addab416a44917f3e43801` |
+| Aligned through | PR #975 |
+| Runtime baseline | `d5632e9600902afe20046c0f71fdfa0d466d8359` |
 | Last aligned | `2026-08-12` |
-| Current migration | `0094_import_entity_resolution_gate.sql` |
-| Current next | `AUTOMATION-JOB-RUNTIME` |
+| Current migration | `0095_import_automation_job_runtime.sql` |
+| Current next | `AUTOMATION-JOB-PREVIEW-ACTIVATION` |
 
 ## Import readiness capability mapping
 
@@ -154,6 +154,7 @@ This table maps current capability evidence to the canonical phase systems. The 
 | Entity Candidate Pipeline | Complete | `docs/import/ENTITY_CANDIDATE_PIPELINE.md` | `ENTITY-RESOLUTION-GATE` |
 | Entity Resolution Gate | Complete | `docs/import/ENTITY_RESOLUTION_GATE.md` | `WORKER-RUNTIME-ADR` |
 | Worker Runtime ADR | Complete / implementation closed | `docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md` | `AUTOMATION-JOB-RUNTIME` as a separate reviewed PR |
+| Automation Job Runtime | Complete / activation closed | `docs/import/AUTOMATION_JOB_RUNTIME.md` | `AUTOMATION-JOB-PREVIEW-ACTIVATION` |
 | AI-assisted intake | Draft/Review boundary complete | `docs/import/INTAKE_CONTRACT_CONVERGENCE.md` | Contract hardening; no runtime or publish |
 | Content/SEO Agent | Planned separate track | — | After CMS/automation authority |
 
@@ -187,6 +188,7 @@ The current reservation audit signature is `event_type=reservation_created`, `ev
 | `ENTITY-CANDIDATE-PIPELINE` | Phase 9 | Phase 10 | Phase 6 |
 | `WORKER-RUNTIME-ADR` | Phase 9 | Phase 10 | Phase 6 |
 | `AUTOMATION-JOB-RUNTIME` | Phase 9 | Phase 10 | Phase 6 |
+| `AUTOMATION-JOB-PREVIEW-ACTIVATION` | Phase 9 | Phase 10 | Phase 6 |
 
 This is the primary mapping and must be confirmed against current `main` before each PR. Program milestones do not replace the canonical phase systems.
 

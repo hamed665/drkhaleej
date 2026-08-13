@@ -5,6 +5,7 @@ const files = {
   roadmap: 'docs/import/import-readiness-roadmap-after-933.md',
   workerRuntimeAdrGate: 'docs/import/WORKER_RUNTIME_ADR_GATE.md',
   workerRuntimeAdr: 'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
+  automationJobRuntime: 'docs/import/AUTOMATION_JOB_RUNTIME.md',
   currentState: 'docs/project-state/CURRENT_STATE.md',
   matrix: 'docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md',
   readme: 'README.md',
@@ -12,11 +13,11 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 974,
-  runtimeBaseline: 'e3b759a3e0b07a7458addab416a44917f3e43801',
+  alignedThroughPr: 975,
+  runtimeBaseline: 'd5632e9600902afe20046c0f71fdfa0d466d8359',
   lastAligned: '2026-08-12',
-  currentMigration: '0094_import_entity_resolution_gate.sql',
-  currentNext: 'AUTOMATION-JOB-RUNTIME',
+  currentMigration: '0095_import_automation_job_runtime.sql',
+  currentNext: 'AUTOMATION-JOB-PREVIEW-ACTIVATION',
   waves: {
     0: 'COMPLETE',
     1: 'COMPLETE',
@@ -337,6 +338,10 @@ function validateMatrix(source, manifest) {
       'Complete / implementation closed',
       'docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md',
     ],
+    'Automation Job Runtime': [
+      'Complete / activation closed',
+      'docs/import/AUTOMATION_JOB_RUNTIME.md',
+    ],
     'AI-assisted intake': [
       'Draft/Review boundary complete',
       'docs/import/INTAKE_CONTRACT_CONVERGENCE.md',
@@ -443,17 +448,35 @@ function validateWorkerRuntimeAdr(source) {
   }
 }
 
+function validateAutomationJobRuntime(source) {
+  const required = [
+    '# Automation Job Runtime',
+    '`AUTOMATION-JOB-RUNTIME`',
+    '`0095_import_automation_job_runtime.sql`',
+    'all controls and identities default disabled',
+    '`AUTOMATION-JOB-PREVIEW-ACTIVATION`',
+    'Render provisioning is not performed by this PR',
+    'Production remains disconnected',
+  ];
+  for (const token of required) {
+    if (!source.includes(token)) {
+      fail(files.automationJobRuntime, 'required closed-runtime token', token, '<missing>');
+    }
+  }
+}
+
 function validateReadme(source, manifest) {
   const section = extractSection(files.readme, source, 'Current project phase status');
   const required = [
     `PR #${manifest.alignedThroughPr}`,
     manifest.runtimeBaseline,
     manifest.currentMigration,
-    '`0001` through `0094`',
+    '`0001` through `0095`',
     manifest.currentNext,
     '[`docs/project-state/CURRENT_STATE.md`](docs/project-state/CURRENT_STATE.md)',
     '[`docs/import/WORKER_RUNTIME_ADR_GATE.md`](docs/import/WORKER_RUNTIME_ADR_GATE.md)',
     '[`docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md)',
+    '[`docs/import/AUTOMATION_JOB_RUNTIME.md`](docs/import/AUTOMATION_JOB_RUNTIME.md)',
     '[`docs/import/import-readiness-roadmap-after-933.md`](docs/import/import-readiness-roadmap-after-933.md)',
     '[`docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md`](docs/project-state/V10_4_PHASE_ALIGNMENT_MATRIX.md)',
   ];
@@ -480,6 +503,7 @@ validateCanonicalManifest(manifest);
 validateVisibleRoadmapLedger(sources.roadmap, manifest);
 validateWorkerRuntimeAdrGate(sources.workerRuntimeAdrGate);
 validateWorkerRuntimeAdr(sources.workerRuntimeAdr);
+validateAutomationJobRuntime(sources.automationJobRuntime);
 validateCurrentState(sources.currentState, manifest);
 validateMatrix(sources.matrix, manifest);
 validateReadme(sources.readme, manifest);
