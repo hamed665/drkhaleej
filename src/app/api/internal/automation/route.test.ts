@@ -20,11 +20,18 @@ import { verifyAutomationServiceToken } from "@/server/imports/automation-servic
 import { POST } from "./route";
 
 function openPreviewBoundary() {
+  const sourceCommit = "a".repeat(40);
   vi.stubEnv("APP_ENV", "preview");
+  vi.stubEnv("VERCEL_ENV", "preview");
+  vi.stubEnv("VERCEL_GIT_COMMIT_SHA", sourceCommit);
+  vi.stubEnv("AUTOMATION_PREVIEW_ACTIVATION_ENABLED", "true");
+  vi.stubEnv("AUTOMATION_PREVIEW_ACTIVATION_SHA", sourceCommit);
   vi.stubEnv("AUTOMATION_EMERGENCY_ENABLED", "true");
-  vi.stubEnv("AUTOMATION_PREVIEW_PROJECT_REF", "preview-ref");
-  vi.stubEnv("AUTOMATION_PRODUCTION_PROJECT_REF", "production-ref");
-  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://preview-ref.supabase.co");
+  vi.stubEnv("AUTOMATION_RUNTIME_PROBE_ENABLED", "true");
+  vi.stubEnv("AUTOMATION_PREVIEW_PROJECT_REF", "previewref1234567890");
+  vi.stubEnv("AUTOMATION_PRODUCTION_PROJECT_REF", "productionref1234567");
+  vi.stubEnv("AUTOMATION_VERCEL_PREVIEW_HOST", "drkhaleej-preview-a1b2c3.vercel.app");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://previewref1234567890.supabase.co");
   vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-only-service-key");
 }
 
@@ -48,14 +55,14 @@ describe("internal automation route boundary", () => {
 
   it("rejects non-JSON and declared oversized bodies before identity work", async () => {
     openPreviewBoundary();
-    const nonJson = await POST(new Request("https://preview.example/api/internal/automation", {
+    const nonJson = await POST(new Request("https://drkhaleej-preview-a1b2c3.vercel.app/api/internal/automation", {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: "{}",
     }));
     expect(nonJson.status).toBe(415);
 
-    const oversized = await POST(new Request("https://preview.example/api/internal/automation", {
+    const oversized = await POST(new Request("https://drkhaleej-preview-a1b2c3.vercel.app/api/internal/automation", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Content-Length": "65537" },
       body: "{}",
@@ -67,7 +74,7 @@ describe("internal automation route boundary", () => {
   it("passes the exact bounded request bytes into signed identity verification", async () => {
     openPreviewBoundary();
     const body = JSON.stringify({ operation: "claim_job", jobTypes: ["report"] });
-    const response = await POST(new Request("https://preview.example/api/internal/automation", {
+    const response = await POST(new Request("https://drkhaleej-preview-a1b2c3.vercel.app/api/internal/automation", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer invalid" },
       body,
@@ -78,5 +85,16 @@ describe("internal automation route boundary", () => {
       normalizedPath: "/api/internal/automation",
       requestBody: new TextEncoder().encode(body),
     }));
+  });
+
+  it("rejects a different Vercel host before identity work", async () => {
+    openPreviewBoundary();
+    const response = await POST(new Request("https://production.example.com/api/internal/automation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation: "claim_job", jobTypes: ["report"] }),
+    }));
+    expect(response.status).toBe(503);
+    expect(verifyAutomationServiceToken).not.toHaveBeenCalled();
   });
 });

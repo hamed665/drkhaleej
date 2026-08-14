@@ -25,13 +25,26 @@ function required(name, maximum = 16_000) {
 
 function previewConfiguration() {
   const appEnvironment = process.env.APP_ENV?.trim();
+  const activation = process.env.AUTOMATION_PREVIEW_ACTIVATION_ENABLED?.trim();
   const emergency = process.env.AUTOMATION_EMERGENCY_ENABLED?.trim();
   const probe = process.env.AUTOMATION_RUNTIME_PROBE_ENABLED?.trim();
-  if (appEnvironment !== 'preview' || emergency !== 'true' || probe !== 'true') return null;
+  if (appEnvironment !== 'preview' || activation !== 'true' || emergency !== 'true' || probe !== 'true') return null;
+  const activationCommit = required('AUTOMATION_PREVIEW_ACTIVATION_SHA', 40);
+  const renderCommit = required('RENDER_GIT_COMMIT', 40);
+  const previewRef = required('AUTOMATION_PREVIEW_PROJECT_REF', 40);
+  const productionRef = required('AUTOMATION_PRODUCTION_PROJECT_REF', 40);
+  const previewHost = required('AUTOMATION_VERCEL_PREVIEW_HOST', 253).toLowerCase();
+  if (!/^[a-f0-9]{40}$/.test(activationCommit) || activationCommit !== renderCommit ||
+    process.env.RENDER !== 'true' || process.env.RENDER_GIT_REPO_SLUG !== 'hamed665/drkhaleej' ||
+    process.env.IS_PULL_REQUEST !== 'false' || !/^[a-z0-9]{8,40}$/.test(previewRef) ||
+    !/^[a-z0-9]{8,40}$/.test(productionRef) || previewRef === productionRef ||
+    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.vercel\.app$/.test(previewHost)) {
+    throw new Error('preview_activation_invalid');
+  }
   const baseUrl = required('AUTOMATION_INTERNAL_API_BASE_URL', 240);
   const parsed = new URL(baseUrl);
   if (parsed.protocol !== 'https:' || parsed.port || parsed.username || parsed.password || parsed.search || parsed.hash ||
-    parsed.pathname !== '/' || /(^|\.)localhost$/.test(parsed.hostname)) throw new Error('internal_api_url_invalid');
+    parsed.pathname !== '/' || parsed.hostname !== previewHost) throw new Error('internal_api_url_invalid');
   const kid = required('AUTOMATION_SERVICE_KEY_ID', 80);
   if (!/^worker-preview-[0-9]{8}-[0-9]{2}$/.test(kid)) throw new Error('service_key_id_invalid');
   const privateKey = createPrivateKey({

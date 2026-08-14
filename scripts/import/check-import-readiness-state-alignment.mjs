@@ -13,9 +13,9 @@ const files = {
 
 const expectedCanonicalState = {
   schemaVersion: 'drkhaleej.importReadinessState.v1',
-  alignedThroughPr: 975,
-  runtimeBaseline: 'd5632e9600902afe20046c0f71fdfa0d466d8359',
-  lastAligned: '2026-08-12',
+  alignedThroughPr: 976,
+  runtimeBaseline: '1b33835ceda3ebce9b1bc671f87e7e67b7594ee9',
+  lastAligned: '2026-08-13',
   currentMigration: '0095_import_automation_job_runtime.sql',
   currentNext: 'AUTOMATION-JOB-PREVIEW-ACTIVATION',
   waves: {

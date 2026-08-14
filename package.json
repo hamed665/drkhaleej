@@ -62,6 +62,7 @@
     "import:entity-candidate-pipeline:validate": "node scripts/import/check-entity-candidate-pipeline.mjs && vitest run src/server/admin/import-entity-candidate-pipeline.test.ts",
     "import:entity-resolution-gate:validate": "node scripts/import/check-entity-resolution-gate.mjs && vitest run src/server/admin/import-entity-resolution-gate.test.ts",
     "import:automation-job-runtime:validate": "node scripts/import/check-automation-job-runtime.mjs && vitest run src/server/imports/automation-job-runtime.test.ts src/server/imports/automation-service-identity.test.ts src/server/imports/automation-control-plane.test.ts src/app/api/internal/automation/route.test.ts",
+    "import:automation-job-preview-activation:validate": "node scripts/import/check-automation-job-preview-activation.mjs && vitest run src/server/imports/automation-preview-activation.test.ts src/app/api/internal/automation/route.test.ts",
     "import:reservation-db-safety:validate": "node scripts/import/check-import-reservation-db-safety-proof.mjs",
     "import:reservation-audit-split:validate": "node scripts/import/check-import-reservation-audit-split.mjs",
     "import:state-alignment:validate": "node scripts/import/check-import-readiness-state-alignment.mjs && node scripts/import/test-import-readiness-state-alignment.mjs",

@@ -26,7 +26,7 @@ Build mode:
 
 ## Current project phase status
 
-- Import-readiness runtime is aligned through **PR #975** at baseline **`d5632e9600902afe20046c0f71fdfa0d466d8359`**.
+- Import-readiness runtime is aligned through **PR #976** at baseline **`1b33835ceda3ebce9b1bc671f87e7e67b7594ee9`**.
 - Database/migration status: **validates through `0095_import_automation_job_runtime.sql`**.
 - Completed migration set: **`0001` through `0095`**.
 - Current import-readiness implementation: **`AUTOMATION-JOB-RUNTIME`** adds the closed-by-default Preview queue, service identity boundary, lease fencing, bounded outbox, internal API and idle Worker shell recorded in [`docs/import/AUTOMATION_JOB_RUNTIME.md`](docs/import/AUTOMATION_JOB_RUNTIME.md). All controls and identities remain disabled, Render is not provisioned, and **`AUTOMATION-JOB-PREVIEW-ACTIVATION`** is the next independently reviewable gate. The completed decision gate is recorded in [`docs/import/WORKER_RUNTIME_ADR_GATE.md`](docs/import/WORKER_RUNTIME_ADR_GATE.md), and the accepted choices remain in [`docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md`](docs/import/WORKER_RUNTIME_ARCHITECTURE_DECISION.md); decision application and every downstream/Production authority remain gated.

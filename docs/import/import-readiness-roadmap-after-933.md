@@ -32,9 +32,9 @@ Wave 8     PARTIAL   P16 intake, P17 Source Evidence, P18 duplicate/geo candidat
 PRs #919–#921 are earlier canary/readback infrastructure. They predate the current Reservation authority and do not complete Wave 2, but their verifier and integrity-report implementations must be extended instead of rebuilt.
 
 ```text
-Aligned through: PR #975
-Baseline commit: d5632e9
-Last aligned: 2026-08-12
+Aligned through: PR #976
+Baseline commit: 1b33835
+Last aligned: 2026-08-13
 ```
 
 The full runtime baseline and the cross-document state tokens are machine-readable here. The alignment validator treats this manifest as the canonical state record.
@@ -42,9 +42,9 @@ The full runtime baseline and the cross-document state tokens are machine-readab
 ```json import-readiness-state
 {
   "schemaVersion": "drkhaleej.importReadinessState.v1",
-  "alignedThroughPr": 975,
-  "runtimeBaseline": "d5632e9600902afe20046c0f71fdfa0d466d8359",
-  "lastAligned": "2026-08-12",
+  "alignedThroughPr": 976,
+  "runtimeBaseline": "1b33835ceda3ebce9b1bc671f87e7e67b7594ee9",
+  "lastAligned": "2026-08-13",
   "currentMigration": "0095_import_automation_job_runtime.sql",
   "currentNext": "AUTOMATION-JOB-PREVIEW-ACTIVATION",
   "waves": {

@@ -15,7 +15,7 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 ## Current Repository Baseline
 
-- Import-readiness runtime is aligned through PR #975 at baseline `d5632e9600902afe20046c0f71fdfa0d466d8359` (last aligned 2026-08-12).
+- Import-readiness runtime is aligned through PR #976 at baseline `1b33835ceda3ebce9b1bc671f87e7e67b7594ee9` (last aligned 2026-08-13).
 - Migrations validate through `0095_import_automation_job_runtime.sql`.
 - Registry Convergence, P11–P15 of the Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline, additive Entity Resolution decisions, the Worker Runtime architecture decision and the closed-by-default Automation Job Runtime are complete. `AUTOMATION-JOB-PREVIEW-ACTIVATION` is the next independent gate; external runtime and Production authority remain closed.
 - Current foundations include public catalog/detail pages, static public article shell routes, provider onboarding lead capture, callback request capture, protected root `/admin`, minimal admin login, lead list/detail, limited lead mutation, lead history, draft center creation from lead, center subscription view/assignment, base plan initializer, admin quick navigation, admin commercial add-on assignment shell, and the Preview-only guarded Pharmacy private publish/readback path.
@@ -111,9 +111,9 @@ If this file conflicts with `docs/master-spec/`, the master spec wins. If it con
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #975 |
-| Runtime baseline | `d5632e9600902afe20046c0f71fdfa0d466d8359` |
-| Last aligned | `2026-08-12` |
+| Aligned through | PR #976 |
+| Runtime baseline | `1b33835ceda3ebce9b1bc671f87e7e67b7594ee9` |
+| Last aligned | `2026-08-13` |
 | Current migration | `0095_import_automation_job_runtime.sql` |
 | Current next | `AUTOMATION-JOB-PREVIEW-ACTIVATION` |
 

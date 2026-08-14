@@ -10,6 +10,7 @@ import {
   parseAutomationPublicJwks,
   verifyAutomationServiceToken,
 } from "@/server/imports/automation-service-identity";
+import { resolveAutomationPreviewActivation } from "@/server/imports/automation-preview-activation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,21 +54,21 @@ async function readBoundedBody(request: Request): Promise<Uint8Array | null> {
   return body;
 }
 
-function previewBoundary() {
-  const appEnvironment = process.env.APP_ENV?.trim();
-  const emergencyEnabled = process.env.AUTOMATION_EMERGENCY_ENABLED?.trim();
+function previewBoundary(request: Request) {
+  const activation = resolveAutomationPreviewActivation(process.env, "vercel");
   const previewRef = process.env.AUTOMATION_PREVIEW_PROJECT_REF?.trim();
   const productionRef = process.env.AUTOMATION_PRODUCTION_PROJECT_REF?.trim();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (appEnvironment !== "preview" || emergencyEnabled !== "true" || !previewRef || !productionRef ||
+  if (!activation.enabled || new URL(request.url).hostname !== activation.previewHost ||
+    !previewRef || !productionRef ||
     previewRef === productionRef || !supabaseUrl || !serviceRoleKey || !supabaseUrl.includes(previewRef) ||
     supabaseUrl.includes(productionRef)) return null;
   return { supabaseUrl, serviceRoleKey };
 }
 
 export async function POST(request: Request) {
-  const boundary = previewBoundary();
+  const boundary = previewBoundary(request);
   if (boundary === null) return denied("automation_preview_boundary_closed", 503);
   if (request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase() !== "application/json") {
     return denied("automation_content_type_invalid", 415);
