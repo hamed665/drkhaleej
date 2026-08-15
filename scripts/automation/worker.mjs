@@ -52,7 +52,8 @@ function previewConfiguration() {
     format: 'pem',
   });
   if (privateKey.asymmetricKeyType !== 'ed25519') throw new Error('service_private_key_invalid');
-  return { endpoint: new URL(PATH, parsed).toString(), kid, privateKey };
+  const bypassSecret = required('VERCEL_AUTOMATION_BYPASS_SECRET', 256);
+  return { endpoint: new URL(PATH, parsed).toString(), kid, privateKey, bypassSecret };
 }
 
 function token(config, scope, body, jobBinding = null) {
@@ -84,6 +85,7 @@ async function operation(config, scope, payload, jobBinding = null) {
     redirect: 'error',
     headers: {
       Authorization: `Bearer ${token(config, scope, body, jobBinding)}`,
+      'x-vercel-protection-bypass': config.bypassSecret,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },

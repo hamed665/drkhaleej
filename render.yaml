@@ -32,3 +32,5 @@ services:
         sync: false
       - key: AUTOMATION_SERVICE_PRIVATE_KEY_PEM_BASE64
         sync: false
+      - key: VERCEL_AUTOMATION_BYPASS_SECRET
+        sync: false

@@ -70,6 +70,8 @@ requireTokens(files.worker, worker, [
   "process.env.IS_PULL_REQUEST !== 'false'",
   "parsed.hostname !== previewHost",
   "throw new Error('preview_activation_invalid')",
+  "required('VERCEL_AUTOMATION_BYPASS_SECRET', 256)",
+  "'x-vercel-protection-bypass': config.bypassSecret",
 ]);
 forbid(files.worker, worker, /SUPABASE|DATABASE_URL|STORAGE|service[_-]?role|publish|rollback/i,
   'Worker must hold no database, Storage or downstream authority');
@@ -83,6 +85,7 @@ requireTokens(files.render, render, [
   'value: "false"',
   'AUTOMATION_PREVIEW_ACTIVATION_SHA',
   'AUTOMATION_VERCEL_PREVIEW_HOST',
+  'VERCEL_AUTOMATION_BYPASS_SECRET',
 ]);
 forbid(files.render, render, /type:\s*(web|pserv)|disk:|databases:|scaling:|autoDeployTrigger:\s*(commit|checksPass)/,
   'activation must remain one manual Background Worker without endpoint, disk, datastore or autoscale');
@@ -90,6 +93,7 @@ requireTokens(files.env, env, [
   'AUTOMATION_PREVIEW_ACTIVATION_ENABLED=false',
   'AUTOMATION_PREVIEW_ACTIVATION_SHA=',
   'AUTOMATION_VERCEL_PREVIEW_HOST=',
+  'VERCEL_AUTOMATION_BYPASS_SECRET=',
 ]);
 forbid(files.env, env, /BEGIN (RSA|EC|OPENSSH|PRIVATE) PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\./,
   'environment example must not contain a credential');
@@ -100,6 +104,7 @@ requireTokens(files.docs, docs, [
   'controlsDefaultEnabled": false',
   'Production remains disconnected',
   'Items 9–11 may be recorded as `closed_not_exercised`',
+  '`x-vercel-protection-bypass`',
 ]);
 requireTokens(files.workflow, workflow, [
   "'scripts/import/check-automation-job-preview-activation.mjs'",

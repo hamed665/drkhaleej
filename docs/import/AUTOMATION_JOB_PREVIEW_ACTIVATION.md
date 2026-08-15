@@ -51,6 +51,12 @@ Both runtimes require distinct bounded Preview and Production project references
 verifies that the configured Supabase URL contains only the Preview reference. The Worker receives
 no database URL, Supabase credential, Storage credential or Production secret.
 
+Vercel Authentication remains enabled. Create one Vercel Protection Bypass for Automation secret,
+store the same value in the Render Worker as `VERCEL_AUTOMATION_BYPASS_SECRET`, and never place the
+value in Git, logs, artifacts or pull-request text. The Worker sends it only in the
+`x-vercel-protection-bypass` request header; query-parameter bypass is forbidden. Rotating the
+secret requires updating Render and redeploying the Worker before any bounded probe.
+
 ## Provisioning contract
 
 The only authorized paid resource is one `drkhaleej-automation-worker-preview` Render Background
@@ -64,11 +70,12 @@ Provisioning order:
 2. obtain a Vercel Preview deployment for that exact commit;
 3. create the Render service with all activation switches false;
 4. create one environment-specific Ed25519 Worker key and configure only its public JWK on Vercel;
-5. populate the exact Preview host, separate project references and exact source SHA;
-6. verify the service is one manual Starter instance and still idle;
-7. collect the accepted evidence bundle;
-8. enable the three switches only for the bounded `report` probe;
-9. return every switch and service identity to disabled after evidence collection.
+5. create one Vercel Automation Bypass secret and save the same value only in Render;
+6. populate the exact Preview host, separate project references and exact source SHA;
+7. verify the service is one manual Starter instance and still idle;
+8. collect the accepted evidence bundle;
+9. enable the three switches only for the bounded `report` probe;
+10. return every switch and service identity to disabled after evidence collection.
 
 Creating a key or saving any private key is an operator action in the provider secret stores. No
 private key, JWT, database credential, lease token or raw evidence may enter Git, logs, artifacts,
