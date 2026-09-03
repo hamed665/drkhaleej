@@ -48,13 +48,21 @@ jobs:
             --image-optimization=none \
             --no-prerender
 
-      - name: Apply exact-optional compatibility fix for CDN adapter
+      - name: Normalize Vinext CDN descriptor for strict optional typing
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'cdnAdapter()' vite.config.ts
-          sed -i 's/cdnAdapter()/cdnAdapter({})/' vite.config.ts
-          grep -q 'cdnAdapter({})' vite.config.ts
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('vite.config.ts')
+          text = path.read_text()
+          old = 'cdn: cdnAdapter()'
+          new = 'cdn: (() => { const descriptor = cdnAdapter(); return { ...descriptor, options: { ...(descriptor.options ?? {}) } }; })()'
+          if old not in text:
+              raise SystemExit('expected generated cdnAdapter() expression not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+          grep -q 'descriptor.options' vite.config.ts
 
       - name: Existing validation gates
         shell: bash
