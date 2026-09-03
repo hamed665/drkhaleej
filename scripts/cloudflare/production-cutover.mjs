@@ -43,6 +43,7 @@ const baselineWwwCname = "99f83eafeb1926bc.vercel-dns-017.com";
 const productionSupabaseUrl = `https://${process.env.PRODUCTION_PROJECT_REF}.supabase.co`;
 const generatedWranglerConfig = "dist/server/wrangler.json";
 const WEB_ROUTING_TYPES = new Set(["A", "AAAA", "CNAME"]);
+const TARGET_HOSTS = new Set([apexHost, canonicalHost]);
 
 const secrets = [
   process.env.CLOUDFLARE_API_TOKEN,
@@ -115,7 +116,7 @@ async function fetchTimed(url, init = {}) {
   return fetch(url, { ...init, signal: AbortSignal.timeout(20_000) });
 }
 
-async function cf(method, path, body = undefined) {
+async function cfRaw(method, path, body = undefined) {
   const response = await fetchTimed(`https://api.cloudflare.com/client/v4${path}`, {
     method,
     headers: {
@@ -126,6 +127,11 @@ async function cf(method, path, body = undefined) {
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   const payload = await response.json().catch(() => null);
+  return { response, payload };
+}
+
+async function cf(method, path, body = undefined) {
+  const { response, payload } = await cfRaw(method, path, body);
   if (!response.ok || payload?.success !== true) {
     const codes = Array.isArray(payload?.errors)
       ? payload.errors.map((error) => error?.code).filter(Boolean).join(",")
@@ -166,6 +172,31 @@ async function listDomains() {
   return Array.isArray(domains) ? domains : [];
 }
 
+function targetDomains(domains) {
+  return domains.filter((domain) => TARGET_HOSTS.has(domain.hostname));
+}
+
+function assertTargetDomainsOwnedByWorker(domains, marker) {
+  const targets = targetDomains(domains);
+  const foreign = targets.filter((domain) => domain.service !== workerName);
+  if (foreign.length) {
+    throw new Error(
+      `${marker}=TARGET_DOMAIN_SERVICE_DRIFT:${foreign
+        .map((domain) => `${domain.hostname}:${domain.service}`)
+        .join(",")}`,
+    );
+  }
+  return targets;
+}
+
+function assertBothTargetDomainsAttached(domains, marker) {
+  for (const hostname of [canonicalHost, apexHost]) {
+    if (!domains.some((domain) => domain.hostname === hostname && domain.service === workerName)) {
+      throw new Error(`${marker}=CUSTOM_DOMAIN_MISSING_${hostname}`);
+    }
+  }
+}
+
 async function listWorkerDeployments() {
   const result = await cf(
     "GET",
@@ -174,6 +205,16 @@ async function listWorkerDeployments() {
   if (Array.isArray(result)) return result;
   if (Array.isArray(result?.deployments)) return result.deployments;
   throw new Error("WORKER_DEPLOYMENTS=UNEXPECTED_RESPONSE_SHAPE");
+}
+
+function deploymentHasExactVersion(deployments, versionId) {
+  const active = deployments[0];
+  const versions = Array.isArray(active?.versions) ? active.versions : [];
+  return (
+    versions.length === 1 &&
+    versions[0]?.version_id === versionId &&
+    Number(versions[0]?.percentage) === 100
+  );
 }
 
 async function getActiveSingleVersionId() {
@@ -196,8 +237,23 @@ async function getActiveSingleVersionId() {
   throw new Error(`WORKER_ACTIVE_SINGLE_VERSION=NOT_STABLE:${last}`);
 }
 
+async function waitForExactWorkerVersion(versionId, marker) {
+  let last = "missing";
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    const deployments = await listWorkerDeployments();
+    if (deploymentHasExactVersion(deployments, versionId)) {
+      console.log(`${marker}=VERIFIED_ATTEMPT_${attempt}`);
+      return;
+    }
+    const versions = Array.isArray(deployments[0]?.versions) ? deployments[0].versions : [];
+    last = `deployments_${deployments.length}_versions_${versions.length}`;
+    await sleep(1_000);
+  }
+  throw new Error(`${marker}=DID_NOT_CONVERGE:${last}`);
+}
+
 async function deploySingleWorkerVersion(versionId, message) {
-  const deployment = await cf(
+  await cf(
     "POST",
     `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${encodeURIComponent(workerName)}/deployments`,
     {
@@ -206,14 +262,7 @@ async function deploySingleWorkerVersion(versionId, message) {
       annotations: { "workers/message": message },
     },
   );
-  const versions = Array.isArray(deployment?.versions) ? deployment.versions : [];
-  if (
-    versions.length !== 1 ||
-    versions[0]?.version_id !== versionId ||
-    Number(versions[0]?.percentage) !== 100
-  ) {
-    throw new Error("WORKER_VERSION_ROLLBACK=DEPLOYMENT_RESPONSE_MISMATCH");
-  }
+  await waitForExactWorkerVersion(versionId, "WORKER_VERSION_ROLLBACK");
 }
 
 async function getWorkersAccountSubdomain() {
@@ -251,7 +300,7 @@ async function setWorkerSubdomainState({ enabled, previewsEnabled }) {
 }
 
 function assertNoTargetDomains(domains, marker) {
-  const matches = domains.filter((domain) => [apexHost, canonicalHost].includes(domain.hostname));
+  const matches = targetDomains(domains);
   if (matches.length) {
     throw new Error(
       `${marker}=TARGET_CUSTOM_DOMAIN_ALREADY_ATTACHED:${matches
@@ -359,6 +408,14 @@ async function deleteRecords(zoneId, records) {
   }
 }
 
+async function removeWebRoutingForHost(zoneId, hostname) {
+  const records = webRoutingRecords(await listDns(zoneId, hostname));
+  if (!records.length) return 0;
+  await deleteRecords(zoneId, records);
+  console.log(`RECOVERY_WEB_ROUTING_REMOVED=${hostname}:${records.length}`);
+  return records.length;
+}
+
 async function restoreSnapshot(zoneId, snapshot) {
   for (const hostname of [apexHost, canonicalHost]) {
     const currentWebRouting = webRoutingRecords(await listDns(zoneId, hostname));
@@ -382,17 +439,39 @@ async function attachDomain(zone, hostname) {
   );
 }
 
+async function detachDomainVerified(domain) {
+  const path = `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/domains/${domain.id}`;
+  const { response, payload } = await cfRaw("DELETE", path);
+  if (!response.ok) {
+    const codes = Array.isArray(payload?.errors)
+      ? payload.errors.map((error) => error?.code).filter(Boolean).join(",")
+      : "unknown";
+    throw new Error(`Cloudflare DELETE ${path} failed; status=${response.status}; codes=${codes}`);
+  }
+
+  for (let attempt = 1; attempt <= 10; attempt += 1) {
+    const remaining = await listDomains();
+    const stillAttached = remaining.some(
+      (candidate) =>
+        candidate.hostname === domain.hostname &&
+        candidate.service === workerName &&
+        (!domain.id || candidate.id === domain.id),
+    );
+    if (!stillAttached) {
+      console.log(
+        `CUSTOM_DOMAIN_DETACH=VERIFIED_${domain.hostname}_ATTEMPT_${attempt};API_SUCCESS_${payload?.success === true ? "TRUE" : "UNRELIABLE"}`,
+      );
+      return;
+    }
+    await sleep(1_000);
+  }
+  throw new Error(`CUSTOM_DOMAIN_DETACH=NOT_CONFIRMED_${domain.hostname}_STATUS_${response.status}`);
+}
+
 async function detachOurDomains() {
   for (const domain of await listDomains()) {
-    if (
-      [apexHost, canonicalHost].includes(domain.hostname) &&
-      domain.service === workerName &&
-      domain.id
-    ) {
-      await cf(
-        "DELETE",
-        `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/domains/${domain.id}`,
-      );
+    if (TARGET_HOSTS.has(domain.hostname) && domain.service === workerName && domain.id) {
+      await detachDomainVerified(domain);
     }
   }
 }
@@ -473,9 +552,11 @@ async function waitForWorkersDev(baseUrl) {
   throw new Error(`WORKERS_DEV_NOT_READY:${last}`);
 }
 
-async function waitForProduction() {
+async function waitForProduction(maxWaitMs = 120_000) {
+  const intervalMs = 5_000;
+  const attempts = Math.max(24, Math.ceil(maxWaitMs / intervalMs));
   let last = "unknown";
-  for (let attempt = 1; attempt <= 24; attempt += 1) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       const response = await fetchTimed(`${canonicalAppUrl}/en/om`, { redirect: "manual" });
       last = `status_${response.status}`;
@@ -484,12 +565,24 @@ async function waitForProduction() {
         console.log(`PRODUCTION_DOMAIN_READY=ATTEMPT_${attempt}`);
         return;
       }
+      console.log(`PRODUCTION_READINESS_ATTEMPT_${attempt}=STATUS_${response.status}`);
     } catch (error) {
       last = sanitize(error?.message ?? error);
+      console.log(`PRODUCTION_READINESS_ATTEMPT_${attempt}=ERROR`);
     }
-    await sleep(5_000);
+    await sleep(intervalMs);
   }
   throw new Error(`PRODUCTION_DOMAIN_NOT_READY:${last}`);
+}
+
+function productionReadinessWindowMs(records) {
+  const maxTtl = records.reduce((current, record) => {
+    const ttl = Number(record?.body?.ttl);
+    return Number.isFinite(ttl) && ttl > 1 ? Math.max(current, ttl) : current;
+  }, 0);
+  const seconds = Math.max(120, Math.min(600, maxTtl + 60));
+  console.log(`PRODUCTION_READINESS_WINDOW_SECONDS=${seconds};BASELINE_MAX_TTL_${maxTtl}`);
+  return seconds * 1_000;
 }
 
 async function verifyRollback(zoneId) {
@@ -512,9 +605,93 @@ async function verifyRollback(zoneId) {
   throw new Error(`ROLLBACK_PUBLIC_VERIFY_DID_NOT_CONVERGE:${last}`);
 }
 
+async function recoverFailedCutover(zone, existingTargets) {
+  console.log(
+    `CLOUDFLARE_CUTOVER_RECOVERY=START;ATTACHED_TARGET_DOMAINS_${existingTargets.length}`,
+  );
+  const rollbackVersionId = await getActiveSingleVersionId();
+  console.log("CLOUDFLARE_RECOVERY_ROLLBACK_VERSION=CAPTURED");
+
+  let production = null;
+  try {
+    production = deploy({ indexing: true, workersDev: false, suffix: "recovery" });
+    await setWorkerSubdomainState({ enabled: false, previewsEnabled: false });
+    console.log("PRODUCTION_WORKER=INDEXING_ON_WORKERS_DEV_OFF_VERIFIED");
+
+    let currentDomains = await listDomains();
+    assertTargetDomainsOwnedByWorker(currentDomains, "RECOVERY_PRE_ATTACH");
+    for (const hostname of [canonicalHost, apexHost]) {
+      if (!currentDomains.some((domain) => domain.hostname === hostname && domain.service === workerName)) {
+        await removeWebRoutingForHost(zone.id, hostname);
+        await attachDomain(zone, hostname);
+        console.log(`RECOVERY_CUSTOM_DOMAIN=ATTACHED_${hostname}`);
+        currentDomains = await listDomains();
+      }
+    }
+
+    assertBothTargetDomainsAttached(await listDomains(), "RECOVERY_POST_ATTACH");
+    await waitForProduction();
+    await runRuntimeSmoke(canonicalAppUrl, production.actionId, { productionDomain: true });
+    await observeTailAndLoad({
+      baseUrl: canonicalAppUrl,
+      workerName,
+      configPath: production.configPath,
+      env: childEnv,
+      sanitize,
+    });
+    assertBothTargetDomainsAttached(await listDomains(), "RECOVERY_POST_SMOKE");
+
+    console.log("CLOUDFLARE_CUTOVER_RECOVERY=GREEN");
+    console.log("CLOUDFLARE_PRODUCTION_CUTOVER=GREEN");
+    console.log("VERCEL_ORIGIN=RETAINED_FOR_STABILIZATION_ROLLBACK");
+  } catch (error) {
+    console.error(`RECOVERY_FAILURE=${sanitize(error?.message ?? error)}`);
+    console.error("ROLLBACK_CLOUDFLARE_RECOVERY_VERSION=STARTING");
+    try {
+      await deploySingleWorkerVersion(
+        rollbackVersionId,
+        "Automatic rollback to exact pre-recovery DrKhaleej Worker version",
+      );
+      assertBothTargetDomainsAttached(await listDomains(), "ROLLBACK_CLOUDFLARE_RECOVERY");
+      await waitForProduction();
+      if (production) {
+        await runRuntimeSmoke(canonicalAppUrl, production.actionId);
+        await observeTailAndLoad({
+          baseUrl: canonicalAppUrl,
+          workerName,
+          configPath: production.configPath,
+          env: childEnv,
+          sanitize,
+        });
+      }
+      console.error("ROLLBACK_CLOUDFLARE_RECOVERY_VERSION=GREEN;INDEXING_STATE_PRE_RECOVERY_RESTORED");
+    } catch (rollbackError) {
+      console.error(
+        `ROLLBACK_CLOUDFLARE_RECOVERY_FAILURE=${sanitize(rollbackError?.message ?? rollbackError)}`,
+      );
+      throw new AggregateError(
+        [error, rollbackError],
+        "Failed-cutover recovery failed and exact Worker-version rollback also failed",
+      );
+    }
+    throw error;
+  }
+}
+
 const zone = await getZone();
 console.log("CLOUDFLARE_ZONE=ACTIVE_ACCOUNT_MATCH");
-assertNoTargetDomains(await listDomains(), "PRE_STAGE");
+const initialDomains = await listDomains();
+const existingTargets = assertTargetDomainsOwnedByWorker(initialDomains, "PRE_STAGE");
+
+if (existingTargets.length) {
+  if (mode !== "cutover") {
+    throw new Error("PRE_STAGE=TARGET_CUSTOM_DOMAIN_ALREADY_ATTACHED_REQUIRES_CUTOVER_RECOVERY");
+  }
+  await recoverFailedCutover(zone, existingTargets);
+  process.exit(0);
+}
+
+assertNoTargetDomains(initialDomains, "PRE_STAGE");
 console.log("PRE_STAGE_TARGET_CUSTOM_DOMAINS=ABSENT");
 
 const stage = deploy({ indexing: false, workersDev: true, suffix: "stage" });
@@ -558,6 +735,7 @@ const wwwRecords = await listDns(zone.id, canonicalHost);
 const webBaseline = assertVercelDnsBaseline(apexRecords, wwwRecords);
 await assertPublicVercelBaseline();
 const snapshot = [...webBaseline.apex, ...webBaseline.www].map(snapshotRecord);
+const readinessWindowMs = productionReadinessWindowMs(snapshot);
 console.log(`DNS_SNAPSHOT=CAPTURED_${snapshot.length}_WEB_ROUTING_RECORDS`);
 assertNoTargetDomains(await listDomains(), "IMMEDIATE_PRE_CUTOVER");
 console.log("IMMEDIATE_PRE_CUTOVER=GREEN");
@@ -573,7 +751,7 @@ try {
   await attachDomain(zone, apexHost);
   console.log("CUSTOM_DOMAIN_APEX=ATTACHED");
 
-  await waitForProduction();
+  await waitForProduction(readinessWindowMs);
   await runRuntimeSmoke(canonicalAppUrl, production.actionId, { productionDomain: true });
   await observeTailAndLoad({
     baseUrl: canonicalAppUrl,
@@ -583,12 +761,7 @@ try {
     sanitize,
   });
 
-  const domains = await listDomains();
-  for (const hostname of [canonicalHost, apexHost]) {
-    if (!domains.some((domain) => domain.hostname === hostname && domain.service === workerName)) {
-      throw new Error(`POST_CUTOVER_CUSTOM_DOMAIN_MISSING=${hostname}`);
-    }
-  }
+  assertBothTargetDomainsAttached(await listDomains(), "POST_CUTOVER");
 
   console.log("CLOUDFLARE_PRODUCTION_CUTOVER=GREEN");
   console.log("VERCEL_ORIGIN=RETAINED_FOR_STABILIZATION_ROLLBACK");
@@ -602,12 +775,7 @@ try {
         stageRollbackVersionId,
         "Automatic rollback to last verified DrKhaleej pre-cutover stage",
       );
-      const domains = await listDomains();
-      for (const hostname of [canonicalHost, apexHost]) {
-        if (!domains.some((domain) => domain.hostname === hostname && domain.service === workerName)) {
-          throw new Error(`ROLLBACK_CLOUDFLARE_STAGE=DOMAIN_NOT_ATTACHED_${hostname}`);
-        }
-      }
+      assertBothTargetDomainsAttached(await listDomains(), "ROLLBACK_CLOUDFLARE_STAGE");
       await waitForProduction();
       await runRuntimeSmoke(canonicalAppUrl, stage.actionId);
       await observeTailAndLoad({
