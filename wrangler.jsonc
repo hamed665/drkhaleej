@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "drkhaleej-web",
+  "main": ".vinext/worker/index.mjs",
+  "compatibility_date": "2026-09-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": {
+    "directory": ".vinext/assets",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "observability": {
+    "enabled": true
+  },
+  "env": {
+    "candidate": {
+      "name": "drkhaleej-web-candidate",
+      "workers_dev": true
+    }
+  }
+}
