@@ -42,6 +42,10 @@ jobs:
           retention-days: 7
       - name: Build
         run: pnpm build
+      - name: Vinext compatibility check
+        run: pnpm exec vinext check
+      - name: Cloudflare Vinext build
+        run: pnpm build:vinext
       - name: Routes check
         run: pnpm routes:check
       - name: Env check
