@@ -31,10 +31,10 @@ Exact HTTP handler count at the baseline main is five.
 
 | Route | Router | Method | Auth/session | Side effect | Runtime / compatibility note |
 | --- | --- | --- | --- | --- | --- |
-| `/api/callback-requests` | App | POST | none | Supabase-backed callback request creation | Web Request/Response surface; smoke must avoid creating test entities |
-| `/api/provider-onboarding-leads` | App | POST | none | Supabase-backed onboarding lead creation | Web Request/Response surface; smoke must avoid creating test entities |
+| `/api/callback-requests` | App | POST | none | Supabase-backed callback request creation | Public catalog validation uses the anon client; duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase. |
+| `/api/provider-onboarding-leads` | App | POST | none | Supabase-backed onboarding lead creation | Duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase. |
 | `/api/internal/automation` | App | POST | Ed25519 service JWT, replay/fencing contracts | Existing automation control-plane operations | Explicit `runtime = "nodejs"`; 64 KiB bounded streaming body; `Buffer`; `node:crypto` transitively; `nodejs_compat` build-proven but runtime smoke still required |
-| `/auth/callback` | App | GET | Supabase auth code exchange | session establishment | Redirect is request-origin based; no Vercel-specific URL dependency |
+| `/auth/callback` | App | GET | Supabase auth code exchange | session establishment | Uses the session-aware Supabase client backed by the public URL + anon key; redirect is request-origin based and has no Vercel-specific URL dependency. |
 | `/api/_drk/public-hospital-profile/[locale]/[country]/[hospitalSlug]` | Pages | GET | public guard | read-only profile lookup | `no-store, private`; Pages API compatibility included in Vinext build |
 
 ## Server Action inventory
@@ -93,15 +93,54 @@ Server-only Web/API:
 
 Automation settings remain fail-closed and are not made Production-active by PR A.
 
-DrKhaleej Preview and Production Supabase project identities are not guessed. Candidate deployment remains blocked until the actual project identities and environment parity can be verified by authorized source-of-truth access.
+### Candidate credential preflight
+
+A read-only GitHub Actions preflight checked only presence/missing state and identity relationships. It did not print, persist or commit secret values or Supabase project refs.
+
+Verified existing repository secrets/contracts:
+
+- Preview Supabase project ref: **present**.
+- Production Supabase project ref: **present**.
+- Preview and Production project refs: **distinct**.
+- Preview database URL: **present**.
+- Preview database identity matches the Preview project ref: **yes**.
+
+Bounded alias probing also confirmed that no existing repository secret is available under the checked canonical or common alternate names for:
+
+- Cloudflare API token.
+- Cloudflare account ID.
+- Preview Supabase anon key.
+- Preview Supabase service-role key.
+
+The connected Supabase account available to this migration session does not expose a DrKhaleej project, so Smart Visions project credentials must never be substituted.
+
+### Minimum-secret candidate phases
+
+The Supabase helper boundary is deliberately split:
+
+- Public and ordinary server clients call `getSupabasePublicEnv()` and require only `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Session-aware auth also uses the public URL + anon key.
+- Privileged access is isolated behind `createSupabaseServiceRoleClient()` and reads `SUPABASE_SERVICE_ROLE_KEY` only when that client is invoked.
+
+Therefore the first non-Production Cloudflare candidate may use a lower-privilege environment and is blocked only on:
+
+1. Cloudflare API token with Worker deployment permission for the existing paid account.
+2. Cloudflare account ID for that same account.
+3. The **Preview** Supabase anon/publishable-compatible runtime key mapped to `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+`NEXT_PUBLIC_SUPABASE_URL` can be constructed from the already verified Preview project ref without printing the ref. The first candidate must not contain a Production Supabase key.
+
+The first candidate is intentionally limited to public/read-only pages, static assets, auth/session flow, non-mutating handler behavior, SEO/header/cache checks and safe auth-bound Server Action compatibility. The two public POST creation endpoints that invoke the service-role client are excluded from this lower-privilege smoke phase.
+
+Full Web runtime parity still requires a later Preview-only privileged phase with the Preview service-role key before PR A can be declared cutover-ready. That later phase must validate service-role-dependent runtime behavior without creating junk leads/callbacks and without invoking publish, rollback, index, sitemap, bulk-import, activation or other externally visible side effects.
 
 ## Candidate and cutover gates
 
 PR A cannot be considered complete from build evidence alone. It still requires:
 
-1. Public pre-cutover DNS/origin/TLS/header/SEO baseline.
-2. Cloudflare candidate Worker deployment in the existing paid account, without Production custom-domain routing.
-3. Present/missing or hash-only environment parity verification and verified Supabase project identity.
+1. Public pre-cutover DNS/origin/TLS/header/SEO baseline. **Captured.**
+2. Lower-privilege Cloudflare candidate Worker deployment in the existing paid account, without Production custom-domain routing.
+3. Lower-privilege environment parity using the verified Preview identity and Preview anon key only.
 4. EN/AR Oman public smoke.
 5. Admin login/auth callback smoke.
 6. Non-mutating HTTP-handler smoke, including a fail-closed automation check.
@@ -109,5 +148,6 @@ PR A cannot be considered complete from build evidence alone. It still requires:
 8. Static asset/image, canonical/hreflang, robots and sitemap comparison.
 9. Cache behavior validation for the Vinext/Cloudflare runtime.
 10. Controlled request/load observation and Worker Tail with zero unexplained 5xx.
+11. Preview-only privileged runtime parity using the Preview service-role key for service-role-dependent code paths, without creating test entities or relaxing existing security contracts.
 
 No Production DNS mutation is permitted until those gates are green and an executable rollback state has been captured.
