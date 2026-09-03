@@ -48,6 +48,14 @@ jobs:
             --image-optimization=none \
             --no-prerender
 
+      - name: Apply exact-optional compatibility fix for CDN adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'cdnAdapter()' vite.config.ts
+          sed -i 's/cdnAdapter()/cdnAdapter({})/' vite.config.ts
+          grep -q 'cdnAdapter({})' vite.config.ts
+
       - name: Existing validation gates
         shell: bash
         run: |
