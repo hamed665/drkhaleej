@@ -154,6 +154,13 @@ async function request(label, path, init = {}, allowedStatuses = null) {
   console.log(`${label}: HTTP ${response.status}`);
 
   if (response.status >= 500) {
+    console.error(`${label}: 5xx diagnostics`);
+    console.error(`content-type=${response.headers.get("content-type") ?? "<none>"}`);
+    console.error(`server=${response.headers.get("server") ?? "<none>"}`);
+    console.error(`cf-ray=${response.headers.get("cf-ray") ?? "<none>"}`);
+    console.error("BODY_TAIL_BEGIN");
+    console.error(boundedTail(text, 8_000));
+    console.error("BODY_TAIL_END");
     throw new Error(`${label} returned ${response.status}`);
   }
   if (allowedStatuses && !allowedStatuses.includes(response.status)) {
