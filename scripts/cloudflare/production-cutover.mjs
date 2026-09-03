@@ -166,6 +166,40 @@ async function listDomains() {
   return Array.isArray(domains) ? domains : [];
 }
 
+async function getWorkersAccountSubdomain() {
+  const result = await cf(
+    "GET",
+    `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/subdomain`,
+  );
+  if (!result?.subdomain) throw new Error("WORKERS_DEV_ACCOUNT_SUBDOMAIN=MISSING");
+  return result.subdomain;
+}
+
+async function getWorkerSubdomainState() {
+  return cf(
+    "GET",
+    `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${encodeURIComponent(workerName)}/subdomain`,
+  );
+}
+
+async function setWorkerSubdomainState({ enabled, previewsEnabled }) {
+  const result = await cf(
+    "POST",
+    `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${encodeURIComponent(workerName)}/subdomain`,
+    { enabled, previews_enabled: previewsEnabled },
+  );
+  if (result?.enabled !== enabled || result?.previews_enabled !== previewsEnabled) {
+    throw new Error("WORKERS_DEV_STATE=POST_RESPONSE_MISMATCH");
+  }
+  const readBack = await getWorkerSubdomainState();
+  if (readBack?.enabled !== enabled || readBack?.previews_enabled !== previewsEnabled) {
+    throw new Error("WORKERS_DEV_STATE=READBACK_MISMATCH");
+  }
+  console.log(
+    `WORKERS_DEV_STATE=${enabled ? "ENABLED" : "DISABLED"};PREVIEWS_${previewsEnabled ? "ENABLED" : "DISABLED"}`,
+  );
+}
+
 function assertNoTargetDomains(domains, marker) {
   const matches = domains.filter((domain) => [apexHost, canonicalHost].includes(domain.hostname));
   if (matches.length) {
@@ -318,7 +352,7 @@ function deploy({ indexing, workersDev, suffix }) {
   run("pnpm", ["build:vinext"]);
   const actionId = discoverSafeServerActionId();
   const configPath = writeConfig({ indexing, workersDev, suffix });
-  const output = run(
+  run(
     "pnpm",
     ["exec", "wrangler", "deploy", "--config", configPath, "--name", workerName],
   );
@@ -329,15 +363,29 @@ function deploy({ indexing, workersDev, suffix }) {
     process.env.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY,
   );
   console.log("WORKER_SECRETS=ATTACHED_WITHOUT_VALUE_OUTPUT");
-  const urls = output.match(/https:\/\/[A-Za-z0-9.-]+\.workers\.dev(?:\/[^\s]*)?/g) ?? [];
-  return {
-    actionId,
-    configPath,
-    baseUrl: urls.at(-1)?.replace(/[),.;]+$/, "").replace(/\/$/, "") ?? null,
-  };
+  return { actionId, configPath };
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function waitForWorkersDev(baseUrl) {
+  let last = "unknown";
+  for (let attempt = 1; attempt <= 20; attempt += 1) {
+    try {
+      const response = await fetchTimed(`${baseUrl}/`, { redirect: "manual" });
+      last = `status_${response.status}`;
+      await response.body?.cancel().catch(() => {});
+      if (response.status === 308) {
+        console.log(`WORKERS_DEV_READY=ATTEMPT_${attempt}`);
+        return;
+      }
+    } catch (error) {
+      last = sanitize(error?.message ?? error);
+    }
+    await sleep(2_000);
+  }
+  throw new Error(`WORKERS_DEV_NOT_READY:${last}`);
+}
 
 async function waitForProduction() {
   let last = "unknown";
@@ -392,10 +440,13 @@ assertNoTargetDomains(await listDomains(), "PRE_STAGE");
 console.log("PRE_STAGE_TARGET_CUSTOM_DOMAINS=ABSENT");
 
 const stage = deploy({ indexing: false, workersDev: true, suffix: "stage" });
-if (!stage.baseUrl) throw new Error("STAGE_WORKERS_DEV_URL_NOT_FOUND");
-await runRuntimeSmoke(stage.baseUrl, stage.actionId);
+await setWorkerSubdomainState({ enabled: true, previewsEnabled: false });
+const accountSubdomain = await getWorkersAccountSubdomain();
+const stageBaseUrl = `https://${workerName}.${accountSubdomain}.workers.dev`;
+await waitForWorkersDev(stageBaseUrl);
+await runRuntimeSmoke(stageBaseUrl, stage.actionId);
 await observeTailAndLoad({
-  baseUrl: stage.baseUrl,
+  baseUrl: stageBaseUrl,
   workerName,
   configPath: stage.configPath,
   env: childEnv,
@@ -411,7 +462,8 @@ if (mode === "stage") {
 }
 
 const production = deploy({ indexing: true, workersDev: false, suffix: "cutover" });
-console.log("PRODUCTION_WORKER=INDEXING_ON_WORKERS_DEV_OFF");
+await setWorkerSubdomainState({ enabled: false, previewsEnabled: false });
+console.log("PRODUCTION_WORKER=INDEXING_ON_WORKERS_DEV_OFF_VERIFIED");
 
 const apexRecords = await listDns(zone.id, apexHost);
 const wwwRecords = await listDns(zone.id, canonicalHost);
