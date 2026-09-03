@@ -1,0 +1,145 @@
+name: Cloudflare Server Action Inventory
+
+on:
+  push:
+    branches:
+      - infra/cloudflare-web-readiness
+
+permissions:
+  contents: write
+
+jobs:
+  inventory:
+    if: ${{ !contains(github.event.head_commit.message, '[server-action-inventory]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: infra/cloudflare-web-readiness
+          fetch-depth: 0
+
+      - name: Build deterministic Server Action inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import pathlib
+          import re
+
+          root = pathlib.Path('.')
+          out = pathlib.Path('docs/project-state/CLOUDFLARE_SERVER_ACTION_INVENTORY.md')
+          out.parent.mkdir(parents=True, exist_ok=True)
+
+          excluded_parts = {
+              '.git', '.next', '.vinext', 'dist', 'node_modules', 'coverage',
+              '.vercel', '.wrangler', 'public',
+          }
+          extensions = {'.ts', '.tsx', '.js', '.jsx', '.mts', '.cts', '.mjs', '.cjs'}
+          directive_re = re.compile(r"^[\t ]*(['\"])use server\1;?[\t ]*(?://.*)?$")
+
+          def strip_leading_comments_and_blank(lines: list[str]) -> int:
+              in_block = False
+              for i, raw in enumerate(lines):
+                  line = raw.lstrip('\ufeff').strip()
+                  if in_block:
+                      if '*/' in line:
+                          in_block = False
+                          tail = line.split('*/', 1)[1].strip()
+                          if tail:
+                              return i
+                      continue
+                  if not line or line.startswith('//'):
+                      continue
+                  if line.startswith('/*'):
+                      if '*/' not in line[2:]:
+                          in_block = True
+                          continue
+                      tail = line.split('*/', 1)[1].strip()
+                      if not tail:
+                          continue
+                  return i
+              return len(lines)
+
+          records: list[dict[str, object]] = []
+          scanned = 0
+          for path in sorted(root.rglob('*')):
+              if not path.is_file() or path.suffix.lower() not in extensions:
+                  continue
+              if any(part in excluded_parts for part in path.parts):
+                  continue
+              scanned += 1
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              lines = text.splitlines()
+              matches = [i for i, line in enumerate(lines) if directive_re.match(line)]
+              if not matches:
+                  continue
+              first_stmt = strip_leading_comments_and_blank(lines)
+              module_level = first_stmt < len(lines) and directive_re.match(lines[first_stmt]) is not None
+              records.append({
+                  'path': path.as_posix(),
+                  'module_level': module_level,
+                  'directive_lines': [i + 1 for i in matches],
+                  'sha256': hashlib.sha256(text.encode('utf-8')).hexdigest(),
+              })
+
+          module_level_count = sum(1 for r in records if r['module_level'])
+          inline_only_count = len(records) - module_level_count
+          directive_count = sum(len(r['directive_lines']) for r in records)
+
+          lines = [
+              '# Cloudflare Server Action Inventory',
+              '',
+              '> Generated deterministically from the migration branch source tree. This inventory performs no runtime invocation, database mutation, deployment or Production change.',
+              '',
+              f'- Source commit: `{__import__("subprocess").check_output(["git", "rev-parse", "HEAD"], text=True).strip()}`',
+              f'- Source files scanned: **{scanned}**',
+              f'- Files containing an exact `use server` directive: **{len(records)}**',
+              f'- Files with module-level `use server` as the first executable statement: **{module_level_count}**',
+              f'- Files with inline-only `use server` directive(s): **{inline_only_count}**',
+              f'- Total exact directive lines: **{directive_count}**',
+              '',
+              '## Exact source inventory',
+              '',
+              '| Path | Directive shape | Line(s) | Source SHA256 |',
+              '| --- | --- | ---: | --- |',
+          ]
+          for r in records:
+              shape = 'module-level' if r['module_level'] else 'inline-only'
+              line_nums = ', '.join(str(n) for n in r['directive_lines'])
+              lines.append(f"| `{r['path']}` | {shape} | {line_nums} | `{r['sha256']}` |")
+
+          lines += [
+              '',
+              '## Migration QA rule',
+              '',
+              '- Cloudflare candidate QA must include representative **safe** Server Action execution for auth/session, ordinary admin mutation validation, and read-only/private workflows where applicable.',
+              '- Destructive, publish, rollback, index-promotion, sitemap-promotion, bulk-import, or externally visible actions must **not** be invoked merely to prove hosting compatibility.',
+              '- Build success alone is not evidence of Server Action runtime parity.',
+              '- This file records source presence only; authorization and side-effect semantics remain owned by the existing application contracts.',
+              '',
+          ]
+          out.write_text('\n'.join(lines), encoding='utf-8')
+          print(f'Inventory: {len(records)} files, {module_level_count} module-level, {inline_only_count} inline-only, {directive_count} directives')
+          PY
+          git diff --check -- docs/project-state/CLOUDFLARE_SERVER_ACTION_INVENTORY.md
+
+      - name: Commit inventory evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/project-state/CLOUDFLARE_SERVER_ACTION_INVENTORY.md
+          if git diff --cached --quiet; then
+            echo "No Server Action inventory change to commit"
+            exit 0
+          fi
+          git commit -m "docs(cloudflare): capture Server Action inventory [server-action-inventory]"
+          git push origin HEAD:infra/cloudflare-web-readiness
