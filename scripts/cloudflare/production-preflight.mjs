@@ -63,7 +63,7 @@ async function cloudflare(path) {
   return payload.result;
 }
 
-function policyAllows(token, permissionNames, resourceMarkers) {
+function policyAllows(token, permissionNames, resourceAllows) {
   const allowedNames = new Set(permissionNames.map((name) => name.toLowerCase()));
   return (token?.policies ?? []).some((policy) => {
     if (policy?.effect !== "allow") return false;
@@ -71,9 +71,28 @@ function policyAllows(token, permissionNames, resourceMarkers) {
       allowedNames.has(String(permission?.name ?? "").toLowerCase()),
     );
     if (!permissionMatch) return false;
-    const resources = JSON.stringify(policy.resources ?? {});
-    return resourceMarkers.some((marker) => resources.includes(marker));
+    return resourceAllows(policy.resources ?? {});
   });
+}
+
+function zoneResourceAllows(resources, accountId, zoneId) {
+  if (resources[`com.cloudflare.api.account.zone.${zoneId}`] === "*") return true;
+  if (resources["com.cloudflare.api.account.zone.*"] === "*") return true;
+
+  const accountZones = resources[`com.cloudflare.api.account.${accountId}`];
+  if (!accountZones || typeof accountZones !== "object" || Array.isArray(accountZones)) return false;
+
+  return (
+    accountZones["com.cloudflare.api.account.zone.*"] === "*" ||
+    accountZones[`com.cloudflare.api.account.zone.${zoneId}`] === "*"
+  );
+}
+
+function accountResourceAllows(resources, accountId) {
+  return (
+    resources[`com.cloudflare.api.account.${accountId}`] === "*" ||
+    resources["com.cloudflare.api.account.*"] === "*"
+  );
 }
 
 async function inspectCloudflareTokenPermissions(zone) {
@@ -108,15 +127,13 @@ async function inspectCloudflareTokenPermissions(zone) {
     }
 
     const token = details.payload.result;
-    const dnsWrite = policyAllows(
-      token,
-      ["DNS Write", "DNS Edit"],
-      [zone.id, "com.cloudflare.api.account.zone.*", "\"*\""],
+    const dnsWrite = policyAllows(token, ["DNS Write", "DNS Edit"], (resources) =>
+      zoneResourceAllows(resources, accountId, zone.id),
     );
     const workersScriptsWrite = policyAllows(
       token,
       ["Workers Scripts Write", "Workers Scripts Edit"],
-      [accountId, "com.cloudflare.api.account.*", "\"*\""],
+      (resources) => accountResourceAllows(resources, accountId),
     );
 
     if (!dnsWrite) throw new Error("CLOUDFLARE_TOKEN_PERMISSION=DNS_WRITE_MISSING_OR_OUT_OF_SCOPE");
