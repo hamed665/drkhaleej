@@ -1,6 +1,5 @@
 import { spawn, spawnSync } from "node:child_process";
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
 
 const REQUIRED = [
   "CLOUDFLARE_API_TOKEN",
@@ -79,34 +78,10 @@ function run(command, args, options = {}) {
   return `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
 }
 
-function readBuiltJavaScript(directory) {
-  let output = "";
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) output += readBuiltJavaScript(path);
-    else if (entry.name.endsWith(".js")) output += readFileSync(path, "utf8");
-  }
-  return output;
-}
-
-function findActionId(source, exportName) {
-  const escapedExportName = exportName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(
-    "[\"'`]([0-9a-f]{12})[\"'`]\\s*,\\s*[\"'`]" + escapedExportName + "[\"'`]",
-  );
-  const match = source.match(pattern);
-  if (!match) throw new Error(`Missing built action id for ${exportName}`);
-  return `${match[1]}#${exportName}`;
-}
-
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 console.log("Building Vinext candidate with Preview public environment only...");
 run("pnpm", ["build:vinext"]);
-
-const builtSource = readBuiltJavaScript("dist/server");
-const safeAuthActionId = findActionId(builtSource, "initializeBaseSubscriptionPlanCatalog");
-console.log("server_action_probe_id=DISCOVERED");
 
 const generatedPath = "dist/server/wrangler.json";
 const candidatePath = "dist/server/wrangler.candidate.json";
@@ -241,9 +216,9 @@ const automation = await request(
     headers: { "content-type": "application/json" },
     body: "{}",
   },
-  [400, 401, 403, 503],
+  [503],
 );
-if (automation.response.status === 503 && !automation.text.includes("automation_preview_boundary_closed")) {
+if (!automation.text.includes("automation_preview_boundary_closed")) {
   throw new Error("automation fail-closed 503 did not carry the expected preview-boundary code");
 }
 
@@ -279,36 +254,38 @@ if ((hospitalApi.response.headers.get("cache-control") ?? "").toLowerCase() !== 
   throw new Error("Pages API hospital 404 cache contract drift detected");
 }
 
-const actionResponse = await fetch(`${baseUrl}/admin/center-subscriptions`, {
-  method: "POST",
-  redirect: "manual",
-  signal: AbortSignal.timeout(20_000),
-  headers: {
-    accept: "text/x-component",
-    "content-type": "text/plain;charset=UTF-8",
-    "next-action": safeAuthActionId,
-    origin: baseUrl,
+console.log("server_action_runtime_qa=SKIPPED_NO_SAFE_NON_MUTATING_INVOCATION_SELECTED");
+
+const expectedSeo = {
+  public_en: {
+    canonical: `${canonicalAppUrl}/en/om`,
+    alternates: {
+      "en-om": `${canonicalAppUrl}/en/om`,
+      "ar-om": `${canonicalAppUrl}/ar/om`,
+      en: `${canonicalAppUrl}/en/om`,
+      ar: `${canonicalAppUrl}/ar/om`,
+      "x-default": `${canonicalAppUrl}/en/om`,
+    },
   },
-  body: "[]",
-});
-const actionBody = await actionResponse.text();
-console.log(`server_action_unauthenticated: HTTP ${actionResponse.status}`);
-if (actionResponse.headers.get("x-nextjs-action-not-found") === "1") {
-  throw new Error("Server Action probe was not recognized by the deployed Vinext runtime");
-}
-if (actionResponse.status !== 303 || actionResponse.headers.get("x-action-redirect") !== "/admin/login") {
-  console.error(`server_action_redirect=${actionResponse.headers.get("x-action-redirect") ?? "<none>"}`);
-  console.error(`server_action_body=${boundedTail(actionBody, 2_000)}`);
-  throw new Error("Server Action auth/session gate did not redirect unauthenticated execution to /admin/login");
-}
-console.log("server_action_unauthenticated: recognized and blocked before mutation by admin auth gate");
+  public_ar: {
+    canonical: `${canonicalAppUrl}/ar/om`,
+    alternates: {
+      "en-om": `${canonicalAppUrl}/en/om`,
+      "ar-om": `${canonicalAppUrl}/ar/om`,
+      en: `${canonicalAppUrl}/en/om`,
+      ar: `${canonicalAppUrl}/ar/om`,
+      "x-default": `${canonicalAppUrl}/en/om`,
+    },
+  },
+};
 
 for (const [label, html] of [
   ["public_en", en.text],
   ["public_ar", ar.text],
 ]) {
+  const expected = expectedSeo[label];
   const canonical = htmlAttribute(html, "canonical", "href");
-  if (!canonical || !canonical.startsWith(`${canonicalAppUrl}/`)) {
+  if (canonical !== expected.canonical) {
     throw new Error(`${label} canonical drift detected`);
   }
   if (html.includes("workers.dev")) {
@@ -316,17 +293,31 @@ for (const [label, html] of [
   }
   console.log(`${label}: canonical preserved`);
 
-  const alternates = alternateLinks(html);
-  for (const locale of ["en", "ar"]) {
-    const alternate = alternates.find((entry) => entry.hreflang.toLowerCase() === locale);
-    if (!alternate || !alternate.href.startsWith(`${canonicalAppUrl}/${locale}/om`)) {
-      throw new Error(`${label} hreflang ${locale} drift detected`);
+  const alternates = new Map(
+    alternateLinks(html).map((entry) => [entry.hreflang.toLowerCase(), entry.href]),
+  );
+  for (const [hreflang, expectedHref] of Object.entries(expected.alternates)) {
+    if (alternates.get(hreflang) !== expectedHref) {
+      throw new Error(`${label} hreflang ${hreflang} drift detected`);
     }
   }
-  console.log(`${label}: hreflang en/ar preserved`);
+  console.log(`${label}: hreflang en-OM/ar-OM/en/ar/x-default preserved`);
 }
 
-for (const required of ["Disallow: /api/", "Disallow: /admin/", `Sitemap: ${canonicalAppUrl}/sitemap.xml`]) {
+const requiredRobotsLines = [
+  "User-agent: *",
+  "Allow: /",
+  "Disallow: /api/",
+  "Disallow: /admin/",
+  "Disallow: /dashboard/",
+  "Disallow: /import/",
+  "Disallow: /preview/",
+  "Disallow: /demo/",
+  "Disallow: /en/om/demo/",
+  "Disallow: /ar/om/demo/",
+  `Sitemap: ${canonicalAppUrl}/sitemap.xml`,
+];
+for (const required of requiredRobotsLines) {
   if (!robots.text.includes(required)) {
     throw new Error(`robots contract missing: ${required}`);
   }
@@ -334,26 +325,46 @@ for (const required of ["Disallow: /api/", "Disallow: /admin/", `Sitemap: ${cano
 if (robots.text.includes("workers.dev")) {
   throw new Error("robots leaked candidate hostname");
 }
-console.log("robots: admin/api blocks and canonical sitemap preserved");
+console.log("robots: full sensitive-path block contract and canonical sitemap preserved");
 
-for (const requiredUrl of [`${canonicalAppUrl}/en/om`, `${canonicalAppUrl}/ar/om`]) {
-  if (!sitemap.text.includes(requiredUrl)) {
-    throw new Error(`sitemap missing required market root ${requiredUrl}`);
+const sitemapLocs = Array.from(
+  sitemap.text.matchAll(/<loc>([^<]+)<\/loc>/gi),
+  (match) => match[1].trim(),
+);
+if (sitemapLocs.length === 0) {
+  throw new Error("sitemap returned no loc entries");
+}
+for (const loc of sitemapLocs) {
+  if (!loc.startsWith(`${canonicalAppUrl}/`)) {
+    throw new Error(`sitemap contains non-canonical-domain URL: ${loc}`);
   }
 }
-if (sitemap.text.includes("workers.dev")) {
-  throw new Error("sitemap leaked candidate hostname");
+for (const requiredUrl of [
+  `${canonicalAppUrl}/en/om`,
+  `${canonicalAppUrl}/ar/om`,
+  `${canonicalAppUrl}/en/om/doctors`,
+  `${canonicalAppUrl}/ar/om/doctors`,
+]) {
+  if (!sitemapLocs.includes(requiredUrl)) {
+    throw new Error(`sitemap missing required static URL ${requiredUrl}`);
+  }
 }
-console.log("sitemap: EN/AR market roots and canonical domain preserved");
+console.log("sitemap: canonical-domain purity and representative EN/AR static entries preserved");
 
 const staticAssetPath = en.text.match(/["'](\/_next\/static\/[^"']+\.(?:js|css))["']/i)?.[1];
 if (!staticAssetPath) {
   throw new Error("could not discover a rendered Next static asset for candidate smoke");
 }
 const staticAsset = await request("static_asset", staticAssetPath, {}, [200]);
-if ((staticAsset.response.headers.get("content-type") ?? "").toLowerCase().includes("text/html")) {
-  throw new Error("static asset unexpectedly returned HTML");
+const staticAssetContentType = (staticAsset.response.headers.get("content-type") ?? "").toLowerCase();
+if (staticAssetPath.toLowerCase().endsWith(".js")) {
+  if (!staticAssetContentType.includes("javascript") && !staticAssetContentType.includes("ecmascript")) {
+    throw new Error(`JavaScript static asset returned unexpected content-type ${staticAssetContentType || "<none>"}`);
+  }
+} else if (!staticAssetContentType.includes("text/css")) {
+  throw new Error(`CSS static asset returned unexpected content-type ${staticAssetContentType || "<none>"}`);
 }
+console.log(`static_asset: content-type ${staticAssetContentType}`);
 
 console.log("Starting Worker Tail error-only observation...");
 const tail = spawn(
