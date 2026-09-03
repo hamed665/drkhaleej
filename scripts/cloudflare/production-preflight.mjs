@@ -19,11 +19,14 @@ if (process.env.PRODUCTION_PROJECT_REF === process.env.PREVIEW_PROJECT_REF) {
 }
 console.log("SUPABASE_IDENTITY=DISTINCT");
 
+const runMode = process.env.RUN_MODE ?? "stage";
+const workerName = "drkhaleej-web-production";
 const zoneName = "drkhaleej.com";
 const canonicalHost = "www.drkhaleej.com";
 const baselineWwwCname = "99f83eafeb1926bc.vercel-dns-017.com";
 const productionSupabaseUrl = `https://${process.env.PRODUCTION_PROJECT_REF}.supabase.co`;
 const timeoutMs = 20_000;
+const WEB_ROUTING_TYPES = new Set(["A", "AAAA", "CNAME"]);
 
 function uniqueCandidates(entries) {
   const seen = new Set();
@@ -178,6 +181,31 @@ console.log("CLOUDFLARE_ZONE=ACTIVE_ACCOUNT_MATCH");
 
 await inspectCloudflareTokenPermissions(zone);
 
+const domains = await cloudflare(
+  `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/domains`,
+);
+const targetHosts = new Set([zoneName, canonicalHost]);
+const targetDomains = Array.isArray(domains)
+  ? domains.filter((domain) => targetHosts.has(domain.hostname))
+  : [];
+const foreignTargetDomains = targetDomains.filter((domain) => domain.service !== workerName);
+if (foreignTargetDomains.length) {
+  throw new Error(
+    `CLOUDFLARE_RECOVERY_PREFLIGHT=TARGET_DOMAIN_SERVICE_DRIFT:${foreignTargetDomains
+      .map((domain) => `${domain.hostname}:${domain.service}`)
+      .join(",")}`,
+  );
+}
+if (targetDomains.length && runMode !== "cutover") {
+  throw new Error("CLOUDFLARE_RECOVERY_PREFLIGHT=ATTACHED_TARGET_DOMAINS_REQUIRE_CUTOVER_MODE");
+}
+const recoveryAttached = runMode === "cutover" && targetDomains.length > 0;
+if (recoveryAttached) {
+  console.log(
+    `CLOUDFLARE_RECOVERY_PREFLIGHT=TARGET_CUSTOM_DOMAINS_ATTACHED_${targetDomains.length}_TO_PRODUCTION_WORKER`,
+  );
+}
+
 const apexRecords = await cloudflare(
   `/zones/${zone.id}/dns_records?name=${encodeURIComponent(zoneName)}&per_page=100`,
 );
@@ -185,18 +213,31 @@ const wwwRecords = await cloudflare(
   `/zones/${zone.id}/dns_records?name=${encodeURIComponent(canonicalHost)}&per_page=100`,
 );
 
-if (!Array.isArray(apexRecords) || apexRecords.length === 0) {
-  throw new Error("DNS_BASELINE=APEX_RECORDS_MISSING");
-}
-if (!Array.isArray(wwwRecords) || wwwRecords.length === 0) {
-  throw new Error("DNS_BASELINE=WWW_RECORDS_MISSING");
+if (!Array.isArray(apexRecords) || !Array.isArray(wwwRecords)) {
+  throw new Error("DNS_BASELINE=UNEXPECTED_RESPONSE_SHAPE");
 }
 
-const wwwCname = wwwRecords.find((record) => record.type === "CNAME");
-if (!wwwCname || String(wwwCname.content).replace(/\.$/, "") !== baselineWwwCname) {
-  throw new Error("DNS_BASELINE=WWW_ORIGIN_DRIFT");
+const apexWebRecords = apexRecords.filter((record) => WEB_ROUTING_TYPES.has(record.type));
+const wwwWebRecords = wwwRecords.filter((record) => WEB_ROUTING_TYPES.has(record.type));
+const wwwCname = wwwWebRecords.find((record) => record.type === "CNAME");
+const vercelBaseline =
+  apexWebRecords.length > 0 &&
+  wwwWebRecords.length === 1 &&
+  wwwCname &&
+  String(wwwCname.content).replace(/\.$/, "") === baselineWwwCname;
+
+if (!recoveryAttached) {
+  if (!vercelBaseline) {
+    throw new Error("DNS_BASELINE=VERCEL_WEB_ROUTING_NOT_CONFIRMED");
+  }
+  console.log(
+    `DNS_BASELINE=VERCEL_CONFIRMED;APEX_RECORD_COUNT=${apexRecords.length};WWW_RECORD_COUNT=${wwwRecords.length}`,
+  );
+} else {
+  console.log(
+    `DNS_BASELINE=RECOVERY_ATTACHED_CUSTOM_DOMAINS;APEX_WEB_${apexWebRecords.length};WWW_WEB_${wwwWebRecords.length};VERCEL_BASELINE_${vercelBaseline ? "PRESENT" : "NOT_REQUIRED"}`,
+  );
 }
-console.log(`DNS_BASELINE=VERCEL_CONFIRMED;APEX_RECORD_COUNT=${apexRecords.length};WWW_RECORD_COUNT=${wwwRecords.length}`);
 
 const publicCandidates = uniqueCandidates([
   { name: "PRODUCTION_SUPABASE_ANON_KEY", value: process.env.PRODUCTION_SUPABASE_ANON_KEY },
