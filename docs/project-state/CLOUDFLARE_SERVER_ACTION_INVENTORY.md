@@ -2,7 +2,7 @@
 
 > Generated deterministically from the migration branch source tree. This inventory performs no runtime invocation, database mutation, deployment or Production change.
 
-- Source commit: `ddb276780dd88072805a0bb03d5bfc1274e231f7`
+- Source commit: `9a3dfd5bbcfcde0b9f9014dd84b3e32913b9f6fb`
 - Source files scanned: **931**
 - Files containing an exact `use server` directive: **35**
 - Files with module-level `use server` as the first executable statement: **33**
