@@ -204,6 +204,11 @@ const baseSubscriptionPlans: SubscriptionPlanInsert[] = [
   ),
 ];
 
+export async function verifyCloudflareServerActionRuntimeBoundary(): Promise<{ ok: true }> {
+  await requireAdminPermission("subscription_plans.sync");
+  return { ok: true };
+}
+
 export async function initializeBaseSubscriptionPlanCatalog(
   _previousState: BaseSubscriptionPlanCatalogState,
   _formData: FormData,
