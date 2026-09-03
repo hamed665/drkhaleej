@@ -25,31 +25,14 @@ Status: PR A readiness only. No Production DNS cutover. No Agent Production acti
 
 The generated Vinext CDN adapter descriptor is normalized so its optional `options` field is materialized as an object under this repository's strict `exactOptionalPropertyTypes` TypeScript configuration. TypeScript strictness is not weakened and the Cloudflare CDN adapter remains enabled.
 
-### Unauthenticated temporary Cloudflare deployment probe
-
-A temporary Wrangler deployment probe was executed without using the user's Cloudflare account, Production domain, DNS route, Supabase credential or Production secret. The first workflow attempt failed before deployment because `actions/setup-node` requested pnpm caching before Corepack made pnpm available; the toolchain ordering was corrected and the second attempt reached Cloudflare.
-
-The corrected probe established the following deployment-path evidence:
-
-- Dependency installation completed successfully with the locked pnpm version.
-- The full Vinext Worker build completed successfully, including App Router, Pages API and Server Action/server-reference compilation.
-- Wrangler accepted the generated Worker configuration and uploaded **66 static assets** successfully.
-- Wrangler reported Worker upload size of **4351.43 KiB raw / 1063.82 KiB gzip**.
-- Cloudflare then rejected Worker script validation with code `10027` solely because Wrangler `--temporary` uses a temporary free account capped at **1 MiB** Worker size.
-- The returned Cloudflare error explicitly states that a paid Workers plan accepts Workers up to **10 MiB**, so the measured bundle is above the temporary/free limit but below the paid-plan limit targeted by this migration.
-- No Worker runtime request was executed because validation stopped deployment before a temporary `workers.dev` runtime became available.
-- The temporary claim URL, temporary account identity and any token-like values were intentionally suppressed from logs/evidence.
-
-This probe is useful upload/validation evidence, but it is **not** a substitute for the paid-account candidate gate. Actual runtime compatibility, safe Server Action execution, auth/session behavior and cache/header parity still require deployment to the existing paid Cloudflare account with the bounded Preview environment described below.
-
 ## HTTP handler inventory
 
 Exact HTTP handler count at the baseline main is five.
 
 | Route | Router | Method | Auth/session | Side effect | Runtime / compatibility note |
 | --- | --- | --- | --- | --- | --- |
-| `/api/callback-requests` | App | POST | none | Supabase-backed callback request creation | Public catalog validation uses the anon client; duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase. |
-| `/api/provider-onboarding-leads` | App | POST | none | Supabase-backed onboarding lead creation | Duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase. |
+| `/api/callback-requests` | App | POST | none | Supabase-backed callback request creation | Public catalog validation uses the anon client; duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase except with deliberately invalid input that must fail before privileged code is reached. |
+| `/api/provider-onboarding-leads` | App | POST | none | Supabase-backed onboarding lead creation | Duplicate detection and insertion use the server-only service-role client. Do not invoke during the lower-privilege candidate phase except with deliberately invalid input that must fail before privileged code is reached. |
 | `/api/internal/automation` | App | POST | Ed25519 service JWT, replay/fencing contracts | Existing automation control-plane operations | Explicit `runtime = "nodejs"`; 64 KiB bounded streaming body; `Buffer`; `node:crypto` transitively; `nodejs_compat` build-proven but runtime smoke still required |
 | `/auth/callback` | App | GET | Supabase auth code exchange | session establishment | Uses the session-aware Supabase client backed by the public URL + anon key; redirect is request-origin based and has no Vercel-specific URL dependency. |
 | `/api/_drk/public-hospital-profile/[locale]/[country]/[hospitalSlug]` | Pages | GET | public guard | read-only profile lookup | `no-store, private`; Pages API compatibility included in Vinext build |
@@ -121,17 +104,13 @@ Verified existing repository secrets/contracts:
 - Preview and Production project refs: **distinct**.
 - Preview database URL: **present**.
 - Preview database identity matches the Preview project ref: **yes**.
-
-Bounded alias probing also confirmed that no existing repository secret is available under the checked canonical or common alternate names for:
-
-- Cloudflare API token.
-- Cloudflare account ID.
-- Preview Supabase anon key.
-- Preview Supabase service-role key.
+- Cloudflare API token for the existing paid account: **present**.
+- Cloudflare account ID for the existing paid account: **present**.
+- DrKhaleej Preview publishable/anon-compatible key: **present** as `PREVIEW_SUPABASE_ANON_KEY`.
 
 The connected Supabase account available to this migration session does not expose a DrKhaleej project, so Smart Visions project credentials must never be substituted.
 
-### Minimum-secret candidate phases
+### Minimum-secret candidate phase
 
 The Supabase helper boundary is deliberately split:
 
@@ -139,25 +118,26 @@ The Supabase helper boundary is deliberately split:
 - Session-aware auth also uses the public URL + anon key.
 - Privileged access is isolated behind `createSupabaseServiceRoleClient()` and reads `SUPABASE_SERVICE_ROLE_KEY` only when that client is invoked.
 
-Therefore the first non-Production Cloudflare candidate may use a lower-privilege environment and is blocked only on:
+The first non-Production Cloudflare candidate therefore uses a lower-privilege environment:
 
-1. Cloudflare API token with Worker deployment permission for the existing paid account.
-2. Cloudflare account ID for that same account.
-3. The **Preview** Supabase anon/publishable-compatible runtime key mapped to `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Worker name is fixed to `drkhaleej-web-candidate`.
+- `workers.dev` is enabled.
+- custom-domain routes are deleted from the generated candidate configuration before deploy.
+- `NEXT_PUBLIC_ENABLE_INDEXING=false`.
+- Preview Supabase identity only.
+- no Production Supabase key.
+- no service-role key.
+- the Preview publishable key is provided at build time and then attached as a Worker secret binding for runtime rather than committed as a plaintext Wrangler var.
 
-`NEXT_PUBLIC_SUPABASE_URL` can be constructed from the already verified Preview project ref without printing the ref. The first candidate must not contain a Production Supabase key.
-
-The first candidate is intentionally limited to public/read-only pages, static assets, auth/session flow, non-mutating handler behavior, SEO/header/cache checks and safe auth-bound Server Action compatibility. The two public POST creation endpoints that invoke the service-role client are excluded from this lower-privilege smoke phase.
-
-Full Web runtime parity still requires a later Preview-only privileged phase with the Preview service-role key before PR A can be declared cutover-ready. That later phase must validate service-role-dependent runtime behavior without creating junk leads/callbacks and without invoking publish, rollback, index, sitemap, bulk-import, activation or other externally visible side effects.
+`scripts/cloudflare/deploy-web-candidate.mjs` owns the bounded deploy and non-mutating smoke. `docs/project-state/CLOUDFLARE_CANDIDATE_WORKFLOW_RUNBOOK.md` contains the exact manual GitHub Actions bridge required because this migration tool session is not permitted to create a workflow that consumes repository secrets directly.
 
 ## Candidate and cutover gates
 
 PR A cannot be considered complete from build evidence alone. It still requires:
 
 1. Public pre-cutover DNS/origin/TLS/header/SEO baseline. **Captured.**
-2. Lower-privilege Cloudflare candidate Worker deployment in the existing paid account, without Production custom-domain routing.
-3. Lower-privilege environment parity using the verified Preview identity and Preview anon key only.
+2. Lower-privilege Cloudflare candidate Worker deployment in the existing paid account, without Production custom-domain routing. **Credentials ready; workflow bridge pending.**
+3. Lower-privilege environment parity using the verified Preview identity and Preview publishable key. **Credentials ready; runtime proof pending.**
 4. EN/AR Oman public smoke.
 5. Admin login/auth callback smoke.
 6. Non-mutating HTTP-handler smoke, including a fail-closed automation check.
