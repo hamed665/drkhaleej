@@ -85,7 +85,7 @@ jobs:
             echo "- SHA256: $(sha256sum "$file" | awk '{print $1}')"
             echo '- Canonical / robots / hreflang evidence:'
             echo '```text'
-            grep -Eio '<link[^>]+rel=["'"']canonical["'"'][^>]*>|<meta[^>]+name=["'"']robots["'"'][^>]*>|<link[^>]+hreflang=[^>]*>' "$file" | head -n 30 || true
+            grep -Eio '<link[^>]+(canonical|hreflang)[^>]*>|<meta[^>]+robots[^>]*>' "$file" | head -n 30 || true
             echo '```'
           }
 
