@@ -153,18 +153,21 @@ async function request(label, path, init = {}, allowedStatuses = null) {
   const text = await response.text();
   console.log(`${label}: HTTP ${response.status}`);
 
-  if (response.status >= 500) {
-    console.error(`${label}: 5xx diagnostics`);
-    console.error(`content-type=${response.headers.get("content-type") ?? "<none>"}`);
-    console.error(`server=${response.headers.get("server") ?? "<none>"}`);
-    console.error(`cf-ray=${response.headers.get("cf-ray") ?? "<none>"}`);
-    console.error("BODY_TAIL_BEGIN");
-    console.error(boundedTail(text, 8_000));
-    console.error("BODY_TAIL_END");
-    throw new Error(`${label} returned ${response.status}`);
-  }
-  if (allowedStatuses && !allowedStatuses.includes(response.status)) {
+  const explicitlyAllowed = allowedStatuses?.includes(response.status) ?? false;
+  if (allowedStatuses && !explicitlyAllowed) {
+    if (response.status >= 500) {
+      console.error(`${label}: unexplained 5xx diagnostics`);
+      console.error(`content-type=${response.headers.get("content-type") ?? "<none>"}`);
+      console.error(`server=${response.headers.get("server") ?? "<none>"}`);
+      console.error(`cf-ray=${response.headers.get("cf-ray") ?? "<none>"}`);
+      console.error("BODY_TAIL_BEGIN");
+      console.error(boundedTail(text, 8_000));
+      console.error("BODY_TAIL_END");
+    }
     throw new Error(`${label} returned unexpected status ${response.status}`);
+  }
+  if (!allowedStatuses && response.status >= 500) {
+    throw new Error(`${label} returned ${response.status}`);
   }
   return { response, text };
 }
@@ -178,7 +181,7 @@ await request("admin_login", "/admin/login", {}, [200]);
 await request("auth_callback_no_code", "/auth/callback?next=%2Fadmin", {}, [301, 302, 303, 307, 308]);
 await request("robots", "/robots.txt", {}, [200]);
 
-await request(
+const automation = await request(
   "automation_fail_closed",
   "/api/internal/automation",
   {
@@ -186,8 +189,11 @@ await request(
     headers: { "content-type": "application/json" },
     body: "{}",
   },
-  [400, 401, 403],
+  [400, 401, 403, 503],
 );
+if (automation.response.status === 503 && !automation.text.includes("automation_preview_boundary_closed")) {
+  throw new Error("automation fail-closed 503 did not carry the expected preview-boundary code");
+}
 
 await request(
   "callback_invalid",
