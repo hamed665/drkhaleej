@@ -7,7 +7,7 @@
 
 ## Current completed state
 
-- Import-readiness runtime is aligned through PR #975 at baseline commit `d5632e9600902afe20046c0f71fdfa0d466d8359` (last aligned 2026-08-12).
+- Import-readiness runtime is aligned through PR #976 at baseline commit `1b33835ceda3ebce9b1bc671f87e7e67b7594ee9` (last aligned 2026-08-13).
 - The current repository includes approved public catalog/detail foundations, public article shell routes, provider onboarding lead capture, callback request capture, protected admin shell, admin provider onboarding lead operations baseline, center subscription assignment foundation, and admin commercial add-on assignment shell.
 - Future phases must remain narrowly scoped and explicitly approved.
 
@@ -21,9 +21,9 @@
 
 | Field | Value |
 | --- | --- |
-| Aligned through | PR #975 |
-| Runtime baseline | `d5632e9600902afe20046c0f71fdfa0d466d8359` |
-| Last aligned | `2026-08-12` |
+| Aligned through | PR #976 |
+| Runtime baseline | `1b33835ceda3ebce9b1bc671f87e7e67b7594ee9` |
+| Last aligned | `2026-08-13` |
 | Current migration | `0095_import_automation_job_runtime.sql` |
 | Current next | `AUTOMATION-JOB-PREVIEW-ACTIVATION` |
 | Reservation audit event | `reservation_created` |
@@ -146,7 +146,7 @@ Current validation gate:
 
 ## Last known validation status
 
-- PRs #936–#975 are the current import-readiness runtime baseline.
+- PRs #936–#976 are the current import-readiness runtime baseline.
 - Migration validation passes through `0095_import_automation_job_runtime.sql`.
 - Env, seed validation, static RLS, static seed, routes, SEO, typecheck, build and lint gates pass in CI.
 - Preview Migration Sync, the isolated P05 regression proof, P06 concurrent rollback authority proof, P07 exact logical recovery proof, P09 hosted/literal completion, P11 authority proof, P13 exact public rollback proof, P14 independent Index proof, P15 independent Sitemap proof, P17 Source Evidence proof and Entity Candidate persistence/readback proof run against the exact PR head with Production disconnected.

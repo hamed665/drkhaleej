@@ -162,8 +162,9 @@ requireTokens(files.controlPlaneTests, controlPlaneTests, [
 
 requireTokens(files.route, route, [
   'export const runtime = "nodejs"',
-  'AUTOMATION_EMERGENCY_ENABLED',
-  'APP_ENV',
+  'resolveAutomationPreviewActivation',
+  'resolveAutomationPreviewActivation(process.env, "vercel")',
+  '!activation.enabled',
   'AUTOMATION_PREVIEW_PROJECT_REF',
   'AUTOMATION_PRODUCTION_PROJECT_REF',
   'parseAutomationPublicJwks',

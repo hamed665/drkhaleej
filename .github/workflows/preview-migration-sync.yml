@@ -44,6 +44,7 @@ on:
       - 'scripts/import/check-entity-resolution-gate.mjs'
       - 'scripts/import/run-automation-job-runtime-proof.mjs'
       - 'scripts/import/check-automation-job-runtime.mjs'
+      - 'scripts/import/check-automation-job-preview-activation.mjs'
       - 'scripts/automation/**'
       - 'docs/import/PHARMACY_PUBLIC_NOINDEX_AUTHORITY.md'
       - 'docs/import/PHARMACY_BILINGUAL_LIVE_VERIFY.md'
@@ -56,6 +57,7 @@ on:
       - 'docs/import/ENTITY_CANDIDATE_PIPELINE.md'
       - 'docs/import/ENTITY_RESOLUTION_GATE.md'
       - 'docs/import/AUTOMATION_JOB_RUNTIME.md'
+      - 'docs/import/AUTOMATION_JOB_PREVIEW_ACTIVATION.md'
       - 'docs/import/contract-hardening-reconciliation.json'
       - 'docs/ai-agent-program/drkhaleej-ai-agent-program-2026-v1.2.2/**'
       - 'src/lib/routes/public.ts'
@@ -279,6 +281,7 @@ jobs:
             pnpm import:entity-candidate-pipeline:validate
             pnpm import:entity-resolution-gate:validate
             pnpm import:automation-job-runtime:validate
+            pnpm import:automation-job-preview-activation:validate
           } 2>&1 | tee artifacts/preview-migration-sync/validation.log
 
       - name: Fail-closed identity preflight

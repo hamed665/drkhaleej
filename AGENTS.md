@@ -76,7 +76,7 @@ Use `PHASED_BUILD_ONLY` mode.
 
 Do not build the full platform in one pass.
 
-Current import-readiness runtime baseline: **PR #975 at `d5632e9600902afe20046c0f71fdfa0d466d8359`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline, the additive Entity Resolution decision gate and the Worker Runtime architecture gate are complete. `AUTOMATION-JOB-RUNTIME` now implements only the closed-by-default Preview queue, identity, fencing, internal API and idle Worker shell. The current next independently reviewable gate is **`AUTOMATION-JOB-PREVIEW-ACTIVATION`**. Render provisioning, decision application, Agent/Worker activation and Production execution remain unauthorized.
+Current import-readiness runtime baseline: **PR #976 at `1b33835ceda3ebce9b1bc671f87e7e67b7594ee9`**. The Registry Authority Audit, Registry Convergence, P11–P15 Pharmacy public lifecycle, P16 Intake Contract Convergence, P17 Source Evidence Ledger, P18 Duplicate / Geo Candidate Contract, Gate B Contract Hardening, Entity Candidate Pipeline, the additive Entity Resolution decision gate, the Worker Runtime architecture gate and the closed-by-default `AUTOMATION-JOB-RUNTIME` are complete. The current next independently reviewable gate is **`AUTOMATION-JOB-PREVIEW-ACTIVATION`**. Its bounded Preview provisioning/evidence remains incomplete; decision application, broader Agent/Worker activation and Production execution remain unauthorized.
 
 Completed migrations: **`0001` through `0095`**. Migration validation is expected through `0095_import_automation_job_runtime.sql`.
 

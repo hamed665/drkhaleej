@@ -12,13 +12,25 @@ services:
     envVars:
       - key: APP_ENV
         value: preview
+      - key: AUTOMATION_PREVIEW_ACTIVATION_ENABLED
+        value: "false"
+      - key: AUTOMATION_PREVIEW_ACTIVATION_SHA
+        sync: false
       - key: AUTOMATION_EMERGENCY_ENABLED
         value: "false"
       - key: AUTOMATION_RUNTIME_PROBE_ENABLED
         value: "false"
+      - key: AUTOMATION_PREVIEW_PROJECT_REF
+        sync: false
+      - key: AUTOMATION_PRODUCTION_PROJECT_REF
+        sync: false
+      - key: AUTOMATION_VERCEL_PREVIEW_HOST
+        sync: false
       - key: AUTOMATION_INTERNAL_API_BASE_URL
         sync: false
       - key: AUTOMATION_SERVICE_KEY_ID
         sync: false
       - key: AUTOMATION_SERVICE_PRIVATE_KEY_PEM_BASE64
+        sync: false
+      - key: VERCEL_AUTOMATION_BYPASS_SECRET
         sync: false
