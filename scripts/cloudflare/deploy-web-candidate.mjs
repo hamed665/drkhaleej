@@ -366,25 +366,30 @@ for (const [label, html] of [
   console.log(`${label}: hreflang en-OM/ar-OM/en/ar/x-default preserved`);
 }
 
+const robotsLines = robots.text
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter(Boolean);
+const normalizedRobotsLines = new Set(robotsLines.map((line) => line.toLowerCase()));
 const requiredRobotsLines = [
-  "User-agent: *",
-  "Allow: /",
-  "Disallow: /api/",
-  "Disallow: /admin/",
-  "Disallow: /dashboard/",
-  "Disallow: /import/",
-  "Disallow: /preview/",
-  "Disallow: /demo/",
-  "Disallow: /en/om/demo/",
-  "Disallow: /ar/om/demo/",
-  `Sitemap: ${canonicalAppUrl}/sitemap.xml`,
+  "user-agent: *",
+  "allow: /",
+  "disallow: /api/",
+  "disallow: /admin/",
+  "disallow: /dashboard/",
+  "disallow: /import/",
+  "disallow: /preview/",
+  "disallow: /demo/",
+  "disallow: /en/om/demo/",
+  "disallow: /ar/om/demo/",
+  `sitemap: ${canonicalAppUrl}/sitemap.xml`,
 ];
 for (const required of requiredRobotsLines) {
-  if (!robots.text.includes(required)) {
+  if (!normalizedRobotsLines.has(required.toLowerCase())) {
     throw new Error(`robots contract missing: ${required}`);
   }
 }
-if (robots.text.includes("workers.dev")) {
+if (robots.text.toLowerCase().includes("workers.dev")) {
   throw new Error("robots leaked candidate hostname");
 }
 console.log("robots: full sensitive-path block contract and canonical sitemap preserved");
