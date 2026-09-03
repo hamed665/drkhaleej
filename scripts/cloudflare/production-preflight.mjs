@@ -41,7 +41,7 @@ async function fetchWithTimeout(url, init = {}) {
   });
 }
 
-async function cloudflare(path) {
+async function cloudflareRaw(path) {
   const response = await fetchWithTimeout(`https://api.cloudflare.com/client/v4${path}`, {
     headers: {
       authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
@@ -49,6 +49,11 @@ async function cloudflare(path) {
     },
   });
   const payload = await response.json().catch(() => null);
+  return { response, payload };
+}
+
+async function cloudflare(path) {
+  const { response, payload } = await cloudflareRaw(path);
   if (!response.ok || payload?.success !== true) {
     const codes = Array.isArray(payload?.errors)
       ? payload.errors.map((error) => error?.code).filter(Boolean).join(",")
@@ -56,6 +61,75 @@ async function cloudflare(path) {
     throw new Error(`Cloudflare read failed for ${path}; status=${response.status}; codes=${codes}`);
   }
   return payload.result;
+}
+
+function policyAllows(token, permissionNames, resourceMarkers) {
+  const allowedNames = new Set(permissionNames.map((name) => name.toLowerCase()));
+  return (token?.policies ?? []).some((policy) => {
+    if (policy?.effect !== "allow") return false;
+    const permissionMatch = (policy.permission_groups ?? []).some((permission) =>
+      allowedNames.has(String(permission?.name ?? "").toLowerCase()),
+    );
+    if (!permissionMatch) return false;
+    const resources = JSON.stringify(policy.resources ?? {});
+    return resourceMarkers.some((marker) => resources.includes(marker));
+  });
+}
+
+async function inspectCloudflareTokenPermissions(zone) {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const candidates = [
+    {
+      kind: "ACCOUNT_OWNED",
+      verifyPath: `/accounts/${accountId}/tokens/verify`,
+      detailPath: (id) => `/accounts/${accountId}/tokens/${id}`,
+    },
+    {
+      kind: "USER",
+      verifyPath: "/user/tokens/verify",
+      detailPath: (id) => `/user/tokens/${id}`,
+    },
+  ];
+
+  for (const candidate of candidates) {
+    const verified = await cloudflareRaw(candidate.verifyPath);
+    if (!verified.response.ok || verified.payload?.success !== true) continue;
+    const tokenId = verified.payload?.result?.id;
+    const status = verified.payload?.result?.status;
+    if (!tokenId || status !== "active") {
+      throw new Error(`CLOUDFLARE_TOKEN=${candidate.kind}_NOT_ACTIVE`);
+    }
+    console.log(`CLOUDFLARE_TOKEN=${candidate.kind}_ACTIVE`);
+
+    const details = await cloudflareRaw(candidate.detailPath(tokenId));
+    if (!details.response.ok || details.payload?.success !== true) {
+      console.log("CLOUDFLARE_TOKEN_PERMISSION_INTROSPECTION=UNAVAILABLE_MANUAL_CONFIRMATION_REQUIRED");
+      return;
+    }
+
+    const token = details.payload.result;
+    const dnsWrite = policyAllows(
+      token,
+      ["DNS Write", "DNS Edit"],
+      [zone.id, "com.cloudflare.api.account.zone.*", "\"*\""],
+    );
+    const workersScriptsWrite = policyAllows(
+      token,
+      ["Workers Scripts Write", "Workers Scripts Edit"],
+      [accountId, "com.cloudflare.api.account.*", "\"*\""],
+    );
+
+    if (!dnsWrite) throw new Error("CLOUDFLARE_TOKEN_PERMISSION=DNS_WRITE_MISSING_OR_OUT_OF_SCOPE");
+    if (!workersScriptsWrite) {
+      throw new Error("CLOUDFLARE_TOKEN_PERMISSION=WORKERS_SCRIPTS_WRITE_MISSING_OR_OUT_OF_SCOPE");
+    }
+    console.log("CLOUDFLARE_TOKEN_PERMISSION=DNS_WRITE_CONFIRMED");
+    console.log("CLOUDFLARE_TOKEN_PERMISSION=WORKERS_SCRIPTS_WRITE_CONFIRMED");
+    console.log("CLOUDFLARE_TOKEN_PERMISSION_INTROSPECTION=GREEN");
+    return;
+  }
+
+  throw new Error("CLOUDFLARE_TOKEN=VERIFY_FAILED");
 }
 
 async function validateSupabaseKey(key, path) {
@@ -83,6 +157,8 @@ if (zone.account?.id !== process.env.CLOUDFLARE_ACCOUNT_ID) {
   throw new Error("CLOUDFLARE_ZONE=ACCOUNT_MISMATCH");
 }
 console.log("CLOUDFLARE_ZONE=ACTIVE_ACCOUNT_MATCH");
+
+await inspectCloudflareTokenPermissions(zone);
 
 const apexRecords = await cloudflare(
   `/zones/${zone.id}/dns_records?name=${encodeURIComponent(zoneName)}&per_page=100`,
