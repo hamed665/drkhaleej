@@ -166,6 +166,56 @@ async function listDomains() {
   return Array.isArray(domains) ? domains : [];
 }
 
+async function listWorkerDeployments() {
+  const result = await cf(
+    "GET",
+    `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${encodeURIComponent(workerName)}/deployments`,
+  );
+  if (Array.isArray(result)) return result;
+  if (Array.isArray(result?.deployments)) return result.deployments;
+  throw new Error("WORKER_DEPLOYMENTS=UNEXPECTED_RESPONSE_SHAPE");
+}
+
+async function getActiveSingleVersionId() {
+  let last = "missing";
+  for (let attempt = 1; attempt <= 10; attempt += 1) {
+    const deployments = await listWorkerDeployments();
+    const active = deployments[0];
+    const versions = Array.isArray(active?.versions) ? active.versions : [];
+    if (versions.length === 1) {
+      const versionId = versions[0]?.version_id;
+      const percentage = Number(versions[0]?.percentage);
+      if (typeof versionId === "string" && versionId && percentage === 100) {
+        console.log(`WORKER_ACTIVE_SINGLE_VERSION=CAPTURED_ATTEMPT_${attempt}`);
+        return versionId;
+      }
+    }
+    last = `deployments_${deployments.length}_versions_${versions.length}`;
+    await sleep(1_000);
+  }
+  throw new Error(`WORKER_ACTIVE_SINGLE_VERSION=NOT_STABLE:${last}`);
+}
+
+async function deploySingleWorkerVersion(versionId, message) {
+  const deployment = await cf(
+    "POST",
+    `/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${encodeURIComponent(workerName)}/deployments`,
+    {
+      strategy: "percentage",
+      versions: [{ percentage: 100, version_id: versionId }],
+      annotations: { "workers/message": message },
+    },
+  );
+  const versions = Array.isArray(deployment?.versions) ? deployment.versions : [];
+  if (
+    versions.length !== 1 ||
+    versions[0]?.version_id !== versionId ||
+    Number(versions[0]?.percentage) !== 100
+  ) {
+    throw new Error("WORKER_VERSION_ROLLBACK=DEPLOYMENT_RESPONSE_MISMATCH");
+  }
+}
+
 async function getWorkersAccountSubdomain() {
   const result = await cf(
     "GET",
@@ -230,25 +280,61 @@ function assertVercelDnsBaseline(apexAll, wwwAll) {
   return { apex, www };
 }
 
+async function inspectVercelResponse(url) {
+  const response = await fetchTimed(url, {
+    redirect: "manual",
+    headers: {
+      accept: "text/html,application/xhtml+xml,*/*;q=0.8",
+      "user-agent": "DrKhaleej-Cloudflare-Cutover/1.0",
+    },
+  });
+  const status = response.status;
+  const headerEvidence =
+    (response.headers.get("server") ?? "").toLowerCase().includes("vercel") ||
+    response.headers.has("x-vercel-id") ||
+    response.headers.has("x-vercel-cache");
+  const deploymentDisabled = status === 402 && headerEvidence;
+  await response.body?.cancel().catch(() => {});
+  return {
+    status,
+    location: response.headers.get("location") ?? "",
+    isVercel: headerEvidence,
+    deploymentDisabled,
+  };
+}
+
+function assertRecognizedVercelResponse(result, marker) {
+  if (!result.isVercel) {
+    throw new Error(`${marker}=ORIGIN_NOT_VERCEL_STATUS_${result.status}`);
+  }
+  if (result.status === 402 && !result.deploymentDisabled) {
+    throw new Error(`${marker}=UNRECOGNIZED_402`);
+  }
+  if (result.status >= 500) {
+    throw new Error(`${marker}=VERCEL_5XX_STATUS_${result.status}`);
+  }
+}
+
 async function assertPublicVercelBaseline() {
-  const www = await fetchTimed(`${canonicalAppUrl}/en/om`, { redirect: "manual" });
-  const wwwIsVercel =
-    (www.headers.get("server") ?? "").toLowerCase().includes("vercel") ||
-    www.headers.has("x-vercel-id");
-  const wwwStatus = www.status;
-  await www.body?.cancel().catch(() => {});
-  if (wwwStatus !== 200 || !wwwIsVercel) {
-    throw new Error(`PUBLIC_BASELINE=WWW_NOT_VERCEL_STATUS_${wwwStatus}`);
+  const www = await inspectVercelResponse(`${canonicalAppUrl}/en/om`);
+  assertRecognizedVercelResponse(www, "PUBLIC_BASELINE_WWW");
+  if (www.status !== 200 && !(www.status === 402 && www.deploymentDisabled)) {
+    throw new Error(`PUBLIC_BASELINE_WWW=UNEXPECTED_VERCEL_STATUS_${www.status}`);
   }
 
-  const apex = await fetchTimed(`https://${apexHost}/`, { redirect: "manual" });
-  const apexStatus = apex.status;
-  const location = apex.headers.get("location") ?? "";
-  await apex.body?.cancel().catch(() => {});
-  if (![301, 302, 307, 308].includes(apexStatus) || !location.startsWith(canonicalAppUrl)) {
-    throw new Error(`PUBLIC_BASELINE=APEX_REDIRECT_DRIFT_STATUS_${apexStatus}`);
+  const apex = await inspectVercelResponse(`https://${apexHost}/`);
+  const apexRedirectOk =
+    [301, 302, 307, 308].includes(apex.status) && apex.location.startsWith(canonicalAppUrl);
+  const apexDisabledOk = apex.status === 402 && apex.deploymentDisabled && apex.isVercel;
+  if (!apexRedirectOk && !apexDisabledOk) {
+    throw new Error(`PUBLIC_BASELINE_APEX=REDIRECT_DRIFT_STATUS_${apex.status}`);
   }
-  console.log("PUBLIC_BASELINE=VERCEL_ORIGIN_AND_APEX_REDIRECT_CONFIRMED");
+
+  const deploymentDisabled = www.deploymentDisabled || apex.deploymentDisabled;
+  console.log(
+    `PUBLIC_BASELINE=VERCEL_ORIGIN_CONFIRMED;WWW_STATUS_${www.status};APEX_STATUS_${apex.status};DEPLOYMENT_${deploymentDisabled ? "DISABLED" : "SERVING"}`,
+  );
+  return { deploymentDisabled };
 }
 
 function snapshotRecord(record) {
@@ -406,26 +492,18 @@ async function waitForProduction() {
   throw new Error(`PRODUCTION_DOMAIN_NOT_READY:${last}`);
 }
 
-async function verifyRollback() {
+async function verifyRollback(zoneId) {
   let last = "unknown";
   for (let attempt = 1; attempt <= 12; attempt += 1) {
     try {
-      const www = await fetchTimed(`${canonicalAppUrl}/en/om`, { redirect: "manual" });
-      const vercel =
-        (www.headers.get("server") ?? "").toLowerCase().includes("vercel") ||
-        www.headers.has("x-vercel-id");
-      last = `www_${www.status}_vercel_${vercel}`;
-      await www.body?.cancel().catch(() => {});
-      if (www.status === 200 && vercel) {
-        const apex = await fetchTimed(`https://${apexHost}/`, { redirect: "manual" });
-        const location = apex.headers.get("location") ?? "";
-        const status = apex.status;
-        await apex.body?.cancel().catch(() => {});
-        if ([301, 302, 307, 308].includes(status) && location.startsWith(canonicalAppUrl)) {
-          console.log(`ROLLBACK_VERIFY=VERCEL_RESTORED_ATTEMPT_${attempt}`);
-          return;
-        }
-      }
+      const apexRecords = await listDns(zoneId, apexHost);
+      const wwwRecords = await listDns(zoneId, canonicalHost);
+      assertVercelDnsBaseline(apexRecords, wwwRecords);
+      const publicBaseline = await assertPublicVercelBaseline();
+      console.log(
+        `ROLLBACK_VERIFY=VERCEL_ORIGIN_RESTORED_ATTEMPT_${attempt};DEPLOYMENT_${publicBaseline.deploymentDisabled ? "DISABLED" : "SERVING"}`,
+      );
+      return publicBaseline;
     } catch (error) {
       last = sanitize(error?.message ?? error);
     }
@@ -454,6 +532,16 @@ await observeTailAndLoad({
 });
 assertNoTargetDomains(await listDomains(), "POST_STAGE");
 console.log("POST_STAGE_TARGET_CUSTOM_DOMAINS=ABSENT");
+
+const stageApexRecords = await listDns(zone.id, apexHost);
+const stageWwwRecords = await listDns(zone.id, canonicalHost);
+assertVercelDnsBaseline(stageApexRecords, stageWwwRecords);
+const stagePublicBaseline = await assertPublicVercelBaseline();
+console.log(
+  `STAGE_READ_ONLY_VERCEL_BASELINE=GREEN;DEPLOYMENT_${stagePublicBaseline.deploymentDisabled ? "DISABLED" : "SERVING"}`,
+);
+const stageRollbackVersionId = await getActiveSingleVersionId();
+console.log("CLOUDFLARE_STAGE_ROLLBACK_VERSION=CAPTURED");
 
 if (mode === "stage") {
   console.log("CLOUDFLARE_PRODUCTION_STAGE=GREEN");
@@ -507,19 +595,62 @@ try {
 } catch (error) {
   console.error(`CUTOVER_FAILURE=${sanitize(error?.message ?? error)}`);
   if (mutationStarted) {
-    console.error("ROLLBACK=STARTING");
+    console.error("ROLLBACK_CLOUDFLARE_STAGE=STARTING");
+    let cloudflareStageRollbackGreen = false;
+    try {
+      await deploySingleWorkerVersion(
+        stageRollbackVersionId,
+        "Automatic rollback to last verified DrKhaleej pre-cutover stage",
+      );
+      const domains = await listDomains();
+      for (const hostname of [canonicalHost, apexHost]) {
+        if (!domains.some((domain) => domain.hostname === hostname && domain.service === workerName)) {
+          throw new Error(`ROLLBACK_CLOUDFLARE_STAGE=DOMAIN_NOT_ATTACHED_${hostname}`);
+        }
+      }
+      await waitForProduction();
+      await runRuntimeSmoke(canonicalAppUrl, stage.actionId);
+      await observeTailAndLoad({
+        baseUrl: canonicalAppUrl,
+        workerName,
+        configPath: stage.configPath,
+        env: childEnv,
+        sanitize,
+      });
+      cloudflareStageRollbackGreen = true;
+      console.error("ROLLBACK_CLOUDFLARE_STAGE=GREEN;INDEXING_DISABLED");
+    } catch (cloudflareRollbackError) {
+      console.error(
+        `ROLLBACK_CLOUDFLARE_STAGE_FAILURE=${sanitize(cloudflareRollbackError?.message ?? cloudflareRollbackError)}`,
+      );
+    }
+
+    if (cloudflareStageRollbackGreen) {
+      console.error("ROLLBACK=GREEN_CLOUDFLARE_STAGE");
+      throw error;
+    }
+
+    console.error("ROLLBACK_VERCEL_FALLBACK=STARTING");
     try {
       await detachOurDomains();
       console.error("ROLLBACK_CUSTOM_DOMAINS=DETACHED");
       await restoreSnapshot(zone.id, snapshot);
       console.error("ROLLBACK_DNS=WEB_SNAPSHOT_RESTORED_NON_WEB_PRESERVED");
-      await verifyRollback();
-      console.error("ROLLBACK=GREEN");
+      const publicBaseline = await verifyRollback(zone.id);
+      console.error(
+        `ROLLBACK_VERCEL_DNS=RESTORED;DEPLOYMENT_${publicBaseline.deploymentDisabled ? "DISABLED" : "SERVING"}`,
+      );
+      if (publicBaseline.deploymentDisabled) {
+        console.error("ROLLBACK_VERCEL_SERVICE=DEGRADED_402");
+      } else {
+        console.error("ROLLBACK_VERCEL_SERVICE=SERVING");
+      }
+      console.error("ROLLBACK=GREEN_VERCEL_FALLBACK");
     } catch (rollbackError) {
       console.error(`ROLLBACK_FAILURE=${sanitize(rollbackError?.message ?? rollbackError)}`);
       throw new AggregateError(
         [error, rollbackError],
-        "Cutover failed and rollback verification also failed",
+        "Cutover failed and both Cloudflare-stage and Vercel-DNS rollback paths failed",
       );
     }
   }
