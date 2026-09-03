@@ -1,5 +1,6 @@
 import { spawn, spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const REQUIRED = [
   "CLOUDFLARE_API_TOKEN",
@@ -35,6 +36,18 @@ const childEnv = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.PREVIEW_SUPABASE_ANON_KEY,
   DRMUSCAT_PUBLIC_FAQ_CMS_ENABLED: "false",
 };
+
+for (const forbidden of [
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "PRODUCTION_SUPABASE_SERVICE_ROLE_KEY",
+  "DATABASE_URL",
+  "SUPABASE_DB_URL",
+  "PRODUCTION_DATABASE_URL",
+  "IMPORT_PREVIEW_APPROVAL_TOKEN",
+  "IMPORT_PREVIEW_EXPECTED_APPROVAL_TOKEN",
+]) {
+  delete childEnv[forbidden];
+}
 
 function sanitize(text) {
   let result = String(text ?? "");
@@ -78,10 +91,37 @@ function run(command, args, options = {}) {
   return `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
 }
 
+function readBuiltJavaScript(directory) {
+  let output = "";
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) output += readBuiltJavaScript(path);
+    else if (entry.name.endsWith(".js")) output += readFileSync(path, "utf8");
+  }
+  return output;
+}
+
+function findActionId(source, exportName) {
+  const escapedExportName = exportName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    "[\"'`]([0-9a-f]{12})[\"'`]\\s*,\\s*[\"'`]" + escapedExportName + "[\"'`]",
+  );
+  const match = source.match(pattern);
+  if (!match) throw new Error(`Missing built action id for ${exportName}`);
+  return `${match[1]}#${exportName}`;
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 console.log("Building Vinext candidate with Preview public environment only...");
 run("pnpm", ["build:vinext"]);
+
+const builtSource = readBuiltJavaScript("dist/server");
+const safeAuthActionId = findActionId(
+  builtSource,
+  "verifyCloudflareServerActionRuntimeBoundary",
+);
+console.log("server_action_probe_id=DISCOVERED_NON_MUTATING");
 
 const generatedPath = "dist/server/wrangler.json";
 const candidatePath = "dist/server/wrangler.candidate.json";
@@ -254,7 +294,29 @@ if ((hospitalApi.response.headers.get("cache-control") ?? "").toLowerCase() !== 
   throw new Error("Pages API hospital 404 cache contract drift detected");
 }
 
-console.log("server_action_runtime_qa=SKIPPED_NO_SAFE_NON_MUTATING_INVOCATION_SELECTED");
+const actionResponse = await fetch(`${baseUrl}/admin/center-subscriptions`, {
+  method: "POST",
+  redirect: "manual",
+  signal: AbortSignal.timeout(20_000),
+  headers: {
+    accept: "text/x-component",
+    "content-type": "text/plain;charset=UTF-8",
+    "next-action": safeAuthActionId,
+    origin: baseUrl,
+  },
+  body: "[]",
+});
+const actionBody = await actionResponse.text();
+console.log(`server_action_unauthenticated: HTTP ${actionResponse.status}`);
+if (actionResponse.headers.get("x-nextjs-action-not-found") === "1") {
+  throw new Error("Non-mutating Server Action probe was not recognized by the deployed Vinext runtime");
+}
+if (actionResponse.status !== 303 || actionResponse.headers.get("x-action-redirect") !== "/admin/login") {
+  console.error(`server_action_redirect=${actionResponse.headers.get("x-action-redirect") ?? "<none>"}`);
+  console.error(`server_action_body=${boundedTail(actionBody, 2_000)}`);
+  throw new Error("Non-mutating Server Action auth/session gate did not redirect unauthenticated execution to /admin/login");
+}
+console.log("server_action_unauthenticated: non-mutating action recognized and blocked by admin auth gate");
 
 const expectedSeo = {
   public_en: {
