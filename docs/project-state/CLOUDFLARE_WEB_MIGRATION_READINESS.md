@@ -25,6 +25,23 @@ Status: PR A readiness only. No Production DNS cutover. No Agent Production acti
 
 The generated Vinext CDN adapter descriptor is normalized so its optional `options` field is materialized as an object under this repository's strict `exactOptionalPropertyTypes` TypeScript configuration. TypeScript strictness is not weakened and the Cloudflare CDN adapter remains enabled.
 
+### Unauthenticated temporary Cloudflare deployment probe
+
+A temporary Wrangler deployment probe was executed without using the user's Cloudflare account, Production domain, DNS route, Supabase credential or Production secret. The first workflow attempt failed before deployment because `actions/setup-node` requested pnpm caching before Corepack made pnpm available; the toolchain ordering was corrected and the second attempt reached Cloudflare.
+
+The corrected probe established the following deployment-path evidence:
+
+- Dependency installation completed successfully with the locked pnpm version.
+- The full Vinext Worker build completed successfully, including App Router, Pages API and Server Action/server-reference compilation.
+- Wrangler accepted the generated Worker configuration and uploaded **66 static assets** successfully.
+- Wrangler reported Worker upload size of **4351.43 KiB raw / 1063.82 KiB gzip**.
+- Cloudflare then rejected Worker script validation with code `10027` solely because Wrangler `--temporary` uses a temporary free account capped at **1 MiB** Worker size.
+- The returned Cloudflare error explicitly states that a paid Workers plan accepts Workers up to **10 MiB**, so the measured bundle is above the temporary/free limit but below the paid-plan limit targeted by this migration.
+- No Worker runtime request was executed because validation stopped deployment before a temporary `workers.dev` runtime became available.
+- The temporary claim URL, temporary account identity and any token-like values were intentionally suppressed from logs/evidence.
+
+This probe is useful upload/validation evidence, but it is **not** a substitute for the paid-account candidate gate. Actual runtime compatibility, safe Server Action execution, auth/session behavior and cache/header parity still require deployment to the existing paid Cloudflare account with the bounded Preview environment described below.
+
 ## HTTP handler inventory
 
 Exact HTTP handler count at the baseline main is five.
