@@ -172,6 +172,30 @@ async function request(label, path, init = {}, allowedStatuses = null) {
   return { response, text };
 }
 
+function htmlAttribute(html, rel, attribute) {
+  const tags = html.match(/<link\b[^>]*>/gi) ?? [];
+  for (const tag of tags) {
+    const relValue = tag.match(/\brel=["']([^"']+)["']/i)?.[1];
+    if (relValue?.split(/\s+/).includes(rel)) {
+      const value = tag.match(new RegExp(`\\b${attribute}=["']([^"']+)["']`, "i"))?.[1];
+      if (value) return value;
+    }
+  }
+  return null;
+}
+
+function alternateLinks(html) {
+  const links = [];
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
+    const rel = tag.match(/\brel=["']([^"']+)["']/i)?.[1] ?? "";
+    if (!rel.split(/\s+/).includes("alternate")) continue;
+    const hreflang = tag.match(/\bhreflang=["']([^"']+)["']/i)?.[1];
+    const href = tag.match(/\bhref=["']([^"']+)["']/i)?.[1];
+    if (hreflang && href) links.push({ hreflang, href });
+  }
+  return links;
+}
+
 console.log("Running non-mutating candidate smoke...");
 
 await request("root", "/", {}, [301, 302, 307, 308]);
@@ -179,7 +203,8 @@ const en = await request("public_en", "/en/om", {}, [200]);
 const ar = await request("public_ar", "/ar/om", {}, [200]);
 await request("admin_login", "/admin/login", {}, [200]);
 await request("auth_callback_no_code", "/auth/callback?next=%2Fadmin", {}, [301, 302, 303, 307, 308]);
-await request("robots", "/robots.txt", {}, [200]);
+const robots = await request("robots", "/robots.txt", {}, [200]);
+const sitemap = await request("sitemap", "/sitemap.xml", {}, [200]);
 
 const automation = await request(
   "automation_fail_closed",
@@ -217,16 +242,66 @@ await request(
   [400, 422],
 );
 
+const hospitalApi = await request(
+  "pages_api_hospital_not_found",
+  "/api/_drk/public-hospital-profile/en/om/cloudflare-migration-nonexistent-hospital",
+  {},
+  [404],
+);
+if ((hospitalApi.response.headers.get("cache-control") ?? "").toLowerCase() !== "no-store, private") {
+  throw new Error("Pages API hospital 404 cache contract drift detected");
+}
+
 for (const [label, html] of [
   ["public_en", en.text],
   ["public_ar", ar.text],
 ]) {
-  const canonical = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)?.[1]
-    ?? html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i)?.[1];
+  const canonical = htmlAttribute(html, "canonical", "href");
   if (!canonical || !canonical.startsWith(`${canonicalAppUrl}/`)) {
     throw new Error(`${label} canonical drift detected`);
   }
+  if (html.includes("workers.dev")) {
+    throw new Error(`${label} leaked the candidate hostname into rendered SEO output`);
+  }
   console.log(`${label}: canonical preserved`);
+
+  const alternates = alternateLinks(html);
+  for (const locale of ["en", "ar"]) {
+    const alternate = alternates.find((entry) => entry.hreflang.toLowerCase() === locale);
+    if (!alternate || !alternate.href.startsWith(`${canonicalAppUrl}/${locale}/om`)) {
+      throw new Error(`${label} hreflang ${locale} drift detected`);
+    }
+  }
+  console.log(`${label}: hreflang en/ar preserved`);
+}
+
+for (const required of ["Disallow: /api/", "Disallow: /admin/", `Sitemap: ${canonicalAppUrl}/sitemap.xml`]) {
+  if (!robots.text.includes(required)) {
+    throw new Error(`robots contract missing: ${required}`);
+  }
+}
+if (robots.text.includes("workers.dev")) {
+  throw new Error("robots leaked candidate hostname");
+}
+console.log("robots: admin/api blocks and canonical sitemap preserved");
+
+for (const requiredUrl of [`${canonicalAppUrl}/en/om`, `${canonicalAppUrl}/ar/om`]) {
+  if (!sitemap.text.includes(requiredUrl)) {
+    throw new Error(`sitemap missing required market root ${requiredUrl}`);
+  }
+}
+if (sitemap.text.includes("workers.dev")) {
+  throw new Error("sitemap leaked candidate hostname");
+}
+console.log("sitemap: EN/AR market roots and canonical domain preserved");
+
+const staticAssetPath = en.text.match(/["'](\/_next\/static\/[^"']+\.(?:js|css))["']/i)?.[1];
+if (!staticAssetPath) {
+  throw new Error("could not discover a rendered Next static asset for candidate smoke");
+}
+const staticAsset = await request("static_asset", staticAssetPath, {}, [200]);
+if ((staticAsset.response.headers.get("content-type") ?? "").toLowerCase().includes("text/html")) {
+  throw new Error("static asset unexpectedly returned HTML");
 }
 
 const loadRequests = Array.from({ length: 20 }, () =>
