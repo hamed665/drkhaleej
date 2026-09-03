@@ -132,12 +132,13 @@ async function inspectCloudflareTokenPermissions(zone) {
   throw new Error("CLOUDFLARE_TOKEN=VERIFY_FAILED");
 }
 
-async function validateSupabaseKey(key, path) {
+async function validateSupabaseApiKey(key, path) {
   try {
     const response = await fetchWithTimeout(`${productionSupabaseUrl}${path}`, {
       headers: {
+        // Current publishable/secret keys are opaque API keys rather than JWTs.
+        // Legacy anon/service_role keys are also accepted in the apikey header.
         apikey: key,
-        authorization: `Bearer ${key}`,
         accept: "application/json",
       },
     });
@@ -187,7 +188,9 @@ const publicCandidates = uniqueCandidates([
 ]);
 let validPublic = null;
 for (const candidate of publicCandidates) {
-  if (await validateSupabaseKey(candidate.value, "/rest/v1/")) {
+  // Auth settings is a read-only endpoint intended to accept the project's public API key.
+  // Unlike the PostgREST OpenAPI root, it does not require an elevated/admin key.
+  if (await validateSupabaseApiKey(candidate.value, "/auth/v1/settings")) {
     validPublic = candidate.name;
     break;
   }
@@ -196,6 +199,7 @@ if (!validPublic) {
   throw new Error("PRODUCTION_PUBLIC_SUPABASE_KEY=MISSING_OR_PROJECT_MISMATCH");
 }
 console.log(`PRODUCTION_PUBLIC_SUPABASE_KEY=VALID_FROM_${validPublic}`);
+console.log("PRODUCTION_PUBLIC_SUPABASE_AUTH_SETTINGS=OK_NON_MUTATING");
 
 const serviceCandidates = uniqueCandidates([
   { name: "PRODUCTION_SUPABASE_SERVICE_ROLE_KEY", value: process.env.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY },
@@ -204,7 +208,7 @@ const serviceCandidates = uniqueCandidates([
 let validService = null;
 for (const candidate of serviceCandidates) {
   if (
-    await validateSupabaseKey(
+    await validateSupabaseApiKey(
       candidate.value,
       "/rest/v1/import_publish_queue?select=target_entity_type&limit=1",
     )
