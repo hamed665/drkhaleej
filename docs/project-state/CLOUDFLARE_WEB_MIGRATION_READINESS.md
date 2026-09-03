@@ -27,7 +27,7 @@ The generated Vinext CDN adapter descriptor is normalized so its optional `optio
 
 ## HTTP handler inventory
 
-Exact handler count at the baseline main is five. No `use server` Server Actions are present.
+Exact HTTP handler count at the baseline main is five.
 
 | Route | Router | Method | Auth/session | Side effect | Runtime / compatibility note |
 | --- | --- | --- | --- | --- | --- |
@@ -36,6 +36,21 @@ Exact handler count at the baseline main is five. No `use server` Server Actions
 | `/api/internal/automation` | App | POST | Ed25519 service JWT, replay/fencing contracts | Existing automation control-plane operations | Explicit `runtime = "nodejs"`; 64 KiB bounded streaming body; `Buffer`; `node:crypto` transitively; `nodejs_compat` build-proven but runtime smoke still required |
 | `/auth/callback` | App | GET | Supabase auth code exchange | session establishment | Redirect is request-origin based; no Vercel-specific URL dependency |
 | `/api/_drk/public-hospital-profile/[locale]/[country]/[hospitalSlug]` | Pages | GET | public guard | read-only profile lookup | `no-store, private`; Pages API compatibility included in Vinext build |
+
+## Server Action inventory
+
+The earlier readiness statement that this repository had zero Server Actions was incorrect and is superseded by deterministic source-tree evidence in `docs/project-state/CLOUDFLARE_SERVER_ACTION_INVENTORY.md`.
+
+At source commit `ddb276780dd88072805a0bb03d5bfc1274e231f7`, the scanner inspected 931 JavaScript/TypeScript source files and found:
+
+- **35 files** containing an exact `use server` directive.
+- **33 files** with module-level `use server` as the first executable statement.
+- **2 files** containing inline-only Server Actions.
+- **53 exact `use server` directive lines** in total.
+
+These actions span admin center management, CMS/FAQ, subscriptions, media, provider onboarding and import/readiness workflows. Build success proves that Vinext can compile these modules, but it does **not** establish runtime parity for Server Actions.
+
+Candidate QA therefore must exercise representative **safe** Server Actions through the deployed Worker, including session/auth-bound behavior and a bounded ordinary admin action where an existing test-safe path is available. Destructive, publish, rollback, index-promotion, sitemap-promotion, bulk-import, activation or externally visible actions must not be invoked merely to prove hosting compatibility. Existing authorization and side-effect contracts remain authoritative.
 
 ## Automation boundary
 
@@ -86,11 +101,13 @@ PR A cannot be considered complete from build evidence alone. It still requires:
 
 1. Public pre-cutover DNS/origin/TLS/header/SEO baseline.
 2. Cloudflare candidate Worker deployment in the existing paid account, without Production custom-domain routing.
-3. Present/missing or hash-only environment parity verification.
+3. Present/missing or hash-only environment parity verification and verified Supabase project identity.
 4. EN/AR Oman public smoke.
 5. Admin login/auth callback smoke.
-6. Non-mutating API smoke, including a fail-closed automation check.
-7. Static asset, canonical, robots and sitemap comparison.
-8. Controlled request/load observation and Worker Tail with zero unexplained 5xx.
+6. Non-mutating HTTP-handler smoke, including a fail-closed automation check.
+7. Representative safe Server Action runtime smoke without triggering publish/rollback/index/sitemap/bulk-import/external side effects.
+8. Static asset/image, canonical/hreflang, robots and sitemap comparison.
+9. Cache behavior validation for the Vinext/Cloudflare runtime.
+10. Controlled request/load observation and Worker Tail with zero unexplained 5xx.
 
 No Production DNS mutation is permitted until those gates are green and an executable rollback state has been captured.
