@@ -42,6 +42,7 @@ const canonicalAppUrl = `https://${canonicalHost}`;
 const baselineWwwCname = "99f83eafeb1926bc.vercel-dns-017.com";
 const productionSupabaseUrl = `https://${process.env.PRODUCTION_PROJECT_REF}.supabase.co`;
 const generatedWranglerConfig = "dist/server/wrangler.json";
+const WEB_ROUTING_TYPES = new Set(["A", "AAAA", "CNAME"]);
 
 const secrets = [
   process.env.CLOUDFLARE_API_TOKEN,
@@ -153,6 +154,10 @@ async function listDns(zoneId, hostname) {
   return Array.isArray(records) ? records.filter((record) => record.name === hostname) : [];
 }
 
+function webRoutingRecords(records) {
+  return records.filter((record) => WEB_ROUTING_TYPES.has(record.type));
+}
+
 async function listDomains() {
   const domains = await cf(
     "GET",
@@ -172,16 +177,44 @@ function assertNoTargetDomains(domains, marker) {
   }
 }
 
-function assertVercelBaseline(apex, www) {
-  if (apex.length !== 2 || apex.some((record) => record.type !== "A")) {
-    throw new Error("DNS_BASELINE=APEX_EXPECTED_EXACTLY_TWO_A_RECORDS");
+function assertVercelDnsBaseline(apexAll, wwwAll) {
+  const apex = webRoutingRecords(apexAll);
+  const www = webRoutingRecords(wwwAll);
+  if (apex.length === 0) {
+    throw new Error("DNS_BASELINE=APEX_WEB_ROUTING_RECORD_MISSING");
   }
   if (www.length !== 1 || www[0].type !== "CNAME") {
-    throw new Error("DNS_BASELINE=WWW_EXPECTED_EXACTLY_ONE_CNAME");
+    throw new Error("DNS_BASELINE=WWW_EXPECTED_EXACTLY_ONE_WEB_CNAME");
   }
   if (String(www[0].content ?? "").replace(/\.$/, "") !== baselineWwwCname) {
     throw new Error("DNS_BASELINE=WWW_ORIGIN_DRIFT");
   }
+  const preservedNonWeb = apexAll.length + wwwAll.length - apex.length - www.length;
+  console.log(
+    `DNS_WEB_ROUTING_BASELINE=APEX_${apex.length}_WWW_${www.length};NON_WEB_PRESERVED_${preservedNonWeb}`,
+  );
+  return { apex, www };
+}
+
+async function assertPublicVercelBaseline() {
+  const www = await fetchTimed(`${canonicalAppUrl}/en/om`, { redirect: "manual" });
+  const wwwIsVercel =
+    (www.headers.get("server") ?? "").toLowerCase().includes("vercel") ||
+    www.headers.has("x-vercel-id");
+  const wwwStatus = www.status;
+  await www.body?.cancel().catch(() => {});
+  if (wwwStatus !== 200 || !wwwIsVercel) {
+    throw new Error(`PUBLIC_BASELINE=WWW_NOT_VERCEL_STATUS_${wwwStatus}`);
+  }
+
+  const apex = await fetchTimed(`https://${apexHost}/`, { redirect: "manual" });
+  const apexStatus = apex.status;
+  const location = apex.headers.get("location") ?? "";
+  await apex.body?.cancel().catch(() => {});
+  if (![301, 302, 307, 308].includes(apexStatus) || !location.startsWith(canonicalAppUrl)) {
+    throw new Error(`PUBLIC_BASELINE=APEX_REDIRECT_DRIFT_STATUS_${apexStatus}`);
+  }
+  console.log("PUBLIC_BASELINE=VERCEL_ORIGIN_AND_APEX_REDIRECT_CONFIRMED");
 }
 
 function snapshotRecord(record) {
@@ -208,7 +241,8 @@ async function deleteRecords(zoneId, records) {
 
 async function restoreSnapshot(zoneId, snapshot) {
   for (const hostname of [apexHost, canonicalHost]) {
-    await deleteRecords(zoneId, await listDns(zoneId, hostname));
+    const currentWebRouting = webRoutingRecords(await listDns(zoneId, hostname));
+    await deleteRecords(zoneId, currentWebRouting);
   }
   for (const record of snapshot) {
     await cf("POST", `/zones/${zoneId}/dns_records`, record.body);
@@ -381,17 +415,18 @@ console.log("PRODUCTION_WORKER=INDEXING_ON_WORKERS_DEV_OFF");
 
 const apexRecords = await listDns(zone.id, apexHost);
 const wwwRecords = await listDns(zone.id, canonicalHost);
-assertVercelBaseline(apexRecords, wwwRecords);
-const snapshot = [...apexRecords, ...wwwRecords].map(snapshotRecord);
-console.log(`DNS_SNAPSHOT=CAPTURED_${snapshot.length}_RECORDS`);
+const webBaseline = assertVercelDnsBaseline(apexRecords, wwwRecords);
+await assertPublicVercelBaseline();
+const snapshot = [...webBaseline.apex, ...webBaseline.www].map(snapshotRecord);
+console.log(`DNS_SNAPSHOT=CAPTURED_${snapshot.length}_WEB_ROUTING_RECORDS`);
 assertNoTargetDomains(await listDomains(), "IMMEDIATE_PRE_CUTOVER");
 console.log("IMMEDIATE_PRE_CUTOVER=GREEN");
 
 let mutationStarted = false;
 try {
   mutationStarted = true;
-  await deleteRecords(zone.id, [...apexRecords, ...wwwRecords]);
-  console.log("VERCEL_DNS=REMOVED_AFTER_SNAPSHOT");
+  await deleteRecords(zone.id, [...webBaseline.apex, ...webBaseline.www]);
+  console.log("VERCEL_WEB_DNS=REMOVED_AFTER_SNAPSHOT;NON_WEB_DNS=PRESERVED");
 
   await attachDomain(zone, canonicalHost);
   console.log("CUSTOM_DOMAIN_WWW=ATTACHED");
@@ -425,7 +460,7 @@ try {
       await detachOurDomains();
       console.error("ROLLBACK_CUSTOM_DOMAINS=DETACHED");
       await restoreSnapshot(zone.id, snapshot);
-      console.error("ROLLBACK_DNS=SNAPSHOT_RESTORED");
+      console.error("ROLLBACK_DNS=WEB_SNAPSHOT_RESTORED_NON_WEB_PRESERVED");
       await verifyRollback();
       console.error("ROLLBACK=GREEN");
     } catch (rollbackError) {
