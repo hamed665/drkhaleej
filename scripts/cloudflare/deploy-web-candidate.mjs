@@ -370,7 +370,7 @@ const tail = spawn(
     "--status",
     "error",
     "--sampling-rate",
-    "1",
+    "0.99",
   ],
   { cwd: process.cwd(), env: childEnv, stdio: ["ignore", "pipe", "pipe"] },
 );
