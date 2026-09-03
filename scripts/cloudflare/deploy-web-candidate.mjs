@@ -91,7 +91,6 @@ config.vars = {
   NEXT_PUBLIC_ALLOWED_PUBLIC_COUNTRIES: "om",
   NEXT_PUBLIC_ENABLE_INDEXING: "false",
   NEXT_PUBLIC_SUPABASE_URL: previewSupabaseUrl,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.PREVIEW_SUPABASE_ANON_KEY,
   DRMUSCAT_PUBLIC_FAQ_CMS_ENABLED: "false",
 };
 
@@ -107,6 +106,23 @@ const deployOutput = run("pnpm", [
   "--name",
   candidateName,
 ]);
+
+console.log("Attaching Preview publishable key as a Worker secret binding...");
+run(
+  "pnpm",
+  [
+    "exec",
+    "wrangler",
+    "secret",
+    "put",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "--config",
+    candidatePath,
+    "--name",
+    candidateName,
+  ],
+  { input: `${process.env.PREVIEW_SUPABASE_ANON_KEY}\n` },
+);
 
 const workerUrls = deployOutput.match(/https:\/\/[A-Za-z0-9.-]+\.workers\.dev(?:\/[^\s]*)?/g) ?? [];
 const baseUrl = workerUrls.at(-1)?.replace(/[),.;]+$/, "").replace(/\/$/, "");
