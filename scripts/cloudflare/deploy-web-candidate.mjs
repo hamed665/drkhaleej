@@ -49,6 +49,12 @@ function sanitize(text) {
   return result;
 }
 
+function boundedTail(text, maxChars = 12_000) {
+  const safe = sanitize(text);
+  if (safe.length <= maxChars) return safe;
+  return `[earlier output omitted; showing final ${maxChars} characters]\n${safe.slice(-maxChars)}`;
+}
+
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
@@ -59,8 +65,13 @@ function run(command, args, options = {}) {
   });
 
   if (result.status !== 0) {
-    console.error(sanitize(result.stdout));
-    console.error(sanitize(result.stderr));
+    console.error(`COMMAND_FAILED=${sanitize([command, ...args].join(" "))}`);
+    console.error("STDOUT_TAIL_BEGIN");
+    console.error(boundedTail(result.stdout));
+    console.error("STDOUT_TAIL_END");
+    console.error("STDERR_TAIL_BEGIN");
+    console.error(boundedTail(result.stderr));
+    console.error("STDERR_TAIL_END");
     process.exit(result.status ?? 1);
   }
 
