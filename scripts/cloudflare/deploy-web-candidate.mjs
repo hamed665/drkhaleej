@@ -1,5 +1,6 @@
-import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const REQUIRED = [
   "CLOUDFLARE_API_TOKEN",
@@ -78,8 +79,34 @@ function run(command, args, options = {}) {
   return `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
 }
 
+function readBuiltJavaScript(directory) {
+  let output = "";
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) output += readBuiltJavaScript(path);
+    else if (entry.name.endsWith(".js")) output += readFileSync(path, "utf8");
+  }
+  return output;
+}
+
+function findActionId(source, exportName) {
+  const escapedExportName = exportName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    "[\"'`]([0-9a-f]{12})[\"'`]\\s*,\\s*[\"'`]" + escapedExportName + "[\"'`]",
+  );
+  const match = source.match(pattern);
+  if (!match) throw new Error(`Missing built action id for ${exportName}`);
+  return `${match[1]}#${exportName}`;
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 console.log("Building Vinext candidate with Preview public environment only...");
 run("pnpm", ["build:vinext"]);
+
+const builtSource = readBuiltJavaScript("dist/server");
+const safeAuthActionId = findActionId(builtSource, "initializeBaseSubscriptionPlanCatalog");
+console.log("server_action_probe_id=DISCOVERED");
 
 const generatedPath = "dist/server/wrangler.json";
 const candidatePath = "dist/server/wrangler.candidate.json";
@@ -252,6 +279,30 @@ if ((hospitalApi.response.headers.get("cache-control") ?? "").toLowerCase() !== 
   throw new Error("Pages API hospital 404 cache contract drift detected");
 }
 
+const actionResponse = await fetch(`${baseUrl}/admin/center-subscriptions`, {
+  method: "POST",
+  redirect: "manual",
+  signal: AbortSignal.timeout(20_000),
+  headers: {
+    accept: "text/x-component",
+    "content-type": "text/plain;charset=UTF-8",
+    "next-action": safeAuthActionId,
+    origin: baseUrl,
+  },
+  body: "[]",
+});
+const actionBody = await actionResponse.text();
+console.log(`server_action_unauthenticated: HTTP ${actionResponse.status}`);
+if (actionResponse.headers.get("x-nextjs-action-not-found") === "1") {
+  throw new Error("Server Action probe was not recognized by the deployed Vinext runtime");
+}
+if (actionResponse.status !== 303 || actionResponse.headers.get("x-action-redirect") !== "/admin/login") {
+  console.error(`server_action_redirect=${actionResponse.headers.get("x-action-redirect") ?? "<none>"}`);
+  console.error(`server_action_body=${boundedTail(actionBody, 2_000)}`);
+  throw new Error("Server Action auth/session gate did not redirect unauthenticated execution to /admin/login");
+}
+console.log("server_action_unauthenticated: recognized and blocked before mutation by admin auth gate");
+
 for (const [label, html] of [
   ["public_en", en.text],
   ["public_ar", ar.text],
@@ -304,6 +355,37 @@ if ((staticAsset.response.headers.get("content-type") ?? "").toLowerCase().inclu
   throw new Error("static asset unexpectedly returned HTML");
 }
 
+console.log("Starting Worker Tail error-only observation...");
+const tail = spawn(
+  "pnpm",
+  [
+    "exec",
+    "wrangler",
+    "tail",
+    candidateName,
+    "--config",
+    candidatePath,
+    "--format",
+    "json",
+    "--status",
+    "error",
+    "--sampling-rate",
+    "1",
+  ],
+  { cwd: process.cwd(), env: childEnv, stdio: ["ignore", "pipe", "pipe"] },
+);
+let tailStdout = "";
+let tailStderr = "";
+tail.stdout.setEncoding("utf8");
+tail.stderr.setEncoding("utf8");
+tail.stdout.on("data", (chunk) => { tailStdout = (tailStdout + chunk).slice(-100_000); });
+tail.stderr.on("data", (chunk) => { tailStderr = (tailStderr + chunk).slice(-50_000); });
+
+await sleep(2_500);
+if (tail.exitCode !== null) {
+  throw new Error(`Worker Tail exited before observation: ${boundedTail(tailStderr, 4_000)}`);
+}
+
 const loadRequests = Array.from({ length: 20 }, () =>
   fetch(`${baseUrl}/en/om`, { signal: AbortSignal.timeout(20_000) })
     .then((response) => response.status),
@@ -311,9 +393,27 @@ const loadRequests = Array.from({ length: 20 }, () =>
 const loadStatuses = await Promise.all(loadRequests);
 const load5xx = loadStatuses.filter((status) => status >= 500);
 if (load5xx.length) {
+  tail.kill("SIGINT");
   throw new Error(`controlled load produced ${load5xx.length} 5xx responses`);
 }
+await sleep(2_000);
+tail.kill("SIGINT");
+await Promise.race([
+  new Promise((resolve) => tail.once("close", resolve)),
+  sleep(3_000),
+]);
+
+const tailEvents = tailStdout
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter((line) => line.startsWith("{") && line.endsWith("}"));
+if (tailEvents.length > 0) {
+  console.error(`TAIL_ERROR_EVENTS=${tailEvents.length}`);
+  console.error(boundedTail(tailStdout, 8_000));
+  throw new Error("Worker Tail observed invocation errors during controlled load");
+}
 console.log(`controlled_load: ${loadStatuses.length} requests, zero 5xx`);
+console.log("worker_tail: error-only observation recorded zero invocation errors");
 
 console.log("CANDIDATE_GATE=GREEN");
 console.log("No Production DNS, custom-domain route, service-role key, automation Production authority, publish, rollback, index or sitemap authority was enabled by this runner.");
