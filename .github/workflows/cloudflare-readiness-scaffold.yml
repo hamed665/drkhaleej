@@ -1,0 +1,87 @@
+name: Cloudflare Readiness Scaffold
+
+on:
+  push:
+    branches:
+      - infra/cloudflare-web-readiness
+
+permissions:
+  contents: write
+
+jobs:
+  scaffold-and-validate:
+    if: ${{ !contains(github.event.head_commit.message, '[cloudflare-scaffold]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: infra/cloudflare-web-readiness
+          fetch-depth: 0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Prepare pnpm 10.22.0
+        run: corepack prepare pnpm@10.22.0 --activate
+
+      - name: Install current repository dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Vinext compatibility report
+        run: pnpm dlx vinext@1.0.0-beta.8 check
+
+      - name: Regenerate official Cloudflare Vinext scaffold
+        shell: bash
+        run: |
+          rm -f wrangler.jsonc vite.config.ts
+          pnpm dlx vinext@1.0.0-beta.8 init \
+            --skip-check \
+            --platform=cloudflare \
+            --data-cache=none \
+            --cdn-cache=workers-cache \
+            --image-optimization=none \
+            --no-prerender
+
+      - name: Existing validation gates
+        shell: bash
+        run: |
+          set -euxo pipefail
+          pnpm lint
+          pnpm typecheck
+          pnpm test:unit
+          pnpm build
+          pnpm routes:check
+          pnpm env:check
+          pnpm db:validate:migrations
+          pnpm db:validate:seeds
+          pnpm geo:validate:iran-import
+          pnpm geo:check:oman
+          pnpm seo:market-gate
+          pnpm test:db:rls
+          pnpm test:db:seed
+          pnpm seo:check
+
+      - name: Cloudflare Vinext build gate
+        run: pnpm build:vinext
+
+      - name: Diff safety
+        run: git diff --check
+
+      - name: Commit generated readiness scaffold
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json pnpm-lock.yaml vite.config.ts wrangler.jsonc .gitignore
+          if git diff --cached --quiet; then
+            echo "No scaffold changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(cloudflare): add official Vinext scaffold [cloudflare-scaffold]"
+          git push origin HEAD:infra/cloudflare-web-readiness
