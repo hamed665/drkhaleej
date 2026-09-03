@@ -15,17 +15,13 @@ The workflow:
 - uses DrKhaleej Preview Supabase only;
 - invokes `scripts/cloudflare/deploy-web-candidate.mjs`, which performs non-mutating smoke and fails on any 5xx or canonical drift.
 
-## File to create manually
+## Single manual bridge
 
-Create exactly:
+In GitHub, switch to branch `infra/cloudflare-web-readiness`, create exactly:
 
 `.github/workflows/cloudflare-web-candidate.yml`
 
-on branch:
-
-`infra/cloudflare-web-readiness`
-
-with this content:
+Paste the workflow below and commit it directly to **that branch**, not `main`. The push itself triggers the candidate run, so no separate Actions button is required.
 
 ```yaml
 name: Cloudflare Web Candidate
@@ -72,8 +68,6 @@ jobs:
       - name: Deploy and smoke isolated Cloudflare candidate
         run: node scripts/cloudflare/deploy-web-candidate.mjs
 ```
-
-Commit directly to the existing migration branch, not `main`.
 
 ## Expected result
 
