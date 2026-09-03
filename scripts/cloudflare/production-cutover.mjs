@@ -243,17 +243,12 @@ async function inspectVercelResponse(url) {
     (response.headers.get("server") ?? "").toLowerCase().includes("vercel") ||
     response.headers.has("x-vercel-id") ||
     response.headers.has("x-vercel-cache");
-  let deploymentDisabled = false;
-  if (status === 402) {
-    const body = (await response.text().catch(() => "")).slice(0, 16_384);
-    deploymentDisabled = /DEPLOYMENT_DISABLED/i.test(body);
-  } else {
-    await response.body?.cancel().catch(() => {});
-  }
+  const deploymentDisabled = status === 402 && headerEvidence;
+  await response.body?.cancel().catch(() => {});
   return {
     status,
     location: response.headers.get("location") ?? "",
-    isVercel: headerEvidence || deploymentDisabled,
+    isVercel: headerEvidence,
     deploymentDisabled,
   };
 }
