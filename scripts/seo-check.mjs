@@ -124,15 +124,19 @@ if (!sitemapSource.includes('sitemapMarketCountries.flatMap') || !sitemapSource.
 }
 
 for (const route of approvedDiscoveryRoutes) {
-  if (!sitemapSource.includes(route)) {
-    throw new Error(`src/app/sitemap.ts must include approved public skeleton route: ${route}.`);
+  if (!pageRegistrySource.includes(`pathname: '${route}'`)) {
+    throw new Error(`src/lib/seo/page-registry.ts must include approved public skeleton route: ${route}.`);
   }
 }
 
 for (const route of approvedProviderRoutes) {
-  if (!sitemapSource.includes(route)) {
-    throw new Error(`src/app/sitemap.ts must include approved provider route: ${route}.`);
+  if (!pageRegistrySource.includes(`pathname: '${route}'`)) {
+    throw new Error(`src/lib/seo/page-registry.ts must include approved provider route: ${route}.`);
   }
+}
+
+if (!sitemapSource.includes('listSitemapEligibleSeoPageDefinitions')) {
+  throw new Error('src/app/sitemap.ts must source static routes from the gated SEO page registry.');
 }
 
 for (const blockedCountry of ['ae', 'qa', 'bh', 'kw', 'sa', 'iq', 'sy', 'jo', 'lb', 'ps', 'eg', 'ye', 'ma', 'dz', 'tn', 'ly', 'sd', 'mr', 'ir']) {
