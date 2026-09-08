@@ -24,10 +24,20 @@ const registry = read(registryPath);
 for (const token of [
   'listSitemapEligibleSeoPageDefinitions',
   'siteConfig.baseUrl',
-  'new URL(page.pathname, siteConfig.baseUrl)',
-  'return [...staticEntries, ...importedEntries]',
+  'localizedAlternates',
+  '"en-OM"',
+  '"ar-OM"',
+  '"x-default"',
+  'eligiblePathnames',
+  'uniqueEntries',
+  'return [...uniqueEntries.values()]',
+  'entry.lastModified === undefined',
 ]) {
   mustHave(sitemap, token, sitemapPath);
+}
+
+if (/const\s+lastModified\s*=\s*new\s+Date\(\)/.test(sitemap)) {
+  throw new Error(`${sitemapPath} must not fabricate a current lastmod for static pages`);
 }
 
 for (const token of [
