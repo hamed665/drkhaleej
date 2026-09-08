@@ -166,7 +166,8 @@ for (const routePath of [
 assertFileIncludes('src/app/sitemap.ts', [
   'listSitemapEligibleSeoPageDefinitions',
   'listPublicImportSitemapEntries',
-  'return [...staticEntries, ...importedEntries]',
+  'const candidates = [...staticEntries, ...importedEntries]',
+  'return [...uniqueEntries.values()]',
 ]);
 assertFileNotIncludes('src/app/sitemap.ts', [
   'getPublicDoctorBySlug',
