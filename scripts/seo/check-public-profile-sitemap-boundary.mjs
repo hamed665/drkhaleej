@@ -32,7 +32,8 @@ for (const token of [
   'listSitemapEligibleSeoPageDefinitions',
   'listPublicImportSitemapEntries',
   'const importEntries = await listPublicImportSitemapEntries()',
-  'return [...staticEntries, ...importedEntries]',
+  'const candidates = [...staticEntries, ...importedEntries]',
+  'return [...uniqueEntries.values()]',
 ]) {
   assertIncludes(sitemap, token, sitemapPath);
 }
