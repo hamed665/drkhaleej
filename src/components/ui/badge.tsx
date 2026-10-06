@@ -1,6 +1,15 @@
 import type { HTMLAttributes } from 'react';
 
-type BadgeVariant = 'default' | 'trust' | 'verified' | 'featured' | 'medical' | 'pharmacy' | 'laboratory';
+type BadgeVariant =
+  | 'default'
+  | 'neutral'
+  | 'trust'
+  | 'verified'
+  | 'featured'
+  | 'premium'
+  | 'medical'
+  | 'pharmacy'
+  | 'laboratory';
 
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
   variant?: BadgeVariant;

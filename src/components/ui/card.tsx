@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-type CardVariant = 'default' | 'glass' | 'elevated';
+type CardVariant = 'default' | 'glass' | 'elevated' | 'interactive' | 'featured' | 'editorial' | 'compact';
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
   variant?: CardVariant;
