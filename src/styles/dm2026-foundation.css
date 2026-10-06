@@ -1,18 +1,19 @@
-/* DrMuscat 2026 premium visual foundation.
-   Opt-in only: tokens use --dm-* aliases and primitives use dm2026-* classes. */
+/* Canonical public premium foundation.
+   Existing dm2026-* class names remain stable for route/component compatibility; this file is the single shared visual authority. */
 
 :root {
   --dm-color-bg: var(--dm-bg, #f7faf9);
   --dm-color-bg-soft: var(--dm-bg-soft, #eff6f4);
   --dm-color-surface: var(--dm-surface, #ffffff);
-  --dm-color-surface-glass: var(--dm-surface-glass, rgba(255, 255, 255, 0.78));
+  --dm-color-surface-muted: var(--dm-surface-muted, #f3f7f5);
+  --dm-color-surface-glass: var(--dm-surface-glass, rgba(255, 255, 255, 0.9));
   --dm-color-text: var(--dm-text, #0f1a1c);
-  --dm-color-text-muted: var(--dm-text-muted, #7d8a89);
+  --dm-color-text-muted: var(--dm-text-muted, #5c6b6b);
   --dm-color-brand: var(--dm-brand, #0e6e64);
   --dm-color-brand-strong: var(--dm-brand-strong, #0b4f4a);
   --dm-color-accent-gold: var(--dm-accent-gold, #c9a24b);
   --dm-color-border: var(--dm-border, #e2e9e7);
-  --dm-shadow-glass: 0 18px 48px rgba(11, 40, 38, 0.1), 0 1px 0 rgba(255, 255, 255, 0.82) inset;
+  --dm-shadow-glass: 0 14px 36px rgba(7, 48, 44, 0.08), 0 1px 0 rgba(255, 255, 255, 0.86) inset;
   --dm2026-safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -20,9 +21,8 @@
   min-block-size: 100%;
   overflow-x: clip;
   background:
-    radial-gradient(760px circle at 12% 0%, rgba(42, 161, 146, 0.14), transparent 46%),
-    radial-gradient(620px circle at 92% 8%, rgba(201, 162, 75, 0.09), transparent 44%),
-    linear-gradient(180deg, var(--dm-bg-warm, #fbfbf8) 0%, var(--dm-color-bg) 58%, var(--dm-color-bg-soft) 100%);
+    radial-gradient(680px circle at 12% 0%, rgba(142, 206, 194, 0.12), transparent 48%),
+    linear-gradient(180deg, var(--dm-bg-warm, #fcfbf7) 0%, var(--dm-color-bg) 60%, var(--dm-color-bg-soft) 100%);
   color: var(--dm-color-text);
 }
 
@@ -50,6 +50,11 @@
 .dm2026-card,
 .dm2026-card-soft,
 .dm2026-card-glass,
+.dm2026-card-elevated,
+.dm2026-card-interactive,
+.dm2026-card-featured,
+.dm2026-card-editorial,
+.dm2026-card-compact,
 .dm2026-glass,
 .dm2026-search-surface {
   border: 1px solid var(--dm-color-border);
@@ -58,12 +63,12 @@
 
 .dm2026-card {
   background: var(--dm-color-surface);
-  box-shadow: var(--dm-shadow-sm);
+  box-shadow: var(--dm-shadow-xs);
 }
 
 .dm2026-card-soft {
-  background: linear-gradient(180deg, var(--dm-color-surface) 0%, rgba(239, 246, 244, 0.72) 100%);
-  box-shadow: var(--dm-shadow-md);
+  background: var(--dm-color-surface-muted);
+  box-shadow: var(--dm-shadow-sm);
 }
 
 .dm2026-card-glass,
@@ -72,13 +77,39 @@
   box-shadow: var(--dm-shadow-glass);
 }
 
-@supports ((backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px))) {
+.dm2026-card-elevated {
+  background: var(--dm-color-surface);
+  box-shadow: var(--dm-shadow-md);
+}
+
+.dm2026-card-interactive {
+  background: var(--dm-color-surface);
+  box-shadow: var(--dm-shadow-xs);
+  transition: transform var(--dm-motion-fast, 160ms) var(--dm-ease, ease), box-shadow var(--dm-motion-fast, 160ms) var(--dm-ease, ease), border-color var(--dm-motion-fast, 160ms) var(--dm-ease, ease);
+}
+
+.dm2026-card-featured {
+  border-color: rgba(156, 115, 39, 0.22);
+  background: var(--dm-color-surface);
+  box-shadow: var(--dm-shadow-md);
+}
+
+.dm2026-card-editorial {
+  border-radius: var(--dm-radius-2xl);
+  background: var(--dm-color-surface);
+}
+
+.dm2026-card-compact {
+  border-radius: var(--dm-radius-lg);
+}
+
+@supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
   .dm2026-card-glass,
   .dm2026-glass,
   .dm2026-search-surface,
   .dm2026-floating-dock {
-    -webkit-backdrop-filter: blur(14px) saturate(120%);
-    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(112%);
+    backdrop-filter: blur(10px) saturate(112%);
   }
 }
 
@@ -118,9 +149,20 @@
 }
 
 .dm2026-button-primary {
-  background: linear-gradient(135deg, var(--dm-color-brand) 0%, var(--dm-color-brand-strong) 100%);
+  background: var(--dm-color-brand-strong);
   color: #ffffff;
-  box-shadow: 0 12px 28px rgba(14, 110, 100, 0.22);
+  box-shadow: 0 12px 26px rgba(11, 79, 74, 0.16);
+}
+
+.dm2026-button-primary:hover {
+  background: var(--dm-teal-900, #0a3d39);
+}
+
+.dm2026-button-accent {
+  background: var(--dm-gold-100, #f6efdd);
+  color: #6e4d16;
+  border-color: rgba(156, 115, 39, 0.22);
+  box-shadow: var(--dm-shadow-xs);
 }
 
 .dm2026-button-secondary {
@@ -186,6 +228,18 @@
   font-size: var(--dm-type-caption, 0.8125rem);
   font-weight: var(--dm-weight-semibold, 600);
   line-height: 1.25;
+}
+
+.dm2026-badge-neutral {
+  border-color: var(--dm-border);
+  background: var(--dm-color-surface-muted);
+  color: var(--dm-ink-700, #2e3a3b);
+}
+
+.dm2026-badge-premium {
+  border-color: rgba(156, 115, 39, 0.2);
+  background: var(--dm-gold-100, #f6efdd);
+  color: #6e4d16;
 }
 
 .dm2026-search {
@@ -282,15 +336,47 @@
   }
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .dm2026-card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: rgba(14, 110, 100, 0.22);
+    box-shadow: var(--dm-shadow-md);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dm2026-visually-safe-motion,
   .dm2026-button,
   .dm2026-input,
-  .dm2026-select {
+  .dm2026-select,
+  .dm2026-card-interactive {
     transition-duration: 1ms;
   }
 
-  .dm2026-button:hover {
+  .dm2026-button:hover,
+  .dm2026-card-interactive:hover {
     transform: none;
   }
 }
+
+
+.dm2026-media-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--dm-color-border);
+  border-radius: var(--dm-radius-xl);
+  background: var(--dm-color-surface-muted);
+  box-shadow: var(--dm-shadow-xs);
+}
+
+.dm2026-media-frame > :is(img, picture, video) {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.dm2026-media-frame--portrait { aspect-ratio: 4 / 5; }
+.dm2026-media-frame--landscape { aspect-ratio: 16 / 10; }
+.dm2026-media-frame--editorial { aspect-ratio: 16 / 9; }
+
