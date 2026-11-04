@@ -2,7 +2,25 @@
 
 DrMuscat is an SEO-first healthcare discovery and provider visibility platform for Oman, designed to scale later to other GCC countries.
 
-Canonical specification path:
+## Repository guide
+
+**Maintainer:** [Hamed Minaei](https://github.com/hamed665)
+
+DrMuscat combines bilingual public discovery with provider data, geography/taxonomy, protected administration and staged publishing controls. Public locale/country routes are `/:locale/:country`, currently `en`/`ar` and `om`.
+
+| Review area | Entry point |
+| --- | --- |
+| Current implementation and gates | [Current state](docs/project-state/CURRENT_STATE.md) |
+| Public application | [Localized routes](src/app/) |
+| Database change history | [Migrations](supabase/migrations/) |
+| Import and publishing controls | [Import documentation](docs/import/) |
+| Development commands | [Package manifest](package.json) |
+| Contribution rules and required read order | [AGENTS.md](AGENTS.md) |
+
+The status and specification sections below retain the canonical phase boundaries. Schema foundations, planning documents and implemented public capabilities have different activation requirements; use the current-state record to determine the applicable gate.
+
+## Canonical specifications
+
 
 - `docs/master-spec/`
 - `docs/platform/DRMUSCAT_PLATFORM_ARCHITECTURE_V1.md` — documentation-only future platform architecture map.
